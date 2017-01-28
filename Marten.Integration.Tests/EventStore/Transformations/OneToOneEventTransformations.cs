@@ -100,10 +100,11 @@ namespace Marten.Integration.Tests.EventStore.Transformations
 
             transformedEvents.Should().Have.Count.EqualTo(events.Length);
 
-            var transFormedEventId = transformedEvents.Select(ev => ev.TaskId).OrderBy(id => id);
-            var eventIds = events.OfType<TaskCreated>().Select(el => el.TaskId).Concat(events.OfType<TaskUpdated>().Select(el => el.TaskId)).OrderBy(id => id);
+            var transformedEventsIds = transformedEvents.Select(ev => ev.TaskId).OrderBy(id => id);
+            var eventsIds = events.OfType<TaskCreated>().Select(el => el.TaskId)
+                .Concat(events.OfType<TaskUpdated>().Select(el => el.TaskId)).OrderBy(id => id);
 
-            transFormedEventId.Should().Have.SameSequenceAs(eventIds);
+            transformedEventsIds.Should().Have.SameSequenceAs(eventsIds);
         }
     }
 }
