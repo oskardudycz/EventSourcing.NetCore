@@ -6,6 +6,7 @@ Install recent version of the Postgres (eg. from link: https://www.postgresql.or
 
 ##Libraries used
 1. [Marten](https://github.com/JasperFx/marten) - Event Store
+2. [MediatR](https://github.com/jbogard/MediatR) - Event Bus
 
 ##Suggested Order of learning
 1. Marten Event Store
