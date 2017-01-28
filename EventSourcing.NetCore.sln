@@ -7,6 +7,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Domain", "Domain\Domain.xpr
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Domain.Tests", "Domain.Tests\Domain.Tests.xproj", "{E1B97A7B-97C3-4C14-9BE6-ACE0AF45CE61}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Marten.Integration.Tests", "Marten.Integration.Tests\Marten.Integration.Tests.xproj", "{10A477FB-4AF7-4AB5-84BF-FC2AC538B306}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{E1B97A7B-97C3-4C14-9BE6-ACE0AF45CE61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1B97A7B-97C3-4C14-9BE6-ACE0AF45CE61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1B97A7B-97C3-4C14-9BE6-ACE0AF45CE61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10A477FB-4AF7-4AB5-84BF-FC2AC538B306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10A477FB-4AF7-4AB5-84BF-FC2AC538B306}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10A477FB-4AF7-4AB5-84BF-FC2AC538B306}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10A477FB-4AF7-4AB5-84BF-FC2AC538B306}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
