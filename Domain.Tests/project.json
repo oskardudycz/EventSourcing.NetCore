@@ -3,7 +3,10 @@
 
   "dependencies": {
     "Domain": "1.0.0-*",
-    "NETStandard.Library": "1.6.0"
+    "Marten": "1.2.5",
+    "NETStandard.Library": "1.6.0",
+    "SharpTestsEx": "2.0.0",
+    "xunit": "2.2.0-beta5-build3474"
   },
 
   "frameworks": {
