@@ -11,18 +11,23 @@ namespace Marten.Integration.Tests.TestsInfrasructure
 
         protected IEventStore EventStore => Session.Events;
 
-        private readonly string _schemaName = "sch" + Guid.NewGuid().ToString().Replace("-",string.Empty);
+        protected readonly string SchemaName = "sch" + Guid.NewGuid().ToString().Replace("-",string.Empty);
 
         protected MartenTest()
         {
-            Session = DocumentSessionProvider.Get(_schemaName);
+            Session = CreateSession();
+        }
+
+        protected virtual IDocumentSession CreateSession()
+        {
+            return DocumentSessionProvider.Get(SchemaName);
         }
 
         public void Dispose()
         {
             Session?.Dispose();
 
-            var sql = $"DROP SCHEMA {_schemaName} CASCADE;";
+            var sql = $"DROP SCHEMA {SchemaName} CASCADE;";
             using (var conn = new NpgsqlConnection(Settings.ConnectionString))
             {
                 conn.Open();

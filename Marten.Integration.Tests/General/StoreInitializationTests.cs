@@ -37,11 +37,11 @@ namespace Marten.Integration.Tests.General
         {
             var ex = Record.Exception(() =>
             {
-                var store = DocumentStore.For(_ =>
+                var store = DocumentStore.For(options =>
                 {
-                    _.Connection(Settings.ConnectionString);
-                    _.AutoCreateSchemaObjects = AutoCreate.All;
-                    _.Events.DatabaseSchemaName = Settings.SchemaName;
+                    options.Connection(Settings.ConnectionString);
+                    options.AutoCreateSchemaObjects = AutoCreate.All;
+                    options.Events.DatabaseSchemaName = Settings.SchemaName;
                 });
 
                 ConnectionShouldBeEstablished(store);

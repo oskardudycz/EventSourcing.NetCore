@@ -6,11 +6,11 @@ namespace Marten.Integration.Tests.TestsInfrasructure
     {
         public static IDocumentStore Get(string schemaName = null)
         {
-            return DocumentStore.For(_ =>
+            return DocumentStore.For(options =>
             {
-                _.Connection(Settings.ConnectionString);
-                _.AutoCreateSchemaObjects = AutoCreate.All;
-                _.Events.DatabaseSchemaName = schemaName ?? Settings.SchemaName;
+                options.Connection(Settings.ConnectionString);
+                options.AutoCreateSchemaObjects = AutoCreate.All;
+                options.Events.DatabaseSchemaName = schemaName ?? Settings.SchemaName;
             });
         }
     }

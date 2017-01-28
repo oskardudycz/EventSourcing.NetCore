@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Marten.Integration.Tests.TestsInfrasructure;
 using SharpTestsEx;
 using Xunit;
@@ -20,6 +19,11 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
+        }
+
+        private class TaskRemoved
+        {
+            public Guid TaskId { get; set; }
         }
 
         private class Task
@@ -50,9 +54,15 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
                 task.Description = @event.Description;
             }
+
+            public void Apply(TaskRemoved @event)
+            {
+                var task = List.Single(t => t.TaskId == @event.TaskId);
+
+                List.Remove(task);
+            }
         }
-
-
+        
         [Fact]
         public void GivenStreamOfEvents_WhenAggregateStreamIsCalled_ThenChangesAreAppliedProperly()
         {
@@ -90,6 +100,18 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             taskList.List.Select(t => t.Description)
                 .Should()
                 .Have.SameSequenceAs("New Description", "Description2", "Description3");
+
+
+            //4. First task was removed
+            EventStore.Append(streamId, new TaskRemoved { TaskId = task1Id });
+            Session.SaveChanges();
+
+            taskList = EventStore.AggregateStream<TaskList>(streamId);
+
+            taskList.List.Should().Have.Count.EqualTo(2);
+            taskList.List.Select(t => t.Description)
+                .Should()
+                .Have.SameSequenceAs("Description2", "Description3");
         }
     }
 }
