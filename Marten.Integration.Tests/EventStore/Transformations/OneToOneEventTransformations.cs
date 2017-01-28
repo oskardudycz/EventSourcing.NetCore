@@ -123,7 +123,6 @@ namespace Marten.Integration.Tests.EventStore.Transformations
 
             changeLogs.Count(ev => ev.TaskId == task2Id)
                 .Should().Be.EqualTo(events.Count(ev => ev.TaskId == task2Id));
-
         }
     }
 }
