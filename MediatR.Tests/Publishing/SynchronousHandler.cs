@@ -73,7 +73,7 @@ namespace MediatR.Tests.Publishing
         }
 
         [Fact]
-        public async void GivenRegisteredhronousRequestHandler_WhenSendMethodIsBeingCalled_ThenReturnsProperResult()
+        public async void GivenRegisteredhronousRequestHandler_WhenPublishMethodIsBeingCalled_ThenReturnsProperResult()
         {
             //Given
             var @event = new TaskWasAdded("cleaning");

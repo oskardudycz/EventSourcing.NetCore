@@ -39,7 +39,7 @@ namespace MediatR.Tests.Publishing
         }
 
         [Fact]
-        public async void GivenNonRegisteredQueryHandler_WhenPublishMethodIsBeingCalled_ThenThrowsAnError()
+        public async void GivenNonRegisteredQueryHandler_WhenSendMethodIsBeingCalled_ThenThrowsAnError()
         {
             var ex = await Record.ExceptionAsync(async () =>
             {

@@ -72,7 +72,7 @@ namespace MediatR.Tests.Sending
         }
 
         [Fact]
-        public async void GivenRegisteredSynchronousRequestHandler_WhenSendMethodIsBeingCalled_ThenReturnsProperResult()
+        public async void GivenTwoHandlersForOneCommand_WhenSendMethodIsBeingCalled_ThenOnlyFIrstHandlersIsBeingCalled()
         {
             //Given
             var query = new AddTaskCommand("cleaning");
