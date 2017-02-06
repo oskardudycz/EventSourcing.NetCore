@@ -24,12 +24,12 @@ Install recent version of the Postgres DB (eg. from link: https://www.postgresql
 
 2. MediatR - Message Bus (eg. for Commands, Queries, Events)
   * [Initialization](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Initialization/Initialization.cs) - MediatR uses services locator pattern to find proper handler for message type.
-  * Sending Messages - Sending messages finds and uses first registered handler for the message type. It could be used for queries (when we need to return values), commands (when we performing an action).
+  * Sending Messages - finds and uses first registered handler for the message type. It could be used for queries (when we need to return values), commands (when we performing an action).
     * [No Handlers](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/NoHandlers.cs) - when MediatR doesn't find proper handler it throws an exception.
     * [Synchronous Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/SynchronousHandler.cs) - by implementing implementing IRequestHandler we're making decision that this handler should be run one by one with other synchronous handlers.
     * [Aynchronous Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/AsynchronousHandler.cs) - by implementing implementing IAsyncRequestHandler we're making decision that this handler should be run asynchronously with other async handlers (so we don't wait for the previous handler to finish its work).
     * [More Than One Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/MoreThanOneHandler.cs) - when there is more than one handler registered MediatR takes only one ignoring others when Send method is being called.
-  * Publishing Messages - Publishing messages finds and uses all registered handlers for the message type. It's good for processing events.
+  * Publishing Messages - finds and uses all registered handlers for the message type. It's good for processing events.
     * [No Handlers](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/NoHandlers.cs) - when MediatR doesn't find proper handler it throws an exception
     * [Synchronous Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/SynchronousHandler.cs) - by implementing implementing INotificationHandler we're making decision that this handler should be run one by one with other synchronous handlers.
     * [Aynchronous Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/AsynchronousHandler.cs) - by implementing implementing IAsyncNotificationHandler we're making decision that this handler should be run asynchronously with other async handlers (so we don't wait for the previous handler to finish its work)
