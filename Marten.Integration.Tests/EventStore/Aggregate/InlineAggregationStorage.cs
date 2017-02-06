@@ -104,7 +104,6 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
             taskListFromLiveAggregation.List.Count.Should().Be.EqualTo(2);
             taskListFromLiveAggregation.List.Count.Should().Be.EqualTo(taskListFromInlineAggregation.List.Count);
-
         }
     }
 }
