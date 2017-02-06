@@ -38,26 +38,6 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        public class GetTaskNamesQueryHandler : IRequestHandler<GetTaskNamesQuery, List<string>>
-        {
-            private readonly TasksList _taskList;
-            public GetTaskNamesQueryHandler(TasksList tasksList)
-            {
-                _taskList = tasksList;
-            }
-
-            public List<string> Handle(GetTaskNamesQuery query)
-            {
-                return _taskList.Tasks
-                    .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
-                    .ToList();
-            }
-        }
-
-        public NoHandlers()
-        {
-        }
-
         [Fact]
         public async void GivenNonRegisteredQueryHandler_WhenPublishMethodIsBeingCalled_ThenThrowsAnError()
         {

@@ -38,24 +38,6 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        public class TaskWasAddedHandler : INotificationHandler<TaskWasAdded>
-        {
-            private readonly TasksList _taskList;
-            public TaskWasAddedHandler(TasksList tasksList)
-            {
-                _taskList = tasksList;
-            }
-
-            public void Handle(TaskWasAdded @event)
-            {
-                _taskList.Tasks.Add(@event.TaskName);
-            }
-        }
-
-        public NoHandlers()
-        {
-        }
-
         [Fact]
         public async void GivenNonRegisteredQueryHandler_WhenPublishMethodIsBeingCalled_ThenThrowsAnError()
         {
