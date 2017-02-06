@@ -18,7 +18,7 @@ namespace MediatR.Tests.Sending
             public List<object> Get(Type type) { return Services[type]; }
         }
 
-        public class TasksList
+        class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -28,7 +28,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        public class TaskWasAdded : INotification
+        class TaskWasAdded : INotification
         {
             public string TaskName { get; }
 

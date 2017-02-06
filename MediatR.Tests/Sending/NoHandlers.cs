@@ -18,7 +18,7 @@ namespace MediatR.Tests.Publishing
             public List<object> Get(Type type) { return Services[type]; }
         }
 
-        public class TasksList
+        class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -28,7 +28,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        public class GetTaskNamesQuery : IRequest<List<string>>
+        class GetTaskNamesQuery : IRequest<List<string>>
         {
             public string Filter { get; }
 
