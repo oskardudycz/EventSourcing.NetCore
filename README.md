@@ -6,7 +6,7 @@ Install recent version of the Postgres DB (eg. from link: https://www.postgresql
 
 ##Libraries used
 1. [Marten](https://github.com/JasperFx/marten) - Event Store
-2. [MediatR](https://github.com/jbogard/MediatR) - Message Bus (eg. for Commands, Queries, Events)
+2. [MediatR](https://github.com/jbogard/MediatR) - Message Bus (for processing Commands, Queries, Events)
 
 ##Suggested Order of reading
 1. Marten Event Store
@@ -22,7 +22,7 @@ Install recent version of the Postgres DB (eg. from link: https://www.postgresql
     * [One event to one object transformations](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/OneToOneEventTransformations.cs)
     * [Inline Transformation storage](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/InlineTransformationsStorage.cs)
 
-2. MediatR - Message Bus (eg. for Commands, Queries, Events)
+2. MediatR - Message Bus (for processing Commands, Queries, Events)
   * [Initialization](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Initialization/Initialization.cs) - MediatR uses services locator pattern to find proper handler for message type.
   * Sending Messages - finds and uses first registered handler for the message type. It could be used for queries (when we need to return values), commands (when we performing an action).
     * [No Handlers](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/NoHandlers.cs) - when MediatR doesn't find proper handler it throws an exception.
