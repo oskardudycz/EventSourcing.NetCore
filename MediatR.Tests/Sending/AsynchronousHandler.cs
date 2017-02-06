@@ -19,7 +19,7 @@ namespace MediatR.Tests.Sending
             public List<object> Get(Type type) { return Services[type]; }
         }
 
-        public class TasksList
+        class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -29,7 +29,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        public class GetTaskNamesQuery : IRequest<List<string>>
+        class GetTaskNamesQuery : IRequest<List<string>>
         {
             public string Filter { get; }
 
@@ -39,7 +39,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        public class GetTaskNamesQueryAsyncHandler : IAsyncRequestHandler<GetTaskNamesQuery, List<string>>
+        class GetTaskNamesQueryAsyncHandler : IAsyncRequestHandler<GetTaskNamesQuery, List<string>>
         {
             private readonly TasksList _taskList;
             public GetTaskNamesQueryAsyncHandler(TasksList tasksList)
@@ -63,9 +63,10 @@ namespace MediatR.Tests.Sending
                 new TasksList("Cleaning main room", "Writing blog", "cleaning kitchen"));
 
             var serviceLocator = new ServiceLocator();
+            serviceLocator.Register(typeof(IAsyncRequestHandler<GetTaskNamesQuery, List<string>>), queryHandler);
             //Registration needed internally by MediatR
             serviceLocator.Register(typeof(IPipelineBehavior<GetTaskNamesQuery, List<string>>), new object[] { });
-            serviceLocator.Register(typeof(IRequestHandler<GetTaskNamesQuery, List<string>>), queryHandler);
+            serviceLocator.Register(typeof(IRequestHandler<GetTaskNamesQuery, List<string>>), new IRequestHandler<GetTaskNamesQuery, List<string>>[] { });
 
             mediator = new Mediator(
                     type => serviceLocator.Get(type).FirstOrDefault(),
@@ -76,18 +77,6 @@ namespace MediatR.Tests.Sending
         public async void GivenRegisteredAsynchronousRequestHandler_WhenSendMethodIsBeingCalled_ThenReturnsProperResult()
         {
             //Given
-            var queryHandler = new GetTaskNamesQueryAsyncHandler(
-                new TasksList("Cleaning main room", "Writing blog", "cleaning kitchen"));
-
-            var serviceLocator = new ServiceLocator();
-            //Registration needed internally by MediatR
-            serviceLocator.Register(typeof(IPipelineBehavior<GetTaskNamesQuery, List<string>>), new object[] { });
-            serviceLocator.Register(typeof(IAsyncRequestHandler<GetTaskNamesQuery, List<string>>), queryHandler);
-
-            var mediator = new Mediator(
-                    type => serviceLocator.Get(type).FirstOrDefault(),
-                    type => serviceLocator.Get(type));
-
             var query = new GetTaskNamesQuery("cleaning");
 
             //When

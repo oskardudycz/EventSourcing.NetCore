@@ -85,47 +85,5 @@ namespace MediatR.Tests.Sending
             result.Should().Have.Count.EqualTo(2);
             result.Should().Have.SameValuesAs("Cleaning main room", "cleaning kitchen");
         }
-
-        public class GetTaskNamesQueryAsyncHandler : IAsyncRequestHandler<GetTaskNamesQuery, List<string>>
-        {
-            private readonly TasksList _taskList;
-            public GetTaskNamesQueryAsyncHandler(TasksList tasksList)
-            {
-                _taskList = tasksList;
-            }
-
-            public Task<List<string>> Handle(GetTaskNamesQuery query)
-            {
-                return Task.Run(() => _taskList.Tasks
-                    .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
-                    .ToList());
-            }
-        }
-
-        [Fact]
-        public async void GivenRegisteredAsynchronousRequestHandler_WhenSendMethodIsBeingCalled_ThenReturnsProperResult()
-        {
-            //Given
-            var queryHandler = new GetTaskNamesQueryAsyncHandler(
-                new TasksList("Cleaning main room", "Writing blog", "cleaning kitchen"));
-
-            var serviceLocator = new ServiceLocator();
-            //Registration needed internally by MediatR
-            serviceLocator.Register(typeof(IPipelineBehavior<GetTaskNamesQuery, List<string>>), new object[] { });
-            serviceLocator.Register(typeof(IAsyncRequestHandler<GetTaskNamesQuery, List<string>>), queryHandler);
-
-            var mediator = new Mediator(
-                    type => serviceLocator.Get(type).FirstOrDefault(),
-                    type => serviceLocator.Get(type));
-
-            var query = new GetTaskNamesQuery("cleaning");
-
-            //When
-            var result = await mediator.Send(query);
-
-            //Then
-            result.Should().Have.Count.EqualTo(2);
-            result.Should().Have.SameValuesAs("Cleaning main room", "cleaning kitchen");
-        }
     }
 }
