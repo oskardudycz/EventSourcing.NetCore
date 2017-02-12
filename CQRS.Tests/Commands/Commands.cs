@@ -1,8 +1,6 @@
 ﻿using CQRS.Tests.TestsInfrasructure;
 using MediatR;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using SharpTestsEx;
 using Xunit;
@@ -14,8 +12,6 @@ namespace CQRS.Tests.Commands
         interface ICommand : IRequest { }
 
         interface ICommandHandler<T> : IRequestHandler<T> where T: ICommand { }
-        
-        interface IAsyncCommandHandler<T> : IAsyncRequestHandler<T> where T : ICommand { }
 
         interface ICommandBus
         {
