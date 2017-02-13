@@ -35,3 +35,6 @@ Install recent version of the Postgres DB (eg. from link: https://www.postgresql
     * [Aynchronous Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/AsynchronousHandler.cs) - by implementing implementing IAsyncNotificationHandler we're making decision that this handler should be run asynchronously with other async handlers (so we don't wait for the previous handler to finish its work)
     * [More Than One Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/MoreThanOneHandler.cs) - when there is more than one handler registered MediatR takes only all of them when calling Publish method
   * Pipeline (to be defined)
+  
+3. CQRS (Command Query Responsibility Separation)
+  * [Command handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/CQRS.Tests/Commands/Commands.cs)
