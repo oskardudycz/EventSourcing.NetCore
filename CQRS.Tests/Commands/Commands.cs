@@ -103,14 +103,17 @@ namespace CQRS.Tests.Commands
 
             var applicationService = new TaskApplicationService(new CommandBus(serviceLocator.GetMediator()));
 
-            var taskName = "test";
+            //Given
+            var addedTaskName = "cleaning";
 
-            var command = new AddTaskCommand(taskName);
+            var command = new AddTaskCommand(addedTaskName);
 
+            //When
             applicationService.AddTask(command);
 
+            //Then
             writeModel.Tasks.Should().Have.Count.EqualTo(1);
-            writeModel.Tasks.Should().Have.SameValuesAs(taskName);
+            writeModel.Tasks.Should().Have.SameValuesAs(addedTaskName);
         }
     }
 }

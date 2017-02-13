@@ -24,6 +24,15 @@ namespace CQRS.Tests.TestsInfrasructure
             Register(typeof(IAsyncRequestHandler<TCommand>), new IAsyncRequestHandler<TCommand>[] { });
         }
 
+        public void RegisterQueryHandler<TQuery, TResponse>(IAsyncRequestHandler<TQuery, TResponse> queryHandler)
+            where TQuery : IRequest<TResponse>
+        {
+            Register(typeof(IAsyncRequestHandler<TQuery, TResponse>), queryHandler);
+            //Registration needed internally by MediatR
+            Register(typeof(IPipelineBehavior<TQuery, TResponse>), new object[] { });
+            Register(typeof(IRequestHandler<TQuery, TResponse>), new IRequestHandler<TQuery, TResponse>[] { });
+        }
+
         public IMediator GetMediator()
         {
             return new Mediator(
