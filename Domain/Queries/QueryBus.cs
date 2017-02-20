@@ -7,7 +7,7 @@ namespace Domain.Queries
     {
         private IMediator _mediator;
 
-        internal QueryBus(IMediator mediator)
+        public QueryBus(IMediator mediator)
         {
             _mediator = mediator;
         }

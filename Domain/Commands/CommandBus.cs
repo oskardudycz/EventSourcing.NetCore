@@ -7,7 +7,7 @@ namespace Domain.Commands
     {
         private IMediator _mediator;
 
-        internal CommandBus(IMediator mediator)
+        public CommandBus(IMediator mediator)
         {
             _mediator = mediator;
         }
