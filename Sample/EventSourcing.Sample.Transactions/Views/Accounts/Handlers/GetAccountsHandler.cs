@@ -20,7 +20,7 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts.Handlers
         public IEnumerable<AccountSummary> Handle(GetAccounts message)
         {
             var document = _session.Query<AccountsSummaryView>().FirstOrDefault();
-            return new List<AccountSummary>();
+            return document?.Accounts;
         }
     }
 }

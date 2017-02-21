@@ -17,10 +17,9 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
         public void Handle(CreateNewAccount command)
         {
             var account = new Account(command.ClientId);
-            var accountId = _store.StartStream<Account>(account.PendingEvents.ToArray());
 
-            _store.AggregateStream<Account>(accountId);
-
+            _store.StartStream<Account>(account.PendingEvents.ToArray());
+            _session.SaveChanges();
         }
     }
 }

@@ -77,6 +77,8 @@ namespace EventSourcing.Web.Sample
             services.AddTransient<IQueryBus, QueryBus>();
 
             services.AddTransient<IRequestHandler<CreateNewAccount>, CreateNewAccountHandler>();
+            services.AddTransient<IRequestHandler<ProcessInflow>, ProcessInflowHandler>();
+            services.AddTransient<IRequestHandler<ProcessOutflow>, ProcessOutflowHandler>();
             services.AddTransient<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
         }
 

@@ -25,16 +25,16 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts
 
         public decimal Balance { get; private set; }
 
-        public void RecordInflow(decimal ammount)
+        public void RecordInflow(Guid fromId, decimal ammount)
         {
-            var @event = new NewInflowRecorded(Id, new Inflow(ammount, DateTime.Now));
+            var @event = new NewInflowRecorded(fromId, Id, new Inflow(ammount, DateTime.Now));
             Apply(@event);
             Append(@event);
         }
 
-        public void RecordOutflow(decimal ammount)
+        public void RecordOutflow(Guid toId, decimal ammount)
         {
-            var @event = new NewOutflowRecorded(Id, new Outflow(ammount, DateTime.Now));
+            var @event = new NewOutflowRecorded(Id, toId, new Outflow(ammount, DateTime.Now));
             Apply(@event);
             Append(@event);
         }

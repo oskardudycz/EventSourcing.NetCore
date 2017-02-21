@@ -5,13 +5,14 @@ namespace EventSourcing.Sample.Tasks.Contracts.Transactions.Events
 {
     public class NewInflowRecorded : IEvent
     {
-        public Guid AccountId { get; }
-
+        public Guid FromAccountId { get; }
+        public Guid ToAccountId { get; }
         public Inflow Outflow { get; }
 
-        public NewInflowRecorded(Guid accountId, Inflow outflow)
+        public NewInflowRecorded(Guid fromAccountId, Guid toAccountId, Inflow outflow)
         {
-            AccountId = accountId;
+            FromAccountId = fromAccountId;
+            ToAccountId = toAccountId;
             Outflow = outflow;
         }
     }
