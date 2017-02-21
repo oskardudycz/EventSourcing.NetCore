@@ -2,10 +2,8 @@
 using EventSourcing.Sample.Tasks.Contracts.Accounts;
 using Marten;
 using Marten.Events;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace EventSourcing.Sample.Tasks.Views.Accounts.Handlers
 {
@@ -21,7 +19,7 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts.Handlers
 
         public IEnumerable<AccountSummary> Handle(GetAccounts message)
         {
-            var document = _session.Load<AccountsSummaryView>(Guid.Empty);
+            var document = _session.Query<AccountsSummaryView>().FirstOrDefault();
             return new List<AccountSummary>();
         }
     }

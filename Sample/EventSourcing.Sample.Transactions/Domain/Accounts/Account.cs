@@ -15,7 +15,7 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts
 
         public Account(Guid clientId)
         {
-            var @event = new NewAccountCreated(Guid.NewGuid(), clientId);
+            var @event = new NewAccountCreated { AccountId = Guid.NewGuid(), ClientId = clientId };
 
             Apply(@event);
             Append(@event);

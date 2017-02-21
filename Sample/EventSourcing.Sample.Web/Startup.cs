@@ -20,6 +20,7 @@ using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
 using EventSourcing.Sample.Tasks.Contracts.Accounts;
 using EventSourcing.Sample.Tasks.Views.Accounts;
 using EventSourcing.Sample.Tasks.Views.Accounts.Handlers;
+using EventSourcing.Sample.Tasks.Domain.Accounts;
 
 namespace EventSourcing.Web.Sample
 {
@@ -51,11 +52,10 @@ namespace EventSourcing.Web.Sample
             services.AddScoped<IMediator, Mediator>();
             services.AddTransient<SingleInstanceFactory>(sp => t => sp.GetService(t));
             services.AddTransient<MultiInstanceFactory>(sp => t => sp.GetServices(t));
-
-
-            services.AddScoped<IDocumentStore>(sp =>
+                        
+            services.AddTransient(sp =>
             {
-                return DocumentStore.For(options =>
+                var documentStore = DocumentStore.For(options =>
                 {
                     var config = Configuration.GetSection("EventStore");
                     var connectionString = config.GetValue<string>("ConnectionString");
@@ -64,19 +64,11 @@ namespace EventSourcing.Web.Sample
                     options.Connection(connectionString);
                     options.AutoCreateSchemaObjects = AutoCreate.All;
                     options.Events.DatabaseSchemaName = schemaName;
+                    options.DatabaseSchemaName = schemaName;
                     
-
-                    //options.Events.AddEventType(typeof(NewAccountCreated));
-                    //options.Events.AddEventType(typeof(NewInflowRecorded));
-                    //options.Events.AddEventType(typeof(NewOutflowRecorded));
-                    
+                    options.Events.InlineProjections.AggregateStreamsWith<Account>();
                     options.Events.InlineProjections.Add(new AccountSummaryViewProjection());
                 });
-            });
-
-            services.AddScoped(sp =>
-            {
-                var documentStore = sp.GetService<IDocumentStore>();
 
                 return documentStore.OpenSession();
             });

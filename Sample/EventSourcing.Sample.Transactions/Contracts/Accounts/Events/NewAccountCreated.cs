@@ -5,14 +5,8 @@ namespace EventSourcing.Sample.Tasks.Contracts.Accounts.Events
 {
     public class NewAccountCreated : IEvent
     {
-        public Guid AccountId { get; }
+        public Guid AccountId { get; set; }
 
-        public Guid ClientId { get; }
-
-        public NewAccountCreated(Guid accountId, Guid clientId)
-        {
-            AccountId = accountId;
-            ClientId = clientId;
-        }
+        public Guid ClientId { get; set; }
     }
 }

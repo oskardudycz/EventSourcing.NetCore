@@ -60,24 +60,34 @@ namespace Marten.Integration.Tests.EventStore.Projections
         private class TaskDescriptionView
         {
             public Guid Id { get; set; }
-            public IList<string> Descriptions { get; } = new List<string>();
+            public IDictionary<Guid, string> Descriptions { get; } = new Dictionary<Guid, string>();
 
             internal void ApplyEvent(TaskCreated @event)
             {
-                Descriptions.Add(@event.Description);
+                Descriptions.Add(@event.TaskId, @event.Description);
+            }
+
+            internal void ApplyEvent(TaskUpdated @event)
+            {
+                Descriptions[@event.TaskId] = @event.Description;
             }
         }
-
-
-
+        
         private class TaskListViewProjection : ViewProjection<TaskDescriptionView>
         {
+            readonly Guid viewid = new Guid("a8c1a4ac-686d-4fb7-a64a-710bc630f471");
             public TaskListViewProjection()
             {
-                ProjectEvent<TaskCreated>((ev) => Guid.Empty, Persist);
+                ProjectEvent<TaskCreated>((ev) => viewid, Persist);
+                ProjectEvent<TaskUpdated>((ev) => viewid, Persist);
             }
 
             private void Persist(TaskDescriptionView view, TaskCreated @event)
+            {
+                view.ApplyEvent(@event);
+            }
+
+            private void Persist(TaskDescriptionView view, TaskUpdated @event)
             {
                 view.ApplyEvent(@event);
             }
@@ -128,7 +138,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
             //3. Get inline aggregation
             var taskListFromInlineAggregation = Session.Load<TaskList>(streamId);
 
-            var test = Session.Load<TaskDescriptionView>(Guid.Empty);
+            var projection = Session.Query<TaskDescriptionView>().FirstOrDefault();
 
             taskListFromLiveAggregation.Should().Not.Be.Null();
             taskListFromInlineAggregation.Should().Not.Be.Null();
