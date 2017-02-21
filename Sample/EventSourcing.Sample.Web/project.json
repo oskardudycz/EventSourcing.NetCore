@@ -26,9 +26,9 @@
     "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
     "Marten": "1.3.0",
     "MediatR": "3.0.0",
-    "Domain": "1.0.0-*",
     "EventSourcing.Sample.Transactions": "1.0.0-*",
-    "Swashbuckle.AspNetCore": "1.0.0-rc1"
+    "Swashbuckle.AspNetCore": "1.0.0-rc1",
+    "Domain": "1.0.0-*"
   },
 
   "tools": {

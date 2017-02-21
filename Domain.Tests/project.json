@@ -6,6 +6,7 @@
     "Domain": "1.0.0-*",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "Marten": "1.3.0",
+    "Microsoft.DotNet.InternalAbstractions": "1.0.500-preview2-1-003177",
     "NETStandard.Library": "1.6.1",
     "SharpTestsEx": "2.0.0",
     "xunit": "2.2.0-rc2-build3523",

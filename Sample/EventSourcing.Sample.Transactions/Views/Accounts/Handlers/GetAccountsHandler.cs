@@ -21,6 +21,7 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts.Handlers
 
         public IEnumerable<AccountSummary> Handle(GetAccounts message)
         {
+            var document = _session.Load<AccountsSummaryView>(Guid.Empty);
             return new List<AccountSummary>();
         }
     }

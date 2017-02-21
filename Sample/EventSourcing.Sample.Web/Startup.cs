@@ -66,11 +66,10 @@ namespace EventSourcing.Web.Sample
                     options.Events.DatabaseSchemaName = schemaName;
                     
 
-                    options.Events.AddEventType(typeof(NewAccountCreated));
-                    options.Events.AddEventType(typeof(NewInflowRecorded));
-                    options.Events.AddEventType(typeof(NewOutflowRecorded));
-
-                    options.Events.InlineProjections.AggregateStreamsWith<NewAccountCreated>();
+                    //options.Events.AddEventType(typeof(NewAccountCreated));
+                    //options.Events.AddEventType(typeof(NewInflowRecorded));
+                    //options.Events.AddEventType(typeof(NewOutflowRecorded));
+                    
                     options.Events.InlineProjections.Add(new AccountSummaryViewProjection());
                 });
             });

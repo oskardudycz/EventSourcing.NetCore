@@ -11,7 +11,7 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts
         public Guid Id { get; set; }
         public IList<AccountSummary> Accounts { get; } = new List<AccountSummary>();
 
-        public void Apply(NewAccountCreated @event)
+        public void ApplyEvent(NewAccountCreated @event)
         {
             Accounts.Add(new AccountSummary()
             {
