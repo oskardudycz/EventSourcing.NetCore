@@ -7,6 +7,7 @@ using Domain.Commands;
 using Domain.Queries;
 using EventSourcing.Sample.Tasks.Views.Accounts;
 using EventSourcing.Sample.Tasks.Contracts.Accounts;
+using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 
 namespace EventSourcing.Web.Sample.Controllers
 {
@@ -38,8 +39,9 @@ namespace EventSourcing.Web.Sample.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public async void Post([FromBody]CreateNewAccount command)
         {
+            await _commandBus.Send(command);
         }
 
         // PUT api/values/5
