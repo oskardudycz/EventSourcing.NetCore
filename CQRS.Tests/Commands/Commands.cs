@@ -11,7 +11,7 @@ namespace CQRS.Tests.Commands
     {
         interface ICommand : IRequest { }
 
-        interface ICommandHandler<T> : IRequestHandler<T> where T: ICommand { }
+        interface ICommandHandler<in T> : IRequestHandler<T> where T: ICommand { }
 
         interface ICommandBus
         {

@@ -10,9 +10,9 @@ namespace CQRS.Tests.Queries
 {
     public class Queries
     {
-        interface IQuery<TResponse> : IRequest<TResponse> { }
+        interface IQuery<out TResponse> : IRequest<TResponse> { }
 
-        interface IQueryHandler<TQuery, TResponse> : IAsyncRequestHandler<TQuery, TResponse>
+        interface IQueryHandler<in TQuery, TResponse> : IAsyncRequestHandler<TQuery, TResponse>
             where TQuery : IQuery<TResponse>
         { }
 
