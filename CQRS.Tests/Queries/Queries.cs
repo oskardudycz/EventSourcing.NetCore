@@ -23,7 +23,7 @@ namespace CQRS.Tests.Queries
 
         class QueryBus : IQueryBus
         {
-            private IMediator _mediator;
+            private readonly IMediator _mediator;
 
             internal QueryBus(IMediator mediator)
             {
@@ -53,7 +53,7 @@ namespace CQRS.Tests.Queries
 
         class TaskApplicationService : ITaskApplicationService
         {
-            private IQueryBus _queryBus;
+            private readonly IQueryBus _queryBus;
 
             internal TaskApplicationService(IQueryBus queryBus)
             {
@@ -73,7 +73,7 @@ namespace CQRS.Tests.Queries
 
         class AppReadModel : IAppReadModel
         {
-            private IList<string> _tasks;
+            private readonly IList<string> _tasks;
             public IQueryable<string> Tasks => _tasks.AsQueryable();
 
             public AppReadModel(params string[] tasks)
@@ -84,7 +84,7 @@ namespace CQRS.Tests.Queries
 
         class AddTaskCommandHandler : IQueryHandler<GetTaskNamesQuery, List<string>>
         {
-            private IAppReadModel _readModel;
+            private readonly IAppReadModel _readModel;
 
             internal AddTaskCommandHandler(IAppReadModel readModel)
             {

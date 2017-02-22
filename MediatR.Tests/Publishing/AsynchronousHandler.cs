@@ -53,8 +53,8 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        private IMediator mediator;
-        private TasksList _tasksList = new TasksList();
+        private readonly IMediator mediator;
+        private readonly TasksList _tasksList = new TasksList();
 
         public AsynchronousHandler()
         {

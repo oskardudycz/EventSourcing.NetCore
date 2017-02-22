@@ -52,8 +52,8 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private IMediator mediator;
-        private TasksList _taskList = new TasksList();
+        private readonly IMediator mediator;
+        private readonly TasksList _taskList = new TasksList();
 
         public MoreThanOneHandler()
         {

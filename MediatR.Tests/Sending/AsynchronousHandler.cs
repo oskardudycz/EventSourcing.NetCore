@@ -55,7 +55,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private IMediator mediator;
+        private readonly IMediator mediator;
 
         public AsynchronousHandler()
         {

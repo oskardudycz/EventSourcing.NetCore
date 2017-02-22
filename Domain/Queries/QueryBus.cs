@@ -5,7 +5,7 @@ namespace Domain.Queries
 {
     public class QueryBus : IQueryBus
     {
-        private IMediator _mediator;
+        private readonly IMediator _mediator;
 
         public QueryBus(IMediator mediator)
         {

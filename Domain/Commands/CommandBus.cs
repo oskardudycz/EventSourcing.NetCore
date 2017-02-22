@@ -5,7 +5,7 @@ namespace Domain.Commands
 {
     public class CommandBus : ICommandBus
     {
-        private IMediator _mediator;
+        private readonly IMediator _mediator;
 
         public CommandBus(IMediator mediator)
         {
