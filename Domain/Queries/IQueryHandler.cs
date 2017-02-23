@@ -2,7 +2,7 @@
 
 namespace Domain.Queries
 {
-    public interface IQueryHandler<TQuery, TResponse> : IRequestHandler<TQuery, TResponse>
+    public interface IQueryHandler<in TQuery, out TResponse> : IRequestHandler<TQuery, TResponse>
            where TQuery : IQuery<TResponse>
     {
     }

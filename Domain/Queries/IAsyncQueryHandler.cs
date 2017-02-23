@@ -3,7 +3,7 @@
 
 namespace Domain.Queries
 {
-    interface IAsyncQueryHandler<TQuery, TResponse> : IAsyncRequestHandler<TQuery, TResponse>
+    interface IAsyncQueryHandler<in TQuery, TResponse> : IAsyncRequestHandler<TQuery, TResponse>
            where TQuery : IQuery<TResponse>
     {
     }

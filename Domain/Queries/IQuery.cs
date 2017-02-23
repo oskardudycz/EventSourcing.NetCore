@@ -2,7 +2,7 @@
 
 namespace Domain.Queries
 {
-    public interface IQuery<TResponse> : IRequest<TResponse>
+    public interface IQuery<out TResponse> : IRequest<TResponse>
     {
     }
 }

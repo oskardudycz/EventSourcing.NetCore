@@ -11,7 +11,7 @@ namespace CQRS.Tests.Commands
     {
         interface ICommand : IRequest { }
 
-        interface ICommandHandler<T> : IRequestHandler<T> where T: ICommand { }
+        interface ICommandHandler<in T> : IRequestHandler<T> where T: ICommand { }
 
         interface ICommandBus
         {
@@ -20,7 +20,7 @@ namespace CQRS.Tests.Commands
 
         class CommandBus : ICommandBus
         {
-            private IMediator _mediator;
+            private readonly IMediator _mediator;
 
             internal CommandBus(IMediator mediator)
             {
@@ -50,7 +50,7 @@ namespace CQRS.Tests.Commands
 
         class TaskApplicationService : ITaskApplicationService
         {
-            private ICommandBus _commandBus;
+            private readonly ICommandBus _commandBus;
 
             internal TaskApplicationService(ICommandBus commandBus)
             {
@@ -80,7 +80,7 @@ namespace CQRS.Tests.Commands
 
         class AddTaskCommandHandler : ICommandHandler<AddTaskCommand>
         {
-            private IAppWrtiteModel _writeModel;
+            private readonly IAppWrtiteModel _writeModel;
 
             internal AddTaskCommandHandler(IAppWrtiteModel writeModel)
             {
