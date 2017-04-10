@@ -1,14 +1,15 @@
 # EventSourcing.NetCore
 Example of Event Sourcing in .NET Core
 
-#Prerequisites
+# Prerequisites
 Install recent version of the Postgres DB (eg. from link: https://www.postgresql.org/download/)
 
 Video presentation (PL): https://www.youtube.com/watch?v=i1XDr9km0RY
 Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Slides.pptx
 
-##Libraries used
+## Libraries used
 1. [Marten](https://github.com/JasperFx/marten) - Event Store
+
 2. [MediatR](https://github.com/jbogard/MediatR) - Message Bus (for processing Commands, Queries, Events)
 
 ##Suggested Order of reading
