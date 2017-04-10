@@ -12,7 +12,7 @@ Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Sl
 
 2. [MediatR](https://github.com/jbogard/MediatR) - Message Bus (for processing Commands, Queries, Events)
 
-##Suggested Order of reading
+## Suggested Order of reading
 1. Marten Event Store
   * [Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/General/StoreInitializationTests.cs)
   * Event Stream
