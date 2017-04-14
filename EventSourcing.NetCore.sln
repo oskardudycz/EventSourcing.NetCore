@@ -1,36 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Domain", "Domain\Domain.xproj", "{4EF79FCF-29C6-43BF-8E38-1B17E0FADD90}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Domain.Tests", "Domain.Tests\Domain.Tests.xproj", "{E1B97A7B-97C3-4C14-9BE6-ACE0AF45CE61}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Marten.Integration.Tests", "Marten.Integration.Tests\Marten.Integration.Tests.xproj", "{10A477FB-4AF7-4AB5-84BF-FC2AC538B306}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "MediatR.Tests", "MediatR.Tests\MediatR.Tests.xproj", "{E942A5A1-2B6E-41A0-8445-C5A38D955611}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CQRS.Tests", "CQRS.Tests\CQRS.Tests.xproj", "{7532F3EB-D50F-490C-A1E1-4E0B882281FD}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EventSourcing.Integration.Tests", "EventSourcing.Integration.Tests\EventSourcing.Integration.Tests.xproj", "{215691EC-51FB-4BD2-A46C-396094727054}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{107B18E3-65C8-4A6C-976D-7EEED6A6D318}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{A7186B6B-D56D-4AEF-B6B7-FAA827764C34}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{0570E45A-2EB6-4C4C-84E4-2C80E1FECEB5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EventSourcing.Sample.Clients", "Sample\EventSourcing.Sample.Clients\EventSourcing.Sample.Clients.xproj", "{83A20A3D-0CBB-4525-972E-8935E3120774}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EventSourcing.Sample.Transactions", "Sample\EventSourcing.Sample.Transactions\EventSourcing.Sample.Transactions.xproj", "{6E3C337A-04FC-4E4E-B890-00A2535CC60F}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EventSourcing.Sample.Web", "Sample\EventSourcing.Sample.Web\EventSourcing.Sample.Web.xproj", "{88A064C1-BDDA-463B-AF82-F514EE3114F5}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A406B86-7F72-4773-B99C-545CCACC92B0}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{4EF79FCF-29C6-43BF-8E38-1B17E0FADD90}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Tests", "Domain.Tests\Domain.Tests.csproj", "{E1B97A7B-97C3-4C14-9BE6-ACE0AF45CE61}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marten.Integration.Tests", "Marten.Integration.Tests\Marten.Integration.Tests.csproj", "{10A477FB-4AF7-4AB5-84BF-FC2AC538B306}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.Tests", "MediatR.Tests\MediatR.Tests.csproj", "{E942A5A1-2B6E-41A0-8445-C5A38D955611}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CQRS.Tests", "CQRS.Tests\CQRS.Tests.csproj", "{7532F3EB-D50F-490C-A1E1-4E0B882281FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventSourcing.Integration.Tests", "EventSourcing.Integration.Tests\EventSourcing.Integration.Tests.csproj", "{215691EC-51FB-4BD2-A46C-396094727054}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventSourcing.Sample.Clients", "Sample\EventSourcing.Sample.Clients\EventSourcing.Sample.Clients.csproj", "{83A20A3D-0CBB-4525-972E-8935E3120774}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventSourcing.Sample.Transactions", "Sample\EventSourcing.Sample.Transactions\EventSourcing.Sample.Transactions.csproj", "{6E3C337A-04FC-4E4E-B890-00A2535CC60F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventSourcing.Sample.Web", "Sample\EventSourcing.Sample.Web\EventSourcing.Sample.Web.csproj", "{88A064C1-BDDA-463B-AF82-F514EE3114F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
