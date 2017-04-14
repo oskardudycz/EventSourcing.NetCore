@@ -1,5 +1,6 @@
 ﻿using Domain.Queries;
-using EventSourcing.Sample.Tasks.Contracts.Accounts;
+using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
+using EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary;
 using Marten;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,18 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts.Handlers
 
         public IEnumerable<AccountSummary> Handle(GetAccounts message)
         {
-            var document = _session.Query<AccountsSummaryView>().FirstOrDefault();
-            return document?.Accounts;
+            return _session.Query<AccountSummaryView>()
+                .Select(
+                    a => new AccountSummary
+                    {
+                        AccountId = a.AccountId,
+                        Balance = a.Balance,
+                        ClientId = a.ClientId,
+                        Number = a.Number,
+                        TransactionsCount = a.TransactionsCount
+                    }
+                )
+                .ToList();
         }
     }
 }

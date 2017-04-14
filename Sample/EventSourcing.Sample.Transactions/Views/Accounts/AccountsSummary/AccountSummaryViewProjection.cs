@@ -14,7 +14,7 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts
 
         private void Persist(AccountsSummaryView view, NewAccountCreated @event)
         {
-            view.ApplyEvent(@event);
+            view.Apply(@event);
         }
     }
 }

@@ -5,7 +5,7 @@ using Marten.Events;
 
 namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
 {
-    public class ProcessInflowHandler : ICommandHandler<ProcessInflow>
+    public class ProcessInflowHandler : ICommandHandler<MakeTransfer>
     {
         private readonly IDocumentSession _session;
         private IEventStore _store => _session.Events;
@@ -14,14 +14,18 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
             _session = session;
         }
 
-        public void Handle(ProcessInflow command)
-        {
-            var account = _store.AggregateStream<Account>(command.ToAccountId);
+        public void Handle(MakeTransfer command)
+        { 
+            var accountFrom = _store.AggregateStream<Account>(command.ToAccountId);
 
-            account.RecordInflow(command.FromAccountId, command.Ammount);
+            accountFrom.RecordOutflow(command.FromAccountId, command.Ammount);
+            _store.Append(accountFrom.Id, accountFrom.PendingEvents.ToArray());
+            
 
-            _store.Append(account.Id, account.PendingEvents.ToArray());
+            var accountTo = _store.AggregateStream<Account>(command.ToAccountId);
 
+            accountTo.RecordInflow(command.FromAccountId, command.Ammount);
+            _store.Append(accountTo.Id, accountTo.PendingEvents.ToArray());            
         }
     }
 }

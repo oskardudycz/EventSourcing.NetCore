@@ -8,5 +8,7 @@ namespace EventSourcing.Sample.Tasks.Contracts.Accounts.Events
         public Guid AccountId { get; set; }
 
         public Guid ClientId { get; set; }
+
+        public string Number { get; set; }
     }
 }

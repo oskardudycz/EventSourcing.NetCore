@@ -50,7 +50,7 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts
 
         public void Apply(NewInflowRecorded @event)
         {
-            Balance += @event.Outflow.Ammount;
+            Balance += @event.Inflow.Ammount;
         }
 
         public void Apply(NewOutflowRecorded @event)

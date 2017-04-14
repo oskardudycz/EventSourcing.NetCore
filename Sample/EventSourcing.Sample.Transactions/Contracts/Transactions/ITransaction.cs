@@ -3,6 +3,5 @@
     interface ITransaction
     {
         decimal Ammount { get; }
-
     }
 }

@@ -21,6 +21,7 @@ using EventSourcing.Sample.Tasks.Contracts.Accounts;
 using EventSourcing.Sample.Tasks.Views.Accounts;
 using EventSourcing.Sample.Tasks.Views.Accounts.Handlers;
 using EventSourcing.Sample.Tasks.Domain.Accounts;
+using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
 
 namespace EventSourcing.Web.Sample
 {
@@ -49,10 +50,25 @@ namespace EventSourcing.Web.Sample
                 c.SwaggerDoc("v1", new Info { Title = "Event Sourcing Example", Version = "v1" });
             });
 
-            services.AddScoped<IMediator, Mediator>();
-            services.AddTransient<SingleInstanceFactory>(sp => t => sp.GetService(t));
-            services.AddTransient<MultiInstanceFactory>(sp => t => sp.GetServices(t));
-                        
+            ConfigureMediator(services);
+
+            ConfigureMarten(services);
+
+            ConfigureCQRS(services);
+        }
+
+        private static void ConfigureCQRS(IServiceCollection services)
+        {
+            services.AddTransient<ICommandBus, CommandBus>();
+            services.AddTransient<IQueryBus, QueryBus>();
+
+            services.AddTransient<IRequestHandler<CreateNewAccount>, CreateNewAccountHandler>();
+            services.AddTransient<IRequestHandler<MakeTransfer>, ProcessInflowHandler>();
+            services.AddTransient<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
+        }
+
+        private void ConfigureMarten(IServiceCollection services)
+        {
             services.AddTransient(sp =>
             {
                 var documentStore = DocumentStore.For(options =>
@@ -65,21 +81,20 @@ namespace EventSourcing.Web.Sample
                     options.AutoCreateSchemaObjects = AutoCreate.All;
                     options.Events.DatabaseSchemaName = schemaName;
                     options.DatabaseSchemaName = schemaName;
-                    
+
                     options.Events.InlineProjections.AggregateStreamsWith<Account>();
                     options.Events.InlineProjections.Add(new AccountSummaryViewProjection());
                 });
 
                 return documentStore.OpenSession();
             });
+        }
 
-            services.AddTransient<ICommandBus, CommandBus>();
-            services.AddTransient<IQueryBus, QueryBus>();
-
-            services.AddTransient<IRequestHandler<CreateNewAccount>, CreateNewAccountHandler>();
-            services.AddTransient<IRequestHandler<ProcessInflow>, ProcessInflowHandler>();
-            services.AddTransient<IRequestHandler<ProcessOutflow>, ProcessOutflowHandler>();
-            services.AddTransient<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
+        private static void ConfigureMediator(IServiceCollection services)
+        {
+            services.AddScoped<IMediator, Mediator>();
+            services.AddTransient<SingleInstanceFactory>(sp => t => sp.GetService(t));
+            services.AddTransient<MultiInstanceFactory>(sp => t => sp.GetServices(t));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

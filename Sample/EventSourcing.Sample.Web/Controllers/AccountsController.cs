@@ -8,6 +8,7 @@ using Domain.Queries;
 using EventSourcing.Sample.Tasks.Views.Accounts;
 using EventSourcing.Sample.Tasks.Contracts.Accounts;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
+using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
 
 namespace EventSourcing.Web.Sample.Controllers
 {
