@@ -45,7 +45,18 @@ Slides (PL):
       * geting one event by its id  
          ```csharp
          var @event = EventStore.Load<TaskCreated>(eventId);
-         ```       
+         ```  
+    * **[Stream loading from exact state](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoadingFromExactState.cs)** - all events that were placed on the event store should be possible to load them back. Marten allows to get stream from exact state by:
+      * timestamp (has to be in UTC)
+         ```csharp
+         var dateTime = new DateTime(2017, 01, 11);
+         var events = EventStore.FetchStream(streamId, timestamp: dateTime);
+         ```  
+      * version number (has to be in UTC)
+         ```csharp
+         var versionNumber = 3;
+         var events = EventStore.FetchStream(streamId, version: versionNumber);
+         ```  
   * **Event stream aggregation** - events that were stored can be aggregated to form the entity once again. During aggregation process events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first empty entity instance is being created (by calling default constructor). Then events based of the order of apperance (timestamp) are being applied on the entity instance by calling proper Apply methods.
     * **[Aggregation general rules](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/AggregationRules.cs)**
     * **[Online Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs)**
