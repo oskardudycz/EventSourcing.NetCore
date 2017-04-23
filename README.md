@@ -13,7 +13,7 @@ Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Sl
 2. [MediatR](https://github.com/jbogard/MediatR) - Message Bus (for processing Commands, Queries, Events)
 
 ## Suggested Order of reading
-1. Marten Event Store
+### 1. Marten Event Store
   * [Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/General/StoreInitializationTests.cs)
   * Event Stream
     * [Stream starting](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs)
@@ -26,7 +26,7 @@ Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Sl
     * [One event to one object transformations](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/OneToOneEventTransformations.cs)
     * [Inline Transformation storage](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/InlineTransformationsStorage.cs)
 
-2. MediatR - Message Bus (for processing Commands, Queries, Events)
+### 2. MediatR - Message Bus (for processing Commands, Queries, Events)
   * [Initialization](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Initialization/Initialization.cs) - MediatR uses services locator pattern to find proper handler for message type.
   * Sending Messages - finds and uses first registered handler for the message type. It could be used for queries (when we need to return values), commands (when we performing an action).
     * [No Handlers](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/NoHandlers.cs) - when MediatR doesn't find proper handler it throws an exception.
@@ -40,6 +40,6 @@ Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Sl
     * [More Than One Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/MoreThanOneHandler.cs) - when there is more than one handler registered MediatR takes only all of them when calling Publish method
   * Pipeline (to be defined)
   
-3. CQRS (Command Query Responsibility Separation)
+### 3. CQRS (Command Query Responsibility Separation)
   * [Command handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/CQRS.Tests/Commands/Commands.cs)
   * [Query handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/CQRS.Tests/Queries/Queries.cs)
