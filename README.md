@@ -49,7 +49,7 @@ Slides (PL):
     * **[Stream loading from exact state](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoadingFromExactState.cs)** - all events that were placed on the event store should be possible to load them back. Marten allows to get stream from exact state by:
       * timestamp (has to be in UTC)
          ```csharp
-         var dateTime = new DateTime(2017, 01, 11);
+         var dateTime = new DateTime(2017, 1, 11);
          var events = EventStore.FetchStream(streamId, timestamp: dateTime);
          ```  
       * version number (has to be in UTC)
