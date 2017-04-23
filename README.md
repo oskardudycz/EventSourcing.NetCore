@@ -2,10 +2,14 @@
 Example of Event Sourcing in .NET Core
 
 ## Prerequisites
-Install recent version of the Postgres DB (eg. from link: https://www.postgresql.org/download/)
+Install recent version of the Postgres DB (eg. from: [https://www.postgresql.org/download/])
 
-Video presentation (PL): https://www.youtube.com/watch?v=i1XDr9km0RY  
-Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Slides.pptx
+Video presentation (PL): 
+
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=i1XDr9km0RY" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
+
+Slides (PL):  
+[https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Slides.pptx]
 
 ## Libraries used
 1. [Marten](https://github.com/JasperFx/marten) - Event Store
@@ -13,20 +17,20 @@ Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Sl
 2. [MediatR](https://github.com/jbogard/MediatR) - Message Bus (for processing Commands, Queries, Events)
 
 ## Suggested Order of reading
-1. Marten Event Store
-  * [Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/General/StoreInitializationTests.cs)
-  * Event Stream
+### 1. Marten Event Store
+  * **[Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/General/StoreInitializationTests.cs)**
+  * **Event Stream** - is in short words representation of the entity. It's a set of events grouped by the stream (entity) id.
     * [Stream starting](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs)
     * [Stream loading](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoading.cs)
-  * Event stream aggregation
+  * **Event stream aggregation** - events that were stored can be aggregated to form the entity once again. During aggregation process events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first empty entity instance is being created (by calling default constructor). Then events based of the order of apperance (timestamp) are being applied on the entity instance by calling proper Apply methods.
     * [Aggregation general rules](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/AggregationRules.cs)
     * [Online Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs)
     * [Inline Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/InlineAggregationStorage.cs)
-  * Event transformations
+  * **Event transformations**
     * [One event to one object transformations](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/OneToOneEventTransformations.cs)
     * [Inline Transformation storage](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/InlineTransformationsStorage.cs)
 
-2. MediatR - Message Bus (for processing Commands, Queries, Events)
+### 2. MediatR - Message Bus (for processing Commands, Queries, Events)
   * [Initialization](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Initialization/Initialization.cs) - MediatR uses services locator pattern to find proper handler for message type.
   * Sending Messages - finds and uses first registered handler for the message type. It could be used for queries (when we need to return values), commands (when we performing an action).
     * [No Handlers](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/NoHandlers.cs) - when MediatR doesn't find proper handler it throws an exception.
@@ -40,6 +44,6 @@ Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Sl
     * [More Than One Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/MoreThanOneHandler.cs) - when there is more than one handler registered MediatR takes only all of them when calling Publish method
   * Pipeline (to be defined)
   
-3. CQRS (Command Query Responsibility Separation)
+### 3. CQRS (Command Query Responsibility Separation)
   * [Command handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/CQRS.Tests/Commands/Commands.cs)
   * [Query handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/CQRS.Tests/Queries/Queries.cs)
