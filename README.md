@@ -22,10 +22,10 @@ Slides (PL):
   * **Event Stream** - is a representation of the entity in event sourcing. It's a set of events that hapened for the entity with the exact id. Stream id should be unique, can have different types but usually is a Guid.
     * [Stream starting](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs) - stream should be always started with a unique id. Marten provides two ways of starting stream:  
     By calling StartStream method with a given id
-```csharp
-var streamId = Guid.NewGuid();
-EventStore.StartStream<TaskList>(streamId);
-```
+    ```csharp
+    var streamId = Guid.NewGuid();
+    EventStore.StartStream<TaskList>(streamId);
+    ```  
     * [Stream loading](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoading.cs)
   * **Event stream aggregation** - events that were stored can be aggregated to form the entity once again. During aggregation process events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first empty entity instance is being created (by calling default constructor). Then events based of the order of apperance (timestamp) are being applied on the entity instance by calling proper Apply methods.
     * [Aggregation general rules](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/AggregationRules.cs)
