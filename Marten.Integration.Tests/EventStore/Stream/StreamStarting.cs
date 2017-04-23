@@ -20,7 +20,20 @@ namespace Marten.Integration.Tests.EventStore.Stream
         }
 
         private class TaskList { }
-        
+
+        [Fact]
+        public void GivenNoEvents_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
+        {
+            var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
+            var streamId = Guid.NewGuid();
+
+            EventStore.StartStream<TaskList>(streamId);
+
+            streamId.Should().Not.Be.Null();
+
+            Session.SaveChanges();
+        }
+
         [Fact]
         public void GivenOneEvent_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
         {
