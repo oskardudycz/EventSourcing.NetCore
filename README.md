@@ -2,14 +2,14 @@
 Example of Event Sourcing in .NET Core
 
 ## Prerequisites
-Install recent version of the Postgres DB (eg. from: [https://www.postgresql.org/download/])
+Install recent version of the Postgres DB (eg. from: <https://www.postgresql.org/download/>)
 
 Video presentation (PL): 
 
 <a href="https://www.youtube.com/watch?feature=player_embedded&v=i1XDr9km0RY" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
 
 Slides (PL):  
-[https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Slides.pptx]
+<https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Slides.pptx>
 
 ## Libraries used
 1. [Marten](https://github.com/JasperFx/marten) - Event Store
@@ -20,8 +20,8 @@ Slides (PL):
 ### 1. Marten Event Store
   * **[Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/General/StoreInitializationTests.cs)**
   * **Event Stream** - is a representation of the entity in event sourcing. It's a set of events that hapened for the entity with the exact id. Stream id should be unique, can have different types but usually is a Guid.
-    * [Stream starting](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs) - stream should be always started with a unique id. Marten provides two ways of starting stream:  
-      * calling StartStream method with a given id  
+    * [Stream starting](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs) - stream should be always started with a unique id. Marten provides three ways of starting stream:  
+      * calling StartStream method with a stream id  
          ```csharp
          var streamId = Guid.NewGuid();
          EventStore.StartStream<TaskList>(streamId);
@@ -31,13 +31,21 @@ Slides (PL):
          var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
          var streamId = EventStore.StartStream<TaskList>(@event);
          ```  
-      * just appending events with the stream Id
+      * just appending events with a stream id
          ```csharp
          var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
          var streamId = Guid.NewGuid();
          EventStore.Append(streamId, @event);
          ```  
-    * [Stream loading](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoading.cs)
+    * [Stream loading](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoading.cs) - all events that were placed on the event store should be possible to load them back. Marten allows to:
+      * get list of event by calling FetchStream method with a stream id  
+         ```csharp
+         var eventsList = EventStore.FetchStream(streamId);
+         ```  
+      * geting one event by its id  
+         ```csharp
+         var @event = EventStore.Load<TaskCreated>(eventId);
+         ```       
   * **Event stream aggregation** - events that were stored can be aggregated to form the entity once again. During aggregation process events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first empty entity instance is being created (by calling default constructor). Then events based of the order of apperance (timestamp) are being applied on the entity instance by calling proper Apply methods.
     * [Aggregation general rules](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/AggregationRules.cs)
     * [Online Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs)
