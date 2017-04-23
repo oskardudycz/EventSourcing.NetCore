@@ -15,14 +15,14 @@ Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Sl
 ## Suggested Order of reading
 ### 1. Marten Event Store
   * [Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/General/StoreInitializationTests.cs)
-  * Event Stream - is in short words representation of the entity. It's a set of events grouped by the stream (entity) id.
+  * *Event Stream* - is in short words representation of the entity. It's a set of events grouped by the stream (entity) id.
     * [Stream starting](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs)
     * [Stream loading](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoading.cs)
-  * Event stream aggregation - when events are being stored it can be aggregated to form the entity once again. Events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first empty object is being created. Then events based of the order of apperance are being applied on the entity object by calling proper Apply methods.
+  * *Event stream aggregation* - when events are being stored it can be aggregated to form the entity once again. Events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first empty object is being created. Then events based of the order of apperance are being applied on the entity object by calling proper Apply methods.
     * [Aggregation general rules](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/AggregationRules.cs)
     * [Online Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs)
     * [Inline Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/InlineAggregationStorage.cs)
-  * Event transformations
+  * *Event transformations*
     * [One event to one object transformations](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/OneToOneEventTransformations.cs)
     * [Inline Transformation storage](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/InlineTransformationsStorage.cs)
 
