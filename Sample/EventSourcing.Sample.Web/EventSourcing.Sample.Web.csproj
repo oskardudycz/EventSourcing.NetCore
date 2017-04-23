@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Backup\Sample\EventSourcing.Sample.Transactions\EventSourcing.Sample.Transactions.csproj" />
     <ProjectReference Include="..\..\Domain\Domain.csproj" />
     <ProjectReference Include="..\EventSourcing.Sample.Transactions\EventSourcing.Sample.Transactions.csproj" />
   </ItemGroup>
@@ -33,9 +32,9 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="1.1.1" />
-    <PackageReference Include="Marten" Version="1.3.0" />
-    <PackageReference Include="MediatR" Version="3.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0-rc1" />
+    <PackageReference Include="Marten" Version="1.5.0" />
+    <PackageReference Include="MediatR" Version="3.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

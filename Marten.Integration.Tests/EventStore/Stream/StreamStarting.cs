@@ -22,42 +22,48 @@ namespace Marten.Integration.Tests.EventStore.Stream
         private class TaskList { }
         
         [Fact]
-        public void GivenOneEvent_WhenStreamIsStarted_ThenEventsAreSavedWithouthError()
+        public void GivenOneEvent_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
         {
-            var ex = Record.Exception(() =>
-            {
-                var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
+            var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
 
-                var streamId = EventStore.StartStream<TaskList>(@event);
+            var streamId = EventStore.StartStream<TaskList>(@event);
 
-                streamId.Should().Not.Be.Null();
+            streamId.Should().Not.Be.Null();
 
-                Session.SaveChanges();
-            });
+            Session.SaveChanges();
+        }
+        
+        [Fact]
+        public void GivenOneEvent_WhenEventsArePublishedWithStreamId_ThenEventsAreSavedWithoutErrorAndStreamIsStarted()
+        {
+            var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
+            var streamId = Guid.NewGuid();
 
-            ex.Should().Be.Null();
+            EventStore.Append(streamId, @event);
+
+            Session.SaveChanges();
+
+            var streamState = EventStore.FetchStreamState(streamId);
+
+            streamState.Should().Not.Be.Null();
+            streamState.Version.Should().Be.EqualTo(1);
         }
 
         [Fact]
-        public void GivenMoreThenOneEvent_WhenStreamIsStarted_ThenEventsAreSavedWithouthError()
+        public void GivenMoreThenOneEvent_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
         {
-            var ex = Record.Exception(() =>
+            var taskId = Guid.NewGuid();
+            var events = new object[]
             {
-                var taskId = Guid.NewGuid();
-                var events = new object[]
-                {
                     new TaskCreated {TaskId = taskId, Description = "Description1"},
                     new TaskUpdated {TaskId = taskId, Description = "Description2"}
-                };
+            };
 
-                var streamId = EventStore.StartStream<TaskList>(events);
+            var streamId = EventStore.StartStream<TaskList>(events);
 
-                streamId.Should().Not.Be.Null();
+            streamId.Should().Not.Be.Null();
 
-                Session.SaveChanges();
-            });
-
-            ex.Should().Be.Null();
+            Session.SaveChanges();
         }
     }
 }

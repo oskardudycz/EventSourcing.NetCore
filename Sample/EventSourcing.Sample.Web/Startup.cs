@@ -83,6 +83,7 @@ namespace EventSourcing.Web.Sample
                     options.DatabaseSchemaName = schemaName;
 
                     options.Events.InlineProjections.AggregateStreamsWith<Account>();
+                    options.Events.InlineProjections.AggregateStreamsWith<AccountsSummaryView>();
                     options.Events.InlineProjections.Add(new AccountSummaryViewProjection());
                 });
 
@@ -109,7 +110,7 @@ namespace EventSourcing.Web.Sample
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUi(c =>
+            app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Event Sourcing Example V1");
             });
