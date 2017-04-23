@@ -4,7 +4,7 @@ Example of Event Sourcing in .NET Core
 ## Prerequisites
 Install recent version of the Postgres DB (eg. from link: https://www.postgresql.org/download/)
 
-Video presentation (PL): https://www.youtube.com/watch?v=i1XDr9km0RY  
+Video presentation (PL): [![Video presentation (PL)](https://img.youtube.com/vi/i1XDr9km0RY/0.jpg)](https://www.youtube.com/watch?v=i1XDr9km0RY)
 Slides (PL): https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Slides.pptx
 
 ## Libraries used
