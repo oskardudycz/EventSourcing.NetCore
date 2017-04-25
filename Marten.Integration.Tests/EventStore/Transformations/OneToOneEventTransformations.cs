@@ -67,7 +67,7 @@ namespace Marten.Integration.Tests.EventStore.Transformations
             }
         }
 
-        protected override IDocumentSession CreateSession()
+        protected override IDocumentSession CreateSession(Action<StoreOptions> setStoreOptions)
         {
             var store = DocumentStore.For(options =>
             {

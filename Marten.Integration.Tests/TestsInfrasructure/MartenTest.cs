@@ -13,14 +13,19 @@ namespace Marten.Integration.Tests.TestsInfrasructure
 
         protected readonly string SchemaName = "sch" + Guid.NewGuid().ToString().Replace("-",string.Empty);
 
-        protected MartenTest()
+        protected MartenTest() : this(true)
         {
-            Session = CreateSession();
         }
 
-        protected virtual IDocumentSession CreateSession()
+        protected MartenTest(bool shouldCreateSession)
         {
-            return DocumentSessionProvider.Get(SchemaName);
+            if(shouldCreateSession)
+                Session = CreateSession();
+        }
+
+        protected virtual IDocumentSession CreateSession(Action<StoreOptions> storeOptions = null)
+        {
+            return DocumentSessionProvider.Get(SchemaName, storeOptions);
         }
 
         public void Dispose()

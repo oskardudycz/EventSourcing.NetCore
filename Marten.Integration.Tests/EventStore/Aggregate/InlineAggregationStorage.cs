@@ -57,20 +57,13 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             }
         }
 
-        protected override IDocumentSession CreateSession()
+        protected override IDocumentSession CreateSession(Action<StoreOptions> storeOptions = null)
         {
-            var store = DocumentStore.For(options =>
+            return base.CreateSession(options =>
             {
-                options.Connection(Settings.ConnectionString);
-                options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.DatabaseSchemaName = SchemaName;
-                options.Events.DatabaseSchemaName = SchemaName;
-
                 //It's needed to manualy set that inline aggegation should be applied
                 options.Events.InlineProjections.AggregateStreamsWith<TaskList>();
             });
-
-            return store.OpenSession();
         }
 
         [Fact]
