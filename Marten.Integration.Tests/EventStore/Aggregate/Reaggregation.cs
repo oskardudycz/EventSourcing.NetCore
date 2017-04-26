@@ -49,12 +49,12 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             public void Apply(TaskCreated @event)
             {
                 Id = @event.TaskId;
-                Description = $"Description: {@event.Description}";
+                Description = $"New Logic: {@event.Description}";
             }
 
             public void Apply(TaskUpdated @event)
             {
-                Description = $"Description: {@event.Description}";
+                Description = $"New Logic: {@event.Description}";
             }
         }
     }
@@ -114,17 +114,17 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
             //4. Inline aggregated snapshot won't change automatically
             taskFromV2InlineAggregation.Description.Should().Be.EqualTo(taskFromV1InlineAggregation.Description);
-            taskFromV2InlineAggregation.Description.Should().Not.Be.EqualTo("Description: Task 1 Updated");
+            taskFromV2InlineAggregation.Description.Should().Not.Be.EqualTo("New Logic: Task 1 Updated");
             
             //5. But online aggregation is being applied automatically
             taskFromV2OnlineAggregation.Description.Should().Not.Be.EqualTo(taskFromV1OnlineAggregation.Description);
-            taskFromV2OnlineAggregation.Description.Should().Be.EqualTo("Description: Task 1 Updated");
+            taskFromV2OnlineAggregation.Description.Should().Be.EqualTo("New Logic: Task 1 Updated");
 
             //6. Reagregation
             using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Task>())
             {
                 //7. Get online aggregation
-                //8. Store manually aggregation as reaggregated inline aggregation
+                //8. Store manually online aggregation as inline aggregation
                 session.Store(taskFromV2OnlineAggregation);
                 session.SaveChanges();
                 
@@ -132,14 +132,14 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
                 taskFromV2AfterReaggregation.Description.Should().Not.Be.EqualTo(taskFromV1OnlineAggregation.Description);
                 taskFromV2AfterReaggregation.Description.Should().Be.EqualTo(taskFromV2OnlineAggregation.Description);
-                taskFromV2AfterReaggregation.Description.Should().Be.EqualTo("Description: Task 1 Updated");
+                taskFromV2AfterReaggregation.Description.Should().Be.EqualTo("New Logic: Task 1 Updated");
 
                 //9. Check if next event would be properly applied to inline aggregation
                 session.Events.Append(taskId, new TaskUpdated { TaskId = taskId, Description = "Completely New text" });
                 session.SaveChanges();
 
                 var taskFromV2NewInlineAggregation = session.Load<NewVersion.Task>(taskId);
-                taskFromV2NewInlineAggregation.Description.Should().Be.EqualTo("Description: Completely New text");
+                taskFromV2NewInlineAggregation.Description.Should().Be.EqualTo("New Logic: Completely New text");
             }
         }
     }

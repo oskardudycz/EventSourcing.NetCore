@@ -24,44 +24,50 @@ Slides (PL):
       * calling StartStream method with a stream id  
          ```csharp
          var streamId = Guid.NewGuid();
-         EventStore.StartStream<TaskList>(streamId);
+         documentSession.Events.StartStream<TaskList>(streamId);
          ```  
       * calling StartStream method with a set of events  
          ```csharp
          var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
-         var streamId = EventStore.StartStream<TaskList>(@event);
+         var streamId = documentSession.Events.StartStream<TaskList>(@event);
          ```  
       * just appending events with a stream id
          ```csharp
          var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
          var streamId = Guid.NewGuid();
-         EventStore.Append(streamId, @event);
+         documentSession.Events.Append(streamId, @event);
          ```  
     * **[Stream loading](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoading.cs)** - all events that were placed on the event store should be possible to load them back. Marten allows to:
       * get list of event by calling FetchStream method with a stream id  
          ```csharp
-         var eventsList = EventStore.FetchStream(streamId);
+         var eventsList = documentSession.Events.FetchStream(streamId);
          ```  
       * geting one event by its id  
          ```csharp
-         var @event = EventStore.Load<TaskCreated>(eventId);
+         var @event = documentSession.Events.Load<TaskCreated>(eventId);
          ```  
     * **[Stream loading from exact state](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoadingFromExactState.cs)** - all events that were placed on the event store should be possible to load them back. Marten allows to get stream from exact state by:
       * timestamp (has to be in UTC)
          ```csharp
          var dateTime = new DateTime(2017, 1, 11);
-         var events = EventStore.FetchStream(streamId, timestamp: dateTime);
+         var events = documentSession.Events.FetchStream(streamId, timestamp: dateTime);
          ```  
       * version number
          ```csharp
          var versionNumber = 3;
-         var events = EventStore.FetchStream(streamId, version: versionNumber);
+         var events = documentSession.Events.FetchStream(streamId, version: versionNumber);
          ```  
   * **Event stream aggregation** - events that were stored can be aggregated to form the entity once again. During aggregation process events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first empty entity instance is being created (by calling default constructor). Then events based of the order of apperance (timestamp) are being applied on the entity instance by calling proper Apply methods.
     * **[Aggregation general rules](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/AggregationRules.cs)**
     * **[Online Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs)** - online aggregation is a process when entity instance is being constructed on the fly from events. Events are taken from the database and then aggregation is being done. The biggest advantage of the online aggregation is that it always gets the most recent business logic. So after the change it's automatically reflected and it's not needed to do any migration or updates.
-    * **[Inline Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/InlineAggregationStorage.cs)** - inline aggregation happens when we take the snapshot of the entity from the db. In that case it's not needed to get all events. Marten stores the snapshot as a document. This is good for the performance reasons, because only one record is being materialized. The con of using inline aggregation is that after business logic has changed records need to be reaggregated.
-    * **[Reaggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/Reaggregation.cs)** 
+    * **[Inline Aggregation (Snapshot)](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/InlineAggregationStorage.cs)** - inline aggregation happens when we take the snapshot of the entity from the db. In that case it's not needed to get all events. Marten stores the snapshot as a document. This is good for the performance reasons, because only one record is being materialized. The con of using inline aggregation is that after business logic has changed records need to be reaggregated.
+    * **[Reaggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/Reaggregation.cs)** - one of the biggest advantage of the event sourcing is flexibility to business logic updates. It's not needed to perform complex miggration. Online aggregation it's not needed to perform reaggregation in fact it's being made always automatically. Inline aggregation needs to be reaggregated. It can be done by performing online aggregation on all stream events and storing the result as a snapshot.
+      * reaggregation of inline aggregation with Marten
+         ```csharp
+         var onlineAggregation = documentSession.Events.AggregateStream<TEntity>(streamId);
+         documentSession.Store<TEntity>(onlineAggregation);
+         documentSession.SaveChanges();
+         ```  
   * **Event transformations**
     * **[One event to one object transformations](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/OneToOneEventTransformations.cs)**
     * **[Inline Transformation storage](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Transformations/InlineTransformationsStorage.cs)**
