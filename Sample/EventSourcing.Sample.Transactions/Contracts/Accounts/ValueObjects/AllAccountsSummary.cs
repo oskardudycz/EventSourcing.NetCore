@@ -1,6 +1,6 @@
 ﻿namespace EventSourcing.Sample.Transactions.Contracts.Accounts.ValueObjects
 {
-    public class AccountsSummary
+    public class AllAccountsSummary
     {
         public int TotalCount { get; set; }
 

@@ -6,26 +6,26 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts
 {
     public class AccountsSummaryView
     {
-        public Guid Id { get; private set; }
+        public Guid Id { get; set; }
 
-        public int TotalCount { get; private set; }
+        public int TotalCount { get; set; }
         
-        public decimal TotalBalance { get; private set; }
+        public decimal TotalBalance { get; set; }
 
-        public int TotalTransactionsCount{ get; private set; }
+        public int TotalTransactionsCount{ get; set; }
 
-        public void Apply(NewAccountCreated @event)
+        public void ApplyEvent(NewAccountCreated @event)
         {
             TotalCount++;
         }
 
-        public void Apply(NewInflowRecorded @event)
+        public void ApplyEvent(NewInflowRecorded @event)
         {
             TotalBalance += @event.Inflow.Ammount;
             TotalTransactionsCount++;
         }
 
-        public void Apply(NewOutflowRecorded @event)
+        public void ApplyEvent(NewOutflowRecorded @event)
         {
             TotalBalance += @event.Outflow.Ammount;
             TotalTransactionsCount++;

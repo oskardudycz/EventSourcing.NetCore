@@ -22,6 +22,7 @@ using EventSourcing.Sample.Tasks.Views.Accounts;
 using EventSourcing.Sample.Tasks.Views.Accounts.Handlers;
 using EventSourcing.Sample.Tasks.Domain.Accounts;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
+using EventSourcing.Sample.Transactions.Domain.Accounts;
 
 namespace EventSourcing.Web.Sample
 {
@@ -49,6 +50,9 @@ namespace EventSourcing.Web.Sample
             {
                 c.SwaggerDoc("v1", new Info { Title = "Event Sourcing Example", Version = "v1" });
             });
+
+
+            services.AddTransient<IAccountNumberGenerator, RandomAccountNumberGenerator>();
 
             ConfigureMediator(services);
 
@@ -83,7 +87,6 @@ namespace EventSourcing.Web.Sample
                     options.DatabaseSchemaName = schemaName;
 
                     options.Events.InlineProjections.AggregateStreamsWith<Account>();
-                    options.Events.InlineProjections.AggregateStreamsWith<AccountsSummaryView>();
                     options.Events.InlineProjections.Add(new AccountSummaryViewProjection());
                 });
 

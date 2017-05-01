@@ -2,31 +2,35 @@
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
 using EventSourcing.Sample.Tasks.Contracts.Transactions;
 using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
+using EventSourcing.Sample.Transactions.Domain.Accounts;
 using System;
 
 namespace EventSourcing.Sample.Tasks.Domain.Accounts
 {
     public class Account : EventSource
     {
+        public Guid ClientId { get; private set; }
+
+        public decimal Balance { get; private set; }
+
+        public string Number { get; private set; }
+
         public Account()
         {
         }
 
-        public Account(Guid clientId)
+        public Account(Guid clientId, IAccountNumberGenerator accountNumberGenerator)
         {
             var @event = new NewAccountCreated
             {
                 AccountId = Guid.NewGuid(),
-                ClientId = clientId
+                ClientId = clientId,
+                Number = accountNumberGenerator.Generate()
             };
 
             Apply(@event);
             Append(@event);
         }
-
-        public Guid ClientId { get; private set; }
-
-        public decimal Balance { get; private set; }
 
         public void RecordInflow(Guid fromId, decimal ammount)
         {
@@ -46,6 +50,7 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts
         {
             Id = @event.AccountId;
             ClientId = @event.ClientId;
+            Number = @event.Number;
         }
 
         public void Apply(NewInflowRecorded @event)

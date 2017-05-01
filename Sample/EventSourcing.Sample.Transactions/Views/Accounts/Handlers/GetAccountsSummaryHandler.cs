@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
 {
-    public class GetAccountsSummaryHandler : IQueryHandler<GetAccountsSummary, AccountsSummary>
+    public class GetAccountsSummaryHandler : IQueryHandler<GetAccountsSummary, AllAccountsSummary>
     {
         private readonly IDocumentSession _session;
 
@@ -16,11 +16,11 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
             _session = session;
         }
 
-        public AccountsSummary Handle(GetAccountsSummary message)
+        public AllAccountsSummary Handle(GetAccountsSummary message)
         {
             return _session.Query<AccountsSummaryView>()
                   .Select(
-                      a => new AccountsSummary
+                      a => new AllAccountsSummary
                       {
                           TotalBalance = a.TotalBalance,
                           TotalCount = a.TotalCount,
