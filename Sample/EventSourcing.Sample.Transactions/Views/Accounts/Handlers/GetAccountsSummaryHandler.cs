@@ -18,7 +18,7 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
 
         public AllAccountsSummary Handle(GetAccountsSummary message)
         {
-            return _session.Query<AccountsSummaryView>()
+            return _session.Query<AllAccountsSummaryView>()
                   .Select(
                       a => new AllAccountsSummary
                       {

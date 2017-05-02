@@ -87,7 +87,7 @@ namespace EventSourcing.Web.Sample
                     options.DatabaseSchemaName = schemaName;
 
                     options.Events.InlineProjections.AggregateStreamsWith<Account>();
-                    options.Events.InlineProjections.Add(new AccountSummaryViewProjection());
+                    options.Events.InlineProjections.Add(new AllAccountSummaryViewProjection());
                 });
 
                 return documentStore.OpenSession();

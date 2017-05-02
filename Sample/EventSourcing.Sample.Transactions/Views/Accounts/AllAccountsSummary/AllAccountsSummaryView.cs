@@ -4,7 +4,7 @@ using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
 
 namespace EventSourcing.Sample.Tasks.Views.Accounts
 {
-    public class AccountsSummaryView
+    public class AllAccountsSummaryView
     {
         public Guid Id { get; set; }
 
