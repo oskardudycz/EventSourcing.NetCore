@@ -75,21 +75,21 @@ namespace Marten.Integration.Tests.EventStore.Projections
         
         private class TaskListViewProjection : ViewProjection<TaskDescriptionView>
         {
-            readonly Guid viewid = new Guid("a8c1a4ac-686d-4fb7-a64a-710bc630f471");
             public TaskListViewProjection()
             {
-                ProjectEvent<TaskCreated>((ev) => viewid, Persist);
-                ProjectEvent<TaskUpdated>((ev) => viewid, Persist);
+                ProjectEventToSingleRecord<TaskCreated>((view, @event) => view.ApplyEvent(@event));
+                ProjectEventToSingleRecord<TaskUpdated>((view, @event) => view.ApplyEvent(@event));
             }
 
-            private void Persist(TaskDescriptionView view, TaskCreated @event)
+            ViewProjection<TaskDescriptionView> ProjectEventToSingleRecord<TEvent>(Action<TaskDescriptionView, TEvent> handler) where TEvent : class
             {
-                view.ApplyEvent(@event);
+                return ProjectEvent((documentSession, ev) => FindIdOfRecord(documentSession) ?? Guid.NewGuid(), handler);
             }
 
-            private void Persist(TaskDescriptionView view, TaskUpdated @event)
+            Guid? FindIdOfRecord(IDocumentSession documentSession)
             {
-                view.ApplyEvent(@event);
+                return documentSession.Query<TaskDescriptionView>()
+                                   .Select(t => (Guid?)t.Id).SingleOrDefault();
             }
         }
 
