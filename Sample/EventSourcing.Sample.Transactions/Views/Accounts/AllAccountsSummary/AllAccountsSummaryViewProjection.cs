@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace EventSourcing.Sample.Tasks.Views.Accounts
 {
-    public class AllAccountSummaryViewProjection : ViewProjection<AllAccountsSummaryView>
+    public class AllAccountsSummaryViewProjection : ViewProjection<AllAccountsSummaryView>
     {
-        public AllAccountSummaryViewProjection()
+        public AllAccountsSummaryViewProjection()
         {
             ProjectEventToSingleRecord<NewAccountCreated>(Persist);    
         }
