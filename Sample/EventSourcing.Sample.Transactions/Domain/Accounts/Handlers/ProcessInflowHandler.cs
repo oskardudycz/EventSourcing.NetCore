@@ -15,17 +15,19 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
         }
 
         public void Handle(MakeTransfer command)
-        { 
-            var accountFrom = _store.AggregateStream<Account>(command.ToAccountId);
+        {
+            var accountFrom = _store.AggregateStream<Account>(command.FromAccountId);
 
-            accountFrom.RecordOutflow(command.FromAccountId, command.Ammount);
+            accountFrom.RecordOutflow(command.ToAccountId, command.Ammount);
             _store.Append(accountFrom.Id, accountFrom.PendingEvents.ToArray());
-            
+
 
             var accountTo = _store.AggregateStream<Account>(command.ToAccountId);
 
             accountTo.RecordInflow(command.FromAccountId, command.Ammount);
-            _store.Append(accountTo.Id, accountTo.PendingEvents.ToArray());            
+            _store.Append(accountTo.Id, accountTo.PendingEvents.ToArray());
+
+            _session.SaveChanges();
         }
     }
 }
