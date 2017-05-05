@@ -14,7 +14,7 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
         public decimal Balance { get; private set; }
         public int TransactionsCount { get; private set; }
 
-        private void Apply(NewAccountCreated @event)
+        public void ApplyEvent(NewAccountCreated @event)
         {
             AccountId = @event.AccountId;
             Balance = 0;
@@ -23,12 +23,12 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
             TransactionsCount = 0;
         }
 
-        public void Apply(NewInflowRecorded @event)
+        public void ApplyEvent(NewInflowRecorded @event)
         {
             Balance += @event.Inflow.Ammount;
         }
 
-        public void Apply(NewOutflowRecorded @event)
+        public void ApplyEvent(NewOutflowRecorded @event)
         {
             Balance -= @event.Outflow.Ammount;
         }
