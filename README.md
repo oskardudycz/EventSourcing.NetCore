@@ -18,9 +18,9 @@ Slides (PL):
 
 ## Suggested Order of reading
 ### 1. Event Store - Marten
-  * #### [Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/General/StoreInitializationTests.cs)
-  * #### Event Stream #### - is a representation of the entity in event sourcing. It's a set of events that hapened for the entity with the exact id. Stream id should be unique, can have different types but usually is a Guid.
-    * #### [Stream starting] ####(https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs) - stream should be always started with a unique id. Marten provides three ways of starting stream:  
+  * [Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/General/StoreInitializationTests.cs)
+  * Event Stream - is a representation of the entity in event sourcing. It's a set of events that hapened for the entity with the exact id. Stream id should be unique, can have different types but usually is a Guid.
+    * [Stream starting] ####(https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs) - stream should be always started with a unique id. Marten provides three ways of starting stream:  
       * calling StartStream method with a stream id  
          ```csharp
          var streamId = Guid.NewGuid();
