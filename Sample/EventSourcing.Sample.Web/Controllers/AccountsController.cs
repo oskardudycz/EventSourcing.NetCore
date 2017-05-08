@@ -27,18 +27,9 @@ namespace EventSourcing.Web.Sample.Controllers
 
         // GET api/values
         [HttpGet]
-        [Route("clientid={client_id}")]
-        public Task<IEnumerable<AccountSummary>> GetClientAccounts(Guid client_id)
+        public Task<AccountSummary> Get(Guid accountId)
         {
-            return _queryBus.Send(new GetAccounts(client_id));
-        }
-
-        // GET api/values
-        [HttpGet]
-        [Route("accountid={account_id}")]
-        public Task<AccountSummary> Get(Guid account_id)
-        {
-            return _queryBus.Send(new GetAccount(account_id));
+            return _queryBus.Send(new GetAccount(accountId));
         }
 
         // POST api/values

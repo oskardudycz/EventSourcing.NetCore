@@ -4,30 +4,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domain.Commands;
 using Domain.Queries;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
+using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
+using EventSourcing.Sample.Tasks.Views.Accounts;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace EventSourcing.Sample.Web.Controllers
 {
     [Route("api/[controller]")]
-    public class TransactionController : Controller
+    public class ClientsController : Controller
     {
         private readonly ICommandBus _commandBus;
         private readonly IQueryBus _queryBus;
 
-        public TransactionController(ICommandBus commandBus, IQueryBus queryBus)
+        public ClientsController(ICommandBus commandBus, IQueryBus queryBus)
         {
             _commandBus = commandBus;
             _queryBus = queryBus;
         }
 
-        // POST api/values
-        [HttpPost]
-        public async void Post([FromBody]MakeTransfer command)
+        // GET api/values
+        [HttpGet]
+        [Route("{clientId}/accounts")]
+        public Task<IEnumerable<AccountSummary>> Get(Guid clientId)
         {
-            await _commandBus.Send(command);
+            return _queryBus.Send(new GetAccounts(clientId));
         }
     }
 }
