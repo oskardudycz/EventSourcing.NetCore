@@ -22,7 +22,9 @@ using EventSourcing.Sample.Tasks.Views.Accounts;
 using EventSourcing.Sample.Tasks.Views.Accounts.Handlers;
 using EventSourcing.Sample.Tasks.Domain.Accounts;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
+using EventSourcing.Sample.Tasks.Views.Account;
 using EventSourcing.Sample.Transactions.Domain.Accounts;
+using EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary;
 
 namespace EventSourcing.Web.Sample
 {
@@ -69,6 +71,7 @@ namespace EventSourcing.Web.Sample
             services.AddTransient<IRequestHandler<CreateNewAccount>, CreateNewAccountHandler>();
             services.AddTransient<IRequestHandler<MakeTransfer>, ProcessInflowHandler>();
             services.AddTransient<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
+            services.AddTransient<IRequestHandler<GetAccount, AccountSummary>, GetAccountHandler>();
         }
 
         private void ConfigureMarten(IServiceCollection services)
@@ -88,6 +91,14 @@ namespace EventSourcing.Web.Sample
 
                     options.Events.InlineProjections.AggregateStreamsWith<Account>();
                     options.Events.InlineProjections.Add(new AllAccountsSummaryViewProjection());
+
+                    options.Events.InlineProjections.Add(new AccountSummaryViewProjection());
+
+                    options.Events.AddEventType(typeof(NewAccountCreated));
+                    options.Events.AddEventType(typeof(NewInflowRecorded));
+                    options.Events.AddEventType(typeof(NewOutflowRecorded));
+
+
                 });
 
                 return documentStore.OpenSession();

@@ -9,6 +9,7 @@ using EventSourcing.Sample.Tasks.Views.Accounts;
 using EventSourcing.Sample.Tasks.Contracts.Accounts;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
+using EventSourcing.Sample.Tasks.Views.Account;
 
 namespace EventSourcing.Web.Sample.Controllers
 {
@@ -26,16 +27,9 @@ namespace EventSourcing.Web.Sample.Controllers
 
         // GET api/values
         [HttpGet]
-        public Task<IEnumerable<AccountSummary>> Get([FromQuery]GetAccounts query)
+        public Task<AccountSummary> Get(Guid accountId)
         {
-            return _queryBus.Send(query);
-        }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            return _queryBus.Send(new GetAccount(accountId));
         }
 
         // POST api/values
@@ -44,17 +38,6 @@ namespace EventSourcing.Web.Sample.Controllers
         {
             await _commandBus.Send(command);
         }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
+

@@ -46,7 +46,7 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts
             Append(@event);
         }
 
-        private void Apply(NewAccountCreated @event)
+        public void Apply(NewAccountCreated @event)
         {
             Id = @event.AccountId;
             ClientId = @event.ClientId;
