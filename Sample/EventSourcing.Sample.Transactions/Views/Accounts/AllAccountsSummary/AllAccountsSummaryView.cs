@@ -27,7 +27,7 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts
 
         public void ApplyEvent(NewOutflowRecorded @event)
         {
-            TotalBalance += @event.Outflow.Ammount;
+            TotalBalance -= @event.Outflow.Ammount;
             TotalTransactionsCount++;
         }
     }

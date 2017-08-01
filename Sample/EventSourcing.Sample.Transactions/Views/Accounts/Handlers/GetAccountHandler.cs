@@ -4,32 +4,32 @@ using EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary;
 using Marten;
 using System.Collections.Generic;
 using System.Linq;
+using EventSourcing.Sample.Tasks.Views.Account;
 
 namespace EventSourcing.Sample.Tasks.Views.Accounts.Handlers
 {
-    public class GetAccountsHandler : IQueryHandler<GetAccounts, IEnumerable<AccountSummary>>
+    public class GetAccountHandler : IQueryHandler<GetAccount, AccountSummary>
     {
         private readonly IDocumentSession _session;
 
-        public GetAccountsHandler(IDocumentSession session)
+        public GetAccountHandler(IDocumentSession session)
         {
             _session = session;
         }
 
-        public IEnumerable<AccountSummary> Handle(GetAccounts message)
+        public AccountSummary Handle(GetAccount message)
         {
-            return _session.Query<AccountSummaryView>()
-                .Select(
-                    a => new AccountSummary
+            return _session
+                .Query<AccountSummaryView>()
+                .Select(a => new AccountSummary
                     {
                         AccountId = a.AccountId,
                         Balance = a.Balance,
                         ClientId = a.ClientId,
                         Number = a.Number,
                         TransactionsCount = a.TransactionsCount
-                    }
-                ).Where(p => p.ClientId == message.ClientId)
-                .ToList();
+                    })
+                .FirstOrDefault(p => p.AccountId == message.AccountId);
         }
     }
 }
