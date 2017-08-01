@@ -66,7 +66,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
         [Fact]
         public void GivenStreamOfEvents_WhenAggregateStreamIsCalled_ThenChangesAreAppliedProperly()
         {
-            var streamId = EventStore.StartStream<TaskList>();
+            var streamId = EventStore.StartStream<TaskList>().Id;
 
             //1. First Task Was Created
             var task1Id = Guid.NewGuid();

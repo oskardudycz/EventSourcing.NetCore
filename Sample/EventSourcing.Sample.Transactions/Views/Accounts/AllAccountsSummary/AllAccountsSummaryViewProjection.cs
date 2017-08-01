@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace EventSourcing.Sample.Tasks.Views.Accounts
 {
-    public class AllAccountsSummaryViewProjection : ViewProjection<AllAccountsSummaryView>
+    public class AllAccountsSummaryViewProjection : ViewProjection<AllAccountsSummaryView, Guid>
     {
         public AllAccountsSummaryViewProjection()
         {
@@ -18,7 +18,7 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts
             view.ApplyEvent(@event);
         }
         
-        ViewProjection<AllAccountsSummaryView> ProjectEventToSingleRecord<TEvent>(Action<AllAccountsSummaryView, TEvent> handler) where TEvent : class
+        ViewProjection<AllAccountsSummaryView, Guid> ProjectEventToSingleRecord<TEvent>(Action<AllAccountsSummaryView, TEvent> handler) where TEvent : class
         {
             return ProjectEvent((documentSession, ev) => FindIdOfRecord(documentSession) ?? Guid.NewGuid(), handler);
         }

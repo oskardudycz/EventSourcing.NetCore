@@ -13,7 +13,9 @@ namespace Marten.Integration.Tests.General
         {
             var ex = Record.Exception(() =>
             {
-                DocumentStore.For("WrongConnectionString");
+                var store = DocumentStore.For("WrongConnectionString");
+
+                ConnectionShouldBeEstablished(store);
             });
 
             ex.Should().Not.Be.Null();
@@ -98,8 +100,6 @@ namespace Marten.Integration.Tests.General
         {
             using (var session = store.OpenSession())
             {
-                session.DocumentStore.Schema.EnsureStorageExists(typeof(EventStream));
-
                 var events = session.Events.QueryAllRawEvents().ToList();
 
                 events.Should().Not.Be.Null();

@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Marten" Version="1.5.0" />
+    <PackageReference Include="Marten" Version="2.0.0" />
     <PackageReference Include="MediatR" Version="3.0.1" />
   </ItemGroup>
 

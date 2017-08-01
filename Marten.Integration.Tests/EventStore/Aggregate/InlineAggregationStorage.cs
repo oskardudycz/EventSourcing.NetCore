@@ -82,7 +82,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             };
 
             //1. Create events
-            var streamId = EventStore.StartStream<TaskList>(events);
+            var streamId = EventStore.StartStream<TaskList>(events).Id;
 
             Session.SaveChanges();
 

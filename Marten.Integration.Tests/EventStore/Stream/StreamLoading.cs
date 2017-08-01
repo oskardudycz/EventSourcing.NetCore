@@ -29,7 +29,7 @@ namespace Marten.Integration.Tests.EventStore.Stream
         private Guid GetExistingStreamId()
         {
             var @event = new TaskCreated { TaskId = _taskId, Description = "Description" };
-            var streamId = EventStore.StartStream<TaskList>(@event);
+            var streamId = EventStore.StartStream<TaskList>(@event).Id;
             Session.SaveChanges();
 
             return streamId;

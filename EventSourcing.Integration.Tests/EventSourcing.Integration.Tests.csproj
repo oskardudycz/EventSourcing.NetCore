@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Marten" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="Marten" Version="1.5.0" />
     <PackageReference Include="MediatR" Version="3.0.1" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
     <PackageReference Include="SharpTestsEx" Version="2.0.0" />

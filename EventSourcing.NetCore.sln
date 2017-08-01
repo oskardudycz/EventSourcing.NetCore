@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.12
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{107B18E3-65C8-4A6C-976D-7EEED6A6D318}"
 EndProject
@@ -31,6 +31,16 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventSourcing.Sample.Transactions", "Sample\EventSourcing.Sample.Transactions\EventSourcing.Sample.Transactions.csproj", "{6E3C337A-04FC-4E4E-B890-00A2535CC60F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventSourcing.Sample.Web", "Sample\EventSourcing.Sample.Web\EventSourcing.Sample.Web.csproj", "{88A064C1-BDDA-463B-AF82-F514EE3114F5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{821D8306-C110-45AB-BDF7-AA80FDA942CE}"
+	ProjectSection(SolutionItems) = preProject
+		docker\docker-compose.yml = docker\docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postgres", "postgres", "{2B58F5C7-3974-46C2-83DB-F0DE78C1A298}"
+	ProjectSection(SolutionItems) = preProject
+		docker\postgres\variables.env = docker\postgres\variables.env
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,5 +98,6 @@ Global
 		{83A20A3D-0CBB-4525-972E-8935E3120774} = {A7186B6B-D56D-4AEF-B6B7-FAA827764C34}
 		{6E3C337A-04FC-4E4E-B890-00A2535CC60F} = {A7186B6B-D56D-4AEF-B6B7-FAA827764C34}
 		{88A064C1-BDDA-463B-AF82-F514EE3114F5} = {A7186B6B-D56D-4AEF-B6B7-FAA827764C34}
+		{2B58F5C7-3974-46C2-83DB-F0DE78C1A298} = {821D8306-C110-45AB-BDF7-AA80FDA942CE}
 	EndGlobalSection
 EndGlobal

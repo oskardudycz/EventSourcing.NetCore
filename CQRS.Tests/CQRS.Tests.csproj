@@ -24,9 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Marten" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="MediatR" Version="3.0.1" />
-    <PackageReference Include="Marten" Version="1.5.0" />
     <PackageReference Include="SharpTestsEx" Version="2.0.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />

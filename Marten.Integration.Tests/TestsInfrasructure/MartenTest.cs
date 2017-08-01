@@ -36,7 +36,7 @@ namespace Marten.Integration.Tests.TestsInfrasructure
             using (var conn = new NpgsqlConnection(Settings.ConnectionString))
             {
                 conn.Open();
-                using (var tran = conn.BeginTransaction(IsolationLevel.ReadUncommitted))
+                using (var tran = conn.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     var command = conn.CreateCommand();
                     command.CommandText = sql;

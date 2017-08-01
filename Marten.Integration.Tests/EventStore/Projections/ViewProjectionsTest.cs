@@ -73,7 +73,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
             }
         }
         
-        private class TaskListViewProjection : ViewProjection<TaskDescriptionView>
+        private class TaskListViewProjection : ViewProjection<TaskDescriptionView, Guid>
         {
             public TaskListViewProjection()
             {
@@ -81,7 +81,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
                 ProjectEventToSingleRecord<TaskUpdated>((view, @event) => view.ApplyEvent(@event));
             }
 
-            ViewProjection<TaskDescriptionView> ProjectEventToSingleRecord<TEvent>(Action<TaskDescriptionView, TEvent> handler) where TEvent : class
+            ViewProjection<TaskDescriptionView, Guid> ProjectEventToSingleRecord<TEvent>(Action<TaskDescriptionView, TEvent> handler) where TEvent : class
             {
                 return ProjectEvent((documentSession, ev) => FindIdOfRecord(documentSession) ?? Guid.NewGuid(), handler);
             }
@@ -128,7 +128,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
             };
 
             //1. Create events
-            var streamId = EventStore.StartStream<TaskList>(events);
+            var streamId = EventStore.StartStream<TaskList>(events).Id;
 
             Session.SaveChanges();
 

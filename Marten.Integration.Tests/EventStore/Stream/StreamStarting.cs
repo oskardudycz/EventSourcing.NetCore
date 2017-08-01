@@ -25,13 +25,12 @@ namespace Marten.Integration.Tests.EventStore.Stream
         public void GivenNoEvents_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
         {
             var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
-            var streamId = Guid.NewGuid();
 
-            EventStore.StartStream<TaskList>(streamId);
-
-            streamId.Should().Not.Be.Null();
+            var streamId = EventStore.StartStream<TaskList>(@event.TaskId);
 
             Session.SaveChanges();
+
+            streamId.Should().Not.Be.Null();
         }
 
         [Fact]
@@ -39,13 +38,29 @@ namespace Marten.Integration.Tests.EventStore.Stream
         {
             var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
 
-            var streamId = EventStore.StartStream<TaskList>(@event);
+            var streamId = EventStore.StartStream<TaskList>(@event.TaskId, @event);
 
             streamId.Should().Not.Be.Null();
 
             Session.SaveChanges();
         }
-        
+
+        [Fact]
+        public void GivenStartedStream_WhenStartStreamIsBeingCalledAgain_ThenExceptionIsThrown()
+        {
+            var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
+
+            var streamId = EventStore.StartStream<TaskList>(@event.TaskId, @event);
+
+            Session.SaveChanges();
+
+            Assert.Throws<Events.ExistingStreamIdCollisionException>(() =>
+            {
+                EventStore.StartStream<TaskList>(@event.TaskId, @event);
+                Session.SaveChanges();
+            });
+        }
+
         [Fact]
         public void GivenOneEvent_WhenEventsArePublishedWithStreamId_ThenEventsAreSavedWithoutErrorAndStreamIsStarted()
         {
