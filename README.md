@@ -9,7 +9,7 @@ For running the Event Store examples you need to have Postgres DB. You can get i
 docker-compose up
 ```
 
-**More information about using .NET Core, WebApi and Docker you can found in my other tutorial:** [link](https://github.com/oskardudycz/NetCoreWithDocker)
+**More information about using .NET Core, WebApi and Docker you can found in my other tutorial:** [.Net Core With Docker](https://github.com/oskardudycz/NetCoreWithDocker)
 
 * Installing most recent version of the Postgres DB (eg. from: <https://www.postgresql.org/download/>). 
 
