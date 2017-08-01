@@ -6,8 +6,9 @@ Example of Event Sourcing in .NET Core
 For running the Event Store examples you need to have Postgres DB. You can get it by:
 * Installing [Docker](https://store.docker.com/search?type=edition&offering=community), go to the `docker` folder and run:
 ```
-    docker-compose up
+docker-compose up
 ```
+
     **More information about using .NET Core, WebApi and Docker you can found in my other tutorial:** [link](https://github.com/oskardudycz/NetCoreWithDocker)
 
 * Installing most recent version of the Postgres DB (eg. from: <https://www.postgresql.org/download/>). 
