@@ -1,8 +1,5 @@
-﻿using EventSourcing.Sample.Clients.Domain.Users;
+﻿using EventSourcing.Sample.Clients.Domain.Clients;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EventSourcing.Sample.Clients.Storage
 {
@@ -12,6 +9,6 @@ namespace EventSourcing.Sample.Clients.Storage
             : base(options)
         { }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<Client> Users { get; set; }
     }
 }

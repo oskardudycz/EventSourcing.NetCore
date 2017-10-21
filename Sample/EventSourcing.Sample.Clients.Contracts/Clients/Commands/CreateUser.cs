@@ -1,6 +1,6 @@
 ﻿using Domain.Commands;
 
-namespace EventSourcing.Sample.Clients.Contracts.Users.Commands
+namespace EventSourcing.Sample.Clients.Contracts.Clients.Commands
 {
     public class CreateUser : ICommand
     {

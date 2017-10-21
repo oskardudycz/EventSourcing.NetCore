@@ -1,7 +1,7 @@
 ﻿using Domain.Events;
 using System;
 
-namespace EventSourcing.Sample.Clients.Contracts.Users.Events
+namespace EventSourcing.Sample.Clients.Contracts.Clients.Events
 {
     public class UserDeleted : IEvent
     {

@@ -1,34 +1,33 @@
 ﻿using Domain.Commands;
-using EventSourcing.Sample.Clients.Contracts.Users.Commands;
+using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
 using EventSourcing.Sample.Clients.Storage;
 using System;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
-namespace EventSourcing.Sample.Clients.Domain.Users.Handlers
+namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
 {
-    public class UserCommandHandler :
+    public class ClientsCommandHandler :
         IAsyncCommandHandler<CreateUser>,
         IAsyncCommandHandler<UpdateUser>,
         IAsyncCommandHandler<DeleteUser>
     {
         private readonly ClientsDbContext dbContext;
 
-        private DbSet<User> DbSet => dbContext.Users;
+        private DbSet<Client> DbSet => dbContext.Users;
 
-        public UserCommandHandler(ClientsDbContext dbContext)
+        public ClientsCommandHandler(ClientsDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
 
         public async Task Handle(CreateUser command)
         {
-            await DbSet.AddAsync(new User
-            {
-                Id = Guid.NewGuid(),
-                Name = command.Name,
-                Email = command.Email
-            });
+            await DbSet.AddAsync(new Client(
+                Guid.NewGuid(), 
+                command.Name,
+                command.Email
+            ));
             await dbContext.SaveChangesAsync();
         }
 
@@ -36,8 +35,7 @@ namespace EventSourcing.Sample.Clients.Domain.Users.Handlers
         {
             var user = await DbSet.FindAsync(command.Id);
 
-            user.Name = command.Name;
-            user.Email = command.Email;
+            user.Update(command.Name, command.Email);
 
             dbContext.Update(user);
             await dbContext.SaveChangesAsync();

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Domain.Commands;
 using Domain.Queries;
-using EventSourcing.Sample.Tasks.Views.Accounts;
-using EventSourcing.Sample.Tasks.Contracts.Accounts;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
 using EventSourcing.Sample.Tasks.Views.Account;
