@@ -1,6 +1,7 @@
 ﻿using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
 using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
 using System;
+using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 
 namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
 {
@@ -10,9 +11,11 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
 
         public Guid AccountId { get; set; }
         public Guid ClientId { get; set; }
+        public string ClientName { get; set; }
         public string Number { get; set; }
         public decimal Balance { get; set; }
         public int TransactionsCount { get; set; }
+        public bool IsDeleted { get; set; }
 
         public void ApplyEvent(NewAccountCreated @event)
         {
@@ -26,6 +29,21 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
         public void ApplyEvent(NewInflowRecorded @event)
         {
             Balance += @event.Inflow.Ammount;
+        }
+
+        internal void ApplyEvent(ClientCreated @event)
+        {
+            ClientName = @event.Data.Name;
+        }
+
+        internal void ApplyEvent(ClientUpdated @event)
+        {
+            ClientName = @event.Data.Name;
+        }
+
+        internal void ApplyEvent(ClientDeleted @event)
+        {
+            IsDeleted = false;
         }
 
         public void ApplyEvent(NewOutflowRecorded @event)

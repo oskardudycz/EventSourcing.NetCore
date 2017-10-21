@@ -4,6 +4,6 @@ namespace Domain.Commands
 {
     public interface ICommandBus
     {
-        Task Send(ICommand command);
+        Task Send<TCommand>(TCommand command) where TCommand : ICommand;
     }
 }

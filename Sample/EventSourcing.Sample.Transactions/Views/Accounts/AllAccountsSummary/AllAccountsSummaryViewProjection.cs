@@ -11,24 +11,9 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts
     {
         public AllAccountsSummaryViewProjection()
         {
-            ProjectEventToSingleRecord<NewAccountCreated>(Persist);    
-            ProjectEventToSingleRecord<NewInflowRecorded>(Persist);
-            ProjectEventToSingleRecord<NewOutflowRecorded>(Persist);
-        }
-
-        private void Persist(AllAccountsSummaryView view, NewAccountCreated @event)
-        {
-            view.ApplyEvent(@event);
-        }
-        
-        private void Persist(AllAccountsSummaryView view, NewInflowRecorded @event)
-        {
-            view.ApplyEvent(@event);
-        }
-
-        private void Persist(AllAccountsSummaryView view, NewOutflowRecorded @event)
-        {
-            view.ApplyEvent(@event);
+            ProjectEventToSingleRecord<NewAccountCreated>((view, @event) => view.ApplyEvent(@event));    
+            ProjectEventToSingleRecord<NewInflowRecorded>((view, @event) => view.ApplyEvent(@event));
+            ProjectEventToSingleRecord<NewOutflowRecorded>((view, @event) => view.ApplyEvent(@event));
         }
 
         ViewProjection<AllAccountsSummaryView, Guid> ProjectEventToSingleRecord<TEvent>(Action<AllAccountsSummaryView, TEvent> handler) where TEvent : class
