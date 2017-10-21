@@ -102,3 +102,6 @@ Slides (PL):
 ### 3. CQRS (Command Query Responsibility Separation)
   * **[Command handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/CQRS.Tests/Commands/Commands.cs)**
   * **[Query handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/CQRS.Tests/Queries/Queries.cs)**
+
+### 4. Fully working sample application
+See also fully working sample application in https://github.com/oskardudycz/EventSourcing.NetCore/tree/master/Sample
