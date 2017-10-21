@@ -24,6 +24,7 @@ namespace EventSourcing.Sample.Clients.Storage
             var connectionString =
                 new ConfigurationBuilder()
                     .SetBasePath(AppContext.BaseDirectory)
+                    .AddJsonFile("appsettings.json")
                     .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: false)
                     .AddEnvironmentVariables()
                     .Build()

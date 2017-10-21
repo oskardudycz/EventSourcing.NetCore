@@ -1,4 +1,5 @@
 ﻿using Domain.Aggregates;
+using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
 using System;
 
 namespace EventSourcing.Sample.Clients.Domain.Clients
@@ -23,10 +24,10 @@ namespace EventSourcing.Sample.Clients.Domain.Clients
             Email = email;
         }
 
-        public void Update(string name, string email)
+        public void Update(ClientInfo clientInfo)
         {
-            Name = name;
-            Email = email;
+            Name = clientInfo.Name;
+            Email = clientInfo.Email;
         }
     }
 }

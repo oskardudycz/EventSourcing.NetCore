@@ -1,15 +1,15 @@
-﻿using Domain.Events;
+﻿using Domain.Commands;
 using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
 using System;
 
-namespace EventSourcing.Sample.Clients.Contracts.Clients.Events
+namespace EventSourcing.Sample.Clients.Contracts.Clients.Commands
 {
-    public class UserUpdated : IEvent
+    public class UpdateClient : ICommand
     {
         public Guid Id { get; }
         public ClientInfo Data { get; }
 
-        public UserUpdated(Guid id, ClientInfo data)
+        public UpdateClient(Guid id, ClientInfo data)
         {
             Id = id;
             Data = data;

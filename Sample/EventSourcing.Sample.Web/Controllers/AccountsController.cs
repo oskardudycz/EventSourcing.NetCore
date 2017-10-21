@@ -30,7 +30,7 @@ namespace EventSourcing.Web.Sample.Controllers
 
         // POST api/values
         [HttpPost]
-        public async void Post([FromBody]CreateNewAccount command)
+        public async Task Post([FromBody]CreateNewAccount command)
         {
             await _commandBus.Send(command);
         }

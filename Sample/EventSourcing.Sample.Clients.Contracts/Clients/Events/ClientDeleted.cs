@@ -3,11 +3,11 @@ using System;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Events
 {
-    public class UserDeleted : IEvent
+    public class ClientDeleted : IEvent
     {
         public Guid Id { get; }
 
-        public UserDeleted(Guid id)
+        public ClientDeleted(Guid id)
         {
             Id = id;
         }

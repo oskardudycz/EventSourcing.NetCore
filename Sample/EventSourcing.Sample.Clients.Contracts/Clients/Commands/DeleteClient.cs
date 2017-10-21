@@ -3,11 +3,11 @@ using System;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Commands
 {
-    public class DeleteUser : ICommand
+    public class DeleteClient : ICommand
     {
         public Guid Id { get; }
 
-        public DeleteUser(Guid id)
+        public DeleteClient(Guid id)
         {
             Id = id;
         }

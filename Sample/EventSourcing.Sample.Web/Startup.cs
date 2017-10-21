@@ -1,30 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Domain.Commands;
+using Domain.Queries;
+using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
+using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
+using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
+using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
+using EventSourcing.Sample.Tasks.Domain.Accounts.Handlers;
+using EventSourcing.Sample.Tasks.Domain.Accounts;
+using EventSourcing.Sample.Tasks.Views.Account;
+using EventSourcing.Sample.Tasks.Views.Accounts.Handlers;
+using EventSourcing.Sample.Tasks.Views.Accounts;
+using EventSourcing.Sample.Transactions.Domain.Accounts;
+using EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary;
+using Marten;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
-using MediatR;
-using System.Reflection;
-using Domain.Commands;
-using Domain.Queries;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
-using EventSourcing.Sample.Tasks.Domain.Accounts.Handlers;
-using Marten;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
-using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
-using EventSourcing.Sample.Tasks.Contracts.Accounts;
-using EventSourcing.Sample.Tasks.Views.Accounts;
-using EventSourcing.Sample.Tasks.Views.Accounts.Handlers;
-using EventSourcing.Sample.Tasks.Domain.Accounts;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
-using EventSourcing.Sample.Tasks.Views.Account;
-using EventSourcing.Sample.Transactions.Domain.Accounts;
-using EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary;
+using System.Collections.Generic;
+using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
+using EventSourcing.Sample.Clients.Domain.Clients.Handlers;
+using EventSourcing.Sample.Clients.Storage;
+using Microsoft.EntityFrameworkCore;
+using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
+using EventSourcing.Sample.Clients.Views.Clients;
+using EventSourcing.Sample.Clients.Contracts.Clients.Events;
+using EventSourcing.Sample.Transactions.Domain.Clients.Handlers;
+using Domain.Events;
+using EventSourcing.Sample.Transactions.Views.Clients;
 
 namespace EventSourcing.Web.Sample
 {
@@ -60,23 +65,37 @@ namespace EventSourcing.Web.Sample
 
             ConfigureMarten(services);
 
+            ConfigureEF(services);
+
             ConfigureCQRS(services);
         }
 
         private static void ConfigureCQRS(IServiceCollection services)
         {
-            services.AddTransient<ICommandBus, CommandBus>();
-            services.AddTransient<IQueryBus, QueryBus>();
+            services.AddScoped<ICommandBus, CommandBus>();
+            services.AddScoped<IQueryBus, QueryBus>();
+            services.AddScoped<IEventBus, EventBus>();
 
-            services.AddTransient<IRequestHandler<CreateNewAccount>, CreateNewAccountHandler>();
-            services.AddTransient<IRequestHandler<MakeTransfer>, ProcessInflowHandler>();
-            services.AddTransient<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
-            services.AddTransient<IRequestHandler<GetAccount, AccountSummary>, GetAccountHandler>();
+            services.AddScoped<IRequestHandler<CreateNewAccount>, CreateNewAccountHandler>();
+            services.AddScoped<IRequestHandler<MakeTransfer>, ProcessInflowHandler>();
+            services.AddScoped<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
+            services.AddScoped<IRequestHandler<GetAccount, AccountSummary>, GetAccountHandler>();
+
+            services.AddScoped<IAsyncNotificationHandler<ClientCreated>, ClientsEventHandler>();
+            services.AddScoped<IAsyncNotificationHandler<ClientUpdated>, ClientsEventHandler>();
+            services.AddScoped<IAsyncNotificationHandler<ClientDeleted>, ClientsEventHandler>();
+
+
+            services.AddScoped<IAsyncRequestHandler<CreateClient>, ClientsCommandHandler>();
+            services.AddScoped<IAsyncRequestHandler<UpdateClient>, ClientsCommandHandler>();
+            services.AddScoped<IAsyncRequestHandler<DeleteClient>, ClientsCommandHandler>();
+            services.AddScoped<IAsyncRequestHandler<GetClients, List<ClientListItem>>, ClientsQueryHandler>();
+            services.AddScoped<IAsyncRequestHandler<GetClient, ClientItem>, ClientsQueryHandler>();
         }
 
         private void ConfigureMarten(IServiceCollection services)
         {
-            services.AddTransient(sp =>
+            services.AddScoped(sp =>
             {
                 var documentStore = DocumentStore.For(options =>
                 {
@@ -91,18 +110,26 @@ namespace EventSourcing.Web.Sample
 
                     options.Events.InlineProjections.AggregateStreamsWith<Account>();
                     options.Events.InlineProjections.Add(new AllAccountsSummaryViewProjection());
-
                     options.Events.InlineProjections.Add(new AccountSummaryViewProjection());
+                    options.Events.InlineProjections.Add(new ClientsViewProjection());
 
                     options.Events.AddEventType(typeof(NewAccountCreated));
                     options.Events.AddEventType(typeof(NewInflowRecorded));
                     options.Events.AddEventType(typeof(NewOutflowRecorded));
+                    options.Events.AddEventType(typeof(ClientCreated));
+                    options.Events.AddEventType(typeof(ClientUpdated));
+                    options.Events.AddEventType(typeof(ClientDeleted));
 
 
                 });
 
                 return documentStore.OpenSession();
             });
+        }
+
+        private void ConfigureEF(IServiceCollection services)
+        {
+            services.AddDbContext<ClientsDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("ClientsDatabase")));
         }
 
         private static void ConfigureMediator(IServiceCollection services)

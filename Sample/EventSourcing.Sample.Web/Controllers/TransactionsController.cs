@@ -25,7 +25,7 @@ namespace EventSourcing.Sample.Web.Controllers
 
         // POST api/values
         [HttpPost]
-        public async void Post([FromBody]MakeTransfer command)
+        public async Task Post([FromBody]MakeTransfer command)
         {
             await _commandBus.Send(command);
         }

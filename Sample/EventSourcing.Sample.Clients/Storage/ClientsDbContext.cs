@@ -7,8 +7,12 @@ namespace EventSourcing.Sample.Clients.Storage
     {
         public ClientsDbContext(DbContextOptions<ClientsDbContext> options)
             : base(options)
-        { }
+        {
+            #if DEBUG
+            Database.Migrate();
+            #endif
+        }
 
-        public DbSet<Client> Users { get; set; }
+        public DbSet<Client> Clients { get; set; }
     }
 }

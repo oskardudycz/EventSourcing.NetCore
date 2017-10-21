@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\EventSourcing.Sample.Clients.Contracts\EventSourcing.Sample.Clients.Contracts.csproj" />
+    <ProjectReference Include="..\EventSourcing.Sample.Clients\EventSourcing.Sample.Clients.csproj" />
     <ProjectReference Include="..\EventSourcing.Sample.Transactions.Contracts\EventSourcing.Sample.Transactions.Contracts.csproj" />
     <ProjectReference Include="..\EventSourcing.Sample.Transactions\EventSourcing.Sample.Transactions.csproj" />
   </ItemGroup>
@@ -21,6 +23,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
@@ -38,6 +41,12 @@
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
