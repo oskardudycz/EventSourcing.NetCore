@@ -29,7 +29,7 @@ namespace EventSourcing.Web.Sample.Controllers
         [HttpGet]
         public Task<AccountSummary> Get(Guid accountId)
         {
-            return _queryBus.Send(new GetAccount(accountId));
+            return _queryBus.Send<GetAccount, AccountSummary>(new GetAccount(accountId));
         }
 
         // POST api/values

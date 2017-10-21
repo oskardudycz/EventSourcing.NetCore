@@ -12,9 +12,9 @@ namespace Domain.Queries
             _mediator = mediator;
         }
 
-        public Task<TResponse> Send<TResponse>(IQuery<TResponse> command)
+        public Task<TResponse> Send<TQuery, TResponse>(TQuery query) where TQuery : IQuery<TResponse>
         {
-            return _mediator.Send(command);
+            return _mediator.Send(query);
         }
     }
 }

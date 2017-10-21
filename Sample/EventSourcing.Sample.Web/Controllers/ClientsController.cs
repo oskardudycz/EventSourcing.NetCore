@@ -27,7 +27,7 @@ namespace EventSourcing.Sample.Web.Controllers
         [Route("{clientId}/accounts")]
         public Task<IEnumerable<AccountSummary>> Get(Guid clientId)
         {
-            return _queryBus.Send(new GetAccounts(clientId));
+            return _queryBus.Send<GetAccounts, IEnumerable<AccountSummary>>(new GetAccounts(clientId));
         }
     }
 }

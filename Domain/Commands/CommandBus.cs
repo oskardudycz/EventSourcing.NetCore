@@ -12,7 +12,7 @@ namespace Domain.Commands
             _mediator = mediator;
         }
 
-        public Task Send(ICommand command)
+        public Task Send<TCommand>(TCommand command) where TCommand : ICommand
         {
             return _mediator.Send(command);
         }
