@@ -51,7 +51,7 @@ namespace Marten.Integration.Tests.EventStore.Transformations
                 return new TaskChangesLog
                 {
                     TaskId = input.Data.TaskId,
-                    Timestamp = DateTime.Now,
+                    Timestamp = input.Timestamp.DateTime,
                     ChangeType = ChangeType.Creation
                 };
             }
@@ -61,7 +61,7 @@ namespace Marten.Integration.Tests.EventStore.Transformations
                 return new TaskChangesLog
                 {
                     TaskId = input.Data.TaskId,
-                    Timestamp = DateTime.Now,
+                    Timestamp = input.Timestamp.DateTime,
                     ChangeType = ChangeType.Modification
                 };
             }
@@ -111,13 +111,13 @@ namespace Marten.Integration.Tests.EventStore.Transformations
 
             changeLogs.Select(ev => ev.TaskId)
                 .Should().Have.SameValuesAs(events.Select(ev => ev.TaskId));
-            
+
             changeLogs.Count(ev => ev.ChangeType == ChangeType.Creation)
                 .Should().Be.EqualTo(events.OfType<TaskCreated>().Count());
 
             changeLogs.Count(ev => ev.ChangeType == ChangeType.Modification)
                 .Should().Be.EqualTo(events.OfType<TaskUpdated>().Count());
-            
+
             changeLogs.Count(ev => ev.TaskId == task1Id)
                 .Should().Be.EqualTo(events.Count(ev => ev.TaskId == task1Id));
 

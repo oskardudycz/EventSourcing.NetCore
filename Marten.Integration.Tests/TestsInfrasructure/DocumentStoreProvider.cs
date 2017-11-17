@@ -10,6 +10,7 @@ namespace Marten.Integration.Tests.TestsInfrasructure
             {
                 options.Connection(Settings.ConnectionString);
                 options.AutoCreateSchemaObjects = AutoCreate.All;
+                options.DatabaseSchemaName = schemaName ?? Settings.SchemaName;
                 options.Events.DatabaseSchemaName = schemaName ?? Settings.SchemaName;
 
                 if (setOptions != null)

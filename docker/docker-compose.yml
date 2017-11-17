@@ -1,7 +1,7 @@
 version: "3"
 services:
     postgres: 
-        image: postgres
+        image: postgres:9.5
         environment:
             - postgres/variables.env
         ports:
