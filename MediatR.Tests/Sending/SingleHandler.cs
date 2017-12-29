@@ -8,7 +8,7 @@ using Xunit;
 
 namespace MediatR.Tests.Sending
 {
-    public class AsynchronousHandler
+    public class SingleHandler
     {
         private class ServiceLocator
         {
@@ -43,11 +43,11 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private class GetTaskNamesQueryAsyncHandler : IRequestHandler<GetTaskNamesQuery, List<string>>
+        private class GetTaskNamesQueryHandler : IRequestHandler<GetTaskNamesQuery, List<string>>
         {
             private readonly TasksList _taskList;
 
-            public GetTaskNamesQueryAsyncHandler(TasksList tasksList)
+            public GetTaskNamesQueryHandler(TasksList tasksList)
             {
                 _taskList = tasksList;
             }
@@ -62,9 +62,9 @@ namespace MediatR.Tests.Sending
 
         private readonly IMediator mediator;
 
-        public AsynchronousHandler()
+        public SingleHandler()
         {
-            var queryHandler = new GetTaskNamesQueryAsyncHandler(
+            var queryHandler = new GetTaskNamesQueryHandler(
                 new TasksList("Cleaning main room", "Writing blog", "cleaning kitchen"));
 
             var serviceLocator = new ServiceLocator();

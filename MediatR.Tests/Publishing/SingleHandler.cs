@@ -43,11 +43,11 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        private class TaskWasAddedAsyncHandler : INotificationHandler<TaskWasAdded>
+        private class TaskWasAddedHandler : INotificationHandler<TaskWasAdded>
         {
             private readonly TasksList _taskList;
 
-            public TaskWasAddedAsyncHandler(TasksList tasksList)
+            public TaskWasAddedHandler(TasksList tasksList)
             {
                 _taskList = tasksList;
             }
@@ -64,7 +64,7 @@ namespace MediatR.Tests.Publishing
 
         public SingleHandler()
         {
-            var notificationHandler = new TaskWasAddedAsyncHandler(_tasksList);
+            var notificationHandler = new TaskWasAddedHandler(_tasksList);
 
             var serviceLocator = new ServiceLocator();
 
