@@ -1,9 +1,11 @@
-﻿using Domain.Queries;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Domain.Queries;
 using EventSourcing.Sample.Tasks.Views.Accounts;
 using EventSourcing.Sample.Transactions.Contracts.Accounts.Queries;
 using EventSourcing.Sample.Transactions.Contracts.Accounts.ValueObjects;
 using Marten;
-using System.Linq;
 
 namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
 {
@@ -16,7 +18,7 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
             _session = session;
         }
 
-        public AllAccountsSummary Handle(GetAccountsSummary message)
+        public Task<AllAccountsSummary> Handle(GetAccountsSummary message, CancellationToken cancellationToken = default(CancellationToken))
         {
             return _session.Query<AllAccountsSummaryView>()
                   .Select(
@@ -27,7 +29,7 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
                           TotalTransactionsCount = a.TotalTransactionsCount
                       }
                   )
-                  .SingleOrDefault();
+                  .SingleOrDefaultAsync(cancellationToken);
         }
     }
 }

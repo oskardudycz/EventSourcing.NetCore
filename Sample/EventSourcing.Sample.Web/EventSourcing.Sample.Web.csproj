@@ -33,7 +33,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.0.1" />
-    <PackageReference Include="MediatR" Version="3.0.1" />
+    <PackageReference Include="MediatR" Version="4.0.1" />
     <PackageReference Include="NETStandard.Library" Version="2.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.1.0" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />

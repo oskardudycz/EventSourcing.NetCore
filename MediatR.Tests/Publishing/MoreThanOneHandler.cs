@@ -1,21 +1,26 @@
-﻿using SharpTestsEx;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using SharpTestsEx;
 using Xunit;
 
 namespace MediatR.Tests.Publishing
 {
     public class MoreThanOneHandler
     {
-        class ServiceLocator
+        private class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
                 => Services.Add(type, implementations.ToList());
 
-            public List<object> Get(Type type) { return Services[type]; }
+            public List<object> Get(Type type)
+            {
+                return Services[type];
+            }
         }
 
         public class TasksList
@@ -41,14 +46,16 @@ namespace MediatR.Tests.Publishing
         public class TaskWasAddedHandler : INotificationHandler<TaskWasAdded>
         {
             private readonly TasksList _taskList;
+
             public TaskWasAddedHandler(TasksList tasksList)
             {
                 _taskList = tasksList;
             }
 
-            public void Handle(TaskWasAdded @event)
+            public Task Handle(TaskWasAdded @event, CancellationToken cancellationToken = default(CancellationToken))
             {
                 _taskList.Tasks.Add(@event.TaskName);
+                return Task.CompletedTask;
             }
         }
 
@@ -61,9 +68,6 @@ namespace MediatR.Tests.Publishing
 
             var serviceLocator = new ServiceLocator();
             serviceLocator.Register(typeof(INotificationHandler<TaskWasAdded>), eventHandler, eventHandler);
-            //Registration needed internally by MediatR
-            serviceLocator.Register(typeof(IAsyncNotificationHandler<TaskWasAdded>), new IAsyncNotificationHandler<TaskWasAdded>[] { });
-            serviceLocator.Register(typeof(ICancellableAsyncNotificationHandler<TaskWasAdded>), new ICancellableAsyncNotificationHandler<TaskWasAdded>[] {  });
 
             mediator = new Mediator(
                     type => new { },

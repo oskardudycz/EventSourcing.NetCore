@@ -1,7 +1,8 @@
-﻿using CQRS.Tests.TestsInfrasructure;
-using MediatR;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using CQRS.Tests.TestsInfrasructure;
+using MediatR;
 using SharpTestsEx;
 using Xunit;
 
@@ -9,16 +10,18 @@ namespace CQRS.Tests.Commands
 {
     public class Commands
     {
-        interface ICommand : IRequest { }
+        private interface ICommand : IRequest
+        { }
 
-        interface ICommandHandler<in T> : IRequestHandler<T> where T: ICommand { }
+        private interface ICommandHandler<in T> : IRequestHandler<T> where T : ICommand
+        { }
 
-        interface ICommandBus
+        private interface ICommandBus
         {
             Task Send(ICommand command);
         }
 
-        class CommandBus : ICommandBus
+        private class CommandBus : ICommandBus
         {
             private readonly IMediator _mediator;
 
@@ -33,7 +36,7 @@ namespace CQRS.Tests.Commands
             }
         }
 
-        class AddTaskCommand : ICommand
+        private class AddTaskCommand : ICommand
         {
             public string Name { get; }
 
@@ -43,12 +46,12 @@ namespace CQRS.Tests.Commands
             }
         }
 
-        interface ITaskApplicationService
+        private interface ITaskApplicationService
         {
             Task AddTask(AddTaskCommand command);
         }
 
-        class TaskApplicationService : ITaskApplicationService
+        private class TaskApplicationService : ITaskApplicationService
         {
             private readonly ICommandBus _commandBus;
 
@@ -63,12 +66,12 @@ namespace CQRS.Tests.Commands
             }
         }
 
-        interface IAppWrtiteModel
+        private interface IAppWrtiteModel
         {
             IList<string> Tasks { get; }
         }
 
-        class AppWriteModel : IAppWrtiteModel
+        private class AppWriteModel : IAppWrtiteModel
         {
             public IList<string> Tasks { get; }
 
@@ -78,7 +81,7 @@ namespace CQRS.Tests.Commands
             }
         }
 
-        class AddTaskCommandHandler : ICommandHandler<AddTaskCommand>
+        private class AddTaskCommandHandler : ICommandHandler<AddTaskCommand>
         {
             private readonly IAppWrtiteModel _writeModel;
 
@@ -86,9 +89,11 @@ namespace CQRS.Tests.Commands
             {
                 _writeModel = writeModel;
             }
-            public void Handle(AddTaskCommand message)
+
+            public Task Handle(AddTaskCommand message, CancellationToken cancellationToken = default(CancellationToken))
             {
                 _writeModel.Tasks.Add(message.Name);
+                return Task.CompletedTask;
             }
         }
 

@@ -1,35 +1,35 @@
-﻿using Domain.Commands;
+﻿using System.Collections.Generic;
+using Domain.Commands;
+using Domain.Events;
 using Domain.Queries;
+using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
+using EventSourcing.Sample.Clients.Contracts.Clients.Events;
+using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
+using EventSourcing.Sample.Clients.Domain.Clients.Handlers;
+using EventSourcing.Sample.Clients.Storage;
+using EventSourcing.Sample.Clients.Views.Clients;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
 using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
-using EventSourcing.Sample.Tasks.Domain.Accounts.Handlers;
 using EventSourcing.Sample.Tasks.Domain.Accounts;
+using EventSourcing.Sample.Tasks.Domain.Accounts.Handlers;
 using EventSourcing.Sample.Tasks.Views.Account;
-using EventSourcing.Sample.Tasks.Views.Accounts.Handlers;
 using EventSourcing.Sample.Tasks.Views.Accounts;
+using EventSourcing.Sample.Tasks.Views.Accounts.Handlers;
 using EventSourcing.Sample.Transactions.Domain.Accounts;
+using EventSourcing.Sample.Transactions.Domain.Clients.Handlers;
 using EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary;
+using EventSourcing.Sample.Transactions.Views.Clients;
 using Marten;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
-using System.Collections.Generic;
-using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
-using EventSourcing.Sample.Clients.Domain.Clients.Handlers;
-using EventSourcing.Sample.Clients.Storage;
-using Microsoft.EntityFrameworkCore;
-using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
-using EventSourcing.Sample.Clients.Views.Clients;
-using EventSourcing.Sample.Clients.Contracts.Clients.Events;
-using EventSourcing.Sample.Transactions.Domain.Clients.Handlers;
-using Domain.Events;
-using EventSourcing.Sample.Transactions.Views.Clients;
 
 namespace EventSourcing.Web.Sample
 {
@@ -58,7 +58,6 @@ namespace EventSourcing.Web.Sample
                 c.SwaggerDoc("v1", new Info { Title = "Event Sourcing Example", Version = "v1" });
             });
 
-
             services.AddTransient<IAccountNumberGenerator, RandomAccountNumberGenerator>();
 
             ConfigureMediator(services);
@@ -81,16 +80,15 @@ namespace EventSourcing.Web.Sample
             services.AddScoped<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
             services.AddScoped<IRequestHandler<GetAccount, AccountSummary>, GetAccountHandler>();
 
-            services.AddScoped<IAsyncNotificationHandler<ClientCreated>, ClientsEventHandler>();
-            services.AddScoped<IAsyncNotificationHandler<ClientUpdated>, ClientsEventHandler>();
-            services.AddScoped<IAsyncNotificationHandler<ClientDeleted>, ClientsEventHandler>();
+            services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>();
+            services.AddScoped<INotificationHandler<ClientUpdated>, ClientsEventHandler>();
+            services.AddScoped<INotificationHandler<ClientDeleted>, ClientsEventHandler>();
 
-
-            services.AddScoped<IAsyncRequestHandler<CreateClient>, ClientsCommandHandler>();
-            services.AddScoped<IAsyncRequestHandler<UpdateClient>, ClientsCommandHandler>();
-            services.AddScoped<IAsyncRequestHandler<DeleteClient>, ClientsCommandHandler>();
-            services.AddScoped<IAsyncRequestHandler<GetClients, List<ClientListItem>>, ClientsQueryHandler>();
-            services.AddScoped<IAsyncRequestHandler<GetClient, ClientItem>, ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<CreateClient>, ClientsCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateClient>, ClientsCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteClient>, ClientsCommandHandler>();
+            services.AddScoped<IRequestHandler<GetClients, List<ClientListItem>>, ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetClient, ClientItem>, ClientsQueryHandler>();
         }
 
         private void ConfigureMarten(IServiceCollection services)
@@ -119,8 +117,6 @@ namespace EventSourcing.Web.Sample
                     options.Events.AddEventType(typeof(ClientCreated));
                     options.Events.AddEventType(typeof(ClientUpdated));
                     options.Events.AddEventType(typeof(ClientDeleted));
-
-
                 });
 
                 return documentStore.OpenSession();

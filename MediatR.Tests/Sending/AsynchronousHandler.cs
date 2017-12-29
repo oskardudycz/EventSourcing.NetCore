@@ -1,25 +1,29 @@
-﻿using SharpTestsEx;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xunit;
+using System.Threading;
 using System.Threading.Tasks;
+using SharpTestsEx;
+using Xunit;
 
 namespace MediatR.Tests.Sending
 {
     public class AsynchronousHandler
     {
-        class ServiceLocator
+        private class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
                 => Services.Add(type, implementations.ToList());
 
-            public List<object> Get(Type type) { return Services[type]; }
+            public List<object> Get(Type type)
+            {
+                return Services[type];
+            }
         }
 
-        class TasksList
+        private class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -29,7 +33,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        class GetTaskNamesQuery : IRequest<List<string>>
+        private class GetTaskNamesQuery : IRequest<List<string>>
         {
             public string Filter { get; }
 
@@ -39,15 +43,16 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        class GetTaskNamesQueryAsyncHandler : IAsyncRequestHandler<GetTaskNamesQuery, List<string>>
+        private class GetTaskNamesQueryAsyncHandler : IRequestHandler<GetTaskNamesQuery, List<string>>
         {
             private readonly TasksList _taskList;
+
             public GetTaskNamesQueryAsyncHandler(TasksList tasksList)
             {
                 _taskList = tasksList;
             }
 
-            public Task<List<string>> Handle(GetTaskNamesQuery query)
+            public Task<List<string>> Handle(GetTaskNamesQuery query, CancellationToken cancellationToken = default(CancellationToken))
             {
                 return Task.Run(() => _taskList.Tasks
                     .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
@@ -63,10 +68,9 @@ namespace MediatR.Tests.Sending
                 new TasksList("Cleaning main room", "Writing blog", "cleaning kitchen"));
 
             var serviceLocator = new ServiceLocator();
-            serviceLocator.Register(typeof(IAsyncRequestHandler<GetTaskNamesQuery, List<string>>), queryHandler);
+            serviceLocator.Register(typeof(IRequestHandler<GetTaskNamesQuery, List<string>>), queryHandler);
             //Registration needed internally by MediatR
             serviceLocator.Register(typeof(IPipelineBehavior<GetTaskNamesQuery, List<string>>), new object[] { });
-            serviceLocator.Register(typeof(IRequestHandler<GetTaskNamesQuery, List<string>>), new IRequestHandler<GetTaskNamesQuery, List<string>>[] { });
 
             mediator = new Mediator(
                     type => serviceLocator.Get(type).FirstOrDefault(),

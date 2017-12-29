@@ -1,11 +1,13 @@
-﻿using Domain.Commands;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Domain.Commands;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using EventSourcing.Sample.Transactions.Domain.Accounts;
 using EventSourcing.Sample.Transactions.Views.Clients;
 using Marten;
 using Marten.Events;
-using System;
-using System.Linq;
 
 namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
 {
@@ -15,13 +17,14 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
         private readonly IAccountNumberGenerator _accountNumberGenerator;
 
         private IEventStore _store => _session.Events;
+
         public CreateNewAccountHandler(IDocumentSession session, IAccountNumberGenerator accountNumberGenerator)
         {
             _session = session;
             _accountNumberGenerator = accountNumberGenerator;
         }
 
-        public void Handle(CreateNewAccount command)
+        public Task Handle(CreateNewAccount command, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!_session.Query<ClientsView>().Any(c => c.Id == command.ClientId))
                 throw new ArgumentException("Client does not exist!", nameof(command.ClientId));
@@ -29,7 +32,7 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
             var account = new Account(command.ClientId, _accountNumberGenerator);
 
             _store.Append(account.Id, account.PendingEvents.ToArray());
-            _session.SaveChanges();
+            return _session.SaveChangesAsync(cancellationToken);
         }
     }
 }

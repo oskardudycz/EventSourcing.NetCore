@@ -1,25 +1,29 @@
-﻿using SharpTestsEx;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xunit;
+using System.Threading;
 using System.Threading.Tasks;
+using SharpTestsEx;
+using Xunit;
 
 namespace MediatR.Tests.Publishing
 {
-    public class SynchronousHandler
+    public class SingleHandler
     {
-        class ServiceLocator
+        private class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
                 => Services.Add(type, implementations.ToList());
 
-            public List<object> Get(Type type) { return Services[type]; }
+            public List<object> Get(Type type)
+            {
+                return Services[type];
+            }
         }
 
-        class TasksList
+        private class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -29,7 +33,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        class TaskWasAdded : INotification
+        private class TaskWasAdded : INotification
         {
             public string TaskName { get; }
 
@@ -39,33 +43,32 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        class TaskWasAddedHandler : INotificationHandler<TaskWasAdded>
+        private class TaskWasAddedAsyncHandler : INotificationHandler<TaskWasAdded>
         {
             private readonly TasksList _taskList;
-            public TaskWasAddedHandler(TasksList tasksList)
+
+            public TaskWasAddedAsyncHandler(TasksList tasksList)
             {
                 _taskList = tasksList;
             }
 
-            public void Handle(TaskWasAdded @event)
+            public Task Handle(TaskWasAdded @event, CancellationToken cancellationToken = default(CancellationToken))
             {
                 _taskList.Tasks.Add(@event.TaskName);
+                return Task.CompletedTask;
             }
         }
 
         private readonly IMediator mediator;
         private readonly TasksList _tasksList = new TasksList();
 
-        public SynchronousHandler()
+        public SingleHandler()
         {
-            var notificationHandler = new TaskWasAddedHandler(_tasksList);
+            var notificationHandler = new TaskWasAddedAsyncHandler(_tasksList);
 
             var serviceLocator = new ServiceLocator();
 
             serviceLocator.Register(typeof(INotificationHandler<TaskWasAdded>), notificationHandler);
-            //Registration needed internally by MediatR
-            serviceLocator.Register(typeof(IAsyncNotificationHandler<TaskWasAdded>), new IAsyncNotificationHandler<TaskWasAdded>[] { });
-            serviceLocator.Register(typeof(ICancellableAsyncNotificationHandler<TaskWasAdded>), new ICancellableAsyncNotificationHandler<TaskWasAdded>[] { });
 
             mediator = new Mediator(
                     type => serviceLocator.Get(type).FirstOrDefault(),
@@ -73,7 +76,7 @@ namespace MediatR.Tests.Publishing
         }
 
         [Fact]
-        public async void GivenRegisteredhronousRequestHandler_WhenPublishMethodIsBeingCalled_ThenReturnsProperResult()
+        public async void GivenRegisteredAsynchronousRequestHandler_WhenPublishMethodIsBeingCalled_ThenReturnsProperResult()
         {
             //Given
             var @event = new TaskWasAdded("cleaning");

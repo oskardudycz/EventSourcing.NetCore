@@ -1,18 +1,19 @@
-﻿using Domain.Commands;
-using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
-using EventSourcing.Sample.Clients.Storage;
-using System;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Domain.Commands;
 using Domain.Events;
+using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
+using EventSourcing.Sample.Clients.Storage;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
 {
     public class ClientsCommandHandler :
-        IAsyncCommandHandler<CreateClient>,
-        IAsyncCommandHandler<UpdateClient>,
-        IAsyncCommandHandler<DeleteClient>
+        ICommandHandler<CreateClient>,
+        ICommandHandler<UpdateClient>,
+        ICommandHandler<DeleteClient>
     {
         private readonly ClientsDbContext dbContext;
         private readonly IEventBus eventBus;
@@ -26,22 +27,22 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
             this.eventBus = eventBus;
         }
 
-        public async Task Handle(CreateClient command)
+        public async Task Handle(CreateClient command, CancellationToken cancellationToken = default(CancellationToken))
         {
             var id = command.Id ?? Guid.NewGuid();
 
             await Clients.AddAsync(new Client(
-                id, 
+                id,
                 command.Data.Name,
                 command.Data.Email
             ));
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             await eventBus.Publish(new ClientCreated(id, command.Data));
         }
 
-        public async Task Handle(UpdateClient command)
+        public async Task Handle(UpdateClient command, CancellationToken cancellationToken = default(CancellationToken))
         {
             var client = await Clients.FindAsync(command.Id);
 
@@ -49,18 +50,18 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
 
             dbContext.Update(client);
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             await eventBus.Publish(new ClientUpdated(command.Id, command.Data));
         }
 
-        public async Task Handle(DeleteClient command)
+        public async Task Handle(DeleteClient command, CancellationToken cancellationToken = default(CancellationToken))
         {
             var client = await Clients.FindAsync(command.Id);
 
             dbContext.Remove(client);
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             await eventBus.Publish(new ClientDeleted(command.Id));
         }
