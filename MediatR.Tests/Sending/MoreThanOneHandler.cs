@@ -1,24 +1,29 @@
-﻿using SharpTestsEx;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using SharpTestsEx;
 using Xunit;
 
 namespace MediatR.Tests.Sending
 {
     public class MoreThanOneHandler
     {
-        class ServiceLocator
+        private class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
                 => Services.Add(type, implementations.ToList());
 
-            public List<object> Get(Type type) { return Services[type]; }
+            public List<object> Get(Type type)
+            {
+                return Services[type];
+            }
         }
 
-        class TasksList
+        private class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -28,7 +33,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        class AddTaskCommand : IRequest
+        private class AddTaskCommand : IRequest
         {
             public string TaskName { get; }
 
@@ -38,17 +43,19 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        class AddTaskCommandHandler : IRequestHandler<AddTaskCommand>
+        private class AddTaskCommandHandler : IRequestHandler<AddTaskCommand>
         {
             private readonly TasksList _taskList;
+
             public AddTaskCommandHandler(TasksList tasksList)
             {
                 _taskList = tasksList;
             }
 
-            public void Handle(AddTaskCommand command)
+            public Task Handle(AddTaskCommand command, CancellationToken cancellationToken = default(CancellationToken))
             {
                 _taskList.Tasks.Add(command.TaskName);
+                return Task.CompletedTask;
             }
         }
 
@@ -63,8 +70,6 @@ namespace MediatR.Tests.Sending
             serviceLocator.Register(typeof(IRequestHandler<AddTaskCommand>), commandHandler, commandHandler);
             //Registration needed internally by MediatR
             serviceLocator.Register(typeof(IPipelineBehavior<AddTaskCommand, Unit>), new object[] { });
-            serviceLocator.Register(typeof(IAsyncRequestHandler<AddTaskCommand>), new IAsyncRequestHandler<AddTaskCommand>[] { });
-
 
             mediator = new Mediator(
                     type => commandHandler,

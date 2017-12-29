@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
-using Marten.Integration.Tests.TestsInfrasructure;
-using Xunit;
-using Marten.Events.Projections;
-using Marten.Schema;
 using System.Reflection;
 using Baseline;
+using Marten.Events.Projections;
+using Marten.Integration.Tests.TestsInfrasructure;
+using Marten.Schema;
 using Marten.Storage;
 using Marten.Util;
+using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections
 {

@@ -1,4 +1,6 @@
-﻿using Domain.Commands;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Domain.Commands;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using Marten;
 using Marten.Events;
@@ -9,25 +11,25 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
     {
         private readonly IDocumentSession _session;
         private IEventStore _store => _session.Events;
+
         public ProcessInflowHandler(IDocumentSession session)
         {
             _session = session;
         }
 
-        public void Handle(MakeTransfer command)
+        public async Task Handle(MakeTransfer command, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var accountFrom = _store.AggregateStream<Account>(command.FromAccountId);
+            var accountFrom = await _store.AggregateStreamAsync<Account>(command.FromAccountId, token: cancellationToken);
 
             accountFrom.RecordOutflow(command.ToAccountId, command.Ammount);
             _store.Append(accountFrom.Id, accountFrom.PendingEvents.ToArray());
 
-
-            var accountTo = _store.AggregateStream<Account>(command.ToAccountId);
+            var accountTo = await _store.AggregateStreamAsync<Account>(command.ToAccountId, token: cancellationToken);
 
             accountTo.RecordInflow(command.FromAccountId, command.Ammount);
             _store.Append(accountTo.Id, accountTo.PendingEvents.ToArray());
 
-            _session.SaveChanges();
+            await _session.SaveChangesAsync(cancellationToken);
         }
     }
 }

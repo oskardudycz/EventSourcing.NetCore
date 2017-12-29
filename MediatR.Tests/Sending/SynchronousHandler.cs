@@ -1,22 +1,26 @@
-﻿using SharpTestsEx;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xunit;
+using System.Threading;
 using System.Threading.Tasks;
+using SharpTestsEx;
+using Xunit;
 
 namespace MediatR.Tests.Sending
 {
     public class SynchronousHandler
     {
-        class ServiceLocator
+        private class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
                 => Services.Add(type, implementations.ToList());
 
-            public List<object> Get(Type type) { return Services[type]; }
+            public List<object> Get(Type type)
+            {
+                return Services[type];
+            }
         }
 
         public class TasksList
@@ -42,16 +46,18 @@ namespace MediatR.Tests.Sending
         public class GetTaskNamesQueryHandler : IRequestHandler<GetTaskNamesQuery, List<string>>
         {
             private readonly TasksList _taskList;
+
             public GetTaskNamesQueryHandler(TasksList tasksList)
             {
                 _taskList = tasksList;
             }
 
-            public List<string> Handle(GetTaskNamesQuery query)
+            public Task<List<string>> Handle(GetTaskNamesQuery query, CancellationToken cancellationToken = default(CancellationToken))
             {
-                return _taskList.Tasks
-                    .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
-                    .ToList();
+                return Task.FromResult(
+                    _taskList.Tasks
+                        .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
+                        .ToList());
             }
         }
 
