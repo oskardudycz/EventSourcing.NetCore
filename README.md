@@ -103,3 +103,13 @@ Slides (PL):
 
 ### 4. Fully working sample application
 See also fully working sample application in https://github.com/oskardudycz/EventSourcing.NetCore/tree/master/Sample
+
+### 5. Nuget packages to help you get started.
+I gathered and generalized all of practices used in this tutorial/samples in Nuget Packages of maintained by me [GoldenEye Framework](https://github.com/oskardudycz/GoldenEye).
+See more in:
+  * [GoldenEye DDD package](https://github.com/oskardudycz/GoldenEye/tree/master/src/Core/Backend.Core.DDD) - it provides set of base and bootstrap classes that helps you to reduce boilerplate code and help you focus on writing business code. You can find all classes like Commands/Queries/Event handlers and many more. To use it run:
+
+  `dotnet add package GoldenEye.Backend.Core.DDD`
+  * [GoldenEye Marten package](https://github.com/oskardudycz/GoldenEye/tree/master/src/Core/Backend.Core.Marten) - contains helpers, and abstractions to use Marten as document/event store. Gives you abstractions like repositories etc. To use it run:
+
+  `dotnet add package GoldenEye.Backend.Core.Marten`
