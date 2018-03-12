@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore)
+
 # EventSourcing.NetCore
 Example of Event Sourcing in .NET Core
 
