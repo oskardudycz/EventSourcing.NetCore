@@ -2,16 +2,21 @@
 using System.Data;
 using Marten.Events;
 using Npgsql;
+using Xunit;
 
 namespace Marten.Integration.Tests.TestsInfrasructure
 {
+    [Collection("Marten")]
     public abstract class MartenTest : IDisposable
     {
         protected readonly IDocumentSession Session;
 
-        protected IEventStore EventStore => Session.Events;
+        protected IEventStore EventStore
+        {
+            get { return Session.Events; }
+        }
 
-        protected readonly string SchemaName = "sch" + Guid.NewGuid().ToString().Replace("-",string.Empty);
+        protected readonly string SchemaName = "sch" + Guid.NewGuid().ToString().Replace("-", string.Empty);
 
         protected MartenTest() : this(true)
         {
@@ -19,7 +24,7 @@ namespace Marten.Integration.Tests.TestsInfrasructure
 
         protected MartenTest(bool shouldCreateSession)
         {
-            if(shouldCreateSession)
+            if (shouldCreateSession)
                 Session = CreateSession();
         }
 
