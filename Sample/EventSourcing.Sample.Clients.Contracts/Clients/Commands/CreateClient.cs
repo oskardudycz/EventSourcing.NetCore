@@ -1,6 +1,6 @@
-﻿using Domain.Commands;
+﻿using System;
+using Domain.Commands;
 using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
-using System;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Commands
 {
@@ -9,7 +9,7 @@ namespace EventSourcing.Sample.Clients.Contracts.Clients.Commands
         public Guid? Id { get; }
         public ClientInfo Data { get; }
 
-        public CreateClient(Guid id, ClientInfo data)
+        public CreateClient(Guid? id, ClientInfo data)
         {
             Id = id;
             Data = data;
