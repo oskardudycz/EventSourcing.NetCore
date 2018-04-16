@@ -22,20 +22,20 @@ namespace EventSourcing.Sample.Transactions.Domain.Clients.Handlers
 
         public Task Handle(ClientCreated @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            store.Append(@event.Id, @event);
-            return session.SaveChangesAsync();
+            store.Append(@event.ClientId, @event);
+            return session.SaveChangesAsync(cancellationToken);
         }
 
         public Task Handle(ClientUpdated @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            store.Append(@event.Id, @event);
-            return session.SaveChangesAsync();
+            store.Append(@event.ClientId, @event);
+            return session.SaveChangesAsync(cancellationToken);
         }
 
         public Task Handle(ClientDeleted @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            store.Append(@event.Id, @event);
-            return session.SaveChangesAsync();
+            store.Append(@event.ClientId, @event);
+            return session.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Domain.Commands;
 using Domain.Events;
@@ -29,17 +28,15 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
 
         public async Task Handle(CreateClient command, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var id = command.Id ?? Guid.NewGuid();
-
             await Clients.AddAsync(new Client(
-                id,
+                command.Id.Value,
                 command.Data.Name,
                 command.Data.Email
             ));
 
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            await eventBus.Publish(new ClientCreated(id, command.Data));
+            await eventBus.Publish(new ClientCreated(command.Id.Value, command.Data));
         }
 
         public async Task Handle(UpdateClient command, CancellationToken cancellationToken = default(CancellationToken))
