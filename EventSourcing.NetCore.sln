@@ -42,9 +42,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postgres", "postgres", "{2B
 		docker\postgres\variables.env = docker\postgres\variables.env
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventSourcing.Sample.Clients.Contracts", "Sample\EventSourcing.Sample.Clients.Contracts\EventSourcing.Sample.Clients.Contracts.csproj", "{A83EF80F-F034-4047-8BFB-A040FC0D8109}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventSourcing.Sample.Clients.Contracts", "Sample\EventSourcing.Sample.Clients.Contracts\EventSourcing.Sample.Clients.Contracts.csproj", "{A83EF80F-F034-4047-8BFB-A040FC0D8109}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventSourcing.Sample.Transactions.Contracts", "Sample\EventSourcing.Sample.Transactions.Contracts\EventSourcing.Sample.Transactions.Contracts.csproj", "{2933E140-6722-4172-AEE2-96B55175A044}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventSourcing.Sample.Transactions.Contracts", "Sample\EventSourcing.Sample.Transactions.Contracts\EventSourcing.Sample.Transactions.Contracts.csproj", "{2933E140-6722-4172-AEE2-96B55175A044}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventSourcing.Sample.IntegrationTests", "Sample\EventSourcing.Sample.IntegrationTests\EventSourcing.Sample.IntegrationTests.csproj", "{F4D18045-4834-4E3E-A38E-12FA61FCF076}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,6 +98,10 @@ Global
 		{2933E140-6722-4172-AEE2-96B55175A044}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2933E140-6722-4172-AEE2-96B55175A044}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2933E140-6722-4172-AEE2-96B55175A044}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4D18045-4834-4E3E-A38E-12FA61FCF076}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4D18045-4834-4E3E-A38E-12FA61FCF076}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4D18045-4834-4E3E-A38E-12FA61FCF076}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4D18045-4834-4E3E-A38E-12FA61FCF076}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +119,7 @@ Global
 		{2B58F5C7-3974-46C2-83DB-F0DE78C1A298} = {821D8306-C110-45AB-BDF7-AA80FDA942CE}
 		{A83EF80F-F034-4047-8BFB-A040FC0D8109} = {A7186B6B-D56D-4AEF-B6B7-FAA827764C34}
 		{2933E140-6722-4172-AEE2-96B55175A044} = {A7186B6B-D56D-4AEF-B6B7-FAA827764C34}
+		{F4D18045-4834-4E3E-A38E-12FA61FCF076} = {A7186B6B-D56D-4AEF-B6B7-FAA827764C34}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A5F55604-2FF3-43B7-B657-4F18E6E95D3B}

@@ -1,15 +1,15 @@
-﻿using Domain.Events;
-using System;
+﻿using System;
+using Domain.Events;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Events
 {
     public class ClientDeleted : IEvent
     {
-        public Guid Id { get; }
+        public Guid ClientId { get; }
 
-        public ClientDeleted(Guid id)
+        public ClientDeleted(Guid clientId)
         {
-            Id = id;
+            ClientId = clientId;
         }
     }
 }

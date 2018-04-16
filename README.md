@@ -104,7 +104,9 @@ Slides (PL):
   * **[Query handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/CQRS.Tests/Queries/Queries.cs)**
 
 ### 4. Fully working sample application
-See also fully working sample application in https://github.com/oskardudycz/EventSourcing.NetCore/tree/master/Sample
+See also fully working sample application in [Sample Project](https://github.com/oskardudycz/EventSourcing.NetCore/tree/master/Sample)
+* See [sample](https://github.com/oskardudycz/EventSourcing.NetCore/tree/master/Sample/EventSourcing.Sample.IntegrationTests/Clients/CreateClientTests.cs) how Entity Framework and Marten can coexist together with CQRS and Event Sourcing
+
 
 ### 5. Nuget packages to help you get started.
 I gathered and generalized all of practices used in this tutorial/samples in Nuget Packages of maintained by me [GoldenEye Framework](https://github.com/oskardudycz/GoldenEye).

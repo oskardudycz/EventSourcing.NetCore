@@ -7,7 +7,6 @@ using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
 using EventSourcing.Sample.Clients.Domain.Clients.Handlers;
 using EventSourcing.Sample.Clients.Storage;
-using EventSourcing.Sample.Clients.Views.Clients;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
@@ -87,8 +86,9 @@ namespace EventSourcing.Web.Sample
             services.AddScoped<IRequestHandler<CreateClient>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateClient>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteClient>, ClientsCommandHandler>();
-            services.AddScoped<IRequestHandler<GetClients, List<ClientListItem>>, ClientsQueryHandler>();
-            services.AddScoped<IRequestHandler<GetClient, ClientItem>, ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetClients, List<ClientListItem>>, EventSourcing.Sample.Clients.Views.Clients.ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetClient, ClientItem>, EventSourcing.Sample.Clients.Views.Clients.ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetClientView, ClientView>, ClientsQueryHandler>();
         }
 
         private void ConfigureMarten(IServiceCollection services)

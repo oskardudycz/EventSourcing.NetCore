@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
 using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
-using Marten.Events.Projections;
-using EventSourcing.Sample.Clients.Contracts.Clients.Events;
-using System.Collections.Generic;
 using Marten;
-using System.Linq;
+using Marten.Events.Projections;
 
 namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
 {
@@ -23,15 +23,17 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
 
         private List<Guid> FindClientAccountIds(IDocumentSession session, ClientCreated @event)
         {
-            return FindClientAccountIds(session, @event.Id);
+            return FindClientAccountIds(session, @event.ClientId);
         }
+
         private List<Guid> FindClientAccountIds(IDocumentSession session, ClientUpdated @event)
         {
-            return FindClientAccountIds(session, @event.Id);
+            return FindClientAccountIds(session, @event.ClientId);
         }
+
         private List<Guid> FindClientAccountIds(IDocumentSession session, ClientDeleted @event)
         {
-            return FindClientAccountIds(session, @event.Id);
+            return FindClientAccountIds(session, @event.ClientId);
         }
 
         private List<Guid> FindClientAccountIds(IDocumentSession session, Guid clientId)

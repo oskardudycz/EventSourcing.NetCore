@@ -26,7 +26,7 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
 
         public Task Handle(CreateNewAccount command, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (!_session.Query<ClientsView>().Any(c => c.Id == command.ClientId))
+            if (!_session.Query<ClientView>().Any(c => c.Id == command.ClientId))
                 throw new ArgumentException("Client does not exist!", nameof(command.ClientId));
 
             var account = new Account(command.ClientId, _accountNumberGenerator);

@@ -1,7 +1,7 @@
 version: "3"
 services:
     postgres: 
-        image: postgres:9.5
+        image: clkao/postgres-plv8:9.6-2.0
         environment:
             - postgres/variables.env
         ports:
