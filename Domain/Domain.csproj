@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Marten" Version="2.7.0" />
-    <PackageReference Include="MediatR" Version="4.0.1" />
+    <PackageReference Include="Marten" Version="2.7.1" />
+    <PackageReference Include="MediatR" Version="4.1.0" />
   </ItemGroup>
 
   <ItemGroup>
