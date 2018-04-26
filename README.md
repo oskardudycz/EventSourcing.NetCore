@@ -117,3 +117,10 @@ See more in:
   * [GoldenEye Marten package](https://github.com/oskardudycz/GoldenEye/tree/master/src/Core/Backend.Core.Marten) - contains helpers, and abstractions to use Marten as document/event store. Gives you abstractions like repositories etc. To use it run:
 
   `dotnet add package GoldenEye.Backend.Core.Marten`
+
+
+I found an issue or I have a change request
+--------------------------------
+Feel free to create an issue on GitHub. Contributions, pull requests are more than welcome!
+
+GoldenEye is Copyright &copy; 2017-2018 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
