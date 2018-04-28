@@ -2,6 +2,7 @@ version: "3"
 services:
     postgres: 
         image: postgres:9.5
+        container_name: event-sourcing-net-postgres
         environment:
             - postgres/variables.env
         ports:
