@@ -119,6 +119,14 @@ See more in:
   `dotnet add package GoldenEye.Backend.Core.Marten`
 
 
+The simplest way to start is **Installing the [project template](https://github.com/oskardudycz/GoldenEye/tree/master/src/Templates/SimpleDDD/content) by running**
+
+`dotnet -i GoldenEye.WebApi.Template.SimpleDDD`
+
+**and then create new project based on it:**
+
+`dotnet new SimpleDDD -n NameOfYourProject`
+
 I found an issue or I have a change request
 --------------------------------
 Feel free to create an issue on GitHub. Contributions, pull requests are more than welcome!
