@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="5.3.2" />
+    <PackageReference Include="Marten" Version="2.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Domain\Domain.csproj" />
     <ProjectReference Include="..\EventSourcing.Sample.Clients.Contracts\EventSourcing.Sample.Clients.Contracts.csproj" />
     <ProjectReference Include="..\EventSourcing.Sample.Transactions.Contracts\EventSourcing.Sample.Transactions.Contracts.csproj" />
