@@ -50,7 +50,7 @@ Slides (PL):
          var streamId = Guid.NewGuid();
          documentSession.Events.Append(streamId, @event);
          ```  
-    * **[Stream loading](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoading.cs)** - all events that were placed on the event store should be possible to load them back. Marten allows to:
+    * **[Stream loading](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamLoading.cs)** - all events that were placed on the event store should be possible to load them back. [Marten](https://github.com/JasperFx/marten) allows to:
       * get list of event by calling FetchStream method with a stream id  
          ```csharp
          var eventsList = documentSession.Events.FetchStream(streamId);
