@@ -127,6 +127,12 @@ The simplest way to start is **installing the [project template](https://github.
 
 `dotnet new SimpleDDD -n NameOfYourProject`
 
+
+### 6. Other sources
+
+* [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
+
+
 I found an issue or I have a change request
 --------------------------------
 Feel free to create an issue on GitHub. Contributions, pull requests are more than welcome!
