@@ -130,7 +130,10 @@ The simplest way to start is **installing the [project template](https://github.
 
 ### 6. Other sources
 
+* [Greg Young - Building an Event Storage](https://cqrs.wordpress.com/documents/building-event-storage/)
 * [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
+* [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
+
 
 
 I found an issue or I have a change request
