@@ -131,9 +131,9 @@ The simplest way to start is **installing the [project template](https://github.
 ### 6. Other sources
 
 * [Greg Young - Building an Event Storage](https://cqrs.wordpress.com/documents/building-event-storage/)
-* [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
 * [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
-
+* [Mark Seemann - CQS versus server generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
+* [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
 
 
 I found an issue or I have a change request
