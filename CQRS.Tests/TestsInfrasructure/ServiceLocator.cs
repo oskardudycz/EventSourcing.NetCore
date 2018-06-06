@@ -21,9 +21,9 @@ namespace CQRS.Tests.TestsInfrasructure
             where TCommand : IRequest
             where TCommandHandler : IRequestHandler<TCommand>
         {
-            Register(typeof(IRequestHandler<TCommand>), commandHandler, commandHandler);
+            Register(typeof(IRequestHandler<TCommand, Unit>), commandHandler, commandHandler);
             //Registration needed internally by MediatR
-            Register(typeof(IPipelineBehavior<TCommand, Unit>), new object[] { });
+            Register(typeof(IEnumerable<IPipelineBehavior<TCommand, Unit>>), new List<IPipelineBehavior<TCommand, Unit>>());
         }
 
         public void RegisterQueryHandler<TQuery, TResponse>(IRequestHandler<TQuery, TResponse> queryHandler)
@@ -31,14 +31,12 @@ namespace CQRS.Tests.TestsInfrasructure
         {
             Register(typeof(IRequestHandler<TQuery, TResponse>), queryHandler);
             //Registration needed internally by MediatR
-            Register(typeof(IPipelineBehavior<TQuery, TResponse>), new object[] { });
+            Register(typeof(IEnumerable<IPipelineBehavior<TQuery, TResponse>>), new List<IPipelineBehavior<TQuery, TResponse>>());
         }
 
         public IMediator GetMediator()
         {
-            return new Mediator(
-                    type => Get(type).FirstOrDefault(),
-                    type => Get(type));
+            return new Mediator(type => Get(type).FirstOrDefault());
         }
     }
 }

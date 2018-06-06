@@ -5,6 +5,7 @@ using Domain.Events;
 using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 using EventSourcing.Sample.Clients.Storage;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
@@ -26,7 +27,7 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
             this.eventBus = eventBus;
         }
 
-        public async Task Handle(CreateClient command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Unit> Handle(CreateClient command, CancellationToken cancellationToken = default(CancellationToken))
         {
             await Clients.AddAsync(new Client(
                 command.Id.Value,
@@ -37,9 +38,11 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
             await dbContext.SaveChangesAsync(cancellationToken);
 
             await eventBus.Publish(new ClientCreated(command.Id.Value, command.Data));
+
+            return Unit.Value;
         }
 
-        public async Task Handle(UpdateClient command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Unit> Handle(UpdateClient command, CancellationToken cancellationToken = default(CancellationToken))
         {
             var client = await Clients.FindAsync(command.Id);
 
@@ -50,9 +53,11 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
             await dbContext.SaveChangesAsync(cancellationToken);
 
             await eventBus.Publish(new ClientUpdated(command.Id, command.Data));
+
+            return Unit.Value;
         }
 
-        public async Task Handle(DeleteClient command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Unit> Handle(DeleteClient command, CancellationToken cancellationToken = default(CancellationToken))
         {
             var client = await Clients.FindAsync(command.Id);
 
@@ -61,6 +66,8 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
             await dbContext.SaveChangesAsync(cancellationToken);
 
             await eventBus.Publish(new ClientDeleted(command.Id));
+
+            return Unit.Value;
         }
     }
 }

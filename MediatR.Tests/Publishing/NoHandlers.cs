@@ -1,24 +1,27 @@
-﻿using SharpTestsEx;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SharpTestsEx;
 using Xunit;
 
 namespace MediatR.Tests.Sending
 {
     public class NoHandlers
     {
-        class ServiceLocator
+        private class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
                 => Services.Add(type, implementations.ToList());
 
-            public List<object> Get(Type type) { return Services[type]; }
+            public List<object> Get(Type type)
+            {
+                return Services[type];
+            }
         }
 
-        class TasksList
+        private class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -28,7 +31,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        class TaskWasAdded : INotification
+        private class TaskWasAdded : INotification
         {
             public string TaskName { get; }
 
@@ -45,9 +48,7 @@ namespace MediatR.Tests.Sending
             {
                 //Given
                 var serviceLocator = new ServiceLocator();
-                var mediator = new Mediator(
-                        type => serviceLocator.Get(type).FirstOrDefault(),
-                        type => serviceLocator.Get(type));
+                var mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
 
                 var @event = new TaskWasAdded("cleaning");
 

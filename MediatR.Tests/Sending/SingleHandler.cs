@@ -70,11 +70,9 @@ namespace MediatR.Tests.Sending
             var serviceLocator = new ServiceLocator();
             serviceLocator.Register(typeof(IRequestHandler<GetTaskNamesQuery, List<string>>), queryHandler);
             //Registration needed internally by MediatR
-            serviceLocator.Register(typeof(IPipelineBehavior<GetTaskNamesQuery, List<string>>), new object[] { });
+            serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<GetTaskNamesQuery, List<string>>>), new List<IPipelineBehavior<GetTaskNamesQuery, List<string>>>());
 
-            mediator = new Mediator(
-                    type => serviceLocator.Get(type).FirstOrDefault(),
-                    type => serviceLocator.Get(type));
+            mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
         }
 
         [Fact]

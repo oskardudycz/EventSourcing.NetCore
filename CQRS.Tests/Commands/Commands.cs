@@ -90,10 +90,10 @@ namespace CQRS.Tests.Commands
                 _writeModel = writeModel;
             }
 
-            public Task Handle(AddTaskCommand message, CancellationToken cancellationToken = default(CancellationToken))
+            public Task<Unit> Handle(AddTaskCommand message, CancellationToken cancellationToken = default(CancellationToken))
             {
                 _writeModel.Tasks.Add(message.Name);
-                return Task.CompletedTask;
+                return Unit.Task;
             }
         }
 

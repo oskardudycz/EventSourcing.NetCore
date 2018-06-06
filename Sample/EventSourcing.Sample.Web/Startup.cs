@@ -74,8 +74,8 @@ namespace EventSourcing.Web.Sample
             services.AddScoped<IQueryBus, QueryBus>();
             services.AddScoped<IEventBus, EventBus>();
 
-            services.AddScoped<IRequestHandler<CreateNewAccount>, CreateNewAccountHandler>();
-            services.AddScoped<IRequestHandler<MakeTransfer>, ProcessInflowHandler>();
+            services.AddScoped<IRequestHandler<CreateNewAccount, Unit>, CreateNewAccountHandler>();
+            services.AddScoped<IRequestHandler<MakeTransfer, Unit>, ProcessInflowHandler>();
             services.AddScoped<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
             services.AddScoped<IRequestHandler<GetAccount, AccountSummary>, GetAccountHandler>();
 
@@ -83,9 +83,9 @@ namespace EventSourcing.Web.Sample
             services.AddScoped<INotificationHandler<ClientUpdated>, ClientsEventHandler>();
             services.AddScoped<INotificationHandler<ClientDeleted>, ClientsEventHandler>();
 
-            services.AddScoped<IRequestHandler<CreateClient>, ClientsCommandHandler>();
-            services.AddScoped<IRequestHandler<UpdateClient>, ClientsCommandHandler>();
-            services.AddScoped<IRequestHandler<DeleteClient>, ClientsCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateClient, Unit>, ClientsCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateClient, Unit>, ClientsCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteClient, Unit>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<GetClients, List<ClientListItem>>, EventSourcing.Sample.Clients.Views.Clients.ClientsQueryHandler>();
             services.AddScoped<IRequestHandler<GetClient, ClientItem>, EventSourcing.Sample.Clients.Views.Clients.ClientsQueryHandler>();
             services.AddScoped<IRequestHandler<GetClientView, ClientView>, ClientsQueryHandler>();
@@ -131,8 +131,7 @@ namespace EventSourcing.Web.Sample
         private static void ConfigureMediator(IServiceCollection services)
         {
             services.AddScoped<IMediator, Mediator>();
-            services.AddTransient<SingleInstanceFactory>(sp => t => sp.GetService(t));
-            services.AddTransient<MultiInstanceFactory>(sp => t => sp.GetServices(t));
+            services.AddTransient<ServiceFactory>(sp => t => sp.GetService(t));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

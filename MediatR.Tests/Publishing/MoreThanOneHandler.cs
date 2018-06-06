@@ -67,11 +67,10 @@ namespace MediatR.Tests.Publishing
             var eventHandler = new TaskWasAddedHandler(_taskList);
 
             var serviceLocator = new ServiceLocator();
-            serviceLocator.Register(typeof(INotificationHandler<TaskWasAdded>), eventHandler, eventHandler);
+            serviceLocator.Register(typeof(IEnumerable<INotificationHandler<TaskWasAdded>>),
+                new object[] { new List<INotificationHandler<TaskWasAdded>> { eventHandler, eventHandler } });
 
-            mediator = new Mediator(
-                    type => new { },
-                    type => serviceLocator.Get(type));
+            mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
         }
 
         [Fact]

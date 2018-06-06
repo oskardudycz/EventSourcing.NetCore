@@ -4,6 +4,7 @@ using Domain.Commands;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using Marten;
 using Marten.Events;
+using MediatR;
 
 namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
 {
@@ -17,7 +18,7 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
             _session = session;
         }
 
-        public async Task Handle(MakeTransfer command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Unit> Handle(MakeTransfer command, CancellationToken cancellationToken = default(CancellationToken))
         {
             var accountFrom = await _store.AggregateStreamAsync<Account>(command.FromAccountId, token: cancellationToken);
 
@@ -30,6 +31,8 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
             _store.Append(accountTo.Id, accountTo.PendingEvents.ToArray());
 
             await _session.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
         }
     }
 }

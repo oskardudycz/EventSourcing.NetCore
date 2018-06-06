@@ -8,6 +8,7 @@ using EventSourcing.Sample.Transactions.Domain.Accounts;
 using EventSourcing.Sample.Transactions.Views.Clients;
 using Marten;
 using Marten.Events;
+using MediatR;
 
 namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
 {
@@ -24,7 +25,7 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
             _accountNumberGenerator = accountNumberGenerator;
         }
 
-        public Task Handle(CreateNewAccount command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Unit> Handle(CreateNewAccount command, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!_session.Query<ClientView>().Any(c => c.Id == command.ClientId))
                 throw new ArgumentException("Client does not exist!", nameof(command.ClientId));
@@ -32,7 +33,9 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
             var account = new Account(command.ClientId, _accountNumberGenerator);
 
             _store.Append(account.Id, account.PendingEvents.ToArray());
-            return _session.SaveChangesAsync(cancellationToken);
+            await _session.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
         }
     }
 }

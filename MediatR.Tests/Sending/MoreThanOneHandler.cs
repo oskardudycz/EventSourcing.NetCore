@@ -52,10 +52,10 @@ namespace MediatR.Tests.Sending
                 _taskList = tasksList;
             }
 
-            public Task Handle(AddTaskCommand command, CancellationToken cancellationToken = default(CancellationToken))
+            public Task<Unit> Handle(AddTaskCommand command, CancellationToken cancellationToken = default(CancellationToken))
             {
                 _taskList.Tasks.Add(command.TaskName);
-                return Task.CompletedTask;
+                return Unit.Task;
             }
         }
 
@@ -67,13 +67,11 @@ namespace MediatR.Tests.Sending
             var commandHandler = new AddTaskCommandHandler(_taskList);
 
             var serviceLocator = new ServiceLocator();
-            serviceLocator.Register(typeof(IRequestHandler<AddTaskCommand>), commandHandler, commandHandler);
+            serviceLocator.Register(typeof(IRequestHandler<AddTaskCommand, Unit>), commandHandler, commandHandler);
             //Registration needed internally by MediatR
-            serviceLocator.Register(typeof(IPipelineBehavior<AddTaskCommand, Unit>), new object[] { });
+            serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<AddTaskCommand, Unit>>), new List<IPipelineBehavior<AddTaskCommand, Unit>>());
 
-            mediator = new Mediator(
-                    type => commandHandler,
-                    type => serviceLocator.Get(type));
+            mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
         }
 
         [Fact]
