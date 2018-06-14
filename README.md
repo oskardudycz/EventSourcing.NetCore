@@ -138,7 +138,7 @@ The simplest way to start is **installing the [project template](https://github.
 * [Vaughn Vernon - Reactive DDD: Modeling Uncertainty](https://www.infoq.com/presentations/reactive-ddd-distributed-systems)
 * [Mark Seemann - CQS versus server generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
 * [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
-
+* [Event Store - The open-source, functional database with Complex Event Processing in JavaScript](https://eventstore.org/)
 
 I found an issue or I have a change request
 --------------------------------
