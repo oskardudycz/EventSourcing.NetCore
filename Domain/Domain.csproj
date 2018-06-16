@@ -1,19 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Domain</AssemblyName>
     <PackageId>Domain</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.3.2" />
-    <PackageReference Include="Marten" Version="2.8.0" />
+    <PackageReference Include="FluentAssertions" Version="5.4.0" />
+    <PackageReference Include="Marten" Version="2.8.1" />
     <PackageReference Include="MediatR" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-
 </Project>
