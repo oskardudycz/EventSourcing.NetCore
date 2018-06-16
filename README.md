@@ -140,6 +140,7 @@ The simplest way to start is **installing the [project template](https://github.
 * [Mark Seemann - CQS versus server generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
 * [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
 * [Event Store - The open-source, functional database with Complex Event Processing in JavaScript](https://eventstore.org/)
+* [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont’s](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
 
 I found an issue or I have a change request
 --------------------------------
