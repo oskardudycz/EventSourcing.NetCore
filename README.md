@@ -141,6 +141,7 @@ The simplest way to start is **installing the [project template](https://github.
 * [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
 * [Event Store - The open-source, functional database with Complex Event Processing in JavaScript](https://eventstore.org/)
 * [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont’s](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
+* [David Boike - Putting your events on a diet](https://particular.net/blog/putting-your-events-on-a-diet)
 
 I found an issue or I have a change request
 --------------------------------
