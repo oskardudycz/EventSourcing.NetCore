@@ -137,6 +137,7 @@ The simplest way to start is **installing the [project template](https://github.
 * [Martin Fowler - Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html)
 * [Eric Evans - DDD and Microservices: At Last, Some Boundaries!](https://www.infoq.com/presentations/ddd-microservices-2016)
 * [Martin Kleppmann — Event Sourcing and Stream Processing at Scale](https://www.youtube.com/watch?v=avi-TZI9t2I)
+* [Julie Lerman - Data Points - CQRS and EF Data Models](https://msdn.microsoft.com/en-us/magazine/mt788619.aspx)
 * [Vaughn Vernon - Reactive DDD: Modeling Uncertainty](https://www.infoq.com/presentations/reactive-ddd-distributed-systems)
 * [Mark Seemann - CQS versus server generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
 * [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
