@@ -35,7 +35,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.4.0" />
-    <PackageReference Include="Marten" Version="2.8.1" />
+    <PackageReference Include="Marten" Version="3.0.0-alpha-2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
