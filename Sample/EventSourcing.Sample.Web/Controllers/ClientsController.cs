@@ -54,27 +54,25 @@ namespace EventSourcing.Sample.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]CreateClient command)
         {
-            var id = Guid.NewGuid();
-
-            command.Id = id;
+            command.Id = command.Id ?? Guid.NewGuid();
 
             await _commandBus.Send(command);
 
-            return Created("api/Clients", id);
+            return Created("api/Clients", command.Id);
         }
 
         [HttpPut("{id}")]
-        public async Task Put(Guid id, [FromBody]ClientInfo clientInfo)
+        public Task Put(Guid id, [FromBody]ClientInfo clientInfo)
         {
-            await _commandBus.Send(new UpdateClient(id, clientInfo));
+            return _commandBus.Send(new UpdateClient(id, clientInfo));
         }
 
         // POST api/values
 
         [HttpDelete("{id}")]
-        public async Task Post(Guid id)
+        public Task Post(Guid id)
         {
-            await _commandBus.Send(new DeleteClient(id));
+            return _commandBus.Send(new DeleteClient(id));
         }
     }
 }

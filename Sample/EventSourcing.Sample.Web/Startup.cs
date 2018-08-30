@@ -74,8 +74,8 @@ namespace EventSourcing.Web.Sample
             services.AddScoped<IQueryBus, QueryBus>();
             services.AddScoped<IEventBus, EventBus>();
 
-            services.AddScoped<IRequestHandler<CreateNewAccount, Unit>, CreateNewAccountHandler>();
-            services.AddScoped<IRequestHandler<MakeTransfer, Unit>, ProcessInflowHandler>();
+            services.AddScoped<IRequestHandler<CreateNewAccount, Unit>, AccountCommandHandler>();
+            services.AddScoped<IRequestHandler<MakeTransfer, Unit>, AccountCommandHandler>();
             services.AddScoped<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
             services.AddScoped<IRequestHandler<GetAccount, AccountSummary>, GetAccountHandler>();
 
@@ -86,6 +86,7 @@ namespace EventSourcing.Web.Sample
             services.AddScoped<IRequestHandler<CreateClient, Unit>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateClient, Unit>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteClient, Unit>, ClientsCommandHandler>();
+
             services.AddScoped<IRequestHandler<GetClients, List<ClientListItem>>, EventSourcing.Sample.Clients.Views.Clients.ClientsQueryHandler>();
             services.AddScoped<IRequestHandler<GetClient, ClientItem>, EventSourcing.Sample.Clients.Views.Clients.ClientsQueryHandler>();
             services.AddScoped<IRequestHandler<GetClientView, ClientView>, ClientsQueryHandler>();
@@ -114,6 +115,7 @@ namespace EventSourcing.Web.Sample
                     options.Events.AddEventType(typeof(NewAccountCreated));
                     options.Events.AddEventType(typeof(NewInflowRecorded));
                     options.Events.AddEventType(typeof(NewOutflowRecorded));
+
                     options.Events.AddEventType(typeof(ClientCreated));
                     options.Events.AddEventType(typeof(ClientUpdated));
                     options.Events.AddEventType(typeof(ClientDeleted));

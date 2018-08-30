@@ -1,16 +1,16 @@
-﻿using Domain.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Domain.Events;
 
 namespace Domain.Aggregates
 {
-    public abstract class EventSource : IAggregate
+    public abstract class EventSourcedAggregate : IEventSourcedAggregate
     {
         public Guid Id { get; protected set; }
 
         public Queue<IEvent> PendingEvents { get; private set; }
-        
-        protected EventSource()
+
+        protected EventSourcedAggregate()
         {
             PendingEvents = new Queue<IEvent>();
         }
