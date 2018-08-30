@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -34,14 +34,14 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.4.0" />
+    <PackageReference Include="FluentAssertions" Version="5.4.1" />
     <PackageReference Include="Marten" Version="3.0.0-alpha-2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
     <PackageReference Include="NSubstitute" Version="3.1.0" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
