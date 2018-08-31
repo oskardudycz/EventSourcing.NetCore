@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.4.0" />
-    <PackageReference Include="Marten" Version="2.8.1" />
-    <PackageReference Include="MediatR" Version="5.0.1" />
+    <PackageReference Include="FluentAssertions" Version="5.4.1" />
+    <PackageReference Include="Marten" Version="3.0.0-alpha-2" />
+    <PackageReference Include="MediatR" Version="5.1.0" />
   </ItemGroup>
 
   <ItemGroup>
