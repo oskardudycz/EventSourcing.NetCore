@@ -8,9 +8,14 @@ namespace EventSourcing.Sample.Clients.Storage
         public ClientsDbContext(DbContextOptions<ClientsDbContext> options)
             : base(options)
         {
-            #if DEBUG
+#if DEBUG
             Database.Migrate();
-            #endif
+#endif
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Client>().Ignore(c => c.PendingEvents);
         }
 
         public DbSet<Client> Clients { get; set; }
