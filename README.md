@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore)
+[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master)
 
 # EventSourcing.NetCore
 Example of Event Sourcing in .NET Core
@@ -121,24 +121,30 @@ See more in:
 
 The simplest way to start is **installing the [project template](https://github.com/oskardudycz/GoldenEye/tree/master/src/Templates/SimpleDDD/content) by running**
 
-`dotnet -i GoldenEye.WebApi.Template.SimpleDDD`
+`dotnet new -i GoldenEye.WebApi.Template.SimpleDDD`
 
 **and then creating new project based on it:**
 
 `dotnet new SimpleDDD -n NameOfYourProject`
 
 
-### 6. Other sources
+### 6. Other resources
 
 * [Greg Young - Building an Event Storage](https://cqrs.wordpress.com/documents/building-event-storage/)
 * [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
+* [Greg Young - CQRS & Event Sourcing](https://m.youtube.com/watch?v=JHGkaShoyNs)
+* [Greg Young - A Decade of DDD, CQRS, Event Sourcing](https://m.youtube.com/watch?v=LDW0QWie21s)
 * [Martin Fowler - Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html)
 * [Eric Evans - DDD and Microservices: At Last, Some Boundaries!](https://www.infoq.com/presentations/ddd-microservices-2016)
 * [Martin Kleppmann — Event Sourcing and Stream Processing at Scale](https://www.youtube.com/watch?v=avi-TZI9t2I)
+* [Julie Lerman - Data Points - CQRS and EF Data Models](https://msdn.microsoft.com/en-us/magazine/mt788619.aspx)
 * [Vaughn Vernon - Reactive DDD: Modeling Uncertainty](https://www.infoq.com/presentations/reactive-ddd-distributed-systems)
 * [Mark Seemann - CQS versus server generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
 * [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
-
+* [Event Store - The open-source, functional database with Complex Event Processing in JavaScript](https://eventstore.org/)
+* [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont’s](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
+* [David Boike - Putting your events on a diet](https://particular.net/blog/putting-your-events-on-a-diet)
+* [DDD Quickly](https://www.infoq.com/minibooks/domain-driven-design-quickly)
 
 I found an issue or I have a change request
 --------------------------------
