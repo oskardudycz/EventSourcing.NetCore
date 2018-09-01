@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master) [![](https://images.microbadger.com/badges/version/oskardudycz/eventsourcing.netcore.svg)](https://microbadger.com/images/oskardudycz/eventsourcing.netcore "Get your own version badge on microbadger.com")
 
 # EventSourcing.NetCore
 Example of Event Sourcing in .NET Core
