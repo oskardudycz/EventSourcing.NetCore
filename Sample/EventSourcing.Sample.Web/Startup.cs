@@ -150,6 +150,8 @@ namespace EventSourcing.Web.Sample
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Event Sourcing Example V1");
             });
+
+            app.ApplicationServices.GetService<ClientsDbContext>().Database.Migrate();
         }
     }
 }
