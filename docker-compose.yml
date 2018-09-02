@@ -1,0 +1,32 @@
+version: "2.1"
+services:
+    postgres: 
+        image: clkao/postgres-plv8
+        container_name: postgres
+        hostname: postgres
+        environment:
+            - postgres/variables.env
+        ports:
+            - "5432:5432"
+        networks:
+            - es_network
+        healthcheck:
+          test: "pg_isready -U postgres"
+          interval: 10s
+          timeout: 5s
+          retries: 5
+    backend: 
+        build:
+            dockerfile: DOCKERFILE
+            context: .
+        container_name: event_sourcing_sample
+        ports:
+            - "5000:5000"
+        depends_on:
+          postgres:
+            condition: service_healthy
+        networks:
+            - es_network
+networks:
+  es_network:
+     driver: bridge

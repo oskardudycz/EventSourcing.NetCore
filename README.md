@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master) ![](https://dockerbuildbadges.quelltext.eu/status.svg?organization=oskardudycz&repository=eventsourcing.netcore)
 
 # EventSourcing.NetCore
 Example of Event Sourcing in .NET Core
