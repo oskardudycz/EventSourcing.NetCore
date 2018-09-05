@@ -1,5 +1,5 @@
-﻿using MediatR;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using MediatR;
 
 namespace Domain.Events
 {
@@ -12,9 +12,12 @@ namespace Domain.Events
             _mediator = mediator;
         }
 
-        public Task Publish<TEvent>(TEvent @event) where TEvent : IEvent
+        public async Task Publish<TEvent>(params TEvent[] events) where TEvent : IEvent
         {
-            return _mediator.Publish(@event);
+            foreach (var @event in events)
+            {
+                await _mediator.Publish(@event);
+            }
         }
     }
 }

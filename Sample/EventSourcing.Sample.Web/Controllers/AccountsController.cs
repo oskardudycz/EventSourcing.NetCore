@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Domain.Commands;
 using Domain.Queries;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
 using EventSourcing.Sample.Tasks.Views.Account;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EventSourcing.Web.Sample.Controllers
 {
@@ -30,10 +30,9 @@ namespace EventSourcing.Web.Sample.Controllers
 
         // POST api/values
         [HttpPost]
-        public async Task Post([FromBody]CreateNewAccount command)
+        public Task Post([FromBody]CreateNewAccount command)
         {
-            await _commandBus.Send(command);
+            return _commandBus.Send(command);
         }
     }
 }
-
