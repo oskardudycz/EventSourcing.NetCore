@@ -145,6 +145,8 @@ The simplest way to start is **installing the [project template](https://github.
 * [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont’s](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
 * [David Boike - Putting your events on a diet](https://particular.net/blog/putting-your-events-on-a-diet)
 * [DDD Quickly](https://www.infoq.com/minibooks/domain-driven-design-quickly)
+* [Dennis Doomen - The Good, The Bad and the Ugly of Event Sourcing](https://www.continuousimprover.com/2017/11/event-sourcing-good-bad-and-ugly.html)
+* [Liquid Projections - A set of highly efficient building blocks to build fast autonomous synchronous and asynchronous projector](https://liquidprojections.net/)
 
 I found an issue or I have a change request
 --------------------------------
