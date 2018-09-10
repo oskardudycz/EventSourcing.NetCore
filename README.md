@@ -133,6 +133,7 @@ The simplest way to start is **installing the [project template](https://github.
 * [Greg Young - Building an Event Storage](https://cqrs.wordpress.com/documents/building-event-storage/)
 * [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
 * [Greg Young - CQRS & Event Sourcing](https://m.youtube.com/watch?v=JHGkaShoyNs)
+* [Lorenzo Nicora - A visual introduction to event sourcing and cqrs](https://www.slideshare.net/LorenzoNicora/a-visual-introduction-to-event-sourcing-and-cqrs)
 * [Greg Young - A Decade of DDD, CQRS, Event Sourcing](https://m.youtube.com/watch?v=LDW0QWie21s)
 * [Martin Fowler - Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html)
 * [Eric Evans - DDD and Microservices: At Last, Some Boundaries!](https://www.infoq.com/presentations/ddd-microservices-2016)
