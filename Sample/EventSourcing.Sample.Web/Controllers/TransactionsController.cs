@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Domain.Commands;
 using Domain.Queries;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
@@ -25,9 +22,9 @@ namespace EventSourcing.Sample.Web.Controllers
 
         // POST api/values
         [HttpPost]
-        public async Task Post([FromBody]MakeTransfer command)
+        public Task Post([FromBody]MakeTransfer command)
         {
-            await _commandBus.Send(command);
+            return _commandBus.Send(command);
         }
     }
 }

@@ -1,20 +1,18 @@
-﻿using Domain.Aggregates;
+﻿using System;
+using Domain.Aggregates;
 using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
-using System;
+using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 
 namespace EventSourcing.Sample.Clients.Domain.Clients
 {
-    public class Client : IAggregate
+    public class Client : EventSourcedAggregate
     {
-        public Guid Id { get; private set;  }
-
         public string Name { get; private set; }
 
         public string Email { get; private set; }
 
         public Client()
         {
-
         }
 
         public Client(Guid id, string name, string email)
@@ -22,12 +20,20 @@ namespace EventSourcing.Sample.Clients.Domain.Clients
             Id = id;
             Name = name;
             Email = email;
+
+            Append(new ClientCreated(id, new ClientInfo
+            {
+                Email = email,
+                Name = name
+            }));
         }
 
         public void Update(ClientInfo clientInfo)
         {
             Name = clientInfo.Name;
             Email = clientInfo.Email;
+
+            Append(new ClientUpdated(Id, clientInfo));
         }
     }
 }

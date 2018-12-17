@@ -10,6 +10,11 @@ namespace EventSourcing.Sample.Clients.Storage
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Client>().Ignore(c => c.PendingEvents);
+        }
+
         public DbSet<Client> Clients { get; set; }
     }
 }
