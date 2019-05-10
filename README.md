@@ -139,6 +139,7 @@ The simplest way to start is **installing the [project template](https://github.
 * [Wojciech Suwała - Building Microservices On .NET Core – Part 5 Marten An Ideal Repository For Your Domain Aggregates](https://altkomsoftware.pl/en/blog/building-microservices-domain-aggregates/)
 * [Eric Evans - DDD and Microservices: At Last, Some Boundaries!](https://www.infoq.com/presentations/ddd-microservices-2016)
 * [Martin Kleppmann — Event Sourcing and Stream Processing at Scale](https://www.youtube.com/watch?v=avi-TZI9t2I)
+* [Thomas Pierrain - As Time Goes By… (a Bi-temporal Event Sourcing story)](https://www.youtube.com/watch?v=xzekp1RuZbM)
 * [Julie Lerman - Data Points - CQRS and EF Data Models](https://msdn.microsoft.com/en-us/magazine/mt788619.aspx)
 * [Vaughn Vernon - Reactive DDD: Modeling Uncertainty](https://www.infoq.com/presentations/reactive-ddd-distributed-systems)
 * [Mark Seemann - CQS versus server generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
