@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Events;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
@@ -6,7 +6,7 @@ using Marten;
 
 namespace EventSourcing.Sample.Transactions.Domain.Clients.Handlers
 {
-    public class ClientsEventHandler :
+    public class ClientsEventHandler:
         IEventHandler<ClientCreated>,
         IEventHandler<ClientUpdated>,
         IEventHandler<ClientDeleted>

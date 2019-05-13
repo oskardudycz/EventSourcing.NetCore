@@ -1,27 +1,27 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrasructure;
 using SharpTestsEx;
 using Xunit;
-using Marten.Events.Projections;
 
 namespace Marten.Integration.Tests.EventStore.Projections
 {
-    public class ViewProjectionsTest : MartenTest
+    public class ViewProjectionsTest: MartenTest
     {
         private interface ITaskEvent
         {
             Guid TaskId { get; set; }
         }
 
-        private class TaskCreated : ITaskEvent
+        private class TaskCreated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskUpdated : ITaskEvent
+        private class TaskUpdated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
@@ -72,8 +72,8 @@ namespace Marten.Integration.Tests.EventStore.Projections
                 Descriptions[@event.TaskId] = @event.Description;
             }
         }
-        
-        private class TaskListViewProjection : ViewProjection<TaskDescriptionView, Guid>
+
+        private class TaskListViewProjection: ViewProjection<TaskDescriptionView, Guid>
         {
             public TaskListViewProjection()
             {
@@ -81,19 +81,17 @@ namespace Marten.Integration.Tests.EventStore.Projections
                 ProjectEventToSingleRecord<TaskUpdated>((view, @event) => view.ApplyEvent(@event));
             }
 
-            ViewProjection<TaskDescriptionView, Guid> ProjectEventToSingleRecord<TEvent>(Action<TaskDescriptionView, TEvent> handler) where TEvent : class
+            private ViewProjection<TaskDescriptionView, Guid> ProjectEventToSingleRecord<TEvent>(Action<TaskDescriptionView, TEvent> handler) where TEvent : class
             {
                 return ProjectEvent((documentSession, ev) => FindIdOfRecord(documentSession) ?? Guid.NewGuid(), handler);
             }
 
-            Guid? FindIdOfRecord(IDocumentSession documentSession)
+            private Guid? FindIdOfRecord(IDocumentSession documentSession)
             {
                 return documentSession.Query<TaskDescriptionView>()
                                    .Select(t => (Guid?)t.Id).SingleOrDefault();
             }
         }
-
-
 
         protected override IDocumentSession CreateSession(Action<StoreOptions> setStoreOptions)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Aggregates;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
 using EventSourcing.Sample.Tasks.Contracts.Transactions;
@@ -7,7 +7,7 @@ using EventSourcing.Sample.Transactions.Domain.Accounts;
 
 namespace EventSourcing.Sample.Tasks.Domain.Accounts
 {
-    public class Account : EventSourcedAggregate
+    public class Account: EventSourcedAggregate
     {
         public Guid ClientId { get; private set; }
 

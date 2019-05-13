@@ -1,9 +1,9 @@
-﻿using MediatR;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace Domain.Queries
 {
-    public class QueryBus : IQueryBus
+    public class QueryBus: IQueryBus
     {
         private readonly IMediator _mediator;
 

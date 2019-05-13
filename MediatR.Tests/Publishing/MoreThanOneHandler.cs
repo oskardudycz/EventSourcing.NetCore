@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -33,7 +33,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        public class TaskWasAdded : INotification
+        public class TaskWasAdded: INotification
         {
             public string TaskName { get; }
 
@@ -43,7 +43,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        public class TaskWasAddedHandler : INotificationHandler<TaskWasAdded>
+        public class TaskWasAddedHandler: INotificationHandler<TaskWasAdded>
         {
             private readonly TasksList _taskList;
 

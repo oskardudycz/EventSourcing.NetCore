@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SharpTestsEx;
@@ -31,7 +31,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private class TaskWasAdded : INotification
+        private class TaskWasAdded: INotification
         {
             public string TaskName { get; }
 

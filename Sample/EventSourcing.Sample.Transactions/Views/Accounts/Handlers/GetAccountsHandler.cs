@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +9,7 @@ using Marten;
 
 namespace EventSourcing.Sample.Tasks.Views.Accounts.Handlers
 {
-    public class GetAccountsHandler : IQueryHandler<GetAccounts, IEnumerable<AccountSummary>>
+    public class GetAccountsHandler: IQueryHandler<GetAccounts, IEnumerable<AccountSummary>>
     {
         private readonly IDocumentSession _session;
 

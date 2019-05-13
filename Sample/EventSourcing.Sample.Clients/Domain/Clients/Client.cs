@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using Domain.Aggregates;
 using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 
 namespace EventSourcing.Sample.Clients.Domain.Clients
 {
-    public class Client : EventSourcedAggregate
+    public class Client: EventSourcedAggregate
     {
         public string Name { get; private set; }
 

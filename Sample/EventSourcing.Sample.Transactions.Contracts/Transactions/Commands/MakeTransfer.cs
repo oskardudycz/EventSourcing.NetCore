@@ -1,9 +1,9 @@
-﻿using Domain.Commands;
 using System;
+using Domain.Commands;
 
 namespace EventSourcing.Sample.Tasks.Contracts.Accounts.Commands
 {
-    public class MakeTransfer : ICommand
+    public class MakeTransfer: ICommand
     {
         public Guid FromAccountId { get; }
         public Guid ToAccountId { get; }

@@ -1,9 +1,9 @@
-﻿using Domain.Events;
 using System;
+using Domain.Events;
 
 namespace EventSourcing.Sample.Tasks.Contracts.Transactions.Events
 {
-    public class NewOutflowRecorded : IEvent
+    public class NewOutflowRecorded: IEvent
     {
         public Guid FromAccountId { get; }
         public Guid ToAccountId { get; }

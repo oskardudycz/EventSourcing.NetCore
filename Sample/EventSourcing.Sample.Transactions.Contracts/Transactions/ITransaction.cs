@@ -1,6 +1,6 @@
-﻿namespace EventSourcing.Sample.Tasks.Contracts.Transactions
+namespace EventSourcing.Sample.Tasks.Contracts.Transactions
 {
-    interface ITransaction
+    internal interface ITransaction
     {
         decimal Ammount { get; }
     }

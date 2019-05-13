@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Domain.Events;
 
 namespace Domain.Aggregates
 {
-    public abstract class EventSourcedAggregate : IEventSourcedAggregate
+    public abstract class EventSourcedAggregate: IEventSourcedAggregate
     {
         public Guid Id { get; protected set; }
 

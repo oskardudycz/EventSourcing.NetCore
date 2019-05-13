@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Tests.TestsInfrasructure;
@@ -10,10 +10,10 @@ namespace CQRS.Tests.Commands
 {
     public class Commands
     {
-        private interface ICommand : IRequest
+        private interface ICommand: IRequest
         { }
 
-        private interface ICommandHandler<in T> : IRequestHandler<T> where T : ICommand
+        private interface ICommandHandler<in T>: IRequestHandler<T> where T : ICommand
         { }
 
         private interface ICommandBus
@@ -21,7 +21,7 @@ namespace CQRS.Tests.Commands
             Task Send(ICommand command);
         }
 
-        private class CommandBus : ICommandBus
+        private class CommandBus: ICommandBus
         {
             private readonly IMediator _mediator;
 
@@ -36,7 +36,7 @@ namespace CQRS.Tests.Commands
             }
         }
 
-        private class AddTaskCommand : ICommand
+        private class AddTaskCommand: ICommand
         {
             public string Name { get; }
 
@@ -51,7 +51,7 @@ namespace CQRS.Tests.Commands
             Task AddTask(AddTaskCommand command);
         }
 
-        private class TaskApplicationService : ITaskApplicationService
+        private class TaskApplicationService: ITaskApplicationService
         {
             private readonly ICommandBus _commandBus;
 
@@ -71,7 +71,7 @@ namespace CQRS.Tests.Commands
             IList<string> Tasks { get; }
         }
 
-        private class AppWriteModel : IAppWrtiteModel
+        private class AppWriteModel: IAppWrtiteModel
         {
             public IList<string> Tasks { get; }
 
@@ -81,7 +81,7 @@ namespace CQRS.Tests.Commands
             }
         }
 
-        private class AddTaskCommandHandler : ICommandHandler<AddTaskCommand>
+        private class AddTaskCommandHandler: ICommandHandler<AddTaskCommand>
         {
             private readonly IAppWrtiteModel _writeModel;
 

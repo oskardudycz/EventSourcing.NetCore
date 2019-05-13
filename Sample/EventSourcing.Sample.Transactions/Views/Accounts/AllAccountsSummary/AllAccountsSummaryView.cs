@@ -1,6 +1,6 @@
-﻿using System;
-using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
+using System;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
+using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
 
 namespace EventSourcing.Sample.Tasks.Views.Accounts
 {
@@ -9,10 +9,10 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts
         public Guid Id { get; set; }
 
         public int TotalCount { get; set; }
-        
+
         public decimal TotalBalance { get; set; }
 
-        public int TotalTransactionsCount{ get; set; }
+        public int TotalTransactionsCount { get; set; }
 
         public void ApplyEvent(NewAccountCreated @event)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using EventSourcing.Web.Sample;
@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace EventSourcing.Sample.IntegrationTests.Infrastructure
 {
-    public class TestContext : IDisposable
+    public class TestContext: IDisposable
     {
         private TestServer _server;
         public HttpClient Client { get; private set; }

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Marten.Events;
+using System.Linq;
 using Npgsql;
 using SharpTestsEx;
 using Xunit;
@@ -67,9 +66,9 @@ namespace Marten.Integration.Tests.General
                 ConnectionShouldBeEstablished(store);
             });
 
-
             ex.Should().Be.Null();
         }
+
         [Fact]
         public void GivenProperConnectionString_WhenDocumentSessionIsCreatedAndTransactionIsCreated_ThenConnectionIsCreatedAndItsPossibleToMakeRollback()
         {

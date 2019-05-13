@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Commands;
@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EventSourcing.Sample.Web.Controllers
 {
     [Route("api/[controller]")]
-    public class ClientsController : Controller
+    public class ClientsController: Controller
     {
         private readonly ICommandBus _commandBus;
         private readonly IQueryBus _queryBus;

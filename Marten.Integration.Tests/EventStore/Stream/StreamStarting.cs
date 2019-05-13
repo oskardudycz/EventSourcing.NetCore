@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using Marten.Integration.Tests.TestsInfrasructure;
 using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Stream
 {
-    public class StreamStarting : MartenTest
+    public class StreamStarting: MartenTest
     {
         private class TaskCreated
         {

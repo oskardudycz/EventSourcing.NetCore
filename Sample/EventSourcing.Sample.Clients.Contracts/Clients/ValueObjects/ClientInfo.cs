@@ -1,4 +1,4 @@
-﻿namespace EventSourcing.Sample.Clients.Contracts.Clients.DTOs
+namespace EventSourcing.Sample.Clients.Contracts.Clients.DTOs
 {
     public class ClientInfo
     {

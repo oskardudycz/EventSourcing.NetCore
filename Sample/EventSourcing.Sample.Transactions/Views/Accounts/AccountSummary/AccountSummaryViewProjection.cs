@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
@@ -9,7 +9,7 @@ using Marten.Events.Projections;
 
 namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
 {
-    public class AccountSummaryViewProjection : ViewProjection<AccountSummaryView, Guid>
+    public class AccountSummaryViewProjection: ViewProjection<AccountSummaryView, Guid>
     {
         public AccountSummaryViewProjection()
         {

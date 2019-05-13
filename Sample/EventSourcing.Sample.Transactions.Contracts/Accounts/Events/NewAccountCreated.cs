@@ -1,9 +1,9 @@
-﻿using Domain.Events;
 using System;
+using Domain.Events;
 
 namespace EventSourcing.Sample.Tasks.Contracts.Accounts.Events
 {
-    public class NewAccountCreated : IEvent
+    public class NewAccountCreated: IEvent
     {
         public Guid AccountId { get; set; }
 

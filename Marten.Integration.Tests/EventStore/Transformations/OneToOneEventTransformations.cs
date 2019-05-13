@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Marten.Events;
 using Marten.Events.Projections;
@@ -8,20 +8,20 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Transformations
 {
-    public class OneToOneEventTransformations : MartenTest
+    public class OneToOneEventTransformations: MartenTest
     {
         private interface ITaskEvent
         {
             Guid TaskId { get; set; }
         }
 
-        private class TaskCreated : ITaskEvent
+        private class TaskCreated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskUpdated : ITaskEvent
+        private class TaskUpdated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
@@ -43,7 +43,7 @@ namespace Marten.Integration.Tests.EventStore.Transformations
 
         private class TaskList { }
 
-        private class TaskChangeLogTransform : ITransform<TaskCreated, TaskChangesLog>,
+        private class TaskChangeLogTransform: ITransform<TaskCreated, TaskChangesLog>,
             ITransform<TaskUpdated, TaskChangesLog>
         {
             public TaskChangesLog Transform(EventStream stream, Event<TaskCreated> input)

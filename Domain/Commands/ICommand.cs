@@ -1,6 +1,6 @@
-﻿using MediatR;
+using MediatR;
 
 namespace Domain.Commands
 {
-    public interface ICommand : IRequest { }
+    public interface ICommand: IRequest { }
 }

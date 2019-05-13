@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Queries;
@@ -9,7 +9,7 @@ using Marten;
 
 namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
 {
-    public class GetAccountsSummaryHandler : IQueryHandler<GetAccountsSummary, AllAccountsSummary>
+    public class GetAccountsSummaryHandler: IQueryHandler<GetAccountsSummary, AllAccountsSummary>
     {
         private readonly IDocumentSession _session;
 

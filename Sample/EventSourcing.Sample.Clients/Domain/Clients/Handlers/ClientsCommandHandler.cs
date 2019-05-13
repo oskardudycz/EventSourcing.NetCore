@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Commands;
 using Domain.Events;
@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
 {
-    public class ClientsCommandHandler :
+    public class ClientsCommandHandler:
         ICommandHandler<CreateClient>,
         ICommandHandler<UpdateClient>,
         ICommandHandler<DeleteClient>

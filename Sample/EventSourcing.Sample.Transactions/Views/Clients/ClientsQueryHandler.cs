@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Queries;
 using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
@@ -6,7 +6,7 @@ using Marten;
 
 namespace EventSourcing.Sample.Transactions.Views.Clients
 {
-    public class ClientsQueryHandler : IQueryHandler<GetClientView, ClientView>
+    public class ClientsQueryHandler: IQueryHandler<GetClientView, ClientView>
     {
         private IDocumentSession _session;
 

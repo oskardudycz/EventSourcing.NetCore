@@ -1,6 +1,4 @@
-﻿using Domain.Events;
 using System;
-using System.Collections.Generic;
 
 namespace Domain.Aggregates
 {

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+
 namespace EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects
 {
     public class AccountSummary

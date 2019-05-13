@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -33,7 +33,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private class AddTaskCommand : IRequest
+        private class AddTaskCommand: IRequest
         {
             public string TaskName { get; }
 
@@ -43,7 +43,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private class AddTaskCommandHandler : IRequestHandler<AddTaskCommand>
+        private class AddTaskCommandHandler: IRequestHandler<AddTaskCommand>
         {
             private readonly TasksList _taskList;
 

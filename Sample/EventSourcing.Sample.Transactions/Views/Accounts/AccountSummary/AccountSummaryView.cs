@@ -1,7 +1,7 @@
-﻿using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
-using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
 using System;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
+using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
+using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
 
 namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
 {

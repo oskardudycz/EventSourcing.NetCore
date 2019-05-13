@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Marten.Integration.Tests.TestsInfrasructure;
@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate
 {
-    public class EventsAggregation : MartenTest
+    public class EventsAggregation: MartenTest
     {
         private class TaskCreated
         {
@@ -62,7 +62,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
                 List.Remove(task);
             }
         }
-        
+
         [Fact]
         public void GivenStreamOfEvents_WhenAggregateStreamIsCalled_ThenChangesAreAppliedProperly()
         {
@@ -70,9 +70,9 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
             //1. First Task Was Created
             var task1Id = Guid.NewGuid();
-            EventStore.Append(streamId, new TaskCreated { TaskId = task1Id, Description = "Description"});
+            EventStore.Append(streamId, new TaskCreated { TaskId = task1Id, Description = "Description" });
             Session.SaveChanges();
-            
+
             var taskList = EventStore.AggregateStream<TaskList>(streamId);
 
             taskList.List.Should().Have.Count.EqualTo(1);
@@ -90,7 +90,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             taskList.List.Single().Description.Should().Be.EqualTo("New Description");
 
             //3. Two Other tasks were added
-            EventStore.Append(streamId, new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description2" }, 
+            EventStore.Append(streamId, new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description2" },
                 new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description3" });
             Session.SaveChanges();
 
@@ -100,7 +100,6 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             taskList.List.Select(t => t.Description)
                 .Should()
                 .Have.SameSequenceAs("New Description", "Description2", "Description3");
-
 
             //4. First task was removed
             EventStore.Append(streamId, new TaskRemoved { TaskId = task1Id });

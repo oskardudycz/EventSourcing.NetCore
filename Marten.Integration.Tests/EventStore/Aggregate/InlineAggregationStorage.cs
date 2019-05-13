@@ -1,27 +1,26 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Marten.Integration.Tests.TestsInfrasructure;
 using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate
 {
-    public class InlineAggregationStorage : MartenTest
+    public class InlineAggregationStorage: MartenTest
     {
         private interface ITaskEvent
         {
             Guid TaskId { get; set; }
         }
 
-        private class TaskCreated : ITaskEvent
+        private class TaskCreated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskUpdated : ITaskEvent
+        private class TaskUpdated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }

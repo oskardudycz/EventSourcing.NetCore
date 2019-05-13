@@ -1,17 +1,17 @@
-﻿using Marten.Integration.Tests.TestsInfrasructure;
-using SharpTestsEx;
 using System;
+using Marten.Integration.Tests.TestsInfrasructure;
+using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate
 {
-    class TaskCreated
+    internal class TaskCreated
     {
         public Guid TaskId { get; set; }
         public string Description { get; set; }
     }
 
-    class TaskUpdated
+    internal class TaskUpdated
     {
         public Guid TaskId { get; set; }
         public string Description { get; set; }
@@ -19,7 +19,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
     namespace OldVersion
     {
-        class Task
+        internal class Task
         {
             public Guid Id { get; set; }
 
@@ -36,11 +36,11 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
                 Description = @event.Description;
             }
         }
-    }    
+    }
 
     namespace NewVersion
     {
-        class Task
+        internal class Task
         {
             public Guid Id { get; set; }
 
@@ -59,11 +59,13 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
         }
     }
 
-    public class Reaggregation : MartenTest
+    public class Reaggregation: MartenTest
     {
-        public Reaggregation() : base(false) { }
+        public Reaggregation() : base(false)
+        {
+        }
 
-        public IDocumentSession CreateSessionWithInlineAggregationFor<TTask>() where TTask : class, new ()
+        public IDocumentSession CreateSessionWithInlineAggregationFor<TTask>() where TTask : class, new()
         {
             return base.CreateSession(options =>
             {
@@ -83,7 +85,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
                 new TaskCreated {TaskId = taskId, Description = "Task 1"},
                 new TaskUpdated {TaskId = taskId, Description = "Task 1 Updated"},
             };
-            
+
             OldVersion.Task taskFromV1InlineAggregation;
             OldVersion.Task taskFromV1OnlineAggregation;
 
@@ -115,7 +117,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             //4. Inline aggregated snapshot won't change automatically
             taskFromV2InlineAggregation.Description.Should().Be.EqualTo(taskFromV1InlineAggregation.Description);
             taskFromV2InlineAggregation.Description.Should().Not.Be.EqualTo("New Logic: Task 1 Updated");
-            
+
             //5. But online aggregation is being applied automatically
             taskFromV2OnlineAggregation.Description.Should().Not.Be.EqualTo(taskFromV1OnlineAggregation.Description);
             taskFromV2OnlineAggregation.Description.Should().Be.EqualTo("New Logic: Task 1 Updated");
@@ -127,7 +129,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
                 //8. Store manually online aggregation as inline aggregation
                 session.Store(taskFromV2OnlineAggregation);
                 session.SaveChanges();
-                
+
                 var taskFromV2AfterReaggregation = session.Load<NewVersion.Task>(taskId);
 
                 taskFromV2AfterReaggregation.Description.Should().Not.Be.EqualTo(taskFromV1OnlineAggregation.Description);

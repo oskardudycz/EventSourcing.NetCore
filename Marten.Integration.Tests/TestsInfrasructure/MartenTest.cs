@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using Marten.Events;
 using Npgsql;
@@ -7,7 +7,7 @@ using Xunit;
 namespace Marten.Integration.Tests.TestsInfrasructure
 {
     [Collection("Marten")]
-    public abstract class MartenTest : IDisposable
+    public abstract class MartenTest: IDisposable
     {
         protected readonly IDocumentSession Session;
 

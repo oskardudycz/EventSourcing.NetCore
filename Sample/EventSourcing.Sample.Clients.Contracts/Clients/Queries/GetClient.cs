@@ -1,7 +1,5 @@
-﻿using Domain.Queries;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using Domain.Queries;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Queries
 {
@@ -12,7 +10,7 @@ namespace EventSourcing.Sample.Clients.Contracts.Clients.Queries
         public string Email { get; set; }
     }
 
-    public class GetClient : IQuery<ClientItem>
+    public class GetClient: IQuery<ClientItem>
     {
         public Guid Id { get; }
 
@@ -20,6 +18,5 @@ namespace EventSourcing.Sample.Clients.Contracts.Clients.Queries
         {
             Id = id;
         }
-
     }
 }

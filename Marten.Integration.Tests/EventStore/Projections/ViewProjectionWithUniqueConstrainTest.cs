@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using Baseline;
@@ -11,9 +11,9 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections
 {
-    public class ViewProjectionWithUniqueConstrainTest : MartenTest
+    public class ViewProjectionWithUniqueConstrainTest: MartenTest
     {
-        public class UniqueIndex : IIndexDefinition
+        public class UniqueIndex: IIndexDefinition
         {
             private readonly MemberInfo[][] _members;
             private readonly string _locator = string.Empty;
@@ -151,7 +151,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
         }
 
         [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-        public class UniqueIndexAttribute : MartenAttribute
+        public class UniqueIndexAttribute: MartenAttribute
         {
             public override void Modify(DocumentMapping mapping, MemberInfo member)
             {
@@ -218,7 +218,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
             public string FullName { get; set; }
         }
 
-        private class UserViewProjection : ViewProjection<UserView, Guid>
+        private class UserViewProjection: ViewProjection<UserView, Guid>
         {
             public UserViewProjection()
             {

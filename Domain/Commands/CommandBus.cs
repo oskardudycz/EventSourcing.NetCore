@@ -1,9 +1,9 @@
-﻿using MediatR;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace Domain.Commands
 {
-    public class CommandBus : ICommandBus
+    public class CommandBus: ICommandBus
     {
         private readonly IMediator _mediator;
 

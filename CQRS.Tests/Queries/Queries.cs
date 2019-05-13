@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,10 +11,10 @@ namespace CQRS.Tests.Queries
 {
     public class Queries
     {
-        private interface IQuery<out TResponse> : IRequest<TResponse>
+        private interface IQuery<out TResponse>: IRequest<TResponse>
         { }
 
-        private interface IQueryHandler<in TQuery, TResponse> : IRequestHandler<TQuery, TResponse>
+        private interface IQueryHandler<in TQuery, TResponse>: IRequestHandler<TQuery, TResponse>
             where TQuery : IQuery<TResponse>
         { }
 
@@ -23,7 +23,7 @@ namespace CQRS.Tests.Queries
             Task<TResponse> Send<TResponse>(IQuery<TResponse> command);
         }
 
-        private class QueryBus : IQueryBus
+        private class QueryBus: IQueryBus
         {
             private readonly IMediator _mediator;
 
@@ -38,7 +38,7 @@ namespace CQRS.Tests.Queries
             }
         }
 
-        private class GetTaskNamesQuery : IQuery<List<string>>
+        private class GetTaskNamesQuery: IQuery<List<string>>
         {
             public string Filter { get; }
 
@@ -53,7 +53,7 @@ namespace CQRS.Tests.Queries
             Task<List<string>> GetTaskNames(GetTaskNamesQuery query);
         }
 
-        private class TaskApplicationService : ITaskApplicationService
+        private class TaskApplicationService: ITaskApplicationService
         {
             private readonly IQueryBus _queryBus;
 
@@ -73,7 +73,7 @@ namespace CQRS.Tests.Queries
             IQueryable<string> Tasks { get; }
         }
 
-        private class AppReadModel : IAppReadModel
+        private class AppReadModel: IAppReadModel
         {
             private readonly IList<string> _tasks;
             public IQueryable<string> Tasks => _tasks.AsQueryable();
@@ -84,7 +84,7 @@ namespace CQRS.Tests.Queries
             }
         }
 
-        private class AddTaskCommandHandler : IQueryHandler<GetTaskNamesQuery, List<string>>
+        private class AddTaskCommandHandler: IQueryHandler<GetTaskNamesQuery, List<string>>
         {
             private readonly IAppReadModel _readModel;
 

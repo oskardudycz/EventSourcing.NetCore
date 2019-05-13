@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EventSourcing.Sample.Clients.Views.Clients
 {
-    public class ClientsQueryHandler :
+    public class ClientsQueryHandler:
         IQueryHandler<GetClients, List<ClientListItem>>,
         IQueryHandler<GetClient, ClientItem>
     {

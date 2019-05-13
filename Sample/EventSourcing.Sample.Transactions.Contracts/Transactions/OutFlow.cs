@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace EventSourcing.Sample.Tasks.Contracts.Transactions
 {
-    public class Outflow : ITransaction
+    public class Outflow: ITransaction
     {
         public decimal Ammount { get; }
 

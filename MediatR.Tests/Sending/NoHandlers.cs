@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SharpTestsEx;
@@ -31,7 +31,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        private class GetTaskNamesQuery : IRequest<List<string>>
+        private class GetTaskNamesQuery: IRequest<List<string>>
         {
             public string Filter { get; }
 

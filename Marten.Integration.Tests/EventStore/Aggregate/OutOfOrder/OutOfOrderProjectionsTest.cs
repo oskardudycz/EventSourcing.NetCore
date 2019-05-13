@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Marten.Integration.Tests.TestsInfrasructure;
@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections
 {
-    public class OutOfOrderProjectionsTest : MartenTest
+    public class OutOfOrderProjectionsTest: MartenTest
     {
         private interface ITaskEvent
         {
@@ -16,7 +16,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
             int TaskVersion { get; set; }
         }
 
-        private class TaskCreated : ITaskEvent
+        private class TaskCreated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
@@ -24,7 +24,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
             public int TaskVersion { get; set; }
         }
 
-        private class TaskUpdated : ITaskEvent
+        private class TaskUpdated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }

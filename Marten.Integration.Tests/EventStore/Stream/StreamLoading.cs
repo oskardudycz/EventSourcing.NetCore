@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Marten.Integration.Tests.TestsInfrasructure;
 using SharpTestsEx;
@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Stream
 {
-    public class StreamLoading : MartenTest
+    public class StreamLoading: MartenTest
     {
         private class TaskCreated
         {
@@ -34,7 +34,7 @@ namespace Marten.Integration.Tests.EventStore.Stream
 
             return streamId;
         }
-        
+
         [Fact]
         public void GivenExistingStream_WithOneEventWhenStreamIsLoaded_ThenItLoadsOneEvent()
         {
@@ -65,7 +65,6 @@ namespace Marten.Integration.Tests.EventStore.Stream
             events.Count.Should().Be.EqualTo(2);
             events.Last().Version.Should().Be.EqualTo(2);
         }
-
 
         [Fact]
         public void GivenExistingStreamWithOneEvent_WhenStreamIsLoadedByEventType_ThenItLoadsOneEvent()

@@ -1,6 +1,6 @@
-﻿using Domain.Queries;
 using System;
 using System.Collections.Generic;
+using Domain.Queries;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Queries
 {
@@ -10,7 +10,7 @@ namespace EventSourcing.Sample.Clients.Contracts.Clients.Queries
         public string Name { get; set; }
     }
 
-    public class GetClients : IQuery<List<ClientListItem>>
+    public class GetClients: IQuery<List<ClientListItem>>
     {
     }
 }

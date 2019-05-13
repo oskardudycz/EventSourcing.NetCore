@@ -1,4 +1,4 @@
-﻿namespace EventSourcing.Sample.Transactions.Contracts.Accounts.ValueObjects
+namespace EventSourcing.Sample.Transactions.Contracts.Accounts.ValueObjects
 {
     public class AllAccountsSummary
     {

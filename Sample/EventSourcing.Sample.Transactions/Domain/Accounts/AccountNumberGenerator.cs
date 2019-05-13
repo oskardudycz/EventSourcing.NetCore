@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace EventSourcing.Sample.Transactions.Domain.Accounts
 {
@@ -7,9 +7,9 @@ namespace EventSourcing.Sample.Transactions.Domain.Accounts
         string Generate();
     }
 
-    public class RandomAccountNumberGenerator : IAccountNumberGenerator
+    public class RandomAccountNumberGenerator: IAccountNumberGenerator
     {
-        Random _random = new Random();
+        private Random _random = new Random();
 
         public string Generate()
         {

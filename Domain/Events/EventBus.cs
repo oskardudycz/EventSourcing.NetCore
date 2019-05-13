@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using MediatR;
 
 namespace Domain.Events
 {
-    public class EventBus : IEventBus
+    public class EventBus: IEventBus
     {
         private readonly IMediator _mediator;
 

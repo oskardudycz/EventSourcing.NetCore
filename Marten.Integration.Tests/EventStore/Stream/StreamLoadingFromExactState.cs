@@ -1,12 +1,11 @@
-﻿using System;
-using System.Linq;
+using System;
 using Marten.Integration.Tests.TestsInfrasructure;
 using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Stream
 {
-    public class StreamLoadingFromExactState : MartenTest
+    public class StreamLoadingFromExactState: MartenTest
     {
         private class TaskCreated
         {
