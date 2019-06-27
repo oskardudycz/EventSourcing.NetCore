@@ -155,6 +155,7 @@ The simplest way to start is **installing the [project template](https://github.
 * [Thomas Pierrain - As Time Goes By… (a Bi-temporal Event Sourcing story)](https://m.youtube.com/watch?v=xzekp1RuZbM)
 * [Michiel Overeem, Marten Spoor, Slinger Jansen - The dark side of event sourcing: Managing data conversion](https://www.researchgate.net/publication/315637858_The_dark_side_of_event_sourcing_Managing_data_conversion)
 * [Jakub Pilimon - DDD by Examples](https://github.com/ddd-by-examples/library)
+* [Michiel Overeem - Event Sourcing after launch](https://www.youtube.com/watch?v=JzWJI8kW2kc)
 
 I found an issue or I have a change request
 --------------------------------
