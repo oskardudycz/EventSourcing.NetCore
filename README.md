@@ -149,7 +149,6 @@ The simplest way to start is **installing the [project template](https://github.
 * [David Boike - Putting your events on a diet](https://particular.net/blog/putting-your-events-on-a-diet)
 * [DDD Quickly](https://www.infoq.com/minibooks/domain-driven-design-quickly)
 * [Dennis Doomen - The Good, The Bad and the Ugly of Event Sourcing](https://www.continuousimprover.com/2017/11/event-sourcing-good-bad-and-ugly.html)
-* [Liquid Projections - A set of highly efficient building blocks to build fast autonomous synchronous and asynchronous projector](https://liquidprojections.net/)
 * [Versioning in an Event Sourced System](http://blog.approache.com/2019/02/versioning-in-event-sourced-system-tldr_10.html?m=1)
 * [Jay Kreps - Why local state is a fundamental primitive in stream processing](https://www.oreilly.com/ideas/why-local-state-is-a-fundamental-primitive-in-stream-processing)
 * [Thomas Pierrain - As Time Goes By… (a Bi-temporal Event Sourcing story)](https://m.youtube.com/watch?v=xzekp1RuZbM)
