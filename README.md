@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master) ![](https://dockerbuildbadges.quelltext.eu/status.svg?organization=oskardudycz&repository=eventsourcing.netcore)
+[![Financial Contributors on Open Collective](https://opencollective.com/eventsourcingnetcore/all/badge.svg?label=financial+contributors)](https://opencollective.com/eventsourcingnetcore) [![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master) ![](https://dockerbuildbadges.quelltext.eu/status.svg?organization=oskardudycz&repository=eventsourcing.netcore)
 
 # EventSourcing.NetCore
 Example of Event Sourcing in .NET Core
@@ -161,3 +161,33 @@ I found an issue or I have a change request
 Feel free to create an issue on GitHub. Contributions, pull requests are more than welcome!
 
 **EventSourcing.NetCore** is Copyright &copy; 2017-2019 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/oskardudycz/EventSourcing.NetCore/graphs/contributors"><img src="https://opencollective.com/eventsourcingnetcore/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/eventsourcingnetcore/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/eventsourcingnetcore"><img src="https://opencollective.com/eventsourcingnetcore/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/eventsourcingnetcore/contribute)]
+
+<a href="https://opencollective.com/eventsourcingnetcore/organization/0/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/eventsourcingnetcore/organization/1/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/eventsourcingnetcore/organization/2/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/eventsourcingnetcore/organization/3/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/eventsourcingnetcore/organization/4/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/eventsourcingnetcore/organization/5/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/eventsourcingnetcore/organization/6/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/eventsourcingnetcore/organization/7/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/eventsourcingnetcore/organization/8/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/eventsourcingnetcore/organization/9/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/9/avatar.svg"></a>
