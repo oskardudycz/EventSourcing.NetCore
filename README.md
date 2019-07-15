@@ -1,4 +1,4 @@
-[![Financial Contributors on Open Collective](https://opencollective.com/eventsourcingnetcore/all/badge.svg?label=financial+contributors)](https://opencollective.com/eventsourcingnetcore) [![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master) ![](https://dockerbuildbadges.quelltext.eu/status.svg?organization=oskardudycz&repository=eventsourcing.netcore)
+[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master) ![](https://dockerbuildbadges.quelltext.eu/status.svg?organization=oskardudycz&repository=eventsourcing.netcore) [![Financial Contributors on Open Collective](https://opencollective.com/eventsourcingnetcore/all/badge.svg?label=financial+contributors)](https://opencollective.com/eventsourcingnetcore) 
 
 # EventSourcing.NetCore
 Example of Event Sourcing in .NET Core
@@ -160,8 +160,6 @@ I found an issue or I have a change request
 --------------------------------
 Feel free to create an issue on GitHub. Contributions, pull requests are more than welcome!
 
-**EventSourcing.NetCore** is Copyright &copy; 2017-2019 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
-
 ## Contributors
 
 ### Code Contributors
@@ -191,3 +189,5 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/eventsourcingnetcore/organization/7/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/7/avatar.svg"></a>
 <a href="https://opencollective.com/eventsourcingnetcore/organization/8/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/8/avatar.svg"></a>
 <a href="https://opencollective.com/eventsourcingnetcore/organization/9/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/9/avatar.svg"></a>
+
+**EventSourcing.NetCore** is Copyright &copy; 2017-2019 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
