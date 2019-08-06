@@ -156,6 +156,8 @@ The simplest way to start is **installing the [project template](https://github.
 * [Jakub Pilimon - DDD by Examples](https://github.com/ddd-by-examples/library)
 * [Michiel Overeem - Event Sourcing after launch](https://www.youtube.com/watch?v=JzWJI8kW2kc)
 * [Jimmy Bogard - Domain Driven Design: The Good Parts](https://www.youtube.com/watch?v=U6CeaA-Phqo)
+* [Event Modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
+* [Event Storming](https://leanpub.com/introducing_eventstorming)
 
 I found an issue or I have a change request
 --------------------------------
