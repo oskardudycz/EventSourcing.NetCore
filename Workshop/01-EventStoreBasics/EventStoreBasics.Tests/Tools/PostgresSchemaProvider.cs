@@ -10,8 +10,11 @@ namespace EventStoreBasics.Tests.Tools
         private readonly NpgsqlConnection databaseConnection;
 
         const string GetTableColumns =
-            @"select column_name as name, data_type as type
-              from INFORMATION_SCHEMA.COLUMNS where table_name = @tableName";
+            @"SELECT column_name AS name, data_type AS type
+              FROM INFORMATION_SCHEMA.COLUMNS
+              WHERE
+                  table_name = @tableName
+                  AND table_schema in (select schemas[1] from (select current_schemas(false) as schemas) as currentschema)";
 
         public PostgresSchemaProvider(NpgsqlConnection databaseConnection)
         {
