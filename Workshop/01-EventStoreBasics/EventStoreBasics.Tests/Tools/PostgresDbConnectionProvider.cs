@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Dapper;
 using Npgsql;
 
@@ -7,10 +8,13 @@ namespace EventStoreBasics.Tests.Tools
     {
         public static NpgsqlConnection GetFreshDbConnection()
         {
-            var connection = new NpgsqlConnection(Settings.ConnectionString);
+            // get the test class name that will be used as POSTGRES schema
+            var testClassName = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
+            // each test will have it's own schema named to run them in isolation and make them not interfere each other
+            var connection = new NpgsqlConnection(Settings.ConnectionString + $"Search Path= '{testClassName}'");
 
             // recreate schema to have it fresh for tests. Kids do not try that on production.
-            connection.Execute("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
+            connection.Execute($"DROP SCHEMA IF EXISTS {testClassName} CASCADE; CREATE SCHEMA {testClassName};");
 
             return connection;
         }
