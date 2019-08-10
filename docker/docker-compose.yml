@@ -1,9 +1,32 @@
 version: "3"
 services:
-    postgres: 
+    postgres:
         image: clkao/postgres-plv8
         container_name: event-sourcing-net-postgres
         environment:
             - postgres/variables.env
         ports:
             - "5432:5432"
+        networks:
+            - postgres
+
+    pgadmin:
+        image: dpage/pgadmin4
+        container_name: pgadmin_container
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+        volumes:
+            - pgadmin:/root/.pgadmin
+        ports:
+            - "${PGADMIN_PORT:-5050}:80"
+        networks:
+            - postgres
+
+networks:
+    postgres:
+        driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:

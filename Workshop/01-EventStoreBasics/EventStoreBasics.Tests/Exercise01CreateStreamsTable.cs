@@ -45,18 +45,18 @@ namespace EventStoreBasics.Tests
         private readonly NpgsqlConnection databaseConnection;
         private readonly PostgresSchemaProvider schemaProvider;
 
-        private const string StreamsTableName = "Streams";
+        private const string StreamsTableName = "streams";
 
-        private const string IdColumnName = "Id";
-        private const string TypeColumnName = "Type";
-        private const string VersionColumnName = "Version";
+        private const string IdColumnName = "id";
+        private const string TypeColumnName = "type";
+        private const string VersionColumnName = "version";
 
         /// <summary>
         /// Inits Event Store
         /// </summary>
         public Exercise01CreateStreamsTable()
         {
-            databaseConnection = new NpgsqlConnection(Settings.ConnectionString);
+            databaseConnection = PostgresDbConnectionProvider.GetFreshDbConnection();
             schemaProvider = new PostgresSchemaProvider(databaseConnection);
 
             // Create Event Store
@@ -101,7 +101,7 @@ namespace EventStoreBasics.Tests
         {
             var typeColumn = schemaProvider
                 .GetTable(StreamsTableName)
-                .GetColumn(IdColumnName);
+                .GetColumn(TypeColumnName);
 
             typeColumn.Should().NotBeNull();
             typeColumn.Name.Should().Be(TypeColumnName);
@@ -116,7 +116,7 @@ namespace EventStoreBasics.Tests
         {
             var versionColumn = schemaProvider
                 .GetTable(StreamsTableName)
-                .GetColumn(IdColumnName);
+                .GetColumn(VersionColumnName);
 
             versionColumn.Should().NotBeNull();
             versionColumn.Name.Should().Be(VersionColumnName);
