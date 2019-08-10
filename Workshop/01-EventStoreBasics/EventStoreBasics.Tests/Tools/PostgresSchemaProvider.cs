@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Dapper;
@@ -12,7 +11,7 @@ namespace EventStoreBasics.Tests.Tools
 
         const string GetTableColumns =
             @"select column_name as name, data_type as type
-              from INFORMATION_SCHEMA.COLUMNS where table_name = '@tableName'";
+              from INFORMATION_SCHEMA.COLUMNS where table_name = @tableName";
 
         public PostgresSchemaProvider(NpgsqlConnection databaseConnection)
         {
@@ -21,16 +20,16 @@ namespace EventStoreBasics.Tests.Tools
 
         public Table GetTable(string tableName)
         {
-            var columns =  databaseConnection.Query<Column>(GetTableColumns);
+            var columns =  databaseConnection.Query<Column>(GetTableColumns, new { tableName });
 
-            return columns.Any() ? null : new Table(tableName, columns);
+            return columns.Any() ? new Table(tableName, columns) : null;
         }
     }
 
     public class Table
     {
         public string Name { get; }
-        public IEnumerable<Column> Columns { get; }
+        private IEnumerable<Column> Columns { get; }
 
         public Table(string name, IEnumerable<Column> columns)
         {
@@ -48,9 +47,8 @@ namespace EventStoreBasics.Tests.Tools
     {
         public const string GuidType = "uuid";
         public const string LongType = "bigint";
-        public const string StringType = "varchar";
+        public const string StringType = "text";
         public const string JSONType = "jsonb";
-
 
         public string Name { get; }
         public string Type { get; }
