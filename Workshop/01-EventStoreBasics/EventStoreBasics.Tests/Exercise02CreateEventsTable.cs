@@ -107,6 +107,36 @@ namespace EventStoreBasics.Tests
         }
 
         /// <summary>
+        /// Verifies if Stream table has Id column of type Guid
+        /// </summary>
+        [Fact]
+        public void EventsTable_ShouldHave_DataColumn_WithJsonType()
+        {
+            var dataColumn = schemaProvider
+                .GetTable(EventsTableName)
+                .GetColumn(DataColumnName);
+
+            dataColumn.Should().NotBeNull();
+            dataColumn.Name.Should().Be(DataColumnName);
+            dataColumn.Type.Should().Be(Column.JSONType);
+        }
+
+        /// <summary>
+        /// Verifies if Stream table has StreamId column of type Guid
+        /// </summary>
+        [Fact]
+        public void EventsTable_ShouldHave_StreamIdColumn_WithGuidType()
+        {
+            var dataColumn = schemaProvider
+                .GetTable(EventsTableName)
+                .GetColumn(StreamIdColumnName);
+
+            dataColumn.Should().NotBeNull();
+            dataColumn.Name.Should().Be(StreamIdColumnName);
+            dataColumn.Type.Should().Be(Column.GuidType);
+        }
+
+        /// <summary>
         /// Verifies if Stream table has Type column of type String
         /// </summary>
         [Fact]
@@ -134,6 +164,21 @@ namespace EventStoreBasics.Tests
             versionColumn.Should().NotBeNull();
             versionColumn.Name.Should().Be(VersionColumnName);
             versionColumn.Type.Should().Be(Column.LongType);
+        }
+
+        /// <summary>
+        /// Verifies if Stream table has Version column of type Long
+        /// </summary>
+        [Fact]
+        public void EventsTable_ShouldHave_CreatedColumn_WithDateTimeType()
+        {
+            var createdColumn = schemaProvider
+                .GetTable(EventsTableName)
+                .GetColumn(CreatedColumnName);
+
+            createdColumn.Should().NotBeNull();
+            createdColumn.Name.Should().Be(CreatedColumnName);
+            createdColumn.Type.Should().Be(Column.DateTimeType);
         }
 
         /// <summary>
