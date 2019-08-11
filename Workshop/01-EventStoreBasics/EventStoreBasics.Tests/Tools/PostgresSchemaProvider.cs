@@ -5,6 +5,9 @@ using Npgsql;
 
 namespace EventStoreBasics.Tests.Tools
 {
+    /// <summary>
+    /// Helper class that returns information about the database schema (Tables and its Columns)
+    /// </summary>
     public class PostgresSchemaProvider
     {
         private readonly NpgsqlConnection databaseConnection;
@@ -14,6 +17,7 @@ namespace EventStoreBasics.Tests.Tools
               FROM INFORMATION_SCHEMA.COLUMNS
               WHERE
                   table_name = @tableName
+                  -- get only tables from current schema named as current test class
                   AND table_schema in (select schemas[1] from (select current_schemas(false) as schemas) as currentschema)";
 
         public PostgresSchemaProvider(NpgsqlConnection databaseConnection)
@@ -21,6 +25,11 @@ namespace EventStoreBasics.Tests.Tools
             this.databaseConnection = databaseConnection;
         }
 
+        /// <summary>
+        /// Returns schema information about specific table
+        /// </summary>
+        /// <param name="tableName">table name</param>
+        /// <returns></returns>
         public Table GetTable(string tableName)
         {
             var columns =  databaseConnection.Query<Column>(GetTableColumns, new { tableName });
@@ -29,9 +38,18 @@ namespace EventStoreBasics.Tests.Tools
         }
     }
 
+    /// <summary>
+    /// Describes basic information about database table
+    /// </summary>
     public class Table
     {
+        /// <summary>
+        /// Table Name
+        /// </summary>
         public string Name { get; }
+        /// <summary>
+        /// Table Columns
+        /// </summary>
         private IEnumerable<Column> Columns { get; }
 
         public Table(string name, IEnumerable<Column> columns)
@@ -46,15 +64,26 @@ namespace EventStoreBasics.Tests.Tools
         }
     }
 
+    /// <summary>
+    /// Describes basic information about database column
+    /// </summary>
     public class Column
     {
         public const string GuidType = "uuid";
         public const string LongType = "bigint";
         public const string StringType = "text";
         public const string JSONType = "jsonb";
+        public const string DateTimeType = "timestamp with time zone";
 
+        /// <summary>
+        /// Column Name
+        /// </summary>
         public string Name { get; }
+        /// <summary>
+        /// Column Type
+        /// </summary>
         public string Type { get; }
+
 
         public Column(string name, string type)
         {

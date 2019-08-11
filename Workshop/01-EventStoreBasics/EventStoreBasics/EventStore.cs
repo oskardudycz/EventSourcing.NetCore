@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 using Dapper;
 using Npgsql;
 
@@ -9,11 +8,24 @@ namespace EventStoreBasics
     {
         private readonly NpgsqlConnection databaseConnection;
 
-        const string CreatStreamsTable =
+        const string CreatStreamsTableSQL =
             @"CREATE TABLE IF NOT EXISTS streams(
-                  id             UUID    NOT NULL    PRIMARY KEY,
-                  type           TEXT    NOT NULL,
-                  version        BIGINT  NOT NULL
+                  id             UUID                      NOT NULL    PRIMARY KEY,
+                  type           TEXT                      NOT NULL,
+                  version        BIGINT                    NOT NULL
+              );";
+
+
+        const string CreatEventsTableSQL =
+            @"CREATE TABLE IF NOT EXISTS events(
+                  id             UUID                      NOT NULL    PRIMARY KEY,
+                  data           JSONB                     NOT NULL,
+                  streamid       UUID                      NOT NULL,
+                  type           TEXT                      NOT NULL,
+                  version        BIGINT                    NOT NULL,
+                  created        timestamp with time zone  NOT NULL    default (now()),
+                  FOREIGN KEY(streamid) REFERENCES streams(id),
+                  CONSTRAINT events_stream_and_version UNIQUE(streamid, version)
               );";
 
         public EventStore(NpgsqlConnection databaseConnection)
@@ -23,21 +35,18 @@ namespace EventStoreBasics
 
         public void Init()
         {
-            if (databaseConnection.State != ConnectionState.Open)
-            {
-                databaseConnection.Open();
-            }
-            using (var transaction = databaseConnection.BeginTransaction())
-            {
-                CreateStreamsTable(transaction);
-
-                transaction.Commit();
-            }
+            CreateStreamsTable();
+            CreateEventsTable();
         }
 
-        private void CreateStreamsTable(IDbTransaction transaction)
+        private void CreateStreamsTable()
         {
-            databaseConnection.Execute(CreatStreamsTable);
+            databaseConnection.Execute(CreatStreamsTableSQL);
+        }
+
+        private void CreateEventsTable()
+        {
+            databaseConnection.Execute(CreatEventsTableSQL);
         }
 
         public void Dispose()
