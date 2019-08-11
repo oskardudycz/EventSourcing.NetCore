@@ -1,5 +1,6 @@
 using System;
 using EventStoreBasics.Tests.Tools;
+using FluentAssertions;
 using Npgsql;
 using Xunit;
 
@@ -43,7 +44,9 @@ namespace EventStoreBasics.Tests
             var streamId = Guid.NewGuid();
             var @event = new UserCreated {Name = "John Doe"};
 
-            eventStore.AppendEvent<User, UserCreated>(streamId, @event);
+            var result = eventStore.AppendEvent<User, UserCreated>(streamId, @event);
+
+            result.Should().BeTrue();
         }
     }
 }
