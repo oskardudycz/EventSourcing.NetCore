@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Linq;
 using Dapper;
 using Newtonsoft.Json;
 using Npgsql;
@@ -25,7 +26,7 @@ namespace EventStoreBasics
 
         public bool AppendEvent<TStream, TEvent>(Guid streamId, TEvent @event, long? expectedVersion = null)
         {
-            databaseConnection.Execute(
+            return databaseConnection.Query<bool>(
                 "SELECT append_event(@Id, @Data, @Type, @StreamId, @StreamType, @ExpectedVersion)",
                 new
                 {
@@ -37,8 +38,7 @@ namespace EventStoreBasics
                     ExpectedVersion = expectedVersion
                 },
                 commandType: CommandType.Text
-            );
-            return true;
+            ).Single();
         }
 
         private void CreateStreamsTable()
@@ -86,7 +86,7 @@ namespace EventStoreBasics
 
                     -- if stream doesn't exist - create new one with version 0
                     IF stream_version IS NULL THEN
-		                stream_version := 0;
+                        stream_version := 0;
 
                         INSERT INTO streams
                             (id, type, version)
