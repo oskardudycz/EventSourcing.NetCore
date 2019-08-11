@@ -1,6 +1,5 @@
 using System;
 using System.Data;
-using System.Linq;
 using Dapper;
 using Newtonsoft.Json;
 using Npgsql;
@@ -72,7 +71,7 @@ namespace EventStoreBasics
         private void CreateAppendEventFunction()
         {
             const string AppendEventFunctionSQL =
-                @"CREATE OR REPLACE FUNCTION append_event(id uuid, data jsonb, type text, stream_id uuid, stream_type text, expected_stream_version bigint) RETURNS boolean
+                @"CREATE OR REPLACE FUNCTION append_event(id uuid, data text, type text, stream_id uuid, stream_type text, expected_stream_version bigint default null) RETURNS boolean
                 LANGUAGE plpgsql
                 AS $$
                 DECLARE
@@ -92,7 +91,7 @@ namespace EventStoreBasics
                         INSERT INTO streams
                             (id, type, version)
                         VALUES
-                            (id, stream_type, stream_version);
+                            (stream_id, stream_type, stream_version);
                     END IF;
 
                     -- check optimistic concurrency
@@ -107,7 +106,7 @@ namespace EventStoreBasics
                     INSERT INTO events
 			            (id, data, streamid, type, version)
 		            VALUES
-			            (id, data, stream_id, type, stream_version);
+			            (id, data::jsonb, stream_id, type, stream_version);
 
                     -- update stream version
                     UPDATE streams as s
