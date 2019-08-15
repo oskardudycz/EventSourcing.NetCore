@@ -8,12 +8,23 @@ using Xunit;
 namespace EventStoreBasics.Tests
 {
 
-    public class Exercise04EventStoreMethods
+    public class Exercise05StreamAggregation
     {
         class User
         {
-            public Guid Id { get; set; }
-            public string Name { get; set; }
+            public Guid Id { get; private set; }
+            public string Name { get; private set; }
+
+            private void Apply(UserCreated @event)
+            {
+                Id = @event.UserId;
+                Name = @event.UserName;
+            }
+
+            private void Apply(UserNameUpdated @event)
+            {
+                Name = @event.UserName;
+            }
         }
 
         class UserCreated
@@ -48,7 +59,7 @@ namespace EventStoreBasics.Tests
         /// <summary>
         /// Inits Event Store
         /// </summary>
-        public Exercise04EventStoreMethods()
+        public Exercise05StreamAggregation()
         {
             databaseConnection = PostgresDbConnectionProvider.GetFreshDbConnection();
             schemaProvider = new PostgresSchemaProvider(databaseConnection);
@@ -61,22 +72,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
-        public void GetStreamState_ShouldReturnProperStreamInfo()
-        {
-            var streamId = Guid.NewGuid();
-            var @event = new UserCreated(streamId,"John Doe");
-
-            eventStore.AppendEvent<User, UserCreated>(streamId, @event);
-
-            var streamState = eventStore.GetStreamState(streamId);
-
-            streamState.Id.Should().Be(streamId);
-            streamState.Type.Should().Be(typeof(User));
-            streamState.Version.Should().Be(1);
-        }
-
-        [Fact]
-        public void GetEvents_ShouldReturnAppendedEvents()
+        public void AggregateStream_ShouldReturnObjectWithStateBasedOnEvents()
         {
             var streamId = Guid.NewGuid();
             var userCreated = new UserCreated(streamId, "John Doe");
@@ -85,15 +81,10 @@ namespace EventStoreBasics.Tests
             eventStore.AppendEvent<User, UserCreated>(streamId, userCreated);
             eventStore.AppendEvent<User, UserNameUpdated>(streamId, userNameUpdated);
 
-            var events = eventStore.GetEvents(streamId);
+            var aggregate = eventStore.AggregateStream<User>(streamId);
 
-            events.Should().HaveCount(2);
-
-            events.OfType<UserCreated>().Should().Contain(
-                e => e.UserId == userCreated.UserId && e.UserName == userCreated.UserName);
-
-            events.OfType<UserNameUpdated>().Should().Contain(
-                e => e.UserId == userNameUpdated.UserId && e.UserName == userNameUpdated.UserName);
+            aggregate.Id.Should().Be(streamId);
+            aggregate.Name.Should().Be(userNameUpdated.UserName);
         }
     }
 }
