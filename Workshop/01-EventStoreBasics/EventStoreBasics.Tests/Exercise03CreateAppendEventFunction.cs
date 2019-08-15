@@ -1,4 +1,6 @@
 using System;
+using System.Reflection.Metadata;
+using Dapper;
 using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Npgsql;
@@ -14,7 +16,12 @@ namespace EventStoreBasics.Tests
 
     public class UserCreated
     {
-        public string Name { get; set; }
+        public string Name { get; }
+
+        public UserCreated(string name)
+        {
+            Name = name;
+        }
     }
 
     public class Exercise03CreateAppendEventFunction
@@ -22,6 +29,9 @@ namespace EventStoreBasics.Tests
         private readonly NpgsqlConnection databaseConnection;
         private readonly PostgresSchemaProvider schemaProvider;
         private readonly EventStore eventStore;
+
+
+        private const string AppendEventFunctionName = "append_event";
 
         /// <summary>
         /// Inits Event Store
@@ -41,12 +51,31 @@ namespace EventStoreBasics.Tests
         [Fact]
         public void AppendEventFunction_ShouldBeCreated()
         {
+            var appendFunctionExists = schemaProvider
+                .FunctionExists(AppendEventFunctionName);
+
+            appendFunctionExists.Should().BeTrue();
+        }
+
+        [Fact]
+        public void AppendEventFunction_WhenStreamDoesNotExist_CreateNewStream_And_AppendNewEvent()
+        {
             var streamId = Guid.NewGuid();
-            var @event = new UserCreated {Name = "John Doe"};
+            var @event = new UserCreated("John Doe");
 
             var result = eventStore.AppendEvent<User, UserCreated>(streamId, @event);
 
             result.Should().BeTrue();
+
+            var wasStreamCreated = databaseConnection.QuerySingle<bool>(
+                "select exists (select 1 from streams where id = @streamId)", new {streamId}
+            );
+            wasStreamCreated.Should().BeTrue();
+
+            var wasEventAppended = databaseConnection.QuerySingle<bool>(
+                "select exists (select 1 from events where stream_id = @streamId)", new {streamId}
+            );
+            wasEventAppended.Should().BeTrue();
         }
     }
 }
