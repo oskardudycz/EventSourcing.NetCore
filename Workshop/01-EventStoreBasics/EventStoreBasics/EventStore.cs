@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Data;
 using System.Linq;
 using Dapper;
@@ -32,13 +33,49 @@ namespace EventStoreBasics
                 {
                     Id = Guid.NewGuid(),
                     Data = JsonConvert.SerializeObject(@event),
-                    Type = typeof(TEvent).FullName,
+                    Type = typeof(TEvent).AssemblyQualifiedName,
                     StreamId = streamId,
-                    StreamType = typeof(TStream).FullName,
+                    StreamType = typeof(TStream).AssemblyQualifiedName,
                     ExpectedVersion = expectedVersion
                 },
                 commandType: CommandType.Text
             );
+        }
+
+        public StreamState GetStreamState(Guid streamId)
+        {
+            const string GetStreamSQL =
+                @"SELECT id, type, version
+                  FROM streams
+                  WHERE id = @streamId";
+
+            return databaseConnection
+                .Query<dynamic>(GetStreamSQL, new {streamId})
+                .Select(streamData =>
+                    new StreamState(
+                        streamData.id,
+                        Type.GetType(streamData.type),
+                        streamData.version
+                    ))
+                .SingleOrDefault();
+        }
+
+        public IEnumerable GetEvents(Guid streamId)
+        {
+            const string GetStreamSQL =
+                @"SELECT id, data, stream_id, type, version, created
+                  FROM events
+                  WHERE stream_id = @streamId
+                  ORDER BY version";
+
+            return databaseConnection
+                .Query<dynamic>(GetStreamSQL, new {streamId})
+                .Select(@event =>
+                    JsonConvert.DeserializeObject(
+                        @event.data,
+                        Type.GetType(@event.type)
+                    ))
+                .ToList();
         }
 
         private void CreateStreamsTable()
@@ -58,7 +95,7 @@ namespace EventStoreBasics
                 @"CREATE TABLE IF NOT EXISTS events(
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       data           JSONB                     NOT NULL,
-                      stream_id       UUID                      NOT NULL,
+                      stream_id      UUID                      NOT NULL,
                       type           TEXT                      NOT NULL,
                       version        BIGINT                    NOT NULL,
                       created        timestamp with time zone  NOT NULL    default (now()),

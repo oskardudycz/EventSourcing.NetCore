@@ -8,24 +8,23 @@ using Xunit;
 
 namespace EventStoreBasics.Tests
 {
-    public class User
-    {
-        public string Name { get; set; }
-    }
-
-
-    public class UserCreated
-    {
-        public string Name { get; }
-
-        public UserCreated(string name)
-        {
-            Name = name;
-        }
-    }
-
     public class Exercise03CreateAppendEventFunction
     {
+        class User
+        {
+            public string Name { get; set; }
+        }
+
+
+        class UserCreated
+        {
+            public string Name { get; }
+
+            public UserCreated(string name)
+            {
+                Name = name;
+            }
+        }
         private readonly NpgsqlConnection databaseConnection;
         private readonly PostgresSchemaProvider schemaProvider;
         private readonly EventStore eventStore;
