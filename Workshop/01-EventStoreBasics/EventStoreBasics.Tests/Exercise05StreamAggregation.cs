@@ -15,6 +15,12 @@ namespace EventStoreBasics.Tests
             public Guid Id { get; private set; }
             public string Name { get; private set; }
 
+            public User(Guid id, string name)
+            {
+                Id = id;
+                Name = name;
+            }
+
             private void Apply(UserCreated @event)
             {
                 Id = @event.UserId;
