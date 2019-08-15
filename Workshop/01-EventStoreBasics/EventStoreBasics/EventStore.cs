@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Data;
 using System.Linq;
+using System.Runtime.Serialization;
 using Dapper;
+using EventStoreBasics.Tools;
 using Newtonsoft.Json;
 using Npgsql;
 
@@ -11,6 +13,8 @@ namespace EventStoreBasics
     public class EventStore : IDisposable
     {
         private readonly NpgsqlConnection databaseConnection;
+
+        private const string Apply = "Apply";
 
         public EventStore(NpgsqlConnection databaseConnection)
         {
@@ -40,6 +44,20 @@ namespace EventStoreBasics
                 },
                 commandType: CommandType.Text
             );
+        }
+
+        public T AggregateStream<T>(Guid streamId)
+        {
+            var aggregate = (T)FormatterServices.GetUninitializedObject(typeof(T));
+
+            var events = GetEvents(streamId);
+
+            foreach (var @event in events)
+            {
+                aggregate.InvokeIfExists(Apply, @event);
+            }
+
+            return aggregate;
         }
 
         public StreamState GetStreamState(Guid streamId)
