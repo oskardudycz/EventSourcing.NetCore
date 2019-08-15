@@ -26,7 +26,7 @@ namespace EventStoreBasics
 
         public bool AppendEvent<TStream, TEvent>(Guid streamId, TEvent @event, long? expectedVersion = null)
         {
-            return databaseConnection.Query<bool>(
+            return databaseConnection.QuerySingle<bool>(
                 "SELECT append_event(@Id, @Data, @Type, @StreamId, @StreamType, @ExpectedVersion)",
                 new
                 {
@@ -38,7 +38,7 @@ namespace EventStoreBasics
                     ExpectedVersion = expectedVersion
                 },
                 commandType: CommandType.Text
-            ).Single();
+            );
         }
 
         private void CreateStreamsTable()
@@ -58,12 +58,12 @@ namespace EventStoreBasics
                 @"CREATE TABLE IF NOT EXISTS events(
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       data           JSONB                     NOT NULL,
-                      streamid       UUID                      NOT NULL,
+                      stream_id       UUID                      NOT NULL,
                       type           TEXT                      NOT NULL,
                       version        BIGINT                    NOT NULL,
                       created        timestamp with time zone  NOT NULL    default (now()),
-                      FOREIGN KEY(streamid) REFERENCES streams(id),
-                      CONSTRAINT events_stream_and_version UNIQUE(streamid, version)
+                      FOREIGN KEY(stream_id) REFERENCES streams(id),
+                      CONSTRAINT events_stream_and_version UNIQUE(stream_id, version)
                 );";
             databaseConnection.Execute(CreatEventsTableSQL);
         }
@@ -104,7 +104,7 @@ namespace EventStoreBasics
 
                     -- append event
                     INSERT INTO events
-			            (id, data, streamid, type, version)
+			            (id, data, stream_id, type, version)
 		            VALUES
 			            (id, data::jsonb, stream_id, type, stream_version);
 

@@ -59,7 +59,7 @@ namespace EventStoreBasics.Tests
 
         private const string IdColumnName = "id";
         private const string DataColumnName = "data";
-        private const string StreamIdColumnName = "streamid";
+        private const string StreamIdColumnName = "stream_id";
         private const string TypeColumnName = "type";
         private const string VersionColumnName = "version";
         private const string CreatedColumnName = "created";

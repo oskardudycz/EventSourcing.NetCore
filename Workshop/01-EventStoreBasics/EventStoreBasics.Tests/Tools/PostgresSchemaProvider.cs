@@ -12,13 +12,16 @@ namespace EventStoreBasics.Tests.Tools
     {
         private readonly NpgsqlConnection databaseConnection;
 
-        const string GetTableColumns =
+        const string GetTableColumnsSQL =
             @"SELECT column_name AS name, data_type AS type
               FROM INFORMATION_SCHEMA.COLUMNS
               WHERE
                   table_name = @tableName
                   -- get only tables from current schema named as current test class
                   AND table_schema in (select schemas[1] from (select current_schemas(false) as schemas) as currentschema)";
+
+        private const string FunctionExistsSQL =
+            @"select exists(select * from pg_proc where proname = @functionName);";
 
         public PostgresSchemaProvider(NpgsqlConnection databaseConnection)
         {
@@ -32,9 +35,19 @@ namespace EventStoreBasics.Tests.Tools
         /// <returns></returns>
         public Table GetTable(string tableName)
         {
-            var columns =  databaseConnection.Query<Column>(GetTableColumns, new { tableName });
+            var columns =  databaseConnection.Query<Column>(GetTableColumnsSQL, new { tableName });
 
             return columns.Any() ? new Table(tableName, columns) : null;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="functionName">function name</param>
+        /// <returns></returns>
+        public bool FunctionExists(string functionName)
+        {
+            return databaseConnection.QuerySingle<bool>(FunctionExistsSQL, new {functionName});
         }
     }
 
