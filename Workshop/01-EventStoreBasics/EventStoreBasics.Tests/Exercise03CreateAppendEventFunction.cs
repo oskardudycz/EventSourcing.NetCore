@@ -62,7 +62,7 @@ namespace EventStoreBasics.Tests
             var streamId = Guid.NewGuid();
             var @event = new UserCreated("John Doe");
 
-            var result = eventStore.AppendEvent<User, UserCreated>(streamId, @event);
+            var result = eventStore.AppendEvent<User>(streamId, @event);
 
             result.Should().BeTrue();
 

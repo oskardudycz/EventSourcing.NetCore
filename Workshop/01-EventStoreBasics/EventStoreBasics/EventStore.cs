@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Runtime.Serialization;
 using Dapper;
 using EventStoreBasics.Tools;
 using Newtonsoft.Json;
@@ -10,9 +10,11 @@ using Npgsql;
 
 namespace EventStoreBasics
 {
-    public class EventStore : IDisposable
+    public class EventStore : IDisposable, IEventStore
     {
         private readonly NpgsqlConnection databaseConnection;
+
+        private readonly IList<ISnapshot> snapshots = new List<ISnapshot>();
 
         private const string Apply = "Apply";
 
@@ -29,7 +31,29 @@ namespace EventStoreBasics
             CreateAppendEventFunction();
         }
 
-        public bool AppendEvent<TStream, TEvent>(Guid streamId, TEvent @event, long? expectedVersion = null)
+        public void AddSnapshot(ISnapshot snapshot)
+        {
+            snapshots.Add(snapshot);
+        }
+
+        public bool Store<TStream>(TStream aggregate) where TStream : IAggregate
+        {
+            var events = aggregate.DequeueUncommittedEvents();
+            var initialVersion = aggregate.Version - events.Count();
+
+            foreach (var @event in events)
+            {
+                AppendEvent<TStream>(aggregate.Id, @event, initialVersion++);
+            }
+
+            snapshots
+                .FirstOrDefault(snapshot => snapshot.Handles == typeof(TStream))?
+                .Handle(aggregate);
+
+            return true;
+        }
+
+        public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null)
         {
             return databaseConnection.QuerySingle<bool>(
                 "SELECT append_event(@Id, @Data, @Type, @StreamId, @StreamType, @ExpectedVersion)",
@@ -37,7 +61,7 @@ namespace EventStoreBasics
                 {
                     Id = Guid.NewGuid(),
                     Data = JsonConvert.SerializeObject(@event),
-                    Type = typeof(TEvent).AssemblyQualifiedName,
+                    Type = @event.GetType().AssemblyQualifiedName,
                     StreamId = streamId,
                     StreamType = typeof(TStream).AssemblyQualifiedName,
                     ExpectedVersion = expectedVersion
@@ -48,13 +72,15 @@ namespace EventStoreBasics
 
         public T AggregateStream<T>(Guid streamId)
         {
-            var aggregate = (T)FormatterServices.GetUninitializedObject(typeof(T));
+            var aggregate = (T)Activator.CreateInstance(typeof(T),true);
 
             var events = GetEvents(streamId);
+            var version = 0;
 
             foreach (var @event in events)
             {
                 aggregate.InvokeIfExists(Apply, @event);
+                aggregate.Set(nameof(IAggregate.Version), ++version);
             }
 
             return aggregate;

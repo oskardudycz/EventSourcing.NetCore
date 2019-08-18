@@ -21,5 +21,13 @@ namespace EventStoreBasics.Tools
 
             return method?.Invoke(item, new [] { param });
         }
+
+        public static void Set<T>(this T item, string propertyName, object value)
+        {
+            item.GetType()
+                .GetProperty(propertyName)
+                .SetValue(item, value);
+        }
+
     }
 }
