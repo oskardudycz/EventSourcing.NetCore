@@ -66,7 +66,7 @@ namespace EventStoreBasics.Tests
             var streamId = Guid.NewGuid();
             var @event = new UserCreated(streamId,"John Doe");
 
-            eventStore.AppendEvent<User, UserCreated>(streamId, @event);
+            eventStore.AppendEvent<User>(streamId, @event);
 
             var streamState = eventStore.GetStreamState(streamId);
 
@@ -82,8 +82,8 @@ namespace EventStoreBasics.Tests
             var userCreated = new UserCreated(streamId, "John Doe");
             var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
 
-            eventStore.AppendEvent<User, UserCreated>(streamId, userCreated);
-            eventStore.AppendEvent<User, UserNameUpdated>(streamId, userNameUpdated);
+            eventStore.AppendEvent<User>(streamId, userCreated);
+            eventStore.AppendEvent<User>(streamId, userNameUpdated);
 
             var events = eventStore.GetEvents(streamId);
 
