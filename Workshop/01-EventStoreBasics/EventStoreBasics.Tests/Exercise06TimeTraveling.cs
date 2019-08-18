@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Npgsql;
@@ -6,31 +7,23 @@ using Xunit;
 
 namespace EventStoreBasics.Tests
 {
-    public class Exercise06AggregateAndRepository
-    {
 
-        class User : Aggregate
+    public class Exercise06TimeTravelling
+    {
+        class User
         {
+            public Guid Id { get; private set; }
             public string Name { get; private set; }
+            public long Version { get; private set; }
 
             public User(Guid id, string name)
             {
-                var @event = new UserCreated(id, name);
-
-                Enqueue(@event);
-                Apply(@event);
+                Id = id;
+                Name = name;
             }
 
-            // For serialization
+            // For deserialization
             private User() { }
-
-            public void ChangeName(string name)
-            {
-                var @event = new UserNameUpdated(Id, name);
-
-                Enqueue(@event);
-                Apply(@event);
-            }
 
             private void Apply(UserCreated @event)
             {
@@ -72,12 +65,11 @@ namespace EventStoreBasics.Tests
         private readonly NpgsqlConnection databaseConnection;
         private readonly PostgresSchemaProvider schemaProvider;
         private readonly EventStore eventStore;
-        private readonly IRepository<User> repository;
 
         /// <summary>
         /// Inits Event Store
         /// </summary>
-        public Exercise06AggregateAndRepository()
+        public Exercise06TimeTravelling()
         {
             databaseConnection = PostgresDbConnectionProvider.GetFreshDbConnection();
             schemaProvider = new PostgresSchemaProvider(databaseConnection);
@@ -87,33 +79,39 @@ namespace EventStoreBasics.Tests
 
             // Initialize Event Store
             eventStore.Init();
-
-            repository = new Repository<User>(eventStore);
         }
 
         [Fact]
-        public void Repository_FullFlow_ShouldSucceed()
+        public void AggregateStream_ShouldReturnSpecifiedVersionOfTheStream()
         {
             var streamId = Guid.NewGuid();
-            var user = new User(streamId, "John Doe");
+            var userCreated = new UserCreated(streamId, "John Doe");
+            var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
+            var userNameUpdatedAgain = new UserNameUpdated(streamId, "Michael Newman");
 
-            repository.Add(user);
+            eventStore.AppendEvent<User>(streamId, userCreated);
+            eventStore.AppendEvent<User>(streamId, userNameUpdated);
+            eventStore.AppendEvent<User>(streamId, userNameUpdatedAgain);
 
-            var userFromRepository = repository.Find(streamId);
+            var aggregateAtVersion1 = eventStore.AggregateStream<User>(streamId, 1);
 
-            userFromRepository.Id.Should().Be(streamId);
-            userFromRepository.Name.Should().Be("John Doe");
-            userFromRepository.Version.Should().Be(1);
+            aggregateAtVersion1.Id.Should().Be(streamId);
+            aggregateAtVersion1.Name.Should().Be(userCreated.UserName);
+            aggregateAtVersion1.Version.Should().Be(1);
 
-            userFromRepository.ChangeName("Adam Smith");
 
-            repository.Update(userFromRepository);
+            var aggregateAtVersion2 = eventStore.AggregateStream<User>(streamId, 2);
 
-            var userAfterUpdate = repository.Find(streamId);
+            aggregateAtVersion2.Id.Should().Be(streamId);
+            aggregateAtVersion2.Name.Should().Be(userNameUpdated.UserName);
+            aggregateAtVersion2.Version.Should().Be(2);
 
-            userAfterUpdate.Id.Should().Be(streamId);
-            userAfterUpdate.Name.Should().Be("Adam Smith");
-            userFromRepository.Version.Should().Be(2);
+
+            var aggregateAtVersion3 = eventStore.AggregateStream<User>(streamId, 3);
+
+            aggregateAtVersion3.Id.Should().Be(streamId);
+            aggregateAtVersion3.Name.Should().Be(userNameUpdatedAgain.UserName);
+            aggregateAtVersion3.Version.Should().Be(3);
         }
     }
 }
