@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace EventStoreBasics.Tools
 {
-    public static class MethodInvoker
+    public static class ReflectionInvoker
     {
         public static object InvokeIfExists<T>(this T item, string methodName, object param)
         {
@@ -22,10 +22,10 @@ namespace EventStoreBasics.Tools
             return method?.Invoke(item, new [] { param });
         }
 
-        public static void Set<T>(this T item, string propertyName, object value)
+        public static void SetIfExists<T>(this T item, string propertyName, object value)
         {
             item.GetType()
-                .GetProperty(propertyName)
+                .GetProperty(propertyName)?
                 .SetValue(item, value);
         }
 

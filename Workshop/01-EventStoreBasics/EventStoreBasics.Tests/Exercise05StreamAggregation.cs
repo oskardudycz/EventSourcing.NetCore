@@ -15,6 +15,8 @@ namespace EventStoreBasics.Tests
             public Guid Id { get; private set; }
             public string Name { get; private set; }
 
+            public long Version { get; private set; }
+
             public User(Guid id, string name)
             {
                 Id = id;
@@ -94,6 +96,7 @@ namespace EventStoreBasics.Tests
 
             aggregate.Id.Should().Be(streamId);
             aggregate.Name.Should().Be(userNameUpdated.UserName);
+            aggregate.Version.Should().Be(2);
         }
     }
 }
