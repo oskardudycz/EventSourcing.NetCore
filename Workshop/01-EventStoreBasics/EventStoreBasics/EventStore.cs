@@ -80,7 +80,7 @@ namespace EventStoreBasics
             foreach (var @event in events)
             {
                 aggregate.InvokeIfExists(Apply, @event);
-                aggregate.Set(nameof(IAggregate.Version), ++version);
+                aggregate.SetIfExists(nameof(IAggregate.Version), ++version);
             }
 
             return aggregate;
