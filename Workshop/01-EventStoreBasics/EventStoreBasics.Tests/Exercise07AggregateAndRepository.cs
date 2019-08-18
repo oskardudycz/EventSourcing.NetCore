@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Npgsql;
@@ -7,23 +6,31 @@ using Xunit;
 
 namespace EventStoreBasics.Tests
 {
-
-    public class Exercise05StreamAggregation
+    public class Exercise07AggregateAndRepository
     {
-        class User
+
+        class User : Aggregate
         {
-            public Guid Id { get; private set; }
             public string Name { get; private set; }
-            public long Version { get; private set; }
 
             public User(Guid id, string name)
             {
-                Id = id;
-                Name = name;
+                var @event = new UserCreated(id, name);
+
+                Enqueue(@event);
+                Apply(@event);
             }
 
-            // For deserialization
+            // For serialization
             private User() { }
+
+            public void ChangeName(string name)
+            {
+                var @event = new UserNameUpdated(Id, name);
+
+                Enqueue(@event);
+                Apply(@event);
+            }
 
             private void Apply(UserCreated @event)
             {
@@ -65,11 +72,12 @@ namespace EventStoreBasics.Tests
         private readonly NpgsqlConnection databaseConnection;
         private readonly PostgresSchemaProvider schemaProvider;
         private readonly EventStore eventStore;
+        private readonly IRepository<User> repository;
 
         /// <summary>
         /// Inits Event Store
         /// </summary>
-        public Exercise05StreamAggregation()
+        public Exercise07AggregateAndRepository()
         {
             databaseConnection = PostgresDbConnectionProvider.GetFreshDbConnection();
             schemaProvider = new PostgresSchemaProvider(databaseConnection);
@@ -79,23 +87,33 @@ namespace EventStoreBasics.Tests
 
             // Initialize Event Store
             eventStore.Init();
+
+            repository = new Repository<User>(eventStore);
         }
 
         [Fact]
-        public void AggregateStream_ShouldReturnObjectWithStateBasedOnEvents()
+        public void Repository_FullFlow_ShouldSucceed()
         {
             var streamId = Guid.NewGuid();
-            var userCreated = new UserCreated(streamId, "John Doe");
-            var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
+            var user = new User(streamId, "John Doe");
 
-            eventStore.AppendEvent<User>(streamId, userCreated);
-            eventStore.AppendEvent<User>(streamId, userNameUpdated);
+            repository.Add(user);
 
-            var aggregate = eventStore.AggregateStream<User>(streamId);
+            var userFromRepository = repository.Find(streamId);
 
-            aggregate.Id.Should().Be(streamId);
-            aggregate.Name.Should().Be(userNameUpdated.UserName);
-            aggregate.Version.Should().Be(2);
+            userFromRepository.Id.Should().Be(streamId);
+            userFromRepository.Name.Should().Be("John Doe");
+            userFromRepository.Version.Should().Be(1);
+
+            userFromRepository.ChangeName("Adam Smith");
+
+            repository.Update(userFromRepository);
+
+            var userAfterUpdate = repository.Find(streamId);
+
+            userAfterUpdate.Id.Should().Be(streamId);
+            userAfterUpdate.Name.Should().Be("Adam Smith");
+            userFromRepository.Version.Should().Be(2);
         }
     }
 }

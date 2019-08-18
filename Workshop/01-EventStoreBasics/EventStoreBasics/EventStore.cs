@@ -70,11 +70,11 @@ namespace EventStoreBasics
             );
         }
 
-        public T AggregateStream<T>(Guid streamId)
+        public T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
         {
             var aggregate = (T)Activator.CreateInstance(typeof(T),true);
 
-            var events = GetEvents(streamId);
+            var events = GetEvents(streamId, atStreamVersion, atTimestamp);
             var version = 0;
 
             foreach (var @event in events)
@@ -104,16 +104,18 @@ namespace EventStoreBasics
                 .SingleOrDefault();
         }
 
-        public IEnumerable GetEvents(Guid streamId)
+        public IEnumerable GetEvents(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
         {
             const string GetStreamSQL =
                 @"SELECT id, data, stream_id, type, version, created
                   FROM events
                   WHERE stream_id = @streamId
+                  AND (@atStreamVersion IS NULL OR version <= @atStreamVersion)
+                  AND (@atTimestamp IS NULL OR created <= @atTimestamp)
                   ORDER BY version";
 
             return databaseConnection
-                .Query<dynamic>(GetStreamSQL, new {streamId})
+                .Query<dynamic>(GetStreamSQL, new {streamId, atStreamVersion, atTimestamp})
                 .Select(@event =>
                     JsonConvert.DeserializeObject(
                         @event.data,

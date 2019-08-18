@@ -12,7 +12,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests
 {
-    public class Exercise07Snapshots
+    public class Exercise08Snapshots
     {
         class User : Aggregate
         {
@@ -100,15 +100,15 @@ namespace EventStoreBasics.Tests
         /// <summary>
         /// Inits Event Store
         /// </summary>
-        public Exercise07Snapshots()
+        public Exercise08Snapshots()
         {
             databaseConnection = PostgresDbConnectionProvider.GetFreshDbConnection();
             schemaProvider = new PostgresSchemaProvider(databaseConnection);
 
             var databaseProvider =
-                new PostgresqlDatabaseProvider(databaseConnection) {SchemaName = typeof(Exercise07Snapshots).Name};
+                new PostgresqlDatabaseProvider(databaseConnection) {SchemaName = typeof(Exercise08Snapshots).Name};
 
-            var migrationsAssembly = typeof(Exercise07Snapshots).Assembly;
+            var migrationsAssembly = typeof(Exercise08Snapshots).Assembly;
             var migrator = new SimpleMigrator(migrationsAssembly, databaseProvider);
             migrator.Load();
             migrator.MigrateToLatest();
