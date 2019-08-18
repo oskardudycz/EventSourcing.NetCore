@@ -63,7 +63,6 @@ namespace EventStoreBasics.Tests
         }
 
         private readonly NpgsqlConnection databaseConnection;
-        private readonly PostgresSchemaProvider schemaProvider;
         private readonly EventStore eventStore;
 
         /// <summary>
@@ -72,7 +71,6 @@ namespace EventStoreBasics.Tests
         public Exercise05StreamAggregation()
         {
             databaseConnection = PostgresDbConnectionProvider.GetFreshDbConnection();
-            schemaProvider = new PostgresSchemaProvider(databaseConnection);
 
             // Create Event Store
             eventStore = new EventStore(databaseConnection);

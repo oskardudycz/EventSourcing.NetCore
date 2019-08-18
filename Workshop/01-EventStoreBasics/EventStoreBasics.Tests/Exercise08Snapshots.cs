@@ -93,7 +93,6 @@ namespace EventStoreBasics.Tests
         }
 
         private readonly NpgsqlConnection databaseConnection;
-        private readonly PostgresSchemaProvider schemaProvider;
         private readonly EventStore eventStore;
         private readonly IRepository<User> repository;
 
@@ -103,7 +102,6 @@ namespace EventStoreBasics.Tests
         public Exercise08Snapshots()
         {
             databaseConnection = PostgresDbConnectionProvider.GetFreshDbConnection();
-            schemaProvider = new PostgresSchemaProvider(databaseConnection);
 
             var databaseProvider =
                 new PostgresqlDatabaseProvider(databaseConnection) {SchemaName = typeof(Exercise08Snapshots).Name};
@@ -144,8 +142,6 @@ namespace EventStoreBasics.Tests
             userFromDb.Id.Should().Be(streamId);
             userFromDb.Name.Should().Be("John Doe");
             userFromDb.Version.Should().Be(1);
-
-            //TODO: add version check
 
             userFromDb.ChangeName("Adam Smith");
 

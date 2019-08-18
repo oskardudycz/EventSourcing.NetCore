@@ -15,6 +15,7 @@ namespace EventStoreBasics
         private readonly NpgsqlConnection databaseConnection;
 
         private readonly IList<ISnapshot> snapshots = new List<ISnapshot>();
+        private readonly IList<IProjection> projections = new List<IProjection>();
 
         private const string Apply = "Apply";
 
@@ -36,6 +37,11 @@ namespace EventStoreBasics
             snapshots.Add(snapshot);
         }
 
+        public void AddProjection(IProjection projection)
+        {
+            projections.Add(projection);
+        }
+
         public bool Store<TStream>(TStream aggregate) where TStream : IAggregate
         {
             var events = aggregate.DequeueUncommittedEvents();
@@ -44,6 +50,12 @@ namespace EventStoreBasics
             foreach (var @event in events)
             {
                 AppendEvent<TStream>(aggregate.Id, @event, initialVersion++);
+
+                foreach (var projection in projections.Where(
+                    projection => projection.Handles.Contains(@event.GetType())))
+                {
+                    projection.Handle(@event);
+                }
             }
 
             snapshots
