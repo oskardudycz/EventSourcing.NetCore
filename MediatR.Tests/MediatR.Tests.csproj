@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.8.0" />
-    <PackageReference Include="Marten" Version="3.6.2" />
+    <PackageReference Include="Marten" Version="3.7.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="MediatR" Version="7.0.0" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
