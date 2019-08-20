@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 
-namespace MeetingsManagement
+namespace MeetingsManagement.Api
 {
     public class Startup
     {

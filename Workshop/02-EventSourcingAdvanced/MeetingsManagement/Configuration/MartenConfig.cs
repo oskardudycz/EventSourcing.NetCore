@@ -15,8 +15,8 @@ namespace MeetingsManagement.Configuration
         private static void SetStoreOptions(StoreOptions options, IConfiguration config)
         {
             var martenConfig = config.GetSection("EventStore");
-            var connectionString = martenConfig.GetValue<string>("ConnectionString");
-            var schemaName = martenConfig.GetValue<string>("Schema");
+            var connectionString = martenConfig.GetSection("ConnectionString").Value;
+            var schemaName = martenConfig.GetSection("Schema").Value;
 
             options.Connection(connectionString);
             options.AutoCreateSchemaObjects = AutoCreate.All;
