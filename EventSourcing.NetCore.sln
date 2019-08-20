@@ -54,10 +54,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workshop", "Workshop", "{CEEE5F74-121E-437F-B3B4-4E7C65482644}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01-EventStoreBasics", "01-EventStoreBasics", "{14D732F0-6655-4E12-A945-8F668A70BF7D}"
+	ProjectSection(SolutionItems) = preProject
+		Workshop\01-EventStoreBasics\EventStoreBasics\Repository.cs = Workshop\01-EventStoreBasics\EventStoreBasics\Repository.cs
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStoreBasics", "Workshop\01-EventStoreBasics\EventStoreBasics\EventStoreBasics.csproj", "{A445DD68-AD59-4D97-9142-5EA6F903D908}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStoreBasics", "Workshop\01-EventStoreBasics\EventStoreBasics\EventStoreBasics.csproj", "{A445DD68-AD59-4D97-9142-5EA6F903D908}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStoreBasics.Tests", "Workshop\01-EventStoreBasics\EventStoreBasics.Tests\EventStoreBasics.Tests.csproj", "{C55A9F53-6C9D-4E77-BA17-610AD6412646}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStoreBasics.Tests", "Workshop\01-EventStoreBasics\EventStoreBasics.Tests\EventStoreBasics.Tests.csproj", "{C55A9F53-6C9D-4E77-BA17-610AD6412646}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
