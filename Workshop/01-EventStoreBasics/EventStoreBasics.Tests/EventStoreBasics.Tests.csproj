@@ -8,7 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="5.8.0" />
-        <PackageReference Include="Marten" Version="3.6.2" />
+        <PackageReference Include="Marten" Version="3.7.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
         <PackageReference Include="Npgsql" Version="4.0.9" />
         <PackageReference Include="xunit" Version="2.4.1" />
