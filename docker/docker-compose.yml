@@ -23,10 +23,31 @@ services:
         networks:
             - postgres
 
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        volumes:
+            - esdata:/usr/share/elasticsearch/data
+        networks:
+            - esnetwork
+    kibana:
+        image: docker.elastic.co/kibana/kibana:6.3.0
+        ports:
+            - "5601:5601"
+        networks:
+            - esnetwork
+        depends_on:
+            - elasticsearch
 networks:
+    esnetwork:
+        driver: bridge
     postgres:
         driver: bridge
 
 volumes:
     postgres:
     pgadmin:
+    esdata:
+        driver: local
