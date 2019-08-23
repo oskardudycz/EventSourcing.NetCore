@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
 using Core.Queries;
 using MeetingsManagement.Meetings.Commands;
 using MeetingsManagement.Meetings.Queries;
 using MeetingsManagement.Meetings.ValueObjects;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MeetingsManagement.Api.Controllers
 {
@@ -21,14 +21,12 @@ namespace MeetingsManagement.Api.Controllers
             _queryBus = queryBus;
         }
 
-        // GET api/values
-        [HttpGet]
-        public Task<MeetingSummary> Get(Guid meetingId)
+        [HttpGet("{id}")]
+        public Task<MeetingSummary> Get(Guid id)
         {
-            return _queryBus.Send<GetMeeting, MeetingSummary>(new GetMeeting());
+            return _queryBus.Send<GetMeeting, MeetingSummary>(new GetMeeting(id));
         }
 
-        // POST api/values
         [HttpPost]
         public Task Post([FromBody]CreateMeeting command)
         {

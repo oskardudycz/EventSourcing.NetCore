@@ -4,9 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MeetingsManagement.Configuration
 {
-    public static class MartenConfig
+    internal static class MartenConfig
     {
-        public static void AddMarten(this IServiceCollection services, IConfiguration config)
+        internal static void AddMarten(this IServiceCollection services, IConfiguration config)
         {
             services.AddSingleton<IDocumentStore>(sp => DocumentStore.For(options => SetStoreOptions(options, config)));
             services.AddSingleton(sp => sp.GetRequiredService<IDocumentStore>().OpenSession());

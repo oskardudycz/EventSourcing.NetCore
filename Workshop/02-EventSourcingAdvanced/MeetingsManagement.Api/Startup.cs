@@ -1,4 +1,5 @@
-﻿using MeetingsManagement.Configuration;
+using Core;
+using MeetingsManagement.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,7 @@ namespace MeetingsManagement.Api
         {
             this.config = config;
         }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -26,9 +28,11 @@ namespace MeetingsManagement.Api
                 c.SwaggerDoc("v1", new Info { Title = "Meeting Management", Version = "v1" });
             });
 
-            services.AddMarten(config);
-
             services.AddMediatR();
+
+            services.AddCoreServices();
+
+            services.AddMeetingsManagement(config);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

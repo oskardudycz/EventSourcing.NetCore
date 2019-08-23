@@ -5,18 +5,21 @@ namespace Core.Events
 {
     public class EventBus: IEventBus
     {
-        private readonly IMediator _mediator;
+        private readonly IMediator mediator;
+        private readonly KafkaProducer producer;
 
         public EventBus(IMediator mediator)
         {
-            _mediator = mediator;
+            this.mediator = mediator;
+            producer = new KafkaProducer("localhost:9092", "meetingsmanagement");
         }
 
         public async Task Publish<TEvent>(params TEvent[] events) where TEvent : IEvent
         {
             foreach (var @event in events)
             {
-                await _mediator.Publish(@event);
+                await mediator.Publish(@event);
+                await producer.Publish(@event);
             }
         }
     }
