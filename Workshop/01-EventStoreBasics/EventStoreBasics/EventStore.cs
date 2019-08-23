@@ -44,13 +44,18 @@ namespace EventStoreBasics
 
         public bool Store<TStream>(TStream aggregate) where TStream : IAggregate
         {
-            //TODO Add applying events for all projections
             var events = aggregate.DequeueUncommittedEvents();
             var initialVersion = aggregate.Version - events.Count();
 
             foreach (var @event in events)
             {
                 AppendEvent<TStream>(aggregate.Id, @event, initialVersion++);
+
+                foreach (var projection in projections.Where(
+                    projection => projection.Handles.Contains(@event.GetType())))
+                {
+                    projection.Handle(@event);
+                }
             }
 
             snapshots

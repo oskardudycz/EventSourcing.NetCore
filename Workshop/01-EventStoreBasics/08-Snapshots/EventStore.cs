@@ -38,6 +38,7 @@ namespace EventStoreBasics
 
         public bool Store<TStream>(TStream aggregate) where TStream : IAggregate
         {
+            //TODO Add storing snapshot of aggregate
             var events = aggregate.DequeueUncommittedEvents();
             var initialVersion = aggregate.Version - events.Count();
 
@@ -45,10 +46,6 @@ namespace EventStoreBasics
             {
                 AppendEvent<TStream>(aggregate.Id, @event, initialVersion++);
             }
-
-            snapshots
-                .FirstOrDefault(snapshot => snapshot.Handles == typeof(TStream))?
-                .Handle(aggregate);
 
             return true;
         }

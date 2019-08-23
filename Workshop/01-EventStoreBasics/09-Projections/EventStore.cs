@@ -10,7 +10,7 @@ using Npgsql;
 
 namespace EventStoreBasics
 {
-    public class EventStore : IDisposable, IEventStore
+    public class EventStore: IDisposable, IEventStore
     {
         private readonly NpgsqlConnection databaseConnection;
 
@@ -44,18 +44,13 @@ namespace EventStoreBasics
 
         public bool Store<TStream>(TStream aggregate) where TStream : IAggregate
         {
+            //TODO Add applying events for all projections
             var events = aggregate.DequeueUncommittedEvents();
             var initialVersion = aggregate.Version - events.Count();
 
             foreach (var @event in events)
             {
                 AppendEvent<TStream>(aggregate.Id, @event, initialVersion++);
-
-                foreach (var projection in projections.Where(
-                    projection => projection.Handles.Contains(@event.GetType())))
-                {
-                    projection.Handle(@event);
-                }
             }
 
             snapshots
@@ -84,7 +79,7 @@ namespace EventStoreBasics
 
         public T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
         {
-            var aggregate = (T)Activator.CreateInstance(typeof(T),true);
+            var aggregate = (T)Activator.CreateInstance(typeof(T), true);
 
             var events = GetEvents(streamId, atStreamVersion, atTimestamp);
             var version = 0;
@@ -106,7 +101,7 @@ namespace EventStoreBasics
                   WHERE id = @streamId";
 
             return databaseConnection
-                .Query<dynamic>(GetStreamSQL, new {streamId})
+                .Query<dynamic>(GetStreamSQL, new { streamId })
                 .Select(streamData =>
                     new StreamState(
                         streamData.id,
@@ -127,7 +122,7 @@ namespace EventStoreBasics
                   ORDER BY version";
 
             return databaseConnection
-                .Query<dynamic>(GetStreamSQL, new {streamId, atStreamVersion, atTimestamp})
+                .Query<dynamic>(GetStreamSQL, new { streamId, atStreamVersion, atTimestamp })
                 .Select(@event =>
                     JsonConvert.DeserializeObject(
                         @event.data,
@@ -170,7 +165,7 @@ namespace EventStoreBasics
                 LANGUAGE plpgsql
                 AS $$
                 DECLARE
-	                stream_version int;
+                    stream_version int;
                 BEGIN
                     -- get stream version
                     SELECT
@@ -199,9 +194,9 @@ namespace EventStoreBasics
 
                     -- append event
                     INSERT INTO events
-			            (id, data, stream_id, type, version)
-		            VALUES
-			            (id, data::jsonb, stream_id, type, stream_version);
+                        (id, data, stream_id, type, version)
+                    VALUES
+                        (id, data::jsonb, stream_id, type, stream_version);
 
                     -- update stream version
                     UPDATE streams as s
