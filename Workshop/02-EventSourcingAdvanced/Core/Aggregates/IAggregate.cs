@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.Events;
 
 namespace Core.Aggregates
 {
@@ -8,6 +9,6 @@ namespace Core.Aggregates
         Guid Id { get; }
         int Version { get; }
 
-        IEnumerable<object> DequeueUncommittedEvents();
+        IEnumerable<IEvent> DequeueUncommittedEvents();
     }
 }

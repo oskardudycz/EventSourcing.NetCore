@@ -28,8 +28,6 @@ namespace MeetingsManagement.Api
                 c.SwaggerDoc("v1", new Info { Title = "Meeting Management", Version = "v1" });
             });
 
-            services.AddMediatR();
-
             services.AddCoreServices();
 
             services.AddMeetingsManagement(config);
