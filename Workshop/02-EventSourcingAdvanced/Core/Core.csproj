@@ -5,8 +5,10 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <PackageReference Include="Confluent.Kafka" Version="1.1.0" />
         <PackageReference Include="MediatR" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     </ItemGroup>
 </Project>

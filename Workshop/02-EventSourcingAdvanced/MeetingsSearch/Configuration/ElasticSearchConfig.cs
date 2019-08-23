@@ -19,12 +19,13 @@ namespace MeetingsSearch
                 .DefaultMappingFor<Meeting>(m => m
                     //.Ignore(p => p.IsPublished)
                     .PropertyName(p => p.Id, "id")
+                    .PropertyName(p => p.Name, "name")
                 );
-//                .DefaultMappingFor<Comment>(m => m
-//                    .Ignore(c => c.Email)
-//                    .Ignore(c => c.IsAdmin)
-//                    .PropertyName(c => c.ID, "id")
-//                );
+            //                .DefaultMappingFor<Comment>(m => m
+            //                    .Ignore(c => c.Email)
+            //                    .Ignore(c => c.IsAdmin)
+            //                    .PropertyName(c => c.ID, "id")
+            //                );
 
             var client = new ElasticClient(settings);
 

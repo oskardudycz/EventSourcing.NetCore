@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Events;
 using Newtonsoft.Json;
 
 namespace Core.Aggregates
@@ -12,12 +13,12 @@ namespace Core.Aggregates
         public int Version { get; protected set; }
 
         [JsonIgnore]
-        private readonly List<object> uncommittedEvents = new List<object>();
+        private readonly List<IEvent> uncommittedEvents = new List<IEvent>();
 
         //for serialization purposes
         protected Aggregate() { }
 
-        IEnumerable<object> IAggregate.DequeueUncommittedEvents()
+        IEnumerable<IEvent> IAggregate.DequeueUncommittedEvents()
         {
             var dequeuedEvents = uncommittedEvents.ToList();
 
@@ -26,7 +27,7 @@ namespace Core.Aggregates
             return dequeuedEvents;
         }
 
-        protected void Enqueue(object @event)
+        protected void Enqueue(IEvent @event)
         {
             Version++;
             uncommittedEvents.Add(@event);

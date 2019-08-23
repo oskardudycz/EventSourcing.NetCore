@@ -55,10 +55,10 @@ namespace MeetingsManagement.Storage
             );
             await documentSession.SaveChangesAsync();
 
-            //foreach (var @event in events)
-            //{
-            //    eventBus.Publish(@event);
-            //}
+            foreach (var @event in events)
+            {
+                await eventBus.Publish(@event);
+            }
         }
     }
 }

@@ -6,12 +6,15 @@ namespace Core.Events
     public class EventBus: IEventBus
     {
         private readonly IMediator mediator;
-        private readonly KafkaProducer producer;
+        private readonly IKafkaProducer producer;
 
-        public EventBus(IMediator mediator)
+        public EventBus(
+            IMediator mediator,
+            IKafkaProducer producer
+        )
         {
             this.mediator = mediator;
-            producer = new KafkaProducer("localhost:9092", "meetingsmanagement");
+            this.producer = producer;
         }
 
         public async Task Publish<TEvent>(params TEvent[] events) where TEvent : IEvent
