@@ -1,0 +1,22 @@
+using Core.Storage;
+using MediatR;
+using MeetingsManagement.Meetings.Commands;
+using MeetingsManagement.Meetings.Queries;
+using MeetingsManagement.Meetings.ValueObjects;
+using MeetingsManagement.Storage;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace MeetingsManagement.Meetings
+{
+    public static class Config
+    {
+        public static void AddMeeting(this IServiceCollection services)
+        {
+            services.AddScoped<IRepository<Meeting>, MartenRepository<Meeting>>();
+
+            services.AddScoped<IRequestHandler<CreateMeeting, Unit>, MeetingCommandHandler>();
+
+            services.AddScoped<IRequestHandler<GetMeeting, MeetingSummary>, MeetingQueryHandler>();
+        }
+    }
+}

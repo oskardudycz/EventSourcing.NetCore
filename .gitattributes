@@ -1,4 +1,4 @@
-* text=auto *.sh eol=lf
+* text=auto eol=lf
 *.png binary
 *.ttf binary
 *.jpg binary

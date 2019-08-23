@@ -4,16 +4,19 @@ using MeetingsManagement.Meetings.Events;
 
 namespace MeetingsManagement.Meetings
 {
-    public class Meeting : EventSourcedAggregate
+    internal class Meeting: Aggregate
     {
         public string Name { get; private set; }
 
-        public Meeting(){}
+        public Meeting()
+        {
+        }
 
         private Meeting(Guid id, string name)
         {
             var @event = new MeetingCreated(id, name);
-            Append(@event);
+
+            Enqueue(@event);
             Apply(@event);
         }
 
