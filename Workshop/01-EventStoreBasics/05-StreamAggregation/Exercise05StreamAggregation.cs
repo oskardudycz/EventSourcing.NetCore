@@ -77,6 +77,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void AggregateStream_ShouldReturnObjectWithStateBasedOnEvents()
         {
             var streamId = Guid.NewGuid();

@@ -8,5 +8,5 @@ build:
 services:
   - postgresql95
 test:
-  assemblies:
-    - '**\*.Tests.dll'
+  categories:
+    except: Exercise

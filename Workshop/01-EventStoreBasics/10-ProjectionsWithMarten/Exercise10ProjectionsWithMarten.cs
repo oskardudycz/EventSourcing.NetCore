@@ -172,6 +172,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
         {
             var user = new User(Guid.NewGuid(), "John Doe");
