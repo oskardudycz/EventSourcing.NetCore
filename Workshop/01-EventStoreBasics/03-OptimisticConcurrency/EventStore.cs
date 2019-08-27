@@ -81,28 +81,31 @@ namespace EventStoreBasics
         private void CreateAppendEventFunction()
         {
             const string AppendEventFunctionSQL =
-                @"CREATE OR REPLACE FUNCTION append_event(
-                    id uuid,
-                    data jsonb,
-                    type text,
-                    stream_id uuid,
-                    stream_type text,
-                    expected_stream_version bigint default null
-                ) RETURNS boolean
+                @"CREATE OR REPLACE FUNCTION append_event(id uuid, data text, type text, stream_id uuid, stream_type text, expected_stream_version bigint default null) RETURNS boolean
                 LANGUAGE plpgsql
                 AS $$
+                DECLARE
+                    stream_version int;
                 BEGIN
-
-                    1. Insert into stream table if there is no stream with provided streamId
+                    -- 1. get stream version
                     -- TODO
 
-                    2. Insert new row into events table with version equal to expected_stream_version + 1
+                    -- 2. if stream doesn't exist - create new one with version 0
                     -- TODO
 
-                    3. Update stream version with expected_stream_version + 1
+                    -- 3. check optimistic concurrency - return false if expected stream version is different than stream version
                     -- TODO
 
-                    RETURNS TRUE;
+                    -- 4. increment stream_version
+                    -- TODO
+
+                    -- 5. append event to events table
+                    -- TODO
+
+                    -- 6. update stream version in stream table
+                    -- TODO
+
+                    RETURN TRUE;
                 END;
                 $$;";
             databaseConnection.Execute(AppendEventFunctionSQL);

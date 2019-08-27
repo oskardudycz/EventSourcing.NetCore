@@ -32,7 +32,7 @@ namespace EventStoreBasics
         public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null)
         {
             return databaseConnection.QuerySingle<bool>(
-                "SELECT append_event(@Id, @Data, @Type, @StreamId, @StreamType, @ExpectedVersion)",
+                "SELECT append_event(@Id, @Data::jsonb, @Type, @StreamId, @StreamType, @ExpectedVersion)",
                 new
                 {
                     Id = Guid.NewGuid(),
@@ -130,7 +130,7 @@ namespace EventStoreBasics
         private void CreateAppendEventFunction()
         {
             const string AppendEventFunctionSQL =
-                @"CREATE OR REPLACE FUNCTION append_event(id uuid, data text, type text, stream_id uuid, stream_type text, expected_stream_version bigint default null) RETURNS boolean
+                @"CREATE OR REPLACE FUNCTION append_event(id uuid, data jsonb, type text, stream_id uuid, stream_type text, expected_stream_version bigint default null) RETURNS boolean
                 LANGUAGE plpgsql
                 AS $$
                 DECLARE
@@ -165,7 +165,7 @@ namespace EventStoreBasics
                     INSERT INTO events
                         (id, data, stream_id, type, version)
                     VALUES
-                        (id, data::jsonb, stream_id, type, stream_version);
+                        (id, data, stream_id, type, stream_version);
 
                     -- update stream version
                     UPDATE streams as s

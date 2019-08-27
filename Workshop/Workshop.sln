@@ -49,6 +49,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postgres", "postgres", "{D1
 		..\docker\postgres\variables.env = ..\docker\postgres\variables.env
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03-OptimisticConcurrency", "01-EventStoreBasics\03-OptimisticConcurrency\03-OptimisticConcurrency.csproj", "{994587CF-44CC-4F16-8065-EC725368F704}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meetings.IntegrationTests", "02-EventSourcingAdvanced\Meetings.IntegrationTests\Meetings.IntegrationTests.csproj", "{87FE4692-217C-442D-94B8-16AD06DF0191}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,6 +123,14 @@ Global
 		{3A8AC785-112D-4431-AAEA-472756969FBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A8AC785-112D-4431-AAEA-472756969FBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A8AC785-112D-4431-AAEA-472756969FBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{994587CF-44CC-4F16-8065-EC725368F704}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{994587CF-44CC-4F16-8065-EC725368F704}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{994587CF-44CC-4F16-8065-EC725368F704}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{994587CF-44CC-4F16-8065-EC725368F704}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87FE4692-217C-442D-94B8-16AD06DF0191}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87FE4692-217C-442D-94B8-16AD06DF0191}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87FE4692-217C-442D-94B8-16AD06DF0191}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87FE4692-217C-442D-94B8-16AD06DF0191}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -141,6 +153,8 @@ Global
 		{70269B35-2332-4880-BED8-2FF0C941A0AA} = {21AE1BDC-BF1B-4FC4-913B-D27F11E09313}
 		{3A8AC785-112D-4431-AAEA-472756969FBF} = {21AE1BDC-BF1B-4FC4-913B-D27F11E09313}
 		{D1583A8B-B89F-47C5-9145-F82C7D434897} = {F42A029E-95A2-481F-91B1-91BCEAF0663F}
+		{994587CF-44CC-4F16-8065-EC725368F704} = {5983AAAE-CEC6-4B86-B078-F22F60020E07}
+		{87FE4692-217C-442D-94B8-16AD06DF0191} = {21AE1BDC-BF1B-4FC4-913B-D27F11E09313}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F7A7AC90-022D-4C06-91A8-29B808FA444B}

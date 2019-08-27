@@ -7,7 +7,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests
 {
-    public class Exercise03CreateAppendEventFunction
+    public class Exercise03OptimisticConcurrency
     {
         private class User
         {
@@ -33,7 +33,7 @@ namespace EventStoreBasics.Tests
         /// <summary>
         /// Inits Event Store
         /// </summary>
-        public Exercise03CreateAppendEventFunction()
+        public Exercise03OptimisticConcurrency()
         {
             databaseConnection = PostgresDbConnectionProvider.GetFreshDbConnection();
             schemaProvider = new PostgresSchemaProvider(databaseConnection);
