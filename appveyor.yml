@@ -7,3 +7,6 @@ build:
   verbosity: minimal
 services:
   - postgresql95
+test:
+  assemblies:
+    - '**\*.Tests.dll'
