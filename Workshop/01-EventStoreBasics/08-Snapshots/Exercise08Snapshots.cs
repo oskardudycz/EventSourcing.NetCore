@@ -122,6 +122,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
         {
             var streamId = Guid.NewGuid();
@@ -148,6 +149,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void Snapshots_ShouldBeQueryable()
         {
             const string john = "John";

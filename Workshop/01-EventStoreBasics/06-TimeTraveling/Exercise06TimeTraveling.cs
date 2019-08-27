@@ -6,10 +6,9 @@ using Xunit;
 
 namespace EventStoreBasics.Tests
 {
-
     public class Exercise06TimeTravelling
     {
-        class User
+        private class User
         {
             public Guid Id { get; private set; }
             public string Name { get; private set; }
@@ -36,7 +35,7 @@ namespace EventStoreBasics.Tests
             }
         }
 
-        class UserCreated
+        private class UserCreated
         {
             public Guid UserId { get; }
             public string UserName { get; }
@@ -48,8 +47,7 @@ namespace EventStoreBasics.Tests
             }
         }
 
-
-        class UserNameUpdated
+        private class UserNameUpdated
         {
             public Guid UserId { get; }
             public string UserName { get; }
@@ -79,6 +77,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void AggregateStream_ShouldReturnSpecifiedVersionOfTheStream()
         {
             var streamId = Guid.NewGuid();
@@ -96,13 +95,11 @@ namespace EventStoreBasics.Tests
             aggregateAtVersion1.Name.Should().Be(userCreated.UserName);
             aggregateAtVersion1.Version.Should().Be(1);
 
-
             var aggregateAtVersion2 = eventStore.AggregateStream<User>(streamId, 2);
 
             aggregateAtVersion2.Id.Should().Be(streamId);
             aggregateAtVersion2.Name.Should().Be(userNameUpdated.UserName);
             aggregateAtVersion2.Version.Should().Be(2);
-
 
             var aggregateAtVersion3 = eventStore.AggregateStream<User>(streamId, 3);
 

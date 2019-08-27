@@ -8,8 +8,7 @@ namespace EventStoreBasics.Tests
 {
     public class Exercise07AggregateAndRepository
     {
-
-        class User : Aggregate
+        private class User: Aggregate
         {
             public string Name { get; private set; }
 
@@ -44,7 +43,7 @@ namespace EventStoreBasics.Tests
             }
         }
 
-        class UserCreated
+        private class UserCreated
         {
             public Guid UserId { get; }
             public string UserName { get; }
@@ -56,8 +55,7 @@ namespace EventStoreBasics.Tests
             }
         }
 
-
-        class UserNameUpdated
+        private class UserNameUpdated
         {
             public Guid UserId { get; }
             public string UserName { get; }
@@ -90,6 +88,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void Repository_FullFlow_ShouldSucceed()
         {
             var streamId = Guid.NewGuid();

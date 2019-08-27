@@ -7,16 +7,15 @@ using Xunit;
 
 namespace EventStoreBasics.Tests
 {
-
     public class Exercise04EventStoreMethods
     {
-        class User
+        private class User
         {
             public Guid Id { get; set; }
             public string Name { get; set; }
         }
 
-        class UserCreated
+        private class UserCreated
         {
             public Guid UserId { get; }
             public string UserName { get; }
@@ -28,8 +27,7 @@ namespace EventStoreBasics.Tests
             }
         }
 
-
-        class UserNameUpdated
+        private class UserNameUpdated
         {
             public Guid UserId { get; }
             public string UserName { get; }
@@ -59,10 +57,11 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void GetStreamState_ShouldReturnProperStreamInfo()
         {
             var streamId = Guid.NewGuid();
-            var @event = new UserCreated(streamId,"John Doe");
+            var @event = new UserCreated(streamId, "John Doe");
 
             eventStore.AppendEvent<User>(streamId, @event);
 
@@ -74,6 +73,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void GetEvents_ShouldReturnAppendedEvents()
         {
             var streamId = Guid.NewGuid();

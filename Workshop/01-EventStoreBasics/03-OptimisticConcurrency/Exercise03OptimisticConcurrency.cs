@@ -46,6 +46,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void AppendEventFunction_ShouldBeCreated()
         {
             var appendFunctionExists = schemaProvider
@@ -55,6 +56,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void AppendEventFunction_WhenStreamDoesNotExist_CreateNewStream_And_AppendNewEvent()
         {
             var streamId = Guid.NewGuid();
