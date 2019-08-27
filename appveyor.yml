@@ -9,4 +9,5 @@ services:
   - postgresql95
 test:
   categories:
-    except: Exercise
+    except: 
+      - Exercise
