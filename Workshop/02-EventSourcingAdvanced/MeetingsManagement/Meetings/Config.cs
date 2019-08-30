@@ -1,4 +1,5 @@
 using Core.Storage;
+using Marten;
 using MediatR;
 using MeetingsManagement.Meetings.Commands;
 using MeetingsManagement.Meetings.Queries;
@@ -17,6 +18,11 @@ namespace MeetingsManagement.Meetings
             services.AddScoped<IRequestHandler<CreateMeeting, Unit>, MeetingCommandHandler>();
 
             services.AddScoped<IRequestHandler<GetMeeting, MeetingSummary>, MeetingQueryHandler>();
+        }
+
+        public static void ConfigureMarten(StoreOptions options)
+        {
+            options.Events.InlineProjections.AggregateStreamsWith<Meeting>();
         }
     }
 }

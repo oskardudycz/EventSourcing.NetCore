@@ -16,7 +16,7 @@ namespace MeetingsManagement.Meetings
             IDocumentSession session
         )
         {
-            this.session = this.session ?? throw new ArgumentNullException(nameof(session));
+            this.session = session ?? throw new ArgumentNullException(nameof(session));
         }
 
         public async Task<MeetingSummary> Handle(GetMeeting request, CancellationToken cancellationToken)
