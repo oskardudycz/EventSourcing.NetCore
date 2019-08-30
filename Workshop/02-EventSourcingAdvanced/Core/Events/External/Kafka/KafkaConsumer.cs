@@ -40,26 +40,7 @@ namespace Core.Events.External.Kafka
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
-                        try
-                        {
-                            var message = consumer.Consume(cancellationToken);
-
-                            var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Key);
-
-                            var @event = JsonConvert.DeserializeObject(message.Value, eventType);
-
-                            using (var scope = serviceProvider.CreateScope())
-                            {
-                                var mediator =
-                                    scope.ServiceProvider.GetRequiredService<IMediator>();
-
-                                await mediator.Publish(@event);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            logger.LogInformation("Error consuming message: " + e.Message + e.StackTrace);
-                        }
+                        await ConsumeMessage(consumer, cancellationToken);
                     }
                 }
                 catch (Exception e)
@@ -68,6 +49,30 @@ namespace Core.Events.External.Kafka
                     // Ensure the consumer leaves the group cleanly and final offsets are committed.
                     consumer.Close();
                 }
+            }
+        }
+
+        private async Task ConsumeMessage(IConsumer<string, string> consumer, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var message = consumer.Consume(cancellationToken);
+
+                var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Key);
+
+                var @event = JsonConvert.DeserializeObject(message.Value, eventType);
+
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    var mediator =
+                        scope.ServiceProvider.GetRequiredService<IMediator>();
+
+                    await mediator.Publish(@event);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogInformation("Error consuming message: " + e.Message + e.StackTrace);
             }
         }
     }
