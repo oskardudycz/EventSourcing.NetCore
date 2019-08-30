@@ -1,38 +1,54 @@
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
-using EventSourcing.Sample.IntegrationTests.Infrastructure;
 using FluentAssertions;
 using Meetings.IntegrationTests.Infrastructure;
+using Meetings.IntegrationTests.MeetingsManagement;
+using MeetingsManagement.Api;
 using MeetingsManagement.Meetings.Commands;
+using MeetingsManagement.Meetings.Events;
 using MeetingsManagement.Meetings.Queries;
 using MeetingsManagement.Meetings.ValueObjects;
 using Xunit;
 
 namespace EventSourcing.Sample.IntegrationTests.Meetings
 {
-    public class CreateMeetingTests
+    public class CreateMeetingFixture: ApiFixture<Startup>
     {
-        private readonly TestContext _sut;
+        public override string ApiUrl { get; } = MeetingsManagementApi.MeetingsUrl;
 
-        private const string ApiUrl = "/api/Meetings";
+        public readonly Guid MeetingId = Guid.NewGuid();
+        public readonly string MeetingName = "Event Sourcing Workshop";
 
-        public CreateMeetingTests()
-        {
-            _sut = new TestContext();
-        }
+        public HttpResponseMessage CommandResponse;
 
-        [Fact]
-        public async Task IssueFlowTests()
+        public override async Task InitializeAsync()
         {
             // prepare command
             var command = new CreateMeeting(
-                Guid.NewGuid(),
-                "Event Sourcing Workshop");
+                MeetingId,
+                MeetingName
+            );
 
             // send create command
-            var commandResponse = await _sut.Client.PostAsync(ApiUrl, command.ToJsonStringContent());
+            CommandResponse = await Client.PostAsync(ApiUrl, command.ToJsonStringContent());
+        }
+    }
 
+    public class CreateMeetingTests: IClassFixture<CreateMeetingFixture>
+    {
+        private readonly CreateMeetingFixture fixture;
+
+        public CreateMeetingTests(CreateMeetingFixture fixture)
+        {
+            this.fixture = fixture;
+        }
+
+        [Fact]
+        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_MeetingId()
+        {
+            var commandResponse = fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
@@ -41,19 +57,36 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
             commandResult.Should().NotBeNull();
 
             var createdId = commandResult.FromJson<Guid>();
+            createdId.Should().Be(fixture.MeetingId);
+        }
 
+        [Fact]
+        public void CreateCommand_ShouldPublish_MeetingCreateEvent()
+        {
+            // assert MeetingCreated event was produced to external bus
+            fixture.Sut.PublishedExternalEventsOfType<MeetingCreated>()
+               .Should().Contain(@event =>
+                   @event.MeetingId == fixture.MeetingId
+                   && @event.Name == fixture.MeetingName
+               );
+        }
+
+        [Fact]
+        public async Task CreateCommand_ShouldUpdateReadModel()
+        {
             // prepare query
-            var query = new GetMeeting(createdId);
+            var query = new GetMeeting(fixture.MeetingId);
 
             //send query
-            var queryResponse = await _sut.Client.GetAsync(ApiUrl + $"/{createdId}/view");
+            var queryResponse = await fixture.Client.GetAsync($"{MeetingsManagementApi.MeetingsUrl}/{fixture.MeetingId}");
+            queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();
-            queryResponse.Should().NotBeNull();
+            queryResult.Should().NotBeNull();
 
-            var MeetingView = queryResult.FromJson<MeetingSummary>();
-            MeetingView.Id.Should().Be(createdId);
-            MeetingView.Name.Should().Be(command.Name);
+            var meetingSummary = queryResult.FromJson<MeetingSummary>();
+            meetingSummary.Id.Should().Be(fixture.MeetingId);
+            meetingSummary.Name.Should().Be(fixture.MeetingName);
         }
     }
 }

@@ -28,9 +28,11 @@ namespace MeetingsManagement.Api.Controllers
         }
 
         [HttpPost]
-        public Task Post([FromBody]CreateMeeting command)
+        public async Task<IActionResult> Post([FromBody]CreateMeeting command)
         {
-            return _commandBus.Send(command);
+            await _commandBus.Send(command);
+
+            return Created("api/Meetings", command.Id);
         }
     }
 }

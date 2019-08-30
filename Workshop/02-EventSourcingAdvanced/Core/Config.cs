@@ -5,6 +5,7 @@ using Core.Events.External.Kafka;
 using Core.Queries;
 using MeetingsManagement.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Core
 {
@@ -14,8 +15,9 @@ namespace Core
         {
             services.AddMediatR();
 
-            services.AddScoped<IExternaEventProducer, KafkaProducer>();
-            services.AddSingleton<IExternalEventConsumer, KafkaConsumer>();
+            //using TryAdd to support mocking, without that it won't be possible to override in tests
+            services.TryAddScoped<IExternalEventProducer, KafkaProducer>();
+            services.TryAddSingleton<IExternalEventConsumer, KafkaConsumer>();
             services.AddHostedService<ExternalEventConsumerBackgroundWorker>();
 
             services.AddScoped<ICommandBus, CommandBus>();

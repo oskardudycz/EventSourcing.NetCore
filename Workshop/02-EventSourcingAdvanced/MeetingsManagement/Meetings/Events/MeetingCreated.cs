@@ -3,14 +3,14 @@ using Core.Events;
 
 namespace MeetingsManagement.Meetings.Events
 {
-    public class MeetingCreated : IEvent
+    public class MeetingCreated: IExternalEvent
     {
-        public Guid Id { get; }
+        public Guid MeetingId { get; }
         public string Name { get; }
 
-        public MeetingCreated(Guid id, string name)
+        public MeetingCreated(Guid meetingId, string name)
         {
-            Id = id;
+            MeetingId = meetingId;
             Name = name;
         }
     }

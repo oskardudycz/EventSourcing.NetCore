@@ -14,6 +14,12 @@ namespace MeetingsManagement.Meetings
 
         private Meeting(Guid id, string name)
         {
+            if (id == Guid.Empty)
+                throw new ArgumentException($"{nameof(id)} cannot be empty.");
+
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException($"{nameof(name)} cannot be empty.");
+
             var @event = new MeetingCreated(id, name);
 
             Enqueue(@event);
@@ -22,7 +28,7 @@ namespace MeetingsManagement.Meetings
 
         public void Apply(MeetingCreated @event)
         {
-            Id = @event.Id;
+            Id = @event.MeetingId;
             Name = @event.Name;
         }
 
