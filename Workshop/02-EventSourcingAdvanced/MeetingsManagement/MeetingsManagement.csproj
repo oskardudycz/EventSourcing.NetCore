@@ -5,13 +5,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Core\Core.csproj" />
+        <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Marten" Version="3.7.0" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+        <PackageReference Include="JsonNet.PrivateSettersContractResolvers" Version="1.0.0" />
+        <PackageReference Include="Marten" Version="3.7.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     </ItemGroup>
-
 </Project>

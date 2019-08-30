@@ -7,72 +7,65 @@ using FluentAssertions;
 using Meetings.IntegrationTests.MeetingsManagement;
 using MeetingsManagement.Api;
 using MeetingsManagement.Meetings.Commands;
-using MeetingsManagement.Meetings.Events;
 using MeetingsManagement.Meetings.Queries;
+using MeetingsManagement.Meetings.ValueObjects;
 using MeetingsManagement.Meetings.Views;
 using Xunit;
 
 namespace EventSourcing.Sample.IntegrationTests.Meetings
 {
-    public class CreateMeetingFixture: ApiFixture<Startup>
+    public class ScheduleMeetingFixture: ApiFixture<Startup>
     {
         public override string ApiUrl { get; } = MeetingsManagementApi.MeetingsUrl;
 
         public readonly Guid MeetingId = Guid.NewGuid();
         public readonly string MeetingName = "Event Sourcing Workshop";
+        public readonly DateTime Start = DateTime.UtcNow;
+        public readonly DateTime End = DateTime.UtcNow;
 
         public HttpResponseMessage CommandResponse;
 
         public override async Task InitializeAsync()
         {
             // prepare command
-            var command = new CreateMeeting(
+            var createCommand = new CreateMeeting(
                 MeetingId,
                 MeetingName
             );
 
             // send create command
-            CommandResponse = await Client.PostAsync(ApiUrl, command.ToJsonStringContent());
+            await Client.PostAsync(ApiUrl, createCommand.ToJsonStringContent());
+
+            var occurs = Range.Create(Start, End);
+
+            // send schedule meeting request
+            CommandResponse = await Client.PostAsync($"{MeetingsManagementApi.MeetingsUrl}/{MeetingId}/schedule", occurs.ToJsonStringContent());
         }
     }
 
-    public class CreateMeetingTests: IClassFixture<CreateMeetingFixture>
+    public class ScheduleMeetingTests: IClassFixture<ScheduleMeetingFixture>
     {
-        private readonly CreateMeetingFixture fixture;
+        private readonly ScheduleMeetingFixture fixture;
 
-        public CreateMeetingTests(CreateMeetingFixture fixture)
+        public ScheduleMeetingTests(ScheduleMeetingFixture fixture)
         {
             this.fixture = fixture;
         }
 
         [Fact]
-        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_MeetingId()
+        public async Task ScheduleMeeting_ShouldReturn_CreatedStatus_With_MeetingId()
         {
             var commandResponse = fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
-            commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             // get created record id
             var commandResult = await commandResponse.Content.ReadAsStringAsync();
-            commandResult.Should().NotBeNull();
-
-            var createdId = commandResult.FromJson<Guid>();
-            createdId.Should().Be(fixture.MeetingId);
+            commandResult.Should().BeEmpty();
         }
 
         [Fact]
-        public void CreateCommand_ShouldPublish_MeetingCreateEvent()
-        {
-            // assert MeetingCreated event was produced to external bus
-            fixture.Sut.PublishedExternalEventsOfType<MeetingCreated>()
-               .Should().Contain(@event =>
-                   @event.MeetingId == fixture.MeetingId
-                   && @event.Name == fixture.MeetingName
-               );
-        }
-
-        [Fact]
-        public async Task CreateCommand_ShouldUpdateReadModel()
+        public async Task ScheduleMeeting_ShouldUpdateReadModel()
         {
             // prepare query
             var query = new GetMeeting(fixture.MeetingId);
@@ -84,9 +77,11 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
             var queryResult = await queryResponse.Content.ReadAsStringAsync();
             queryResult.Should().NotBeNull();
 
-            var meetingSummary = queryResult.FromJson<MeetingView>();
-            meetingSummary.Id.Should().Be(fixture.MeetingId);
-            meetingSummary.Name.Should().Be(fixture.MeetingName);
+            var meeting = queryResult.FromJson<MeetingView>();
+            meeting.Id.Should().Be(fixture.MeetingId);
+            meeting.Name.Should().Be(fixture.MeetingName);
+            meeting.Start.Should().Be(fixture.Start);
+            meeting.End.Should().Be(fixture.End);
         }
     }
 }

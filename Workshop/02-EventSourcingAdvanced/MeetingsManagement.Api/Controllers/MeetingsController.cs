@@ -5,6 +5,7 @@ using Core.Queries;
 using MeetingsManagement.Meetings.Commands;
 using MeetingsManagement.Meetings.Queries;
 using MeetingsManagement.Meetings.ValueObjects;
+using MeetingsManagement.Meetings.Views;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeetingsManagement.Api.Controllers
@@ -22,9 +23,9 @@ namespace MeetingsManagement.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public Task<MeetingSummary> Get(Guid id)
+        public Task<MeetingView> Get(Guid id)
         {
-            return _queryBus.Send<GetMeeting, MeetingSummary>(new GetMeeting(id));
+            return _queryBus.Send<GetMeeting, MeetingView>(new GetMeeting(id));
         }
 
         [HttpPost]
@@ -33,6 +34,15 @@ namespace MeetingsManagement.Api.Controllers
             await _commandBus.Send(command);
 
             return Created("api/Meetings", command.Id);
+        }
+
+        [HttpPost("{id}/schedule")]
+        public async Task<IActionResult> Post(Guid id, [FromBody]Range occurs)
+        {
+            var command = new ScheduleMeeting(id, occurs);
+            await _commandBus.Send(command);
+
+            return Ok();
         }
     }
 }

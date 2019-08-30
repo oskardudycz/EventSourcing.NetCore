@@ -2,8 +2,9 @@ using Core.Storage;
 using Marten;
 using MediatR;
 using MeetingsManagement.Meetings.Commands;
+using MeetingsManagement.Meetings.Projections;
 using MeetingsManagement.Meetings.Queries;
-using MeetingsManagement.Meetings.ValueObjects;
+using MeetingsManagement.Meetings.Views;
 using MeetingsManagement.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,12 +18,15 @@ namespace MeetingsManagement.Meetings
 
             services.AddScoped<IRequestHandler<CreateMeeting, Unit>, MeetingCommandHandler>();
 
-            services.AddScoped<IRequestHandler<GetMeeting, MeetingSummary>, MeetingQueryHandler>();
+            services.AddScoped<IRequestHandler<ScheduleMeeting, Unit>, MeetingCommandHandler>();
+
+            services.AddScoped<IRequestHandler<GetMeeting, MeetingView>, MeetingQueryHandler>();
         }
 
         public static void ConfigureMarten(StoreOptions options)
         {
             options.Events.InlineProjections.AggregateStreamsWith<Meeting>();
+            options.Events.InlineProjections.Add<MeetingViewProjection>();
         }
     }
 }

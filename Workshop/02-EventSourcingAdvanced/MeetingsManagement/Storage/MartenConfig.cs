@@ -21,7 +21,7 @@ namespace MeetingsManagement.Storage
 
         internal static void AddMarten(this IServiceCollection services, IConfiguration config, Action<StoreOptions> configureOptions = null)
         {
-            services.AddSingleton<IDocumentStore>(sp => DocumentStore.For(options => SetStoreOptions(options, config)));
+            services.AddSingleton<IDocumentStore>(sp => DocumentStore.For(options => SetStoreOptions(options, config, configureOptions)));
             services.AddScoped(sp => sp.GetRequiredService<IDocumentStore>().OpenSession());
         }
 

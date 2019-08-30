@@ -50,15 +50,11 @@ namespace MeetingsManagement.Storage
             var events = aggregate.DequeueUncommittedEvents();
             documentSession.Events.Append(
                 aggregate.Id,
-                aggregate.Version,
                 events.ToArray()
             );
             await documentSession.SaveChangesAsync();
 
-            foreach (var @event in events)
-            {
-                await eventBus.Publish(@event);
-            }
+            await eventBus.Publish(events.ToArray());
         }
     }
 }

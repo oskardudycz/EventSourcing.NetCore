@@ -1,4 +1,5 @@
 using MeetingsManagement.Meetings;
+using MeetingsManagement.Notifications;
 using MeetingsManagement.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ namespace MeetingsManagement
                 Meetings.Config.ConfigureMarten(options);
             });
             services.AddMeeting();
+            services.AddNotifications();
         }
     }
 }

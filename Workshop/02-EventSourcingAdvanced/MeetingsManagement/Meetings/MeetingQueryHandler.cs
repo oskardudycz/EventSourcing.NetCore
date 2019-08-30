@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using Core.Queries;
 using Marten;
 using MeetingsManagement.Meetings.Queries;
-using MeetingsManagement.Meetings.ValueObjects;
+using MeetingsManagement.Meetings.Views;
 
 namespace MeetingsManagement.Meetings
 {
-    internal class MeetingQueryHandler: IQueryHandler<GetMeeting, MeetingSummary>
+    internal class MeetingQueryHandler: IQueryHandler<GetMeeting, MeetingView>
     {
         private readonly IDocumentSession session;
 
@@ -19,11 +19,9 @@ namespace MeetingsManagement.Meetings
             this.session = session ?? throw new ArgumentNullException(nameof(session));
         }
 
-        public async Task<MeetingSummary> Handle(GetMeeting request, CancellationToken cancellationToken)
+        public Task<MeetingView> Handle(GetMeeting request, CancellationToken cancellationToken)
         {
-            var meeting = await session.LoadAsync<Meeting>(request.Id, cancellationToken);
-
-            return new MeetingSummary { Id = meeting.Id, Name = meeting.Name };
+            return session.LoadAsync<MeetingView>(request.Id, cancellationToken);
         }
     }
 }
