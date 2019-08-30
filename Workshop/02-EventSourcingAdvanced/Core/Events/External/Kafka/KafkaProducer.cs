@@ -4,9 +4,9 @@ using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
-namespace Core.Events
+namespace Core.Events.External.Kafka
 {
-    public class KafkaProducer: IKafkaProducer
+    public class KafkaProducer: IExternaEventProducer
     {
         private readonly string topic;
         private readonly ProducerConfig producerConfig;

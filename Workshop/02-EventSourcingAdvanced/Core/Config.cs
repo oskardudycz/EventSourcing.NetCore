@@ -1,5 +1,7 @@
 using Core.Commands;
 using Core.Events;
+using Core.Events.External;
+using Core.Events.External.Kafka;
 using Core.Queries;
 using MeetingsManagement.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,8 +14,9 @@ namespace Core
         {
             services.AddMediatR();
 
-            services.AddScoped<IKafkaProducer, KafkaProducer>();
-            services.AddHostedService<KafkaConsumer>();
+            services.AddScoped<IExternaEventProducer, KafkaProducer>();
+            services.AddSingleton<IExternalEventConsumer, KafkaConsumer>();
+            services.AddHostedService<ExternalEventConsumerBackgroundWorker>();
 
             services.AddScoped<ICommandBus, CommandBus>();
             services.AddScoped<IQueryBus, QueryBus>();

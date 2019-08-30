@@ -1,70 +1,52 @@
 using System;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
+using Core.Reflection;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Core.Events
+namespace Core.Events.External.Kafka
 {
-    public class KafkaConsumer: IHostedService
+    public class KafkaConsumer: IExternalEventConsumer
     {
         private readonly IServiceProvider serviceProvider;
         private readonly ILogger<KafkaConsumer> logger;
-        private readonly string[] topics;
-        private readonly ConsumerConfig consumerConfig;
+        private readonly KafkaConsumerConfig config;
 
         public KafkaConsumer(
             IServiceProvider serviceProvider,
             ILogger<KafkaConsumer> logger,
-            IConfiguration config
+            IConfiguration configuration
         )
         {
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            var kafkaConfig = config.GetSection("KafkaConsumer");
-            var consumerGroup = kafkaConfig.GetSection("ConsumerGroup").Value;
-            var endpoint = kafkaConfig.GetSection("Endpoint").Value;
-
-            topics = kafkaConfig.GetSection("Topics").Value.Split(";");
-
-            consumerConfig = new ConsumerConfig
-            {
-                GroupId = consumerGroup,
-                BootstrapServers = endpoint,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-            };
+            config = configuration.GetSection("KafkaConsumer").Get<KafkaConsumerConfig>();
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             logger.LogInformation("Kafka consumer started");
 
-            using (var consumer = new ConsumerBuilder<string, string>(consumerConfig).Build())
+            using (var consumer = new ConsumerBuilder<string, string>(config.ConsumerConfig).Build())
             {
-                consumer.Subscribe(topics);
+                consumer.Subscribe(config.Topics);
                 try
                 {
-                    while (true)
+                    while (!cancellationToken.IsCancellationRequested)
                     {
                         try
                         {
-                            var message = consumer.Consume();
+                            var message = consumer.Consume(cancellationToken);
 
-                            var referencedAssemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies().Select(a => a.FullName);
-                            var type = AppDomain.CurrentDomain.GetAssemblies()
-                                .Where(a => referencedAssemblies.Contains(a.FullName))
-                                .SelectMany(a => a.GetTypes().Where(x => x.Name == message.Key))
-                                .FirstOrDefault();
+                            var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Key);
 
-                            var @event = JsonConvert.DeserializeObject(message.Value, type);
+                            var @event = JsonConvert.DeserializeObject(message.Value, eventType);
 
                             using (var scope = serviceProvider.CreateScope())
                             {
@@ -87,13 +69,6 @@ namespace Core.Events
                     consumer.Close();
                 }
             }
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            logger.LogInformation("Kafka consumer stoped");
-
-            return Task.CompletedTask;
         }
     }
 }

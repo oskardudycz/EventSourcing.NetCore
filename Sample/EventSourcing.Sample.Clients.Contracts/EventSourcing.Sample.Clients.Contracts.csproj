@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>EventSourcing.Sample.Clients.Contracts</AssemblyName>
-    <PackageId>EventSourcing.Sample.Clients.Contracts</PackageId>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <AssemblyName>EventSourcing.Sample.Clients.Contracts</AssemblyName>
+        <PackageId>EventSourcing.Sample.Clients.Contracts</PackageId>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.8.0" />
-    <PackageReference Include="Marten" Version="3.7.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="5.9.0" />
+        <PackageReference Include="Marten" Version="3.7.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Domain\Domain.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Domain\Domain.csproj" />
+    </ItemGroup>
 </Project>
