@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Queries;
-using Core.Storage;
+using Marten;
 using MeetingsManagement.Meetings.Queries;
 using MeetingsManagement.Meetings.ValueObjects;
 
@@ -10,18 +10,18 @@ namespace MeetingsManagement.Meetings
 {
     internal class MeetingQueryHandler: IQueryHandler<GetMeeting, MeetingSummary>
     {
-        private readonly IRepository<Meeting> repository;
+        private readonly IDocumentSession session;
 
         public MeetingQueryHandler(
-            IRepository<Meeting> repository
+            IDocumentSession session
         )
         {
-            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            this.session = this.session ?? throw new ArgumentNullException(nameof(session));
         }
 
         public async Task<MeetingSummary> Handle(GetMeeting request, CancellationToken cancellationToken)
         {
-            var meeting = await repository.Find(request.Id, cancellationToken);
+            var meeting = await session.LoadAsync<Meeting>(request.Id, cancellationToken);
 
             return new MeetingSummary { Id = meeting.Id, Name = meeting.Name };
         }

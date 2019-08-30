@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Core.Events;
 using Core.Events.External;
 
-namespace Meetings.IntegrationTests.Infrastructure
+namespace Core.Testing
 {
     public class DummyExternalEventProducer: IExternalEventProducer
     {

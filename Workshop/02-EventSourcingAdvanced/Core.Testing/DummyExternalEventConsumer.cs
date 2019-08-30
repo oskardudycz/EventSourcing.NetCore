@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Events.External;
 
-namespace Meetings.IntegrationTests.Infrastructure
+namespace Core.Testing
 {
     public class DummyExternalEventConsumer: IExternalEventConsumer
     {
