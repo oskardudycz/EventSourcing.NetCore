@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>EventSourcing.Sample.Transactions</AssemblyName>
-    <PackageId>EventSourcing.Sample.Transactions</PackageId>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <AssemblyName>EventSourcing.Sample.Transactions</AssemblyName>
+        <PackageId>EventSourcing.Sample.Transactions</PackageId>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.8.0" />
-    <PackageReference Include="Marten" Version="3.7.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="5.9.0" />
+        <PackageReference Include="Marten" Version="3.7.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\EventSourcing.Sample.Clients.Contracts\EventSourcing.Sample.Clients.Contracts.csproj" />
-    <ProjectReference Include="..\EventSourcing.Sample.Transactions.Contracts\EventSourcing.Sample.Transactions.Contracts.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Domain\Domain.csproj" />
+        <ProjectReference Include="..\EventSourcing.Sample.Clients.Contracts\EventSourcing.Sample.Clients.Contracts.csproj" />
+        <ProjectReference Include="..\EventSourcing.Sample.Transactions.Contracts\EventSourcing.Sample.Transactions.Contracts.csproj" />
+    </ItemGroup>
 </Project>

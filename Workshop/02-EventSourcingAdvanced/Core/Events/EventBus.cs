@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Core.Events.External;
 using MediatR;
 
 namespace Core.Events
@@ -6,11 +7,11 @@ namespace Core.Events
     public class EventBus: IEventBus
     {
         private readonly IMediator mediator;
-        private readonly IKafkaProducer producer;
+        private readonly IExternaEventProducer producer;
 
         public EventBus(
             IMediator mediator,
-            IKafkaProducer producer
+            IExternaEventProducer producer
         )
         {
             this.mediator = mediator;
