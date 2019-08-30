@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using EventSourcing.Sample.IntegrationTests.Infrastructure;
 using Xunit;
 
-namespace Meetings.IntegrationTests.Infrastructure
+namespace Core.Testing
 {
     public abstract class ApiFixture<TStartup>: IAsyncLifetime where TStartup : class
     {

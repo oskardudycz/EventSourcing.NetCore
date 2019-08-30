@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Meetings.IntegrationTests.Infrastructure
+namespace Core.Testing
 {
     public static class SerializationExtensions
     {

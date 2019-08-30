@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using Core.Storage;
 using MediatR;
 using MeetingsSearch.Meetings.Events;
+using MeetingsSearch.Meetings.Queries;
 using MeetingsSearch.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +14,7 @@ namespace MeetingsSearch.Meetings
         {
             services.AddScoped<IRepository<Meeting>, ElasticSearchRepository<Meeting>>();
             services.AddScoped<INotificationHandler<MeetingCreated>, MeetingEventHandler>();
+            services.AddScoped<IRequestHandler<SearchMeetings, IReadOnlyCollection<Meeting>>, MeetingQueryHandler>();
         }
     }
 }

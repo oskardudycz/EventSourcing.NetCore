@@ -22,7 +22,7 @@ namespace Core
 
             services.AddScoped<ICommandBus, CommandBus>();
             services.AddScoped<IQueryBus, QueryBus>();
-            services.AddScoped<IEventBus, EventBus>();
+            services.TryAddScoped<IEventBus, EventBus>();
         }
     }
 }

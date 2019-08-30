@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Core.Events;
 using Core.Events.External;
-using Meetings.IntegrationTests.Infrastructure;
+using Core.Testing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -51,6 +53,15 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
         public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>()
         {
             return externalEventProducer.PublishedEvents.OfType<TEvent>().ToList();
+        }
+
+        public async Task PublishInternalEvent(IEvent @event)
+        {
+            using (var scope = server.Host.Services.CreateScope())
+            {
+                var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
+                await eventBus.Publish(@event);
+            }
         }
 
         public void Dispose()

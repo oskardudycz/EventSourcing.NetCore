@@ -16,7 +16,6 @@
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="FluentAssertions" Version="5.9.0" />
         <PackageReference Include="Marten" Version="3.7.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
@@ -33,8 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\MeetingsManagement.Api\MeetingsManagement.Api.csproj" />
-        <ProjectReference Include="..\MeetingsManagement\MeetingsManagement.csproj" />
+        <ProjectReference Include="..\Core.Testing\Core.Testing.csproj" />
         <ProjectReference Include="..\MeetingsSearch.Api\MeetingsSearch.Api.csproj" />
         <ProjectReference Include="..\MeetingsSearch\MeetingsSearch.csproj" />
     </ItemGroup>
