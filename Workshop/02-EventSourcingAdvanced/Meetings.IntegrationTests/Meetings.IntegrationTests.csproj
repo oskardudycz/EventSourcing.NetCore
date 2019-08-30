@@ -16,6 +16,7 @@
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="FluentAssertions" Version="5.9.0" />
         <PackageReference Include="Marten" Version="3.7.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />

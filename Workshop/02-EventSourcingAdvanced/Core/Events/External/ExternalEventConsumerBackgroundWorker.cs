@@ -6,8 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Events.External
 {
+    //See more: https://www.stevejgordon.co.uk/asp-net-core-2-ihostedservice
     public class ExternalEventConsumerBackgroundWorker: IHostedService
     {
+        private Task executingTask;
+        private CancellationTokenSource cts;
         private readonly IExternalEventConsumer externalEventConsumer;
         private readonly ILogger<ExternalEventConsumerBackgroundWorker> logger;
 
@@ -24,14 +27,34 @@ namespace Core.Events.External
         {
             logger.LogInformation("External Event Consumer started");
 
-            return externalEventConsumer.StartAsync(cancellationToken);
+            // Create a linked token so we can trigger cancellation outside of this token's cancellation
+            cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            // Store the task we're executing
+            executingTask = externalEventConsumer.StartAsync(cancellationToken);
+
+            // If the task is completed then return it, otherwise it's running
+            return executingTask.IsCompleted ? executingTask : Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            logger.LogInformation("External Event Consumer stoped");
+            // Stop called without start
+            if (executingTask == null)
+            {
+                return;
+            }
 
-            return Task.CompletedTask;
+            // Signal cancellation to the executing method
+            cts.Cancel();
+
+            // Wait until the task completes or the stop token triggers
+            await Task.WhenAny(executingTask, Task.Delay(-1, cancellationToken));
+
+            // Throw if cancellation triggered
+            cancellationToken.ThrowIfCancellationRequested();
+
+            logger.LogInformation("External Event Consumer stopped");
         }
     }
 }

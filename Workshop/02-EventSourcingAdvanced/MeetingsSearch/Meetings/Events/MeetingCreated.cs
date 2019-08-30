@@ -5,12 +5,12 @@ namespace MeetingsSearch.Meetings.Events
 {
     internal class MeetingCreated: IEvent
     {
-        public Guid Id { get; }
+        public Guid MeetingId { get; }
         public string Name { get; }
 
-        public MeetingCreated(Guid id, string name)
+        public MeetingCreated(Guid meetingId, string name)
         {
-            Id = id;
+            MeetingId = meetingId;
             Name = name;
         }
     }

@@ -17,7 +17,7 @@ namespace MeetingsSearch.Meetings
 
         public Task Handle(MeetingCreated @event, CancellationToken cancellationToken)
         {
-            var meeting = new Meeting(@event.Id, @event.Name);
+            var meeting = new Meeting(@event.MeetingId, @event.Name);
 
             return repository.Add(meeting, cancellationToken);
         }

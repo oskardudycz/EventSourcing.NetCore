@@ -4,7 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MeetingsManagement.Configuration
 {
-    internal static class MartenConfig
+    public class MartenConfig
+    {
+    }
+
+    internal static class MartenConfigExtensions
     {
         internal static void AddMarten(this IServiceCollection services, IConfiguration config)
         {

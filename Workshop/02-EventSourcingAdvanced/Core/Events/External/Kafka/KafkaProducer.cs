@@ -6,30 +6,32 @@ using Newtonsoft.Json;
 
 namespace Core.Events.External.Kafka
 {
-    public class KafkaProducer: IExternaEventProducer
+    public class KafkaProducer: IExternalEventProducer
     {
-        private readonly string topic;
-        private readonly ProducerConfig producerConfig;
+        private readonly KafkaProducerConfig config;
 
         public KafkaProducer(
-            IConfiguration config
+            IConfiguration configuration
         )
         {
-            var kafkaConfig = config.GetSection("KafkaProducer");
-            topic = kafkaConfig.GetSection("Topic").Value ?? throw new ArgumentNullException(nameof(topic));
-            var endpoint = kafkaConfig.GetSection("Endpoint").Value;
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
 
-            producerConfig = new ProducerConfig { BootstrapServers = endpoint };
+            // get configuration from appsettings.json
+            config = configuration.GetKafkaProducerConfig();
         }
 
-        public async Task Publish(object @event)
+        public async Task Publish(IExternalEvent @event)
         {
-            using (var p = new ProducerBuilder<string, string>(producerConfig).Build())
+            using (var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build())
             {
-                await p.ProduceAsync(topic,
+                // publish event to kafka topic taken from config
+                await p.ProduceAsync(config.Topic,
                     new Message<string, string>
                     {
+                        // store event type name in message Key
                         Key = @event.GetType().Name,
+                        // serialize event to message Value
                         Value = JsonConvert.SerializeObject(@event)
                     });
             }

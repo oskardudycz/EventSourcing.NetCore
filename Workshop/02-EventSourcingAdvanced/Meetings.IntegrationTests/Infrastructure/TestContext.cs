@@ -1,17 +1,25 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
-using MeetingsManagement.Api;
+using Core.Events.External;
+using Meetings.IntegrationTests.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EventSourcing.Sample.IntegrationTests.Infrastructure
 {
-    public class TestContext: IDisposable
+    public class TestContext<TStartup>: IDisposable
+        where TStartup : class
     {
-        private TestServer _server;
         public HttpClient Client { get; private set; }
+
+        private TestServer server;
+
+        private readonly DummyExternalEventProducer externalEventProducer = new DummyExternalEventProducer();
 
         public TestContext()
         {
@@ -22,7 +30,7 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
         {
             var projectDir = Directory.GetCurrentDirectory();
 
-            _server = new TestServer(new WebHostBuilder()
+            server = new TestServer(new WebHostBuilder()
                 .UseEnvironment("Tests")
                 .UseContentRoot(projectDir)
                 .UseConfiguration(new ConfigurationBuilder()
@@ -30,14 +38,24 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
                     .AddJsonFile("appsettings.json", true)
                     .Build()
                 )
-                .UseStartup<Startup>());
+                .ConfigureServices(services =>
+                {
+                    services.AddSingleton<IExternalEventProducer>(externalEventProducer);
+                    services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
+                })
+                .UseStartup<TStartup>());
 
-            Client = _server.CreateClient();
+            Client = server.CreateClient();
+        }
+
+        public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>()
+        {
+            return externalEventProducer.PublishedEvents.OfType<TEvent>().ToList();
         }
 
         public void Dispose()
         {
-            _server?.Dispose();
+            server?.Dispose();
             Client?.Dispose();
         }
     }
