@@ -1,10 +1,11 @@
 using MeetingsSearch.Meetings;
+using MeetingsSearch.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MeetingsSearch.Configuration
+namespace MeetingsSearch
 {
-    public static class ModuleConfig
+    public static class Config
     {
         public static void AddMeetingsSearch(this IServiceCollection services, IConfiguration config)
         {

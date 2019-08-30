@@ -1,14 +1,18 @@
 using MeetingsManagement.Meetings;
+using MeetingsManagement.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MeetingsManagement.Configuration
+namespace MeetingsManagement
 {
-    public static class ModuleConfig
+    public static class Config
     {
         public static void AddMeetingsManagement(this IServiceCollection services, IConfiguration config)
         {
-            services.AddMarten(config);
+            services.AddMarten(config, options =>
+            {
+                Meetings.Config.ConfigureMarten(options);
+            });
             services.AddMeeting();
         }
     }
