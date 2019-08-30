@@ -8,7 +8,9 @@ using MeetingsManagement.Meetings.Commands;
 
 namespace MeetingsManagement.Meetings
 {
-    internal class MeetingCommandHandler: ICommandHandler<CreateMeeting>
+    internal class MeetingCommandHandler:
+        ICommandHandler<CreateMeeting>,
+        ICommandHandler<ScheduleMeeting>
     {
         private readonly IRepository<Meeting> repository;
 
@@ -24,6 +26,17 @@ namespace MeetingsManagement.Meetings
             var meeting = Meeting.Create(request.Id, request.Name);
 
             await repository.Add(meeting, cancellationToken);
+
+            return Unit.Value;
+        }
+
+        public async Task<Unit> Handle(ScheduleMeeting request, CancellationToken cancellationToken)
+        {
+            var meeting = await repository.Find(request.MeetingId, cancellationToken);
+
+            meeting.Schedule(request.Occurs);
+
+            await repository.Update(meeting, cancellationToken);
 
             return Unit.Value;
         }

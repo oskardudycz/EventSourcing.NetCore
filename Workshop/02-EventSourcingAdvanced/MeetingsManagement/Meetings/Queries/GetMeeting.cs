@@ -1,10 +1,10 @@
 using System;
 using Core.Queries;
-using MeetingsManagement.Meetings.ValueObjects;
+using MeetingsManagement.Meetings.Views;
 
 namespace MeetingsManagement.Meetings.Queries
 {
-    public class GetMeeting: IQuery<MeetingSummary>
+    public class GetMeeting: IQuery<MeetingView>
     {
         public Guid Id { get; }
 
