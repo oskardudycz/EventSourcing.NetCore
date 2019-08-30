@@ -48,6 +48,8 @@ namespace MeetingsSearch.IntegrationTests.Meetings
             var queryResult = await queryResponse.Content.ReadAsStringAsync();
             queryResult.Should().NotBeNull();
 
+            await Task.Delay(5000);
+
             var meetings = queryResult.FromJson<IReadOnlyCollection<Meeting>>();
             meetings.Should().Contain(meeting =>
                 meeting.Id == fixture.MeetingId

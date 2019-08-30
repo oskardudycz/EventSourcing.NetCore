@@ -9,6 +9,8 @@ namespace MeetingsSearch.Meetings
 {
     internal class MeetingQueryHandler: IQueryHandler<SearchMeetings, IReadOnlyCollection<Meeting>>
     {
+        private const int MaxItemsCount = 1000;
+
         private readonly Nest.IElasticClient elasticClient;
 
         public MeetingQueryHandler(
@@ -21,7 +23,7 @@ namespace MeetingsSearch.Meetings
         public async Task<IReadOnlyCollection<Meeting>> Handle(SearchMeetings query, CancellationToken cancellationToken)
         {
             var response = await elasticClient.SearchAsync<Meeting>(
-                s => s.Query(q => q.QueryString(d => d.Query(query.Filter)))
+                s => s.Query(q => q.QueryString(d => d.Query(query.Filter))).Size(MaxItemsCount)
             );
 
             return response.Documents;

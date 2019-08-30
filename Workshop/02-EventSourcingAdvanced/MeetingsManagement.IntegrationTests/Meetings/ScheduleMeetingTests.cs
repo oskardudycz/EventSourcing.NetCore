@@ -53,6 +53,7 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public async Task ScheduleMeeting_ShouldReturn_CreatedStatus_With_MeetingId()
         {
             var commandResponse = fixture.CommandResponse;
@@ -65,6 +66,7 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public async Task ScheduleMeeting_ShouldUpdateReadModel()
         {
             // prepare query

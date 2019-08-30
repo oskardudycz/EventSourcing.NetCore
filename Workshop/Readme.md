@@ -24,4 +24,3 @@
 * Kafka ide for browsing topics. Available at: http://localhost:8000
 * ElasticSearch
 * Kibana for browsing ElasticSearch - http://localhost:5601
-13. 
