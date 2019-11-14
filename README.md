@@ -112,8 +112,8 @@ See also fully working sample application in [Sample Project](https://github.com
 I prepared self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Workshop/Readme.md).
 
 It's splitted into two parts:
-- **Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics
-- **Event Sourcing advanced topics** - it's a real world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores
+- **Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics. See more in [here](./Workshop/01-EventStoreBasics/).
+- **Event Sourcing advanced topics** - it's a real world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores. See more in [here](./Workshop/02-EventSourcingAdvanced/).
 
 ### 6. Nuget packages to help you get started.
 I gathered and generalized all of practices used in this tutorial/samples in Nuget Packages of maintained by me [GoldenEye Framework](https://github.com/oskardudycz/GoldenEye).
