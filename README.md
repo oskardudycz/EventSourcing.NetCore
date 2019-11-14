@@ -128,11 +128,11 @@ See more in:
 
 The simplest way to start is **installing the [project template](https://github.com/oskardudycz/GoldenEye/tree/master/src/Templates/SimpleDDD/content) by running**
 
-`dotnet new -i GoldenEye.WebApi.Template.SimpleDDD`
+    `dotnet new -i GoldenEye.WebApi.Template.SimpleDDD`
 
 **and then creating new project based on it:**
 
-`dotnet new SimpleDDD -n NameOfYourProject`
+    `dotnet new SimpleDDD -n NameOfYourProject`
 
 
 ### 7. Other resources

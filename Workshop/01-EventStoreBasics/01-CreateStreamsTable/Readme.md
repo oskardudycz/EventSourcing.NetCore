@@ -16,7 +16,11 @@ It's also common to add two other columns:
 See more in Greg Young's "Building an Event Storage" [article](https://cqrs.wordpress.com/documents/building-event-storage/) 
 
 ## Description
-In this exercise you should write the code that will create proper Streams table. To do that you need to open [EventStore class](./EventStore.cs) that has already some boilerplate defined and placeholder in the [CreateStreamTable method](./EventStore.cs#L23).
+In this exercise you should write the code that will create proper Streams table based on the requirements described in the [Overview](#overview) section. You need to go to [EventStore class](./EventStore.cs) - it has already some boilerplate code and structure defined. You need to place your logic of creating table into [CreateStreamTable method](./EventStore.cs#L23).
+
+## Tests
+
+To verify if your code you need to run tests from [Exercise01CreateStreamsTable file](./Exercise01CreateStreamsTable.cs). It contains precreated tests that will turn green when code is written properly.
 
 ## Dapper
 It's suggested to use [Dapper](https://github.com/StackExchange/Dapper/) to perform the database calls. `Dapper` is a simple object mapper for .Net provided by and used in [StackOverlfow](https://stackoverflow.com/). It simplifies the mapping between the raw SQL commands/queries and the objects.
