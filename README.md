@@ -107,8 +107,15 @@ Slides (PL):
 See also fully working sample application in [Sample Project](https://github.com/oskardudycz/EventSourcing.NetCore/tree/master/Sample)
 * See [sample](https://github.com/oskardudycz/EventSourcing.NetCore/tree/master/Sample/EventSourcing.Sample.IntegrationTests/Clients/CreateClientTests.cs) how Entity Framework and Marten can coexist together with CQRS and Event Sourcing
 
+### 5. Self-paced training Kit
 
-### 5. Nuget packages to help you get started.
+I prepared self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Workshop/Readme.md).
+
+It's splitted into two parts:
+- **Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics
+- **Event Sourcing advanced topics** - it's a real world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores
+
+### 6. Nuget packages to help you get started.
 I gathered and generalized all of practices used in this tutorial/samples in Nuget Packages of maintained by me [GoldenEye Framework](https://github.com/oskardudycz/GoldenEye).
 See more in:
   * [GoldenEye DDD package](https://github.com/oskardudycz/GoldenEye/tree/master/src/Core/Backend.Core.DDD) - it provides set of base and bootstrap classes that helps you to reduce boilerplate code and help you focus on writing business code. You can find all classes like Commands/Queries/Event handlers and many more. To use it run:
@@ -128,7 +135,7 @@ The simplest way to start is **installing the [project template](https://github.
 `dotnet new SimpleDDD -n NameOfYourProject`
 
 
-### 6. Other resources
+### 7. Other resources
 
 * [Greg Young - Building an Event Storage](https://cqrs.wordpress.com/documents/building-event-storage/)
 * [Mathias Verraes - DDD and Messaging Architectures](http://verraes.net/2019/05/ddd-msg-arch/)
