@@ -11,7 +11,8 @@
 7. Clone Project https://github.com/oskardudycz/EventSourcing.NetCore, make sure that's compiling
 8. Go to gitter channel https://gitter.im/oskardudycz/szkola-event-sourcing.
 9. Check https://github.com/StackExchange/Dapper/, https://github.com/jbogard/MediatR, http://jasperfx.github.io/marten/documentation/
-10. Docker useful commands
+10. Open `Workshop.sln` solution.
+11. Docker useful commands
 
     - `docker-compose up` - start dockers
     - `docker-compose kill` - to stop running dockers.
@@ -19,18 +20,18 @@
     - `docker ps` - for showing running dockers
     - `docker ps -a` - to show all dockers (also stopped)
 
-11. For the first part of workshop please go to [./01-EventStoreBasics/docker.] and run: `docker-compose up`.
-12. Wait until all dockers got are downloaded and running.
-13. You should automatically get:
+12. For the first part of workshop please go to [./01-EventStoreBasics/docker.] and run: `docker-compose up`.
+13. Wait until all dockers got are downloaded and running.
+14. You should automatically get:
 
     - Postgres DB running
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `admin@pgadmin.org`, Password: `admin`
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
 
-14. Before the second part run `docker-compose kill` kill running docker images.
-15. Then go to [./01-EventStoreBasics/docker.] and run: `docker-compose up`.
-16. You should automatically get (besides `Postgres` and `PGAdmin`):
+15. Before the second part run `docker-compose kill` kill running docker images.
+16. Then go to [./01-EventStoreBasics/docker.] and run: `docker-compose up`.
+17. You should automatically get (besides `Postgres` and `PGAdmin`):
     - Kafka
     - Kafka ide for browsing topics. Available at: http://localhost:8000
     - ElasticSearch
