@@ -30,7 +30,7 @@
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
 
 15. Before the second part run `docker-compose kill` kill running docker images.
-16. Then go to [./01-EventStoreBasics/docker.] and run: `docker-compose up`.
+16. Then go to [./02-EventSourcingAdvanced/docker](./02-EventSourcingAdvanced/docker) and run: `docker-compose up`.
 17. You should automatically get (besides `Postgres` and `PGAdmin`):
     - Kafka
     - Kafka ide for browsing topics. Available at: http://localhost:8000
