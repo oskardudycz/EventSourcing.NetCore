@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master) ![](https://dockerbuildbadges.quelltext.eu/status.svg?organization=oskardudycz&repository=eventsourcing.netcore) [![Financial Contributors on Open Collective](https://opencollective.com/eventsourcingnetcore/all/badge.svg?label=financial+contributors)](https://opencollective.com/eventsourcingnetcore)
+[![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/master?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/master) ![Docker Build Status](https://img.shields.io/docker/build/oskardudycz/eventsourcing.netcore) [![Financial Contributors on Open Collective](https://opencollective.com/eventsourcingnetcore/all/badge.svg?label=financial+contributors)](https://opencollective.com/eventsourcingnetcore)
 
 # EventSourcing.NetCore
 
@@ -121,7 +121,8 @@ I prepared self-paced training Kit for the Event Sourcing. See more in the [Work
 
 It's splitted into two parts:
 
--   **Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics. See more in [here](./Workshop/01-EventStoreBasics/).
+1.  **Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics. See more in [here](./Workshop/01-EventStoreBasics/).
+
 
     1. [Streams Table](./Workshop/01-EventStoreBasics/01-CreateStreamsTable)
     2. [Events Table](./Workshop/01-EventStoreBasics/02-CreateEventsTable)
@@ -135,7 +136,8 @@ It's splitted into two parts:
     10. [Projections](./Workshop/01-EventStoreBasics/09-Projections)
     11. [Projections With Marten](./Workshop/01-EventStoreBasics/10-ProjectionsWithMarten)
 
--   **Event Sourcing advanced topics** - it's a real world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores. See more in [here](./Workshop/02-EventSourcingAdvanced/).
+2.  **Event Sourcing advanced topics** - it's a real world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores. See more in [here](./Workshop/02-EventSourcingAdvanced/).
+
 
     1. [Meetings Management Module](./Workshop/02-EventSourcingAdvanced/MeetingsManagement) - module responsible for creating, updating meetings details. Written in `Marten` in **Event Sourcing** pattern. Provides both write model (with Event Sourced aggregates) and read model with projections.
     2. [Meetings Search Module](./Workshop/02-EventSourcingAdvanced/MeetingsSearch) - responsible for searching and advanced filtering. Uses `ElasticSearch` as a storage (because of it's advanced searching capabilities). It's a read module that's listening for the events published by Meetings Management Module.
