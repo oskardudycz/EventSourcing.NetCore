@@ -24,7 +24,7 @@ Video presentation (PL):
 
 Slides (PL):
 - [WrocNet - Przygody z Event Sourcing i CQRS (2017-02-21)](./Slides.pptx)
-- [SegFault - Blaski i Cienie Event Driven Design (2019-11-25)](./SegFault-Blaski i Cienie.pptx)
+- [SegFault - Blaski i Cienie Event Driven Design (2019-11-25)](./SegFault-Blaski_i_Cienie.pptx)
 
 ## Libraries used
 
