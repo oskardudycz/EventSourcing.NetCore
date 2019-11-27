@@ -22,8 +22,9 @@ Video presentation (PL):
 
 <a href="https://www.youtube.com/watch?feature=player_embedded&v=i1XDr9km0RY" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
 
-Slides (PL):  
-<https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Slides.pptx>
+Slides (PL):
+- [WrocNet - Przygody z Event Sourcing i CQRS (2017-02-21)](./Slides.pptx)
+- [SegFault - Blaski i Cienie Event Driven Design (2019-11-25)](./SegFault-Blaski i Cienie.pptx)
 
 ## Libraries used
 
