@@ -16,7 +16,7 @@ docker-compose up
 
 **More information about using .NET Core, WebApi and Docker you can find in my other tutorial:** [.Net Core With Docker](https://github.com/oskardudycz/NetCoreWithDocker)
 
--   Installing most recent version of the Postgres DB (eg. from: <https://www.postgresql.org/download/>).
+-   Installing a most recent version of the Postgres DB (eg. from <https://www.postgresql.org/download/>).
 
 Video presentation (PL):
 
@@ -37,8 +37,8 @@ Slides (PL):
 ### 1. Event Store - Marten
 
 -   **[Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/General/StoreInitializationTests.cs)**
--   **Event Stream** - is a representation of the entity in event sourcing. It's a set of events that hapened for the entity with the exact id. Stream id should be unique, can have different types but usually is a Guid.
-    -   **[Stream starting](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs)** - stream should be always started with a unique id. Marten provides three ways of starting stream:
+-   **Event Stream** - is a representation of the entity in event sourcing. It's a set of events that happened for the entity with the exact id. Stream id should be unique, can have different types but usually is a Guid.
+    -   **[Stream starting](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs)** - stream should be always started with a unique id. Marten provides three ways of starting the stream:
         -   calling StartStream method with a stream id
             ```csharp
             var streamId = Guid.NewGuid();
@@ -75,11 +75,11 @@ Slides (PL):
             var versionNumber = 3;
             var events = documentSession.Events.FetchStream(streamId, version: versionNumber);
             ```
--   **Event stream aggregation** - events that were stored can be aggregated to form the entity once again. During aggregation process events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first empty entity instance is being created (by calling default constructor). Then events based of the order of apperance (timestamp) are being applied on the entity instance by calling proper Apply methods.
+-   **Event stream aggregation** - events that were stored can be aggregated to form the entity once again. During the aggregation, process events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first, an empty entity instance is being created (by calling default constructor). Then events based on the order of appearance (timestamp) are being applied on the entity instance by calling proper Apply methods.
     -   **[Aggregation general rules](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/AggregationRules.cs)**
-    -   **[Online Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs)** - online aggregation is a process when entity instance is being constructed on the fly from events. Events are taken from the database and then aggregation is being done. The biggest advantage of the online aggregation is that it always gets the most recent business logic. So after the change it's automatically reflected and it's not needed to do any migration or updates.
-    -   **[Inline Aggregation (Snapshot)](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/InlineAggregationStorage.cs)** - inline aggregation happens when we take the snapshot of the entity from the db. In that case it's not needed to get all events. Marten stores the snapshot as a document. This is good for the performance reasons, because only one record is being materialized. The con of using inline aggregation is that after business logic has changed records need to be reaggregated.
-    -   **[Reaggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/Reaggregation.cs)** - one of the biggest advantage of the event sourcing is flexibility to business logic updates. It's not needed to perform complex migration. For online aggregation it's not needed to perform reaggregation - it's being made always automatically. Inline aggregation needs to be reaggregated. It can be done by performing online aggregation on all stream events and storing the result as a snapshot.
+    -   **[Online Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs)** - online aggregation is a process when entity instance is being constructed on the fly from events. Events are taken from the database and then aggregation is being done. The biggest advantage of online aggregation is that it always gets the most recent business logic. So after the change, it's automatically reflected and it's not needed to do any migration or updates.
+    -   **[Inline Aggregation (Snapshot)](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/InlineAggregationStorage.cs)** - inline aggregation happens when we take the snapshot of the entity from the DB. In that case, it's not needed to get all events. Marten stores the snapshot as a document. This is good for performance reasons because only one record is being materialized. The con of using inline aggregation is that after business logic has changed records need to be reaggregated.
+    -   **[Reaggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/EventStore/Aggregate/Reaggregation.cs)** - one of the biggest advantages of the event sourcing is flexibility to business logic updates. It's not needed to perform complex migration. For online aggregation it's not needed to perform reaggregation - it's being made always automatically. The inline aggregation needs to be reaggregated. It can be done by performing online aggregation on all stream events and storing the result as a snapshot.
         -   reaggregation of inline snapshot with Marten
             ```csharp
             var onlineAggregation = documentSession.Events.AggregateStream<TEntity>(streamId);
@@ -94,14 +94,14 @@ Slides (PL):
 
 ### 2. Message Bus (for processing Commands, Queries, Events) - MediatR
 
--   **[Initialization](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Initialization/Initialization.cs)** - MediatR uses services locator pattern to find proper handler for message type.
--   **Sending Messages** - finds and uses first registered handler for the message type. It could be used for queries (when we need to return values), commands (when we performing an action).
+-   **[Initialization](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Initialization/Initialization.cs)** - MediatR uses services locator pattern to find a proper handler for the message type.
+-   **Sending Messages** - finds and uses the first registered handler for the message type. It could be used for queries (when we need to return values), commands (when we acting).
     -   **[No Handlers](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/NoHandlers.cs)** - when MediatR doesn't find proper handler it throws an exception.
-    -   **[Single Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/SingleHandler.cs)** - by implementing implementing IRequestHandler we're making decision that this handler should be run asynchronously with other async handlers (so we don't wait for the previous handler to finish its work).
+    -   **[Single Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/SingleHandler.cs)** - by implementing IRequestHandler we're deciding that this handler should be run asynchronously with other async handlers (so we don't wait for the previous handler to finish its work).
     -   **[More Than One Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Sending/MoreThanOneHandler.cs)** - when there is more than one handler registered MediatR takes only one ignoring others when Send method is being called.
 -   **Publishing Messages** - finds and uses all registered handlers for the message type. It's good for processing events.
     -   **[No Handlers](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/NoHandlers.cs)** - when MediatR doesn't find proper handler it throws an exception
-    -   **[Single Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/SingleHandler.cs)** - by implementing implementing INotificationHandler we're making decision that this handler should be run asynchronously with other async handlers (so we don't wait for the previous handler to finish its work)
+    -   **[Single Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/SingleHandler.cs)** - by implementing INotificationHandler we're deciding that this handler should be run asynchronously with other async handlers (so we don't wait for the previous handler to finish its work)
     -   **[More Than One Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/MediatR.Tests/Publishing/MoreThanOneHandler.cs)** - when there is more than one handler registered MediatR takes only all of them when calling Publish method
 -   Pipeline (to be defined)
 
@@ -118,11 +118,11 @@ See also fully working sample application in [Sample Project](https://github.com
 
 ### 5. Self-paced training Kit
 
-I prepared self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Workshop/Readme.md).
+I prepared the self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Workshop/Readme.md).
 
-It's splitted into two parts:
+It's split into two parts:
 
-**Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics. See more in [here](./Workshop/01-EventStoreBasics/).
+**Event Sourcing basics** - it teaches the event store basics by showing how to build your Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projections, snapshots, and finishes with the `Marten` basics. See more in [here](./Workshop/01-EventStoreBasics/).
 
 1. [Streams Table](./Workshop/01-EventStoreBasics/01-CreateStreamsTable)
 2. [Events Table](./Workshop/01-EventStoreBasics/02-CreateEventsTable)
@@ -136,17 +136,17 @@ It's splitted into two parts:
 10. [Projections](./Workshop/01-EventStoreBasics/09-Projections)
 11. [Projections With Marten](./Workshop/01-EventStoreBasics/10-ProjectionsWithMarten)
 
-**Event Sourcing advanced topics** - it's a real world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores. See more in [here](./Workshop/02-EventSourcingAdvanced/).
+**Event Sourcing advanced topics** - it's a real-world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores. See more in [here](./Workshop/02-EventSourcingAdvanced/).
 
-1. [Meetings Management Module](./Workshop/02-EventSourcingAdvanced/MeetingsManagement) - module responsible for creating, updating meetings details. Written in `Marten` in **Event Sourcing** pattern. Provides both write model (with Event Sourced aggregates) and read model with projections.
-2. [Meetings Search Module](./Workshop/02-EventSourcingAdvanced/MeetingsSearch) - responsible for searching and advanced filtering. Uses `ElasticSearch` as a storage (because of it's advanced searching capabilities). It's a read module that's listening for the events published by Meetings Management Module.
+1. [Meetings Management Module](./Workshop/02-EventSourcingAdvanced/MeetingsManagement) - the module responsible for creating, updating meeting details. Written in `Marten` in **Event Sourcing** pattern. Provides both write model (with Event Sourced aggregates) and read model with projections.
+2. [Meetings Search Module](./Workshop/02-EventSourcingAdvanced/MeetingsSearch) - responsible for searching and advanced filtering. Uses `ElasticSearch` as storage (because of its advanced searching capabilities). It's a read module that's listening for the events published by the Meetings Management Module.
 
-### 6. Nuget packages to help you get started.
+### 6. NuGet packages to help you get started.
 
-I gathered and generalized all of practices used in this tutorial/samples in Nuget Packages of maintained by me [GoldenEye Framework](https://github.com/oskardudycz/GoldenEye).
+I gathered and generalized all of the practices used in this tutorial/samples in Nuget Packages maintained by me [GoldenEye Framework](https://github.com/oskardudycz/GoldenEye).
 See more in:
 
--   [GoldenEye DDD package](https://github.com/oskardudycz/GoldenEye/tree/master/src/Core/Backend.Core.DDD) - it provides set of base and bootstrap classes that helps you to reduce boilerplate code and help you focus on writing business code. You can find all classes like Commands/Queries/Event handlers and many more. To use it run:
+-   [GoldenEye DDD package](https://github.com/oskardudycz/GoldenEye/tree/master/src/Core/Backend.Core.DDD) - it provides a set of base and bootstrap classes that helps you to reduce boilerplate code and help you focus on writing business code. You can find all classes like Commands/Queries/Event handlers and many more. To use it run:
 
     `dotnet add package GoldenEye.Backend.Core.DDD`
 
@@ -158,7 +158,7 @@ The simplest way to start is **installing the [project template](https://github.
 
 `dotnet new -i GoldenEye.WebApi.Template.SimpleDDD`
 
-**and then creating new project based on it:**
+**and then creating a new project based on it:**
 
 `dotnet new SimpleDDD -n NameOfYourProject`
 
@@ -178,8 +178,8 @@ The simplest way to start is **installing the [project template](https://github.
 -   [Thomas Pierrain - As Time Goes By… (a Bi-temporal Event Sourcing story)](https://www.youtube.com/watch?v=xzekp1RuZbM)
 -   [Julie Lerman - Data Points - CQRS and EF Data Models](https://msdn.microsoft.com/en-us/magazine/mt788619.aspx)
 -   [Vaughn Vernon - Reactive DDD: Modeling Uncertainty](https://www.infoq.com/presentations/reactive-ddd-distributed-systems)
--   [Mark Seemann - CQS versus server generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
--   [Udi Dahan - If (domain logic) then CQRS, or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
+-   [Mark Seemann - CQS versus server-generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
+-   [Udi Dahan - If (domain logic) then CQRS or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
 -   [Event Store - The open-source, functional database with Complex Event Processing in JavaScript](https://eventstore.org/)
 -   [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont’s](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
 -   [David Boike - Putting your events on a diet](https://particular.net/blog/putting-your-events-on-a-diet)
@@ -191,7 +191,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   [Michiel Overeem, Marten Spoor, Slinger Jansen - The dark side of event sourcing: Managing data conversion](https://www.researchgate.net/publication/315637858_The_dark_side_of_event_sourcing_Managing_data_conversion)
 -   [Jakub Pilimon - DDD by Examples](https://github.com/ddd-by-examples/library)
 -   [Michiel Overeem - Event Sourcing after launch](https://www.youtube.com/watch?v=JzWJI8kW2kc)
--   [Jimmy Bogard - Domain Driven Design: The Good Parts](https://www.youtube.com/watch?v=U6CeaA-Phqo)
+-   [Jimmy Bogard - Domain-Driven Design: The Good Parts](https://www.youtube.com/watch?v=U6CeaA-Phqo)
 -   [Jimmy Bogard - CQRS and REST: the perfect match](https://lostechies.com/jimmybogard/2016/06/01/cqrs-and-rest-the-perfect-match/)
 -   [Microsoft - Domain events: design and implementation](https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-events-design-implementation)
 -   [Event Modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
@@ -199,7 +199,7 @@ The simplest way to start is **installing the [project template](https://github.
 
 ## I found an issue or I have a change request
 
-Feel free to create an issue on GitHub. Contributions, pull requests are more than welcome!
+Feel free to create an issue on GitHub. Contributions pull requests are more than welcome!
 
 ## Contributors
 
