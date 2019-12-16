@@ -102,7 +102,7 @@ namespace EventStoreBasics
                     3. Update stream version with expected_stream_version + 1
                     -- TODO
 
-                    RETURNS TRUE;
+                    RETURN TRUE;
                 END;
                 $$;";
             databaseConnection.Execute(AppendEventFunctionSQL);
