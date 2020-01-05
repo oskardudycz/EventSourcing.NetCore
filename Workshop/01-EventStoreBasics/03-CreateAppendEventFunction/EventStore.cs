@@ -93,13 +93,13 @@ namespace EventStoreBasics
                 AS $$
                 BEGIN
 
-                    1. Insert into stream table if there is no stream with provided streamId
+                    -- 1. Insert into stream table if there is no stream with provided streamId
                     -- TODO
 
-                    2. Insert new row into events table with version equal to expected_stream_version + 1
+                    -- 2. Insert new row into events table with version equal to expected_stream_version + 1
                     -- TODO
 
-                    3. Update stream version with expected_stream_version + 1
+                    -- 3. Update stream version with expected_stream_version + 1
                     -- TODO
 
                     RETURN TRUE;
