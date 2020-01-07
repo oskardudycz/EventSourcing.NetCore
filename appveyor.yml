@@ -1,12 +1,11 @@
 version: 1.0.{build}
 image: Visual Studio 2019
+services: postgresql
 before_build:
 - cmd: dotnet restore
 build:
   project: EventSourcing.NetCore.sln
   verbosity: minimal
-services:
-  - postgresql95
 test:
   categories:
     except: 
