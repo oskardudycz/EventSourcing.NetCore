@@ -19,7 +19,7 @@ namespace MeetingsManagement.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc().AddNewtonsoftJson();
 
             services.AddSwaggerGen(c =>
             {
