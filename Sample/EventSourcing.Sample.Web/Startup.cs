@@ -136,7 +136,8 @@ namespace EventSourcing.Web.Sample
         }
 
         public void Configure(IApplicationBuilder app)
-        {
+        {            
+            app.UseRouting();
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });
