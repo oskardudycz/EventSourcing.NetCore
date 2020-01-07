@@ -34,6 +34,7 @@
         <PackageReference Include="MediatR" Version="8.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc5" />
         <PackageReference Include="System.Data.Common" Version="4.3.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
     </ItemGroup>
 
     <ItemGroup>
