@@ -27,7 +27,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 
 namespace EventSourcing.Web.Sample
 {
@@ -53,7 +53,7 @@ namespace EventSourcing.Web.Sample
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Event Sourcing Example", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Event Sourcing Example", Version = "v1" });
             });
 
             services.AddTransient<IAccountNumberGenerator, RandomAccountNumberGenerator>();
