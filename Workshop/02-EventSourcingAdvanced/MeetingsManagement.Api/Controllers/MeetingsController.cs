@@ -37,7 +37,7 @@ namespace MeetingsManagement.Api.Controllers
         }
 
         [HttpPost("{id}/schedule")]
-        public async Task<IActionResult> Post(Guid id, [FromBody]Range occurs)
+        public async Task<IActionResult> Post(Guid id, [FromBody]DateRange occurs)
         {
             var command = new ScheduleMeeting(id, occurs);
             await _commandBus.Send(command);

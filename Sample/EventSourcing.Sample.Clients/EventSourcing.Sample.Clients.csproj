@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <AssemblyName>EventSourcing.Sample.Clients</AssemblyName>
         <PackageId>EventSourcing.Sample.Clients</PackageId>
     </PropertyGroup>
@@ -12,15 +12,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="5.9.0" />
-        <PackageReference Include="Marten" Version="3.7.0" />
-        <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.6">
+        <PackageReference Include="FluentAssertions" Version="5.10.0" />
+        <PackageReference Include="Marten" Version="3.10.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.0" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
     </ItemGroup>
 </Project>

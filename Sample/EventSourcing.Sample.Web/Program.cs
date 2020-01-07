@@ -1,5 +1,6 @@
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace EventSourcing.Web.Sample
 {
@@ -12,6 +13,12 @@ namespace EventSourcing.Web.Sample
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                    logging.AddDebug();
+                })
                 .Build();
 
             host.Run();

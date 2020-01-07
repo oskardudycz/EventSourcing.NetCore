@@ -7,20 +7,20 @@ namespace MeetingsManagement.Meetings.Events
     public class MeetingScheduled: IEvent
     {
         public Guid MeetingId { get; }
-        public Range Occurs { get; }
+        public DateRange Occurs { get; }
 
-        public MeetingScheduled(Guid meetingId, Range occurs)
+        public MeetingScheduled(Guid meetingId, DateRange occurs)
         {
             MeetingId = meetingId;
             Occurs = occurs;
         }
 
-        public static MeetingScheduled Create(Guid meetingId, Range occurs)
+        public static MeetingScheduled Create(Guid meetingId, DateRange occurs)
         {
             if (meetingId == default(Guid))
                 throw new ArgumentException($"{nameof(meetingId)} needs to be defined.");
 
-            if (occurs == default(Range))
+            if (occurs == default(DateRange))
                 throw new ArgumentException($"{nameof(occurs)} needs to be defined.");
 
             return new MeetingScheduled(meetingId, occurs);

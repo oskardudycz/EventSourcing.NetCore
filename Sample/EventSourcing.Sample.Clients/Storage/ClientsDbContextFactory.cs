@@ -26,7 +26,7 @@ namespace EventSourcing.Sample.Clients.Storage
                     .SetBasePath(AppContext.BaseDirectory)
                     .AddJsonFile("appsettings.json")
                     .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: false)
-                    .AddEnvironmentVariables()
+                    //.AddEnvironmentVariables()
                     .Build()
                     .GetConnectionString("ClientsDatabase");
 

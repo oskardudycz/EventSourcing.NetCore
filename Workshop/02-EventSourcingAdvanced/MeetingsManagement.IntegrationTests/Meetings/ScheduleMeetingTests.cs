@@ -36,7 +36,7 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
             // send create command
             await Client.PostAsync(ApiUrl, createCommand.ToJsonStringContent());
 
-            var occurs = Range.Create(Start, End);
+            var occurs = DateRange.Create(Start, End);
 
             // send schedule meeting request
             CommandResponse = await Client.PostAsync($"{MeetingsManagementApi.MeetingsUrl}/{MeetingId}/schedule", occurs.ToJsonStringContent());
