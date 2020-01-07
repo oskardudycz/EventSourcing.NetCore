@@ -3,7 +3,6 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <AssemblyName>EventSourcing.Sample.Web</AssemblyName>
-        <PackageId>EventSourcing.Sample.Web</PackageId>
     </PropertyGroup>
 
     <ItemGroup>

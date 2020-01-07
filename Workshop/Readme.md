@@ -3,8 +3,8 @@
 ## Prerequisities
 
 1. Install git - https://git-scm.com/downloads.
-2. Install .NET Core 2.2 - https://dotnet.microsoft.com/download/thank-you/dotnet-sdk-2.2.108-windows-x64-installer.
-3. Install Visual Studio (suggested 2017) or Rider.
+2. Install .NET Core 3.1 - https://dotnet.microsoft.com/download/dotnet-core/thank-you/sdk-3.1.100-windows-x64-installer.
+3. Install Visual Studio 2019, Rider or VSCodedock.
 4. Install docker - https://docs.docker.com/docker-for-windows/install/.
 5. Make sure that you have ~10GB disk space.
 6. Create Github Account
