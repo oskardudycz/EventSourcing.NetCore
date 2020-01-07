@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
@@ -9,15 +9,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="NEST" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="System">
-        <HintPath>System</HintPath>
-      </Reference>
+        <PackageReference Include="NEST" Version="7.5.1" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
     </ItemGroup>
 
     <ItemGroup>

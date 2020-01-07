@@ -11,7 +11,7 @@ namespace MeetingsManagement.Meetings
 
         public DateTime Created { get; private set; }
 
-        public Range Occurs { get; private set; }
+        public DateRange Occurs { get; private set; }
 
         public Meeting()
         {
@@ -43,7 +43,7 @@ namespace MeetingsManagement.Meetings
             Created = @event.Created;
         }
 
-        internal void Schedule(Range occurs)
+        internal void Schedule(DateRange occurs)
         {
             var @event = MeetingScheduled.Create(Id, occurs);
 

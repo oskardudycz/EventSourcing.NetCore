@@ -7,9 +7,9 @@ namespace MeetingsManagement.Meetings.Commands
     public class ScheduleMeeting: ICommand
     {
         public Guid MeetingId { get; }
-        public Range Occurs { get; }
+        public DateRange Occurs { get; }
 
-        public ScheduleMeeting(Guid meetingId, Range occurs)
+        public ScheduleMeeting(Guid meetingId, DateRange occurs)
         {
             MeetingId = meetingId;
             Occurs = occurs;
