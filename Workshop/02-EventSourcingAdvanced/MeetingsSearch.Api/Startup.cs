@@ -37,7 +37,7 @@ namespace MeetingsSearch
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseRouting();
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
@@ -50,6 +50,7 @@ namespace MeetingsSearch
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meeting Management V1");
+                c.RoutePrefix = string.Empty;
             });
         }
     }

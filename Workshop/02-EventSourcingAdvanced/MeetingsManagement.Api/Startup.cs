@@ -20,6 +20,7 @@ namespace MeetingsManagement.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().AddNewtonsoftJson();
+            services.AddControllers();
 
             services.AddSwaggerGen(c =>
             {
@@ -37,7 +38,7 @@ namespace MeetingsManagement.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseRouting();
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
@@ -50,6 +51,7 @@ namespace MeetingsManagement.Api
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meeting Management V1");
+                c.RoutePrefix = string.Empty;
             });
         }
     }
