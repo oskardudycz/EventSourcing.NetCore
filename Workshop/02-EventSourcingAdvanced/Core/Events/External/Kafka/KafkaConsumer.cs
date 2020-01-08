@@ -64,6 +64,8 @@ namespace Core.Events.External.Kafka
         {
             try
             {
+                //lol ^_^ - remove this hack when this GH issue is solved: https://github.com/dotnet/extensions/issues/2149#issuecomment-518709751
+                await Task.Yield();
                 // wait for the upcoming message, consume it when arrives
                 var message = consumer.Consume(cancellationToken);
 

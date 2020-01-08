@@ -25,6 +25,7 @@ namespace Core.Events.External.Kafka
         {
             using (var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build())
             {
+                await Task.Yield();
                 // publish event to kafka topic taken from config
                 await p.ProduceAsync(config.Topic,
                     new Message<string, string>
