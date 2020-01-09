@@ -41,35 +41,41 @@ services:
     #  Zookeeper
     #######################################################
     zookeeper:
-        image: debezium/zookeeper
-        container_name: zookeeper
+        image: confluentinc/cp-zookeeper:5.3.2
         hostname: zookeeper
-        ports: ["2181:2181", "2888:2888", "3888:3888"]
-        networks:
-            - kafka_network
+        container_name: zookeeper
+        ports:
+          - "2181:2181"
+        environment:
+          ZOOKEEPER_CLIENT_PORT: 2181
+          ZOOKEEPER_TICK_TIME: 2000
 
     #######################################################
     #  Kafka
     #######################################################
     kafka:
-        image: debezium/kafka
-        container_name: kafka
+        image: confluentinc/cp-kafka:5.3.2
         hostname: kafka
-        ports: ["9092:9092"]
+        container_name: kafka
         depends_on:
-            - zookeeper
-        networks:
-            - kafka_network
-        environment:
-            ZOOKEEPER_CONNECT: zookeeper:2181
-            ADVERTISED_HOST_NAME: kafka
-            KAFKA_ADVERTISED_HOSTNAME: 127.0.0.1
+          - zookeeper
+        ports:
+          - "9092:9092"
+        environment:    
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+          ADVERTISED_HOST_NAME: kafka
+          KAFKA_ADVERTISED_HOSTNAME: 127.0.0.1
 
     #######################################################
     #  Avro Schema Registry
     #######################################################
     schema_registry:
-        image: confluentinc/cp-schema-registry
+        image: confluentinc/cp-schema-registry:5.3.2
         container_name: schema_registry
         hostname: schema_registry
         ports:
@@ -88,7 +94,7 @@ services:
           SCHEMA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
 
     kafka_rest:
-        image: confluentinc/cp-kafka-rest:4.1.1
+        image: confluentinc/cp-kafka-rest:5.3.2
         hostname: kafka_rest
         ports:
             - "8082:8082"
