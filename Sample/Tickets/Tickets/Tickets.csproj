@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Concerts\Commands" />
+      <Folder Include="Concerts\Events" />
+      <Folder Include="Concerts\Queries" />
+      <Folder Include="Reservations\Commands" />
+      <Folder Include="Reservations\Events" />
+      <Folder Include="Reservations\Queries" />
+      <Folder Include="Seats\Commands" />
+      <Folder Include="Seats\Events" />
+      <Folder Include="Seats\Queries" />
+      <Folder Include="Tickets\Commands" />
+      <Folder Include="Tickets\Events" />
+      <Folder Include="Tickets\Queries" />
+    </ItemGroup>
+
+</Project>
