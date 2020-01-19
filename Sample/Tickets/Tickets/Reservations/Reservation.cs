@@ -16,27 +16,40 @@ namespace Tickets.Reservations
 
         private Reservation() { }
 
-        private Reservation(IAggregateIdGenerator<Reservation> idGenerator, Guid seatId, string number)
+        private Reservation(
+            IAggregateIdGenerator<Reservation> idGenerator,
+            IReservationNumberGenerator numberGenerator,
+            Guid seatId)
         {
             Guard.Against.Null(idGenerator, nameof(idGenerator));
+            Guard.Against.Null(numberGenerator, nameof(numberGenerator));
             Guard.Against.Default(seatId, nameof(seatId));
-            Guard.Against.NullOrWhiteSpace(number, nameof(number));
 
             var id = idGenerator.New();
+            var reservationNumber = numberGenerator.Next();
+
+            Guard.Against.Default(id, nameof(id));
+            Guard.Against.NullOrWhiteSpace(reservationNumber, nameof(reservationNumber));
 
             var @event = TentativeReservationCreated.Create(
                 id,
                 seatId,
-                number
+                reservationNumber
             );
 
             Enqueue(@event);
             Apply(@event);
         }
 
-        public static Reservation CreateTentative(IAggregateIdGenerator<Reservation> idGenerator, Guid seatId, string number)
+        public static Reservation CreateTentative(
+            IAggregateIdGenerator<Reservation> idGenerator,
+            IReservationNumberGenerator numberGenerator,
+            Guid seatId)
         {
-            return new Reservation(idGenerator, seatId, number);
+            return new Reservation(
+                idGenerator,
+                numberGenerator,
+                seatId);
         }
 
         private void Apply(TentativeReservationCreated @event)
@@ -86,7 +99,7 @@ namespace Tickets.Reservations
 
         public void Cancel()
         {
-            if(Status == ReservationStatus.Tentative)
+            if(Status != ReservationStatus.Tentative)
                 throw new InvalidOperationException($"Only tentative reservation can be cancelled (current status: {Status}.");
 
             var @event = ReservationCancelled.Create(Id);

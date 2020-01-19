@@ -2,6 +2,7 @@ using System;
 using Core.Aggregates;
 using Tickets.Reservations;
 using Tickets.Tests.Stubs.Ids;
+using Tickets.Tests.Stubs.Reservations;
 
 namespace Tickets.Tests.Builders
 {
@@ -12,14 +13,14 @@ namespace Tickets.Tests.Builders
         public ReservationBuilder Tentative()
         {
             var idGenerator = new FakeAggregateIdGenerator<Reservation>();
+            var numberGenerator = new FakeReservationNumberGenerator();
             var seatId = Guid.NewGuid();
-            const string number = "abcd/123";
 
             // When
             var reservation = Reservation.CreateTentative(
                 idGenerator,
-                seatId,
-                number
+                numberGenerator,
+                seatId
             );
 
             build = () => reservation;
