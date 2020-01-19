@@ -1,5 +1,4 @@
 using System;
-using System.Reflection.Metadata;
 using Dapper;
 using EventStoreBasics.Tests.Tools;
 using FluentAssertions;

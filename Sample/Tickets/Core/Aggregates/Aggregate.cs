@@ -27,7 +27,6 @@ namespace Core.Aggregates
 
         protected void Enqueue(IEvent @event)
         {
-            Version++;
             uncommittedEvents.Add(@event);
         }
     }
