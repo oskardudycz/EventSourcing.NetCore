@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Npgsql;
