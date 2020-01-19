@@ -8,7 +8,6 @@
       <Folder Include="Concerts\Commands" />
       <Folder Include="Concerts\Events" />
       <Folder Include="Concerts\Queries" />
-      <Folder Include="Reservations\Commands" />
       <Folder Include="Reservations\Queries" />
       <Folder Include="Seats\Commands" />
       <Folder Include="Seats\Events" />
