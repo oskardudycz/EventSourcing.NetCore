@@ -1,7 +1,6 @@
 using System;
 using Ardalis.GuardClauses;
 using Core.Aggregates;
-using Core.Ids;
 using Tickets.Reservations.Events;
 
 namespace Tickets.Reservations
@@ -14,18 +13,18 @@ namespace Tickets.Reservations
 
         public ReservationStatus Status { get; private set; }
 
-        private Reservation() { }
+        // For serialization
+        public Reservation() { }
 
         private Reservation(
-            IAggregateIdGenerator<Reservation> idGenerator,
+            Guid id,
             IReservationNumberGenerator numberGenerator,
             Guid seatId)
         {
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
+            Guard.Against.Null(id, nameof(id));
             Guard.Against.Null(numberGenerator, nameof(numberGenerator));
             Guard.Against.Default(seatId, nameof(seatId));
 
-            var id = idGenerator.New();
             var reservationNumber = numberGenerator.Next();
 
             Guard.Against.Default(id, nameof(id));
@@ -42,12 +41,12 @@ namespace Tickets.Reservations
         }
 
         public static Reservation CreateTentative(
-            IAggregateIdGenerator<Reservation> idGenerator,
+            Guid id,
             IReservationNumberGenerator numberGenerator,
             Guid seatId)
         {
             return new Reservation(
-                idGenerator,
+                id,
                 numberGenerator,
                 seatId);
         }

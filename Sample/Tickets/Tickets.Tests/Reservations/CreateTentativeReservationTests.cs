@@ -16,29 +16,28 @@ namespace Tickets.Tests.Reservations
         public void ForValidParams_ShouldCreateReservationWithTentativeStatus()
         {
             // Given
-            var idGenerator = new FakeAggregateIdGenerator<Reservation>();
+            var reservationId = Guid.NewGuid();
             var numberGenerator = new FakeReservationNumberGenerator();
             var seatId = Guid.NewGuid();
 
             // When
             var reservation = Reservation.CreateTentative(
-                idGenerator,
+                reservationId,
                 numberGenerator,
                 seatId
             );
 
             // Then
-            idGenerator.LastGeneratedId.Should().NotBeNull();
             numberGenerator.LastGeneratedNumber.Should().NotBeNull();
 
             reservation
                 .IsTentativeReservationWith(
-                    idGenerator.LastGeneratedId.Value,
+                    reservationId,
                     numberGenerator.LastGeneratedNumber,
                     seatId
                 )
                 .HasTentativeReservationCreatedEventWith(
-                    idGenerator.LastGeneratedId.Value,
+                    reservationId,
                     numberGenerator.LastGeneratedNumber,
                     seatId
                 );

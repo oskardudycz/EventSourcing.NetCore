@@ -12,13 +12,13 @@ namespace Tickets.Tests.Builders
 
         public ReservationBuilder Tentative()
         {
-            var idGenerator = new FakeAggregateIdGenerator<Reservation>();
+            var reservationId = Guid.NewGuid();
             var numberGenerator = new FakeReservationNumberGenerator();
             var seatId = Guid.NewGuid();
 
             // When
             var reservation = Reservation.CreateTentative(
-                idGenerator,
+                reservationId,
                 numberGenerator,
                 seatId
             );

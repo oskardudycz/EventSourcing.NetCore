@@ -2,27 +2,33 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ardalis.GuardClauses;
 using Core.Aggregates;
-using Core.Events;
-using Core.Storage;
 using Marten;
+using Core.Events;
 
 namespace Core.Storage
 {
     public class MartenRepository<T>: IRepository<T> where T : class, IAggregate, new()
     {
         private readonly IDocumentSession documentSession;
+        private readonly IEventBus eventBus;
 
         public MartenRepository(
-            IDocumentSession documentSession
+            IDocumentSession documentSession,
+            IEventBus eventBus
         )
         {
-            this.documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
+            Guard.Against.Null(documentSession, nameof(documentSession));
+            Guard.Against.Null(eventBus, nameof(eventBus));
+
+            this.documentSession = documentSession;
+            this.eventBus = eventBus;
         }
 
         public Task<T> Find(Guid id, CancellationToken cancellationToken)
         {
-            return documentSession.Events.AggregateStreamAsync<T>(id);
+            return documentSession.Events.AggregateStreamAsync<T>(id, token:cancellationToken);
         }
 
         public Task Add(T aggregate, CancellationToken cancellationToken)
@@ -42,12 +48,13 @@ namespace Core.Storage
 
         private async Task Store(T aggregate, CancellationToken cancellationToken)
         {
-            var events = aggregate.DequeueUncommittedEvents();
+            var events = aggregate.DequeueUncommittedEvents().ToArray();
             documentSession.Events.Append(
                 aggregate.Id,
-                events.ToArray()
+                events
             );
             await documentSession.SaveChangesAsync(cancellationToken);
+            await eventBus.Publish(events);
         }
     }
 }

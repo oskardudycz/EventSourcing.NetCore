@@ -10,7 +10,7 @@ namespace Tickets.Reservations.Events
         public Guid SeatId { get; }
         public string Number { get; }
 
-        public TentativeReservationCreated(Guid reservationId, Guid seatId, string number)
+        private TentativeReservationCreated(Guid reservationId, Guid seatId, string number)
         {
             ReservationId = reservationId;
             SeatId = seatId;
