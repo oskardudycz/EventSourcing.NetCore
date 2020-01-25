@@ -9,7 +9,7 @@ namespace Tickets.Reservations.Events
         public Guid ReservationId { get; }
         public Guid SeatId { get; }
 
-        public ReservationSeatChanged(Guid reservationId, Guid seatId)
+        private ReservationSeatChanged(Guid reservationId, Guid seatId)
         {
             ReservationId = reservationId;
             SeatId = seatId;

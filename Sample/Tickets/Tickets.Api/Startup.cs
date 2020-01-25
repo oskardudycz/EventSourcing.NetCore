@@ -1,3 +1,4 @@
+using Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +27,9 @@ namespace Tickets.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tickets", Version = "v1" });
             });
+
+            services.AddCoreServices();
+            services.AddTicketsModule(config);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -34,8 +38,6 @@ namespace Tickets.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseHttpsRedirection();
 
             app.UseRouting();
 

@@ -3,7 +3,7 @@ using Core.Aggregates;
 
 namespace Core.Ids
 {
-    public interface IAggregateIdGenerator<T> where T : IAggregate
+    public interface IIdGenerator
     {
         Guid New();
     }

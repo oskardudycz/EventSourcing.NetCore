@@ -1,7 +1,7 @@
 namespace Tickets.Reservations
 {
-    public class ReservationQueryHandler
+    internal class ReservationQueryHandler
     {
-        
+
     }
 }

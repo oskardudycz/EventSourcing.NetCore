@@ -2,12 +2,12 @@ using System;
 
 namespace Tickets.Reservations
 {
-    public interface IReservationNumberGenerator
+    internal interface IReservationNumberGenerator
     {
         string Next();
     }
 
-    public class ReservationNumberGenerator: IReservationNumberGenerator
+    internal class ReservationNumberGenerator: IReservationNumberGenerator
     {
         public string Next() => Guid.NewGuid().ToString();
     }
