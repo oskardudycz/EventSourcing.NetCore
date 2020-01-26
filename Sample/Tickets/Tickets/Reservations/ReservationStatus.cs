@@ -1,6 +1,6 @@
 namespace Tickets.Reservations
 {
-    internal enum ReservationStatus
+    public enum ReservationStatus
     {
         Tentative,
         Confirmed,

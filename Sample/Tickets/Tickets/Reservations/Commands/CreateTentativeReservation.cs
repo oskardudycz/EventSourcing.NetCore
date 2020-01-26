@@ -1,4 +1,5 @@
 using System;
+using Ardalis.GuardClauses;
 using Core.Commands;
 
 namespace Tickets.Reservations.Commands
@@ -16,6 +17,9 @@ namespace Tickets.Reservations.Commands
 
         public static CreateTentativeReservation Create(Guid reservationId, Guid seatId)
         {
+            Guard.Against.Default(reservationId, nameof(reservationId));
+            Guard.Against.Default(seatId, nameof(seatId));
+
             return new CreateTentativeReservation(reservationId, seatId);
         }
     }

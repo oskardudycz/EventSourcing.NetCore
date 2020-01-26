@@ -23,6 +23,13 @@ namespace Core.Testing
 
         public virtual Task DisposeAsync() => Task.CompletedTask;
 
+        public Task<HttpResponseMessage> GetAsync(string path = "")
+        {
+            return Client.GetAsync(
+                $"{ApiUrl}/{path}"
+            );
+        }
+
         protected Task<HttpResponseMessage> PostAsync(object request)
         {
             return Client.PostAsync(

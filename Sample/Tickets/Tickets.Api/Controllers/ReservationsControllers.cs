@@ -3,9 +3,14 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Ids;
+using Core.Queries;
+using Marten.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Tickets.Api.Requests;
+using Tickets.Api.Responses;
 using Tickets.Reservations.Commands;
+using Tickets.Reservations.Projections;
+using Tickets.Reservations.Queries;
 
 namespace Tickets.Api.Controllers
 {
@@ -13,19 +18,45 @@ namespace Tickets.Api.Controllers
     public class ReservationsController: Controller
     {
         private readonly ICommandBus commandBus;
+        private readonly IQueryBus queryBus;
 
         private readonly IIdGenerator idGenerator;
-        // private readonly IQueryBus _queryBus;
 
         public ReservationsController(
             ICommandBus commandBus,
-            IIdGenerator idGenerator) //, IQueryBus queryBus)
+            IQueryBus queryBus,
+            IIdGenerator idGenerator)
         {
             Guard.Against.Null(commandBus, nameof(commandBus));
+            Guard.Against.Null(queryBus, nameof(queryBus));
             Guard.Against.Null(idGenerator, nameof(idGenerator));
+
             this.commandBus = commandBus;
+            this.queryBus = queryBus;
             this.idGenerator = idGenerator;
-            //_queryBus = queryBus;
+        }
+
+        [HttpGet("{id}")]
+        public Task<ReservationDetails> Get(Guid id)
+        {
+            return queryBus.Send<GetReservationById, ReservationDetails>(GetReservationById.Create(id));
+        }
+
+        [HttpGet]
+        public async Task<PagedListResponse<ReservationShortInfo>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        {
+            var pagedList = await queryBus.Send<GetReservations, IPagedList<ReservationShortInfo>>(GetReservations.Create(pageNumber, pageSize));
+
+            return PagedListResponse.From(pagedList);
+        }
+
+
+        [HttpGet("{id}/history")]
+        public async Task<PagedListResponse<ReservationHistory>> GetHistory(Guid id)
+        {
+            var pagedList = await queryBus.Send<GetReservationHistory, IPagedList<ReservationHistory>>(GetReservationHistory.Create(id));
+
+            return PagedListResponse.From(pagedList);
         }
 
         [HttpPost]
