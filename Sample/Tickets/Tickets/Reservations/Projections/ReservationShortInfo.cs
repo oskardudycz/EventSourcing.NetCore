@@ -11,20 +11,32 @@ namespace Tickets.Reservations.Projections
         public string Number { get; set; }
 
         public ReservationStatus Status { get; set; }
+
+        public void Apply(TentativeReservationCreated @event)
+        {
+            Id = @event.ReservationId;
+            Number = @event.Number;
+            Status = ReservationStatus.Tentative;
+        }
+
+        public void Apply(ReservationConfirmed @event)
+        {
+            Status = ReservationStatus.Confirmed;
+        }
     }
 
     internal class ReservationShortInfoProjection : ViewProjection<ReservationShortInfo, Guid>
     {
         public ReservationShortInfoProjection()
         {
-            ProjectEvent<TentativeReservationCreated>(@event => @event.ReservationId, Apply);
-        }
+            ProjectEvent<TentativeReservationCreated>(@event => @event.ReservationId,
+                (item, @event) => item.Apply(@event));
 
-        private void Apply(ReservationShortInfo item, TentativeReservationCreated @event)
-        {
-            item.Id = @event.ReservationId;
-            item.Number = @event.Number;
-            item.Status = ReservationStatus.Tentative;
+            ProjectEvent<ReservationConfirmed>(@event => @event.ReservationId,
+                (item, @event) => item.Apply(@event));
+
+
+            DeleteEvent<ReservationCancelled>(@event => @event.ReservationId);
         }
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tickets.Api.Requests;
 using Tickets.Api.Responses;
 using Tickets.Reservations.Commands;
+using Tickets.Reservations.Events;
 using Tickets.Reservations.Projections;
 using Tickets.Reservations.Queries;
 
@@ -60,7 +61,7 @@ namespace Tickets.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CreateTentativeReservationRequest request)
+        public async Task<IActionResult> CreateTentative([FromBody] CreateTentativeReservationRequest request)
         {
             Guard.Against.Null(request, nameof(request));
 
@@ -74,6 +75,48 @@ namespace Tickets.Api.Controllers
             await commandBus.Send(command);
 
             return Created("api/Reservations", reservationId);
+        }
+
+
+        [HttpPost("{id}/seat")]
+        public async Task<IActionResult> ChangeSeat(Guid id, [FromBody] ChangeSeatRequest request)
+        {
+            Guard.Against.Null(request, nameof(request));
+
+            var command = ChangeReservationSeat.Create(
+                id,
+                request.SeatId
+            );
+
+            await commandBus.Send(command);
+
+            return Ok();
+        }
+
+        [HttpPost("{id}/confirmation")]
+        public async Task<IActionResult> Confirm(Guid id)
+        {
+            var command = ConfirmReservation.Create(
+                id
+            );
+
+            await commandBus.Send(command);
+
+            return Ok();
+        }
+
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Cancel(Guid id)
+        {
+            var command = CancelReservation.Create(
+                id
+            );
+
+            await commandBus.Send(command);
+
+            return Ok();
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Tickets.Reservations
                 seatId);
         }
 
-        private void Apply(TentativeReservationCreated @event)
+        public void Apply(TentativeReservationCreated @event)
         {
             Id = @event.ReservationId;
             SeatId = @event.SeatId;
@@ -73,7 +73,7 @@ namespace Tickets.Reservations
             Apply(@event);
         }
 
-        private void Apply(ReservationSeatChanged @event)
+        public void Apply(ReservationSeatChanged @event)
         {
             SeatId = @event.SeatId;
             Version++;
@@ -90,16 +90,16 @@ namespace Tickets.Reservations
             Apply(@event);
         }
 
-        private void Apply(ReservationConfirmed @event)
+        public void Apply(ReservationConfirmed @event)
         {
-            Status = ReservationStatus.Cancelled;
+            Status = ReservationStatus.Confirmed;
             Version++;
         }
 
         public void Cancel()
         {
             if(Status != ReservationStatus.Tentative)
-                throw new InvalidOperationException($"Only tentative reservation can be cancelled (current status: {Status}.");
+                throw new InvalidOperationException($"Only tentative reservation can be cancelled (current status: {Status}).");
 
             var @event = ReservationCancelled.Create(Id);
 
@@ -107,7 +107,7 @@ namespace Tickets.Reservations
             Apply(@event);
         }
 
-        private void Apply(ReservationCancelled @event)
+        public void Apply(ReservationCancelled @event)
         {
             Status = ReservationStatus.Cancelled;
             Version++;
