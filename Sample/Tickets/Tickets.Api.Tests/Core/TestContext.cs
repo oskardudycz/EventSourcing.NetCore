@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
-using Core.Events;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -30,14 +29,26 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
 
         private void SetUpClient()
         {
+            var fixtureName = new StackTrace().GetFrame(3).GetMethod().DeclaringType.Name;
+
+            var configuration = new Dictionary<string, string>
+            {
+                {
+                    "EventStore:ConnectionString",
+                    "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; MINPOOLSIZE = 1; MAXPOOLSIZE = 100; COMMANDTIMEOUT = 20; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'"
+                },
+                {"EventStore:WriteModelSchema", $"{fixtureName}Write"},
+                {"EventStore:ReadModelSchema", $"{fixtureName}Read"},
+                {"EventStore:ShouldRecreateDatabase", "true"}
+            };
+
             var projectDir = Directory.GetCurrentDirectory();
 
             server = new TestServer(new WebHostBuilder()
                 .UseEnvironment("Tests")
                 .UseContentRoot(projectDir)
                 .UseConfiguration(new ConfigurationBuilder()
-                    .SetBasePath(projectDir)
-                    .AddJsonFile("appsettings.json", true)
+                    .AddInMemoryCollection(configuration)
                     .Build()
                 )
                 .ConfigureServices(services =>

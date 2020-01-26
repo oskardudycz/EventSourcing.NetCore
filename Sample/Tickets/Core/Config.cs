@@ -1,6 +1,7 @@
 using Core.Commands;
 using Core.Events;
 using Core.Ids;
+using Core.Queries;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -14,11 +15,10 @@ namespace Core
             services.AddMediatR();
 
             services.AddScoped<ICommandBus, CommandBus>();
-
+            services.AddScoped<IQueryBus, QueryBus>();
+            services.TryAddScoped<IEventBus, EventBus>();
 
             services.AddScoped<IIdGenerator, MartenIdGenerator>();
-            // services.AddScoped<IQueryBus, QueryBus>();
-            services.TryAddScoped<IEventBus, EventBus>();
         }
 
         private static void AddMediatR(this IServiceCollection services)
