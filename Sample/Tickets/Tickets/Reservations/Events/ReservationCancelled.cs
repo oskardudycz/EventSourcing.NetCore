@@ -1,5 +1,6 @@
 using System;
 using Core.Events;
+using Newtonsoft.Json;
 
 namespace Tickets.Reservations.Events
 {
@@ -7,6 +8,7 @@ namespace Tickets.Reservations.Events
     {
         public Guid ReservationId { get; }
 
+        [JsonConstructor]
         private ReservationCancelled(Guid reservationId)
         {
             ReservationId = reservationId;

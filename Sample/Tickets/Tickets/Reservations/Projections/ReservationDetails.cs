@@ -10,23 +10,59 @@ namespace Tickets.Reservations.Projections
 
         public string Number { get; set; }
 
-        public string SitNumber { get; set; }
+        public Guid SeatId { get; set; }
+
+        public string SeatNumber { get; set; }
 
         public ReservationStatus Status { get; set; }
+
+        public int Version { get; set; }
+
+        public void Apply(TentativeReservationCreated @event)
+        {
+            Id = @event.ReservationId;
+            SeatId = @event.SeatId;
+            Number = @event.Number;
+            Status = ReservationStatus.Tentative;
+            Version++;
+        }
+
+        public void Apply(ReservationSeatChanged @event)
+        {
+            SeatId = @event.SeatId;
+            Version++;
+        }
+
+        public void Apply(ReservationConfirmed @event)
+        {
+            Status = ReservationStatus.Confirmed;
+            Version++;
+        }
+
+        public void Apply(ReservationCancelled @event)
+        {
+            Status = ReservationStatus.Cancelled;
+            Version++;
+        }
     }
 
-    internal class ReservationDetailsProjection : ViewProjection<ReservationDetails, Guid>
+    internal class ReservationDetailsProjection: ViewProjection<ReservationDetails, Guid>
     {
         public ReservationDetailsProjection()
         {
-            ProjectEvent<TentativeReservationCreated>(@event => @event.ReservationId, Apply);
-        }
+            ProjectEvent<TentativeReservationCreated>(@event => @event.ReservationId,
+                (item, @event) => item.Apply(@event));
 
-        private void Apply(ReservationDetails item, TentativeReservationCreated @event)
-        {
-            item.Id = @event.ReservationId;
-            item.Number = @event.Number;
-            item.Status = ReservationStatus.Tentative;
+
+            ProjectEvent<ReservationSeatChanged>(@event => @event.ReservationId,
+                (item, @event) => item.Apply(@event));
+
+            ProjectEvent<ReservationConfirmed>(@event => @event.ReservationId,
+                (item, @event) => item.Apply(@event));
+
+
+            ProjectEvent<ReservationCancelled>(@event => @event.ReservationId,
+                (item, @event) => item.Apply(@event));
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using Ardalis.GuardClauses;
 using Core.Events;
+using Newtonsoft.Json;
 
 namespace Tickets.Reservations.Events
 {
@@ -10,6 +11,7 @@ namespace Tickets.Reservations.Events
         public Guid SeatId { get; }
         public string Number { get; }
 
+        [JsonConstructor]
         private TentativeReservationCreated(Guid reservationId, Guid seatId, string number)
         {
             ReservationId = reservationId;
