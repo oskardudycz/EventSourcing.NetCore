@@ -48,15 +48,6 @@ namespace Tickets.Reservations
                 seatId);
         }
 
-        public void Apply(TentativeReservationCreated @event)
-        {
-            Id = @event.ReservationId;
-            SeatId = @event.SeatId;
-            Number = @event.Number;
-            Status = ReservationStatus.Tentative;
-            Version++;
-        }
-
         public void ChangeSeat(Guid newSeatId)
         {
             Guard.Against.Default(newSeatId, nameof(newSeatId));
@@ -70,12 +61,6 @@ namespace Tickets.Reservations
             Apply(@event);
         }
 
-        public void Apply(ReservationSeatChanged @event)
-        {
-            SeatId = @event.SeatId;
-            Version++;
-        }
-
         public void Confirm()
         {
             if(Status != ReservationStatus.Tentative)
@@ -87,12 +72,6 @@ namespace Tickets.Reservations
             Apply(@event);
         }
 
-        public void Apply(ReservationConfirmed @event)
-        {
-            Status = ReservationStatus.Confirmed;
-            Version++;
-        }
-
         public void Cancel()
         {
             if(Status != ReservationStatus.Tentative)
@@ -102,6 +81,27 @@ namespace Tickets.Reservations
 
             Enqueue(@event);
             Apply(@event);
+        }
+
+        public void Apply(TentativeReservationCreated @event)
+        {
+            Id = @event.ReservationId;
+            SeatId = @event.SeatId;
+            Number = @event.Number;
+            Status = ReservationStatus.Tentative;
+            Version++;
+        }
+
+        public void Apply(ReservationSeatChanged @event)
+        {
+            SeatId = @event.SeatId;
+            Version++;
+        }
+
+        public void Apply(ReservationConfirmed @event)
+        {
+            Status = ReservationStatus.Confirmed;
+            Version++;
         }
 
         public void Apply(ReservationCancelled @event)

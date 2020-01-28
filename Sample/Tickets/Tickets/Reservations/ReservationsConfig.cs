@@ -59,7 +59,7 @@ namespace Tickets.Reservations
             });
 
 
-            options.Schema.For<Reservation>().UniqueIndex(x => x.SeatId);
+            // options.Schema.For<Reservation>().UniqueIndex(x => x.SeatId);
 
             // projections
             options.Events.InlineProjections.Add<ReservationDetailsProjection>();

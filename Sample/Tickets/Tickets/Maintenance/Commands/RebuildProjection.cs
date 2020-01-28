@@ -5,19 +5,19 @@ namespace Tickets.Maintenance.Commands
 {
     public class RebuildProjection : ICommand
     {
-        public string ProjectionName { get; }
+        public string ViewName { get; }
 
-        private RebuildProjection(string projectionName)
+        private RebuildProjection(string viewName)
         {
-            ProjectionName = projectionName;
+            ViewName = viewName;
         }
 
 
-        public static RebuildProjection Create(string projectionName)
+        public static RebuildProjection Create(string viewName)
         {
-            Guard.Against.NullOrEmpty(projectionName, nameof(projectionName));
+            Guard.Against.NullOrEmpty(viewName, nameof(viewName));
 
-            return new RebuildProjection(projectionName);
+            return new RebuildProjection(viewName);
         }
     }
 }

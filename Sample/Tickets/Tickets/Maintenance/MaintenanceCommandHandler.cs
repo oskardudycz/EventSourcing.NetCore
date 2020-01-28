@@ -26,16 +26,16 @@ namespace Tickets.Reservations
         {
             Guard.Against.Null(command, nameof(command));
 
-            var projectionType =  Assembly.GetExecutingAssembly().GetTypes().SingleOrDefault(t=>t.Name == command.ProjectionName);
+            var viewType =  Assembly.GetExecutingAssembly().GetTypes().SingleOrDefault(t=>t.Name == command.ViewName);
 
             using (var daemon = documentStore.BuildProjectionDaemon(
-                new [] { projectionType },
+                new [] { viewType },
                 settings: new DaemonSettings
                 {
                     LeadingEdgeBuffer = 0.Seconds()
                 }))
             {
-                await daemon.Rebuild(projectionType, cancellationToken);
+                await daemon.Rebuild(viewType, cancellationToken);
             }
 
             return Unit.Value;
