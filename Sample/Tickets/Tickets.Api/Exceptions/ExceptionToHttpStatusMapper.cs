@@ -1,6 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using Marten.Exceptions;
+using Npgsql;
 
 namespace Tickets.Api.Exceptions
 {
@@ -32,10 +34,15 @@ namespace Tickets.Api.Exceptions
                 InvalidOperationException _ => HttpStatusCode.Conflict,
                 ArgumentException _ => HttpStatusCode.BadRequest,
                 ValidationException _ => HttpStatusCode.BadRequest,
+                MartenCommandException martenCommandException =>
+                (martenCommandException.InnerException as PostgresException)?.SqlState ==
+                PostgresErrorCodes.UniqueViolation
+                    ? HttpStatusCode.Conflict
+                    : HttpStatusCode.InternalServerError,
                 _ => HttpStatusCode.InternalServerError
             };
 
-            return new HttpStatusCodeInfo(code, exception.Message);
+            return new HttpStatusCodeInfo(code, (exception.InnerException as PostgresException)?.Message ?? exception.Message);
         }
     }
 }

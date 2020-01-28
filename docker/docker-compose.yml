@@ -1,7 +1,7 @@
 version: "3"
 services:
     postgres:
-        image: clkao/postgres-plv8
+        image: ionx/postgres-plv8:11.1
         container_name: event-sourcing-net-postgres
         environment:
             POSTGRES_PASSWORD: Password12!

@@ -46,7 +46,7 @@ namespace Core.Storage
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.Events.DatabaseSchemaName = config.WriteModelSchema;
             options.DatabaseSchemaName = config.ReadModelSchema;
-            options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters);
+            options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters, enumStorage: EnumStorage.AsString);
 
             configureOptions?.Invoke(options);
         }
