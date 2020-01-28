@@ -1,6 +1,7 @@
 using Core.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Tickets.Maintenance;
 using Tickets.Reservations;
 
 namespace Tickets
@@ -14,6 +15,7 @@ namespace Tickets
                 options.ConfigureReservations();
             });
             services.AddReservations();
+            services.AddMaintainance();
         }
     }
 }

@@ -27,9 +27,6 @@ namespace Tickets.Reservations
 
             var reservationNumber = numberGenerator.Next();
 
-            Guard.Against.Default(id, nameof(id));
-            Guard.Against.NullOrWhiteSpace(reservationNumber, nameof(reservationNumber));
-
             var @event = TentativeReservationCreated.Create(
                 id,
                 seatId,
