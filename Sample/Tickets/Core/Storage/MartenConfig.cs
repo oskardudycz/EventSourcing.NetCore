@@ -32,6 +32,8 @@ namespace Core.Storage
                 if (martenConfig.ShouldRecreateDatabase)
                     documentStore.Advanced.Clean.CompletelyRemoveAll();
 
+                documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
+
                 return documentStore;
             });
             services.AddScoped(sp => sp.GetRequiredService<IDocumentStore>().OpenSession());

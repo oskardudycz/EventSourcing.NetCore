@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Tickets.Api.Exceptions;
 
 namespace Tickets.Api
 {
@@ -38,6 +39,8 @@ namespace Tickets.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseMiddleware(typeof(ExceptionHandlingMiddleware));
 
             app.UseRouting();
 
