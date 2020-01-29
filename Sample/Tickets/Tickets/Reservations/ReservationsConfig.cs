@@ -34,6 +34,7 @@ namespace Tickets.Reservations
         private static void AddQueryHandlers(IServiceCollection services)
         {
             services.AddScoped<IRequestHandler<GetReservationById, ReservationDetails>, ReservationQueryHandler>();
+            services.AddScoped<IRequestHandler<GetReservationAtVersion, ReservationDetails>, ReservationQueryHandler>();
             services.AddScoped<IRequestHandler<GetReservations, IPagedList<ReservationShortInfo>>, ReservationQueryHandler>();
             services
                 .AddScoped<IRequestHandler<GetReservationHistory, IPagedList<ReservationHistory>>, ReservationQueryHandler>();

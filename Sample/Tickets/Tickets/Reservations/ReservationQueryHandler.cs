@@ -15,11 +15,12 @@ namespace Tickets.Reservations
     internal class ReservationQueryHandler :
         IQueryHandler<GetReservationById, ReservationDetails>,
         IRequestHandler<GetReservations, IPagedList<ReservationShortInfo>>,
-        IRequestHandler<GetReservationHistory, IPagedList<ReservationHistory>>
+        IRequestHandler<GetReservationHistory, IPagedList<ReservationHistory>>,
+        IRequestHandler<GetReservationAtVersion, ReservationDetails>
     {
-        private readonly IQuerySession querySession;
+        private readonly IDocumentSession querySession;
 
-        public ReservationQueryHandler(IQuerySession querySession)
+        public ReservationQueryHandler(IDocumentSession querySession)
         {
             Guard.Against.Null(querySession, nameof(querySession));
 
@@ -42,6 +43,11 @@ namespace Tickets.Reservations
             return querySession.Query<ReservationHistory>()
                 .Where(h => h.ReservationId == request.ReservationId)
                 .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
+        }
+
+        public Task<ReservationDetails> Handle(GetReservationAtVersion request, CancellationToken cancellationToken)
+        {
+            return querySession.Events.AggregateStreamAsync<ReservationDetails>(request.ReservationId, request.Version, token: cancellationToken);
         }
     }
 }

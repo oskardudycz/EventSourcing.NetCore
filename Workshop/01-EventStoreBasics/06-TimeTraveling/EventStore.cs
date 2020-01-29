@@ -48,7 +48,6 @@ namespace EventStoreBasics
 
         public T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
         {
-            // TODO aggregate only events that are smaller or bigger than timestamp or version
             var aggregate = (T)Activator.CreateInstance(typeof(T), true);
 
             var events = GetEvents(streamId);

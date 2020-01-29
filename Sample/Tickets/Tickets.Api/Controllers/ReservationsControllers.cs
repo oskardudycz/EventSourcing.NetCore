@@ -60,6 +60,13 @@ namespace Tickets.Api.Controllers
             return PagedListResponse.From(pagedList);
         }
 
+        [HttpGet("{id}/versions")]
+        public Task<ReservationDetails> GetVersion(Guid id, [FromQuery] GetReservationDetailsAtVersion request)
+        {
+            Guard.Against.Null(request, nameof(request));
+            return queryBus.Send<GetReservationAtVersion, ReservationDetails>(GetReservationAtVersion.Create(id, request.Version));
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateTentative([FromBody] CreateTentativeReservationRequest request)
         {
