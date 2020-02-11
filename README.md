@@ -173,6 +173,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   [Martin Fowler - The Many Meanings of Event-Driven Architecture](https://www.youtube.com/watch?v=STKCRSUsyP0&t=822s)
 -   [Martin Fowler - Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html)
 -   [Wojciech Suwała - Building Microservices On .NET Core – Part 5 Marten An Ideal Repository For Your Domain Aggregates](https://altkomsoftware.pl/en/blog/building-microservices-domain-aggregates/)
+-   [Dennis Doomen - A practical introduction to DDD, CQRS & Event Sourcing](https://www.youtube.com/watch?v=r26BuahD8aM)
 -   [Eric Evans - DDD and Microservices: At Last, Some Boundaries!](https://www.infoq.com/presentations/ddd-microservices-2016)
 -   [Martin Kleppmann - Event Sourcing and Stream Processing at Scale](https://www.youtube.com/watch?v=avi-TZI9t2I)
 -   [Thomas Pierrain - As Time Goes By… (a Bi-temporal Event Sourcing story)](https://www.youtube.com/watch?v=xzekp1RuZbM)
