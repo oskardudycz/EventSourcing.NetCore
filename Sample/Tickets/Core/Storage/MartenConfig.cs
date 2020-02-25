@@ -43,7 +43,7 @@ namespace Core.Storage
         private static void SetStoreOptions(StoreOptions options, MartenConfig config, Action<StoreOptions> configureOptions = null)
         {
             options.Connection(config.ConnectionString);
-            options.AutoCreateSchemaObjects = AutoCreate.CreateOnly;
+            options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
             options.Events.DatabaseSchemaName = config.WriteModelSchema;
             options.DatabaseSchemaName = config.ReadModelSchema;
             options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters, enumStorage: EnumStorage.AsString);
