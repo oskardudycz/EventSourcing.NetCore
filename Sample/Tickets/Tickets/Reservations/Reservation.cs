@@ -16,6 +16,17 @@ namespace Tickets.Reservations
         // For serialization
         public Reservation() { }
 
+        public static Reservation CreateTentative(
+            Guid id,
+            IReservationNumberGenerator numberGenerator,
+            Guid seatId)
+        {
+            return new Reservation(
+                id,
+                numberGenerator,
+                seatId);
+        }
+        
         private Reservation(
             Guid id,
             IReservationNumberGenerator numberGenerator,
@@ -37,16 +48,6 @@ namespace Tickets.Reservations
             Apply(@event);
         }
 
-        public static Reservation CreateTentative(
-            Guid id,
-            IReservationNumberGenerator numberGenerator,
-            Guid seatId)
-        {
-            return new Reservation(
-                id,
-                numberGenerator,
-                seatId);
-        }
 
         public void ChangeSeat(Guid newSeatId)
         {
