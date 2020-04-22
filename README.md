@@ -18,13 +18,16 @@ docker-compose up
 
 -   Installing a most recent version of the Postgres DB (eg. from <https://www.postgresql.org/download/>).
 
-Video presentation (PL):
+Video presentations (PL):
 
 <a href="https://www.youtube.com/watch?feature=player_embedded&v=i1XDr9km0RY" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
 
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=i1XDr9km0RY" target="_blank"><img src="https://img.youtube.com/vi/JCcQZhuO8BU/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
+
 Slides (PL):
-- [WrocNet - Przygody z Event Sourcing i CQRS (2017-02-21)](./Slides.pptx)
-- [SegFault - Blaski i Cienie Event Driven Design (2019-11-25)](./SegFault-Blaski_i_Cienie.pptx)
+- [WrocNet - Practical Event Sourcing with Marten (2020-04-21)](./EventSourcing_with_Marten_PL.pptx)
+- [SegFault - Ligths and Shades of Event-Driven Design (2019-11-25)](./SegFault-Blaski_i_Cienie.pptx)
+- [WrocNet - Adventures in Event Sourcing and CQRS (2017-02-21)](./Slides.pptx)
 
 ## Libraries used
 
