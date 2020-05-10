@@ -70,10 +70,10 @@ namespace Core.Events.External.Kafka
                 var message = consumer.Consume(cancellationToken);
 
                 // get event type from name storred in message.Key
-                var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Key);
+                var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Message.Key);
 
                 // deserialize event
-                var @event = JsonConvert.DeserializeObject(message.Value, eventType);
+                var @event = JsonConvert.DeserializeObject(message.Message.Value, eventType);
 
                 using (var scope = serviceProvider.CreateScope())
                 {
