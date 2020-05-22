@@ -20,9 +20,9 @@ docker-compose up
 
 Video presentations (PL):
 
-<a href="https://www.youtube.com/watch?feature=player_embedded&v=i1XDr9km0RY" target="_blank"><img src="https://img.youtube.com/vi/JCcQZhuO8BU/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=JCcQZhuO8BU&list=PLexysh97plk3wjoYvHlLbrFRNP3T9i8Y7&index=2" target="_blank"><img src="https://img.youtube.com/vi/JCcQZhuO8BU/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
 
-<a href="https://www.youtube.com/watch?feature=player_embedded&v=i1XDr9km0RY" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=i1XDr9km0RY&list=PLexysh97plk3wjoYvHlLbrFRNP3T9i8Y7&index=5" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
 
 Slides (PL):
 - [WrocNet - Practical Event Sourcing with Marten (2020-04-21)](./EventSourcing_with_Marten_PL.pptx)
