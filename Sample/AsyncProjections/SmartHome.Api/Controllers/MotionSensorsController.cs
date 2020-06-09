@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
@@ -6,20 +5,20 @@ using Core.Commands;
 using Core.Ids;
 using Core.Queries;
 using Microsoft.AspNetCore.Mvc;
-using SmartHome.Temperature.TemperatureMeasurements;
-using SmartHome.Temperature.TemperatureMeasurements.Commands;
-using SmartHome.Temperature.TemperatureMeasurements.Queries;
+using SmartHome.Temperature.MotionSensors;
+using SmartHome.Temperature.MotionSensors.Commands;
+using SmartHome.Temperature.MotionSensors.Queries;
 
 namespace SmartHome.Api
 {
-    [Route("api/temperature-measurements")]
-    public class TemperatureMeasurementsController: Controller
+    [Route("api/motion-sensors")]
+    public class MotionSensorsController: Controller
     {
         private readonly ICommandBus commandBus;
         private readonly IQueryBus queryBus;
         private readonly IIdGenerator idGenerator;
 
-        public TemperatureMeasurementsController(
+        public MotionSensorsController(
             ICommandBus commandBus,
             IQueryBus queryBus,
             IIdGenerator idGenerator)
@@ -34,9 +33,9 @@ namespace SmartHome.Api
         }
 
         [HttpGet]
-        public Task<IReadOnlyList<TemperatureMeasurement>> Get()
+        public Task<IReadOnlyList<MotionSensor>> Get()
         {
-            return queryBus.Send<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>(GetTemperatureMeasurements.Create());
+            return queryBus.Send<GetMotionSensors, IReadOnlyList<MotionSensor>>(GetMotionSensors.Create());
         }
 
         [HttpPost]
@@ -46,27 +45,23 @@ namespace SmartHome.Api
 
             Guard.Against.Default(measurementId, nameof(measurementId));
 
-            var command = StartTemperatureMeasurement.Create(
+            var command = InstallMotionSensor.Create(
                 measurementId
             );
 
             await commandBus.Send(command);
 
-            return Created("api/TemperatureMeasurements", measurementId);
+            return Created("api/MotionSensors", measurementId);
         }
 
-
-        [HttpPost("{id}/temperatures")]
-        public async Task<IActionResult> Record(Guid id, [FromBody] decimal temperature)
+        [HttpPost("rebuild")]
+        public async Task<IActionResult> Rebuild()
         {
-            var command = RecordTemperature.Create(
-                id,
-                temperature
-            );
+            var command = RebuildMotionSensorsViews.Create();
 
             await commandBus.Send(command);
 
-            return Ok();
+            return NoContent();
         }
     }
 }
