@@ -23,23 +23,23 @@ namespace MeetingsSearch.Storage
 
         public async Task<T> Find(Guid id, CancellationToken cancellationToken)
         {
-            var response = await elasticClient.GetAsync<T>(id);
+            var response = await elasticClient.GetAsync<T>(id, ct: cancellationToken);
             return response.Source;
         }
 
         public Task Add(T aggregate, CancellationToken cancellationToken)
         {
-            return elasticClient.IndexAsync(aggregate, i => i.Id(aggregate.Id));
+            return elasticClient.IndexAsync(aggregate, i => i.Id(aggregate.Id), cancellationToken);
         }
 
         public Task Update(T aggregate, CancellationToken cancellationToken)
         {
-            return elasticClient.UpdateAsync<T>(aggregate.Id, i => i.Doc(aggregate));
+            return elasticClient.UpdateAsync<T>(aggregate.Id, i => i.Doc(aggregate), cancellationToken);
         }
 
         public Task Delete(T aggregate, CancellationToken cancellationToken)
         {
-            return elasticClient.DeleteAsync<T>(aggregate.Id);
+            return elasticClient.DeleteAsync<T>(aggregate.Id, ct: cancellationToken);
         }
     }
 }

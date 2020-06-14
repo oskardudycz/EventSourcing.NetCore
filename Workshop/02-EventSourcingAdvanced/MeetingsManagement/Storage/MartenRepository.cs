@@ -25,7 +25,7 @@ namespace MeetingsManagement.Storage
 
         public Task<T> Find(Guid id, CancellationToken cancellationToken)
         {
-            return documentSession.Events.AggregateStreamAsync<T>(id);
+            return documentSession.Events.AggregateStreamAsync<T>(id, token: cancellationToken);
         }
 
         public Task Add(T aggregate, CancellationToken cancellationToken)
@@ -52,7 +52,7 @@ namespace MeetingsManagement.Storage
                 aggregate.Id,
                 events.ToArray()
             );
-            await documentSession.SaveChangesAsync();
+            await documentSession.SaveChangesAsync(cancellationToken);
 
             await eventBus.Publish(events.ToArray());
         }
