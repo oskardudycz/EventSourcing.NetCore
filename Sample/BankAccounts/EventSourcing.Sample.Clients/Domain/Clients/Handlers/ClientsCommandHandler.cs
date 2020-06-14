@@ -36,7 +36,7 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
                 command.Data.Email
             );
 
-            await Clients.AddAsync(client);
+            await Clients.AddAsync(client, cancellationToken);
 
             await SaveAndPublish(client, cancellationToken);
 

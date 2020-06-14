@@ -23,8 +23,7 @@ namespace MeetingsSearch.Meetings
         public async Task<IReadOnlyCollection<Meeting>> Handle(SearchMeetings query, CancellationToken cancellationToken)
         {
             var response = await elasticClient.SearchAsync<Meeting>(
-                s => s.Query(q => q.QueryString(d => d.Query(query.Filter))).Size(MaxItemsCount)
-            );
+                s => s.Query(q => q.QueryString(d => d.Query(query.Filter))).Size(MaxItemsCount), cancellationToken);
 
             return response.Documents;
         }

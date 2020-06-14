@@ -56,7 +56,7 @@ namespace MediatR.Tests.Sending
             {
                 return Task.Run(() => _taskList.Tasks
                     .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
-                    .ToList());
+                    .ToList(), cancellationToken);
             }
         }
 

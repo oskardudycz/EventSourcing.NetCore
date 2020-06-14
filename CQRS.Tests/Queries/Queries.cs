@@ -97,7 +97,7 @@ namespace CQRS.Tests.Queries
             {
                 return Task.Run(() => _readModel.Tasks
                     .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
-                    .ToList());
+                    .ToList(), cancellationToken);
             }
         }
 
