@@ -2,7 +2,15 @@
 
 # EventSourcing.NetCore
 
-Example of Event Sourcing in .NET Core
+Example of Event Sourcing in .NET Core.
+
+## Support
+
+Feel free to [create an issue](https://github.com/oskardudycz/EventSourcing.NetCore/issues/new) if you have any questions or requests for more explanation or samples. I also take **Pull Requests**!
+
+💖 If this repository helped you I'd be more than happy if you **join** the group of **my official supporters** at:
+
+👉 [Github Sponsors](https://github.com/sponsors/oskardudycz) 
 
 ## Prerequisites
 
