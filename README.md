@@ -32,10 +32,10 @@ Video presentations (PL):
 
 <a href="https://www.youtube.com/watch?v=i1XDr9km0RY&list=PLexysh97plk3wjoYvHlLbrFRNP3T9i8Y7&index=5" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
 
-Slides (PL):
-- [WrocNet - Practical Event Sourcing with Marten (2020-04-21)](./EventSourcing_with_Marten_PL.pptx)
-- [SegFault - Ligths and Shades of Event-Driven Design (2019-11-25)](./SegFault-Blaski_i_Cienie.pptx)
-- [WrocNet - Adventures in Event Sourcing and CQRS (2017-02-21)](./Slides.pptx)
+Slides:
+- **Practical Event Sourcing with Marten** [EN](./EventSourcing_with_Marten_EN.pptx), [PL](./EventSourcing_with_Marten_PL.pptx)
+- **SegFault - Ligths and Shades of Event-Driven Design** [PL](./SegFault-Blaski_i_Cienie.pptx)
+- **WrocNet - Adventures in Event Sourcing and CQRS** [PL](./Slides.pptx)
 
 ## Libraries used
 
