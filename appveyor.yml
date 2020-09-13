@@ -2,7 +2,7 @@ version: 1.0.{build}
 image: Visual Studio 2019
 services: postgresql
 before_build:
-- cmd: dotnet restore
+- cmd: dotnet restore ./EventSourcing.NetCore.sln
 build:
   project: EventSourcing.NetCore.sln
   verbosity: minimal
