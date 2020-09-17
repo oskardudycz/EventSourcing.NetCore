@@ -33,8 +33,8 @@ Video presentations (PL):
 <a href="https://www.youtube.com/watch?v=i1XDr9km0RY&list=PLexysh97plk3wjoYvHlLbrFRNP3T9i8Y7&index=5" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
 
 Slides:
-- **Practical Event Sourcing with Marten** - [EN](./EventSourcing_with_Marten_EN.pptx), [PL](./EventSourcing_with_Marten_PL.pptx)
-- **Ligths and Shades of Event-Driven Design** - [PL](./SegFault-Blaski_i_Cienie.pptx)
+- **Practical Event Sourcing with Marten** - [EN](./Lights_And_Shades_Of_Event-Driven_Design.pptx), [PL](./EventSourcing_with_Marten_PL.pptx)
+- **Ligths and Shades of Event-Driven Design** -  [EN](./SegFault-Blaski_i_Cienie.pptx), [PL](./SegFault-Blaski_i_Cienie.pptx)
 - **Adventures in Event Sourcing and CQRS** - [PL](./Slides.pptx)
 
 ## Libraries used
