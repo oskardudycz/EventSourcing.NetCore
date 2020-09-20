@@ -16,8 +16,9 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
   - [6. NuGet packages to help you get started.](#6-nuget-packages-to-help-you-get-started)
   - [7. Other resources](#7-other-resources)
     - [7.1 Various](#71-various)
-    - [7.2 Distributed processes](#72-distributed-processes)
-    - [7.3 Modeling](#73-modeling)
+    - [7.2 Event processing](#72-event-processing)
+    - [7.3 Distributed processes](#73-distributed-processes)
+    - [7.4 Modeling](#74-modeling)
   - [Contributors](#contributors)
     - [Code Contributors](#code-contributors)
     - [Financial Contributors](#financial-contributors)
@@ -227,16 +228,31 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Microsoft - Domain events: design and implementation](https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-events-design-implementation)
 -   🎞 [Mathew McLoughlin - An Introduction to CQRS and Event Sourcing Patterns](https://www.youtube.com/watch?v=9a1PqwFrMP0)
 
-### 7.2 Distributed processes
+### 7.2 Event processing
+-   📝 [Kamil Grzybek - The Outbox Pattern](http://www.kamilgrzybek.com/design/the-outbox-pattern/)
+-   🎞 [Dev Mentors - Inbox & Outbox pattern - transactional message processing](https://www.youtube.com/watch?v=ebyR5RPKciw)
+-   📝 [Jeremy D. Miller - Jasper’s “Outbox” Pattern Support](https://jeremydmiller.com/2018/04/16/jaspers-outbox-pattern-support/)
+-   📝 [Gunnar Morling  - Reliable Microservices Data Exchange With the Outbox Pattern](https://debezium.io/blog/2019/02/19/reliable-microservices-data-exchange-with-the-outbox-pattern/)
+-   📝 [Michrosoft - Asynchronous message-based communication](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/architect-microservice-container-applications/asynchronous-message-based-communication)
+-   📝 [NServiceBus - Outbox](https://docs.particular.net/nservicebus/outbox/)
+-   📝 [Alvaro Herrera - Implement SKIP LOCKED for row-level locks](https://www.depesz.com/2014/10/10/waiting-for-9-5-implement-skip-locked-for-row-level-locks/)
+
+### 7.3 Distributed processes
 -   📝 [Hector Garcaa-Molrna, Kenneth Salem - Sagas](https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
+-   🎞 [Caitie McCaffrey - Applying the Saga Pattern](https://www.youtube.com/watch?v=xDuwrtwYHu8)
+-   🎞 [Udi Dahan - If (domain logic) then CQRS or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
+-   🎞 [Gregor Hohpe - Starbucks Does Not Use Two-Phase Commit](https://www.enterpriseintegrationpatterns.com/ramblings/18_starbucks.html)
 -   📝 [Microsoft - Design Patterns - Saga distributed transactions pattern](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/saga/saga)
 -   📝 [Microsoft - Design Patterns - Choreography](https://docs.microsoft.com/en-us/azure/architecture/patterns/choreography)
--   🎞 [Udi Dahan - If (domain logic) then CQRS or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
--   🎞 [Caitie McCaffrey - Applying the Saga Pattern](https://www.youtube.com/watch?v=xDuwrtwYHu8)
 -   🎞 [Martin Schimak - Know the Flow! Events, Commands & Long-Running Services](https://www.youtube.com/watch?v=uSF5hyfez60) 
+-   📝 [Martin Schimak - Aggregates and Sagas are Processes](https://medium.com/plexiti/aggregates-and-sagas-are-process-owners-e8c8ba973da7)
 -   🎞 [Chris Richardson - Using sagas to maintain data consistency in a microservice architecture](https://www.youtube.com/watch?v=YPbGW3Fnmbc)
+-   📝 [Thanh Le - What is SAGA Pattern and How important is it?](https://medium.com/swlh/microservices-architecture-what-is-saga-pattern-and-how-important-is-it-55f56cfedd6b)
+-   📝 [Jimmy Bogard - Life Beyond Distributed Transactions: An Apostate's Implementation - Relational Resources](https://jimmybogard.com/life-beyond-distributed-transactions-an-apostates-implementation-relational-resources/)
+-   📝 [Rinat Abdullin - Evolving Business Processes](https://abdullin.com/post/ddd-evolving-business-processes-a-la-lokad/)
+-   📝 [Microsoft - A Saga on Sagas](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591569(v=pandp.10))
 
-### 7.3 Modeling
+### 7.4 Modeling
 -   📝 [Event Modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
 -   📝 [Event Storming](https://leanpub.com/introducing_eventstorming)
 
