@@ -1,9 +1,18 @@
-<mxfile host="app.diagrams.net" modified="2020-09-26T13:33:13.271Z" agent="5.0 (Windows)" etag="eHGiPQ3tjIqLGKAVuKHd" version="13.7.5" type="github">
+<mxfile host="app.diagrams.net" modified="2020-09-26T14:52:20.181Z" agent="5.0 (Windows)" etag="-Yb5GdhL2RX0RJ1zjYIC" version="13.7.5" type="github">
   <diagram id="1DJoSMpmVe1PBzs5LV6L" name="Page-1">
     <mxGraphModel dx="1422" dy="763" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="S-mG011iiMMuwMTmMiyn-3" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.diag_snip_rect;dx=6;sketch=1;fillColor=#fad7ac;strokeColor=#b46504;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="340" y="340" width="420" height="470" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-5" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.diag_stripe;dx=10;sketch=1;strokeWidth=2;rotation=15;fillColor=#FFD966;strokeColor=#CC6600;" vertex="1" parent="1">
+          <mxGeometry x="210" y="280" width="248.88" height="68.73" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-6" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.frame;dx=10;sketch=1;strokeColor=#CC6600;strokeWidth=2;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="154" y="140" width="520" height="140" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
