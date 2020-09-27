@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2020-09-27T13:29:25.396Z" agent="5.0 (Windows)" etag="VYgQmQ0uTdC__pkRpMT-" version="13.7.5" type="github">
+<mxfile host="app.diagrams.net" modified="2020-09-27T13:35:07.118Z" agent="5.0 (Windows)" etag="AkzNogoR6nR6bCPq0iLV" version="13.7.5" type="github">
   <diagram id="1DJoSMpmVe1PBzs5LV6L" name="Page-1">
     <mxGraphModel dx="1673" dy="898" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -42,6 +42,21 @@
         </mxCell>
         <mxCell id="S-mG011iiMMuwMTmMiyn-20" value="" style="shadow=0;dashed=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.databases.database_cube;rounded=0;sketch=1;fillColor=#FFD966;strokeColor=#CC6600;" vertex="1" parent="1">
           <mxGeometry x="500" y="940" width="173.54" height="192" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-22" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=#b46504;fillColor=#fad7ac;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.folder;sketch=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="900" width="231" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-23" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.communications.exchange_active_sync;rounded=0;sketch=1;strokeColor=#CC6600;fillColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="170" y="960" width="49" height="49" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-24" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.contacts;rounded=0;sketch=1;fillColor=#FFFFFF;strokeColor=#CC6600;" vertex="1" parent="1">
+          <mxGeometry x="283" y="996" width="87.41" height="64.32" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-25" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.settings_office_365;rounded=0;sketch=1;fillColor=#FFFFFF;strokeColor=#CC6600;" vertex="1" parent="1">
+          <mxGeometry x="164.57" y="1030" width="61" height="61" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-26" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.connector;rounded=0;sketch=1;fillColor=#FFFFFF;strokeColor=#CC6600;" vertex="1" parent="1">
+          <mxGeometry x="223.57" y="1010" width="48.13" height="35" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
