@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2020-09-27T13:45:29.362Z" agent="5.0 (Windows)" etag="PHgWm0T8AK2z4k7QOnzO" version="13.7.5" type="github">
+<mxfile host="app.diagrams.net" modified="2020-09-27T13:54:07.147Z" agent="5.0 (Windows)" etag="g4__j5CC-lQel936W19L" version="13.7.5" type="github">
   <diagram id="1DJoSMpmVe1PBzs5LV6L" name="Page-1">
     <mxGraphModel dx="1673" dy="898" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -63,6 +63,15 @@
         </mxCell>
         <mxCell id="S-mG011iiMMuwMTmMiyn-28" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.upgrade_site;rounded=0;sketch=1;fillColor=#FFD966;strokeColor=#CC6600;" vertex="1" parent="1">
           <mxGeometry x="740" y="920" width="243.98" height="198.49" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-30" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.sites.business_connectivity_services;rounded=0;sketch=1;fillColor=#FFD966;strokeColor=#CC6600;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="930" width="113.33" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-34" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.migration;rounded=0;sketch=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="600" width="59" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="S-mG011iiMMuwMTmMiyn-35" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.migration;rounded=0;sketch=1;fillColor=#FFD966;strokeColor=#CC6600;" vertex="1" parent="1">
+          <mxGeometry x="34.57" y="355" width="214.01" height="123.33" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
