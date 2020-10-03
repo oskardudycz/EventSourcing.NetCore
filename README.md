@@ -16,9 +16,11 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
   - [6. NuGet packages to help you get started.](#6-nuget-packages-to-help-you-get-started)
   - [7. Other resources](#7-other-resources)
     - [7.1 Various](#71-various)
-    - [7.2 Event processing](#72-event-processing)
-    - [7.3 Distributed processes](#73-distributed-processes)
-    - [7.4 Modeling](#74-modeling)
+    - [7.2 Snapshots](#72-snapshots)
+    - [7.3 Projections](#73-projections)
+    - [7.4 Event processing](#74-event-processing)
+    - [7.5 Distributed processes](#75-distributed-processes)
+    - [7.6 Modeling](#76-modeling)
   - [Contributors](#contributors)
     - [Code Contributors](#code-contributors)
     - [Financial Contributors](#financial-contributors)
@@ -216,6 +218,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [David Boike - Putting your events on a diet](https://particular.net/blog/putting-your-events-on-a-diet)
 -   📖 [DDD Quickly](https://www.infoq.com/minibooks/domain-driven-design-quickly)
 -   📝 [Dennis Doomen - The Good, The Bad and the Ugly of Event Sourcing](https://www.continuousimprover.com/2017/11/event-sourcing-good-bad-and-ugly.html)
+-   📰 [Dennis Doomen - Practical introduction to DDD, CQRS and Event Sourcing ](https://www.slideshare.net/dennisdoomen/practical-introduction-to-ddd-cqrs-and-event-sourcing)
 -   📝 [Versioning in an Event Sourced System](http://blog.approache.com/2019/02/versioning-in-event-sourced-system-tldr_10.html?m=1)
 -   📰 [Bartosz Sypytkowski - Collaborative Event Sourcing](https://www.slideshare.net/BartoszSypytkowski1/collaborative-replication)
 -   📝 [Jay Kreps - Why local state is a fundamental primitive in stream processing](https://www.oreilly.com/ideas/why-local-state-is-a-fundamental-primitive-in-stream-processing)
@@ -227,8 +230,16 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Jimmy Bogard - CQRS and REST: the perfect match](https://lostechies.com/jimmybogard/2016/06/01/cqrs-and-rest-the-perfect-match/)
 -   📝 [Microsoft - Domain events: design and implementation](https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-events-design-implementation)
 -   🎞 [Mathew McLoughlin - An Introduction to CQRS and Event Sourcing Patterns](https://www.youtube.com/watch?v=9a1PqwFrMP0)
+-   🎞 [Alexey Zimarev - DDD, Event Sourcing and Actors](https://www.youtube.com/watch?v=58_Ehl3oETY)
 
-### 7.2 Event processing
+### 7.2 Snapshots
+-   📝 [Kacper Gunia - Event Sourcing: Snapshotting](https://domaincentric.net/blog/event-sourcing-snapshotting)
+
+### 7.3 Projections 
+-   📝 [Alexey Zimarev - Projections in Event Sourcing](https://zimarev.com/blog/event-sourcing/projections/)
+-   📝 [Rinat Abdulin - Event Sourcing - Projections](https://abdullin.com/post/event-sourcing-projections/)
+
+### 7.4 Event processing
 -   📝 [Kamil Grzybek - The Outbox Pattern](http://www.kamilgrzybek.com/design/the-outbox-pattern/)
 -   🎞 [Dev Mentors - Inbox & Outbox pattern - transactional message processing](https://www.youtube.com/watch?v=ebyR5RPKciw)
 -   📝 [Jeremy D. Miller - Jasper’s “Outbox” Pattern Support](https://jeremydmiller.com/2018/04/16/jaspers-outbox-pattern-support/)
@@ -237,7 +248,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [NServiceBus - Outbox](https://docs.particular.net/nservicebus/outbox/)
 -   📝 [Alvaro Herrera - Implement SKIP LOCKED for row-level locks](https://www.depesz.com/2014/10/10/waiting-for-9-5-implement-skip-locked-for-row-level-locks/)
 
-### 7.3 Distributed processes
+### 7.5 Distributed processes
 -   📝 [Hector Garcaa-Molrna, Kenneth Salem - Sagas](https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
 -   🎞 [Caitie McCaffrey - Applying the Saga Pattern](https://www.youtube.com/watch?v=xDuwrtwYHu8)
 -   🎞 [Udi Dahan - If (domain logic) then CQRS or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
@@ -252,7 +263,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Rinat Abdullin - Evolving Business Processes](https://abdullin.com/post/ddd-evolving-business-processes-a-la-lokad/)
 -   📝 [Microsoft - A Saga on Sagas](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591569(v=pandp.10))
 
-### 7.4 Modeling
+### 7.6 Modeling
 -   📝 [Event Modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
 -   📝 [Event Storming](https://leanpub.com/introducing_eventstorming)
 
