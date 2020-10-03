@@ -4,7 +4,7 @@
 
 1. Install git - https://git-scm.com/downloads.
 2. Install .NET Core 3.1 - https://dotnet.microsoft.com/download/dotnet-core/thank-you/sdk-3.1.100-windows-x64-installer.
-3. Install Visual Studio 2019, Rider or VSCodedock.
+3. Install Visual Studio 2019, Rider or VSCode.
 4. Install docker - https://docs.docker.com/docker-for-windows/install/.
 5. Make sure that you have ~10GB disk space.
 6. Create Github Account
@@ -20,7 +20,7 @@
     - `docker ps` - for showing running dockers
     - `docker ps -a` - to show all dockers (also stopped)
 
-12. For the first part of workshop please go to [./01-EventStoreBasics/docker.] and run: `docker-compose up`.
+12. For the first part of workshop please go to [./01-EventStoreBasics/docker](./01-EventStoreBasics/docker) and run: `docker-compose up`.
 13. Wait until all dockers got are downloaded and running.
 14. You should automatically get:
 
