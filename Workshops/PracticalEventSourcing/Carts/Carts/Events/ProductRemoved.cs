@@ -8,9 +8,9 @@ namespace Carts.Carts.Events
     {
         public Guid CartId { get; }
 
-        public ProductItem ProductItem { get; }
+        public PricedProductItem ProductItem { get; }
 
-        public ProductRemoved(Guid cartId, ProductItem productItem)
+        public ProductRemoved(Guid cartId, PricedProductItem productItem)
         {
             CartId = cartId;
             ProductItem = productItem;

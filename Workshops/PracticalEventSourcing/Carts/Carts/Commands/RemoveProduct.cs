@@ -8,9 +8,9 @@ namespace Carts.Carts.Commands
     {
         public Guid CartId { get; }
 
-        public ProductItem ProductItem { get; }
+        public PricedProductItem ProductItem { get; }
 
-        public RemoveProduct(Guid cardId, ProductItem productItem)
+        public RemoveProduct(Guid cardId, PricedProductItem productItem)
         {
             CartId = cardId;
             ProductItem = productItem;
