@@ -7,7 +7,7 @@ using EventSourcing.Sample.Transactions.Domain.Accounts;
 
 namespace EventSourcing.Sample.Tasks.Domain.Accounts
 {
-    public class Account: EventSourcedAggregate
+    public class Account: Aggregate
     {
         public Guid ClientId { get; private set; }
 
@@ -29,21 +29,23 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts
             };
 
             Apply(@event);
-            Append(@event);
+            Enqueue(@event);
         }
 
         public void RecordInflow(Guid fromId, decimal ammount)
         {
             var @event = new NewInflowRecorded(fromId, Id, new Inflow(ammount, DateTime.Now));
+
             Apply(@event);
-            Append(@event);
+            Enqueue(@event);
         }
 
         public void RecordOutflow(Guid toId, decimal ammount)
         {
             var @event = new NewOutflowRecorded(Id, toId, new Outflow(ammount, DateTime.Now));
+
             Apply(@event);
-            Append(@event);
+            Enqueue(@event);
         }
 
         public void Apply(NewAccountCreated @event)

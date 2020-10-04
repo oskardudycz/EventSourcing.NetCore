@@ -10,7 +10,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Tickets\Core\Core.csproj" />
       <ProjectReference Include="..\SmartHome.Temperature\SmartHome.Temperature.csproj" />
     </ItemGroup>
 

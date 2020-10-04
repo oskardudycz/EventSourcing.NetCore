@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Marten;
 
 namespace Core.Ids
@@ -10,9 +9,7 @@ namespace Core.Ids
 
         public MartenIdGenerator(IDocumentSession documentSession)
         {
-            Guard.Against.Null(documentSession, nameof(documentSession));
-
-            this.documentSession = documentSession;
+            this.documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
         }
 
         public Guid New() => documentSession.Events.StartStream().Id;

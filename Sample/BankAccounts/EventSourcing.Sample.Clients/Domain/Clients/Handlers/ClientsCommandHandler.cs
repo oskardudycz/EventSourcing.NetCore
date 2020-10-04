@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
@@ -71,7 +72,7 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
         {
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            await eventBus.Publish(client.PendingEvents.ToArray());
+            await eventBus.Publish(client.DequeueUncommittedEvents().ToArray());
         }
     }
 }

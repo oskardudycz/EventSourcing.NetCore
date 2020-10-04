@@ -11,14 +11,14 @@ namespace Core.Aggregates
 
         public int Version { get; protected set; }
 
-        [NonSerialized] private readonly List<IEvent> uncommittedEvents = new List<IEvent>();
+        [NonSerialized] private readonly Queue<IEvent> uncommittedEvents = new Queue<IEvent>();
 
         //for serialization purposes
         protected Aggregate() { }
 
-        IEnumerable<IEvent> IAggregate.DequeueUncommittedEvents()
+        public IEvent[] DequeueUncommittedEvents()
         {
-            var dequeuedEvents = uncommittedEvents.ToList();
+            var dequeuedEvents = uncommittedEvents.ToArray();
 
             uncommittedEvents.Clear();
 
@@ -27,7 +27,7 @@ namespace Core.Aggregates
 
         protected void Enqueue(IEvent @event)
         {
-            uncommittedEvents.Add(@event);
+            uncommittedEvents.Enqueue(@event);
         }
     }
 }

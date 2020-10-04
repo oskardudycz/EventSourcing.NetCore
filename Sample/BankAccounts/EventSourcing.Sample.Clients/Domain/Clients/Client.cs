@@ -5,7 +5,7 @@ using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 
 namespace EventSourcing.Sample.Clients.Domain.Clients
 {
-    public class Client: EventSourcedAggregate
+    public class Client: Aggregate
     {
         public string Name { get; private set; }
 
@@ -21,7 +21,7 @@ namespace EventSourcing.Sample.Clients.Domain.Clients
             Name = name;
             Email = email;
 
-            Append(new ClientCreated(id, new ClientInfo
+            Enqueue(new ClientCreated(id, new ClientInfo
             {
                 Email = email,
                 Name = name
@@ -33,7 +33,7 @@ namespace EventSourcing.Sample.Clients.Domain.Clients
             Name = clientInfo.Name;
             Email = clientInfo.Email;
 
-            Append(new ClientUpdated(Id, clientInfo));
+            Enqueue(new ClientUpdated(Id, clientInfo));
         }
     }
 }

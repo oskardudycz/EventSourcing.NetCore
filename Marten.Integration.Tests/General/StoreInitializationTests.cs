@@ -99,9 +99,9 @@ namespace Marten.Integration.Tests.General
         {
             using (var session = store.OpenSession())
             {
-                var events = session.Events.QueryAllRawEvents().ToList();
+                var result = session.Query<int>("SELECT 1");
 
-                events.Should().Not.Be.Null();
+                result.Should().Not.Be.Null();
             }
         }
     }

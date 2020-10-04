@@ -17,8 +17,6 @@ namespace Core
             services.AddScoped<ICommandBus, CommandBus>();
             services.AddScoped<IQueryBus, QueryBus>();
             services.TryAddScoped<IEventBus, EventBus>();
-
-            services.AddScoped<IIdGenerator, MartenIdGenerator>();
         }
 
         private static void AddMediatR(this IServiceCollection services)

@@ -26,6 +26,8 @@ namespace EventSourcing.Sample.Clients.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<int>("Version");
+
                     b.HasKey("Id");
 
                     b.ToTable("Clients");

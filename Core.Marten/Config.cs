@@ -1,11 +1,12 @@
 using System;
+using Core.Ids;
 using Marten;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Storage
 {
-    public class MartenConfig
+    public class Config
     {
         private const string DefaultSchema = "public";
 
@@ -23,7 +24,7 @@ namespace Core.Storage
 
         public static void AddMarten(this IServiceCollection services, IConfiguration config, Action<StoreOptions> configureOptions = null)
         {
-            var martenConfig = config.GetSection(DefaultConfigKey).Get<MartenConfig>();
+            var martenConfig = config.GetSection(DefaultConfigKey).Get<Config>();
 
             services.AddSingleton<IDocumentStore>(sp =>
             {
@@ -38,9 +39,11 @@ namespace Core.Storage
             });
             services.AddScoped(sp => sp.GetRequiredService<IDocumentStore>().OpenSession());
             services.AddScoped(sp => sp.GetRequiredService<IDocumentStore>().QuerySession());
+
+            services.AddScoped<IIdGenerator, MartenIdGenerator>();
         }
 
-        private static void SetStoreOptions(StoreOptions options, MartenConfig config, Action<StoreOptions> configureOptions = null)
+        private static void SetStoreOptions(StoreOptions options, Config config, Action<StoreOptions> configureOptions = null)
         {
             options.Connection(config.ConnectionString);
             options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;

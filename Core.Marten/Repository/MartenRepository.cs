@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Aggregates;
 using Marten;
 using Core.Events;
@@ -19,11 +18,8 @@ namespace Core.Storage
             IEventBus eventBus
         )
         {
-            Guard.Against.Null(documentSession, nameof(documentSession));
-            Guard.Against.Null(eventBus, nameof(eventBus));
-
-            this.documentSession = documentSession;
-            this.eventBus = eventBus;
+            this.documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
+            this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         }
 
         public Task<T> Find(Guid id, CancellationToken cancellationToken)
@@ -48,7 +44,7 @@ namespace Core.Storage
 
         private async Task Store(T aggregate, CancellationToken cancellationToken)
         {
-            var events = aggregate.DequeueUncommittedEvents().ToArray();
+            var events = aggregate.DequeueUncommittedEvents();
             documentSession.Events.Append(
                 aggregate.Id,
                 events
