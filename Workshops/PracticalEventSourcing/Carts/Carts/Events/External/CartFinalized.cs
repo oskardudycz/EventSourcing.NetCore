@@ -13,11 +13,14 @@ namespace Carts.Carts.Events.External
 
         public IReadOnlyList<ProductItem> ProductItems { get; }
 
-        public CartFinalized(Guid cartId, Guid clientId, IReadOnlyList<ProductItem> productItems)
+        public Guid TotalPrice { get; }
+
+        public CartFinalized(Guid cartId, Guid clientId, IReadOnlyList<ProductItem> productItems, Guid totalPrice)
         {
             CartId = cartId;
             ClientId = clientId;
             ProductItems = productItems;
+            TotalPrice = totalPrice;
         }
     }
 }
