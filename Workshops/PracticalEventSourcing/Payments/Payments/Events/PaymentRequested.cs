@@ -12,14 +12,11 @@ namespace Payments.Payments.Events
 
         public decimal Amount { get; }
 
-        public PaymentStatus PaymentStatus { get; }
-
-        public PaymentRequested(Guid orderId, Guid paymentId, decimal amount, PaymentStatus paymentStatus)
+        public PaymentRequested(Guid orderId, Guid paymentId, decimal amount)
         {
             OrderId = orderId;
             PaymentId = paymentId;
             Amount = amount;
-            PaymentStatus = paymentStatus;
         }
     }
 }

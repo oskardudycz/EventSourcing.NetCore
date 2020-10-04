@@ -10,13 +10,10 @@ namespace Payments.Payments.Events
 
         public DateTime TimedOutAt { get; }
 
-        public PaymentStatus PaymentStatus { get; }
-
-        public PaymentTimedOut(Guid orderId, Guid paymentId, DateTime timedOutAt, PaymentStatus paymentStatus)
+        public PaymentTimedOut(Guid orderId, Guid paymentId, DateTime timedOutAt)
         {
             PaymentId = paymentId;
             TimedOutAt = timedOutAt;
-            PaymentStatus = paymentStatus;
         }
 
     }

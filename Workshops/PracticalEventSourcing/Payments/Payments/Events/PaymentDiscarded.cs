@@ -9,13 +9,10 @@ namespace Payments.Payments.Events
         public Guid PaymentId { get; }
         public DiscardReason DiscardReason { get; }
 
-        public PaymentStatus PaymentStatus { get; }
-
-        public PaymentDiscarded(Guid paymentId, DiscardReason discardReason, PaymentStatus paymentStatus)
+        public PaymentDiscarded(Guid paymentId, DiscardReason discardReason)
         {
             PaymentId = paymentId;
             DiscardReason = discardReason;
-            PaymentStatus = paymentStatus;
         }
     }
 }
