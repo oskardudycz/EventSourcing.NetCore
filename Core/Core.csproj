@@ -2,16 +2,17 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <AssemblyName>EventSourcing.Sample.Transactions.Contracts</AssemblyName>
-        <PackageId>EventSourcing.Sample.Transactions.Contracts</PackageId>
+        <AssemblyName>Core</AssemblyName>
+        <PackageId>Core</PackageId>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="5.10.3" />
         <PackageReference Include="Marten" Version="3.12.1" />
+        <PackageReference Include="MediatR" Version="8.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Core\Core.csproj" />
+        <Folder Include="Properties\" />
     </ItemGroup>
 </Project>

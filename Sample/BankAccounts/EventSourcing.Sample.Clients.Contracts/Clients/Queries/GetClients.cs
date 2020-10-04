@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Domain.Queries;
+using Core.Queries;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Queries
 {

@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Commands;
-using Domain.Events;
+using Core.Commands;
+using Core.Events;
 using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
 using EventSourcing.Sample.Clients.Storage;
 using MediatR;

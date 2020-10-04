@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Queries;
+using Core.Queries;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
 using EventSourcing.Sample.Tasks.Views.Account;
 using EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary;

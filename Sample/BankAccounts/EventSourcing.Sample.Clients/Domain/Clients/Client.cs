@@ -1,5 +1,5 @@
 using System;
-using Domain.Aggregates;
+using Core.Aggregates;
 using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 

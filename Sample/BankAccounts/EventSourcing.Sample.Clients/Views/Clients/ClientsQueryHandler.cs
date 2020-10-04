@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Queries;
+using Core.Queries;
 using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
 using EventSourcing.Sample.Clients.Domain.Clients;
 using EventSourcing.Sample.Clients.Storage;

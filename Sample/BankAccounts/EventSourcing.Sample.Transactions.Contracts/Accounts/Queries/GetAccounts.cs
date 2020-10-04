@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Domain.Queries;
+using Core.Queries;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
 
 namespace EventSourcing.Sample.Tasks.Views.Accounts

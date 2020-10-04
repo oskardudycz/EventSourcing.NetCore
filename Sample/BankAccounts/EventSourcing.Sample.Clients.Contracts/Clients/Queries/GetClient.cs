@@ -1,5 +1,5 @@
 using System;
-using Domain.Queries;
+using Core.Queries;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Queries
 {

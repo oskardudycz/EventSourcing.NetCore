@@ -1,5 +1,5 @@
 using System;
-using Domain.Events;
+using Core.Events;
 using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Events

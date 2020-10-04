@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Domain.Events
+namespace Core.Events
 {
     public interface IEventBus
     {

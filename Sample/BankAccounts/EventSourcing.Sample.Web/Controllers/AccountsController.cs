@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Domain.Commands;
-using Domain.Queries;
+using Core.Commands;
+using Core.Queries;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
 using EventSourcing.Sample.Tasks.Views.Account;

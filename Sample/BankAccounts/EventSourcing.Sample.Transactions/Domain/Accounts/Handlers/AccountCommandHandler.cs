@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Commands;
-using Domain.Events;
+using Core.Commands;
+using Core.Events;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using EventSourcing.Sample.Transactions.Domain.Accounts;
 using EventSourcing.Sample.Transactions.Views.Clients;

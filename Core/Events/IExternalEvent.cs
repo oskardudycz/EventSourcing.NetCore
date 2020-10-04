@@ -1,4 +1,4 @@
-namespace Domain.Events
+namespace Core.Events
 {
     public interface IExternalEvent: IEvent
     {

@@ -1,5 +1,5 @@
 using System;
-using Domain.Commands;
+using Core.Commands;
 
 namespace EventSourcing.Sample.Tasks.Contracts.Accounts.Commands
 {

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Domain.Commands;
-using Domain.Queries;
+using Core.Commands;
+using Core.Queries;
 using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
 using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
 using EventSourcing.Sample.Clients.Contracts.Clients.Queries;

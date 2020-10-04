@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Domain.Commands;
-using Domain.Events;
-using Domain.Queries;
+using Core.Commands;
+using Core.Events;
+using Core.Queries;
 using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
@@ -136,7 +136,7 @@ namespace EventSourcing.Web.Sample
         }
 
         public void Configure(IApplicationBuilder app)
-        {            
+        {
             app.UseRouting();
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();

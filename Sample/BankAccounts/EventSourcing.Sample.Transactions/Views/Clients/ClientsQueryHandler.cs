@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Queries;
+using Core.Queries;
 using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
 using Marten;
 

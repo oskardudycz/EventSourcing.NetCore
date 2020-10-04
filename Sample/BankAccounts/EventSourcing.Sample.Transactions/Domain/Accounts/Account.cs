@@ -1,5 +1,5 @@
 using System;
-using Domain.Aggregates;
+using Core.Aggregates;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
 using EventSourcing.Sample.Tasks.Contracts.Transactions;
 using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;

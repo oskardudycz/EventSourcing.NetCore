@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using Domain.Commands;
-using Domain.Queries;
+using Core.Commands;
+using Core.Queries;
 using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
 using Microsoft.AspNetCore.Mvc;
 
