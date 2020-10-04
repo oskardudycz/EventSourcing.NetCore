@@ -30,7 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Core.Testing\Core.Testing.csproj" />
+        <ProjectReference Include="..\..\..\..\Core.Testing\Core.Testing.csproj" />
         <ProjectReference Include="..\MeetingsManagement.Api\MeetingsManagement.Api.csproj" />
         <ProjectReference Include="..\MeetingsManagement\MeetingsManagement.csproj" />
     </ItemGroup>
