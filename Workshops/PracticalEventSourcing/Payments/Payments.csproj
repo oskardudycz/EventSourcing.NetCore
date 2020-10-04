@@ -5,11 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Payments\Commands" />
-      <Folder Include="Payments\Events" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Core.csproj" />
     </ItemGroup>
 
