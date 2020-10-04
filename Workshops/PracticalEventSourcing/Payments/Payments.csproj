@@ -4,4 +4,13 @@
         <TargetFramework>netstandard2.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Payments\Commands" />
+      <Folder Include="Payments\Events" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Core\Core.csproj" />
+    </ItemGroup>
+
 </Project>
