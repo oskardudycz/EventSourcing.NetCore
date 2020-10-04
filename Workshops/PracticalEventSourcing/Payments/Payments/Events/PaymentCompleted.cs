@@ -8,12 +8,9 @@ namespace Payments.Payments.Events
     {
         public Guid PaymentId { get; }
 
-        public PaymentStatus PaymentStatus { get; }
-
-        public PaymentCompleted(Guid paymentId, PaymentStatus paymentStatus)
+        public PaymentCompleted(Guid paymentId)
         {
             PaymentId = paymentId;
-            PaymentStatus = paymentStatus;
         }
     }
 }
