@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core;
 using Core.Commands;
 using Core.Events;
 using Core.Queries;
@@ -58,7 +59,7 @@ namespace EventSourcing.Web.Sample
 
             services.AddTransient<IAccountNumberGenerator, RandomAccountNumberGenerator>();
 
-            ConfigureMediator(services);
+            services.AddCoreServices();
 
             ConfigureMarten(services);
 
@@ -69,10 +70,6 @@ namespace EventSourcing.Web.Sample
 
         private static void ConfigureCQRS(IServiceCollection services)
         {
-            services.AddScoped<ICommandBus, CommandBus>();
-            services.AddScoped<IQueryBus, QueryBus>();
-            services.AddScoped<IEventBus, EventBus>();
-
             services.AddScoped<IRequestHandler<CreateNewAccount, Unit>, AccountCommandHandler>();
             services.AddScoped<IRequestHandler<MakeTransfer, Unit>, AccountCommandHandler>();
             services.AddScoped<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
@@ -127,12 +124,6 @@ namespace EventSourcing.Web.Sample
         private void ConfigureEF(IServiceCollection services)
         {
             services.AddDbContext<ClientsDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("ClientsDatabase")));
-        }
-
-        private static void ConfigureMediator(IServiceCollection services)
-        {
-            services.AddScoped<IMediator, Mediator>();
-            services.AddTransient<ServiceFactory>(sp => t => sp.GetService(t));
         }
 
         public void Configure(IApplicationBuilder app)

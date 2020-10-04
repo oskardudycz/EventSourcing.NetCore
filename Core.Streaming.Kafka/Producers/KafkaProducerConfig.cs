@@ -1,7 +1,7 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 
-namespace Core.Events.External.Kafka
+namespace Core.Streaming.Kafka.Producers
 {
     public class KafkaProducerConfig
     {

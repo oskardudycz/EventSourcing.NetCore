@@ -1,6 +1,6 @@
 using Core.Commands;
 using Core.Events;
-using Core.Ids;
+using Core.Events.External;
 using Core.Queries;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,19 +10,22 @@ namespace Core
 {
     public static class Config
     {
-        public static void AddCoreServices(this IServiceCollection services)
+        public static IServiceCollection AddCoreServices(this IServiceCollection services)
         {
-            services.AddMediatR();
+            services.AddMediatR()
+                .AddScoped<ICommandBus, CommandBus>()
+                .AddScoped<IQueryBus, QueryBus>();
 
-            services.AddScoped<ICommandBus, CommandBus>();
-            services.AddScoped<IQueryBus, QueryBus>();
             services.TryAddScoped<IEventBus, EventBus>();
+            services.TryAddScoped<IExternalEventProducer, NulloExternalEventProducer>();
+
+            return services;
         }
 
-        private static void AddMediatR(this IServiceCollection services)
+        private static IServiceCollection AddMediatR(this IServiceCollection services)
         {
-            services.AddScoped<IMediator, Mediator>();
-            services.AddTransient<ServiceFactory>(sp => sp.GetService);
+            return services.AddScoped<IMediator, Mediator>()
+                .AddTransient<ServiceFactory>(sp => sp.GetService);
         }
     }
 }

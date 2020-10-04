@@ -1,10 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Events.External;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Core.Events.External
+namespace Core.Streaming.Consumers
 {
     //See more: https://www.stevejgordon.co.uk/asp-net-core-2-ihostedservice
     public class ExternalEventConsumerBackgroundWorker: IHostedService

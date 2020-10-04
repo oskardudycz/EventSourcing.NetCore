@@ -1,4 +1,5 @@
 using Core;
+using Core.Streaming.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,9 +27,9 @@ namespace MeetingsSearch
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Meeting Search", Version = "v1" });
             });
 
-            services.AddCoreServices();
-
-            services.AddMeetingsSearch(config);
+            services.AddCoreServices()
+                .AddKafkaConsumer()
+                .AddMeetingsSearch(config);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

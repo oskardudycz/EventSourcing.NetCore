@@ -2,13 +2,15 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
+using Core.Events;
+using Core.Events.External;
 using Core.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Core.Events.External.Kafka
+namespace Core.Streaming.Kafka.Consumers
 {
     public class KafkaConsumer: IExternalEventConsumer
     {

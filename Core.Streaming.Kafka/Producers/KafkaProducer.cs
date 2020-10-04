@@ -1,10 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using Confluent.Kafka;
+using Core.Events;
+using Core.Events.External;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
-namespace Core.Events.External.Kafka
+namespace Core.Streaming.Kafka.Producers
 {
     public class KafkaProducer: IExternalEventProducer
     {

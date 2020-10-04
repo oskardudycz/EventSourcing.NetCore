@@ -1,4 +1,5 @@
 using Core;
+using Core.Streaming.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,9 +28,9 @@ namespace MeetingsManagement.Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Meeting Management", Version = "v1" });
             });
 
-            services.AddCoreServices();
-
-            services.AddMeetingsManagement(config);
+            services.AddCoreServices()
+                .AddKafkaProducerAndConsumer()
+                .AddMeetingsManagement(config);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
