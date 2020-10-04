@@ -34,66 +34,66 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{821D83
 		docker\docker-compose.yml = docker\docker-compose.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workshop", "Workshop", "{CEEE5F74-121E-437F-B3B4-4E7C65482644}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workshops", "Workshops", "{CEEE5F74-121E-437F-B3B4-4E7C65482644}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01-EventStoreBasics", "01-EventStoreBasics", "{14D732F0-6655-4E12-A945-8F668A70BF7D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStoreBasics", "Workshop\01-EventStoreBasics\EventStoreBasics\EventStoreBasics.csproj", "{A445DD68-AD59-4D97-9142-5EA6F903D908}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStoreBasics", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\EventStoreBasics\EventStoreBasics.csproj", "{A445DD68-AD59-4D97-9142-5EA6F903D908}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStoreBasics.Tests", "Workshop\01-EventStoreBasics\EventStoreBasics.Tests\EventStoreBasics.Tests.csproj", "{C55A9F53-6C9D-4E77-BA17-610AD6412646}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStoreBasics.Tests", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\EventStoreBasics.Tests\EventStoreBasics.Tests.csproj", "{C55A9F53-6C9D-4E77-BA17-610AD6412646}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02-EventSourcingAdvanced", "02-EventSourcingAdvanced", "{A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsSearch.Api", "Workshop\02-EventSourcingAdvanced\MeetingsSearch.Api\MeetingsSearch.Api.csproj", "{431FF491-256F-4B29-8190-8363A2187CEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsSearch.Api", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsSearch.Api\MeetingsSearch.Api.csproj", "{431FF491-256F-4B29-8190-8363A2187CEA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsManagement.Api", "Workshop\02-EventSourcingAdvanced\MeetingsManagement.Api\MeetingsManagement.Api.csproj", "{3BF46F7C-D492-4CA3-BF62-90EA62288012}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsManagement.Api", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsManagement.Api\MeetingsManagement.Api.csproj", "{3BF46F7C-D492-4CA3-BF62-90EA62288012}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Workshop\02-EventSourcingAdvanced\Core\Core.csproj", "{4C6E3A8B-18BB-44BB-B71F-48B2A410E0F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\Core\Core.csproj", "{4C6E3A8B-18BB-44BB-B71F-48B2A410E0F9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsManagement", "Workshop\02-EventSourcingAdvanced\MeetingsManagement\MeetingsManagement.csproj", "{A67B74EF-CEF3-45C5-99C8-064BA640C7E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsManagement", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsManagement\MeetingsManagement.csproj", "{A67B74EF-CEF3-45C5-99C8-064BA640C7E4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsSearch", "Workshop\02-EventSourcingAdvanced\MeetingsSearch\MeetingsSearch.csproj", "{2D79A980-392C-4AB9-8056-B1B50B988900}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsSearch", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsSearch\MeetingsSearch.csproj", "{2D79A980-392C-4AB9-8056-B1B50B988900}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01-CreateStreamsTable", "Workshop\01-EventStoreBasics\01-CreateStreamsTable\01-CreateStreamsTable.csproj", "{5E3DAEF4-F77A-4087-A022-CF6852D951CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01-CreateStreamsTable", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\01-CreateStreamsTable\01-CreateStreamsTable.csproj", "{5E3DAEF4-F77A-4087-A022-CF6852D951CF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Workshop\01-EventStoreBasics\Tools\Tools.csproj", "{F7809E15-D911-4B8C-B62F-FA9DE63A26F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\Tools\Tools.csproj", "{F7809E15-D911-4B8C-B62F-FA9DE63A26F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02-CreateEventsTable", "Workshop\01-EventStoreBasics\02-CreateEventsTable\02-CreateEventsTable.csproj", "{F992EFBF-CBAD-445D-A07E-3CB3C0571BDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02-CreateEventsTable", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\02-CreateEventsTable\02-CreateEventsTable.csproj", "{F992EFBF-CBAD-445D-A07E-3CB3C0571BDD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03-CreateAppendEventFunction", "Workshop\01-EventStoreBasics\03-CreateAppendEventFunction\03-CreateAppendEventFunction.csproj", "{F6CA2354-0E98-4818-BF67-77EB20AC09DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03-CreateAppendEventFunction", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\03-CreateAppendEventFunction\03-CreateAppendEventFunction.csproj", "{F6CA2354-0E98-4818-BF67-77EB20AC09DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "04-EventStoreMethods", "Workshop\01-EventStoreBasics\04-EventStoreMethods\04-EventStoreMethods.csproj", "{04F02CF1-D30F-435C-951A-273FED1BF91A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "04-EventStoreMethods", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\04-EventStoreMethods\04-EventStoreMethods.csproj", "{04F02CF1-D30F-435C-951A-273FED1BF91A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "05-StreamAggregation", "Workshop\01-EventStoreBasics\05-StreamAggregation\05-StreamAggregation.csproj", "{4E9FFCAC-8125-4243-A4B6-3857C2B5FC33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "05-StreamAggregation", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\05-StreamAggregation\05-StreamAggregation.csproj", "{4E9FFCAC-8125-4243-A4B6-3857C2B5FC33}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "06-TimeTraveling", "Workshop\01-EventStoreBasics\06-TimeTraveling\06-TimeTraveling.csproj", "{80E5D543-A7AE-4043-87E8-1DE12145C4BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "06-TimeTraveling", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\06-TimeTraveling\06-TimeTraveling.csproj", "{80E5D543-A7AE-4043-87E8-1DE12145C4BF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "07-AggregateAndRepository", "Workshop\01-EventStoreBasics\07-AggregateAndRepository\07-AggregateAndRepository.csproj", "{10E209CA-813E-4FDF-856D-AFFB3CA585AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "07-AggregateAndRepository", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\07-AggregateAndRepository\07-AggregateAndRepository.csproj", "{10E209CA-813E-4FDF-856D-AFFB3CA585AD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "08-Snapshots", "Workshop\01-EventStoreBasics\08-Snapshots\08-Snapshots.csproj", "{C906736D-0B5D-4D22-AF2D-1FDF24E1CE55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "08-Snapshots", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\08-Snapshots\08-Snapshots.csproj", "{C906736D-0B5D-4D22-AF2D-1FDF24E1CE55}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "09-Projections", "Workshop\01-EventStoreBasics\09-Projections\09-Projections.csproj", "{F07A16AB-3866-4B52-AE66-E8CE1B24202A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "09-Projections", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\09-Projections\09-Projections.csproj", "{F07A16AB-3866-4B52-AE66-E8CE1B24202A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "10-ProjectionsWithMarten", "Workshop\01-EventStoreBasics\10-ProjectionsWithMarten\10-ProjectionsWithMarten.csproj", "{B112DE86-F995-4D8C-98CA-A7E169D41775}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "10-ProjectionsWithMarten", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\10-ProjectionsWithMarten\10-ProjectionsWithMarten.csproj", "{B112DE86-F995-4D8C-98CA-A7E169D41775}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03-OptimisticConcurrency", "Workshop\01-EventStoreBasics\03-OptimisticConcurrency\03-OptimisticConcurrency.csproj", "{007BC4EB-7021-49B2-977E-959F10347C86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03-OptimisticConcurrency", "Workshops\BuildYourOwnEventStore\01-EventStoreBasics\03-OptimisticConcurrency\03-OptimisticConcurrency.csproj", "{007BC4EB-7021-49B2-977E-959F10347C86}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsManagement.IntegrationTests", "Workshop\02-EventSourcingAdvanced\MeetingsManagement.IntegrationTests\MeetingsManagement.IntegrationTests.csproj", "{81CE8853-7B41-4F4E-B2C2-6522FD3A54F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsManagement.IntegrationTests", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsManagement.IntegrationTests\MeetingsManagement.IntegrationTests.csproj", "{81CE8853-7B41-4F4E-B2C2-6522FD3A54F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Testing", "Workshop\02-EventSourcingAdvanced\Core.Testing\Core.Testing.csproj", "{6FE4A03B-EE5B-4CD5-8810-7EA2BC378D39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Testing", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\Core.Testing\Core.Testing.csproj", "{6FE4A03B-EE5B-4CD5-8810-7EA2BC378D39}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{2B5903DE-AD97-4E3B-ADDA-22DAC5E98C3D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsSearch.IntegrationTests", "Workshop\02-EventSourcingAdvanced\MeetingsSearch.IntegrationTests\MeetingsSearch.IntegrationTests.csproj", "{58C58B11-441E-46CD-AB12-DD2F51C1B992}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsSearch.IntegrationTests", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsSearch.IntegrationTests\MeetingsSearch.IntegrationTests.csproj", "{58C58B11-441E-46CD-AB12-DD2F51C1B992}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{E15B4D4B-1527-446F-8613-A09B230D6643}"
 	ProjectSection(SolutionItems) = preProject
-		Workshop\01-EventStoreBasics\docker\docker-compose.yml = Workshop\01-EventStoreBasics\docker\docker-compose.yml
+		Workshops\BuildYourOwnEventStore\01-EventStoreBasics\docker\docker-compose.yml = Workshops\BuildYourOwnEventStore\01-EventStoreBasics\docker\docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{F755E316-140C-4A73-9586-06860521C1B6}"
 	ProjectSection(SolutionItems) = preProject
-		Workshop\02-EventSourcingAdvanced\docker\docker-compose.yml = Workshop\02-EventSourcingAdvanced\docker\docker-compose.yml
+		Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\docker\docker-compose.yml = Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\docker\docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tickets", "Tickets", "{3C628C0A-71AD-4C41-9977-A33F89C0751B}"
@@ -129,6 +129,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventSourcing.Sample.Web", "Sample\BankAccounts\EventSourcing.Sample.Web\EventSourcing.Sample.Web.csproj", "{084FBED7-9B9A-447C-9987-4BB0EAF1E302}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventSourcing.Sample.IntegrationTests", "Sample\BankAccounts\EventSourcing.Sample.IntegrationTests\EventSourcing.Sample.IntegrationTests.csproj", "{344EFF7D-329C-4A1A-B96D-EF6C9A582CF9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildYourOwnEventStore", "BuildYourOwnEventStore", "{94524EA9-A4BA-4684-99B8-BBE9EE85E791}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -315,10 +317,8 @@ Global
 		{E942A5A1-2B6E-41A0-8445-C5A38D955611} = {107B18E3-65C8-4A6C-976D-7EEED6A6D318}
 		{7532F3EB-D50F-490C-A1E1-4E0B882281FD} = {107B18E3-65C8-4A6C-976D-7EEED6A6D318}
 		{215691EC-51FB-4BD2-A46C-396094727054} = {107B18E3-65C8-4A6C-976D-7EEED6A6D318}
-		{14D732F0-6655-4E12-A945-8F668A70BF7D} = {CEEE5F74-121E-437F-B3B4-4E7C65482644}
 		{A445DD68-AD59-4D97-9142-5EA6F903D908} = {14D732F0-6655-4E12-A945-8F668A70BF7D}
 		{C55A9F53-6C9D-4E77-BA17-610AD6412646} = {14D732F0-6655-4E12-A945-8F668A70BF7D}
-		{A8E25331-55E9-4D1A-87A4-136EC4D2A4B5} = {CEEE5F74-121E-437F-B3B4-4E7C65482644}
 		{431FF491-256F-4B29-8190-8363A2187CEA} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
 		{3BF46F7C-D492-4CA3-BF62-90EA62288012} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
 		{4C6E3A8B-18BB-44BB-B71F-48B2A410E0F9} = {2B5903DE-AD97-4E3B-ADDA-22DAC5E98C3D}
@@ -359,6 +359,9 @@ Global
 		{B352BEFA-85D7-4457-9976-1B3063B5B7C1} = {AE965108-8461-4D7B-A183-41AB4D2BC179}
 		{084FBED7-9B9A-447C-9987-4BB0EAF1E302} = {AE965108-8461-4D7B-A183-41AB4D2BC179}
 		{344EFF7D-329C-4A1A-B96D-EF6C9A582CF9} = {AE965108-8461-4D7B-A183-41AB4D2BC179}
+		{94524EA9-A4BA-4684-99B8-BBE9EE85E791} = {CEEE5F74-121E-437F-B3B4-4E7C65482644}
+		{14D732F0-6655-4E12-A945-8F668A70BF7D} = {94524EA9-A4BA-4684-99B8-BBE9EE85E791}
+		{A8E25331-55E9-4D1A-87A4-136EC4D2A4B5} = {94524EA9-A4BA-4684-99B8-BBE9EE85E791}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A5F55604-2FF3-43B7-B657-4F18E6E95D3B}

@@ -5,29 +5,29 @@
 Tutorial, practical samples and other resources about Event Sourcing in .NET Core.
 
 - [EventSourcing.NetCore](#eventsourcingnetcore)
-  - [Support](#support)
-  - [Prerequisites](#prerequisites)
-  - [Libraries used](#libraries-used)
-  - [1. Event Store - Marten](#1-event-store---marten)
-  - [2. Message Bus (for processing Commands, Queries, Events) - MediatR](#2-message-bus-for-processing-commands-queries-events---mediatr)
-  - [3. CQRS (Command Query Responsibility Separation)](#3-cqrs-command-query-responsibility-separation)
-  - [4. Fully working sample application](#4-fully-working-sample-application)
-  - [5. Self-paced training Kit](#5-self-paced-training-kit)
-  - [6. NuGet packages to help you get started.](#6-nuget-packages-to-help-you-get-started)
-  - [7. Other resources](#7-other-resources)
-    - [7.1 Various](#71-various)
-    - [7.2 Snapshots](#72-snapshots)
-    - [7.3 Projections](#73-projections)
-    - [7.4 Event processing](#74-event-processing)
-    - [7.5 Distributed processes](#75-distributed-processes)
-    - [7.6 Modeling](#76-modeling)
-  - [Contributors](#contributors)
-    - [Code Contributors](#code-contributors)
-    - [Financial Contributors](#financial-contributors)
+  - [1. Support](#1-support)
+  - [2. Prerequisites](#2-prerequisites)
+  - [3. Libraries used](#3-libraries-used)
+  - [4. Event Store - Marten](#4-event-store---marten)
+  - [5. Message Bus (for processing Commands, Queries, Events) - MediatR](#5-message-bus-for-processing-commands-queries-events---mediatr)
+  - [6. CQRS (Command Query Responsibility Separation)](#6-cqrs-command-query-responsibility-separation)
+  - [7. Fully working sample application](#7-fully-working-sample-application)
+  - [8. Self-paced training Kit](#8-self-paced-training-kit)
+  - [9. NuGet packages to help you get started.](#9-nuget-packages-to-help-you-get-started)
+  - [10. Other resources](#10-other-resources)
+    - [10.1 Various](#101-various)
+    - [10.2 Snapshots](#102-snapshots)
+    - [10.3 Projections](#103-projections)
+    - [10.4 Event processing](#104-event-processing)
+    - [10.5 Distributed processes](#105-distributed-processes)
+    - [10.6 Modeling](#106-modeling)
+  - [11. Contributors](#11-contributors)
+    - [11.1 Code Contributors](#111-code-contributors)
+    - [11.2 Financial Contributors](#112-financial-contributors)
       - [Individuals](#individuals)
       - [Organizations](#organizations)
 
-## Support
+## 1. Support
 
 Feel free to [create an issue](https://github.com/oskardudycz/EventSourcing.NetCore/issues/new) if you have any questions or request for more explanation or samples. I also take **Pull Requests**!
 
@@ -35,7 +35,7 @@ Feel free to [create an issue](https://github.com/oskardudycz/EventSourcing.NetC
 
 👉 [Github Sponsors](https://github.com/sponsors/oskardudycz) 
 
-## Prerequisites
+## 2. Prerequisites
 
 For running the Event Store examples you need to have Postgres DB. You can get it by:
 
@@ -56,17 +56,17 @@ Video presentations (PL):
 <a href="https://www.youtube.com/watch?v=i1XDr9km0RY&list=PLexysh97plk3wjoYvHlLbrFRNP3T9i8Y7&index=5" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
 
 Slides:
-- **Practical Event Sourcing with Marten** - [EN](./EventSourcing_with_Marten_EN.pptx), [PL](./EventSourcing_with_Marten_PL.pptx)
-- **Ligths and Shades of Event-Driven Design** -  [EN](./Lights_And_Shades_Of_Event-Driven_Design.pptx), [PL](./SegFault-Blaski_i_Cienie.pptx)
-- **Adventures in Event Sourcing and CQRS** - [PL](./Slides.pptx)
+- **Practical Event Sourcing with Marten** - [EN](./Slides/EventSourcing_with_Marten_EN.pptx), [PL](./Slides/EventSourcing_with_Marten_PL.pptx)
+- **Ligths and Shades of Event-Driven Design** -  [EN](./Slides/Lights_And_Shades_Of_Event-Driven_Design.pptx), [PL](./Slides/SegFault-Blaski_i_Cienie.pptx)
+- **Adventures in Event Sourcing and CQRS** - [PL](./Slides/Slides.pptx)
 
-## Libraries used
+## 3. Libraries used
 
 1. [Marten](https://github.com/JasperFx/marten) - Event Store
 
 2. [MediatR](https://github.com/jbogard/MediatR) - Message Bus (for processing Commands, Queries, Events)
 
-## 1. Event Store - Marten
+## 4. Event Store - Marten
 
 -   **[Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/General/StoreInitializationTests.cs)**
 -   **Event Stream** - is a representation of the entity in event sourcing. It's a set of events that happened for the entity with the exact id. Stream id should be unique, can have different types but usually is a Guid.
@@ -124,7 +124,7 @@ Slides:
 -   **Events projection**
     -   **[Projection of single stream](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Projections/ViewProjectionsTest.cs)**
 
-## 2. Message Bus (for processing Commands, Queries, Events) - MediatR
+## 5. Message Bus (for processing Commands, Queries, Events) - MediatR
 
 -   **[Initialization](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/MediatR.Tests/Initialization/Initialization.cs)** - MediatR uses services locator pattern to find a proper handler for the message type.
 -   **Sending Messages** - finds and uses the first registered handler for the message type. It could be used for queries (when we need to return values), commands (when we acting).
@@ -137,43 +137,43 @@ Slides:
     -   **[More Than One Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/MediatR.Tests/Publishing/MoreThanOneHandler.cs)** - when there is more than one handler registered MediatR takes only all of them when calling Publish method
 -   Pipeline (to be defined)
 
-## 3. CQRS (Command Query Responsibility Separation)
+## 6. CQRS (Command Query Responsibility Separation)
 
 -   **[Command handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/CQRS.Tests/Commands/Commands.cs)**
 -   **[Query handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/CQRS.Tests/Queries/Queries.cs)**
 
-## 4. Fully working sample application
+## 7. Fully working sample application
 
 See also fully working sample application in [Sample Project](https://github.com/oskardudycz/EventSourcing.NetCore/tree/main/Sample)
 
 -   See [sample](https://github.com/oskardudycz/EventSourcing.NetCore/tree/main/Sample/EventSourcing.Sample.IntegrationTests/Clients/CreateClientTests.cs) how Entity Framework and Marten can coexist together with CQRS and Event Sourcing
 
-## 5. Self-paced training Kit
+## 8. Self-paced training Kit
 
-I prepared the self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Workshop/Readme.md).
+I prepared the self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Workshops/BuildYourOwnEventStore/Readme.md).
 
 It's split into two parts:
 
-**Event Sourcing basics** - it teaches the event store basics by showing how to build your Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projections, snapshots, and finishes with the `Marten` basics. See more in [here](./Workshop/01-EventStoreBasics/).
+**Event Sourcing basics** - it teaches the event store basics by showing how to build your Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projections, snapshots, and finishes with the `Marten` basics. See more in [here](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/).
 
-1. [Streams Table](./Workshop/01-EventStoreBasics/01-CreateStreamsTable)
-2. [Events Table](./Workshop/01-EventStoreBasics/02-CreateEventsTable)
-3. [Appending Events](./Workshop/01-EventStoreBasics/03-CreateAppendEventFunction)
-4. [Optimistic Concurrency Handling](03-OptimisticConcurrency)
-5. [Event Store Methods](./Workshop/01-EventStoreBasics/04-EventStoreMethods)
-6. [Stream Aggregation](./Workshop/01-EventStoreBasics/05-StreamAggregation)
-7. [Time Travelling](./Workshop/01-EventStoreBasics/06-TimeTraveling)
-8. [Aggregate and Repositories](./Workshop/01-EventStoreBasics/07-AggregateAndRepository)
-9. [Snapshots](./Workshop/01-EventStoreBasics/08-Snapshots)
-10. [Projections](./Workshop/01-EventStoreBasics/09-Projections)
-11. [Projections With Marten](./Workshop/01-EventStoreBasics/10-ProjectionsWithMarten)
+1. [Streams Table](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/01-CreateStreamsTable)
+2. [Events Table](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/02-CreateEventsTable)
+3. [Appending Events](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/03-CreateAppendEventFunction)
+4. [Optimistic Concurrency Handling](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/03-OptimisticConcurrency)
+5. [Event Store Methods](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/04-EventStoreMethods)
+6. [Stream Aggregation](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/05-StreamAggregation)
+7. [Time Travelling](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/06-TimeTraveling)
+8. [Aggregate and Repositories](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/07-AggregateAndRepository)
+9. [Snapshots](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/08-Snapshots)
+10. [Projections](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/09-Projections)
+11. [Projections With Marten](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/10-ProjectionsWithMarten)
 
-**Event Sourcing advanced topics** - it's a real-world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores. See more in [here](./Workshop/02-EventSourcingAdvanced/).
+**Event Sourcing advanced topics** - it's a real-world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores. See more in [here](./Workshops/BuildYourOwnEventStore/02-EventSourcingAdvanced/).
 
-1. [Meetings Management Module](./Workshop/02-EventSourcingAdvanced/MeetingsManagement) - the module responsible for creating, updating meeting details. Written in `Marten` in **Event Sourcing** pattern. Provides both write model (with Event Sourced aggregates) and read model with projections.
-2. [Meetings Search Module](./Workshop/02-EventSourcingAdvanced/MeetingsSearch) - responsible for searching and advanced filtering. Uses `ElasticSearch` as storage (because of its advanced searching capabilities). It's a read module that's listening for the events published by the Meetings Management Module.
+1. [Meetings Management Module](./Workshops/BuildYourOwnEventStore/02-EventSourcingAdvanced/MeetingsManagement) - the module responsible for creating, updating meeting details. Written in `Marten` in **Event Sourcing** pattern. Provides both write model (with Event Sourced aggregates) and read model with projections.
+2. [Meetings Search Module](./Workshops/BuildYourOwnEventStore/02-EventSourcingAdvanced/MeetingsSearch) - responsible for searching and advanced filtering. Uses `ElasticSearch` as storage (because of its advanced searching capabilities). It's a read module that's listening for the events published by the Meetings Management Module.
 
-## 6. NuGet packages to help you get started.
+## 9. NuGet packages to help you get started.
 
 I gathered and generalized all of the practices used in this tutorial/samples in Nuget Packages maintained by me [GoldenEye Framework](https://github.com/oskardudycz/GoldenEye).
 See more in:
@@ -194,9 +194,9 @@ The simplest way to start is **installing the [project template](https://github.
 
 `dotnet new SimpleDDD -n NameOfYourProject`
 
-## 7. Other resources
+## 10. Other resources
 
-### 7.1 Various
+### 10.1 Various
 -   📝 [Greg Young - Building an Event Storage](https://cqrs.wordpress.com/documents/building-event-storage/)
 -   📝 [Mathias Verraes - DDD and Messaging Architectures](http://verraes.net/2019/05/ddd-msg-arch/)
 -   📝 [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
@@ -232,14 +232,14 @@ The simplest way to start is **installing the [project template](https://github.
 -   🎞 [Mathew McLoughlin - An Introduction to CQRS and Event Sourcing Patterns](https://www.youtube.com/watch?v=9a1PqwFrMP0)
 -   🎞 [Alexey Zimarev - DDD, Event Sourcing and Actors](https://www.youtube.com/watch?v=58_Ehl3oETY)
 
-### 7.2 Snapshots
+### 10.2 Snapshots
 -   📝 [Kacper Gunia - Event Sourcing: Snapshotting](https://domaincentric.net/blog/event-sourcing-snapshotting)
 
-### 7.3 Projections 
+### 10.3 Projections 
 -   📝 [Alexey Zimarev - Projections in Event Sourcing](https://zimarev.com/blog/event-sourcing/projections/)
 -   📝 [Rinat Abdulin - Event Sourcing - Projections](https://abdullin.com/post/event-sourcing-projections/)
 
-### 7.4 Event processing
+### 10.4 Event processing
 -   📝 [Kamil Grzybek - The Outbox Pattern](http://www.kamilgrzybek.com/design/the-outbox-pattern/)
 -   🎞 [Dev Mentors - Inbox & Outbox pattern - transactional message processing](https://www.youtube.com/watch?v=ebyR5RPKciw)
 -   📝 [Jeremy D. Miller - Jasper’s “Outbox” Pattern Support](https://jeremydmiller.com/2018/04/16/jaspers-outbox-pattern-support/)
@@ -248,7 +248,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [NServiceBus - Outbox](https://docs.particular.net/nservicebus/outbox/)
 -   📝 [Alvaro Herrera - Implement SKIP LOCKED for row-level locks](https://www.depesz.com/2014/10/10/waiting-for-9-5-implement-skip-locked-for-row-level-locks/)
 
-### 7.5 Distributed processes
+### 10.5 Distributed processes
 -   📝 [Hector Garcaa-Molrna, Kenneth Salem - Sagas](https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
 -   🎞 [Caitie McCaffrey - Applying the Saga Pattern](https://www.youtube.com/watch?v=xDuwrtwYHu8)
 -   🎞 [Udi Dahan - If (domain logic) then CQRS or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
@@ -263,18 +263,18 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Rinat Abdullin - Evolving Business Processes](https://abdullin.com/post/ddd-evolving-business-processes-a-la-lokad/)
 -   📝 [Microsoft - A Saga on Sagas](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591569(v=pandp.10))
 
-### 7.6 Modeling
+### 10.6 Modeling
 -   📝 [Event Modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
 -   📝 [Event Storming](https://leanpub.com/introducing_eventstorming)
 
-## Contributors
+## 11. Contributors
 
-### Code Contributors
+### 11.1 Code Contributors
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
 <a href="https://github.com/oskardudycz/EventSourcing.NetCore/graphs/contributors"><img src="https://opencollective.com/eventsourcingnetcore/contributors.svg?width=890&button=false" /></a>
 
-### Financial Contributors
+### 11.2 Financial Contributors
 
 Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/eventsourcingnetcore/contribute)]
 
