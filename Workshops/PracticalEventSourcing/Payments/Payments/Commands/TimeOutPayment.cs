@@ -9,7 +9,7 @@ namespace Payments.Payments.Commands
 
         public DateTime TimedOutAt { get; }
 
-        public TimeOutPayment(Guid orderId, Guid paymentId, DateTime timedOutAt)
+        public TimeOutPayment(Guid paymentId, DateTime timedOutAt)
         {
             PaymentId = paymentId;
             TimedOutAt = timedOutAt;

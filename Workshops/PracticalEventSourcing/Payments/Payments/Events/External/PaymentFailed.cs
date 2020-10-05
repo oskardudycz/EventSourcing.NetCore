@@ -11,11 +11,14 @@ namespace Payments.Payments.Events.External
 
         public decimal Amount { get; }
 
-        public PaymentFailed(Guid orderId, Guid paymentId, decimal amount)
+        public DateTime FailedAt { get; }
+
+        public PaymentFailed(Guid orderId, Guid paymentId, decimal amount, DateTime failedAt)
         {
             OrderId = orderId;
             PaymentId = paymentId;
             Amount = amount;
+            FailedAt = failedAt;
         }
     }
 }

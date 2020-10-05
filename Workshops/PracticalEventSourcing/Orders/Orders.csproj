@@ -5,12 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Orders\Commands" />
-      <Folder Include="Orders\Events" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Core.csproj" />
+      <ProjectReference Include="..\Carts\Carts.csproj" />
+      <ProjectReference Include="..\Payments\Payments.csproj" />
+      <ProjectReference Include="..\Shipments\Shipments.csproj" />
     </ItemGroup>
 
 </Project>

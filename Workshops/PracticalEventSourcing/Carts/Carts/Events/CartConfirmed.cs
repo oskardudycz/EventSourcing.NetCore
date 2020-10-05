@@ -9,10 +9,13 @@ namespace Carts.Carts.Events
 
         public CartStatus CartStatus { get; }
 
-        public CartConfirmed(Guid cartId, CartStatus cartStatus)
+        public DateTime ConfirmedAt { get; }
+
+        public CartConfirmed(Guid cartId, CartStatus cartStatus, DateTime confirmedAt)
         {
             CartId = cartId;
             CartStatus = cartStatus;
+            ConfirmedAt = confirmedAt;
         }
     }
 }

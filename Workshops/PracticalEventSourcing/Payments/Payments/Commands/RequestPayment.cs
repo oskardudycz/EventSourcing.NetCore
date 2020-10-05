@@ -7,14 +7,11 @@ namespace Payments.Payments.Commands
     {
         public Guid OrderId { get; }
 
-        public Guid PaymentId { get; }
-
         public decimal Amount { get; }
 
-        public RequestPayment(Guid orderId, Guid paymentId, decimal amount)
+        public RequestPayment(Guid orderId, decimal amount)
         {
             OrderId = orderId;
-            PaymentId = paymentId;
             Amount = amount;
         }
     }
