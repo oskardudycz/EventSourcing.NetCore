@@ -8,7 +8,7 @@ namespace Carts.Carts.ValueObjects
 
         public int Quantity { get; }
 
-        public ProductItem(Guid productId, decimal unitPrice, int quantity)
+        public ProductItem(Guid productId, int quantity)
         {
             ProductId = productId;
             Quantity = quantity;

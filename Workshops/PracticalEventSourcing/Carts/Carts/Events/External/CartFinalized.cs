@@ -11,16 +11,24 @@ namespace Carts.Carts.Events.External
 
         public Guid ClientId { get; }
 
-        public IReadOnlyList<ProductItem> ProductItems { get; }
+        public IReadOnlyList<PricedProductItem> ProductItems { get; }
 
-        public Guid TotalPrice { get; }
+        public decimal TotalPrice { get; }
 
-        public CartFinalized(Guid cartId, Guid clientId, IReadOnlyList<ProductItem> productItems, Guid totalPrice)
+        public DateTime FinalizedAt { get; }
+
+        public CartFinalized(
+            Guid cartId,
+            Guid clientId,
+            IReadOnlyList<PricedProductItem> productItems,
+            decimal totalPrice,
+            DateTime finalizedAt)
         {
             CartId = cartId;
             ClientId = clientId;
             ProductItems = productItems;
             TotalPrice = totalPrice;
+            FinalizedAt = finalizedAt;
         }
     }
 }

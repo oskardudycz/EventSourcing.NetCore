@@ -7,7 +7,9 @@ namespace Payments.Payments.Commands
     {
         public Guid PaymentId { get; }
 
-        public CompletePayment(Guid paymentId)
+        public CompletePayment(
+            Guid paymentId,
+            DateTime completedAt)
         {
             PaymentId = paymentId;
         }

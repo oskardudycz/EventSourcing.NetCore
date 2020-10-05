@@ -6,6 +6,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Core.csproj" />
+      <ProjectReference Include="..\Carts\Carts.csproj" />
     </ItemGroup>
 
 </Project>

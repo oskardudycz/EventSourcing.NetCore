@@ -9,9 +9,9 @@ namespace Carts.Carts.Events
 
         public Guid ClientId { get; }
 
-        public Guid CartStatus { get; }
+        public CartStatus CartStatus { get; }
 
-        public CartInitialized(Guid cartId, Guid clientId, Guid cartStatus)
+        public CartInitialized(Guid cartId, Guid clientId, CartStatus cartStatus)
         {
             CartId = cartId;
             ClientId = clientId;
