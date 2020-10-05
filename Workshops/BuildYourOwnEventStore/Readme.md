@@ -11,7 +11,7 @@
 7. Clone Project https://github.com/oskardudycz/EventSourcing.NetCore, make sure that's compiling
 8. Go to gitter channel https://gitter.im/oskardudycz/szkola-event-sourcing.
 9. Check https://github.com/StackExchange/Dapper/, https://github.com/jbogard/MediatR, http://jasperfx.github.io/marten/documentation/
-10. Open `Workshop.sln` solution.
+10. Open `BuildYourOwnEventStore.sln` solution.
 11. Docker useful commands
 
     - `docker-compose up` - start dockers
