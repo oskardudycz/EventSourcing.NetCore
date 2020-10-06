@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Events;
-using Core.Storage;
+using Core.Repositories;
 using MeetingsSearch.Meetings.Events;
 
 namespace MeetingsSearch.Meetings

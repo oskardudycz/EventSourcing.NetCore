@@ -6,6 +6,6 @@ namespace Carts.Pricing
 {
     public interface IProductPriceCalculator
     {
-        IReadOnlyList<PricedProductItem> Calculate(Guid userId, IReadOnlyList<ProductItem> productItems);
+        IReadOnlyList<PricedProductItem> Calculate(params ProductItem[] productItems);
     }
 }

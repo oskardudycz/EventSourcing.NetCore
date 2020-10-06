@@ -2,8 +2,8 @@ namespace Carts.Carts
 {
     public enum CartStatus
     {
-        Pending,
-        Confirmed,
-        Cancelled
+        Pending = 1,
+        Confirmed = 2,
+        Cancelled = 3
     }
 }

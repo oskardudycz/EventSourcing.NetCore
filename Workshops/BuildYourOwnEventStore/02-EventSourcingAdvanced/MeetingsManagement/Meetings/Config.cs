@@ -1,4 +1,4 @@
-using Core.Storage;
+using Core.Repositories;
 using Marten;
 using MediatR;
 using MeetingsManagement.Meetings.Commands;
