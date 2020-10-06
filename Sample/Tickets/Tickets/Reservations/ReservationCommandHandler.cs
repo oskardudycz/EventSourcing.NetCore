@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Core.Commands;
+using Core.Repositories;
 using Core.Storage;
 using MediatR;
 using Tickets.Reservations.Commands;

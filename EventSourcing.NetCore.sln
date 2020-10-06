@@ -119,6 +119,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventSourcing.Sample.IntegrationTests", "Sample\BankAccounts\EventSourcing.Sample.IntegrationTests\EventSourcing.Sample.IntegrationTests.csproj", "{344EFF7D-329C-4A1A-B96D-EF6C9A582CF9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildYourOwnEventStore", "BuildYourOwnEventStore", "{94524EA9-A4BA-4684-99B8-BBE9EE85E791}"
+ProjectSection(SolutionItems) = preProject
+	Workshops\BuildYourOwnEventStore\Readme.md = Workshops\BuildYourOwnEventStore\Readme.md
+EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PracticalEventSourcing", "PracticalEventSourcing", "{DAAECD4C-BCF7-4D9B-BD7B-C028E77B8245}"
 EndProject

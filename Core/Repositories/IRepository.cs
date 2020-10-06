@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
 
-namespace Core.Storage
+namespace Core.Repositories
 {
     public interface IRepository<T> where T : IAggregate
     {

@@ -1,4 +1,5 @@
 using System;
+using Ardalis.GuardClauses;
 using Core.Events;
 
 namespace Carts.Carts.Events
@@ -7,15 +8,20 @@ namespace Carts.Carts.Events
     {
         public Guid CartId { get; }
 
-        public CartStatus CartStatus { get; }
-
         public DateTime ConfirmedAt { get; }
 
-        public CartConfirmed(Guid cartId, CartStatus cartStatus, DateTime confirmedAt)
+        private CartConfirmed(Guid cartId, DateTime confirmedAt)
         {
             CartId = cartId;
-            CartStatus = cartStatus;
             ConfirmedAt = confirmedAt;
+        }
+
+        public static CartConfirmed Create(Guid cartId, DateTime confirmedAt)
+        {
+            Guard.Against.Default(cartId, nameof(cartId));
+            Guard.Against.Default(confirmedAt, nameof(confirmedAt));
+
+            return new CartConfirmed(cartId, confirmedAt);
         }
     }
 }

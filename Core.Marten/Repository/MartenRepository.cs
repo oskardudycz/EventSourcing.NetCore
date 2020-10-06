@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Aggregates;
 using Marten;
 using Core.Events;
+using Core.Repositories;
 
 namespace Core.Storage
 {

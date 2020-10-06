@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.Events;
-using Core.Storage;
+using Core.Repositories;
 
 namespace MeetingsSearch.Storage
 {

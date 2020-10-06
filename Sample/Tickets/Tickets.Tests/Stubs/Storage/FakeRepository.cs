@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
+using Core.Repositories;
 using Core.Storage;
 
 namespace Tickets.Tests.Stubs.Storage

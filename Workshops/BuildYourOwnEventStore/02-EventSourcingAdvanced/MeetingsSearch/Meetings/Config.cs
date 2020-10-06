@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Core.Storage;
+using Core.Repositories;
 using MediatR;
 using MeetingsSearch.Meetings.Events;
 using MeetingsSearch.Meetings.Queries;

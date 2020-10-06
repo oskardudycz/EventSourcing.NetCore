@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Baseline.Dates;
 using Core.Commands;
+using Core.Repositories;
 using Core.Storage;
 using Marten;
 using Marten.Events.Projections.Async;
