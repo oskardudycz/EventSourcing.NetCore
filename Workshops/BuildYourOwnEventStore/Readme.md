@@ -3,7 +3,7 @@
 ## Prerequisities
 
 1. Install git - https://git-scm.com/downloads.
-2. Install .NET Core 3.1 - https://dotnet.microsoft.com/download/dotnet-core/thank-you/sdk-3.1.100-windows-x64-installer.
+2. Install .NET Core 3.1 - https://dotnet.microsoft.com/download/dotnet-core/thank-you/sdk-3.1.402-windows-x64-installer.
 3. Install Visual Studio 2019, Rider or VSCode.
 4. Install docker - https://docs.docker.com/docker-for-windows/install/.
 5. Make sure that you have ~10GB disk space.
