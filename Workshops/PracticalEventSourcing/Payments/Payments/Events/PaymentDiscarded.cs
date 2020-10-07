@@ -1,7 +1,7 @@
 using System;
 using Ardalis.GuardClauses;
 using Core.Events;
-using Payments.Payments.Events.Enums;
+using Payments.Payments.Enums;
 
 namespace Payments.Payments.Events
 {

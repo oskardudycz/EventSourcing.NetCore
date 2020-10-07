@@ -5,7 +5,7 @@ using Core.Commands;
 using Core.Repositories;
 using MediatR;
 using Payments.Payments.Commands;
-using Payments.Payments.Events.Enums;
+using Payments.Payments.Enums;
 
 namespace Payments.Payments
 {
