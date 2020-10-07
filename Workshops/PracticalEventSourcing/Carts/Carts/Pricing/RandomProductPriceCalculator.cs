@@ -16,7 +16,7 @@ namespace Carts.Pricing
 
             return productItems
                 .Select(pi =>
-                    new PricedProductItem(pi, (decimal)random.NextDouble() * 100))
+                    PricedProductItem.Create(pi, (decimal)random.NextDouble() * 100))
                 .ToList();
         }
     }

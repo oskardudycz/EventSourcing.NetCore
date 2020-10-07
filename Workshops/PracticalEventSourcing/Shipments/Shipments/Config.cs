@@ -24,7 +24,7 @@ namespace Shipments
                 options => options.UseNpgsql(config.GetConnectionString("ShipmentsDatabase")));
         }
 
-        public static void ConfigureShipments(this IServiceProvider serviceProvider)
+        public static void ConfigureShipmentsModule(this IServiceProvider serviceProvider)
         {
             // Kids, don't try this at production
             serviceProvider.GetService<ShipmentsDbContext>().Database.Migrate();

@@ -10,10 +10,15 @@ namespace Carts.Carts.Commands
 
         public PricedProductItem ProductItem { get; }
 
-        public RemoveProduct(Guid cardId, PricedProductItem productItem)
+        private RemoveProduct(Guid cardId, PricedProductItem productItem)
         {
             CartId = cardId;
             ProductItem = productItem;
+        }
+
+        public static RemoveProduct Create(Guid cardId, PricedProductItem productItem)
+        {
+            return new RemoveProduct(cardId, productItem);
         }
     }
 }

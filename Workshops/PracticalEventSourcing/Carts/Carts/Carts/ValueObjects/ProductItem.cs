@@ -15,7 +15,7 @@ namespace Carts.Carts.ValueObjects
             Quantity = quantity;
         }
 
-        public ProductItem Create(Guid productId, int quantity)
+        public static ProductItem Create(Guid productId, int quantity)
         {
             Guard.Against.Default(productId, nameof(productId));
             Guard.Against.NegativeOrZero(quantity, nameof(quantity));

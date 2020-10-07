@@ -13,8 +13,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core.WebApi\Core.WebApi.csproj" />
-      <ProjectReference Include="..\Shipments\Shipments.csproj" />
+      <ProjectReference Include="..\..\..\..\Core.WebApi\Core.WebApi.csproj" />
+      <ProjectReference Include="..\Carts\Carts.csproj" />
     </ItemGroup>
 
 

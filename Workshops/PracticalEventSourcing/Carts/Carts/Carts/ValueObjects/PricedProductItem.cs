@@ -1,4 +1,5 @@
 using System;
+using Ardalis.GuardClauses;
 
 namespace Carts.Carts.ValueObjects
 {
@@ -11,10 +12,29 @@ namespace Carts.Carts.ValueObjects
         public decimal UnitPrice { get; }
         public ProductItem ProductItem { get; }
 
-        public PricedProductItem(ProductItem productItem, decimal unitPrice)
+        private PricedProductItem(ProductItem productItem, decimal unitPrice)
         {
             ProductItem = productItem;
             UnitPrice = unitPrice;
+        }
+
+        public static PricedProductItem Create(Guid productId, int quantity, decimal unitPrice)
+        {
+            return Create(
+                ProductItem.Create(productId, quantity),
+                unitPrice
+            );
+        }
+
+        public static PricedProductItem Create(ProductItem productItem, decimal unitPrice)
+        {
+            Guard.Against.Null(productItem, nameof(productItem));
+            Guard.Against.NegativeOrZero(unitPrice, nameof(unitPrice));
+
+            return new PricedProductItem(
+                productItem,
+                unitPrice
+            );
         }
 
         public bool MatchesProductAndPrice(PricedProductItem pricedProductItem)

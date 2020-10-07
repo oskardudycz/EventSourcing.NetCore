@@ -2,7 +2,7 @@
 // using Core.Aggregates;
 // using Core.Events;
 //
-// namespace Shipments.Tests.Extensions
+// namespace Carts.Tests.Extensions
 // {
 //     public static class AggregateExtensions
 //     {

@@ -7,7 +7,7 @@
 // using Core.Repositories;
 // using Core.Storage;
 //
-// namespace Shipments.Tests.Stubs.Storage
+// namespace Carts.Tests.Stubs.Storage
 // {
 //     public class FakeRepository<T> : IRepository<T> where T : IAggregate
 //     {

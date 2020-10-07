@@ -2,7 +2,7 @@
 // using Core.Aggregates;
 // using Core.Ids;
 //
-// namespace Shipments.Tests.Stubs.Ids
+// namespace Carts.Tests.Stubs.Ids
 // {
 //     public class FakeIdGenerator : IIdGenerator
 //     {

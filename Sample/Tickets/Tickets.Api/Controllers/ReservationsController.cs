@@ -100,7 +100,7 @@ namespace Tickets.Api.Controllers
             return Ok();
         }
 
-        [HttpPost("{id}/confirmation")]
+        [HttpPut("{id}/confirmation")]
         public async Task<IActionResult> Confirm(Guid id)
         {
             var command = ConfirmReservation.Create(

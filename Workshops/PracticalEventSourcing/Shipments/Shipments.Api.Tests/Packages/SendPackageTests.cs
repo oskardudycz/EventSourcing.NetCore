@@ -56,7 +56,7 @@ namespace Shipments.Api.Tests.Packages
 
         [Fact]
         [Trait("Category", "Exercise")]
-        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_ReservationId()
+        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_PackageId()
         {
             var commandResponse = fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
@@ -74,13 +74,13 @@ namespace Shipments.Api.Tests.Packages
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldPublish_PackageWasSentEvent()
         {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
 
             fixture.PublishedInternalEventsOfType<PackageWasSent>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>
-                    @event.PackageId != Guid.Empty
+                    @event.PackageId == createdId
                     && @event.OrderId == fixture.OrderId
                     && @event.SentAt > fixture.TimeBeforeSending
                     && @event.ProductItems.Count == fixture.ProductItems.Count
@@ -106,12 +106,12 @@ namespace Shipments.Api.Tests.Packages
             var queryResult = await queryResponse.Content.ReadAsStringAsync();
             queryResult.Should().NotBeNull();
 
-            var reservationDetails = queryResult.FromJson<Package>();
-            reservationDetails.Id.Should().Be(createdId);
-            reservationDetails.OrderId.Should().Be(fixture.OrderId);
-            reservationDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);
-            reservationDetails.ProductItems.Should().NotBeEmpty();
-            reservationDetails.ProductItems.All(
+            var packageDetails = queryResult.FromJson<Package>();
+            packageDetails.Id.Should().Be(createdId);
+            packageDetails.OrderId.Should().Be(fixture.OrderId);
+            packageDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);
+            packageDetails.ProductItems.Should().NotBeEmpty();
+            packageDetails.ProductItems.All(
                 pi => fixture.ProductItems.Exists(
                     expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
                 .Should().BeTrue();

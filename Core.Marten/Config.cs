@@ -4,7 +4,7 @@ using Marten;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Core.Storage
+namespace Core.Marten
 {
     public class Config
     {

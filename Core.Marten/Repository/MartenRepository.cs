@@ -9,7 +9,7 @@ using Core.Repositories;
 
 namespace Core.Storage
 {
-    public class MartenRepository<T>: IRepository<T> where T : class, IAggregate, new()
+    public class MartenRepository<T>: IRepository<T> where T : class, IAggregate
     {
         private readonly IDocumentSession documentSession;
         private readonly IEventBus eventBus;

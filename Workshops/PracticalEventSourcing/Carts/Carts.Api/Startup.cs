@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 
-namespace Shipments.Api
+namespace Carts.Api
 {
     public class Startup
     {
@@ -28,11 +28,11 @@ namespace Shipments.Api
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Shipments", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Carts", Version = "v1"});
             });
 
             services.AddCoreServices()
-                .AddShipmentsModule(config);
+                .AddCartsModule(config);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -57,11 +57,9 @@ namespace Shipments.Api
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Shipments V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Carts V1");
                 c.RoutePrefix = string.Empty;
             });
-
-            app.ApplicationServices.ConfigureShipments();
         }
     }
 }
