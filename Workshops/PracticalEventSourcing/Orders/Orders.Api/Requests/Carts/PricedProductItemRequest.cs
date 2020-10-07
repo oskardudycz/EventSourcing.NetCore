@@ -1,6 +1,6 @@
 using System;
 
-namespace Carts.Api.Requests.Carts
+namespace Orders.Api.Requests.Carts
 {
     public class PricedProductItemRequest
     {
