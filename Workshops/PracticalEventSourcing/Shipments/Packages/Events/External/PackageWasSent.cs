@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Carts.Carts.ValueObjects;
 using Core.Events;
+using Shipments.Products;
 
 namespace Shipments.Packages.Events.External
 {
-    public class PackageWasSent : IExternalEvent
+    internal class PackageWasSent : IExternalEvent
     {
+
         public Guid PackageId { get; }
         public Guid OrderId { get; }
 

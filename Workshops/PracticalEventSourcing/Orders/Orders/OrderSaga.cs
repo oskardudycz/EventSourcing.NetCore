@@ -45,7 +45,7 @@ namespace Orders.Orders
         public Task Handle(OrderPaymentRecorded @event, CancellationToken cancellationToken)
         {
             return SendCommand(
-                SentPackage.Create(
+                SendPackage.Create(
                     @event.OrderId,
                     @event.ProductItems.Select(pi => new ProductItem(pi.ProductId, pi.Quantity)).ToList()
                 )

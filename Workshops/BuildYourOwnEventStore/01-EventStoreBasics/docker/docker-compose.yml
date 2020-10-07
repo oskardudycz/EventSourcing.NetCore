@@ -2,7 +2,7 @@ version: "3"
 services:
     postgres:
         image: clkao/postgres-plv8
-        container_name: event-sourcing-net-postgres
+        container_name: postgres
         environment:
             POSTGRES_PASSWORD: Password12!
         ports:
@@ -12,7 +12,7 @@ services:
 
     pgadmin:
         image: dpage/pgadmin4
-        container_name: pgadmin_container
+        container_name: pgadmin
         environment:
             PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.org}
             PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}

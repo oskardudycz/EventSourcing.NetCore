@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Carts.Carts.ValueObjects;
+using Shipments.Products;
 
 namespace Shipments.Packages.Commands
 {
-    public class SentPackage
+    public class SendPackage
     {
         public Guid OrderId { get; set; }
 

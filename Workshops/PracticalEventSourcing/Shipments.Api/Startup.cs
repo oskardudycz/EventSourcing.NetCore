@@ -31,8 +31,8 @@ namespace Shipments.Api
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Shipments", Version = "v1"});
             });
 
-            services.AddCoreServices();
-            services.AddShipmentsModule(config);
+            services.AddCoreServices()
+                .AddShipmentsModule(config);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -60,6 +60,8 @@ namespace Shipments.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Shipments V1");
                 c.RoutePrefix = string.Empty;
             });
+
+            app.ApplicationServices.ConfigureShipments();
         }
     }
 }

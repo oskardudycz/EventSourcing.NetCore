@@ -8,7 +8,7 @@ namespace Core.Testing
 {
     public abstract class ApiFixture<TStartup>: IAsyncLifetime where TStartup : class
     {
-        public readonly TestContext<TStartup> Sut;
+        protected readonly TestContext<TStartup> Sut;
 
         private HttpClient Client => Sut.Client;
 

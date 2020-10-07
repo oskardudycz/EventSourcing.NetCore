@@ -6,13 +6,13 @@ using Orders.Products.ValueObjects;
 
 namespace Orders.Shipments.Commands
 {
-    public class SentPackage : ICommand
+    public class SendPackage : ICommand
     {
         public Guid OrderId { get; }
 
         public IReadOnlyList<ProductItem> ProductItems { get; }
 
-        private SentPackage(
+        private SendPackage(
             Guid orderId,
             IReadOnlyList<ProductItem> productItems
         )
@@ -21,7 +21,7 @@ namespace Orders.Shipments.Commands
             ProductItems = productItems;
         }
 
-        public static SentPackage Create(
+        public static SendPackage Create(
             Guid orderId,
             IReadOnlyList<ProductItem> productItems
         )
@@ -29,7 +29,7 @@ namespace Orders.Shipments.Commands
             Guard.Against.Default(orderId, nameof(orderId));
             Guard.Against.NullOrEmpty(productItems, nameof(productItems));
 
-            return new SentPackage(orderId, productItems);
+            return new SendPackage(orderId, productItems);
         }
     }
 }
