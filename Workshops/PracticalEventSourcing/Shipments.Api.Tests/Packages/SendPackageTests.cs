@@ -13,7 +13,7 @@ using Shipments.Packages.Events.External;
 using Shipments.Products;
 using Xunit;
 
-namespace Shipments.Api.Tests.Reservations
+namespace Shipments.Api.Tests.Packages
 {
     public class SendPackageFixture: ApiFixture<Startup>
     {
@@ -76,7 +76,7 @@ namespace Shipments.Api.Tests.Reservations
         {
             var createdReservationId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
 
-            fixture.PublishedEventsOfType<PackageWasSent>()
+            fixture.PublishedInternalEventsOfType<PackageWasSent>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>

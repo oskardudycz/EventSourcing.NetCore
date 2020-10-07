@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -7,10 +8,12 @@ using System.Threading.Tasks;
 using Core.Events;
 using Core.Events.External;
 using Core.Testing;
+using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Shipments.Api.Tests.Core;
 
 namespace EventSourcing.Sample.IntegrationTests.Infrastructure
 {
@@ -21,6 +24,7 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
 
         private TestServer server;
 
+        private readonly EventsLog eventsLog = new EventsLog();
         private readonly DummyExternalEventProducer externalEventProducer = new DummyExternalEventProducer();
 
         public TestContext()
@@ -30,6 +34,16 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
 
         private void SetUpClient()
         {
+            var fixtureName = new StackTrace().GetFrame(3).GetMethod().DeclaringType.Name;
+
+            var configuration = new Dictionary<string, string>
+            {
+                {
+                    "ConnectionStrings:ShipmentsDatabase",
+                    "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; MINPOOLSIZE = 1; MAXPOOLSIZE = 100; COMMANDTIMEOUT = 20; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'"
+                },
+            };
+
             var projectDir = Directory.GetCurrentDirectory();
 
             server = new TestServer(new WebHostBuilder()
@@ -38,10 +52,13 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
                 .UseConfiguration(new ConfigurationBuilder()
                     .SetBasePath(projectDir)
                     .AddJsonFile("appsettings.json", true)
+                    .AddInMemoryCollection(configuration)
                     .Build()
                 )
                 .ConfigureServices(services =>
                 {
+                    services.AddSingleton(eventsLog);
+                    services.AddSingleton(typeof(INotificationHandler<>), typeof(EventListener<>));
                     services.AddSingleton<IExternalEventProducer>(externalEventProducer);
                     services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
                 })
@@ -68,6 +85,11 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
         {
             server?.Dispose();
             Client?.Dispose();
+        }
+
+        public IReadOnlyCollection<TEvent> PublishedInternalEventsOfType<TEvent>()
+        {
+            return eventsLog.PublishedEvents.OfType<TEvent>().ToList();
         }
     }
 }

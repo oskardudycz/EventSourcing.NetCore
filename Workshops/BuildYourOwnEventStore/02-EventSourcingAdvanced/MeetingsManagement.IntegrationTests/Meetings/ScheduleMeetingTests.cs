@@ -12,11 +12,11 @@ using MeetingsManagement.Meetings.ValueObjects;
 using MeetingsManagement.Meetings.Views;
 using Xunit;
 
-namespace EventSourcing.Sample.IntegrationTests.Meetings
+namespace MeetingsManagement.IntegrationTests.Meetings
 {
     public class ScheduleMeetingFixture: ApiFixture<Startup>
     {
-        public override string ApiUrl { get; } = MeetingsManagementApi.MeetingsUrl;
+        protected override string ApiUrl { get; } = MeetingsManagementApi.MeetingsUrl;
 
         public readonly Guid MeetingId = Guid.NewGuid();
         public readonly string MeetingName = "Event Sourcing Workshop";
@@ -34,12 +34,12 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
             );
 
             // send create command
-            await Client.PostAsync(ApiUrl, createCommand.ToJsonStringContent());
+            await PostAsync( createCommand);
 
             var occurs = DateRange.Create(Start, End);
 
             // send schedule meeting request
-            CommandResponse = await Client.PostAsync($"{MeetingsManagementApi.MeetingsUrl}/{MeetingId}/schedule", occurs.ToJsonStringContent());
+            CommandResponse = await PostAsync($"{MeetingId}/schedule", occurs);
         }
     }
 
@@ -73,7 +73,7 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
             var query = new GetMeeting(fixture.MeetingId);
 
             //send query
-            var queryResponse = await fixture.Client.GetAsync($"{MeetingsManagementApi.MeetingsUrl}/{fixture.MeetingId}");
+            var queryResponse = await fixture.GetAsync($"{fixture.MeetingId}");
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();

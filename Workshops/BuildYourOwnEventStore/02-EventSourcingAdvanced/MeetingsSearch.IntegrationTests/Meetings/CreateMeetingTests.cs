@@ -11,7 +11,7 @@ namespace MeetingsSearch.IntegrationTests.Meetings
 {
     public class CreateMeetingFixture: ApiFixture<Startup>
     {
-        public override string ApiUrl { get; } = MeetingsSearchApi.MeetingsUrl;
+        protected override string ApiUrl { get; } = MeetingsSearchApi.MeetingsUrl;
 
         public readonly Guid MeetingId = Guid.NewGuid();
         public readonly string MeetingName = "Event Sourcing Workshop";
@@ -43,7 +43,7 @@ namespace MeetingsSearch.IntegrationTests.Meetings
         public async Task MeetingCreated_ShouldUpdateReadModel()
         {
             //send query
-            var queryResponse = await fixture.Client.GetAsync($"{MeetingsSearchApi.MeetingsUrl}");
+            var queryResponse = await fixture.GetAsync($"{MeetingsSearchApi.MeetingsUrl}");
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();

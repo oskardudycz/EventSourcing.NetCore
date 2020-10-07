@@ -12,11 +12,11 @@ using MeetingsManagement.Meetings.Queries;
 using MeetingsManagement.Meetings.Views;
 using Xunit;
 
-namespace EventSourcing.Sample.IntegrationTests.Meetings
+namespace MeetingsManagement.IntegrationTests.Meetings
 {
     public class CreateMeetingFixture: ApiFixture<Startup>
     {
-        public override string ApiUrl { get; } = MeetingsManagementApi.MeetingsUrl;
+        protected override string ApiUrl { get; } = MeetingsManagementApi.MeetingsUrl;
 
         public readonly Guid MeetingId = Guid.NewGuid();
         public readonly string MeetingName = "Event Sourcing Workshop";
@@ -32,7 +32,7 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
             );
 
             // send create command
-            CommandResponse = await Client.PostAsync(ApiUrl, command.ToJsonStringContent());
+            CommandResponse = await PostAsync(command);
         }
     }
 
@@ -66,7 +66,7 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
         public void CreateCommand_ShouldPublish_MeetingCreateEvent()
         {
             // assert MeetingCreated event was produced to external bus
-            fixture.Sut.PublishedExternalEventsOfType<MeetingCreated>()
+            fixture.PublishedExternalEventsOfType<MeetingCreated>()
                .Should().Contain(@event =>
                    @event.MeetingId == fixture.MeetingId
                    && @event.Name == fixture.MeetingName
@@ -78,10 +78,10 @@ namespace EventSourcing.Sample.IntegrationTests.Meetings
         public async Task CreateCommand_ShouldUpdateReadModel()
         {
             // prepare query
-            var query = new GetMeeting(fixture.MeetingId);
+            var query = $"{fixture.MeetingId}";
 
             //send query
-            var queryResponse = await fixture.Client.GetAsync($"{MeetingsManagementApi.MeetingsUrl}/{fixture.MeetingId}");
+            var queryResponse = await fixture.GetAsync(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();
