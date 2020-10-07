@@ -6,7 +6,7 @@ using Shipments.Storage;
 
 namespace EventSourcing.Sample.Clients.Storage
 {
-    public class ClientsDbContextFactory: IDesignTimeDbContextFactory<ShipmentsDbContext>
+    internal class ClientsDbContextFactory: IDesignTimeDbContextFactory<ShipmentsDbContext>
     {
         public ClientsDbContextFactory()
         {
