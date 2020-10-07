@@ -1,10 +1,12 @@
 using System;
+using Ardalis.GuardClauses;
 using Core.Commands;
 
 namespace Payments.Payments.Commands
 {
     public class RequestPayment: ICommand
     {
+
         public Guid OrderId { get; }
 
         public decimal Amount { get; }

@@ -1,8 +1,7 @@
-namespace Payments.Payments.Events.Enums
+namespace Orders.Payments.Enums
 {
     public enum DiscardReason
     {
-        UnexpectedError = 0,
         OrderCancelled = 1
     }
 }

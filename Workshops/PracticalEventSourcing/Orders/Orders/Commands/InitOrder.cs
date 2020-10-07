@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Carts.Carts.ValueObjects;
 using Core.Commands;
+using Orders.Products;
+using Orders.Products.ValueObjects;
 
 namespace Orders.Orders.Commands
 {

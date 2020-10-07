@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Ardalis.GuardClauses;
-using Carts.Carts.ValueObjects;
 using Core.Aggregates;
 using Orders.Orders.Enums;
 using Orders.Orders.Events;
+using Orders.Products;
+using Orders.Products.ValueObjects;
 
 namespace Orders.Orders
 {

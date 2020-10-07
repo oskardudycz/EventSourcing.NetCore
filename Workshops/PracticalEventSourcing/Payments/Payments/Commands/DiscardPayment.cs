@@ -1,6 +1,6 @@
 using System;
 using Core.Commands;
-using Payments.Payments.Events.Enums;
+using Payments.Payments.Enums;
 
 namespace Payments.Payments.Commands
 {

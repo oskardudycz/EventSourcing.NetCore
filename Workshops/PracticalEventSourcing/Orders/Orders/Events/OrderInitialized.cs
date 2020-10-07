@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Ardalis.GuardClauses;
-using Carts.Carts.ValueObjects;
 using Core.Events;
+using Orders.Products;
+using Orders.Products.ValueObjects;
 
 namespace Orders.Orders.Events
 {

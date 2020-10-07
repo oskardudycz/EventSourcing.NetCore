@@ -2,16 +2,17 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Carts.Carts.Events.External;
 using Core.Commands;
 using Core.Events;
+using Orders.Carts.Events;
 using Orders.Orders.Commands;
 using Orders.Orders.Enums;
 using Orders.Orders.Events;
-using Payments.Payments.Commands;
-using Payments.Payments.Events.Enums;
-using Payments.Payments.Events.External;
-using Shipments.Packages.Commands;
+using Orders.Payments.Commands;
+using Orders.Payments.Events;
+using Orders.Products.ValueObjects;
+using Orders.Shipments.Commands;
+using Orders.Shipments.Events;
 using Shipments.Packages.Events.External;
 
 namespace Orders.Orders
@@ -33,7 +34,7 @@ namespace Orders.Orders
 
         public Task Handle(OrderInitialized @event, CancellationToken cancellationToken)
         {
-            return SendCommand(new RequestPayment(@event.OrderId, @event.TotalPrice));
+            return SendCommand(RequestPayment.Create(@event.OrderId, @event.TotalPrice));
         }
 
         public async Task Handle(PaymentFinalized @event, CancellationToken cancellationToken)
@@ -43,7 +44,12 @@ namespace Orders.Orders
 
         public Task Handle(OrderPaymentRecorded @event, CancellationToken cancellationToken)
         {
-            return SendCommand(new SentPackage(@event.OrderId, @event.ProductItems.Select(pi => pi.ProductItem).ToList()));
+            return SendCommand(
+                SentPackage.Create(
+                    @event.OrderId,
+                    @event.ProductItems.Select(pi => new ProductItem(pi.ProductId, pi.Quantity)).ToList()
+                )
+            );
         }
 
         public Task Handle(PackageWasSent @event, CancellationToken cancellationToken)
@@ -62,7 +68,7 @@ namespace Orders.Orders
             if (!@event.PaymentId.HasValue)
                 return Task.CompletedTask;
 
-            return SendCommand(new DiscardPayment(@event.PaymentId.Value, DiscardReason.OrderCancelled));
+            return SendCommand(DiscardPayment.Create(@event.PaymentId.Value));
         }
 
         private static Task SendCommand(ICommand command)

@@ -6,9 +6,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Core.csproj" />
-      <ProjectReference Include="..\Carts\Carts.csproj" />
-      <ProjectReference Include="..\Payments\Payments.csproj" />
-      <ProjectReference Include="..\Shipments\Shipments.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Ardalis.GuardClauses" Version="1.5.0" />
     </ItemGroup>
 
 </Project>
