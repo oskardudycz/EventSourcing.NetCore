@@ -23,17 +23,35 @@ namespace Carts.Carts.ValueObjects
             return new ProductItem(productId, quantity);
         }
 
-        public bool MatchesProduct(ProductItem productItem)
-        {
-            return ProductId == productItem.ProductId;
-        }
-
-        public ProductItem SumQuantity(ProductItem productItem)
+        public ProductItem MergeWith(ProductItem productItem)
         {
             if (!MatchesProduct(productItem))
                 throw new ArgumentException("Product does not match.");
 
             return Create(ProductId, Quantity + productItem.Quantity);
+        }
+
+        public ProductItem Substract(ProductItem productItem)
+        {
+            if (!MatchesProduct(productItem))
+                throw new ArgumentException("Product does not match.");
+
+            return Create(ProductId, Quantity - productItem.Quantity);
+        }
+
+        public bool MatchesProduct(ProductItem productItem)
+        {
+            return ProductId == productItem.ProductId;
+        }
+
+        public bool HasEnough(int quantity)
+        {
+            return Quantity >= quantity;
+        }
+
+        public bool HasTheSameQuantity(ProductItem productItem)
+        {
+            return Quantity == productItem.Quantity;
         }
     }
 }
