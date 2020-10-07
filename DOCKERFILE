@@ -5,15 +5,15 @@ WORKDIR /app
 # Copy files
 COPY . ./
 
-RUN dotnet restore
-RUN dotnet build
+RUN dotnet restore ./EventSourcing.NetCore.sln
+RUN dotnet build ./EventSourcing.NetCore.sln
 
-WORKDIR /app/Sample/EventSourcing.Sample.Web
+WORKDIR /app/Sample/BankAccounts/EventSourcing.Sample.Web
 RUN dotnet publish -c Debug -o out
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
-COPY --from=builder /app/Sample/EventSourcing.Sample.Web/out .
+COPY --from=builder /app/Sample/BankAccounts/EventSourcing.Sample.Web/out .
 ENV ASPNETCORE_URLS="http://*:5000"
 ENTRYPOINT ["dotnet", "EventSourcing.Sample.Web.dll"]
