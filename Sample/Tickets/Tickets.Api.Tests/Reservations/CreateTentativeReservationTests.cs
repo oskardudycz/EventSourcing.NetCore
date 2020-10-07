@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Testing;
 using FluentAssertions;
-using Marten.Pagination;
+using Shipments.Api.Tests.Core;
 using Tickets.Api.Requests;
 using Tickets.Api.Responses;
-using Tickets.Api.Tests.Core;
+using Tickets.Api.Tests.Config;
 using Tickets.Reservations;
 using Tickets.Reservations.Events;
 using Tickets.Reservations.Projections;
@@ -19,6 +20,9 @@ namespace Tickets.Api.Tests.Reservations
     public class CreateTentativeReservationFixture: ApiFixture<Startup>
     {
         protected override string ApiUrl { get; } = "/api/Reservations";
+
+        protected override Dictionary<string, string> GetConfiguration(string fixtureName) =>
+            TestConfiguration.Get(fixtureName);
 
         public readonly Guid SeatId = Guid.NewGuid();
 
@@ -62,7 +66,7 @@ namespace Tickets.Api.Tests.Reservations
         {
             var createdReservationId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
 
-            fixture.PublishedEventsOfType<TentativeReservationCreated>()
+            fixture.PublishedInternalEventsOfType<TentativeReservationCreated>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>

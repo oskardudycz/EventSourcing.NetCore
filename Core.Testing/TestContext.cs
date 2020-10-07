@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Events;
 using Core.Events.External;
-using Core.Testing;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -15,7 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shipments.Api.Tests.Core;
 
-namespace EventSourcing.Sample.IntegrationTests.Infrastructure
+namespace Core.Testing
 {
     public class TestContext<TStartup>: IDisposable
         where TStartup : class
@@ -27,8 +26,14 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
         private readonly EventsLog eventsLog = new EventsLog();
         private readonly DummyExternalEventProducer externalEventProducer = new DummyExternalEventProducer();
 
-        public TestContext()
+        private readonly Func<string, Dictionary<string, string>> getConfiguration = fixtureName => new Dictionary<string, string>();
+
+        public TestContext(Func<string, Dictionary<string, string>> getConfiguration = null)
         {
+            if (getConfiguration != null)
+            {
+                this.getConfiguration = getConfiguration;
+            }
             SetUpClient();
         }
 
@@ -36,14 +41,7 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
         {
             var fixtureName = new StackTrace().GetFrame(3).GetMethod().DeclaringType.Name;
 
-            var configuration = new Dictionary<string, string>
-            {
-                {
-                    "ConnectionStrings:ShipmentsDatabase",
-                    "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; MINPOOLSIZE = 1; MAXPOOLSIZE = 100; COMMANDTIMEOUT = 20; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'"
-                },
-            };
-
+            var configuration = getConfiguration(fixtureName);
             var projectDir = Directory.GetCurrentDirectory();
 
             server = new TestServer(new WebHostBuilder()

@@ -18,6 +18,7 @@
     </ItemGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj" />
       <ProjectReference Include="..\Tickets.Api\Tickets.Api.csproj" />
     </ItemGroup>
 

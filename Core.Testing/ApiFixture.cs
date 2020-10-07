@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Events;
-using EventSourcing.Sample.IntegrationTests.Infrastructure;
 using Xunit;
 
 namespace Core.Testing
@@ -15,9 +14,12 @@ namespace Core.Testing
 
         protected abstract string ApiUrl { get; }
 
+        protected virtual Dictionary<string,string> GetConfiguration(string fixtureName)
+            => new Dictionary<string, string>();
+
         protected ApiFixture()
         {
-            Sut = new TestContext<TStartup>();
+            Sut = new TestContext<TStartup>(GetConfiguration);
         }
 
         public virtual Task InitializeAsync() => Task.CompletedTask;
