@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shipments.Packages;
+using Shipments.Products;
 using Shipments.Storage;
 
 namespace Shipments
@@ -13,7 +14,8 @@ namespace Shipments
         {
             return services
                 .AddEntityFramework(config)
-                .AddPackages();
+                .AddPackages()
+                .AddProducts();
         }
 
         private static IServiceCollection AddEntityFramework(this IServiceCollection services, IConfiguration config)

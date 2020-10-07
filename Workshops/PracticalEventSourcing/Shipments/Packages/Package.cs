@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Carts.Carts.ValueObjects;
+using Shipments.Products;
 
 namespace Shipments.Packages
 {
-    internal class Package
+    public class Package
     {
         public Guid Id { get; set; }
         public Guid OrderId { get; set; }

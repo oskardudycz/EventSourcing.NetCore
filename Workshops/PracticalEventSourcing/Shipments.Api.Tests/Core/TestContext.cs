@@ -34,12 +34,9 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
             var configuration = new Dictionary<string, string>
             {
                 {
-                    "EventStore:ConnectionString",
+                    "ConnectionStrings:ShipmentsDatabase",
                     "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; MINPOOLSIZE = 1; MAXPOOLSIZE = 100; COMMANDTIMEOUT = 20; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'"
                 },
-                {"EventStore:WriteModelSchema", $"{fixtureName}Write"},
-                {"EventStore:ReadModelSchema", $"{fixtureName}Read"},
-                {"EventStore:ShouldRecreateDatabase", "true"}
             };
 
             var projectDir = Directory.GetCurrentDirectory();

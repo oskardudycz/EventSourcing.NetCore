@@ -1,23 +1,20 @@
 using System;
 using System.Collections.Generic;
-using Carts.Carts.ValueObjects;
 using Core.Events;
+using Shipments.Products;
 
 namespace Shipments.Packages.Events.External
 {
-    public class ProductWasOutOfStock: IEvent
+    internal class ProductWasOutOfStock: IExternalEvent
     {
         public Guid OrderId { get; }
-
-        public IReadOnlyList<ProductItem> AvailableProductItems { get; }
 
         public DateTime AvailabilityCheckedAt { get; }
 
 
-        public ProductWasOutOfStock(Guid orderId, IReadOnlyList<ProductItem> availableProductItems, DateTime availabilityCheckedAt)
+        public ProductWasOutOfStock(Guid orderId, DateTime availabilityCheckedAt)
         {
             OrderId = orderId;
-            AvailableProductItems = availableProductItems;
             AvailabilityCheckedAt = availabilityCheckedAt;
         }
     }
