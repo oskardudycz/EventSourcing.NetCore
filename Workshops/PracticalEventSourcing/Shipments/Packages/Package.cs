@@ -4,7 +4,7 @@ using Carts.Carts.ValueObjects;
 
 namespace Shipments.Packages
 {
-    public class Package
+    internal class Package
     {
         public Guid Id { get; set; }
         public Guid OrderId { get; set; }
