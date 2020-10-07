@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Ardalis.GuardClauses;
 using Carts.Carts.ValueObjects;
 using Core.Events;
 
@@ -16,14 +17,29 @@ namespace Orders.Orders.Events
 
         public DateTime InitializedAt { get; }
 
-        public OrderInitialized(Guid orderId, Guid clientId, IReadOnlyList<PricedProductItem> productItems,
-            decimal totalPrice, DateTime initializedAt)
+        private OrderInitialized(
+            Guid orderId,
+            Guid clientId,
+            IReadOnlyList<PricedProductItem> productItems,
+            decimal totalPrice,
+            DateTime initializedAt)
         {
             OrderId = orderId;
             ClientId = clientId;
             ProductItems = productItems;
             TotalPrice = totalPrice;
             InitializedAt = initializedAt;
+        }
+
+        public static OrderInitialized Create(Guid orderId, Guid clientId, IReadOnlyList<PricedProductItem> productItems, decimal totalPrice, DateTime initializedAt)
+        {
+            Guard.Against.Default(orderId, nameof(orderId));
+            Guard.Against.Default(clientId, nameof(clientId));
+            Guard.Against.NullOrEmpty(productItems, nameof(productItems));
+            Guard.Against.NegativeOrZero(totalPrice, nameof(totalPrice));
+            Guard.Against.Default(initializedAt, nameof(initializedAt));
+
+            return new OrderInitialized(orderId, clientId, productItems, totalPrice, initializedAt);
         }
     }
 }

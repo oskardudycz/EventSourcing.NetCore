@@ -59,7 +59,10 @@ namespace Orders.Orders
 
         public Task Handle(OrderCancelled @event, CancellationToken cancellationToken)
         {
-            return SendCommand(new DiscardPayment(@event.PaymentId, DiscardReason.OrderCancelled));
+            if (!@event.PaymentId.HasValue)
+                return Task.CompletedTask;
+
+            return SendCommand(new DiscardPayment(@event.PaymentId.Value, DiscardReason.OrderCancelled));
         }
 
         private static Task SendCommand(ICommand command)
