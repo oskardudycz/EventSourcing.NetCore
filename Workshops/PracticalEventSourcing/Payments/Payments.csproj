@@ -8,4 +8,8 @@
       <ProjectReference Include="..\..\..\Core\Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Ardalis.GuardClauses" Version="1.5.0" />
+    </ItemGroup>
+
 </Project>

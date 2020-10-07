@@ -6,6 +6,7 @@ using Carts.Carts.Events;
 using Carts.Carts.ValueObjects;
 using Carts.Pricing;
 using Core.Aggregates;
+using Core.Extensions;
 
 namespace Carts.Carts
 {
@@ -72,7 +73,7 @@ namespace Carts.Carts
 
             var newProductItem = @event.ProductItem;
 
-            var existingProductItem = ProductItems.FirstOrDefault(pi => pi.MatchesProductAndPrice(newProductItem));
+            var existingProductItem = FindProductItemMatchingWith(newProductItem);
 
             if (existingProductItem is null)
             {
@@ -80,17 +81,27 @@ namespace Carts.Carts
                 return;
             }
 
-            var indexOfExistingItem = ProductItems.IndexOf(existingProductItem);
-            ProductItems[indexOfExistingItem] = existingProductItem.SumQuantity(newProductItem);
+            ProductItems.Replace(
+                existingProductItem,
+                existingProductItem.MergeWith(newProductItem)
+            );
         }
 
         public void RemoveProduct(
-            PricedProductItem pricedProductItem)
+            PricedProductItem productItemToBeRemoved)
         {
             if(Status != CartStatus.Pending)
                 throw new InvalidOperationException($"Removing product from the cart in '{Status}' status is not allowed.");
 
-            var @event = ProductRemoved.Create(Id, pricedProductItem);
+            var existingProductItem = FindProductItemMatchingWith(productItemToBeRemoved);
+
+            if (existingProductItem is null)
+                throw new InvalidOperationException($"Product with id `{productItemToBeRemoved.ProductId}` and price '{productItemToBeRemoved.UnitPrice}' was not found in cart.");
+
+            if(existingProductItem.HasEnough(productItemToBeRemoved.Quantity))
+                throw new InvalidOperationException($"Cannot remove {productItemToBeRemoved.Quantity} items of Product with id `{productItemToBeRemoved.ProductId}` as there are only ${existingProductItem.Quantity} items in card");
+
+            var @event = ProductRemoved.Create(Id, productItemToBeRemoved);
 
             Enqueue(@event);
             Apply(@event);
@@ -100,9 +111,20 @@ namespace Carts.Carts
         {
             Version++;
 
-            var existingProductItem = ProductItems.FirstOrDefault(pi => pi.MatchesProductAndPrice(@event.ProductItem));
+            var productItemToBeRemoved = @event.ProductItem;
 
-            ProductItems.Remove(existingProductItem);
+            var existingProductItem = FindProductItemMatchingWith(@event.ProductItem);
+
+            if (existingProductItem.HasTheSameQuantity(productItemToBeRemoved))
+            {
+                ProductItems.Remove(existingProductItem);
+                return;
+            }
+
+            ProductItems.Replace(
+                existingProductItem,
+                existingProductItem.Substract(productItemToBeRemoved)
+            );
         }
 
         public void Confirm()
@@ -121,6 +143,12 @@ namespace Carts.Carts
             Version++;
 
             Status = CartStatus.Confirmed;
+        }
+
+        private PricedProductItem FindProductItemMatchingWith(PricedProductItem productItem)
+        {
+            return ProductItems
+                .FirstOrDefault(pi => pi.MatchesProductAndPrice(productItem));
         }
     }
 }
