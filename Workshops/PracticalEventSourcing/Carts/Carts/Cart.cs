@@ -29,9 +29,6 @@ namespace Carts.Carts
             Guid id,
             Guid clientId)
         {
-            Guard.Against.Default(id, nameof(id));
-            Guard.Against.Default(clientId, nameof(clientId));
-
             var @event = CartInitialized.Create(
                 id,
                 clientId,
@@ -56,6 +53,9 @@ namespace Carts.Carts
             IProductPriceCalculator productPriceCalculator,
             ProductItem productItem)
         {
+            Guard.Against.Null(productPriceCalculator, nameof(productPriceCalculator));
+            Guard.Against.Null(productItem, nameof(productItem));
+
             if(Status != CartStatus.Pending)
                 throw new InvalidOperationException($"Adding product for the cart in '{Status}' status is not allowed.");
 
@@ -90,6 +90,8 @@ namespace Carts.Carts
         public void RemoveProduct(
             PricedProductItem productItemToBeRemoved)
         {
+            Guard.Against.Null(productItemToBeRemoved, nameof(productItemToBeRemoved));
+
             if(Status != CartStatus.Pending)
                 throw new InvalidOperationException($"Removing product from the cart in '{Status}' status is not allowed.");
 

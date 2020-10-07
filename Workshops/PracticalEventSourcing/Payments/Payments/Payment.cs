@@ -22,10 +22,6 @@ namespace Payments.Payments
         }
         private Payment(Guid id, Guid orderId, in decimal amount)
         {
-            Guard.Against.Default(id, nameof(id));
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.NegativeOrZero(amount, nameof(amount));
-
             var @event = PaymentRequested.Create(id, orderId, amount);
 
             Enqueue(@event);
