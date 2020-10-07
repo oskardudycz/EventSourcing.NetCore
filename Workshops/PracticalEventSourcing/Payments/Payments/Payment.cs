@@ -46,17 +46,53 @@ namespace Payments.Payments
             if(Status != PaymentStatus.Pending)
                 throw new InvalidOperationException($"Completing payment in '{Status}' status is not allowed.");
 
+            var @event = PaymentCompleted.Create(Id, DateTime.UtcNow);
 
+            Enqueue(@event);
+            Apply(@event);
         }
 
-        public void Discard()
+        private void Apply(PaymentCompleted @event)
         {
-            throw new NotImplementedException();
+            Version++;
+
+            Status = PaymentStatus.Completed;
         }
 
-        public void TimeOUt()
+        public void Discard(DiscardReason discardReason)
         {
-            throw new NotImplementedException();
+            if(Status != PaymentStatus.Pending)
+                throw new InvalidOperationException($"Discarding payment in '{Status}' status is not allowed.");
+
+            var @event = PaymentDiscarded.Create(Id, discardReason, DateTime.UtcNow);
+
+            Enqueue(@event);
+            Apply(@event);
+        }
+
+        private void Apply(PaymentDiscarded @event)
+        {
+            Version++;
+
+            Status = PaymentStatus.Failed;
+        }
+
+        public void TimeOut()
+        {
+            if(Status != PaymentStatus.Pending)
+                throw new InvalidOperationException($"Discarding payment in '{Status}' status is not allowed.");
+
+            var @event = PaymentTimedOut.Create(Id, DateTime.UtcNow);
+
+            Enqueue(@event);
+            Apply(@event);
+        }
+
+        private void Apply(PaymentTimedOut @event)
+        {
+            Version++;
+
+            Status = PaymentStatus.Failed;
         }
     }
 }

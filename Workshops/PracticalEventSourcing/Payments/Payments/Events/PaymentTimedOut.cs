@@ -1,4 +1,5 @@
 using System;
+using Ardalis.GuardClauses;
 using Core.Events;
 using Payments.Payments.Events.Enums;
 
@@ -10,11 +11,18 @@ namespace Payments.Payments.Events
 
         public DateTime TimedOutAt { get; }
 
-        public PaymentTimedOut(Guid orderId, Guid paymentId, DateTime timedOutAt)
+        private PaymentTimedOut(Guid paymentId, DateTime timedOutAt)
         {
             PaymentId = paymentId;
             TimedOutAt = timedOutAt;
         }
 
+        public static PaymentTimedOut Create(Guid paymentId, in DateTime timedOutAt)
+        {
+            Guard.Against.Default(paymentId, nameof(paymentId));
+            Guard.Against.Default(timedOutAt, nameof(timedOutAt));
+
+            return new PaymentTimedOut(paymentId, timedOutAt);
+        }
     }
 }

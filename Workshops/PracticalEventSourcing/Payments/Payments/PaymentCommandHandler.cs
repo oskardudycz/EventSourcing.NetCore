@@ -5,6 +5,7 @@ using Core.Commands;
 using Core.Repositories;
 using MediatR;
 using Payments.Payments.Commands;
+using Payments.Payments.Events.Enums;
 
 namespace Payments.Payments
 {
@@ -33,19 +34,30 @@ namespace Payments.Payments
             return Unit.Value;
         }
 
-        public Task<Unit> Handle(CompletePayment command, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CompletePayment command, CancellationToken cancellationToken)
         {
-            return paymentRepository.GetAndUpdate(
-                command.PaymentId,
-                payment => payment.Complete(),
-                cancellationToken);
+            try
+            {
+                await paymentRepository.GetAndUpdate(
+                    command.PaymentId,
+                    payment => payment.Complete(),
+                    cancellationToken);
+            }
+            catch
+            {
+                await paymentRepository.GetAndUpdate(
+                    command.PaymentId,
+                    payment => payment.Discard(DiscardReason.UnexpectedError),
+                    cancellationToken);
+            }
+            return Unit.Value;
         }
 
         public Task<Unit> Handle(DiscardPayment command, CancellationToken cancellationToken)
         {
             return paymentRepository.GetAndUpdate(
                 command.PaymentId,
-                payment => payment.Discard(),
+                payment => payment.Discard(command.DiscardReason),
                 cancellationToken);
         }
 
@@ -53,7 +65,7 @@ namespace Payments.Payments
         {
             return paymentRepository.GetAndUpdate(
                 command.PaymentId,
-                payment => payment.TimeOUt(),
+                payment => payment.TimeOut(),
                 cancellationToken);
         }
     }

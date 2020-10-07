@@ -1,4 +1,5 @@
 using System;
+using Ardalis.GuardClauses;
 using Core.Events;
 using Payments.Payments.Events.Enums;
 
@@ -11,11 +12,19 @@ namespace Payments.Payments.Events
 
         public DateTime DiscardedAt { get; }
 
-        public PaymentDiscarded(Guid paymentId, DiscardReason discardReason, DateTime discardedAt)
+        private PaymentDiscarded(Guid paymentId, DiscardReason discardReason, DateTime discardedAt)
         {
             PaymentId = paymentId;
             DiscardReason = discardReason;
             DiscardedAt = discardedAt;
+        }
+
+        public static PaymentDiscarded Create(Guid paymentId, DiscardReason discardReason, DateTime discardedAt)
+        {
+            Guard.Against.Default(paymentId, nameof(paymentId));
+            Guard.Against.Default(discardedAt, nameof(discardedAt));
+
+            return new PaymentDiscarded(paymentId, discardReason, discardedAt);
         }
     }
 }
