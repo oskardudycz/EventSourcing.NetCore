@@ -148,7 +148,7 @@ namespace Carts.Carts
         private PricedProductItem FindProductItemMatchingWith(PricedProductItem productItem)
         {
             return ProductItems
-                .FirstOrDefault(pi => pi.MatchesProductAndPrice(productItem));
+                .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));
         }
     }
 }
