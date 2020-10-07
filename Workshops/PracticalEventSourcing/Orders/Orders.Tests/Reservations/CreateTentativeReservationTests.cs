@@ -1,14 +1,14 @@
 // using System;
 // using FluentAssertions;
-// using Carts.Reservations;
-// using Carts.Reservations.Events;
-// using Carts.Tests.Extensions;
-// using Carts.Tests.Extensions.Reservations;
-// using Carts.Tests.Stubs.Ids;
-// using Carts.Tests.Stubs.Reservations;
+// using Orders.Reservations;
+// using Orders.Reservations.Events;
+// using Orders.Tests.Extensions;
+// using Orders.Tests.Extensions.Reservations;
+// using Orders.Tests.Stubs.Ids;
+// using Orders.Tests.Stubs.Reservations;
 // using Xunit;
 //
-// namespace Carts.Tests.Reservations
+// namespace Orders.Tests.Reservations
 // {
 //     public class CreateTentativeReservationTests
 //     {

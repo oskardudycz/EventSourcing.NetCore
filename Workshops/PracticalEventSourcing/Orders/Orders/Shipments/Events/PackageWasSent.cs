@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Core.Events;
 using Orders.Products.ValueObjects;
 
-namespace Shipments.Packages.Events.External
+namespace Orders.Shipments.Events
 {
     public class PackageWasSent : IExternalEvent
     {

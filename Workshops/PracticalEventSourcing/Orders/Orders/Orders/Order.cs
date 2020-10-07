@@ -21,12 +21,11 @@ namespace Orders.Orders
         public Guid? PaymentId { get; private set; }
 
         public static Order Initialize(
+            Guid orderId,
             Guid clientId,
             IReadOnlyList<PricedProductItem> productItems,
             decimal totalPrice)
         {
-            var orderId = Guid.NewGuid();
-
             return new Order(
                 orderId,
                 clientId,
@@ -104,7 +103,7 @@ namespace Orders.Orders
             if(OrderStatus.Closed.HasFlag(Status))
                 throw new InvalidOperationException($"Cannot cancel a closed order.");
 
-            var @event = OrderCancelled.Create(Id, PaymentId, DateTime.UtcNow);
+            var @event = OrderCancelled.Create(Id, PaymentId, cancellationReason, DateTime.UtcNow);
 
             Enqueue(@event);
             Apply(@event);

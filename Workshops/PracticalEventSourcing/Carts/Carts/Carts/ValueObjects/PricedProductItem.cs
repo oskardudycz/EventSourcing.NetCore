@@ -10,6 +10,8 @@ namespace Carts.Carts.ValueObjects
         public int Quantity => ProductItem.Quantity;
 
         public decimal UnitPrice { get; }
+
+        public decimal TotalPrice => Quantity * UnitPrice;
         public ProductItem ProductItem { get; }
 
         private PricedProductItem(ProductItem productItem, decimal unitPrice)

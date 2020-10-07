@@ -38,7 +38,7 @@ namespace Core.Marten
                 return documentStore;
             });
             services.AddScoped(sp => sp.GetRequiredService<IDocumentStore>().OpenSession());
-            services.AddScoped(sp => sp.GetRequiredService<IDocumentStore>().QuerySession());
+            services.AddScoped<IQuerySession>(sp => sp.GetRequiredService<IDocumentSession>());
 
             services.AddScoped<IIdGenerator, MartenIdGenerator>();
         }

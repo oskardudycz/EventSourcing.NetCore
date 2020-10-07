@@ -32,7 +32,12 @@ namespace Orders.Orders.Events
             InitializedAt = initializedAt;
         }
 
-        public static OrderInitialized Create(Guid orderId, Guid clientId, IReadOnlyList<PricedProductItem> productItems, decimal totalPrice, DateTime initializedAt)
+        public static OrderInitialized Create(
+            Guid orderId,
+            Guid clientId,
+            IReadOnlyList<PricedProductItem> productItems,
+            decimal totalPrice,
+            DateTime initializedAt)
         {
             Guard.Against.Default(orderId, nameof(orderId));
             Guard.Against.Default(clientId, nameof(clientId));

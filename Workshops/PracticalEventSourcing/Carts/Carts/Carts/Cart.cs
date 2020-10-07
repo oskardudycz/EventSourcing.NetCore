@@ -18,6 +18,8 @@ namespace Carts.Carts
 
         public IList<PricedProductItem> ProductItems { get; private set; }
 
+        public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
+
         public static Cart Initialize(
             Guid cartId,
             Guid clientId)

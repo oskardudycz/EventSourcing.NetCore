@@ -1,22 +1,33 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Carts.Api.Requests.Carts;
-using Carts.Carts;
-using Carts.Carts.Events;
+using Orders.Orders;
+using Orders.Orders.Events;
 using Core.Testing;
 using FluentAssertions;
+using Orders.Api.Requests.Carts;
+using Orders.Products.ValueObjects;
 using Shipments.Api.Tests.Core;
 using Xunit;
 
-namespace Carts.Api.Tests.Carts
+namespace Orders.Api.Tests.Orders
 {
-    public class InitCartFixture: ApiFixture<Startup>
+    public class InitOrderFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = "/api/Carts";
+        protected override string ApiUrl { get; } = "/api/Orders";
 
         public readonly Guid ClientId = Guid.NewGuid();
+
+        public readonly List<PricedProductItemRequest> ProductItems = new List<PricedProductItemRequest>
+        {
+            new PricedProductItemRequest {ProductId = Guid.NewGuid(), Quantity = 10, UnitPrice = 3},
+            new PricedProductItemRequest {ProductId = Guid.NewGuid(), Quantity = 3, UnitPrice = 7}
+        };
+
+        public decimal TotalPrice => ProductItems.Sum(pi => pi.Quantity * pi.UnitPrice);
 
         public readonly DateTime TimeBeforeSending = DateTime.UtcNow;
 
@@ -24,22 +35,25 @@ namespace Carts.Api.Tests.Carts
 
         public override async Task InitializeAsync()
         {
-            CommandResponse = await PostAsync(new InitCartRequest {ClientId = ClientId });
+            CommandResponse = await PostAsync(new InitOrderRequest
+            {
+                ClientId = ClientId, ProductItems = ProductItems, TotalPrice = TotalPrice
+            });
         }
     }
 
-    public class InitCartTests: IClassFixture<InitCartFixture>
+    public class InitOrderTests: IClassFixture<InitOrderFixture>
     {
-        private readonly InitCartFixture fixture;
+        private readonly InitOrderFixture fixture;
 
-        public InitCartTests(InitCartFixture fixture)
+        public InitOrderTests(InitOrderFixture fixture)
         {
             this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Exercise")]
-        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_CartId()
+        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_OrderId()
         {
             var commandResponse = fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
@@ -55,23 +69,27 @@ namespace Carts.Api.Tests.Carts
 
         [Fact]
         [Trait("Category", "Exercise")]
-        public async Task CreateCommand_ShouldPublish_CartInitializedEvent()
+        public async Task CreateCommand_ShouldPublish_OrderInitializedEvent()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
 
-            fixture.PublishedInternalEventsOfType<CartInitialized>()
+            fixture.PublishedInternalEventsOfType<OrderInitialized>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>
-                    @event.CartId == createdId
+                    @event.OrderId == createdId
                     && @event.ClientId == fixture.ClientId
-                    && @event.CartStatus == CartStatus.Pending
+                    && @event.InitializedAt > fixture.TimeBeforeSending
+                    && @event.ProductItems.Count == fixture.ProductItems.Count
+                    && @event.ProductItems.All(
+                        pi => fixture.ProductItems.Exists(
+                            expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
                 );
         }
 
         // [Fact]
         // [Trait("Category", "Exercise")]
-        // public async Task CreateCommand_ShouldCreate_Cart()
+        // public async Task CreateCommand_ShouldCreate_Order()
         // {
         //     var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
         //
@@ -85,12 +103,12 @@ namespace Carts.Api.Tests.Carts
         //     var queryResult = await queryResponse.Content.ReadAsStringAsync();
         //     queryResult.Should().NotBeNull();
         //
-        //     var cartDetails = queryResult.FromJson<Cart>();
-        //     cartDetails.Id.Should().Be(createdId);
-        //     cartDetails.OrderId.Should().Be(fixture.ClientId);
-        //     cartDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);
-        //     cartDetails.ProductItems.Should().NotBeEmpty();
-        //     cartDetails.ProductItems.All(
+        //     var OrderDetails = queryResult.FromJson<Order>();
+        //     OrderDetails.Id.Should().Be(createdId);
+        //     OrderDetails.OrderId.Should().Be(fixture.ClientId);
+        //     OrderDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);
+        //     OrderDetails.ProductItems.Should().NotBeEmpty();
+        //     OrderDetails.ProductItems.All(
         //         pi => fixture.ProductItems.Exists(
         //             expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
         //         .Should().BeTrue();

@@ -15,7 +15,7 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
         },
-        "CartsApi": {
+        "OrdersApi": {
             "commandName": "Project",
             "launchBrowser": true,
             "launchUrl": "http://localhost:5000",

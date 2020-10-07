@@ -25,7 +25,7 @@ namespace Orders.Orders
 
         public async Task<Unit> Handle(InitOrder command, CancellationToken cancellationToken)
         {
-            var order = Order.Initialize(command.ClientId, command.ProductItems, command.TotalPrice);
+            var order = Order.Initialize(command.OrderId, command.ClientId, command.ProductItems, command.TotalPrice);
 
             await orderRepository.Add(order, cancellationToken);
 

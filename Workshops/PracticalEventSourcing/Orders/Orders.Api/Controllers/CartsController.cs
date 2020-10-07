@@ -1,25 +1,25 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Carts.Api.Requests.Carts;
-using Carts.Carts.Commands;
-using Carts.Carts.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
 using Core.Ids;
 using Core.Queries;
-using Commands = Carts.Carts.Commands;
+using Orders.Api.Requests.Carts;
+using Orders.Products.ValueObjects;
+using Commands = Orders.Orders.Commands;
 
-namespace Carts.Api.Controllers
+namespace Orders.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class CartsController: Controller
+    public class OrdersController: Controller
     {
         private readonly ICommandBus commandBus;
         private readonly IQueryBus queryBus;
         private readonly IIdGenerator idGenerator;
 
-        public CartsController(
+        public OrdersController(
             ICommandBus commandBus,
             IQueryBus queryBus,
             IIdGenerator idGenerator)
@@ -34,34 +34,34 @@ namespace Carts.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InitCart([FromBody] InitCartRequest request)
+        public async Task<IActionResult> InitOrder([FromBody] InitOrderRequest request)
         {
             Guard.Against.Null(request, nameof(request));
 
-            var cartId = idGenerator.New();
+            var orderId = idGenerator.New();
 
-            var command = Commands.InitCart.Create(
-                cartId,
-                request.ClientId
+            var command = Commands.InitOrder.Create(
+                orderId,
+                request.ClientId,
+                request.ProductItems.Select(
+                    pi => new PricedProductItem(pi.ProductId, pi.Quantity,pi.UnitPrice)).ToList(),
+                request.TotalPrice
             );
 
             await commandBus.Send(command);
 
-            return Created("api/Carts", cartId);
+            return Created("api/Orders", orderId);
         }
 
         [HttpPost("{id}/products")]
-        public async Task<IActionResult> AddProduct(Guid id, [FromBody] AddProductRequest request)
+        public async Task<IActionResult> RecordOrderPayment(Guid id, [FromBody] RecordOrderPaymentRequest request)
         {
             Guard.Against.Null(request, nameof(request));
-            Guard.Against.Null(request.ProductItem, nameof(request));
 
-            var command = Commands.AddProduct.Create(
+            var command = Commands.RecordOrderPayment.Create(
                 id,
-                ProductItem.Create(
-                    request.ProductItem.ProductId,
-                    request.ProductItem.Quantity
-                )
+                request.PaymentId,
+                request.PaymentRecordedAt
             );
 
             await commandBus.Send(command);
@@ -69,19 +69,14 @@ namespace Carts.Api.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id}/products")]
-        public async Task<IActionResult> RemoveProduct(Guid id, [FromBody] RemoveProductRequest request)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> CancelOrder(Guid id, [FromBody] CancelOrderRequest request)
         {
             Guard.Against.Null(request, nameof(request));
-            Guard.Against.Null(request.ProductItem, nameof(request));
 
-            var command = Commands.RemoveProduct.Create(
+            var command = Commands.CancelOrder.Create(
                 id,
-                PricedProductItem.Create(
-                    request.ProductItem.ProductId,
-                    request.ProductItem.Quantity,
-                    request.ProductItem.UnitPrice
-                )
+                request.CancellationReason
             );
 
             await commandBus.Send(command);
@@ -90,9 +85,9 @@ namespace Carts.Api.Controllers
         }
 
         [HttpPut("{id}/confirmation")]
-        public async Task<IActionResult> ConfirmCart(Guid id)
+        public async Task<IActionResult> ConfirmOrder(Guid id)
         {
-            var command = Commands.ConfirmCart.Create(
+            var command = Commands.CompleteOrder.Create(
                 id
             );
 

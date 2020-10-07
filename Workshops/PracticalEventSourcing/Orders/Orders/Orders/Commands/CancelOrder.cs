@@ -1,4 +1,5 @@
 using System;
+using Ardalis.GuardClauses;
 using Core.Commands;
 using Orders.Orders.Enums;
 
@@ -10,10 +11,17 @@ namespace Orders.Orders.Commands
 
         public OrderCancellationReason CancellationReason { get; }
 
-        public CancelOrder(Guid orderId, OrderCancellationReason cancellationReason)
+        private CancelOrder(Guid orderId, OrderCancellationReason cancellationReason)
         {
             OrderId = orderId;
             CancellationReason = cancellationReason;
+        }
+
+        public static CancelOrder Create(Guid orderId, OrderCancellationReason cancellationReason)
+        {
+            Guard.Against.Default(orderId, nameof(orderId));
+
+            return new CancelOrder(orderId, cancellationReason);
         }
     }
 }

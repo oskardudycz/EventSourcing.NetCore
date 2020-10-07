@@ -1,7 +1,7 @@
 // using System;
-// using Carts.Reservations;
+// using Orders.Reservations;
 //
-// namespace Carts.Tests.Stubs.Reservations
+// namespace Orders.Tests.Stubs.Reservations
 // {
 //     internal class FakeReservationNumberGenerator: IReservationNumberGenerator
 //     {

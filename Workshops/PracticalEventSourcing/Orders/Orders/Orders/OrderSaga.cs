@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Events;
+using Core.Ids;
 using Orders.Carts.Events;
 using Orders.Orders.Commands;
 using Orders.Orders.Enums;
@@ -13,7 +15,6 @@ using Orders.Payments.Events;
 using Orders.Products.ValueObjects;
 using Orders.Shipments.Commands;
 using Orders.Shipments.Events;
-using Shipments.Packages.Events.External;
 
 namespace Orders.Orders
 {
@@ -26,10 +27,21 @@ namespace Orders.Orders
         IEventHandler<OrderCancelled>,
         IEventHandler<OrderPaymentRecorded>
     {
+        private readonly IIdGenerator idGenerator;
+
+        public OrderSaga(IIdGenerator idGenerator)
+        {
+            Guard.Against.Null(idGenerator, nameof(idGenerator));
+
+            this.idGenerator = idGenerator;
+        }
+
         // Happy path
         public Task Handle(CartFinalized @event, CancellationToken cancellationToken)
         {
-            return SendCommand(new InitOrder(@event.ClientId, @event.ProductItems, @event.TotalPrice));
+            var orderId = idGenerator.New();
+
+            return SendCommand(InitOrder.Create(orderId, @event.ClientId, @event.ProductItems, @event.TotalPrice));
         }
 
         public Task Handle(OrderInitialized @event, CancellationToken cancellationToken)
@@ -39,7 +51,7 @@ namespace Orders.Orders
 
         public async Task Handle(PaymentFinalized @event, CancellationToken cancellationToken)
         {
-            await SendCommand(new RecordOrderPayment(@event.OrderId, @event.PaymentId, @event.FinalizedAt));
+            await SendCommand(RecordOrderPayment.Create(@event.OrderId, @event.PaymentId, @event.FinalizedAt));
         }
 
         public Task Handle(OrderPaymentRecorded @event, CancellationToken cancellationToken)
@@ -54,13 +66,13 @@ namespace Orders.Orders
 
         public Task Handle(PackageWasSent @event, CancellationToken cancellationToken)
         {
-            return SendCommand(new CompleteOrder(@event.OrderId));
+            return SendCommand(CompleteOrder.Create(@event.OrderId));
         }
 
         // Compensation
         public Task Handle(ProductWasOutOfStock @event, CancellationToken cancellationToken)
         {
-            return SendCommand(new CancelOrder(@event.OrderId, OrderCancellationReason.ProductWasOutOfStock));
+            return SendCommand(CancelOrder.Create(@event.OrderId, (OrderCancellationReason) OrderCancellationReason.ProductWasOutOfStock));
         }
 
         public Task Handle(OrderCancelled @event, CancellationToken cancellationToken)
@@ -73,7 +85,7 @@ namespace Orders.Orders
 
         private static Task SendCommand(ICommand command)
         {
-            return Task.FromException(new NotImplementedException());
+            return Task.CompletedTask;
         }
     }
 }

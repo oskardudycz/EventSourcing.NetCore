@@ -1,9 +1,9 @@
 // using System;
 // using FluentAssertions;
-// using Carts.Reservations;
-// using Carts.Reservations.Events;
+// using Orders.Reservations;
+// using Orders.Reservations.Events;
 //
-// namespace Carts.Tests.Extensions.Reservations
+// namespace Orders.Tests.Extensions.Reservations
 // {
 //     internal static class ReservationExtensions
 //     {

@@ -17,7 +17,7 @@ namespace Carts.Carts.Events.External
 
         public DateTime FinalizedAt { get; }
 
-        public CartFinalized(
+        private CartFinalized(
             Guid cartId,
             Guid clientId,
             IReadOnlyList<PricedProductItem> productItems,
@@ -29,6 +29,17 @@ namespace Carts.Carts.Events.External
             ProductItems = productItems;
             TotalPrice = totalPrice;
             FinalizedAt = finalizedAt;
+        }
+
+
+        public static CartFinalized Create(
+            Guid cartId,
+            Guid clientId,
+            IReadOnlyList<PricedProductItem> productItems,
+            decimal totalPrice,
+            DateTime finalizedAt)
+        {
+            return new CartFinalized(cartId, clientId, productItems, totalPrice, finalizedAt);
         }
     }
 }

@@ -1,11 +1,11 @@
 // using FluentAssertions;
-// using Carts.Reservations;
-// using Carts.Reservations.Events;
-// using Carts.Tests.Builders;
-// using Carts.Tests.Extensions;
+// using Orders.Reservations;
+// using Orders.Reservations.Events;
+// using Orders.Tests.Builders;
+// using Orders.Tests.Extensions;
 // using Xunit;
 //
-// namespace Carts.Tests.Reservations
+// namespace Orders.Tests.Reservations
 // {
 //     public class CancelReservationTests
 //     {

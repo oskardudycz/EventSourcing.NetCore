@@ -1,4 +1,5 @@
 using System;
+using Ardalis.GuardClauses;
 using Core.Commands;
 
 namespace Orders.Orders.Commands
@@ -7,9 +8,16 @@ namespace Orders.Orders.Commands
     {
         public Guid OrderId { get; }
 
-        public CompleteOrder(Guid orderId)
+        private CompleteOrder(Guid orderId)
         {
             OrderId = orderId;
+        }
+
+        public static CompleteOrder Create(Guid orderId)
+        {
+            Guard.Against.Default(orderId, nameof(orderId));
+
+            return new CompleteOrder(orderId);
         }
     }
 }
