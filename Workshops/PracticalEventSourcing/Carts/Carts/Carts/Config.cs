@@ -71,6 +71,7 @@ namespace Carts.Carts
             //
             // // projections
             options.Events.InlineProjections.Add<CartShortInfoProjection>();
+            options.Events.InlineProjections.Add<CartDetailsProjection>();
             //
             // // transformation
             options.Events.InlineProjections.TransformEvents<CartInitialized, CartHistory>(new CartHistoryTransformation());

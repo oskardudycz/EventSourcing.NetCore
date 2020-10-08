@@ -6,6 +6,7 @@ using Carts.Carts.Events;
 using Carts.Carts.ValueObjects;
 using Carts.Pricing;
 using Core.Extensions;
+using Marten.Events.Projections;
 
 namespace Carts.Carts.Projections
 {
@@ -22,7 +23,7 @@ namespace Carts.Carts.Projections
 
         public int Version { get; set; }
 
-        private void Apply(CartInitialized @event)
+        public void Apply(CartInitialized @event)
         {
             Version++;
 
@@ -32,7 +33,7 @@ namespace Carts.Carts.Projections
             Status = @event.CartStatus;
         }
 
-        private void Apply(ProductAdded @event)
+        public void Apply(ProductAdded @event)
         {
             Version++;
 
@@ -52,7 +53,7 @@ namespace Carts.Carts.Projections
             );
         }
 
-        private void Apply(ProductRemoved @event)
+        public void Apply(ProductRemoved @event)
         {
             Version++;
 
@@ -72,7 +73,7 @@ namespace Carts.Carts.Projections
             );
         }
 
-        private void Apply(CartConfirmed @event)
+        public void Apply(CartConfirmed @event)
         {
             Version++;
 
@@ -83,6 +84,24 @@ namespace Carts.Carts.Projections
         {
             return ProductItems
                 .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));
+        }
+    }
+
+    internal class CartDetailsProjection : ViewProjection<CartDetails, Guid>
+    {
+        public CartDetailsProjection()
+        {
+            ProjectEvent<CartInitialized>(@event => @event.CartId,
+                (item, @event) => item.Apply(@event));
+
+            ProjectEvent<ProductAdded>(@event => @event.CartId,
+                (item, @event) => item.Apply(@event));
+
+            ProjectEvent<ProductRemoved>(@event => @event.CartId,
+                (item, @event) => item.Apply(@event));
+
+            ProjectEvent<CartConfirmed>(@event => @event.CartId,
+                (item, @event) => item.Apply(@event));
         }
     }
 }
