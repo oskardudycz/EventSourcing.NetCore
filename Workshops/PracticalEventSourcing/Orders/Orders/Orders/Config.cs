@@ -13,74 +13,36 @@ namespace Orders.Orders
 {
     internal static class OrdersConfig
     {
-        internal static void AddOrders(this IServiceCollection services)
+        internal static IServiceCollection AddOrders(this IServiceCollection services)
         {
-            services.AddScoped<IRepository<Order>, MartenRepository<Order>>();
-
-            AddCommandHandlers(services);
-            AddQueryHandlers(services);
-            AddEventHandlers(services);
+            return services.AddScoped<IRepository<Order>, MartenRepository<Order>>()
+                .AddCommandHandlers()
+                .AddEventHandlers();
         }
 
-        private static void AddCommandHandlers(IServiceCollection services)
+        private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<InitOrder, Unit>, OrderCommandHandler>();
-            services.AddScoped<IRequestHandler<RecordOrderPayment, Unit>, OrderCommandHandler>();
-            services.AddScoped<IRequestHandler<CompleteOrder, Unit>, OrderCommandHandler>();
-            services.AddScoped<IRequestHandler<CancelOrder, Unit>, OrderCommandHandler>();
+            return services.AddScoped<IRequestHandler<InitOrder, Unit>, OrderCommandHandler>()
+                .AddScoped<IRequestHandler<RecordOrderPayment, Unit>, OrderCommandHandler>()
+                .AddScoped<IRequestHandler<CompleteOrder, Unit>, OrderCommandHandler>()
+                .AddScoped<IRequestHandler<CancelOrder, Unit>, OrderCommandHandler>();
         }
 
-        private static void AddQueryHandlers(IServiceCollection services)
+        private static IServiceCollection AddEventHandlers(this IServiceCollection services)
         {
-            // services.AddScoped<IRequestHandler<GetOrderById, OrderDetails>, OrderQueryHandler>();
-            // services.AddScoped<IRequestHandler<GetOrderAtVersion, OrderDetails>, OrderQueryHandler>();
-            // services.AddScoped<IRequestHandler<GetOrders, IPagedList<OrderShortInfo>>, OrderQueryHandler>();
-            // services
-            //     .AddScoped<IRequestHandler<GetOrderHistory, IPagedList<OrderHistory>>, OrderQueryHandler>();
-        }
-
-        private static void AddEventHandlers(IServiceCollection services)
-        {
-            services.AddScoped<INotificationHandler<CartFinalized>, OrderSaga>();
-            services.AddScoped<INotificationHandler<OrderInitialized>, OrderSaga>();
-            services.AddScoped<INotificationHandler<PaymentFinalized>, OrderSaga>();
-            services.AddScoped<INotificationHandler<PackageWasSent>, OrderSaga>();
-            services.AddScoped<INotificationHandler<ProductWasOutOfStock>, OrderSaga>();
-            services.AddScoped<INotificationHandler<OrderCancelled>, OrderSaga>();
-            services.AddScoped<INotificationHandler<OrderPaymentRecorded>, OrderSaga>();
+            return services.AddScoped<INotificationHandler<CartFinalized>, OrderSaga>()
+                .AddScoped<INotificationHandler<OrderInitialized>, OrderSaga>()
+                .AddScoped<INotificationHandler<PaymentFinalized>, OrderSaga>()
+                .AddScoped<INotificationHandler<PackageWasSent>, OrderSaga>()
+                .AddScoped<INotificationHandler<ProductWasOutOfStock>, OrderSaga>()
+                .AddScoped<INotificationHandler<OrderCancelled>, OrderSaga>()
+                .AddScoped<INotificationHandler<OrderPaymentRecorded>, OrderSaga>();
         }
 
         internal static void ConfigureOrders(this StoreOptions options)
         {
             // Snapshots
             options.Events.InlineProjections.AggregateStreamsWith<Order>();
-            // options.Schema.For<Order>().Index(x => x.SeatId, x =>
-            // {
-            //     x.IsUnique = true;
-            //
-            //     // Partial index by supplying a condition
-            //     x.Where = "(data ->> 'Status') != 'Cancelled'";
-            // });
-            // options.Schema.For<Order>().Index(x => x.Number, x =>
-            // {
-            //     x.IsUnique = true;
-            //
-            //     // Partial index by supplying a condition
-            //     x.Where = "(data ->> 'Status') != 'Cancelled'";
-            // });
-            //
-            //
-            // // options.Schema.For<Order>().UniqueIndex(x => x.SeatId);
-            //
-            // // projections
-            // options.Events.InlineProjections.Add<OrderDetailsProjection>();
-            // options.Events.InlineProjections.Add<OrderShortInfoProjection>();
-            //
-            // // transformation
-            // options.Events.InlineProjections.TransformEvents<TentativeOrderCreated, OrderHistory>(new OrderHistoryTransformation());
-            // options.Events.InlineProjections.TransformEvents<OrderSeatChanged, OrderHistory>(new OrderHistoryTransformation());
-            // options.Events.InlineProjections.TransformEvents<OrderConfirmed, OrderHistory>(new OrderHistoryTransformation());
-            // options.Events.InlineProjections.TransformEvents<OrderCancelled, OrderHistory>(new OrderHistoryTransformation());
         }
     }
 }

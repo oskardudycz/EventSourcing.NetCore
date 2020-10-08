@@ -2,6 +2,7 @@ using Core.Commands;
 using Core.Events;
 using Core.Events.External;
 using Core.Queries;
+using Core.Requests;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -18,6 +19,7 @@ namespace Core
 
             services.TryAddScoped<IEventBus, EventBus>();
             services.TryAddScoped<IExternalEventProducer, NulloExternalEventProducer>();
+            services.TryAddScoped<IExternalCommandBus, ExternalCommandBus>();
 
             return services;
         }

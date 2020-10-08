@@ -46,7 +46,7 @@ It's splitted into two parts:
 1. [Streams Table](./01-EventStoreBasics/01-CreateStreamsTable)
 2. [Events Table](./01-EventStoreBasics/02-CreateEventsTable)
 3. [Appending Events](./01-EventStoreBasics/03-CreateAppendEventFunction)
-4. [Optimistic Concurrency Handling](03-OptimisticConcurrency)
+4. [Optimistic Concurrency Handling](./01-EventStoreBasics/03-OptimisticConcurrency)
 5. [Event Store Methods](./01-EventStoreBasics/04-EventStoreMethods)
 6. [Stream Aggregation](./01-EventStoreBasics/05-StreamAggregation)
 7. [Time Travelling](./01-EventStoreBasics/06-TimeTraveling)

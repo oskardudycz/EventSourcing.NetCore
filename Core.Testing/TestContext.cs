@@ -5,8 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Commands;
 using Core.Events;
 using Core.Events.External;
+using Core.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -25,6 +27,7 @@ namespace Core.Testing
 
         private readonly EventsLog eventsLog = new EventsLog();
         private readonly DummyExternalEventProducer externalEventProducer = new DummyExternalEventProducer();
+        private readonly DummyExternalCommandBus externalCommandBus = new DummyExternalCommandBus();
 
         private readonly Func<string, Dictionary<string, string>> getConfiguration = fixtureName => new Dictionary<string, string>();
 
@@ -58,6 +61,7 @@ namespace Core.Testing
                     services.AddSingleton(eventsLog);
                     services.AddSingleton(typeof(INotificationHandler<>), typeof(EventListener<>));
                     services.AddSingleton<IExternalEventProducer>(externalEventProducer);
+                    services.AddSingleton<IExternalCommandBus>(externalCommandBus);
                     services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
                 })
                 .UseStartup<TStartup>());
@@ -65,9 +69,14 @@ namespace Core.Testing
             Client = server.CreateClient();
         }
 
-        public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>()
+        public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>() where TEvent: IExternalEvent
         {
             return externalEventProducer.PublishedEvents.OfType<TEvent>().ToList();
+        }
+
+        public IReadOnlyCollection<TCommand> PublishedExternalCommandOfType<TCommand>() where TCommand: ICommand
+        {
+            return externalCommandBus.SentCommands.OfType<TCommand>().ToList();
         }
 
         public async Task PublishInternalEvent(IEvent @event)

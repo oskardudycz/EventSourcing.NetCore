@@ -23,34 +23,40 @@ namespace Core.Marten
     {
         private const string DefaultConfigKey = "EventStore";
 
-        public static void AddMarten(this IServiceCollection services, IConfiguration config, Action<StoreOptions> configureOptions = null)
+        public static IServiceCollection AddMarten(this IServiceCollection services, IConfiguration config,
+            Action<StoreOptions> configureOptions = null)
         {
             var martenConfig = config.GetSection(DefaultConfigKey).Get<Config>();
 
-            services.AddSingleton<IDocumentStore>(sp =>
-            {
-                var documentStore = DocumentStore.For(options => SetStoreOptions(options, martenConfig, configureOptions));
+            services
+                .AddSingleton<IDocumentStore>(sp =>
+                {
+                    var documentStore =
+                        DocumentStore.For(options => SetStoreOptions(options, martenConfig, configureOptions));
 
-                if (martenConfig.ShouldRecreateDatabase)
-                    documentStore.Advanced.Clean.CompletelyRemoveAll();
+                    if (martenConfig.ShouldRecreateDatabase)
+                        documentStore.Advanced.Clean.CompletelyRemoveAll();
 
-                documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
+                    documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
 
-                return documentStore;
-            });
-            services.AddScoped(sp => sp.GetRequiredService<IDocumentStore>().OpenSession());
-            services.AddScoped<IQuerySession>(sp => sp.GetRequiredService<IDocumentSession>());
+                    return documentStore;
+                })
+                .AddScoped(sp => sp.GetRequiredService<IDocumentStore>().OpenSession())
+                .AddScoped<IQuerySession>(sp => sp.GetRequiredService<IDocumentSession>())
+                .AddScoped<IIdGenerator, MartenIdGenerator>();
 
-            services.AddScoped<IIdGenerator, MartenIdGenerator>();
+            return services;
         }
 
-        private static void SetStoreOptions(StoreOptions options, Config config, Action<StoreOptions> configureOptions = null)
+        private static void SetStoreOptions(StoreOptions options, Config config,
+            Action<StoreOptions> configureOptions = null)
         {
             options.Connection(config.ConnectionString);
             options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
             options.Events.DatabaseSchemaName = config.WriteModelSchema;
             options.DatabaseSchemaName = config.ReadModelSchema;
-            options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters, enumStorage: EnumStorage.AsString);
+            options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters,
+                enumStorage: EnumStorage.AsString);
             options.PLV8Enabled = false;
             options.Events.UseAggregatorLookup(AggregationLookupStrategy.UsePublicAndPrivateApply);
 
