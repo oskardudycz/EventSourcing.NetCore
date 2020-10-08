@@ -8,7 +8,7 @@ namespace Orders.Shipments
     {
         internal static IServiceCollection AddShipments(this IServiceCollection services)
         {
-            return services.AddScoped<IRequestHandler<SendPackage, Unit>, ShipmentsCommandHandler>();
+            return services;
         }
     }
 }

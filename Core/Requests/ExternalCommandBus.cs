@@ -31,7 +31,7 @@ namespace Core.Requests
             var request = new RestRequest(path, DataFormat.Json);
             request.AddJsonBody(command);
 
-            return client.PostAsync<dynamic>(request, cancellationToken);
+            return client.PutAsync<dynamic>(request, cancellationToken);
         }
 
         public Task Delete<T>(string url, string path, T command, CancellationToken cancellationToken = default) where T: ICommand
@@ -41,7 +41,7 @@ namespace Core.Requests
             var request = new RestRequest(path, DataFormat.Json);
             request.AddJsonBody(command);
 
-            return client.PostAsync<dynamic>(request, cancellationToken);
+            return client.DeleteAsync<dynamic>(request, cancellationToken);
         }
     }
 }

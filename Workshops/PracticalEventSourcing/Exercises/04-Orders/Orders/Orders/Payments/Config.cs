@@ -9,8 +9,7 @@ namespace Orders.Payments
     {
         internal static IServiceCollection AddPayments(this IServiceCollection services)
         {
-            return services.AddScoped<IRequestHandler<DiscardPayment, Unit>, PaymentsCommandHandler>()
-                .AddScoped<IRequestHandler<RequestPayment, Unit>, PaymentsCommandHandler>();
+            return services;
         }
     }
 }

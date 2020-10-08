@@ -15,34 +15,21 @@ namespace Orders.Orders
     {
         internal static IServiceCollection AddOrders(this IServiceCollection services)
         {
-            return services.AddScoped<IRepository<Order>, MartenRepository<Order>>()
-                .AddCommandHandlers()
-                .AddEventHandlers();
+            return services;
         }
 
         private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
-            return services.AddScoped<IRequestHandler<InitOrder, Unit>, OrderCommandHandler>()
-                .AddScoped<IRequestHandler<RecordOrderPayment, Unit>, OrderCommandHandler>()
-                .AddScoped<IRequestHandler<CompleteOrder, Unit>, OrderCommandHandler>()
-                .AddScoped<IRequestHandler<CancelOrder, Unit>, OrderCommandHandler>();
+            return services;
         }
 
         private static IServiceCollection AddEventHandlers(this IServiceCollection services)
         {
-            return services.AddScoped<INotificationHandler<CartFinalized>, OrderSaga>()
-                .AddScoped<INotificationHandler<OrderInitialized>, OrderSaga>()
-                .AddScoped<INotificationHandler<PaymentFinalized>, OrderSaga>()
-                .AddScoped<INotificationHandler<PackageWasSent>, OrderSaga>()
-                .AddScoped<INotificationHandler<ProductWasOutOfStock>, OrderSaga>()
-                .AddScoped<INotificationHandler<OrderCancelled>, OrderSaga>()
-                .AddScoped<INotificationHandler<OrderPaymentRecorded>, OrderSaga>();
+            return services;
         }
 
         internal static void ConfigureOrders(this StoreOptions options)
         {
-            // Snapshots
-            options.Events.InlineProjections.AggregateStreamsWith<Order>();
         }
     }
 }
