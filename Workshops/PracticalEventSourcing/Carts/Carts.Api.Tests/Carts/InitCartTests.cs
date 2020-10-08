@@ -1,10 +1,12 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Carts.Api.Requests.Carts;
 using Carts.Carts;
 using Carts.Carts.Events;
+using Carts.Carts.Projections;
 using Core.Testing;
 using FluentAssertions;
 using Shipments.Api.Tests.Core;
@@ -17,8 +19,6 @@ namespace Carts.Api.Tests.Carts
         protected override string ApiUrl { get; } = "/api/Carts";
 
         public readonly Guid ClientId = Guid.NewGuid();
-
-        public readonly DateTime TimeBeforeSending = DateTime.UtcNow;
 
         public HttpResponseMessage CommandResponse;
 
@@ -69,31 +69,29 @@ namespace Carts.Api.Tests.Carts
                 );
         }
 
-        // [Fact]
-        // [Trait("Category", "Exercise")]
-        // public async Task CreateCommand_ShouldCreate_Cart()
-        // {
-        //     var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
-        //
-        //     // prepare query
-        //     var query = $"{createdId}";
-        //
-        //     //send query
-        //     var queryResponse = await fixture.GetAsync(query);
-        //     queryResponse.EnsureSuccessStatusCode();
-        //
-        //     var queryResult = await queryResponse.Content.ReadAsStringAsync();
-        //     queryResult.Should().NotBeNull();
-        //
-        //     var cartDetails = queryResult.FromJson<Cart>();
-        //     cartDetails.Id.Should().Be(createdId);
-        //     cartDetails.OrderId.Should().Be(fixture.ClientId);
-        //     cartDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);
-        //     cartDetails.ProductItems.Should().NotBeEmpty();
-        //     cartDetails.ProductItems.All(
-        //         pi => fixture.ProductItems.Exists(
-        //             expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
-        //         .Should().BeTrue();
-        // }
+        [Fact]
+        [Trait("Category", "Exercise")]
+        public async Task CreateCommand_ShouldCreate_Cart()
+        {
+            var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+
+            // prepare query
+            var query = $"{createdId}";
+
+            //send query
+            var queryResponse = await fixture.GetAsync(query);
+            queryResponse.EnsureSuccessStatusCode();
+
+            var queryResult = await queryResponse.Content.ReadAsStringAsync();
+            queryResult.Should().NotBeNull();
+
+            var cartDetails = queryResult.FromJson<CartDetails>();
+            cartDetails.Id.Should().Be(createdId);
+            cartDetails.Status.Should().Be(CartStatus.Pending);
+            cartDetails.ClientId.Should().Be(fixture.ClientId);
+            cartDetails.Version.Should().Be(1);
+            cartDetails.ProductItems.Should().BeEmpty();
+            cartDetails.TotalPrice.Should().Be(0);
+        }
     }
 }

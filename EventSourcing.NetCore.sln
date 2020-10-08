@@ -124,6 +124,9 @@ ProjectSection(SolutionItems) = preProject
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PracticalEventSourcing", "PracticalEventSourcing", "{DAAECD4C-BCF7-4D9B-BD7B-C028E77B8245}"
+ProjectSection(SolutionItems) = preProject
+	Workshops\PracticalEventSourcing\README.md = Workshops\PracticalEventSourcing\README.md
+EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carts", "Workshops\PracticalEventSourcing\Carts\Carts\Carts.csproj", "{8B42D67D-28E0-470F-BAE6-B5FD4D7EA8C7}"
 EndProject

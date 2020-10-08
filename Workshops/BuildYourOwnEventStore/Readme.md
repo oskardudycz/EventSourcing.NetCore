@@ -1,4 +1,4 @@
-# Event Sourcing Self-Paced Kit
+# Build Your Own Event Store Self-Paced Kit
 
 ## Prerequisities
 
@@ -36,8 +36,6 @@
     - Kafka ide for browsing topics. Available at: http://localhost:8000
     - ElasticSearch
     - Kibana for browsing ElasticSearch - http://localhost:5601
-
-I prepared self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Readme.md).
 
 ## Description
 

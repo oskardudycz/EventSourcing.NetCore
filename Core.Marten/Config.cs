@@ -1,6 +1,7 @@
 using System;
 using Core.Ids;
 using Marten;
+using Marten.Services.Events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -50,6 +51,8 @@ namespace Core.Marten
             options.Events.DatabaseSchemaName = config.WriteModelSchema;
             options.DatabaseSchemaName = config.ReadModelSchema;
             options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters, enumStorage: EnumStorage.AsString);
+            options.PLV8Enabled = false;
+            options.Events.UseAggregatorLookup(AggregationLookupStrategy.UsePublicAndPrivateApply);
 
             configureOptions?.Invoke(options);
         }

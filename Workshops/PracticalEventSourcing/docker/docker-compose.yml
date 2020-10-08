@@ -12,30 +12,14 @@ services:
 
     pgadmin:
         image: dpage/pgadmin4
-        container_name: pgadmin
+        container_name: pgadmin_container
         environment:
-            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.org}
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
             PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
         ports:
             - "${PGADMIN_PORT:-5050}:80"
         networks:
             - postgres
-
-    elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
-        ports:
-            - "9200:9200"
-            - "9300:9300"
-        networks:
-            - esnetwork
-    kibana:
-        image: docker.elastic.co/kibana/kibana:6.3.0
-        ports:
-            - "5601:5601"
-        networks:
-            - esnetwork
-        depends_on:
-            - elasticsearch
 
     #######################################################
     #  Zookeeper
@@ -128,8 +112,6 @@ services:
             - kafka_rest
 
 networks:
-    esnetwork:
-        driver: bridge
     postgres:
         driver: bridge
     kafka_network:
@@ -138,5 +120,3 @@ networks:
 volumes:
     postgres:
     pgadmin:
-    esdata:
-        driver: local
