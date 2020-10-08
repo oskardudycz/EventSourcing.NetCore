@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{107B18E3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{A7186B6B-D56D-4AEF-B6B7-FAA827764C34}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{0570E45A-2EB6-4C4C-84E4-2C80E1FECEB5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{0570E45A-2EB6-4C4C-84E4-2C80E1FECEB5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A406B86-7F72-4773-B99C-545CCACC92B0}"
 	ProjectSection(SolutionItems) = preProject

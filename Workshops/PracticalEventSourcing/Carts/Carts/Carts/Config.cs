@@ -51,24 +51,6 @@ namespace Carts.Carts
         {
             // Snapshots
             options.Events.InlineProjections.AggregateStreamsWith<Cart>();
-            // options.Schema.For<Cart>().Index(x => x.SeatId, x =>
-            // {
-            //     x.IsUnique = true;
-            //
-            //     // Partial index by supplying a condition
-            //     x.Where = "(data ->> 'Status') != 'Cancelled'";
-            // });
-            // options.Schema.For<Cart>().Index(x => x.Number, x =>
-            // {
-            //     x.IsUnique = true;
-            //
-            //     // Partial index by supplying a condition
-            //     x.Where = "(data ->> 'Status') != 'Cancelled'";
-            // });
-            //
-            //
-            // // options.Schema.For<Cart>().UniqueIndex(x => x.SeatId);
-            //
             // // projections
             options.Events.InlineProjections.Add<CartShortInfoProjection>();
             options.Events.InlineProjections.Add<CartDetailsProjection>();

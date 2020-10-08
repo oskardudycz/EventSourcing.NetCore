@@ -1,6 +1,7 @@
 using System;
 using Carts.Carts;
 using Carts.Carts.Events;
+using Core.Testing;
 using FluentAssertions;
 
 namespace Carts.Tests.Extensions.Reservations
