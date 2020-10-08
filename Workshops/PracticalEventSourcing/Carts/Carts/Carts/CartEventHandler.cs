@@ -10,7 +10,7 @@ using Marten;
 
 namespace Carts.Carts
 {
-    public class CartEventHandler : IEventHandler<CartConfirmed>
+    internal class CartEventHandler : IEventHandler<CartConfirmed>
     {
         private readonly IQuerySession querySession;
         private readonly IEventBus eventBus;

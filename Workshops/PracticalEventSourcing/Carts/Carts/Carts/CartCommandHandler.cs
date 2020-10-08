@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Carts.Carts
 {
-    public class CartCommandHandler:
+    internal class CartCommandHandler:
         ICommandHandler<InitCart>,
         ICommandHandler<AddProduct>,
         ICommandHandler<RemoveProduct>,

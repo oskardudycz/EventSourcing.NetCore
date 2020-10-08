@@ -1,5 +1,7 @@
 using Carts.Carts.Commands;
 using Carts.Carts.Events;
+using Carts.Carts.Projections;
+using Carts.Carts.Queries;
 using Carts.Pricing;
 using Core.Repositories;
 using Core.Storage;
@@ -33,11 +35,11 @@ namespace Carts.Carts
 
         private static void AddQueryHandlers(IServiceCollection services)
         {
-            // services.AddScoped<IRequestHandler<GetCartById, CartDetails>, CartQueryHandler>();
-            // services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
-            // services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, CartQueryHandler>();
-            // services
-            //     .AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, CartQueryHandler>();
+            services.AddScoped<IRequestHandler<GetCartById, CartDetails>, CartQueryHandler>();
+            services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
+            services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, CartQueryHandler>();
+            services
+                 .AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, CartQueryHandler>();
         }
 
         private static void AddEventHandlers(IServiceCollection services)
@@ -68,14 +70,13 @@ namespace Carts.Carts
             // // options.Schema.For<Cart>().UniqueIndex(x => x.SeatId);
             //
             // // projections
-            // options.Events.InlineProjections.Add<CartDetailsProjection>();
-            // options.Events.InlineProjections.Add<CartShortInfoProjection>();
+            options.Events.InlineProjections.Add<CartShortInfoProjection>();
             //
             // // transformation
-            // options.Events.InlineProjections.TransformEvents<TentativeCartCreated, CartHistory>(new CartHistoryTransformation());
-            // options.Events.InlineProjections.TransformEvents<CartSeatChanged, CartHistory>(new CartHistoryTransformation());
-            // options.Events.InlineProjections.TransformEvents<CartConfirmed, CartHistory>(new CartHistoryTransformation());
-            // options.Events.InlineProjections.TransformEvents<CartCancelled, CartHistory>(new CartHistoryTransformation());
+            options.Events.InlineProjections.TransformEvents<CartInitialized, CartHistory>(new CartHistoryTransformation());
+            options.Events.InlineProjections.TransformEvents<ProductAdded, CartHistory>(new CartHistoryTransformation());
+            options.Events.InlineProjections.TransformEvents<CartConfirmed, CartHistory>(new CartHistoryTransformation());
+            options.Events.InlineProjections.TransformEvents<ProductRemoved, CartHistory>(new CartHistoryTransformation());
         }
     }
 }
