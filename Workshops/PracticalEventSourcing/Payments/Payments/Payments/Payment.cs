@@ -17,6 +17,9 @@ namespace Payments.Payments
         {
             return new Payment(paymentId, orderId, amount);
         }
+
+        private Payment(){}
+
         private Payment(Guid id, Guid orderId, decimal amount)
         {
             var @event = PaymentRequested.Create(id, orderId, amount);

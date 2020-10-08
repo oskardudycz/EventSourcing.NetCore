@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\..\Core.Streaming.Kafka\Core.Streaming.Kafka.csproj" />
       <ProjectReference Include="..\..\..\..\Core.WebApi\Core.WebApi.csproj" />
       <ProjectReference Include="..\Carts\Carts.csproj" />
     </ItemGroup>

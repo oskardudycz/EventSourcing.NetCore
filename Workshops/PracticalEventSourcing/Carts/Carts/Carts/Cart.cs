@@ -27,6 +27,8 @@ namespace Carts.Carts
             return new Cart(cartId, clientId);
         }
 
+        private Cart(){}
+
         private Cart(
             Guid id,
             Guid clientId)

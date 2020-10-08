@@ -1,4 +1,5 @@
 using Core;
+using Core.Streaming.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,7 +32,9 @@ namespace Shipments.Api
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Shipments", Version = "v1"});
             });
 
-            services.AddCoreServices()
+            services
+                .AddKafkaProducer()
+                .AddCoreServices()
                 .AddShipmentsModule(config);
         }
 

@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Payments.Api.Tests.Payments
 {
-    public class InitPaymentFixture: ApiFixture<Startup>
+    public class RequestPaymentsTestsFixture: ApiFixture<Startup>
     {
         protected override string ApiUrl { get; } = "/api/Payments";
 
@@ -29,11 +29,11 @@ namespace Payments.Api.Tests.Payments
         }
     }
 
-    public class InitPaymentTests: IClassFixture<InitPaymentFixture>
+    public class RequestPaymentsTestsTests: IClassFixture<RequestPaymentsTestsFixture>
     {
-        private readonly InitPaymentFixture fixture;
+        private readonly RequestPaymentsTestsFixture fixture;
 
-        public InitPaymentTests(InitPaymentFixture fixture)
+        public RequestPaymentsTestsTests(RequestPaymentsTestsFixture fixture)
         {
             this.fixture = fixture;
         }

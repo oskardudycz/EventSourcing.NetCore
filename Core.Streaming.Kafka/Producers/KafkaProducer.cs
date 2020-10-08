@@ -29,7 +29,7 @@ namespace Core.Streaming.Kafka.Producers
             {
                 await Task.Yield();
                 // publish event to kafka topic taken from config
-                await p.ProduceAsync(config.Topic,
+                var result = await p.ProduceAsync(config.Topic,
                     new Message<string, string>
                     {
                         // store event type name in message Key

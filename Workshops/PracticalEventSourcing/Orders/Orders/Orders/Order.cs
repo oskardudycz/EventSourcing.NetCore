@@ -34,6 +34,8 @@ namespace Orders.Orders
             );
         }
 
+        private Order(){}
+
         private Order(Guid id, Guid clientId, IReadOnlyList<PricedProductItem> productItems, decimal totalPrice)
         {
             var @event = OrderInitialized.Create(
