@@ -13,13 +13,11 @@ namespace Payments.Payments
 
         public PaymentStatus Status { get; private set; }
 
-        public static Payment Initialize(Guid orderId, decimal amount)
+        public static Payment Initialize(Guid paymentId, Guid orderId, decimal amount)
         {
-            var paymentId = Guid.NewGuid();
-
             return new Payment(paymentId, orderId, amount);
         }
-        private Payment(Guid id, Guid orderId, in decimal amount)
+        private Payment(Guid id, Guid orderId, decimal amount)
         {
             var @event = PaymentRequested.Create(id, orderId, amount);
 

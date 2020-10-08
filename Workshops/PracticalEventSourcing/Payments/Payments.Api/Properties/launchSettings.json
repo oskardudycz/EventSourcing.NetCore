@@ -15,7 +15,7 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
         },
-        "CartsApi": {
+        "PaymentsApi": {
             "commandName": "Project",
             "launchBrowser": true,
             "launchUrl": "http://localhost:5000",

@@ -1,10 +1,10 @@
 // using System;
 // using Core.Aggregates;
-// using Carts.Reservations;
-// using Carts.Tests.Stubs.Ids;
-// using Carts.Tests.Stubs.Reservations;
+// using Payments.Reservations;
+// using Payments.Tests.Stubs.Ids;
+// using Payments.Tests.Stubs.Reservations;
 //
-// namespace Carts.Tests.Builders
+// namespace Payments.Tests.Builders
 // {
 //     internal class ReservationBuilder
 //     {

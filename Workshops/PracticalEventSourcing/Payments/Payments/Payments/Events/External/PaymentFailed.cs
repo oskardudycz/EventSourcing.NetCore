@@ -1,5 +1,6 @@
 using System;
 using Core.Events;
+using Payments.Payments.Enums;
 
 namespace Payments.Payments.Events.External
 {
@@ -13,12 +14,33 @@ namespace Payments.Payments.Events.External
 
         public DateTime FailedAt { get; }
 
-        public PaymentFailed(Guid orderId, Guid paymentId, decimal amount, DateTime failedAt)
+        public PaymentFailReason FailReason { get; }
+
+        private PaymentFailed(
+            Guid paymentId,
+            Guid orderId,
+            decimal amount,
+            DateTime failedAt,
+            PaymentFailReason failReason
+        )
         {
-            OrderId = orderId;
             PaymentId = paymentId;
+            OrderId = orderId;
             Amount = amount;
             FailedAt = failedAt;
+            FailReason = failReason;
+        }
+
+
+        public static PaymentFailed Create(
+            Guid paymentId,
+            Guid orderId,
+            decimal amount,
+            DateTime failedAt,
+            PaymentFailReason failReason
+        )
+        {
+            return new PaymentFailed(paymentId, orderId, amount, failedAt, failReason);
         }
     }
 }

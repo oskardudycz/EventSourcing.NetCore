@@ -2,21 +2,22 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Carts.Api.Requests.Carts;
-using Carts.Carts;
-using Carts.Carts.Events;
 using Core.Testing;
 using FluentAssertions;
+using Payments.Api.Requests.Carts;
+using Payments.Payments.Events;
 using Shipments.Api.Tests.Core;
 using Xunit;
 
-namespace Carts.Api.Tests.Carts
+namespace Payments.Api.Tests.Payments
 {
-    public class InitCartFixture: ApiFixture<Startup>
+    public class InitPaymentFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = "/api/Carts";
+        protected override string ApiUrl { get; } = "/api/Payments";
 
-        public readonly Guid ClientId = Guid.NewGuid();
+        public readonly Guid OrderId = Guid.NewGuid();
+
+        public readonly decimal Amount = new Random().Next(100);
 
         public readonly DateTime TimeBeforeSending = DateTime.UtcNow;
 
@@ -24,22 +25,22 @@ namespace Carts.Api.Tests.Carts
 
         public override async Task InitializeAsync()
         {
-            CommandResponse = await PostAsync(new InitCartRequest {ClientId = ClientId });
+            CommandResponse = await PostAsync(new RequestPaymentRequest {OrderId = OrderId, Amount = Amount});
         }
     }
 
-    public class InitCartTests: IClassFixture<InitCartFixture>
+    public class InitPaymentTests: IClassFixture<InitPaymentFixture>
     {
-        private readonly InitCartFixture fixture;
+        private readonly InitPaymentFixture fixture;
 
-        public InitCartTests(InitCartFixture fixture)
+        public InitPaymentTests(InitPaymentFixture fixture)
         {
             this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Exercise")]
-        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_CartId()
+        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_PaymentId()
         {
             var commandResponse = fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
@@ -55,23 +56,23 @@ namespace Carts.Api.Tests.Carts
 
         [Fact]
         [Trait("Category", "Exercise")]
-        public async Task CreateCommand_ShouldPublish_CartInitializedEvent()
+        public async Task CreateCommand_ShouldPublish_PaymentInitializedEvent()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
 
-            fixture.PublishedInternalEventsOfType<CartInitialized>()
+            fixture.PublishedInternalEventsOfType<PaymentRequested>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>
-                    @event.CartId == createdId
-                    && @event.ClientId == fixture.ClientId
-                    && @event.CartStatus == CartStatus.Pending
+                    @event.PaymentId == createdId
+                    && @event.OrderId == fixture.OrderId
+                    && @event.Amount == fixture.Amount
                 );
         }
 
         // [Fact]
         // [Trait("Category", "Exercise")]
-        // public async Task CreateCommand_ShouldCreate_Cart()
+        // public async Task CreateCommand_ShouldCreate_Payment()
         // {
         //     var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
         //
@@ -85,12 +86,12 @@ namespace Carts.Api.Tests.Carts
         //     var queryResult = await queryResponse.Content.ReadAsStringAsync();
         //     queryResult.Should().NotBeNull();
         //
-        //     var cartDetails = queryResult.FromJson<Cart>();
-        //     cartDetails.Id.Should().Be(createdId);
-        //     cartDetails.OrderId.Should().Be(fixture.ClientId);
-        //     cartDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);
-        //     cartDetails.ProductItems.Should().NotBeEmpty();
-        //     cartDetails.ProductItems.All(
+        //     var paymentDetails = queryResult.FromJson<Payment>();
+        //     paymentDetails.Id.Should().Be(createdId);
+        //     paymentDetails.OrderId.Should().Be(fixture.ClientId);
+        //     paymentDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);
+        //     paymentDetails.ProductItems.Should().NotBeEmpty();
+        //     paymentDetails.ProductItems.All(
         //         pi => fixture.ProductItems.Exists(
         //             expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
         //         .Should().BeTrue();

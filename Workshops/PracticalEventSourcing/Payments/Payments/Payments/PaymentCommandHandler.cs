@@ -27,7 +27,7 @@ namespace Payments.Payments
 
         public async Task<Unit> Handle(RequestPayment command, CancellationToken cancellationToken)
         {
-            var payment = Payment.Initialize(command.OrderId, command.Amount);
+            var payment = Payment.Initialize(command.PaymentId, command.OrderId, command.Amount);
 
             await paymentRepository.Add(payment, cancellationToken);
 

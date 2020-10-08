@@ -19,7 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\..\Core.Testing\Core.Testing.csproj" />
-      <ProjectReference Include="..\Carts.Api\Carts.Api.csproj" />
+      <ProjectReference Include="..\Payments.Api\Payments.Api.csproj" />
     </ItemGroup>
 
 </Project>

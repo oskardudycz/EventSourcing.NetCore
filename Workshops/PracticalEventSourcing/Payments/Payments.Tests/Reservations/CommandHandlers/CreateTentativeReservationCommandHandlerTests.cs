@@ -3,14 +3,14 @@
 // using System.Threading;
 // using System.Threading.Tasks;
 // using FluentAssertions;
-// using Carts.Reservations;
-// using Carts.Reservations.Commands;
-// using Carts.Tests.Extensions.Reservations;
-// using Carts.Tests.Stubs.Reservations;
-// using Carts.Tests.Stubs.Storage;
+// using Payments.Reservations;
+// using Payments.Reservations.Commands;
+// using Payments.Tests.Extensions.Reservations;
+// using Payments.Tests.Stubs.Reservations;
+// using Payments.Tests.Stubs.Storage;
 // using Xunit;
 //
-// namespace Carts.Tests.Reservations.CommandHandlers
+// namespace Payments.Tests.Reservations.CommandHandlers
 // {
 //     public class CreateTentativeReservationCommandHandlerTests
 //     {

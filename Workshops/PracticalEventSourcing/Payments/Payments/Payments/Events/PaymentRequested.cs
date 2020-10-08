@@ -6,16 +6,14 @@ namespace Payments.Payments.Events
 {
     public class PaymentRequested: IEvent
     {
-        public Guid OrderId { get; }
-
         public Guid PaymentId { get; }
-
+        public Guid OrderId { get; }
         public decimal Amount { get; }
 
-        private PaymentRequested(Guid orderId, Guid paymentId, decimal amount)
+        private PaymentRequested(Guid paymentId, Guid orderId, decimal amount)
         {
-            OrderId = orderId;
             PaymentId = paymentId;
+            OrderId = orderId;
             Amount = amount;
         }
 
