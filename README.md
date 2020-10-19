@@ -234,6 +234,7 @@ The simplest way to start is **installing the [project template](https://github.
 
 ### 10.2 Snapshots
 -   📝 [Kacper Gunia - Event Sourcing: Snapshotting](https://domaincentric.net/blog/event-sourcing-snapshotting)
+-   📝 [Event Store - Rolling Snapshots](https://eventstore.com/docs/event-sourcing-basics/rolling-snapshots/index.html)
 
 ### 10.3 Projections 
 -   📝 [Alexey Zimarev - Projections in Event Sourcing](https://zimarev.com/blog/event-sourcing/projections/)
@@ -262,6 +263,8 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Jimmy Bogard - Life Beyond Distributed Transactions: An Apostate's Implementation - Relational Resources](https://jimmybogard.com/life-beyond-distributed-transactions-an-apostates-implementation-relational-resources/)
 -   📝 [Rinat Abdullin - Evolving Business Processes](https://abdullin.com/post/ddd-evolving-business-processes-a-la-lokad/)
 -   📝 [Microsoft - A Saga on Sagas](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591569(v=pandp.10))
+-   📝 [NServiceBus - Sagas](https://docs.particular.net/nservicebus/sagas/)
+-   📝 [Denis Rosa (Couchbase) - Saga Pattern | Application Transactions Using Microservices](https://blog.couchbase.com/saga-pattern-implement-business-transactions-using-microservices-part/)
 
 ### 10.6 Modeling
 -   📝 [Event Modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
