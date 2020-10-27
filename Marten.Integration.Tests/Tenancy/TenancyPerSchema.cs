@@ -83,16 +83,15 @@ namespace Marten.Integration.Tests.Tenancy
         public void GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
         {
             var services = new ServiceCollection();
-            var tenancyContext = new DummyTenancyContext();
 
-            AddMarten(services, tenancyContext);
+            AddMarten(services);
 
             using (var sp = services.BuildServiceProvider())
             {
                 // simulate scope per HTTP request with different tenant
                 using (var firstScope = sp.CreateScope())
                 {
-                    tenancyContext.TenantId = "Tenant1";
+                    firstScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = FirstTenant;
 
                     using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
                     {
@@ -104,7 +103,7 @@ namespace Marten.Integration.Tests.Tenancy
                 // simulate scope per HTTP request with different tenant
                 using (var secondScope = sp.CreateScope())
                 {
-                    tenancyContext.TenantId = SecondTenant;
+                    secondScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = SecondTenant;
 
                     using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
                     {
@@ -115,17 +114,20 @@ namespace Marten.Integration.Tests.Tenancy
             }
         }
 
-        private static void AddMarten(IServiceCollection services, DummyTenancyContext tenancyContext)
+        private static void AddMarten(IServiceCollection services)
         {
-            services.AddSingleton(tenancyContext);
+            // simulate http context
+            services.AddScoped<DummyTenancyContext>();
+
             services.AddSingleton<ITenancyPerSchemaStoreFactory, TenancyPerSchemaStoreFactory>();
+
+            // register options as function to resolve it per tenant
             services.AddSingleton<Action<string, StoreOptions>>((tenantId, options) =>
             {
                 options.DatabaseSchemaName = tenantId;
                 options.Connection(Settings.ConnectionString);
             });
 
-            // This can be overridden by the expression following
             services.AddScoped<ISessionFactory, TenancyPerSchemaSessionFactory>();
 
             services.AddScoped(s => s.GetRequiredService<ISessionFactory>().QuerySession());
