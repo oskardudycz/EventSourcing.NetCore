@@ -1,57 +1,95 @@
 using System;
 using System.Collections.Concurrent;
 using System.Data;
+using System.Linq.Expressions;
+using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Marten.Integration.Tests.Tenancy
 {
-    public interface ITenancyPerSchemaStoreFactory
+    public interface IDocumentStoreFactory<in T> : IDisposable
     {
-        IDocumentStore Get(string tenantId);
+        IDocumentStore Get(T context);
     }
 
-    public class TenancyPerSchemaStoreFactory : IDisposable, ITenancyPerSchemaStoreFactory
+    public abstract class DocumentStoreFactory<T> : IDocumentStoreFactory<T>
     {
-        private readonly Action<string, StoreOptions> configure;
-        private readonly ConcurrentDictionary<string, DocumentStore> stores = new ConcurrentDictionary<string, DocumentStore>();
+        private readonly ConcurrentDictionary<string, DocumentStore> _stores = new ConcurrentDictionary<string, DocumentStore>();
 
-        public TenancyPerSchemaStoreFactory(Action<string, StoreOptions> configure)
+        public IDocumentStore Get(T context)
         {
-            this.configure = configure;
-        }
-
-        public IDocumentStore Get(string tenant)
-        {
-            return stores.GetOrAdd(tenant, (tenantId) =>
+            var storeKey = GetKey(context);
+            return _stores.GetOrAdd(storeKey, (key) =>
             {
                 var storeOptions = new StoreOptions();
-                configure?.Invoke(tenantId, storeOptions);
+                Configure(context, storeOptions);
                 return new DocumentStore(storeOptions);
             });
         }
 
         public void Dispose()
         {
-            foreach (var documentStore in stores.Values)
+            foreach (var documentStore in _stores.Values)
             {
                 documentStore.Dispose();
             }
         }
+
+        protected abstract void Configure(T initialization, StoreOptions storeOptions);
+        protected abstract string GetKey(T initialization);
+
+    }
+
+    // expression configuration example.
+    public class DelegateDocumentStoreFactory<T> : DocumentStoreFactory<T> where T : class
+    {
+        private readonly Action<T, StoreOptions> _configure;
+        private readonly Func<T, string> _documentStoreKeyExpression;
+
+        public DelegateDocumentStoreFactory(
+            Expression<Func<T, string>> documentStoreKeyExpression,
+            Action<T, StoreOptions> configure
+            )
+        {
+            _configure = configure;
+            _documentStoreKeyExpression = documentStoreKeyExpression.Compile();
+        }
+
+        protected override void Configure(T initialization, StoreOptions storeOptions) => _configure(initialization, storeOptions);
+
+
+        protected override string GetKey(T initialization) => _documentStoreKeyExpression(initialization);
+    }
+
+    // concrete example
+    internal class SampleDocumentStoreFactory : DocumentStoreFactory<DummyTenancyContext>
+    {
+        protected override void Configure(DummyTenancyContext initialization, StoreOptions storeOptions)
+        {
+            storeOptions.DatabaseSchemaName = initialization.TenantId;
+            storeOptions.Connection(initialization.ConnectionString);
+
+        }
+        protected override string GetKey(DummyTenancyContext initialization) => initialization.TenantId;
     }
 
     public class DummyTenancyContext
     {
         // this should be normally taken from the http context or other
+
+        // this can be as complex/simple as it needs to be, for all intents and purposes it's just a class maintained by the application at an expected lifetime scope.
         public string TenantId { get; set; }
+        public string ConnectionString { get; set; }
+       
     }
 
-    public class TenancyPerSchemaSessionFactory: ISessionFactory
+    public class TenancyPerSchemaSessionFactory : ISessionFactory
     {
-        private readonly ITenancyPerSchemaStoreFactory storeFactory;
+        private readonly IDocumentStoreFactory<DummyTenancyContext> storeFactory;
         private readonly DummyTenancyContext tenancyContext;
 
-        public TenancyPerSchemaSessionFactory(ITenancyPerSchemaStoreFactory storeFactory, DummyTenancyContext tenancyContext)
+        public TenancyPerSchemaSessionFactory(IDocumentStoreFactory<DummyTenancyContext> storeFactory, DummyTenancyContext tenancyContext)
         {
             this.storeFactory = storeFactory;
             this.tenancyContext = tenancyContext;
@@ -59,12 +97,12 @@ namespace Marten.Integration.Tests.Tenancy
 
         public IQuerySession QuerySession()
         {
-            return storeFactory.Get(tenancyContext.TenantId).QuerySession();
+            return storeFactory.Get(tenancyContext).QuerySession();
         }
 
         public IDocumentSession OpenSession()
         {
-            return storeFactory.Get(tenancyContext.TenantId).LightweightSession(IsolationLevel.Serializable);
+            return storeFactory.Get(tenancyContext).LightweightSession(IsolationLevel.Serializable);
         }
     }
 
@@ -91,11 +129,13 @@ namespace Marten.Integration.Tests.Tenancy
                 // simulate scope per HTTP request with different tenant
                 using (var firstScope = sp.CreateScope())
                 {
+                    
                     firstScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = FirstTenant;
+                    firstScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().ConnectionString = Settings.ConnectionString;
 
                     using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
                     {
-                        session.Insert(new TestDocumentForTenancy{ Id = Guid.NewGuid(), Name = FirstTenant});
+                        session.Insert(new TestDocumentForTenancy { Id = Guid.NewGuid(), Name = FirstTenant });
                         session.SaveChanges();
                     }
                 }
@@ -104,10 +144,11 @@ namespace Marten.Integration.Tests.Tenancy
                 using (var secondScope = sp.CreateScope())
                 {
                     secondScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = SecondTenant;
+                    secondScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().ConnectionString = Settings.ConnectionString; // in my scenario these connection strings are different.
 
                     using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
                     {
-                        session.Insert(new TestDocumentForTenancy {Id = Guid.NewGuid(), Name = SecondTenant});
+                        session.Insert(new TestDocumentForTenancy { Id = Guid.NewGuid(), Name = SecondTenant });
                         session.SaveChanges();
                     }
                 }
@@ -116,22 +157,45 @@ namespace Marten.Integration.Tests.Tenancy
 
         private static void AddMarten(IServiceCollection services)
         {
-            // simulate http context
             services.AddScoped<DummyTenancyContext>();
 
-            services.AddSingleton<ITenancyPerSchemaStoreFactory, TenancyPerSchemaStoreFactory>();
-
-            // register options as function to resolve it per tenant
-            services.AddSingleton<Action<string, StoreOptions>>((tenantId, options) =>
+            // register a concrete
+            services.UseDocumentStoreFactory<SampleDocumentStoreFactory, DummyTenancyContext>();
+            // or use expression
+            services.UseDocumentStoreFactory<DummyTenancyContext>(context => context.TenantId, (context, options) =>
             {
-                options.DatabaseSchemaName = tenantId;
-                options.Connection(Settings.ConnectionString);
+                options.DatabaseSchemaName = context.TenantId;
+                options.Connection(context.ConnectionString);
             });
-
+            
+            // This can be overridden by the expression following
             services.AddScoped<ISessionFactory, TenancyPerSchemaSessionFactory>();
 
             services.AddScoped(s => s.GetRequiredService<ISessionFactory>().QuerySession());
             services.AddScoped(s => s.GetRequiredService<ISessionFactory>().OpenSession());
+        }
+
+    }
+
+    public static class MoveToMartenExtensions
+    {
+        public static IServiceCollection UseDocumentStoreFactory<TImplementation, TConfigurationElement>(this IServiceCollection services)
+            where TImplementation : class, IDocumentStoreFactory<TConfigurationElement>
+        {
+            // change return type to whatever marten needs
+            services.AddSingleton<IDocumentStoreFactory<TConfigurationElement>, TImplementation>();
+            return services;
+        }
+
+        public static IServiceCollection UseDocumentStoreFactory<T>(this IServiceCollection services,
+            Expression<Func<T, string>> documentStoreKeyExpression,
+            Action<T, StoreOptions> configure)
+            where T : class
+        {
+            // change return type to whatever marten needs
+            var delegateFactory = new DelegateDocumentStoreFactory<T>(documentStoreKeyExpression, configure);
+            services.AddSingleton<IDocumentStoreFactory<T>>(delegateFactory);
+            return services;
         }
     }
 }
