@@ -270,6 +270,7 @@ The simplest way to start is **installing the [project template](https://github.
 ### 10.6 Modeling
 -   📝 [Event Modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
 -   📝 [Event Storming](https://leanpub.com/introducing_eventstorming)
+-   📝 [Vaughn Vernon - Effective Aggregate Design Part I: Modeling a Single Aggregate](https://dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_1.pdf)
 
 ## 11. Contributors
 
