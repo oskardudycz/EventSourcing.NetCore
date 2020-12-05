@@ -10,7 +10,7 @@ namespace MediatR.Tests.Publishing
 {
     public class MoreThanOneHandler
     {
-        private class ServiceLocator
+        public class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 

@@ -8,7 +8,7 @@ namespace EventStoreBasics.Tests
 {
     public class Exercise07AggregateAndRepository
     {
-        private class User: Aggregate
+        public class User: Aggregate
         {
             public string Name { get; private set; }
 
@@ -43,7 +43,7 @@ namespace EventStoreBasics.Tests
             }
         }
 
-        private class UserCreated
+        public class UserCreated
         {
             public Guid UserId { get; }
             public string UserName { get; }
@@ -55,7 +55,7 @@ namespace EventStoreBasics.Tests
             }
         }
 
-        private class UserNameUpdated
+        public class UserNameUpdated
         {
             public Guid UserId { get; }
             public string UserName { get; }

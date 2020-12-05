@@ -10,7 +10,7 @@ namespace MediatR.Tests.Sending
 {
     public class SingleHandler
     {
-        private class ServiceLocator
+        public class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
@@ -23,7 +23,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private class TasksList
+        public class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -33,7 +33,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private class GetTaskNamesQuery: IRequest<List<string>>
+        public class GetTaskNamesQuery: IRequest<List<string>>
         {
             public string Filter { get; }
 
@@ -43,7 +43,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private class GetTaskNamesQueryHandler: IRequestHandler<GetTaskNamesQuery, List<string>>
+        public class GetTaskNamesQueryHandler: IRequestHandler<GetTaskNamesQuery, List<string>>
         {
             private readonly TasksList _taskList;
 

@@ -8,7 +8,7 @@ namespace MediatR.Tests.Publishing
 {
     public class NoHandlers
     {
-        private class ServiceLocator
+        public class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
@@ -21,7 +21,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        private class TasksList
+        public class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -31,7 +31,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        private class GetTaskNamesQuery: IRequest<List<string>>
+        public class GetTaskNamesQuery: IRequest<List<string>>
         {
             public string Filter { get; }
 
