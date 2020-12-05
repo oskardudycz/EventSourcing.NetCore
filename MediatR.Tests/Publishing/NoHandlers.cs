@@ -8,7 +8,7 @@ namespace MediatR.Tests.Sending
 {
     public class NoHandlers
     {
-        private class ServiceLocator
+        public class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
@@ -21,7 +21,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private class TasksList
+        public class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -31,7 +31,7 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        private class TaskWasAdded: INotification
+        public class TaskWasAdded: INotification
         {
             public string TaskName { get; }
 

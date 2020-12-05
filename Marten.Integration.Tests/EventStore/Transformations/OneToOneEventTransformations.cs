@@ -10,30 +10,30 @@ namespace Marten.Integration.Tests.EventStore.Transformations
 {
     public class OneToOneEventTransformations: MartenTest
     {
-        private interface ITaskEvent
+        public interface ITaskEvent
         {
             Guid TaskId { get; set; }
         }
 
-        private class TaskCreated: ITaskEvent
+        public class TaskCreated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskUpdated: ITaskEvent
+        public class TaskUpdated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private enum ChangeType
+        public enum ChangeType
         {
             Creation,
             Modification
         }
 
-        private class TaskChangesLog
+        public class TaskChangesLog
         {
             public Guid Id { get; set; }
             public Guid TaskId { get; set; }
@@ -41,9 +41,9 @@ namespace Marten.Integration.Tests.EventStore.Transformations
             public DateTime Timestamp { get; set; }
         }
 
-        private class TaskList { }
+        public class TaskList { }
 
-        private class TaskChangeLogTransform: ITransform<TaskCreated, TaskChangesLog>,
+        public class TaskChangeLogTransform: ITransform<TaskCreated, TaskChangesLog>,
             ITransform<TaskUpdated, TaskChangesLog>
         {
             public TaskChangesLog Transform(EventStream stream, Event<TaskCreated> input)

@@ -11,23 +11,23 @@ namespace CQRS.Tests.Queries
 {
     public class Queries
     {
-        private interface IQuery<out TResponse>: IRequest<TResponse>
+        public interface IQuery<out TResponse>: IRequest<TResponse>
         { }
 
-        private interface IQueryHandler<in TQuery, TResponse>: IRequestHandler<TQuery, TResponse>
+        public interface IQueryHandler<in TQuery, TResponse>: IRequestHandler<TQuery, TResponse>
             where TQuery : IQuery<TResponse>
         { }
 
-        private interface IQueryBus
+        public interface IQueryBus
         {
             Task<TResponse> Send<TResponse>(IQuery<TResponse> command);
         }
 
-        private class QueryBus: IQueryBus
+        public class QueryBus: IQueryBus
         {
             private readonly IMediator _mediator;
 
-            internal QueryBus(IMediator mediator)
+            public QueryBus(IMediator mediator)
             {
                 _mediator = mediator;
             }
@@ -38,7 +38,7 @@ namespace CQRS.Tests.Queries
             }
         }
 
-        private class GetTaskNamesQuery: IQuery<List<string>>
+        public class GetTaskNamesQuery: IQuery<List<string>>
         {
             public string Filter { get; }
 
@@ -48,16 +48,16 @@ namespace CQRS.Tests.Queries
             }
         }
 
-        private interface ITaskApplicationService
+        public interface ITaskApplicationService
         {
             Task<List<string>> GetTaskNames(GetTaskNamesQuery query);
         }
 
-        private class TaskApplicationService: ITaskApplicationService
+        public class TaskApplicationService: ITaskApplicationService
         {
             private readonly IQueryBus _queryBus;
 
-            internal TaskApplicationService(IQueryBus queryBus)
+            public TaskApplicationService(IQueryBus queryBus)
             {
                 _queryBus = queryBus;
             }
@@ -68,12 +68,12 @@ namespace CQRS.Tests.Queries
             }
         }
 
-        private interface IAppReadModel
+        public interface IAppReadModel
         {
             IQueryable<string> Tasks { get; }
         }
 
-        private class AppReadModel: IAppReadModel
+        public class AppReadModel: IAppReadModel
         {
             private readonly IList<string> _tasks;
             public IQueryable<string> Tasks => _tasks.AsQueryable();
@@ -84,11 +84,11 @@ namespace CQRS.Tests.Queries
             }
         }
 
-        private class AddTaskCommandHandler: IQueryHandler<GetTaskNamesQuery, List<string>>
+        public class AddTaskCommandHandler: IQueryHandler<GetTaskNamesQuery, List<string>>
         {
             private readonly IAppReadModel _readModel;
 
-            internal AddTaskCommandHandler(IAppReadModel readModel)
+            public AddTaskCommandHandler(IAppReadModel readModel)
             {
                 _readModel = readModel;
             }

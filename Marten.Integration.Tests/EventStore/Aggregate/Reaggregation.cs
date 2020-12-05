@@ -5,13 +5,13 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate
 {
-    internal class TaskCreated
+    public class TaskCreated
     {
         public Guid TaskId { get; set; }
         public string Description { get; set; }
     }
 
-    internal class TaskUpdated
+    public class TaskUpdated
     {
         public Guid TaskId { get; set; }
         public string Description { get; set; }
@@ -19,7 +19,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
     namespace OldVersion
     {
-        internal class Task
+        public class Task
         {
             public Guid Id { get; set; }
 
@@ -40,7 +40,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
     namespace NewVersion
     {
-        internal class Task
+        public class Task
         {
             public Guid Id { get; set; }
 

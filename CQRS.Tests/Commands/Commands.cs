@@ -10,22 +10,22 @@ namespace CQRS.Tests.Commands
 {
     public class Commands
     {
-        private interface ICommand: IRequest
+        public interface ICommand: IRequest
         { }
 
-        private interface ICommandHandler<in T>: IRequestHandler<T> where T : ICommand
+        public interface ICommandHandler<in T>: IRequestHandler<T> where T : ICommand
         { }
 
-        private interface ICommandBus
+        public interface ICommandBus
         {
             Task Send(ICommand command);
         }
 
-        private class CommandBus: ICommandBus
+        public class CommandBus: ICommandBus
         {
             private readonly IMediator _mediator;
 
-            internal CommandBus(IMediator mediator)
+            public CommandBus(IMediator mediator)
             {
                 _mediator = mediator;
             }
@@ -36,26 +36,26 @@ namespace CQRS.Tests.Commands
             }
         }
 
-        private class AddTaskCommand: ICommand
+        public class AddTaskCommand: ICommand
         {
             public string Name { get; }
 
-            internal AddTaskCommand(string name)
+            public AddTaskCommand(string name)
             {
                 Name = name;
             }
         }
 
-        private interface ITaskApplicationService
+        public interface ITaskApplicationService
         {
             Task AddTask(AddTaskCommand command);
         }
 
-        private class TaskApplicationService: ITaskApplicationService
+        public class TaskApplicationService: ITaskApplicationService
         {
             private readonly ICommandBus _commandBus;
 
-            internal TaskApplicationService(ICommandBus commandBus)
+            public TaskApplicationService(ICommandBus commandBus)
             {
                 _commandBus = commandBus;
             }
@@ -66,12 +66,12 @@ namespace CQRS.Tests.Commands
             }
         }
 
-        private interface IAppWrtiteModel
+        public interface IAppWrtiteModel
         {
             IList<string> Tasks { get; }
         }
 
-        private class AppWriteModel: IAppWrtiteModel
+        public class AppWriteModel: IAppWrtiteModel
         {
             public IList<string> Tasks { get; }
 
@@ -81,11 +81,11 @@ namespace CQRS.Tests.Commands
             }
         }
 
-        private class AddTaskCommandHandler: ICommandHandler<AddTaskCommand>
+        public class AddTaskCommandHandler: ICommandHandler<AddTaskCommand>
         {
             private readonly IAppWrtiteModel _writeModel;
 
-            internal AddTaskCommandHandler(IAppWrtiteModel writeModel)
+            public AddTaskCommandHandler(IAppWrtiteModel writeModel)
             {
                 _writeModel = writeModel;
             }

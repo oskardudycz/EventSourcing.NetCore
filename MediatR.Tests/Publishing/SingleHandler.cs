@@ -10,7 +10,7 @@ namespace MediatR.Tests.Publishing
 {
     public class SingleHandler
     {
-        private class ServiceLocator
+        public class ServiceLocator
         {
             private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
 
@@ -23,7 +23,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        private class TasksList
+        public class TasksList
         {
             public List<string> Tasks { get; }
 
@@ -33,7 +33,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        private class TaskWasAdded: INotification
+        public class TaskWasAdded: INotification
         {
             public string TaskName { get; }
 
@@ -43,7 +43,7 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        private class TaskWasAddedHandler: INotificationHandler<TaskWasAdded>
+        public class TaskWasAddedHandler: INotificationHandler<TaskWasAdded>
         {
             private readonly TasksList _taskList;
 

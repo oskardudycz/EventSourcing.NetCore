@@ -9,12 +9,12 @@ namespace EventStoreBasics.Tests
 {
     public class Exercise03OptimisticConcurrency
     {
-        private class User
+        public class User
         {
             public string Name { get; set; }
         }
 
-        private class UserCreated
+        public class UserCreated
         {
             public string Name { get; }
 

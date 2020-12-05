@@ -8,7 +8,7 @@ namespace EventStoreBasics.Tests
 {
     public class Exercise05StreamAggregation
     {
-        private class User
+        public class User
         {
             public Guid Id { get; private set; }
             public string Name { get; private set; }
@@ -35,7 +35,7 @@ namespace EventStoreBasics.Tests
             }
         }
 
-        private class UserCreated
+        public class UserCreated
         {
             public Guid UserId { get; }
             public string UserName { get; }
@@ -47,7 +47,7 @@ namespace EventStoreBasics.Tests
             }
         }
 
-        private class UserNameUpdated
+        public class UserNameUpdated
         {
             public Guid UserId { get; }
             public string UserName { get; }

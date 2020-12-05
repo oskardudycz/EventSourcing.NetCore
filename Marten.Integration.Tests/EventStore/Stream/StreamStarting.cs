@@ -8,19 +8,19 @@ namespace Marten.Integration.Tests.EventStore.Stream
 {
     public class StreamStarting: MartenTest
     {
-        private class TaskCreated
+        public class TaskCreated
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskUpdated
+        public class TaskUpdated
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskList { }
+        public class TaskList { }
 
         [Fact]
         public void GivenNoEvents_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()

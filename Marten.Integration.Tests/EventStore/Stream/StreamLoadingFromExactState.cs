@@ -7,19 +7,19 @@ namespace Marten.Integration.Tests.EventStore.Stream
 {
     public class StreamLoadingFromExactState: MartenTest
     {
-        private class TaskCreated
+        public class TaskCreated
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskUpdated
+        public class TaskUpdated
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskList { }
+        public class TaskList { }
 
         [Fact(Skip = "Skipping - AppVeyor for some reason doesn't like it -_-")]
         public void GivenSetOfEvents_WithFetchEventsFromDifferentTimes_ThenProperSetsAreLoaded()

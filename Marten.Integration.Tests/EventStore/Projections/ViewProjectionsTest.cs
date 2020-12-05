@@ -10,31 +10,31 @@ namespace Marten.Integration.Tests.EventStore.Projections
 {
     public class ViewProjectionsTest: MartenTest
     {
-        private interface ITaskEvent
+        public interface ITaskEvent
         {
             Guid TaskId { get; set; }
         }
 
-        private class TaskCreated: ITaskEvent
+        public class TaskCreated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskUpdated: ITaskEvent
+        public class TaskUpdated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class Task
+        public class Task
         {
             public Guid TaskId { get; set; }
 
             public string Description { get; set; }
         }
 
-        private class TaskList
+        public class TaskList
         {
             public Guid Id { get; set; }
             public List<Task> List { get; private set; }
@@ -57,23 +57,23 @@ namespace Marten.Integration.Tests.EventStore.Projections
             }
         }
 
-        private class TaskDescriptionView
+        public class TaskDescriptionView
         {
             public Guid Id { get; set; }
             public IDictionary<Guid, string> Descriptions { get; } = new Dictionary<Guid, string>();
 
-            internal void ApplyEvent(TaskCreated @event)
+            public void ApplyEvent(TaskCreated @event)
             {
                 Descriptions.Add(@event.TaskId, @event.Description);
             }
 
-            internal void ApplyEvent(TaskUpdated @event)
+            public void ApplyEvent(TaskUpdated @event)
             {
                 Descriptions[@event.TaskId] = @event.Description;
             }
         }
 
-        private class TaskListViewProjection: ViewProjection<TaskDescriptionView, Guid>
+        public class TaskListViewProjection: ViewProjection<TaskDescriptionView, Guid>
         {
             public TaskListViewProjection()
             {

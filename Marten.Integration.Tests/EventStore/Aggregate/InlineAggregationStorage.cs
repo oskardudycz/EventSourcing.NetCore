@@ -9,31 +9,31 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 {
     public class InlineAggregationStorage: MartenTest
     {
-        private interface ITaskEvent
+        public interface ITaskEvent
         {
             Guid TaskId { get; set; }
         }
 
-        private class TaskCreated: ITaskEvent
+        public class TaskCreated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class TaskUpdated: ITaskEvent
+        public class TaskUpdated: ITaskEvent
         {
             public Guid TaskId { get; set; }
             public string Description { get; set; }
         }
 
-        private class Task
+        public class Task
         {
             public Guid TaskId { get; set; }
 
             public string Description { get; set; }
         }
 
-        private class TaskList
+        public class TaskList
         {
             public Guid Id { get; set; }
             public List<Task> List { get; private set; }
