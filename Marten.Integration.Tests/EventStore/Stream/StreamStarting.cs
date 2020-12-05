@@ -22,7 +22,7 @@ namespace Marten.Integration.Tests.EventStore.Stream
 
         public class IssuesList { }
 
-        [Fact]
+        [Fact (Skip = "Skipped because of https://github.com/JasperFx/marten/issues/1648")]
         public void GivenNoEvents_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
         {
             var @event = new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description" };
