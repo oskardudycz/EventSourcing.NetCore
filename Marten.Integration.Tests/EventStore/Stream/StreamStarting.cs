@@ -1,4 +1,5 @@
 using System;
+using Marten.Exceptions;
 using Marten.Integration.Tests.TestsInfrasructure;
 using SharpTestsEx;
 using Xunit;
@@ -54,7 +55,7 @@ namespace Marten.Integration.Tests.EventStore.Stream
 
             Session.SaveChanges();
 
-            Assert.Throws<Events.ExistingStreamIdCollisionException>(() =>
+            Assert.Throws<ExistingStreamIdCollisionException>(() =>
             {
                 EventStore.StartStream<TaskList>(@event.TaskId, @event);
                 Session.SaveChanges();

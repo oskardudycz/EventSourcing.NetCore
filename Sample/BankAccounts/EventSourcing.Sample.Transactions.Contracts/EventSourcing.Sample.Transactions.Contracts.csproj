@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <AssemblyName>EventSourcing.Sample.Transactions.Contracts</AssemblyName>
         <PackageId>EventSourcing.Sample.Transactions.Contracts</PackageId>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="5.10.3" />
-        <PackageReference Include="Marten" Version="3.13.1" />
+        <PackageReference Include="Marten" Version="4.0.0-alpha.4" />
     </ItemGroup>
 
     <ItemGroup>
