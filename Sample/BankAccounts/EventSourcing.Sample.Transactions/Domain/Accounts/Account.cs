@@ -1,11 +1,10 @@
 using System;
 using Core.Aggregates;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
-using EventSourcing.Sample.Tasks.Contracts.Transactions;
-using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
-using EventSourcing.Sample.Transactions.Domain.Accounts;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.Events;
+using EventSourcing.Sample.Transactions.Contracts.Transactions;
+using EventSourcing.Sample.Transactions.Contracts.Transactions.Events;
 
-namespace EventSourcing.Sample.Tasks.Domain.Accounts
+namespace EventSourcing.Sample.Transactions.Domain.Accounts
 {
     public class Account: Aggregate
     {
@@ -32,17 +31,17 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts
             Enqueue(@event);
         }
 
-        public void RecordInflow(Guid fromId, decimal ammount)
+        public void RecordInflow(Guid fromId, decimal amount)
         {
-            var @event = new NewInflowRecorded(fromId, Id, new Inflow(ammount, DateTime.Now));
+            var @event = new NewInflowRecorded(fromId, Id, new Inflow(amount, DateTime.Now));
 
             Apply(@event);
             Enqueue(@event);
         }
 
-        public void RecordOutflow(Guid toId, decimal ammount)
+        public void RecordOutflow(Guid toId, decimal amount)
         {
-            var @event = new NewOutflowRecorded(Id, toId, new Outflow(ammount, DateTime.Now));
+            var @event = new NewOutflowRecorded(Id, toId, new Outflow(amount, DateTime.Now));
 
             Apply(@event);
             Enqueue(@event);
@@ -57,12 +56,12 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts
 
         public void Apply(NewInflowRecorded @event)
         {
-            Balance += @event.Inflow.Ammount;
+            Balance += @event.Inflow.Amount;
         }
 
         public void Apply(NewOutflowRecorded @event)
         {
-            Balance -= @event.Outflow.Ammount;
+            Balance -= @event.Outflow.Amount;
         }
     }
 }

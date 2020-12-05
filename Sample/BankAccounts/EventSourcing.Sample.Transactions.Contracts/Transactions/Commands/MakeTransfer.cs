@@ -1,17 +1,17 @@
 using System;
 using Core.Commands;
 
-namespace EventSourcing.Sample.Tasks.Contracts.Accounts.Commands
+namespace EventSourcing.Sample.Transactions.Contracts.Transactions.Commands
 {
     public class MakeTransfer: ICommand
     {
         public Guid FromAccountId { get; }
         public Guid ToAccountId { get; }
-        public decimal Ammount { get; }
+        public decimal Amount { get; }
 
-        public MakeTransfer(decimal ammount, Guid fromAccountId, Guid toAccountId)
+        public MakeTransfer(decimal amount, Guid fromAccountId, Guid toAccountId)
         {
-            Ammount = ammount;
+            Amount = amount;
             FromAccountId = fromAccountId;
             ToAccountId = toAccountId;
         }

@@ -1,16 +1,16 @@
 using System;
 
-namespace EventSourcing.Sample.Tasks.Contracts.Transactions
+namespace EventSourcing.Sample.Transactions.Contracts.Transactions
 {
     public class Outflow: ITransaction
     {
-        public decimal Ammount { get; }
+        public decimal Amount { get; }
 
         public DateTime Timestamp { get; }
 
-        public Outflow(decimal ammount, DateTime timestamp)
+        public Outflow(decimal amount, DateTime timestamp)
         {
-            Ammount = ammount;
+            Amount = amount;
             Timestamp = timestamp;
         }
     }

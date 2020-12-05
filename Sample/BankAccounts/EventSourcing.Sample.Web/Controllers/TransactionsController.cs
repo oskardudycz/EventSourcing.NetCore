@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Core.Commands;
 using Core.Queries;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
+using EventSourcing.Sample.Transactions.Contracts.Transactions.Commands;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860

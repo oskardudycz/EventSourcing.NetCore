@@ -9,106 +9,106 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 {
     public class EventsAggregation: MartenTest
     {
-        public class TaskCreated
+        public class IssueCreated
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
         }
 
-        public class TaskUpdated
+        public class IssueUpdated
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
         }
 
-        public class TaskRemoved
+        public class IssueRemoved
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
         }
 
-        public class Task
+        public class Issue
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
 
             public string Description { get; set; }
         }
 
-        public class TaskList
+        public class IssuesList
         {
             public Guid Id { get; set; }
-            public List<Task> List { get; private set; }
+            public List<Issue> List { get; private set; }
 
-            public TaskList()
+            public IssuesList()
             {
-                List = new List<Task>();
+                List = new List<Issue>();
             }
 
-            public void Apply(TaskCreated @event)
+            public void Apply(IssueCreated @event)
             {
-                List.Add(new Task { TaskId = @event.TaskId, Description = @event.Description });
+                List.Add(new Issue { IssueId = @event.IssueId, Description = @event.Description });
             }
 
-            public void Apply(TaskUpdated @event)
+            public void Apply(IssueUpdated @event)
             {
-                var task = List.Single(t => t.TaskId == @event.TaskId);
+                var issue = List.Single(t => t.IssueId == @event.IssueId);
 
-                task.Description = @event.Description;
+                issue.Description = @event.Description;
             }
 
-            public void Apply(TaskRemoved @event)
+            public void Apply(IssueRemoved @event)
             {
-                var task = List.Single(t => t.TaskId == @event.TaskId);
+                var issue = List.Single(t => t.IssueId == @event.IssueId);
 
-                List.Remove(task);
+                List.Remove(issue);
             }
         }
 
         [Fact]
         public void GivenStreamOfEvents_WhenAggregateStreamIsCalled_ThenChangesAreAppliedProperly()
         {
-            var streamId = EventStore.StartStream<TaskList>().Id;
+            var streamId = EventStore.StartStream<IssuesList>().Id;
 
-            //1. First Task Was Created
-            var task1Id = Guid.NewGuid();
-            EventStore.Append(streamId, new TaskCreated { TaskId = task1Id, Description = "Description" });
+            //1. First Issue Was Created
+            var issue1Id = Guid.NewGuid();
+            EventStore.Append(streamId, new IssueCreated { IssueId = issue1Id, Description = "Description" });
             Session.SaveChanges();
 
-            var taskList = EventStore.AggregateStream<TaskList>(streamId);
+            var issuesList = EventStore.AggregateStream<IssuesList>(streamId);
 
-            taskList.List.Should().Have.Count.EqualTo(1);
-            taskList.List.Single().TaskId.Should().Be.EqualTo(task1Id);
-            taskList.List.Single().Description.Should().Be.EqualTo("Description");
+            issuesList.List.Should().Have.Count.EqualTo(1);
+            issuesList.List.Single().IssueId.Should().Be.EqualTo(issue1Id);
+            issuesList.List.Single().Description.Should().Be.EqualTo("Description");
 
-            //2. First Task Description Was Changed
-            EventStore.Append(streamId, new TaskUpdated { TaskId = task1Id, Description = "New Description" });
+            //2. First Issue Description Was Changed
+            EventStore.Append(streamId, new IssueUpdated { IssueId = issue1Id, Description = "New Description" });
             Session.SaveChanges();
 
-            taskList = EventStore.AggregateStream<TaskList>(streamId);
+            issuesList = EventStore.AggregateStream<IssuesList>(streamId);
 
-            taskList.List.Should().Have.Count.EqualTo(1);
-            taskList.List.Single().TaskId.Should().Be.EqualTo(task1Id);
-            taskList.List.Single().Description.Should().Be.EqualTo("New Description");
+            issuesList.List.Should().Have.Count.EqualTo(1);
+            issuesList.List.Single().IssueId.Should().Be.EqualTo(issue1Id);
+            issuesList.List.Single().Description.Should().Be.EqualTo("New Description");
 
             //3. Two Other tasks were added
-            EventStore.Append(streamId, new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description2" },
-                new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description3" });
+            EventStore.Append(streamId, new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description2" },
+                new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description3" });
             Session.SaveChanges();
 
-            taskList = EventStore.AggregateStream<TaskList>(streamId);
+            issuesList = EventStore.AggregateStream<IssuesList>(streamId);
 
-            taskList.List.Should().Have.Count.EqualTo(3);
-            taskList.List.Select(t => t.Description)
+            issuesList.List.Should().Have.Count.EqualTo(3);
+            issuesList.List.Select(t => t.Description)
                 .Should()
                 .Have.SameSequenceAs("New Description", "Description2", "Description3");
 
-            //4. First task was removed
-            EventStore.Append(streamId, new TaskRemoved { TaskId = task1Id });
+            //4. First issue was removed
+            EventStore.Append(streamId, new IssueRemoved { IssueId = issue1Id });
             Session.SaveChanges();
 
-            taskList = EventStore.AggregateStream<TaskList>(streamId);
+            issuesList = EventStore.AggregateStream<IssuesList>(streamId);
 
-            taskList.List.Should().Have.Count.EqualTo(2);
-            taskList.List.Select(t => t.Description)
+            issuesList.List.Should().Have.Count.EqualTo(2);
+            issuesList.List.Select(t => t.Description)
                 .Should()
                 .Have.SameSequenceAs("Description2", "Description3");
         }

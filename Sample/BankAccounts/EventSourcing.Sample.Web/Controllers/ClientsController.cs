@@ -6,8 +6,8 @@ using Core.Queries;
 using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
 using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
 using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
-using EventSourcing.Sample.Tasks.Views.Accounts;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.Queries;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.ValueObjects;
 using EventSourcing.Sample.Transactions.Views.Clients;
 using Microsoft.AspNetCore.Mvc;
 

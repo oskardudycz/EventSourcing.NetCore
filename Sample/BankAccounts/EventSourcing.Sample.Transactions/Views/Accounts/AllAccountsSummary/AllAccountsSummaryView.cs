@@ -1,8 +1,8 @@
 using System;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
-using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.Events;
+using EventSourcing.Sample.Transactions.Contracts.Transactions.Events;
 
-namespace EventSourcing.Sample.Tasks.Views.Accounts
+namespace EventSourcing.Sample.Transactions.Views.Accounts.AllAccountsSummary
 {
     public class AllAccountsSummaryView
     {
@@ -21,13 +21,13 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts
 
         public void ApplyEvent(NewInflowRecorded @event)
         {
-            TotalBalance += @event.Inflow.Ammount;
+            TotalBalance += @event.Inflow.Amount;
             TotalTransactionsCount++;
         }
 
         public void ApplyEvent(NewOutflowRecorded @event)
         {
-            TotalBalance -= @event.Outflow.Ammount;
+            TotalBalance -= @event.Outflow.Amount;
             TotalTransactionsCount++;
         }
     }

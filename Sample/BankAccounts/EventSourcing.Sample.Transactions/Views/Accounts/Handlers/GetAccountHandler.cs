@@ -2,14 +2,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Queries;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
-using EventSourcing.Sample.Tasks.Views.Account;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.Queries;
 using EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary;
 using Marten;
 
-namespace EventSourcing.Sample.Tasks.Views.Accounts.Handlers
+namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
 {
-    public class GetAccountHandler: IQueryHandler<GetAccount, AccountSummary>
+    public class GetAccountHandler: IQueryHandler<GetAccount, Contracts.Accounts.ValueObjects.AccountSummary>
     {
         private readonly IDocumentSession _session;
 
@@ -18,11 +17,11 @@ namespace EventSourcing.Sample.Tasks.Views.Accounts.Handlers
             _session = session;
         }
 
-        public Task<AccountSummary> Handle(GetAccount message, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<Contracts.Accounts.ValueObjects.AccountSummary> Handle(GetAccount message, CancellationToken cancellationToken = default(CancellationToken))
         {
             return _session
                 .Query<AccountSummaryView>()
-                .Select(a => new AccountSummary
+                .Select(a => new Contracts.Accounts.ValueObjects.AccountSummary
                 {
                     AccountId = a.AccountId,
                     Balance = a.Balance,

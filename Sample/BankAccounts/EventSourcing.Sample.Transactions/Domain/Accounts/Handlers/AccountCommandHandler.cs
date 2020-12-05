@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Core.Commands;
 using Core.Events;
 using Core.Marten.Aggregates;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
-using EventSourcing.Sample.Transactions.Domain.Accounts;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.Commands;
+using EventSourcing.Sample.Transactions.Contracts.Transactions.Commands;
 using EventSourcing.Sample.Transactions.Views.Clients;
 using Marten;
 using Marten.Events;
 using MediatR;
 
-namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
+namespace EventSourcing.Sample.Transactions.Domain.Accounts.Handlers
 {
     public class AccountCommandHandler
         : ICommandHandler<CreateNewAccount>,
@@ -50,14 +50,14 @@ namespace EventSourcing.Sample.Tasks.Domain.Accounts.Handlers
         {
             var accountFrom = await store.AggregateStreamAsync<Account>(command.FromAccountId, token: cancellationToken);
 
-            accountFrom.RecordOutflow(command.ToAccountId, command.Ammount);
+            accountFrom.RecordOutflow(command.ToAccountId, command.Amount);
 
             var accountFromEvents = accountFrom.DequeueUncommittedEvents();
             store.Append(accountFrom.Id, accountFromEvents);
 
             var accountTo = await store.AggregateStreamAsync<Account>(command.ToAccountId, token: cancellationToken);
 
-            accountTo.RecordInflow(command.FromAccountId, command.Ammount);
+            accountTo.RecordInflow(command.FromAccountId, command.Amount);
 
             var accountToEvents = accountFrom.DequeueUncommittedEvents();
             store.Append(accountTo.Id, accountTo);
