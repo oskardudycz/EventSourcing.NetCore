@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Core.Queries;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.ValueObjects;
 
-namespace EventSourcing.Sample.Tasks.Views.Accounts
+namespace EventSourcing.Sample.Transactions.Contracts.Accounts.Queries
 {
     public class GetAccounts: IQuery<IEnumerable<AccountSummary>>
     {

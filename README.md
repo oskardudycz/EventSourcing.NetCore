@@ -74,16 +74,16 @@ Slides:
         -   calling StartStream method with a stream id
             ```csharp
             var streamId = Guid.NewGuid();
-            documentSession.Events.StartStream<TaskList>(streamId);
+            documentSession.Events.StartStream<IssuesList>(streamId);
             ```
         -   calling StartStream method with a set of events
             ```csharp
-            var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
-            var streamId = documentSession.Events.StartStream<TaskList>(@event);
+            var @event = new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description" };
+            var streamId = documentSession.Events.StartStream<IssuesList>(@event);
             ```
         -   just appending events with a stream id
             ```csharp
-            var @event = new TaskCreated { TaskId = Guid.NewGuid(), Description = "Description" };
+            var @event = new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description" };
             var streamId = Guid.NewGuid();
             documentSession.Events.Append(streamId, @event);
             ```
@@ -94,7 +94,7 @@ Slides:
             ```
         -   geting one event by its id
             ```csharp
-            var @event = documentSession.Events.Load<TaskCreated>(eventId);
+            var @event = documentSession.Events.Load<IssueCreated>(eventId);
             ```
     -   **[Stream loading from exact state](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Stream/StreamLoadingFromExactState.cs)** - all events that were placed on the event store should be possible to load them back. Marten allows to get stream from exact state by:
         -   timestamp (has to be in UTC)

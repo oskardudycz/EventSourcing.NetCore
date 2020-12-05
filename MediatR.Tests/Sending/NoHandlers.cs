@@ -21,21 +21,21 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        public class TasksList
+        public class IssuesList
         {
-            public List<string> Tasks { get; }
+            public List<string> Issues { get; }
 
-            public TasksList(params string[] tasks)
+            public IssuesList(params string[] issues)
             {
-                Tasks = tasks.ToList();
+                Issues = issues.ToList();
             }
         }
 
-        public class GetTaskNamesQuery: IRequest<List<string>>
+        public class GetIssuesNamesQuery: IRequest<List<string>>
         {
             public string Filter { get; }
 
-            public GetTaskNamesQuery(string filter)
+            public GetIssuesNamesQuery(string filter)
             {
                 Filter = filter;
             }
@@ -50,7 +50,7 @@ namespace MediatR.Tests.Publishing
                 var serviceLocator = new ServiceLocator();
                 var mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
 
-                var query = new GetTaskNamesQuery("cleaning");
+                var query = new GetIssuesNamesQuery("cleaning");
 
                 //When
                 var result = await mediator.Send(query);

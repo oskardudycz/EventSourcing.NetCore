@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Core.Commands;
 using Core.Queries;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Commands;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects;
-using EventSourcing.Sample.Tasks.Views.Account;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.Commands;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.Queries;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventSourcing.Web.Sample.Controllers

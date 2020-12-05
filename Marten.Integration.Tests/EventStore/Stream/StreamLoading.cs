@@ -8,28 +8,28 @@ namespace Marten.Integration.Tests.EventStore.Stream
 {
     public class StreamLoading: MartenTest
     {
-        public class TaskCreated
+        public class IssueCreated
         {
             public Guid Id { get; set; }
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
         }
 
-        public class TaskUpdated
+        public class IssueUpdated
         {
             public Guid Id { get; set; }
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
         }
 
-        public class TaskList { }
+        public class IssuesList { }
 
-        private readonly Guid _taskId = Guid.NewGuid();
+        private readonly Guid issueId = Guid.NewGuid();
 
         private Guid GetExistingStreamId()
         {
-            var @event = new TaskCreated { TaskId = _taskId, Description = "Description" };
-            var streamId = EventStore.StartStream<TaskList>(@event).Id;
+            var @event = new IssueCreated { IssueId = issueId, Description = "Description" };
+            var streamId = EventStore.StartStream<IssuesList>(@event).Id;
             Session.SaveChanges();
 
             return streamId;
@@ -56,7 +56,7 @@ namespace Marten.Integration.Tests.EventStore.Stream
             var streamId = GetExistingStreamId();
 
             //When
-            EventStore.Append(streamId, new TaskUpdated { Id = Guid.NewGuid(), TaskId = _taskId, Description = "New Description" });
+            EventStore.Append(streamId, new IssueUpdated { Id = Guid.NewGuid(), IssueId = issueId, Description = "New Description" });
             Session.SaveChanges();
 
             //Then
@@ -74,7 +74,7 @@ namespace Marten.Integration.Tests.EventStore.Stream
             var eventId = EventStore.FetchStream(streamId).Single().Id;
 
             //When
-            var @event = EventStore.Load<TaskCreated>(eventId);
+            var @event = EventStore.Load<IssueCreated>(eventId);
 
             //Then
             @event.Should().Not.Be.Null();

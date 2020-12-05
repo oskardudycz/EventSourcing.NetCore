@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.Events;
 using Marten.Events.Projections;
 
 namespace EventSourcing.Sample.Transactions.Views.Clients

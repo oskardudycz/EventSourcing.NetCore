@@ -23,53 +23,53 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        public class TasksList
+        public class IssuesList
         {
-            public List<string> Tasks { get; }
+            public List<string> Issues { get; }
 
-            public TasksList(params string[] tasks)
+            public IssuesList(params string[] issues)
             {
-                Tasks = new List<string>();
+                Issues = issues?.ToList();
             }
         }
 
-        public class AddTaskCommand: IRequest
+        public class CreateIssueCommand: IRequest
         {
-            public string TaskName { get; }
+            public string IssueName { get; }
 
-            public AddTaskCommand(string taskName)
+            public CreateIssueCommand(string issueName)
             {
-                TaskName = taskName;
+                IssueName = issueName;
             }
         }
 
-        public class AddTaskCommandHandler: IRequestHandler<AddTaskCommand>
+        public class CreateIssueCommandHandler: IRequestHandler<CreateIssueCommand>
         {
-            private readonly TasksList _taskList;
+            private readonly IssuesList _issuesList;
 
-            public AddTaskCommandHandler(TasksList tasksList)
+            public CreateIssueCommandHandler(IssuesList issuesList)
             {
-                _taskList = tasksList;
+                _issuesList = issuesList;
             }
 
-            public Task<Unit> Handle(AddTaskCommand command, CancellationToken cancellationToken = default(CancellationToken))
+            public Task<Unit> Handle(CreateIssueCommand command, CancellationToken cancellationToken = default(CancellationToken))
             {
-                _taskList.Tasks.Add(command.TaskName);
+                _issuesList.Issues.Add(command.IssueName);
                 return Unit.Task;
             }
         }
 
         private readonly IMediator mediator;
-        private readonly TasksList _taskList = new TasksList();
+        private readonly IssuesList _issuesList = new IssuesList();
 
         public MoreThanOneHandler()
         {
-            var commandHandler = new AddTaskCommandHandler(_taskList);
+            var commandHandler = new CreateIssueCommandHandler(_issuesList);
 
             var serviceLocator = new ServiceLocator();
-            serviceLocator.Register(typeof(IRequestHandler<AddTaskCommand, Unit>), commandHandler, commandHandler);
+            serviceLocator.Register(typeof(IRequestHandler<CreateIssueCommand, Unit>), commandHandler, commandHandler);
             //Registration needed internally by MediatR
-            serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<AddTaskCommand, Unit>>), new List<IPipelineBehavior<AddTaskCommand, Unit>>());
+            serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<CreateIssueCommand, Unit>>), new List<IPipelineBehavior<CreateIssueCommand, Unit>>());
 
             mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
         }
@@ -78,14 +78,14 @@ namespace MediatR.Tests.Sending
         public async void GivenTwoHandlersForOneCommand_WhenSendMethodIsBeingCalled_ThenOnlyFIrstHandlersIsBeingCalled()
         {
             //Given
-            var query = new AddTaskCommand("cleaning");
+            var query = new CreateIssueCommand("cleaning");
 
             //When
             await mediator.Send(query);
 
             //Then
-            _taskList.Tasks.Count.Should().Be.EqualTo(1);
-            _taskList.Tasks.Should().Have.SameValuesAs("cleaning");
+            _issuesList.Issues.Count.Should().Be.EqualTo(1);
+            _issuesList.Issues.Should().Have.SameValuesAs("cleaning");
         }
     }
 }

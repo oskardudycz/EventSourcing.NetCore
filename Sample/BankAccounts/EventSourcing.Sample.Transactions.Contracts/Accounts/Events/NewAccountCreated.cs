@@ -1,7 +1,7 @@
 using System;
 using Core.Events;
 
-namespace EventSourcing.Sample.Tasks.Contracts.Accounts.Events
+namespace EventSourcing.Sample.Transactions.Contracts.Accounts.Events
 {
     public class NewAccountCreated: IEvent
     {

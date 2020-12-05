@@ -38,31 +38,31 @@ namespace CQRS.Tests.Queries
             }
         }
 
-        public class GetTaskNamesQuery: IQuery<List<string>>
+        public class GetIssuesNamesQuery: IQuery<List<string>>
         {
             public string Filter { get; }
 
-            public GetTaskNamesQuery(string filter)
+            public GetIssuesNamesQuery(string filter)
             {
                 Filter = filter;
             }
         }
 
-        public interface ITaskApplicationService
+        public interface IIssueApplicationService
         {
-            Task<List<string>> GetTaskNames(GetTaskNamesQuery query);
+            Task<List<string>> GetIssuesNames(GetIssuesNamesQuery query);
         }
 
-        public class TaskApplicationService: ITaskApplicationService
+        public class IssueApplicationService: IIssueApplicationService
         {
             private readonly IQueryBus _queryBus;
 
-            public TaskApplicationService(IQueryBus queryBus)
+            public IssueApplicationService(IQueryBus queryBus)
             {
                 _queryBus = queryBus;
             }
 
-            public Task<List<string>> GetTaskNames(GetTaskNamesQuery query)
+            public Task<List<string>> GetIssuesNames(GetIssuesNamesQuery query)
             {
                 return _queryBus.Send(query);
             }
@@ -70,32 +70,32 @@ namespace CQRS.Tests.Queries
 
         public interface IAppReadModel
         {
-            IQueryable<string> Tasks { get; }
+            IQueryable<string> Issues { get; }
         }
 
         public class AppReadModel: IAppReadModel
         {
-            private readonly IList<string> _tasks;
-            public IQueryable<string> Tasks => _tasks.AsQueryable();
+            private readonly IList<string> issues;
+            public IQueryable<string> Issues => issues.AsQueryable();
 
-            public AppReadModel(params string[] tasks)
+            public AppReadModel(params string[] issues)
             {
-                _tasks = tasks?.ToList();
+                this.issues = issues?.ToList();
             }
         }
 
-        public class AddTaskCommandHandler: IQueryHandler<GetTaskNamesQuery, List<string>>
+        public class CreateIssueCommandHandler: IQueryHandler<GetIssuesNamesQuery, List<string>>
         {
             private readonly IAppReadModel _readModel;
 
-            public AddTaskCommandHandler(IAppReadModel readModel)
+            public CreateIssueCommandHandler(IAppReadModel readModel)
             {
                 _readModel = readModel;
             }
 
-            public Task<List<string>> Handle(GetTaskNamesQuery query, CancellationToken cancellationToken = default(CancellationToken))
+            public Task<List<string>> Handle(GetIssuesNamesQuery query, CancellationToken cancellationToken = default(CancellationToken))
             {
-                return Task.Run(() => _readModel.Tasks
+                return Task.Run(() => _readModel.Issues
                     .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
                     .ToList(), cancellationToken);
             }
@@ -107,16 +107,16 @@ namespace CQRS.Tests.Queries
             var serviceLocator = new ServiceLocator();
 
             var readModel = new AppReadModel("Cleaning main room", "Writing blog", "cleaning kitchen");
-            var commandHandler = new AddTaskCommandHandler(readModel);
+            var commandHandler = new CreateIssueCommandHandler(readModel);
             serviceLocator.RegisterQueryHandler(commandHandler);
 
-            var applicationService = new TaskApplicationService(new QueryBus(serviceLocator.GetMediator()));
+            var applicationService = new IssueApplicationService(new QueryBus(serviceLocator.GetMediator()));
 
             //Given
-            var query = new GetTaskNamesQuery("cleaning");
+            var query = new GetIssuesNamesQuery("cleaning");
 
             //When
-            var result = await applicationService.GetTaskNames(query);
+            var result = await applicationService.GetIssuesNames(query);
 
             //Then
             result.Should().Have.Count.EqualTo(2);

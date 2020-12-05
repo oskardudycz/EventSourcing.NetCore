@@ -10,20 +10,20 @@ namespace Marten.Integration.Tests.EventStore.Transformations
 {
     public class OneToOneEventTransformations: MartenTest
     {
-        public interface ITaskEvent
+        public interface IIssueEvent
         {
-            Guid TaskId { get; set; }
+            Guid IssueId { get; set; }
         }
 
-        public class TaskCreated: ITaskEvent
+        public class IssueCreated: IIssueEvent
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
         }
 
-        public class TaskUpdated: ITaskEvent
+        public class IssueUpdated: IIssueEvent
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
         }
 
@@ -33,34 +33,34 @@ namespace Marten.Integration.Tests.EventStore.Transformations
             Modification
         }
 
-        public class TaskChangesLog
+        public class IssueChangesLog
         {
             public Guid Id { get; set; }
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public ChangeType ChangeType { get; set; }
             public DateTime Timestamp { get; set; }
         }
 
-        public class TaskList { }
+        public class IssuesList { }
 
-        public class TaskChangeLogTransform: ITransform<TaskCreated, TaskChangesLog>,
-            ITransform<TaskUpdated, TaskChangesLog>
+        public class IssueChangeLogTransform: ITransform<IssueCreated, IssueChangesLog>,
+            ITransform<IssueUpdated, IssueChangesLog>
         {
-            public TaskChangesLog Transform(EventStream stream, Event<TaskCreated> input)
+            public IssueChangesLog Transform(EventStream stream, Event<IssueCreated> input)
             {
-                return new TaskChangesLog
+                return new IssueChangesLog
                 {
-                    TaskId = input.Data.TaskId,
+                    IssueId = input.Data.IssueId,
                     Timestamp = input.Timestamp.DateTime,
                     ChangeType = ChangeType.Creation
                 };
             }
 
-            public TaskChangesLog Transform(EventStream stream, Event<TaskUpdated> input)
+            public IssueChangesLog Transform(EventStream stream, Event<IssueUpdated> input)
             {
-                return new TaskChangesLog
+                return new IssueChangesLog
                 {
-                    TaskId = input.Data.TaskId,
+                    IssueId = input.Data.IssueId,
                     Timestamp = input.Timestamp.DateTime,
                     ChangeType = ChangeType.Modification
                 };
@@ -77,8 +77,8 @@ namespace Marten.Integration.Tests.EventStore.Transformations
                 options.Events.DatabaseSchemaName = SchemaName;
 
                 //It's needed to manualy set that transformations should be applied
-                options.Events.InlineProjections.TransformEvents<TaskCreated, TaskChangesLog>(new TaskChangeLogTransform());
-                options.Events.InlineProjections.TransformEvents<TaskUpdated, TaskChangesLog>(new TaskChangeLogTransform());
+                options.Events.InlineProjections.TransformEvents<IssueCreated, IssueChangesLog>(new IssueChangeLogTransform());
+                options.Events.InlineProjections.TransformEvents<IssueUpdated, IssueChangesLog>(new IssueChangeLogTransform());
             });
 
             return store.OpenSession();
@@ -87,42 +87,42 @@ namespace Marten.Integration.Tests.EventStore.Transformations
         [Fact]
         public void GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
         {
-            var task1Id = Guid.NewGuid();
-            var task2Id = Guid.NewGuid();
+            var issue1Id = Guid.NewGuid();
+            var issue2Id = Guid.NewGuid();
 
-            var events = new ITaskEvent[]
+            var events = new IIssueEvent[]
             {
-                new TaskCreated {TaskId = task1Id, Description = "Description 1"},
-                new TaskUpdated {TaskId = task1Id, Description = "Description 1 New"},
-                new TaskCreated {TaskId = task2Id, Description = "Description 2"},
-                new TaskUpdated {TaskId = task1Id, Description = "Description 1 Super New"},
-                new TaskUpdated {TaskId = task2Id, Description = "Description 2 New"},
+                new IssueCreated {IssueId = issue1Id, Description = "Description 1"},
+                new IssueUpdated {IssueId = issue1Id, Description = "Description 1 New"},
+                new IssueCreated {IssueId = issue2Id, Description = "Description 2"},
+                new IssueUpdated {IssueId = issue1Id, Description = "Description 1 Super New"},
+                new IssueUpdated {IssueId = issue2Id, Description = "Description 2 New"},
             };
 
             //1. Create events
-            EventStore.StartStream<TaskList>(events);
+            EventStore.StartStream<IssuesList>(events);
 
             Session.SaveChanges();
 
             //2. Get transformed events
-            var changeLogs = Session.Query<TaskChangesLog>().ToList();
+            var changeLogs = Session.Query<IssueChangesLog>().ToList();
 
             changeLogs.Should().Have.Count.EqualTo(events.Length);
 
-            changeLogs.Select(ev => ev.TaskId)
-                .Should().Have.SameValuesAs(events.Select(ev => ev.TaskId));
+            changeLogs.Select(ev => ev.IssueId)
+                .Should().Have.SameValuesAs(events.Select(ev => ev.IssueId));
 
             changeLogs.Count(ev => ev.ChangeType == ChangeType.Creation)
-                .Should().Be.EqualTo(events.OfType<TaskCreated>().Count());
+                .Should().Be.EqualTo(events.OfType<IssueCreated>().Count());
 
             changeLogs.Count(ev => ev.ChangeType == ChangeType.Modification)
-                .Should().Be.EqualTo(events.OfType<TaskUpdated>().Count());
+                .Should().Be.EqualTo(events.OfType<IssueUpdated>().Count());
 
-            changeLogs.Count(ev => ev.TaskId == task1Id)
-                .Should().Be.EqualTo(events.Count(ev => ev.TaskId == task1Id));
+            changeLogs.Count(ev => ev.IssueId == issue1Id)
+                .Should().Be.EqualTo(events.Count(ev => ev.IssueId == issue1Id));
 
-            changeLogs.Count(ev => ev.TaskId == task2Id)
-                .Should().Be.EqualTo(events.Count(ev => ev.TaskId == task2Id));
+            changeLogs.Count(ev => ev.IssueId == issue2Id)
+                .Should().Be.EqualTo(events.Count(ev => ev.IssueId == issue2Id));
         }
     }
 }

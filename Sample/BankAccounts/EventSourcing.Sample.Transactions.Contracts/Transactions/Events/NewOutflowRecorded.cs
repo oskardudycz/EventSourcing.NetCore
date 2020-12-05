@@ -1,7 +1,7 @@
 using System;
 using Core.Events;
 
-namespace EventSourcing.Sample.Tasks.Contracts.Transactions.Events
+namespace EventSourcing.Sample.Transactions.Contracts.Transactions.Events
 {
     public class NewOutflowRecorded: IEvent
     {

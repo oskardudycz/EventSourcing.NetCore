@@ -7,19 +7,19 @@ namespace Marten.Integration.Tests.EventStore.Stream
 {
     public class StreamLoadingFromExactState: MartenTest
     {
-        public class TaskCreated
+        public class IssueCreated
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
         }
 
-        public class TaskUpdated
+        public class IssueUpdated
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
         }
 
-        public class TaskList { }
+        public class IssuesList { }
 
         [Fact(Skip = "Skipping - AppVeyor for some reason doesn't like it -_-")]
         public void GivenSetOfEvents_WithFetchEventsFromDifferentTimes_ThenProperSetsAreLoaded()
@@ -31,16 +31,16 @@ namespace Marten.Integration.Tests.EventStore.Stream
             //When
             var beforeCreateTimestamp = DateTime.UtcNow;
 
-            EventStore.Append(streamId, new TaskCreated { TaskId = taskId, Description = "Initial Name" });
+            EventStore.Append(streamId, new IssueCreated { IssueId = taskId, Description = "Initial Name" });
             Session.SaveChanges();
             var createTimestamp = DateTime.UtcNow;
 
-            EventStore.Append(streamId, new TaskUpdated { TaskId = taskId, Description = "Updated name" });
+            EventStore.Append(streamId, new IssueUpdated { IssueId = taskId, Description = "Updated name" });
             Session.SaveChanges();
             var firstUpdateTimestamp = DateTime.UtcNow;
 
-            EventStore.Append(streamId, new TaskUpdated { TaskId = taskId, Description = "Updated again name" },
-                new TaskUpdated { TaskId = taskId, Description = "Updated again and again name" });
+            EventStore.Append(streamId, new IssueUpdated { IssueId = taskId, Description = "Updated again name" },
+                new IssueUpdated { IssueId = taskId, Description = "Updated again and again name" });
             Session.SaveChanges();
             var secondUpdateTimestamp = DateTime.UtcNow;
 
@@ -66,14 +66,14 @@ namespace Marten.Integration.Tests.EventStore.Stream
             var taskId = Guid.NewGuid();
 
             //When
-            EventStore.Append(streamId, new TaskCreated { TaskId = taskId, Description = "Initial Name" });
+            EventStore.Append(streamId, new IssueCreated { IssueId = taskId, Description = "Initial Name" });
             Session.SaveChanges();
 
-            EventStore.Append(streamId, new TaskUpdated { TaskId = taskId, Description = "Updated name" });
+            EventStore.Append(streamId, new IssueUpdated { IssueId = taskId, Description = "Updated name" });
             Session.SaveChanges();
 
-            EventStore.Append(streamId, new TaskUpdated { TaskId = taskId, Description = "Updated again name" },
-                new TaskUpdated { TaskId = taskId, Description = "Updated again and again name" });
+            EventStore.Append(streamId, new IssueUpdated { IssueId = taskId, Description = "Updated again name" },
+                new IssueUpdated { IssueId = taskId, Description = "Updated again and again name" });
             Session.SaveChanges();
 
             //Then

@@ -1,7 +1,7 @@
 using System;
 using Core.Commands;
 
-namespace EventSourcing.Sample.Tasks.Contracts.Accounts.Commands
+namespace EventSourcing.Sample.Transactions.Contracts.Accounts.Commands
 {
     public class CreateNewAccount: ICommand
     {

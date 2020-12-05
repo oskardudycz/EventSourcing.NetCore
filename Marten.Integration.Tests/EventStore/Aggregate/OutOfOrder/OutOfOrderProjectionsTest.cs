@@ -9,61 +9,61 @@ namespace Marten.Integration.Tests.EventStore.Projections
 {
     public class OutOfOrderProjectionsTest: MartenTest
     {
-        public interface ITaskEvent
+        public interface IIssueEvent
         {
-            Guid TaskId { get; set; }
+            Guid IssueId { get; set; }
 
-            int TaskVersion { get; set; }
+            int IssueVersion { get; set; }
         }
 
-        public class TaskCreated: ITaskEvent
+        public class IssueCreated: IIssueEvent
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
 
-            public int TaskVersion { get; set; }
+            public int IssueVersion { get; set; }
         }
 
-        public class TaskUpdated: ITaskEvent
+        public class IssueUpdated: IIssueEvent
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
             public string Description { get; set; }
 
-            public int TaskVersion { get; set; }
+            public int IssueVersion { get; set; }
         }
 
-        public class Task
+        public class Issue
         {
-            public Guid TaskId { get; set; }
+            public Guid IssueId { get; set; }
 
             public string Description { get; set; }
         }
 
-        public class TaskList
+        public class IssuesList
         {
             public Guid Id { get; set; }
-            public List<Task> List { get; private set; }
+            public List<Issue> List { get; private set; }
 
-            public TaskList()
+            public IssuesList()
             {
-                List = new List<Task>();
+                List = new List<Issue>();
             }
 
-            public void Apply(TaskCreated @event)
+            public void Apply(IssueCreated @event)
             {
-                List.Add(new Task { TaskId = @event.TaskId, Description = @event.Description });
+                List.Add(new Issue { IssueId = @event.IssueId, Description = @event.Description });
             }
 
-            public void Apply(TaskUpdated @event)
+            public void Apply(IssueUpdated @event)
             {
-                var task = List.SingleOrDefault(t => t.TaskId == @event.TaskId);
+                var issue = List.SingleOrDefault(t => t.IssueId == @event.IssueId);
 
-                if (task == null)
+                if (issue == null)
                 {
                     return;
                 }
 
-                task.Description = @event.Description;
+                issue.Description = @event.Description;
             }
         }
 
@@ -77,7 +77,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
                 options.Events.DatabaseSchemaName = SchemaName;
 
                 //It's needed to manualy set that inline aggegation should be applied
-                options.Events.InlineProjections.AggregateStreamsWith<TaskList>();
+                options.Events.InlineProjections.AggregateStreamsWith<IssuesList>();
             });
 
             return store.OpenSession();
@@ -89,31 +89,31 @@ namespace Marten.Integration.Tests.EventStore.Projections
             var firstTaskId = Guid.NewGuid();
             var secondTaskId = Guid.NewGuid();
 
-            var events = new ITaskEvent[]
+            var events = new IIssueEvent[]
             {
-                new TaskUpdated {TaskId = firstTaskId, Description = "Final First Task Description", TaskVersion = 4 },
-                new TaskCreated {TaskId = firstTaskId, Description = "First Task", TaskVersion = 1 },
-                new TaskCreated {TaskId = secondTaskId, Description = "Second Task 2", TaskVersion = 2 },
-                new TaskUpdated {TaskId = firstTaskId, Description = "Intermediate First Task Description", TaskVersion = 3},
-                new TaskUpdated {TaskId = secondTaskId, Description = "Final Second Task Description", TaskVersion = 5},
+                new IssueUpdated {IssueId = firstTaskId, Description = "Final First Issue Description", IssueVersion = 4 },
+                new IssueCreated {IssueId = firstTaskId, Description = "First Issue", IssueVersion = 1 },
+                new IssueCreated {IssueId = secondTaskId, Description = "Second Issue 2", IssueVersion = 2 },
+                new IssueUpdated {IssueId = firstTaskId, Description = "Intermediate First Issue Description", IssueVersion = 3},
+                new IssueUpdated {IssueId = secondTaskId, Description = "Final Second Issue Description", IssueVersion = 5},
             };
 
             //1. Create events
-            var streamId = EventStore.StartStream<TaskList>(events).Id;
+            var streamId = EventStore.StartStream<IssuesList>(events).Id;
 
             Session.SaveChanges();
 
             //2. Get live agregation
-            var taskListFromLiveAggregation = EventStore.AggregateStream<TaskList>(streamId);
+            var issuesListFromLiveAggregation = EventStore.AggregateStream<IssuesList>(streamId);
 
             //3. Get inline aggregation
-            var taskListFromInlineAggregation = Session.Load<TaskList>(streamId);
+            var issuesListFromInlineAggregation = Session.Load<IssuesList>(streamId);
 
-            taskListFromLiveAggregation.Should().Not.Be.Null();
-            taskListFromInlineAggregation.Should().Not.Be.Null();
+            issuesListFromLiveAggregation.Should().Not.Be.Null();
+            issuesListFromInlineAggregation.Should().Not.Be.Null();
 
-            taskListFromLiveAggregation.List.Count.Should().Be.EqualTo(2);
-            taskListFromLiveAggregation.List.Count.Should().Be.EqualTo(taskListFromInlineAggregation.List.Count);
+            issuesListFromLiveAggregation.List.Count.Should().Be.EqualTo(2);
+            issuesListFromLiveAggregation.List.Count.Should().Be.EqualTo(issuesListFromInlineAggregation.List.Count);
         }
     }
 }

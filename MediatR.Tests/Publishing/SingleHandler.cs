@@ -23,53 +23,53 @@ namespace MediatR.Tests.Publishing
             }
         }
 
-        public class TasksList
+        public class IssuesList
         {
-            public List<string> Tasks { get; }
+            public List<string> Issues { get; }
 
-            public TasksList()
+            public IssuesList()
             {
-                Tasks = new List<string>();
+                Issues = new List<string>();
             }
         }
 
-        public class TaskWasAdded: INotification
+        public class IssueCreated: INotification
         {
-            public string TaskName { get; }
+            public string IssueName { get; }
 
-            public TaskWasAdded(string taskName)
+            public IssueCreated(string issueName)
             {
-                TaskName = taskName;
+                IssueName = issueName;
             }
         }
 
-        public class TaskWasAddedHandler: INotificationHandler<TaskWasAdded>
+        public class IssueCreatedHandler: INotificationHandler<IssueCreated>
         {
-            private readonly TasksList _taskList;
+            private readonly IssuesList _issuesList;
 
-            public TaskWasAddedHandler(TasksList tasksList)
+            public IssueCreatedHandler(IssuesList issuesList)
             {
-                _taskList = tasksList;
+                _issuesList = issuesList;
             }
 
-            public Task Handle(TaskWasAdded @event, CancellationToken cancellationToken = default(CancellationToken))
+            public Task Handle(IssueCreated @event, CancellationToken cancellationToken = default)
             {
-                _taskList.Tasks.Add(@event.TaskName);
+                _issuesList.Issues.Add(@event.IssueName);
                 return Task.CompletedTask;
             }
         }
 
         private readonly IMediator mediator;
-        private readonly TasksList _tasksList = new TasksList();
+        private readonly IssuesList _issuesList = new IssuesList();
 
         public SingleHandler()
         {
-            var notificationHandler = new TaskWasAddedHandler(_tasksList);
+            var notificationHandler = new IssueCreatedHandler(_issuesList);
 
             var serviceLocator = new ServiceLocator();
 
-            serviceLocator.Register(typeof(IEnumerable<INotificationHandler<TaskWasAdded>>),
-                new object[] { new List<INotificationHandler<TaskWasAdded>> { notificationHandler } });
+            serviceLocator.Register(typeof(IEnumerable<INotificationHandler<IssueCreated>>),
+                new object[] { new List<INotificationHandler<IssueCreated>> { notificationHandler } });
 
             mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
         }
@@ -78,14 +78,14 @@ namespace MediatR.Tests.Publishing
         public async void GivenRegisteredAsynchronousRequestHandler_WhenPublishMethodIsBeingCalled_ThenReturnsProperResult()
         {
             //Given
-            var @event = new TaskWasAdded("cleaning");
+            var @event = new IssueCreated("cleaning");
 
             //When
             await mediator.Publish(@event);
 
             //Then
-            _tasksList.Tasks.Should().Have.Count.EqualTo(1);
-            _tasksList.Tasks.Should().Have.SameValuesAs("cleaning");
+            _issuesList.Issues.Should().Have.Count.EqualTo(1);
+            _issuesList.Issues.Should().Have.SameValuesAs("cleaning");
         }
     }
 }

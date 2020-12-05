@@ -31,10 +31,10 @@ namespace Core.Streaming.Consumers
             // Create a linked token so we can trigger cancellation outside of this token's cancellation
             cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            // Store the task we're executing
+            // Store the issue we're executing
             executingTask = externalEventConsumer.StartAsync(cancellationToken);
 
-            // If the task is completed then return it, otherwise it's running
+            // If the issue is completed then return it, otherwise it's running
             return executingTask.IsCompleted ? executingTask : Task.CompletedTask;
         }
 
@@ -49,7 +49,7 @@ namespace Core.Streaming.Consumers
             // Signal cancellation to the executing method
             cts.Cancel();
 
-            // Wait until the task completes or the stop token triggers
+            // Wait until the issue completes or the stop token triggers
             await Task.WhenAny(executingTask, Task.Delay(-1, cancellationToken));
 
             // Throw if cancellation triggered

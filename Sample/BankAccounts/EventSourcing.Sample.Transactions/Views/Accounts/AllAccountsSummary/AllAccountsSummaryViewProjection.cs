@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
-using EventSourcing.Sample.Tasks.Contracts.Accounts.Events;
-using EventSourcing.Sample.Tasks.Contracts.Transactions.Events;
+using EventSourcing.Sample.Transactions.Contracts.Accounts.Events;
+using EventSourcing.Sample.Transactions.Contracts.Transactions.Events;
 using Marten;
 using Marten.Events.Projections;
 
-namespace EventSourcing.Sample.Tasks.Views.Accounts
+namespace EventSourcing.Sample.Transactions.Views.Accounts.AllAccountsSummary
 {
     public class AllAccountsSummaryViewProjection: ViewProjection<AllAccountsSummaryView, Guid>
     {

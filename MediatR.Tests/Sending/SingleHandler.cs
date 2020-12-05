@@ -23,38 +23,38 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        public class TasksList
+        public class IssuesList
         {
-            public List<string> Tasks { get; }
+            public List<string> Issues { get; }
 
-            public TasksList(params string[] tasks)
+            public IssuesList(params string[] issues)
             {
-                Tasks = tasks.ToList();
+                Issues = issues.ToList();
             }
         }
 
-        public class GetTaskNamesQuery: IRequest<List<string>>
+        public class GetIssuesNamesQuery: IRequest<List<string>>
         {
             public string Filter { get; }
 
-            public GetTaskNamesQuery(string filter)
+            public GetIssuesNamesQuery(string filter)
             {
                 Filter = filter;
             }
         }
 
-        public class GetTaskNamesQueryHandler: IRequestHandler<GetTaskNamesQuery, List<string>>
+        public class GetIssuesNamesQueryHandler: IRequestHandler<GetIssuesNamesQuery, List<string>>
         {
-            private readonly TasksList _taskList;
+            private readonly IssuesList _issuesList;
 
-            public GetTaskNamesQueryHandler(TasksList tasksList)
+            public GetIssuesNamesQueryHandler(IssuesList issuesList)
             {
-                _taskList = tasksList;
+                _issuesList = issuesList;
             }
 
-            public Task<List<string>> Handle(GetTaskNamesQuery query, CancellationToken cancellationToken = default(CancellationToken))
+            public Task<List<string>> Handle(GetIssuesNamesQuery query, CancellationToken cancellationToken = default)
             {
-                return Task.Run(() => _taskList.Tasks
+                return Task.Run(() => _issuesList.Issues
                     .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
                     .ToList(), cancellationToken);
             }
@@ -64,13 +64,13 @@ namespace MediatR.Tests.Sending
 
         public SingleHandler()
         {
-            var queryHandler = new GetTaskNamesQueryHandler(
-                new TasksList("Cleaning main room", "Writing blog", "cleaning kitchen"));
+            var queryHandler = new GetIssuesNamesQueryHandler(
+                new IssuesList("Cleaning main room", "Writing blog", "cleaning kitchen"));
 
             var serviceLocator = new ServiceLocator();
-            serviceLocator.Register(typeof(IRequestHandler<GetTaskNamesQuery, List<string>>), queryHandler);
+            serviceLocator.Register(typeof(IRequestHandler<GetIssuesNamesQuery, List<string>>), queryHandler);
             //Registration needed internally by MediatR
-            serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<GetTaskNamesQuery, List<string>>>), new List<IPipelineBehavior<GetTaskNamesQuery, List<string>>>());
+            serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<GetIssuesNamesQuery, List<string>>>), new List<IPipelineBehavior<GetIssuesNamesQuery, List<string>>>());
 
             mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
         }
@@ -79,7 +79,7 @@ namespace MediatR.Tests.Sending
         public async void GivenRegisteredAsynchronousRequestHandler_WhenSendMethodIsBeingCalled_ThenReturnsProperResult()
         {
             //Given
-            var query = new GetTaskNamesQuery("cleaning");
+            var query = new GetIssuesNamesQuery("cleaning");
 
             //When
             var result = await mediator.Send(query);

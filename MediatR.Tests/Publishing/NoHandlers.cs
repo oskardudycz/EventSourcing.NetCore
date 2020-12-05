@@ -21,23 +21,23 @@ namespace MediatR.Tests.Sending
             }
         }
 
-        public class TasksList
+        public class IssuesList
         {
-            public List<string> Tasks { get; }
+            public List<string> Issues { get; }
 
-            public TasksList()
+            public IssuesList()
             {
-                Tasks = new List<string>();
+                Issues = new List<string>();
             }
         }
 
-        public class TaskWasAdded: INotification
+        public class IssueCreated: INotification
         {
-            public string TaskName { get; }
+            public string IssueName { get; }
 
-            public TaskWasAdded(string taskName)
+            public IssueCreated(string issueName)
             {
-                TaskName = taskName;
+                IssueName = issueName;
             }
         }
 
@@ -50,7 +50,7 @@ namespace MediatR.Tests.Sending
                 var serviceLocator = new ServiceLocator();
                 var mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
 
-                var @event = new TaskWasAdded("cleaning");
+                var @event = new IssueCreated("cleaning");
 
                 //When
                 await mediator.Publish(@event);

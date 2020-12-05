@@ -1,6 +1,6 @@
 using System;
 
-namespace EventSourcing.Sample.Tasks.Contracts.Accounts.ValueObjects
+namespace EventSourcing.Sample.Transactions.Contracts.Accounts.ValueObjects
 {
     public class AccountSummary
     {
