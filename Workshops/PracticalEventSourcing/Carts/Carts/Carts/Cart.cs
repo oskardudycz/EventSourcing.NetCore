@@ -10,7 +10,7 @@ using Core.Extensions;
 
 namespace Carts.Carts
 {
-    internal class Cart: Aggregate
+    public class Cart: Aggregate
     {
         public Guid ClientId { get; private set; }
 

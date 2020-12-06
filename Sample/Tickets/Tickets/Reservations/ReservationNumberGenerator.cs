@@ -2,7 +2,7 @@ using System;
 
 namespace Tickets.Reservations
 {
-    internal interface IReservationNumberGenerator
+    public interface IReservationNumberGenerator
     {
         string Next();
     }
