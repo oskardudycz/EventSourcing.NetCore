@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Core;
 using Core.Streaming.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 
+[assembly: InternalsVisibleTo("Marten.Generated")]
 namespace Carts.Api
 {
     public class Startup

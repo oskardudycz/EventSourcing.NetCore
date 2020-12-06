@@ -3,7 +3,7 @@ using Core.Aggregates;
 
 namespace Tickets.Tickets
 {
-    internal class Ticket : Aggregate
+    public class Ticket : Aggregate
     {
         public Guid SeatId { get; private set; }
 

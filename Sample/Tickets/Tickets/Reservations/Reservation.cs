@@ -5,7 +5,7 @@ using Tickets.Reservations.Events;
 
 namespace Tickets.Reservations
 {
-    internal class Reservation : Aggregate
+    public class Reservation : Aggregate
     {
         public Guid SeatId { get; private set; }
 
@@ -26,7 +26,7 @@ namespace Tickets.Reservations
                 numberGenerator,
                 seatId);
         }
-        
+
         private Reservation(
             Guid id,
             IReservationNumberGenerator numberGenerator,

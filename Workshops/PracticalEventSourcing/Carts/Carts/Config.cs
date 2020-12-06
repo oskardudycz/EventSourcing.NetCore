@@ -1,7 +1,10 @@
+using System.Runtime.CompilerServices;
 using Carts.Carts;
 using Core.Marten;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
+[assembly: InternalsVisibleTo("Marten.Generated")]
 
 namespace Carts
 {
