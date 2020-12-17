@@ -49,11 +49,9 @@ docker-compose up
 
 -   Installing a most recent version of the Postgres DB (eg. from <https://www.postgresql.org/download/>).
 
-Video presentations (PL):
+Video presentation:
 
-<a href="https://www.youtube.com/watch?v=JCcQZhuO8BU&list=PLexysh97plk3wjoYvHlLbrFRNP3T9i8Y7&index=2" target="_blank"><img src="https://img.youtube.com/vi/JCcQZhuO8BU/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
-
-<a href="https://www.youtube.com/watch?v=i1XDr9km0RY&list=PLexysh97plk3wjoYvHlLbrFRNP3T9i8Y7&index=5" target="_blank"><img src="https://img.youtube.com/vi/i1XDr9km0RY/0.jpg" alt="Video presentation (PL)" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=L_ized5xwww&list=PLw-VZz_H4iio9b_NrH25gPKjr2MAS2YgC&index=7" target="_blank"><img src="https://img.youtube.com/vi/L_ized5xwww/0.jpg" alt="Practical Event Sourcing with Marten (EN)" width="320" height="240" border="10" /></a>
 
 Slides:
 - **Practical Event Sourcing with Marten** - [EN](./Slides/EventSourcing_with_Marten_EN.pptx), [PL](./Slides/EventSourcing_with_Marten_PL.pptx)
