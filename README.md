@@ -1,4 +1,4 @@
-![Twitter Follow](https://img.shields.io/twitter/follow/oskar_at_net?style=social) [![Join the chat at https://gitter.im/EventSourcing-NetCore/community](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/EventSourcing-NetCore/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/main?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/main) ![Docker Build Status](https://img.shields.io/docker/build/oskardudycz/eventsourcing.netcore) [![Financial Contributors on Open Collective](https://opencollective.com/eventsourcingnetcore/all/badge.svg?label=financial+contributors)](https://opencollective.com/eventsourcingnetcore)
+![Twitter Follow](https://img.shields.io/twitter/follow/oskar_at_net?style=social) [![Join the chat at https://gitter.im/EventSourcing-NetCore/community](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/EventSourcing-NetCore/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/8gb320jrp40el9ye/branch/main?svg=true)](https://ci.appveyor.com/project/oskardudycz/eventsourcing-netcore/branch/main) [![blog](https://img.shields.io/badge/blog-event--driven.io-brightgreen)](https://event-driven.io/)
 
 # EventSourcing.NetCore
 
@@ -265,6 +265,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Rinat Abdullin - Evolving Business Processes](https://abdullin.com/post/ddd-evolving-business-processes-a-la-lokad/)
 -   📝 [Microsoft - A Saga on Sagas](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591569(v=pandp.10))
 -   📝 [NServiceBus - Sagas](https://docs.particular.net/nservicebus/sagas/)
+-   📝 [NServiceBus sagas: Integrations](https://docs.particular.net/tutorials/nservicebus-sagas/3-integration)
 -   📝 [Denis Rosa (Couchbase) - Saga Pattern | Application Transactions Using Microservices](https://blog.couchbase.com/saga-pattern-implement-business-transactions-using-microservices-part/)
 
 ### 10.6 Modeling
