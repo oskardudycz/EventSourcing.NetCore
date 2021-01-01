@@ -37,17 +37,19 @@ Feel free to [create an issue](https://github.com/oskardudycz/EventSourcing.NetC
 
 ## 2. Prerequisites
 
-For running the Event Store examples you need to have Postgres DB. You can get it by:
+For running the Event Store examples you need to have:
 
+1. .NET 5 installed - https://dotnet.microsoft.com/download/dotnet/5.0
+2. Postgres DB. You can get it by:
 -   Installing [Docker](https://store.docker.com/search?type=edition&offering=community), going to the `docker` folder and running:
 
 ```
 docker-compose up
 ```
-
-**More information about using .NET Core, WebApi and Docker you can find in my other tutorial:** [.Net Core With Docker](https://github.com/oskardudycz/NetCoreWithDocker)
-
 -   Installing a most recent version of the Postgres DB (eg. from <https://www.postgresql.org/download/>).
+
+**More information about using .NET Core, WebApi and Docker you can find in my other tutorials:** [WebApi with .NET](https://github.com/oskardudycz/WebApiWith.NETCore)
+
 
 Watch "Practical Event Sourcing with Marten":
 
@@ -302,4 +304,4 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/eventsourcingnetcore/organization/8/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/8/avatar.svg"></a>
 <a href="https://opencollective.com/eventsourcingnetcore/organization/9/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/9/avatar.svg"></a>
 
-**EventSourcing.NetCore** is Copyright &copy; 2017-2020 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
+**EventSourcing.NetCore** is Copyright &copy; 2017-2021 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
