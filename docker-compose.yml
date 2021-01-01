@@ -28,9 +28,7 @@ services:
             - es_network
 
     backend: 
-        build:
-            dockerfile: Dockerfile
-            context: .
+        image: oskardudycz/eventsourcing.netcore
         container_name: event_sourcing_sample
         ports:
             - "5555:5000"
