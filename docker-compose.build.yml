@@ -1,0 +1,44 @@
+version: "2.1"
+services:
+    postgres: 
+        image: clkao/postgres-plv8
+        container_name: postgres
+        hostname: postgres
+        environment:
+            POSTGRES_PASSWORD: Password12!
+        ports:
+            - "5432:5432"
+        networks:
+            - es_network
+        healthcheck:
+          test: "pg_isready -U postgres"
+          interval: 10s
+          timeout: 5s
+          retries: 5
+    
+    pgadmin:
+        image: dpage/pgadmin4
+        container_name: pgadmin
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.org}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+        ports:
+            - "${PGADMIN_PORT:-5050}:80"
+        networks:
+            - es_network
+
+    backend: 
+        build:
+            dockerfile: Dockerfile
+            context: .
+        container_name: event_sourcing_sample
+        ports:
+            - "5555:5000"
+        depends_on:
+          postgres:
+            condition: service_healthy
+        networks:
+            - es_network
+networks:
+  es_network:
+     driver: bridge
