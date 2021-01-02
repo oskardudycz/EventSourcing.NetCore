@@ -32,7 +32,7 @@ jobs:
           id: docker_build
           uses: docker/build-push-action@v2
           with:
-            push: github.ref == 'refs/heads/main'
+            push: ${{ github.ref == 'refs/heads/main'}}
             tags: oskardudycz/eventsourcing.netcore:latest
 
         - name: Image digest
