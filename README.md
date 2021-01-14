@@ -233,6 +233,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   🎞 [Mathew McLoughlin - An Introduction to CQRS and Event Sourcing Patterns](https://www.youtube.com/watch?v=9a1PqwFrMP0)
 -   🎞 [Alexey Zimarev - DDD, Event Sourcing and Actors](https://www.youtube.com/watch?v=58_Ehl3oETY)
 -   🎞 [Thomas Bøgh Fangel - Event Sourcing: Traceability, Consistency, Correctness](https://www.youtube.com/watch?v=58_Ehl3oETY)
+-   🎞 [Roman Sachse - Event Sourcing - Do it yourself series](https://www.youtube.com/playlist?list=PL-nSd-yeckKh7Ts5EKChek7iXcgyUGDHa)
 
 ### 10.2 Snapshots
 -   📝 [Kacper Gunia - Event Sourcing: Snapshotting](https://domaincentric.net/blog/event-sourcing-snapshotting)
