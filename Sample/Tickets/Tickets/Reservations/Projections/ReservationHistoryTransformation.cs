@@ -12,13 +12,9 @@ namespace Tickets.Reservations.Projections
         public string Description { get; set; }
     }
 
-    public class ReservationHistoryTransformation :
-        ITransform<TentativeReservationCreated, ReservationHistory>,
-        ITransform<ReservationSeatChanged, ReservationHistory>,
-        ITransform<ReservationConfirmed, ReservationHistory>,
-        ITransform<ReservationCancelled, ReservationHistory>
+    public class ReservationHistoryTransformation : EventProjection
     {
-        public ReservationHistory Transform(EventStream stream, Event<TentativeReservationCreated> input)
+        public ReservationHistory Transform(IEvent<TentativeReservationCreated> input)
         {
             return new ReservationHistory
             {
@@ -28,7 +24,7 @@ namespace Tickets.Reservations.Projections
             };
         }
 
-        public ReservationHistory Transform(EventStream stream, Event<ReservationSeatChanged> input)
+        public ReservationHistory Transform(IEvent<ReservationSeatChanged> input)
         {
             return new ReservationHistory
             {
@@ -38,7 +34,7 @@ namespace Tickets.Reservations.Projections
             };
         }
 
-        public ReservationHistory Transform(EventStream stream, Event<ReservationConfirmed> input)
+        public ReservationHistory Transform(IEvent<ReservationConfirmed> input)
         {
             return new ReservationHistory
             {
@@ -48,7 +44,7 @@ namespace Tickets.Reservations.Projections
             };
         }
 
-        public ReservationHistory Transform(EventStream stream, Event<ReservationCancelled> input)
+        public ReservationHistory Transform(IEvent<ReservationCancelled> input)
         {
             return new ReservationHistory
             {

@@ -36,7 +36,7 @@ namespace SmartHome.Temperature.MotionSensors
         internal static void ConfigureMotionSensors(this StoreOptions options)
         {
             // Snapshots
-            options.Events.InlineProjections.AggregateStreamsWith<MotionSensor>();
+            options.Events.Projections.SelfAggregate<MotionSensor>();
         }
     }
 }

@@ -10,10 +10,10 @@ namespace EventSourcing.Sample.Transactions.Views.Clients
     {
         public ClientsViewProjection()
         {
-            ProjectEvent<ClientCreated>(ev => ev.ClientId, (view, @event) => ApplyEvent(view, @event));
-            ProjectEvent<ClientUpdated>(ev => ev.ClientId, (view, @event) => ApplyEvent(view, @event));
-            ProjectEvent<NewAccountCreated>(ev => ev.ClientId, (view, @event) => ApplyEvent(view, @event));
-            DeleteEvent<ClientDeleted>(ev => ev.ClientId);
+            ProjectEvent<ClientCreated>(ApplyEvent);
+            ProjectEvent<ClientUpdated>(ApplyEvent);
+            ProjectEvent<NewAccountCreated>(ApplyEvent);
+            DeleteEvent<ClientDeleted>();
         }
 
         internal void ApplyEvent(ClientView view, ClientCreated @event)

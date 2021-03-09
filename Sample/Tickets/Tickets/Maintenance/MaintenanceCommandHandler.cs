@@ -4,9 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Baseline.Dates;
 using Marten;
-using Marten.Events.Projections.Async;
 using MediatR;
 using Tickets.Maintenance.Commands;
 
@@ -26,16 +24,9 @@ namespace Tickets.Reservations
         {
             Guard.Against.Null(command, nameof(command));
 
-            var viewType =  Assembly.GetExecutingAssembly().GetTypes().SingleOrDefault(t=>t.Name == command.ViewName);
-
-            using (var daemon = documentStore.BuildProjectionDaemon(
-                new [] { viewType },
-                settings: new DaemonSettings
-                {
-                    LeadingEdgeBuffer = 0.Seconds()
-                }))
+            using (var daemon = documentStore.BuildProjectionDaemon())
             {
-                await daemon.Rebuild(viewType, cancellationToken);
+                await daemon.RebuildProjection(command.ViewName, cancellationToken);
             }
 
             return Unit.Value;

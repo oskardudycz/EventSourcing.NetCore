@@ -12,13 +12,9 @@ namespace Carts.Carts.Projections
         public string Description { get; set; }
     }
 
-    public class CartHistoryTransformation :
-        ITransform<CartInitialized, CartHistory>,
-        ITransform<ProductAdded, CartHistory>,
-        ITransform<ProductRemoved, CartHistory>,
-        ITransform<CartConfirmed, CartHistory>
+    public class CartHistoryTransformation : EventProjection
     {
-        public CartHistory Transform(EventStream stream, Event<CartInitialized> input)
+        public CartHistory Transform(IEvent<CartInitialized> input)
         {
             return new CartHistory
             {
@@ -28,7 +24,7 @@ namespace Carts.Carts.Projections
             };
         }
 
-        public CartHistory Transform(EventStream stream, Event<ProductAdded> input)
+        public CartHistory Transform(IEvent<ProductAdded> input)
         {
             return new CartHistory
             {
@@ -38,7 +34,7 @@ namespace Carts.Carts.Projections
             };
         }
 
-        public CartHistory Transform(EventStream stream, Event<ProductRemoved> input)
+        public CartHistory Transform(IEvent<ProductRemoved> input)
         {
             return new CartHistory
             {
@@ -48,7 +44,7 @@ namespace Carts.Carts.Projections
             };
         }
 
-        public CartHistory Transform(EventStream stream, Event<CartConfirmed> input)
+        public CartHistory Transform(IEvent<CartConfirmed> input)
         {
             return new CartHistory
             {

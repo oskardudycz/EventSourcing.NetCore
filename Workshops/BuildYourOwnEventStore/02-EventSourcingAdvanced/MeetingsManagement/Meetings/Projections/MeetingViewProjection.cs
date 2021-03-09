@@ -9,8 +9,8 @@ namespace MeetingsManagement.Meetings.Projections
     {
         public MeetingViewProjection()
         {
-            ProjectEvent<MeetingCreated>(e => e.MeetingId, Apply);
-            ProjectEvent<MeetingScheduled>(e => e.MeetingId, Apply);
+            ProjectEvent<MeetingCreated>(Apply);
+            ProjectEvent<MeetingScheduled>(Apply);
         }
 
         private void Apply(MeetingView view, MeetingCreated @event)

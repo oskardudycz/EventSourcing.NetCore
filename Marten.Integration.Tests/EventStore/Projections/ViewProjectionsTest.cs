@@ -62,34 +62,31 @@ namespace Marten.Integration.Tests.EventStore.Projections
             public Guid Id { get; set; }
             public IDictionary<Guid, string> Descriptions { get; } = new Dictionary<Guid, string>();
 
-            public void ApplyEvent(IssueCreated @event)
+            public void Apply(IssueCreated @event)
             {
                 Descriptions.Add(@event.IssueId, @event.Description);
             }
 
-            public void ApplyEvent(IssueUpdated @event)
+            public void Apply(IssueUpdated @event)
             {
                 Descriptions[@event.IssueId] = @event.Description;
             }
         }
 
-        public class IssuesListViewProjection: ViewProjection<IssueDescriptionView, Guid>
+        public class IssuesListViewProjection: EventProjection
         {
-            public IssuesListViewProjection()
+            public IssueDescriptionView Create(IssueCreated @event)
             {
-                ProjectEventToSingleRecord<IssueCreated>((view, @event) => view.ApplyEvent(@event));
-                ProjectEventToSingleRecord<IssueUpdated>((view, @event) => view.ApplyEvent(@event));
+                var result = new IssueDescriptionView();
+                result.Apply(@event);
+                return result;
             }
 
-            private ViewProjection<IssueDescriptionView, Guid> ProjectEventToSingleRecord<TEvent>(Action<IssueDescriptionView, TEvent> handler) where TEvent : class
+            public void Project(IssueUpdated @event, IDocumentOperations operations)
             {
-                return ProjectEvent((documentSession, ev) => FindIdOfRecord(documentSession) ?? Guid.NewGuid(), handler);
-            }
-
-            private Guid? FindIdOfRecord(IDocumentSession documentSession)
-            {
-                return documentSession.Query<IssueDescriptionView>()
-                                   .Select(t => (Guid?)t.Id).SingleOrDefault();
+                var issue = operations.Load<IssueDescriptionView>(@event.IssueId);
+                issue.Apply(@event);
+                operations.Store(issue);
             }
         }
 
@@ -103,8 +100,8 @@ namespace Marten.Integration.Tests.EventStore.Projections
                 options.Events.DatabaseSchemaName = SchemaName;
 
                 //It's needed to manualy set that inline aggegation should be applied
-                options.Events.InlineProjections.AggregateStreamsWith<IssuesList>();
-                options.Events.InlineProjections.Add(new IssuesListViewProjection());
+                options.Events.Projections.SelfAggregate<IssuesList>();
+                options.Events.Projections.Add(new IssuesListViewProjection());
             });
 
             return store.OpenSession();

@@ -7,24 +7,27 @@ using Marten.Events.Projections;
 
 namespace EventSourcing.Sample.Transactions.Views.Accounts.AllAccountsSummary
 {
-    public class AllAccountsSummaryViewProjection: ViewProjection<AllAccountsSummaryView, Guid>
+    public class AllAccountsSummaryViewProjection: EventProjection
     {
-        public AllAccountsSummaryViewProjection()
+        public void Project(NewAccountCreated @event, IDocumentOperations operations)
         {
-            ProjectEventToSingleRecord<NewAccountCreated>((view, @event) => view.ApplyEvent(@event));
-            ProjectEventToSingleRecord<NewInflowRecorded>((view, @event) => view.ApplyEvent(@event));
-            ProjectEventToSingleRecord<NewOutflowRecorded>((view, @event) => view.ApplyEvent(@event));
+            var issue = operations.Load<AllAccountsSummaryView>(Guid.Empty) ?? new AllAccountsSummaryView();
+            issue.Apply(@event);
+            operations.Store(issue);
         }
 
-        private ViewProjection<AllAccountsSummaryView, Guid> ProjectEventToSingleRecord<TEvent>(Action<AllAccountsSummaryView, TEvent> handler) where TEvent : class
+        public void Project(NewInflowRecorded @event, IDocumentOperations operations)
         {
-            return ProjectEvent((documentSession, ev) => FindIdOfRecord(documentSession) ?? Guid.NewGuid(), handler);
+            var issue = operations.Load<AllAccountsSummaryView>(Guid.Empty) ?? new AllAccountsSummaryView();
+            issue.Apply(@event);
+            operations.Store(issue);
         }
 
-        private Guid? FindIdOfRecord(IDocumentSession documentSession)
+        public void Project(NewOutflowRecorded @event, IDocumentOperations operations)
         {
-            return documentSession.Query<AllAccountsSummaryView>()
-                               .Select(t => (Guid?)t.Id).SingleOrDefault();
+            var issue = operations.Load<AllAccountsSummaryView>(Guid.Empty) ?? new AllAccountsSummaryView();
+            issue.Apply(@event);
+            operations.Store(issue);
         }
     }
 }

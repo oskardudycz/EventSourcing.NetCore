@@ -42,7 +42,7 @@ namespace Orders.Orders
         internal static void ConfigureOrders(this StoreOptions options)
         {
             // Snapshots
-            options.Events.InlineProjections.AggregateStreamsWith<Order>();
+            options.Events.Projections.SelfAggregate<Order>();
         }
     }
 }

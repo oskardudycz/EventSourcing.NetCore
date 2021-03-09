@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Repositories;
 using Core.Storage;
 using Marten;
+using Marten.Events.Projections;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using SmartHome.Temperature.TemperatureMeasurements.Commands;
@@ -35,7 +36,7 @@ namespace SmartHome.Temperature.TemperatureMeasurements
         internal static void ConfigureTemperatureMeasurements(this StoreOptions options)
         {
             // Snapshots
-            options.Events.AsyncProjections.AggregateStreamsWith<TemperatureMeasurement>();
+            options.Events.Projections.SelfAggregate<TemperatureMeasurement>(ProjectionLifecycle.Async);
         }
     }
 }

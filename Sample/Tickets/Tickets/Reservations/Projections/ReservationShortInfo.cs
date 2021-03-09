@@ -29,14 +29,12 @@ namespace Tickets.Reservations.Projections
     {
         public ReservationShortInfoProjection()
         {
-            ProjectEvent<TentativeReservationCreated>(@event => @event.ReservationId,
-                (item, @event) => item.Apply(@event));
+            ProjectEvent<TentativeReservationCreated>((item, @event) => item.Apply(@event));
 
-            ProjectEvent<ReservationConfirmed>(@event => @event.ReservationId,
-                (item, @event) => item.Apply(@event));
+            ProjectEvent<ReservationConfirmed>((item, @event) => item.Apply(@event));
 
 
-            DeleteEvent<ReservationCancelled>(@event => @event.ReservationId);
+            DeleteEvent<ReservationCancelled>();
         }
     }
 }
