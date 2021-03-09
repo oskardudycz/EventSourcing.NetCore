@@ -50,19 +50,13 @@ namespace Tickets.Reservations.Projections
     {
         public ReservationDetailsProjection()
         {
-            ProjectEvent<TentativeReservationCreated>(@event => @event.ReservationId,
-                (item, @event) => item.Apply(@event));
+            ProjectEvent<TentativeReservationCreated>((item, @event) => item.Apply(@event));
 
+            ProjectEvent<ReservationSeatChanged>((item, @event) => item.Apply(@event));
 
-            ProjectEvent<ReservationSeatChanged>(@event => @event.ReservationId,
-                (item, @event) => item.Apply(@event));
+            ProjectEvent<ReservationConfirmed>((item, @event) => item.Apply(@event));
 
-            ProjectEvent<ReservationConfirmed>(@event => @event.ReservationId,
-                (item, @event) => item.Apply(@event));
-
-
-            ProjectEvent<ReservationCancelled>(@event => @event.ReservationId,
-                (item, @event) => item.Apply(@event));
+            ProjectEvent<ReservationCancelled>((item, @event) => item.Apply(@event));
         }
     }
 }

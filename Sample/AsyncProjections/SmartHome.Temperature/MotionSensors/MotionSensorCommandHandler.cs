@@ -4,9 +4,7 @@ using Ardalis.GuardClauses;
 using Baseline.Dates;
 using Core.Commands;
 using Core.Repositories;
-using Core.Storage;
 using Marten;
-using Marten.Events.Projections.Async;
 using MediatR;
 using Npgsql;
 using SmartHome.Temperature.MotionSensors.Commands;
@@ -51,13 +49,9 @@ namespace SmartHome.Temperature.MotionSensors
 
             Guard.Against.Null(command, nameof(command));
 
-            using (var daemon = session.DocumentStore.BuildProjectionDaemon(new[] {typeof(MotionSensor)},
-                settings: new DaemonSettings
-                {
-                    LeadingEdgeBuffer = 0.Seconds()
-                }))
+            using (var daemon = session.DocumentStore.BuildProjectionDaemon())
             {
-                await daemon.RebuildAll(cancellationToken);
+                await daemon.RebuildProjection<MotionSensor>(cancellationToken);
             }
             return Unit.Value;
         }

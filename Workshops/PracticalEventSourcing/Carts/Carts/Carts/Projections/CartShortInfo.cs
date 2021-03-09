@@ -39,17 +39,13 @@ namespace Carts.Carts.Projections
     {
         public CartShortInfoProjection()
         {
-            ProjectEvent<CartInitialized>(@event => @event.CartId,
-                (item, @event) => item.Apply(@event));
+            ProjectEvent<CartInitialized>((item, @event) => item.Apply(@event));
 
-            ProjectEvent<ProductAdded>(@event => @event.CartId,
-                (item, @event) => item.Apply(@event));
+            ProjectEvent<ProductAdded>((item, @event) => item.Apply(@event));
 
-            ProjectEvent<ProductRemoved>(@event => @event.CartId,
-                (item, @event) => item.Apply(@event));
+            ProjectEvent<ProductRemoved>((item, @event) => item.Apply(@event));
 
-            ProjectEvent<CartConfirmed>(@event => @event.CartId,
-                (item, @event) => item.Apply(@event));
+            ProjectEvent<CartConfirmed>((item, @event) => item.Apply(@event));
         }
     }
 }

@@ -14,18 +14,18 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.AllAccountsSummary
 
         public int TotalTransactionsCount { get; set; }
 
-        public void ApplyEvent(NewAccountCreated @event)
+        public void Apply(NewAccountCreated @event)
         {
             TotalCount++;
         }
 
-        public void ApplyEvent(NewInflowRecorded @event)
+        public void Apply(NewInflowRecorded @event)
         {
             TotalBalance += @event.Inflow.Amount;
             TotalTransactionsCount++;
         }
 
-        public void ApplyEvent(NewOutflowRecorded @event)
+        public void Apply(NewOutflowRecorded @event)
         {
             TotalBalance -= @event.Outflow.Amount;
             TotalTransactionsCount++;

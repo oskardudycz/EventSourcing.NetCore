@@ -121,9 +121,9 @@ namespace EventStoreBasics.Tests
         {
             public UserDashboardProjection()
             {
-                ProjectEvent<UserCreated>(@event => @event.UserId, Apply);
-                ProjectEvent<UserNameUpdated>(@event => @event.UserId, Apply);
-                ProjectEvent<OrderCreated>(@event => @event.UserId, Apply);
+                ProjectEvent<UserCreated>(Apply);
+                ProjectEvent<UserNameUpdated>(Apply);
+                ProjectEvent<OrderCreated>(Apply);
             }
 
             private void Apply(UserDashboard item, UserCreated @event)
@@ -160,9 +160,9 @@ namespace EventStoreBasics.Tests
                 options.Connection(Settings.ConnectionString);
                 options.AutoCreateSchemaObjects = AutoCreate.All;
                 options.DatabaseSchemaName = options.Events.DatabaseSchemaName = typeof(Exercise10ProjectionsWithMarten).Name;
-                options.Events.InlineProjections.AggregateStreamsWith<User>();
-                options.Events.InlineProjections.AggregateStreamsWith<Order>();
-                options.Events.InlineProjections.Add<UserDashboardProjection>();
+                options.Events.Projections.SelfAggregate<User>();
+                options.Events.Projections.SelfAggregate<Order>();
+                options.Events.Projections.Add<UserDashboardProjection>();
             });
 
             documentSession = store.OpenSession();

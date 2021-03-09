@@ -1,7 +1,7 @@
 using System;
 using Core.Ids;
 using Marten;
-using Marten.Services.Events;
+using Marten.Events.Daemon.Resiliency;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +17,8 @@ namespace Core.Marten
         public string ReadModelSchema { get; set; } = DefaultSchema;
 
         public bool ShouldRecreateDatabase { get; set; } = false;
+
+        public DaemonMode DaemonMode { get; set; } = DaemonMode.Disabled;
     }
 
     public static class MartenConfigExtensions
@@ -29,21 +31,33 @@ namespace Core.Marten
             var martenConfig = config.GetSection(DefaultConfigKey).Get<Config>();
 
             services
-                .AddSingleton<IDocumentStore>(sp =>
-                {
-                    var documentStore =
-                        DocumentStore.For(options => SetStoreOptions(options, martenConfig, configureOptions));
-
-                    if (martenConfig.ShouldRecreateDatabase)
-                        documentStore.Advanced.Clean.CompletelyRemoveAll();
-
-                    documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
-
-                    return documentStore;
-                })
-                .AddScoped(sp => sp.GetRequiredService<IDocumentStore>().OpenSession())
-                .AddScoped<IQuerySession>(sp => sp.GetRequiredService<IDocumentSession>())
                 .AddScoped<IIdGenerator, MartenIdGenerator>();
+
+            var documentStore = services
+                .AddMarten(options =>
+                {
+                    SetStoreOptions(options, martenConfig, configureOptions);
+                })
+                .InitializeStore();
+                // .AddSingleton<IDocumentStore>(sp =>
+                // {
+                //     var documentStore =
+                //         DocumentStore.For(options => SetStoreOptions(options, martenConfig, configureOptions));
+                //
+                //     if (martenConfig.ShouldRecreateDatabase)
+                //         documentStore.Advanced.Clean.CompletelyRemoveAll();
+                //
+                //     documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
+                //
+                //     return documentStore;
+                // })
+                // .AddScoped(sp => sp.GetRequiredService<IDocumentStore>().OpenSession())
+                // .AddScoped<IQuerySession>(sp => sp.GetRequiredService<IDocumentSession>());
+
+                if (martenConfig.ShouldRecreateDatabase)
+                    documentStore.Advanced.Clean.CompletelyRemoveAll();
+
+                documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
 
             return services;
         }
@@ -58,7 +72,7 @@ namespace Core.Marten
             options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters,
                 enumStorage: EnumStorage.AsString);
             options.PLV8Enabled = false;
-            options.Events.UseAggregatorLookup(AggregationLookupStrategy.UsePublicAndPrivateApply);
+            options.Events.Daemon.Mode = config.DaemonMode;
 
             configureOptions?.Invoke(options);
         }

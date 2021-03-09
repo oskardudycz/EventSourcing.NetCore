@@ -71,7 +71,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             {
                 options.Events.AddEventTypes(new[] { typeof(IssueCreated), typeof(IssueUpdated) });
                 //It's needed to manualy set that inline aggegation should be applied
-                options.Events.InlineProjections.AggregateStreamsWith<TIssue>();
+                options.Events.Projections.SelfAggregate<TIssue>();
             });
         }
 

@@ -34,8 +34,6 @@ namespace SmartHome.Api
 
             services.AddCoreServices();
             services.AddTemperaturesModule(config);
-
-            services.AddHostedService<AsyncProjectionsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

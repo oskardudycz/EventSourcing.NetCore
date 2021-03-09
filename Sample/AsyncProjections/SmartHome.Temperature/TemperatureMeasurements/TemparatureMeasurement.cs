@@ -35,7 +35,7 @@ namespace SmartHome.Temperature.TemperatureMeasurements
             );
 
             Enqueue(@event);
-            Apply(new Event<TemperatureMeasurementStarted>(@event));
+            Apply(@event);
         }
 
         public void Record(decimal temperature)
@@ -48,21 +48,21 @@ namespace SmartHome.Temperature.TemperatureMeasurements
             );
 
             Enqueue(@event);
-            Apply(new Event<TemperatureRecorded>(@event));
+            Apply(@event);
         }
 
-        public void Apply(Event<TemperatureMeasurementStarted> @event)
+        public void Apply(TemperatureMeasurementStarted @event)
         {
-            Id = @event.Data.MeasurementId;
-            Started = @event.Timestamp;
+            Id = @event.MeasurementId;
+            Started = @event.StartedAt;
             Mesurements = new List<decimal>();
         }
 
 
-        public void Apply(Event<TemperatureRecorded> @event)
+        public void Apply(TemperatureRecorded @event)
         {
-            Mesurements.Add(@event.Data.Temperature);
-            LastRecorded = @event.Timestamp;
+            Mesurements.Add(@event.Temperature);
+            LastRecorded = @event.MeasuredAt;
         }
     }
 }

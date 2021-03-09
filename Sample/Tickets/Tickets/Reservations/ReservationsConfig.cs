@@ -44,7 +44,7 @@ namespace Tickets.Reservations
         internal static void ConfigureReservations(this StoreOptions options)
         {
             // Snapshots
-            options.Events.InlineProjections.AggregateStreamsWith<Reservation>();
+            options.Events.Projections.SelfAggregate<Reservation>();
             options.Schema.For<Reservation>().Index(x => x.SeatId, x =>
             {
                 x.IsUnique = true;
@@ -64,14 +64,11 @@ namespace Tickets.Reservations
             // options.Schema.For<Reservation>().UniqueIndex(x => x.SeatId);
 
             // projections
-            options.Events.InlineProjections.Add<ReservationDetailsProjection>();
-            options.Events.InlineProjections.Add<ReservationShortInfoProjection>();
+            options.Events.Projections.Add<ReservationDetailsProjection>();
+            options.Events.Projections.Add<ReservationShortInfoProjection>();
 
             // transformation
-            options.Events.InlineProjections.TransformEvents<TentativeReservationCreated, ReservationHistory>(new ReservationHistoryTransformation());
-            options.Events.InlineProjections.TransformEvents<ReservationSeatChanged, ReservationHistory>(new ReservationHistoryTransformation());
-            options.Events.InlineProjections.TransformEvents<ReservationConfirmed, ReservationHistory>(new ReservationHistoryTransformation());
-            options.Events.InlineProjections.TransformEvents<ReservationCancelled, ReservationHistory>(new ReservationHistoryTransformation());
+            options.Events.Projections.Add<ReservationHistoryTransformation>();
         }
     }
 }

@@ -50,16 +50,13 @@ namespace Carts.Carts
         internal static void ConfigureCarts(this StoreOptions options)
         {
             // Snapshots
-            options.Events.InlineProjections.AggregateStreamsWith<Cart>();
+            options.Events.Projections.SelfAggregate<Cart>();
             // // projections
-            options.Events.InlineProjections.Add<CartShortInfoProjection>();
-            options.Events.InlineProjections.Add<CartDetailsProjection>();
+            options.Events.Projections.Add<CartShortInfoProjection>();
+            options.Events.Projections.Add<CartDetailsProjection>();
             //
             // // transformation
-            options.Events.InlineProjections.TransformEvents<CartInitialized, CartHistory>(new CartHistoryTransformation());
-            options.Events.InlineProjections.TransformEvents<ProductAdded, CartHistory>(new CartHistoryTransformation());
-            options.Events.InlineProjections.TransformEvents<CartConfirmed, CartHistory>(new CartHistoryTransformation());
-            options.Events.InlineProjections.TransformEvents<ProductRemoved, CartHistory>(new CartHistoryTransformation());
+            options.Events.Projections.Add<CartHistoryTransformation>();
         }
     }
 }

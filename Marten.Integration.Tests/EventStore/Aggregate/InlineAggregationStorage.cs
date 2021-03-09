@@ -61,7 +61,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             return base.CreateSession(options =>
             {
                 //It's needed to manualy set that inline aggegation should be applied
-                options.Events.InlineProjections.AggregateStreamsWith<IssuesList>();
+                options.Events.Projections.SelfAggregate<IssuesList>();
             });
         }
 
