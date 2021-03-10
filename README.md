@@ -248,7 +248,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   🎞 [Dev Mentors - Inbox & Outbox pattern - transactional message processing](https://www.youtube.com/watch?v=ebyR5RPKciw)
 -   📝 [Jeremy D. Miller - Jasper’s “Outbox” Pattern Support](https://jeremydmiller.com/2018/04/16/jaspers-outbox-pattern-support/)
 -   📝 [Gunnar Morling  - Reliable Microservices Data Exchange With the Outbox Pattern](https://debezium.io/blog/2019/02/19/reliable-microservices-data-exchange-with-the-outbox-pattern/)
--   📝 [Michrosoft - Asynchronous message-based communication](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/architect-microservice-container-applications/asynchronous-message-based-communication)
+-   📝 [Microsoft - Asynchronous message-based communication](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/architect-microservice-container-applications/asynchronous-message-based-communication)
 -   📝 [NServiceBus - Outbox](https://docs.particular.net/nservicebus/outbox/)
 -   📝 [Alvaro Herrera - Implement SKIP LOCKED for row-level locks](https://www.depesz.com/2014/10/10/waiting-for-9-5-implement-skip-locked-for-row-level-locks/)
 
