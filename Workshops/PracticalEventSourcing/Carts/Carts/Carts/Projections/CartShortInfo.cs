@@ -1,5 +1,6 @@
 using System;
 using Carts.Carts.Events;
+using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 
 namespace Carts.Carts.Projections
@@ -35,7 +36,7 @@ namespace Carts.Carts.Projections
         }
     }
 
-    internal class CartShortInfoProjection : ViewProjection<CartShortInfo, Guid>
+    public class CartShortInfoProjection : AggregateProjection<CartShortInfo>
     {
         public CartShortInfoProjection()
         {

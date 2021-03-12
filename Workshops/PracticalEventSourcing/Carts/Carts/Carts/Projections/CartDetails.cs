@@ -6,6 +6,7 @@ using Carts.Carts.Events;
 using Carts.Carts.ValueObjects;
 using Carts.Pricing;
 using Core.Extensions;
+using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 
 namespace Carts.Carts.Projections
@@ -87,7 +88,7 @@ namespace Carts.Carts.Projections
         }
     }
 
-    internal class CartDetailsProjection : ViewProjection<CartDetails, Guid>
+    public class CartDetailsProjection : AggregateProjection<CartDetails>
     {
         public CartDetailsProjection()
         {
