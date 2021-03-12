@@ -1,4 +1,5 @@
 using System;
+using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 using Tickets.Reservations.Events;
 
@@ -25,14 +26,13 @@ namespace Tickets.Reservations.Projections
         }
     }
 
-    internal class ReservationShortInfoProjection : ViewProjection<ReservationShortInfo, Guid>
+    public class ReservationShortInfoProjection : AggregateProjection<ReservationShortInfo>
     {
         public ReservationShortInfoProjection()
         {
             ProjectEvent<TentativeReservationCreated>((item, @event) => item.Apply(@event));
 
             ProjectEvent<ReservationConfirmed>((item, @event) => item.Apply(@event));
-
 
             DeleteEvent<ReservationCancelled>();
         }

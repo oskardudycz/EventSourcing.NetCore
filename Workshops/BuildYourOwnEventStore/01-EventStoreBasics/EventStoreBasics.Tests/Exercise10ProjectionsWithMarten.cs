@@ -32,13 +32,13 @@ namespace EventStoreBasics.Tests
                 Apply(@event);
             }
 
-            private void Apply(UserCreated @event)
+            public void Apply(UserCreated @event)
             {
                 Id = @event.UserId;
                 Name = @event.UserName;
             }
 
-            private void Apply(UserNameUpdated @event)
+            public void Apply(UserNameUpdated @event)
             {
                 Name = @event.UserName;
             }
@@ -85,7 +85,7 @@ namespace EventStoreBasics.Tests
                 Apply(@event);
             }
 
-            private void Apply(OrderCreated @event)
+            public void Apply(OrderCreated @event)
             {
                 Id = @event.OrderId;
                 Number = @event.Number;
@@ -121,12 +121,14 @@ namespace EventStoreBasics.Tests
         {
             public UserDashboardProjection()
             {
-                ProjectEvent<UserCreated>(Apply);
-                ProjectEvent<UserNameUpdated>(Apply);
-                ProjectEvent<OrderCreated>(Apply);
+                Identity<UserCreated>(e => e.UserId);
+
+                Identity<UserNameUpdated>(e => e.UserId);
+
+                Identity<OrderCreated>(e => e.UserId);
             }
 
-            private void Apply(UserDashboard item, UserCreated @event)
+            public void Apply(UserCreated @event, UserDashboard item)
             {
                 item.Id = @event.UserId;
                 item.UserName = @event.UserName;
@@ -134,12 +136,12 @@ namespace EventStoreBasics.Tests
                 item.TotalAmount = 0;
             }
 
-            private void Apply(UserDashboard item, UserNameUpdated @event)
+            public void Apply(UserNameUpdated @event, UserDashboard item)
             {
                 item.UserName = @event.UserName;
             }
 
-            private void Apply(UserDashboard item, OrderCreated @event)
+            public void Apply(OrderCreated @event, UserDashboard item)
             {
                 item.TotalAmount += @event.Amount;
                 item.OrdersCount++;

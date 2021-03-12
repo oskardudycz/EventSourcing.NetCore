@@ -1,4 +1,5 @@
 using System;
+using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 using Tickets.Reservations.Events;
 
@@ -46,7 +47,7 @@ namespace Tickets.Reservations.Projections
         }
     }
 
-    internal class ReservationDetailsProjection: ViewProjection<ReservationDetails, Guid>
+    public class ReservationDetailsProjection: AggregateProjection<ReservationDetails>
     {
         public ReservationDetailsProjection()
         {

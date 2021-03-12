@@ -2,6 +2,7 @@ using System;
 using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Marten;
+using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 using Xunit;
 
@@ -121,8 +122,13 @@ namespace EventStoreBasics.Tests
         {
             public UserDashboardProjection()
             {
+                Identity<UserCreated>(e => e.UserId);
                 ProjectEvent<UserCreated>(Apply);
+
+                Identity<UserNameUpdated>(e => e.UserId);
                 ProjectEvent<UserNameUpdated>(Apply);
+
+                Identity<OrderCreated>(e => e.UserId);
                 ProjectEvent<OrderCreated>(Apply);
             }
 
@@ -159,7 +165,7 @@ namespace EventStoreBasics.Tests
             {
                 options.Connection(Settings.ConnectionString);
                 options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.DatabaseSchemaName = options.Events.DatabaseSchemaName = typeof(Exercise10ProjectionsWithMarten).Name;
+                options.DatabaseSchemaName = options.Events.DatabaseSchemaName = nameof(Exercise10ProjectionsWithMarten);
                 options.Events.Projections.SelfAggregate<User>();
                 options.Events.Projections.SelfAggregate<Order>();
                 options.Events.Projections.Add<UserDashboardProjection>();

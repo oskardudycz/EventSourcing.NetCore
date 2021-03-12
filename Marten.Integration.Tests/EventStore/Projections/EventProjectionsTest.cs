@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections
 {
-    public class ViewProjectionsTest: MartenTest
+    public class EventProjectionsTest: MartenTest
     {
         public interface IIssueEvent
         {

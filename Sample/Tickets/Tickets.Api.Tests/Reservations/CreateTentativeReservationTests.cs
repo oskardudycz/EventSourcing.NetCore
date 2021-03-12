@@ -62,7 +62,7 @@ namespace Tickets.Api.Tests.Reservations
 
         [Fact]
         [Trait("Category", "Exercise")]
-        public async Task CreateCommand_ShouldPublish_MeetingCreateEvent()
+        public async Task CreateCommand_ShouldPublish_TentativeReservationCreated()
         {
             var createdReservationId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
 

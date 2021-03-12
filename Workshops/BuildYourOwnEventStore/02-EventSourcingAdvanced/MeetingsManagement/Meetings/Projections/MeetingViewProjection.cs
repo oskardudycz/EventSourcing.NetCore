@@ -1,26 +1,21 @@
 using System;
+using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 using MeetingsManagement.Meetings.Events;
 using MeetingsManagement.Meetings.Views;
 
 namespace MeetingsManagement.Meetings.Projections
 {
-    public class MeetingViewProjection: ViewProjection<MeetingView, Guid>
+    public class MeetingViewProjection: AggregateProjection<MeetingView>
     {
-        public MeetingViewProjection()
-        {
-            ProjectEvent<MeetingCreated>(Apply);
-            ProjectEvent<MeetingScheduled>(Apply);
-        }
-
-        private void Apply(MeetingView view, MeetingCreated @event)
+        public void Apply(MeetingCreated @event, MeetingView view)
         {
             view.Id = @event.MeetingId;
             view.Name = @event.Name;
             view.Created = @event.Created;
         }
 
-        private void Apply(MeetingView view, MeetingScheduled @event)
+        public void Apply(MeetingScheduled @event, MeetingView view)
         {
             view.Id = @event.MeetingId;
             view.Start = @event.Occurs.Start;

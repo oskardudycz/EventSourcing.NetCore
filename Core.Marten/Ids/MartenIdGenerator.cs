@@ -1,5 +1,6 @@
 using System;
 using Marten;
+using Marten.Schema.Identity;
 
 namespace Core.Ids
 {
@@ -12,6 +13,6 @@ namespace Core.Ids
             this.documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
         }
 
-        public Guid New() => documentSession.Events.StartStream().Id;
+        public Guid New() => CombGuidIdGeneration.NewGuid();
     }
 }
