@@ -35,13 +35,13 @@ namespace EventStoreBasics.Tests
                 Apply(@event);
             }
 
-            private void Apply(UserCreated @event)
+            public void Apply(UserCreated @event)
             {
                 Id = @event.UserId;
                 Name = @event.UserName;
             }
 
-            private void Apply(UserNameUpdated @event)
+            public void Apply(UserNameUpdated @event)
             {
                 Name = @event.UserName;
             }
@@ -89,7 +89,7 @@ namespace EventStoreBasics.Tests
                 Apply(@event);
             }
 
-            private void Apply(OrderCreated @event)
+            public void Apply(OrderCreated @event)
             {
                 Id = @event.OrderId;
                 Number = @event.Number;

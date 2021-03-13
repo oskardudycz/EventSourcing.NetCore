@@ -23,7 +23,7 @@ namespace EventSourcing.Sample.IntegrationTests.Clients
         }
 
         [Fact]
-        public async Task IssueFlowTests()
+        public async Task ClientFlowTests()
         {
             // prepare command
             var command = new CreateClient(

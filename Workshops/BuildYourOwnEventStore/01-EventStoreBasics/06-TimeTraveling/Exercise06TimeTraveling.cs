@@ -23,13 +23,13 @@ namespace EventStoreBasics.Tests
             // For deserialization
             private User() { }
 
-            private void Apply(UserCreated @event)
+            public void Apply(UserCreated @event)
             {
                 Id = @event.UserId;
                 Name = @event.UserName;
             }
 
-            private void Apply(UserNameUpdated @event)
+            public void Apply(UserNameUpdated @event)
             {
                 Name = @event.UserName;
             }

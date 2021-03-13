@@ -18,7 +18,7 @@ namespace Payments.Payments
             return new Payment(paymentId, orderId, amount);
         }
 
-        private Payment(){}
+        public Payment(){}
 
         private Payment(Guid id, Guid orderId, decimal amount)
         {
@@ -28,7 +28,7 @@ namespace Payments.Payments
             Apply(@event);
         }
 
-        private void Apply(PaymentRequested @event)
+        public void Apply(PaymentRequested @event)
         {
             Version++;
 
@@ -48,7 +48,7 @@ namespace Payments.Payments
             Apply(@event);
         }
 
-        private void Apply(PaymentCompleted @event)
+        public void Apply(PaymentCompleted @event)
         {
             Version++;
 
@@ -66,7 +66,7 @@ namespace Payments.Payments
             Apply(@event);
         }
 
-        private void Apply(PaymentDiscarded @event)
+        public void Apply(PaymentDiscarded @event)
         {
             Version++;
 
@@ -84,7 +84,7 @@ namespace Payments.Payments
             Apply(@event);
         }
 
-        private void Apply(PaymentTimedOut @event)
+        public void Apply(PaymentTimedOut @event)
         {
             Version++;
 

@@ -66,7 +66,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
         [Fact]
         public void GivenStreamOfEvents_WhenAggregateStreamIsCalled_ThenChangesAreAppliedProperly()
         {
-            var streamId = EventStore.StartStream<IssuesList>().Id;
+            var streamId = Guid.NewGuid();
 
             //1. First Issue Was Created
             var issue1Id = Guid.NewGuid();

@@ -19,7 +19,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="5.10.3" />
-        <PackageReference Include="Marten" Version="4.0.0-alpha.7" />
+        <PackageReference Include="Marten" Version="4.0.0-alpha.8" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />

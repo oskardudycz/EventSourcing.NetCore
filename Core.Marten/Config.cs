@@ -39,20 +39,6 @@ namespace Core.Marten
                     SetStoreOptions(options, martenConfig, configureOptions);
                 })
                 .InitializeStore();
-                // .AddSingleton<IDocumentStore>(sp =>
-                // {
-                //     var documentStore =
-                //         DocumentStore.For(options => SetStoreOptions(options, martenConfig, configureOptions));
-                //
-                //     if (martenConfig.ShouldRecreateDatabase)
-                //         documentStore.Advanced.Clean.CompletelyRemoveAll();
-                //
-                //     documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
-                //
-                //     return documentStore;
-                // })
-                // .AddScoped(sp => sp.GetRequiredService<IDocumentStore>().OpenSession())
-                // .AddScoped<IQuerySession>(sp => sp.GetRequiredService<IDocumentSession>());
 
                 if (martenConfig.ShouldRecreateDatabase)
                     documentStore.Advanced.Clean.CompletelyRemoveAll();
