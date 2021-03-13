@@ -1,11 +1,11 @@
 using Core.Repositories;
+using Core.Storage;
 using Marten;
 using MediatR;
 using MeetingsManagement.Meetings.Commands;
 using MeetingsManagement.Meetings.Projections;
 using MeetingsManagement.Meetings.Queries;
 using MeetingsManagement.Meetings.Views;
-using MeetingsManagement.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MeetingsManagement.Meetings

@@ -17,7 +17,7 @@ namespace MeetingsManagement.Meetings
         {
         }
 
-        public static Meeting Create(Guid id, string name)
+        public static Meeting New(Guid id, string name)
         {
             return new Meeting(id, name, DateTime.UtcNow);
         }
@@ -51,7 +51,7 @@ namespace MeetingsManagement.Meetings
             Apply(@event);
         }
 
-        private void Apply(MeetingScheduled @event)
+        public void Apply(MeetingScheduled @event)
         {
             Occurs = @event.Occurs;
         }

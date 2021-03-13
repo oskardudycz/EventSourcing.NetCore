@@ -27,7 +27,7 @@ namespace Carts.Carts
             return new Cart(cartId, clientId);
         }
 
-        private Cart(){}
+        public Cart(){}
 
         private Cart(
             Guid id,
@@ -43,7 +43,7 @@ namespace Carts.Carts
             Apply(@event);
         }
 
-        private void Apply(CartInitialized @event)
+        public void Apply(CartInitialized @event)
         {
             Version++;
 
@@ -71,7 +71,7 @@ namespace Carts.Carts
             Apply(@event);
         }
 
-        private void Apply(ProductAdded @event)
+        public void Apply(ProductAdded @event)
         {
             Version++;
 
@@ -113,7 +113,7 @@ namespace Carts.Carts
             Apply(@event);
         }
 
-        private void Apply(ProductRemoved @event)
+        public void Apply(ProductRemoved @event)
         {
             Version++;
 
@@ -144,7 +144,7 @@ namespace Carts.Carts
             Apply(@event);
         }
 
-        private void Apply(CartConfirmed @event)
+        public void Apply(CartConfirmed @event)
         {
             Version++;
 

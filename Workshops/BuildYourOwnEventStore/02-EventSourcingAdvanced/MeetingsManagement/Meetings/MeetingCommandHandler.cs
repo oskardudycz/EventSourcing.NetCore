@@ -23,7 +23,7 @@ namespace MeetingsManagement.Meetings
 
         public async Task<Unit> Handle(CreateMeeting request, CancellationToken cancellationToken)
         {
-            var meeting = Meeting.Create(request.Id, request.Name);
+            var meeting = Meeting.New(request.Id, request.Name);
 
             await repository.Add(meeting, cancellationToken);
 

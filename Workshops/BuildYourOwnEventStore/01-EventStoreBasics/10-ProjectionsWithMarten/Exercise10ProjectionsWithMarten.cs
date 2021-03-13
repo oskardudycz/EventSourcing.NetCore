@@ -33,13 +33,13 @@ namespace EventStoreBasics.Tests
                 Apply(@event);
             }
 
-            private void Apply(UserCreated @event)
+            public void Apply(UserCreated @event)
             {
                 Id = @event.UserId;
                 Name = @event.UserName;
             }
 
-            private void Apply(UserNameUpdated @event)
+            public void Apply(UserNameUpdated @event)
             {
                 Name = @event.UserName;
             }
@@ -86,7 +86,7 @@ namespace EventStoreBasics.Tests
                 Apply(@event);
             }
 
-            private void Apply(OrderCreated @event)
+            public void Apply(OrderCreated @event)
             {
                 Id = @event.OrderId;
                 Number = @event.Number;
@@ -132,7 +132,7 @@ namespace EventStoreBasics.Tests
                 ProjectEvent<OrderCreated>(Apply);
             }
 
-            private void Apply(UserDashboard item, UserCreated @event)
+            public void Apply(UserDashboard item, UserCreated @event)
             {
                 item.Id = @event.UserId;
                 item.UserName = @event.UserName;
@@ -140,12 +140,12 @@ namespace EventStoreBasics.Tests
                 item.TotalAmount = 0;
             }
 
-            private void Apply(UserDashboard item, UserNameUpdated @event)
+            public void Apply(UserDashboard item, UserNameUpdated @event)
             {
                 item.UserName = @event.UserName;
             }
 
-            private void Apply(UserDashboard item, OrderCreated @event)
+            public void Apply(UserDashboard item, OrderCreated @event)
             {
                 item.TotalAmount += @event.Amount;
                 item.OrdersCount++;

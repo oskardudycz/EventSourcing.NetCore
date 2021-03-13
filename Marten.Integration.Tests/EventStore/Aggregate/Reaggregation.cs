@@ -139,7 +139,10 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
                 //9. Check if next event would be properly applied to inline aggregation
                 session.Events.Append(taskId, new IssueUpdated { IssueId = taskId, Description = "Completely New text" });
                 session.SaveChanges();
+            }
 
+            using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
+            {
                 var taskFromV2NewInlineAggregation = session.Load<NewVersion.Issue>(taskId);
                 taskFromV2NewInlineAggregation.Description.Should().Be.EqualTo("New Logic: Completely New text");
             }

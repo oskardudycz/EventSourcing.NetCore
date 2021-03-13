@@ -34,7 +34,7 @@ namespace Orders.Orders
             );
         }
 
-        private Order(){}
+        public Order(){}
 
         private Order(Guid id, Guid clientId, IReadOnlyList<PricedProductItem> productItems, decimal totalPrice)
         {
@@ -50,7 +50,7 @@ namespace Orders.Orders
             Apply(@event);
         }
 
-        private void Apply(OrderInitialized @event)
+        public void Apply(OrderInitialized @event)
         {
             Version++;
 
@@ -74,7 +74,7 @@ namespace Orders.Orders
             Apply(@event);
         }
 
-        private void Apply(OrderPaymentRecorded @event)
+        public void Apply(OrderPaymentRecorded @event)
         {
             Version++;
 
@@ -93,7 +93,7 @@ namespace Orders.Orders
             Apply(@event);
         }
 
-        private void Apply(OrderCompleted @event)
+        public void Apply(OrderCompleted @event)
         {
             Version++;
 
@@ -111,7 +111,7 @@ namespace Orders.Orders
             Apply(@event);
         }
 
-        private void Apply(OrderCancelled @event)
+        public void Apply(OrderCancelled @event)
         {
             Version++;
 
