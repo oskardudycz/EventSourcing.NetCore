@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrasructure;
 using SharpTestsEx;
@@ -8,7 +9,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections
 {
-    public class EventProjectionsTest: MartenTest
+    public class AggregationProjectionsTest: MartenTest
     {
         public interface IIssueEvent
         {
@@ -57,7 +58,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
             }
         }
 
-        public class IssueDescriptionView
+        public class IssueDescriptions
         {
             public Guid Id { get; set; }
             public IDictionary<Guid, string> Descriptions { get; } = new Dictionary<Guid, string>();
@@ -73,20 +74,16 @@ namespace Marten.Integration.Tests.EventStore.Projections
             }
         }
 
-        public class IssuesListViewProjection: EventProjection
+        public class IssueDescriptionsProjection: AggregateProjection<IssueDescriptions>
         {
-            public IssueDescriptionView Create(IssueCreated @event)
+            public void Apply(IssueCreated @event, IssueDescriptions item)
             {
-                var result = new IssueDescriptionView();
-                result.Apply(@event);
-                return result;
+                item.Apply(@event);
             }
 
-            public void Project(IssueUpdated @event, IDocumentOperations operations)
+            public void Apply(IssueUpdated @event, IssueDescriptions item)
             {
-                var issue = operations.Load<IssueDescriptionView>(@event.IssueId);
-                issue.Apply(@event);
-                operations.Store(issue);
+                item.Apply(@event);
             }
         }
 
@@ -101,7 +98,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
 
                 //It's needed to manualy set that inline aggegation should be applied
                 options.Events.Projections.SelfAggregate<IssuesList>();
-                options.Events.Projections.Add(new IssuesListViewProjection());
+                options.Events.Projections.Add(new IssueDescriptionsProjection());
             });
 
             return store.OpenSession();
@@ -133,7 +130,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
             //3. Get inline aggregation
             var issuesListFromInlineAggregation = Session.Load<IssuesList>(streamId);
 
-            var projection = Session.Query<IssueDescriptionView>().FirstOrDefault();
+            var projection = Session.Query<IssueDescriptions>().FirstOrDefault();
 
             issuesListFromLiveAggregation.Should().Not.Be.Null();
             issuesListFromInlineAggregation.Should().Not.Be.Null();
