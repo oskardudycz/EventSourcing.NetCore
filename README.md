@@ -8,24 +8,32 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
   - [1. Support](#1-support)
   - [2. Prerequisites](#2-prerequisites)
   - [3. Libraries used](#3-libraries-used)
-  - [4. Event Store - Marten](#4-event-store---marten)
-  - [5. Message Bus (for processing Commands, Queries, Events) - MediatR](#5-message-bus-for-processing-commands-queries-events---mediatr)
-  - [6. CQRS (Command Query Responsibility Separation)](#6-cqrs-command-query-responsibility-separation)
-  - [7. Fully working sample application](#7-fully-working-sample-application)
-  - [8. Self-paced training Kit](#8-self-paced-training-kit)
-  - [9. NuGet packages to help you get started.](#9-nuget-packages-to-help-you-get-started)
-  - [10. Other resources](#10-other-resources)
-    - [10.1 Various](#101-various)
-    - [10.2 Snapshots](#102-snapshots)
-    - [10.3 Projections](#103-projections)
-    - [10.4 Event processing](#104-event-processing)
-    - [10.5 Distributed processes](#105-distributed-processes)
-    - [10.6 Modeling](#106-modeling)
-  - [11. Contributors](#11-contributors)
-    - [11.1 Code Contributors](#111-code-contributors)
-    - [11.2 Financial Contributors](#112-financial-contributors)
-      - [Individuals](#individuals)
-      - [Organizations](#organizations)
+  - [4. Articles](#4-articles)
+  - [5. Event Store - Marten](#5-event-store---marten)
+  - [6. Message Bus (for processing Commands, Queries, Events) - MediatR](#6-message-bus-for-processing-commands-queries-events---mediatr)
+  - [7. CQRS (Command Query Responsibility Separation)](#7-cqrs-command-query-responsibility-separation)
+  - [8. Fully working sample application](#8-fully-working-sample-application)
+  - [9. Self-paced training Kit](#9-self-paced-training-kit)
+  - [10. NuGet packages to help you get started.](#10-nuget-packages-to-help-you-get-started)
+  - [11. Other resources](#11-other-resources)
+    - [11.1 Introduction](#111-introduction)
+    - [11.2 Event Sourcing on production](#112-event-sourcing-on-production)
+    - [11.3 Projections](#113-projections)
+    - [11.4 Snapshots](#114-snapshots)
+    - [11.5 Versioning](#115-versioning)
+    - [11.6 Storage](#116-storage)
+    - [11.7 Design & Modeling](#117-design--modeling)
+    - [11.8 GDPR](#118-gdpr)
+    - [11.9 Conflict Detection](#119-conflict-detection)
+    - [11.10 Functional programming](#1110-functional-programming)
+    - [11.12 Testing](#1112-testing)
+    - [11.13 CQRS](#1113-cqrs)
+    - [11.14 Tools](#1114-tools)
+    - [11.15 Event Sourcing vs Messaging](#1115-event-sourcing-vs-messaging)
+    - [11.15 Event processing](#1115-event-processing)
+    - [11.16 Distributed processes](#1116-distributed-processes)
+    - [11.17 Domain Driven Design](#1117-domain-driven-design)
+    - [11.18 Architecture Weekly](#1118-architecture-weekly)
 
 ## 1. Support
 
@@ -66,7 +74,21 @@ Slides:
 
 2. [MediatR](https://github.com/jbogard/MediatR) - Message Bus (for processing Commands, Queries, Events)
 
-## 4. Event Store - Marten
+## 4. Articles
+Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https://event-driven.io/?utm_source=event_sourcing_net) posts:
+-   📝 [What's the difference between a command and an event?](https://event-driven.io/en/whats_the_difference_between_event_and_command/?utm_source=event_sourcing_net)
+-   📝 [Why a bank account is not the best example of Event Sourcing?](https://event-driven.io/en/bank_account_event_sourcing/?utm_source=event_sourcing_net)
+-   📝 [How to (not) do the events versioning?](https://event-driven.io/en/how_to_do_event_versioning/?utm_source=event_sourcing_net)
+-   📝 [CQRS facts and myths explained](https://event-driven.io/en/cqrs_facts_and_myths_explained/?utm_source=event_sourcing_net)
+-   📝 [Can command return a value?](https://event-driven.io/en/can_command_return_a_value/?utm_source=event_sourcing_net)
+-   📝 [How to create projections of events for nested object structures?](https://event-driven.io/en/how_to_create_projections_of_events_for_nested_object_structures/?utm_source=event_sourcing_net)
+-   📝 [What texting your Ex has to do with Event-Driven Design?](https://event-driven.io/en/what_texting_ex_has_to_do_with_event_driven_design/?utm_source=event_sourcing_net)
+-   📝 [What if I told you that Relational Databases are in fact Event Stores?](https://event-driven.io/en/relational_databases_are_event_stores/?utm_source=event_sourcing_net)
+-   📝 [Optimistic concurrency for pessimistic times](https://event-driven.io/en/optimistic_concurrency_for_pessimistic_times/?utm_source=event_sourcing_net)
+-   📝 [Outbox, Inbox patterns and delivery guarantees explained](https://event-driven.io/en/outbox_inbox_patterns_and_delivery_guarantees_explained/?utm_source=event_sourcing_net)
+-   📝 [Saga and Process Manager - distributed processes in practice](https://event-driven.io/en/saga_process_manager_distributed_transactions/?utm_source=event_sourcing_net)
+
+## 5. Event Store - Marten
 
 -   **[Creating event store](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/General/StoreInitializationTests.cs)**
 -   **Event Stream** - is a representation of the entity in event sourcing. It's a set of events that happened for the entity with the exact id. Stream id should be unique, can have different types but usually is a Guid.
@@ -125,7 +147,7 @@ Slides:
     -   **[Projection of single stream](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Projections/AggregationProjectionsTest.cs)**
 -   **[Multitenancy per schema](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/Tenancy/TenancyPerSchema.cs)**
 
-## 5. Message Bus (for processing Commands, Queries, Events) - MediatR
+## 6. Message Bus (for processing Commands, Queries, Events) - MediatR
 
 -   **[Initialization](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/MediatR.Tests/Initialization/Initialization.cs)** - MediatR uses services locator pattern to find a proper handler for the message type.
 -   **Sending Messages** - finds and uses the first registered handler for the message type. It could be used for queries (when we need to return values), commands (when we acting).
@@ -138,18 +160,18 @@ Slides:
     -   **[More Than One Handler](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/MediatR.Tests/Publishing/MoreThanOneHandler.cs)** - when there is more than one handler registered MediatR takes all of them when calling Publish method
 -   Pipeline (to be defined)
 
-## 6. CQRS (Command Query Responsibility Separation)
+## 7. CQRS (Command Query Responsibility Separation)
 
 -   **[Command handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/CQRS.Tests/Commands/Commands.cs)**
 -   **[Query handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/CQRS.Tests/Queries/Queries.cs)**
 
-## 7. Fully working sample application
+## 8. Fully working sample application
 
 See also fully working sample application in [Sample Project](https://github.com/oskardudycz/EventSourcing.NetCore/tree/main/Sample)
 
 -   See [sample](https://github.com/oskardudycz/EventSourcing.NetCore/tree/main/Sample/EventSourcing.Sample.IntegrationTests/Clients/CreateClientTests.cs) how Entity Framework and Marten can coexist together with CQRS and Event Sourcing
 
-## 8. Self-paced training Kit
+## 9. Self-paced training Kit
 
 I prepared the self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Workshops/BuildYourOwnEventStore/Readme.md).
 
@@ -174,7 +196,7 @@ It's split into two parts:
 1. [Meetings Management Module](./Workshops/BuildYourOwnEventStore/02-EventSourcingAdvanced/MeetingsManagement) - the module responsible for creating, updating meeting details. Written in `Marten` in **Event Sourcing** pattern. Provides both write model (with Event Sourced aggregates) and read model with projections.
 2. [Meetings Search Module](./Workshops/BuildYourOwnEventStore/02-EventSourcingAdvanced/MeetingsSearch) - responsible for searching and advanced filtering. Uses `ElasticSearch` as storage (because of its advanced searching capabilities). It's a read module that's listening for the events published by the Meetings Management Module.
 
-## 9. NuGet packages to help you get started.
+## 10. NuGet packages to help you get started.
 
 I gathered and generalized all of the practices used in this tutorial/samples in Nuget Packages maintained by me [GoldenEye Framework](https://github.com/oskardudycz/GoldenEye).
 See more in:
@@ -195,64 +217,124 @@ The simplest way to start is **installing the [project template](https://github.
 
 `dotnet new SimpleDDD -n NameOfYourProject`
 
-## 10. Other resources
+## 11. Other resources
 
-### 10.1 Various
--   📝 [Greg Young - Building an Event Storage](https://cqrs.wordpress.com/documents/building-event-storage/)
--   📝 [Mathias Verraes - DDD and Messaging Architectures](http://verraes.net/2019/05/ddd-msg-arch/)
--   📝 [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
+### 11.1 Introduction
 -   🎞 [Greg Young - CQRS & Event Sourcing](https://youtube.com/watch?v=JHGkaShoyNs)
+-   📝 [Jay Kreps - Why local state is a fundamental primitive in stream processing](https://www.oreilly.com/ideas/why-local-state-is-a-fundamental-primitive-in-stream-processing)
+-   📝 [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
 -   📰 [Lorenzo Nicora - A visual introduction to event sourcing and cqrs](https://www.slideshare.net/LorenzoNicora/a-visual-introduction-to-event-sourcing-and-cqrs)
--   🎞 [Greg Young - A Decade of DDD, CQRS, Event Sourcing](https://m.youtube.com/watch?v=LDW0QWie21s)
+-   🎞 [Mathew McLoughlin - An Introduction to CQRS and Event Sourcing Patterns](https://www.youtube.com/watch?v=9a1PqwFrMP0)
+-   🎞 [Emily Stamey - Hey Boss, Event Sourcing Could Fix That!](https://www.youtube.com/watch?v=mw7D6OJpsIA)
+-   🎞 [Derek Comartin - Event Sourcing Example & Explained in plain English](https://www.youtube.com/watch?v=AUj4M-st3ic)
+-   🎞 [Duncan Jones - Introduction to event sourcing and CQRS](https://www.youtube.com/watch?v=kpM5gCLF1Zc)
+-   🎞 [Roman Sachse - Event Sourcing - Do it yourself series](https://www.youtube.com/playlist?list=PL-nSd-yeckKh7Ts5EKChek7iXcgyUGDHa)
 -   🎞 [Martin Fowler - The Many Meanings of Event-Driven Architecture](https://www.youtube.com/watch?v=STKCRSUsyP0&t=822s)
 -   📝 [Martin Fowler - Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html)
--   📝 [Wojciech Suwała - Building Microservices On .NET Core – Part 5 Marten An Ideal Repository For Your Domain Aggregates](https://altkomsoftware.pl/en/blog/building-microservices-domain-aggregates/)
--   🎞 [Dennis Doomen - A practical introduction to DDD, CQRS & Event Sourcing](https://www.youtube.com/watch?v=r26BuahD8aM)
 -   📝 [Dennis Doomen - 16 design guidelines for successful Event Sourcing](https://www.continuousimprover.com/2020/06/guidelines-event-sourcing.html)
--   📝 [Eric Evans - DDD and Microservices: At Last, Some Boundaries!](https://www.infoq.com/presentations/ddd-microservices-2016)
 -   🎞 [Martin Kleppmann - Event Sourcing and Stream Processing at Scale](https://www.youtube.com/watch?v=avi-TZI9t2I)
--   📝 [Julie Lerman - Data Points - CQRS and EF Data Models](https://msdn.microsoft.com/en-us/magazine/mt788619.aspx)
--   📝 [Vaughn Vernon - Reactive DDD: Modeling Uncertainty](https://www.infoq.com/presentations/reactive-ddd-distributed-systems)
--   📝 [Mark Seemann - CQS versus server-generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
--   📦 [Event Store - The open-source, functional database with Complex Event Processing in JavaScript](https://eventstore.org/)
--   📝 [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont’s](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
--   📝 [David Boike - Putting your events on a diet](https://particular.net/blog/putting-your-events-on-a-diet)
--   📖 [DDD Quickly](https://www.infoq.com/minibooks/domain-driven-design-quickly)
 -   📝 [Dennis Doomen - The Good, The Bad and the Ugly of Event Sourcing](https://www.continuousimprover.com/2017/11/event-sourcing-good-bad-and-ugly.html)
--   📰 [Dennis Doomen - Practical introduction to DDD, CQRS and Event Sourcing ](https://www.slideshare.net/dennisdoomen/practical-introduction-to-ddd-cqrs-and-event-sourcing)
--   📝 [Versioning in an Event Sourced System](http://blog.approache.com/2019/02/versioning-in-event-sourced-system-tldr_10.html?m=1)
--   📰 [Bartosz Sypytkowski - Collaborative Event Sourcing](https://www.slideshare.net/BartoszSypytkowski1/collaborative-replication)
--   📝 [Jay Kreps - Why local state is a fundamental primitive in stream processing](https://www.oreilly.com/ideas/why-local-state-is-a-fundamental-primitive-in-stream-processing)
--   🎞 [Thomas Pierrain - As Time Goes By… (a Bi-temporal Event Sourcing story)](https://youtube.com/watch?v=xzekp1RuZbM)
--   📝 [Michiel Overeem, Marten Spoor, Slinger Jansen - The dark side of event sourcing: Managing data conversion](https://www.researchgate.net/publication/315637858_The_dark_side_of_event_sourcing_Managing_data_conversion)
--   💻 [Jakub Pilimon - DDD by Examples](https://github.com/ddd-by-examples/library)
--   🎞 [Michiel Overeem - Event Sourcing after launch](https://www.youtube.com/watch?v=JzWJI8kW2kc)
--   🎞 [Jimmy Bogard - Domain-Driven Design: The Good Parts](https://www.youtube.com/watch?v=U6CeaA-Phqo)
--   📝 [Jimmy Bogard - CQRS and REST: the perfect match](https://lostechies.com/jimmybogard/2016/06/01/cqrs-and-rest-the-perfect-match/)
--   📝 [Microsoft - Domain events: design and implementation](https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-events-design-implementation)
--   🎞 [Mathew McLoughlin - An Introduction to CQRS and Event Sourcing Patterns](https://www.youtube.com/watch?v=9a1PqwFrMP0)
 -   🎞 [Alexey Zimarev - DDD, Event Sourcing and Actors](https://www.youtube.com/watch?v=58_Ehl3oETY)
 -   🎞 [Thomas Bøgh Fangel - Event Sourcing: Traceability, Consistency, Correctness](https://www.youtube.com/watch?v=58_Ehl3oETY)
--   🎞 [Roman Sachse - Event Sourcing - Do it yourself series](https://www.youtube.com/playlist?list=PL-nSd-yeckKh7Ts5EKChek7iXcgyUGDHa)
+-   📝 [Joseph Choe - Event Sourcing, Part 1: User Registration](https://josephchoe.com/event-sourcing-part-1)
+-   🎞 [Steven Van Beelen - Intro to Event-Driven Microservices using DDD, CQRS & Event sourcing](https://www.youtube.com/watch?v=F0g5B4F9MMs)
+-   📝 [Yves Lorphelin - The Inevitable Event-Centric Book ](https://github.com/ylorph/The-Inevitable-Event-Centric-Book/issues)
 
-### 10.2 Snapshots
--   📝 [Kacper Gunia - Event Sourcing: Snapshotting](https://domaincentric.net/blog/event-sourcing-snapshotting)
--   📝 [Event Store - Rolling Snapshots](https://eventstore.com/docs/event-sourcing-basics/rolling-snapshots/index.html)
+### 11.2 Event Sourcing on production
+-   📝 [Leo Gorodinski - Scaling Event-Sourcing at Jet](https://medium.com/@eulerfx/scaling-event-sourcing-at-jet-9c873cac33b8)
+-   📝 [EventStoreDB - Customers' case studies](https://www.eventstore.com/case-studies)
+-   🎞 [P. Avery, R. Reta - Scaling Event Sourcing for Netflix Downloads](https://www.youtube.com/watch?v=rsSld8NycCU)
+-   📝 [M. Overeem, M. Spoor, S. Jansen, S. Brinkkemper - An Empirical Characterization of Event Sourced Systems and Their Schema Evolution -- Lessons from Industry](https://arxiv.org/abs/2104.01146)
+-   🎞 [Michiel Overeem - Event Sourcing after launch](https://www.youtube.com/watch?v=JzWJI8kW2kc)
+-   🎞 [Greg Young - A Decade of DDD, CQRS, Event Sourcing](https://m.youtube.com/watch?v=LDW0QWie21s)
+-   📝 [M. Kadijk, J. Taal - The beautiful headache called event sourcing](https://engineering.q42.nl/event-sourcing/)
+-   📝 [Thomas Weiss - Planet-scale event sourcing with Azure Cosmos DB](https://medium.com/@thomasweiss_io/planet-scale-event-sourcing-with-azure-cosmos-db-48a557757c8d)
+-   🎞 [D. Kuzenski, N. Piani - Beyond APIs: Re-architected System Integrations as Event Sourced](https://www.youtube.com/watch?v=MX4_41yLuG0)
+-   🎞 [Greg Young - Why Event Sourced Systems Fail](https://www.youtube.com/watch?v=FKFu78ZEIi8)
+-   🎞 [Kacper Gunia - War Story: How a Large Corporation Used DDD to Replace a Loyalty System](https://www.youtube.com/watch?v=a1pRsAi9UVs)
+-   🎞 [Vladik Khononov - The Dark Side of Events](https://www.youtube.com/watch?v=URYPpY3SgS8)
+-   📝 [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont’s](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
+-   🎞 [Dennis Doomen - An Event Sourcing Retrospective - The Good, The Bad and the Ugly](https://www.youtube.com/watch?v=goknSHnTD4M)
+-   🎞 [David Schmitz - Event Sourcing You are doing it wrong](https://www.youtube.com/watch?v=GzrZworHpIk)
+-   📝 [Dennis Doomen - A recipe for gradually migrating from CRUD to Event Sourcing](https://www.eventstore.com/blog/a-recipe-for-gradually-migrating-from-crud-to-event-sourcing)
 
-### 10.3 Projections 
+### 11.3 Projections 
 -   📝 [Alexey Zimarev - Projections in Event Sourcing](https://zimarev.com/blog/event-sourcing/projections/)
 -   📝 [Rinat Abdulin - Event Sourcing - Projections](https://abdullin.com/post/event-sourcing-projections/)
+-   🎞 [Derek Comartin - Projections in Event Sourcing: Build ANY model you want!](https://www.youtube.com/watch?v=bTRjO6JK4Ws)
 
-### 10.4 Event processing
+### 11.4 Snapshots
+-   📝 [Kacper Gunia - Event Sourcing: Snapshotting](https://domaincentric.net/blog/event-sourcing-snapshotting)
+-   🎞 [Derek Comartin - Event Sourcing: Rehydrating Aggregates with Snapshots](https://www.youtube.com/watch?v=eAIkomEid1Y)
+
+### 11.5 Versioning
+-   📝 [Greg Young - Versioning in an Event Sourced System](https://leanpub.com/esversioning/read)
+-   📝 [Kacper Gunia - Event Sourcing: Snapshotting](https://domaincentric.net/blog/event-sourcing-snapshotting)
+-   📝 [M. Overeem, M. Spoor - The dark side of event sourcing: Managing data conversion](https://www.researchgate.net/publication/315637858_The_dark_side_of_event_sourcing_Managing_data_conversion)
+-   📝 [Savvas Kleanthous - Event immutability and dealing with change](https://www.eventstore.com/blog/event-immutability-and-dealing-with-change)
+-   📝 [Versioning in an Event Sourced System](http://blog.approache.com/2019/02/versioning-in-event-sourced-system-tldr_10.html?m=1)
+
+### 11.6 Storage
+-   📝 [Greg Young - Building an Event Storage](https://cqrs.wordpress.com/documents/building-event-storage/)
+-   🎞 [Andrii Litvinov - Event driven systems backed by MongoDB](https://www.youtube.com/watch?v=w8Z-kPz1cXw)
+-   📝 [Dave Remy - Turning the database inside out with Event Store](https://www.eventstore.com/blog/turning-the-database-inside-out)
+
+### 11.7 Design & Modeling
+-   📝 [Mathias Verraes - DDD and Messaging Architectures](http://verraes.net/2019/05/ddd-msg-arch/)
+-   📝 [David Boike - Putting your events on a diet](https://particular.net/blog/putting-your-events-on-a-diet)
+-   🎞 [Thomas Pierrain - As Time Goes By… (a Bi-temporal Event Sourcing story)](https://youtube.com/watch?v=xzekp1RuZbM)
+-   📝 [Vaughn Vernon - Effective Aggregate Design Part I: Modeling a Single Aggregate](https://dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_1.pdf)
+-   🎞 [Derek Comartin - Aggregate (Root) Design: Separate Behavior & Data for Persistence](https://www.youtube.com/watch?v=GtWVGJp061A)
+-   🎞 [Mauro Servienti - All our aggregates are wrong](https://www.youtube.com/watch?v=hev65ozmYPI)
+-   📝 [Microsoft - Domain events: design and implementation](https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-events-design-implementation)
+-   📝 [Event Storming](https://leanpub.com/introducing_eventstorming)
+-   📝 [Event Modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
+-   📝 [Wojciech Suwała - Building Microservices On .NET Core – Part 5 Marten An Ideal Repository For Your Domain Aggregates](https://altkomsoftware.pl/en/blog/building-microservices-domain-aggregates/)
+
+### 11.8 GDPR
+-   📝 [Michiel Rook - Event sourcing and the GDPR: a follow-up](https://www.michielrook.nl/2017/11/event-sourcing-gdpr-follow-up/)
+
+### 11.9 Conflict Detection
+-   🎞 [James Geall - Conflict Detection and Resolution in an EventSourced System](https://www.youtube.com/watch?v=-zaa6FUYIQM)
+-   🎞 [Lightbend - Data modelling for Replicated Event Sourcing](https://www.youtube.com/watch?v=8PnJxTlOP6o)
+-   📰 [Bartosz Sypytkowski - Collaborative Event Sourcing](https://www.slideshare.net/BartoszSypytkowski1/collaborative-replication)
+
+### 11.10 Functional programming
+-   📝 [Jérémie Chassaing - Functional Programming and Event Sourcing](https://www.youtube.com/watch?v=kgYGMVDHQHs)
+
+### 11.12 Testing
+-   🎞 [N. Rauch & A. Bailly - From Front to Back: Homomorphic Event Sourcing](https://www.youtube.com/watch?v=KyOvBQ87aP4)
+
+### 11.13 CQRS
+-   📝 [Greg Young - CQRS](https://cqrs.files.wordpress.com/2010/11/cqrs_documents.pdf)
+-   📝 [Jimmy Bogard - CQRS and REST: the perfect match](https://lostechies.com/jimmybogard/2016/06/01/cqrs-and-rest-the-perfect-match/)
+-   📝 [Mark Seemann - CQS versus server-generated IDs](http://blog.ploeh.dk/2014/08/11/cqs-versus-server-generated-ids/)
+-   📝 [Julie Lerman - Data Points - CQRS and EF Data Models](https://msdn.microsoft.com/en-us/magazine/mt788619.aspx)
+-   📝 [Marco Bürckel - Some thoughts on using CQRS without Event Sourcing](https://medium.com/@mbue/some-thoughts-on-using-cqrs-without-event-sourcing-938b878166a2)
+-   📝 [Bertrand Meyer - Eiffel: a language for software engineering (CQRS introduced)](http://laser.inf.ethz.ch/2012/slides/Meyer/eiffel_laser_2012.pdf)
+
+### 11.14 Tools
+-   🛠️ [Marten - .NET Transactional Document DB and Event Store on PostgreSQL](https://eventuous.dev/)
+-   🛠️ [EventStoreDB - The stream database built for Event Sourcing ](https://developers.eventstore.com/)
+-   🛠️ [GoldenEye - The CQRS flavoured framework that will speed up your WebAPI and Microservices development ](https://eventuous.dev/)
+-   🛠️ [Eventuous - Event Sourcing for .NET](https://eventuous.dev/)
+-   🛠️ [SQLStreamStore - Stream Store library targeting RDBMS based implementations for .NET ](https://github.com/SQLStreamStore/SQLStreamStore)
+-   🛠️ [Equinox - .NET Event Sourcing library with CosmosDB, EventStoreDB, SqlStreamStore and integration test backends](https://github.com/jet/equinox)
+
+### 11.15 Event Sourcing vs Messaging
+-   📝 [Kacper Gunia - EventStoreDB vs Kafka](https://domaincentric.net/blog/eventstoredb-vs-kafka)
+-   📝 [Vijay Nair - Axon and Kafka - How does Axon compare to Apache Kafka?](https://axoniq.io/blog-overview/axon-and-kafka-how-does-axon-compare-to-apache-kafka)
+
+### 11.15 Event processing
 -   📝 [Kamil Grzybek - The Outbox Pattern](http://www.kamilgrzybek.com/design/the-outbox-pattern/)
 -   🎞 [Dev Mentors - Inbox & Outbox pattern - transactional message processing](https://www.youtube.com/watch?v=ebyR5RPKciw)
--   📝 [Jeremy D. Miller - Jasper’s “Outbox” Pattern Support](https://jeremydmiller.com/2018/04/16/jaspers-outbox-pattern-support/)
+-   📝 [Jeremy D. Miller - Jasper's "Outbox" Pattern Support](https://jeremydmiller.com/2018/04/16/jaspers-outbox-pattern-support/)
 -   📝 [Gunnar Morling  - Reliable Microservices Data Exchange With the Outbox Pattern](https://debezium.io/blog/2019/02/19/reliable-microservices-data-exchange-with-the-outbox-pattern/)
 -   📝 [Microsoft - Asynchronous message-based communication](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/architect-microservice-container-applications/asynchronous-message-based-communication)
 -   📝 [NServiceBus - Outbox](https://docs.particular.net/nservicebus/outbox/)
 -   📝 [Alvaro Herrera - Implement SKIP LOCKED for row-level locks](https://www.depesz.com/2014/10/10/waiting-for-9-5-implement-skip-locked-for-row-level-locks/)
 
-### 10.5 Distributed processes
+### 11.16 Distributed processes
 -   📝 [Hector Garcaa-Molrna, Kenneth Salem - Sagas](https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
 -   🎞 [Caitie McCaffrey - Applying the Saga Pattern](https://www.youtube.com/watch?v=xDuwrtwYHu8)
 -   🎞 [Udi Dahan - If (domain logic) then CQRS or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
@@ -270,39 +352,19 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [NServiceBus sagas: Integrations](https://docs.particular.net/tutorials/nservicebus-sagas/3-integration)
 -   📝 [Denis Rosa (Couchbase) - Saga Pattern | Application Transactions Using Microservices](https://blog.couchbase.com/saga-pattern-implement-business-transactions-using-microservices-part/)
 
-### 10.6 Modeling
--   📝 [Event Storming](https://leanpub.com/introducing_eventstorming)
--   📝 [Event Modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
--   📝 [Vaughn Vernon - Effective Aggregate Design Part I: Modeling a Single Aggregate](https://dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_1.pdf)
+### 11.17 Domain Driven Design
+-   📝 [Eric Evans - DDD and Microservices: At Last, Some Boundaries!](https://www.infoq.com/presentations/ddd-microservices-2016)
+-   📖 [Domain-Driven Design: The First 15 Years](https://leanpub.com/ddd_first_15_years/)
+-   🎞 [Jimmy Bogard - Domain-Driven Design: The Good Parts](https://www.youtube.com/watch?v=U6CeaA-Phqo)
+-   💻 [Jakub Pilimon - DDD by Examples](https://github.com/ddd-by-examples/library)
+-   📖 [DDD Quickly](https://www.infoq.com/minibooks/domain-driven-design-quickly)
+-   📝 [Vaughn Vernon - Reactive DDD: Modeling Uncertainty](https://www.infoq.com/presentations/reactive-ddd-distributed-systems)
 
-## 11. Contributors
+### 11.18 Architecture Weekly
+If you're interested in Architecture resources, check my other repository: https://github.com/oskardudycz/ArchitectureWeekly/.
 
-### 11.1 Code Contributors
+It contains a weekly updated list of materials I found valuable and educational.
 
-This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<a href="https://github.com/oskardudycz/EventSourcing.NetCore/graphs/contributors"><img src="https://opencollective.com/eventsourcingnetcore/contributors.svg?width=890&button=false" /></a>
-
-### 11.2 Financial Contributors
-
-Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/eventsourcingnetcore/contribute)]
-
-#### Individuals
-
-<a href="https://opencollective.com/eventsourcingnetcore"><img src="https://opencollective.com/eventsourcingnetcore/individuals.svg?width=890"></a>
-
-#### Organizations
-
-Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/eventsourcingnetcore/contribute)]
-
-<a href="https://opencollective.com/eventsourcingnetcore/organization/0/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/0/avatar.svg"></a>
-<a href="https://opencollective.com/eventsourcingnetcore/organization/1/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/1/avatar.svg"></a>
-<a href="https://opencollective.com/eventsourcingnetcore/organization/2/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/2/avatar.svg"></a>
-<a href="https://opencollective.com/eventsourcingnetcore/organization/3/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/3/avatar.svg"></a>
-<a href="https://opencollective.com/eventsourcingnetcore/organization/4/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/4/avatar.svg"></a>
-<a href="https://opencollective.com/eventsourcingnetcore/organization/5/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/5/avatar.svg"></a>
-<a href="https://opencollective.com/eventsourcingnetcore/organization/6/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/6/avatar.svg"></a>
-<a href="https://opencollective.com/eventsourcingnetcore/organization/7/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/7/avatar.svg"></a>
-<a href="https://opencollective.com/eventsourcingnetcore/organization/8/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/8/avatar.svg"></a>
-<a href="https://opencollective.com/eventsourcingnetcore/organization/9/website"><img src="https://opencollective.com/eventsourcingnetcore/organization/9/avatar.svg"></a>
+---
 
 **EventSourcing.NetCore** is Copyright &copy; 2017-2021 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
