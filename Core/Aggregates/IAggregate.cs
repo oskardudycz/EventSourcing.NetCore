@@ -4,9 +4,13 @@ using Core.Events;
 
 namespace Core.Aggregates
 {
-    public interface IAggregate
+    public interface IAggregate: IAggregate<Guid>
     {
-        Guid Id { get; }
+    }
+
+    public interface IAggregate<T>
+    {
+        T Id { get; }
         int Version { get; }
 
         IEvent[] DequeueUncommittedEvents();

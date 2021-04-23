@@ -9,22 +9,19 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 {
     public class EventsAggregation: MartenTest
     {
-        public class IssueCreated
-        {
-            public Guid IssueId { get; set; }
-            public string Description { get; set; }
-        }
+        public record IssueCreated(
+            Guid IssueId,
+            string Description
+        );
 
-        public class IssueUpdated
-        {
-            public Guid IssueId { get; set; }
-            public string Description { get; set; }
-        }
+        public record IssueUpdated(
+            Guid IssueId,
+            string Description
+        );
 
-        public class IssueRemoved
-        {
-            public Guid IssueId { get; set; }
-        }
+        public record IssueRemoved(
+            Guid IssueId
+        );
 
         public class Issue
         {
@@ -45,7 +42,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
             public void Apply(IssueCreated @event)
             {
-                List.Add(new Issue { IssueId = @event.IssueId, Description = @event.Description });
+                List.Add(new Issue {IssueId = @event.IssueId, Description = @event.Description});
             }
 
             public void Apply(IssueUpdated @event)
@@ -70,7 +67,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
             //1. First Issue Was Created
             var issue1Id = Guid.NewGuid();
-            EventStore.Append(streamId, new IssueCreated { IssueId = issue1Id, Description = "Description" });
+            EventStore.Append(streamId, new IssueCreated(issue1Id, "Description"));
             Session.SaveChanges();
 
             var issuesList = EventStore.AggregateStream<IssuesList>(streamId);
@@ -80,7 +77,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             issuesList.List.Single().Description.Should().Be.EqualTo("Description");
 
             //2. First Issue Description Was Changed
-            EventStore.Append(streamId, new IssueUpdated { IssueId = issue1Id, Description = "New Description" });
+            EventStore.Append(streamId, new IssueUpdated(issue1Id, "New Description"));
             Session.SaveChanges();
 
             issuesList = EventStore.AggregateStream<IssuesList>(streamId);
@@ -90,8 +87,8 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             issuesList.List.Single().Description.Should().Be.EqualTo("New Description");
 
             //3. Two Other tasks were added
-            EventStore.Append(streamId, new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description2" },
-                new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description3" });
+            EventStore.Append(streamId, new IssueCreated(Guid.NewGuid(), "Description2"),
+                new IssueCreated(Guid.NewGuid(), "Description3"));
             Session.SaveChanges();
 
             issuesList = EventStore.AggregateStream<IssuesList>(streamId);
@@ -102,7 +99,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
                 .Have.SameSequenceAs("New Description", "Description2", "Description3");
 
             //4. First issue was removed
-            EventStore.Append(streamId, new IssueRemoved { IssueId = issue1Id });
+            EventStore.Append(streamId, new IssueRemoved(issue1Id));
             Session.SaveChanges();
 
             issuesList = EventStore.AggregateStream<IssuesList>(streamId);

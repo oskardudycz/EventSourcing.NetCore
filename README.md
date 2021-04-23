@@ -11,6 +11,7 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
     - [1.3 What is Stream?](#13-what-is-stream)
     - [1.4 Event representation](#14-event-representation)
     - [1.5 Event Storage](#15-event-storage)
+    - [1.6 Stream state aggregation](#16-stream-state-aggregation)
   - [2. Support](#2-support)
   - [3. Prerequisites](#3-prerequisites)
   - [4. Libraries used](#4-libraries-used)
@@ -97,7 +98,7 @@ Sample event JSON can look like:
 
   "data":
   {
-    "issuer": {
+    "issuedTo": {
       "name": "Oscar the Grouch",
       "address": "123 Sesame Street",
     },
@@ -113,13 +114,231 @@ Sample event JSON can look like:
   }
 }
 ```
-
 ### 1.5 Event Storage
 
 Event Sourcing is not related to any type of storage implementation. As long as it fulfils the assumptions, it can be implemented having any backing database (relational, document, etc.). The state has to be represented by the append-only log of events. The events are stored in chronological order, and new events are appended to the previous event. Event Stores are the databases' category explicitly designed for such purpose. 
 
 Read more in my article:
 -   📝 [What if I told you that Relational Databases are in fact Event Stores?](https://event-driven.io/en/relational_databases_are_event_stores/=event_sourcing_net)
+
+### 1.6 Stream state aggregation
+
+In Event Sourcing, the state is stored in events. Events are logically grouped into streams. Streams can be thought of as the entities' representation. Traditionally (e.g. in relational or document approach), each entity is stored as a separate record.
+
+| Id       | IssuerName       | IssuerAddress     | Amount | Number         | IssuedAt   |
+| -------- | ---------------- | ----------------- | ------ | -------------- | ---------- |
+| e44f813c | Oscar the Grouch | 123 Sesame Street | 34.12  | INV/2021/11/01 | 2021-11-01 |
+
+ In Event Sourcing, the entity is stored as the series of events that happened for this specific object, e.g. `InvoiceInitiated`, `InvoiceIssued`, `InvoiceSent`. 
+
+```json          
+[
+    {
+        "id": "e44f813c-1a2f-4747-aed5-086805c6450e",
+        "type": "invoice-initiated",
+        "streamId": "INV/2021/11/01",
+        "streamPosition": 1,
+        "timestamp": "2021-11-01T00:05:32.000Z",
+
+        "data":
+        {
+            "issuer": {
+                "name": "Oscar the Grouch",
+                "address": "123 Sesame Street",
+            },
+            "amount": 34.12,
+            "number": "INV/2021/11/01",
+            "initiatedAt": "2021-11-01T00:05:32.000Z"
+        }
+    },        
+    {
+        "id": "5421d67d-d0fe-4c4c-b232-ff284810fb59",
+        "type": "invoice-issued",
+        "streamId": "INV/2021/11/01",
+        "streamPosition": 2,
+        "timestamp": "2021-11-01T00:11:32.000Z",
+
+        "data":
+        {
+            "issuedTo": "Cookie Monster",
+            "issuedAt": "2021-11-01T00:11:32.000Z"
+        }
+    },        
+    {
+        "id": "637cfe0f-ed38-4595-8b17-2534cc706abf",
+        "type": "invoice-sent",
+        "streamId": "INV/2021/11/01",
+        "streamPosition": 3,
+        "timestamp": "2021-11-01T00:12:01.000Z",
+
+        "data":
+        {
+            "sentVia": "email",
+            "sentAt": "2021-11-01T00:12:01.000Z"
+        }
+    }
+]
+```
+
+All of those events shares the stream id (`"streamId": "INV/2021/11/01"`), and have incremented stream position.
+
+We can get to conclusion that in Event Sourcing entity is represented by stream, so sequence of event correlated by the stream id ordered by stream position.
+
+To get the current state of entity we need to perform the stream aggregation process. This can be done with the following the steps:
+1. Read all events for the specific stream.
+2. Order them ascending by the stream position.
+3. Construct the empty object of the entity type (e.g. with default constructor).
+4. Apply each event on the entity.
+
+We could implement that as:
+
+```csharp
+public record Person(
+    string Name,
+    string Address
+);
+
+public record InvoiceInitiated(
+    double Amount,
+    string Number,
+    Person IssuedTo,
+    DateTime InitiatedAt
+);
+
+public record InvoiceIssued(
+    string IssuedBy,
+    DateTime IssuedAt
+);
+
+public enum InvoiceSendMethod
+{
+    Email,
+    Post
+}
+
+public record InvoiceSent(
+    InvoiceSendMethod SentVia,
+    DateTime SentAt
+);
+
+public enum InvoiceStatus
+{
+    Initiated = 1,
+    Issued = 2,
+    Sent = 3
+}
+
+public class Invoice
+{
+    public string Id { get;set; }
+    public double Amount { get; private set; }
+    public string Number { get; private set; }
+
+    public InvoiceStatus Status { get; private set; }
+
+    public Person IssuedTo { get; private set; }
+    public DateTime InitiatedAt { get; private set; }
+
+    public string IssuedBy { get; private set; }
+    public DateTime IssuedAt { get; private set; }
+
+    public InvoiceSendMethod SentVia { get; private set; }
+    public DateTime SentAt { get; private set; }
+
+    public void When(object @event)
+    {
+        switch (@event)
+        {
+            case InvoiceInitiated invoiceInitiated:
+                Apply(invoiceInitiated);
+                break;
+            case InvoiceIssued invoiceIssued:
+                Apply(invoiceIssued);
+                break;
+            case InvoiceSent invoiceSent:
+                Apply(invoiceSent);
+                break;
+        }
+    }
+
+    private void Apply(InvoiceInitiated @event)
+    {
+        Id = @event.Number;
+        Amount = @event.Amount;
+        Number = @event.Number;
+        IssuedTo = @event.IssuedTo;
+        InitiatedAt = @event.InitiatedAt;
+        Status = InvoiceStatus.Initiated;
+    }
+
+    private void Apply(InvoiceIssued @event)
+    {
+        IssuedBy = @event.IssuedBy;
+        IssuedAt = @event.IssuedAt;
+        Status = InvoiceStatus.Issued;
+    }
+
+    private void Apply(InvoiceSent @event)
+    {
+        SentVia = @event.SentVia;
+        SentAt = @event.SentAt;
+        Status = InvoiceStatus.Sent;
+    }
+}
+```
+and use it as:
+
+```csharp
+var invoiceInitiated = new InvoiceInitiated(
+    34.12,
+    "INV/2021/11/01",
+    new Person("Oscar the Grouch", "123 Sesame Street"),
+    DateTime.UtcNow
+);
+var invoiceIssued = new InvoiceIssued(
+    "Cookie Monster",
+    DateTime.UtcNow
+);
+var invoiceSent = new InvoiceSent(
+    InvoiceSendMethod.Email,
+    DateTime.UtcNow
+);
+
+// 1,2. Get all events and sort them in the order of appearance
+var events = new object[] {invoiceInitiated, invoiceIssued, invoiceSent};
+
+// 3. Construct empty Invoice object
+var invoice = new Invoice();
+
+// 4. Apply each event on the entity.
+foreach (var @event in events)
+{
+    invoice.When(@event);
+}
+```
+
+and generalise this into `Aggregate` base class:
+
+```csharp
+public abstract class Aggregate<T>
+{
+    public T Id { get; protected set; }
+    
+    protected Aggregate() { }
+        
+    public virtual void When(object @event) { }
+}
+```
+
+The biggest advantage of _"online"_ stream aggregation is that it always uses the most recent business logic. So after the change in the apply method, it's automatically reflected on the next run. If events data is fine, then it's not needed to do any migration or updates.
+
+In Marten `When` method is not needed. Marten uses naming convention and call the `Apply` method internally. It has to:
+- have single parameter with event object,
+- have `void` type as the result.
+
+See full details in the:
+- [Generic stream aggregation example](/Core.Tests/AggregateWithWhenTests.cs)
+- [Marten](/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs) 
 
 ## 2. Support
 
@@ -145,14 +364,9 @@ docker-compose up
 **More information about using .NET Core, WebApi and Docker you can find in my other tutorials:** [WebApi with .NET](https://github.com/oskardudycz/WebApiWith.NETCore)
 
 
-Watch "Practical Event Sourcing with Marten":
+You can also watch my presentation "Practical Event Sourcing with Marten":
 
 <a href="https://www.youtube.com/watch?v=L_ized5xwww&list=PLw-VZz_H4iio9b_NrH25gPKjr2MAS2YgC&index=7" target="_blank"><img src="https://img.youtube.com/vi/L_ized5xwww/0.jpg" alt="Practical Event Sourcing with Marten (EN)" width="320" height="240" border="10" /></a>
-
-Slides:
-- **Practical Event Sourcing with Marten** - [EN](./Slides/EventSourcing_with_Marten_EN.pptx), [PL](./Slides/EventSourcing_with_Marten_PL.pptx)
-- **Ligths and Shades of Event-Driven Design** -  [EN](./Slides/Lights_And_Shades_Of_Event-Driven_Design.pptx), [PL](./Slides/SegFault-Blaski_i_Cienie.pptx)
-- **Adventures in Event Sourcing and CQRS** - [PL](./Slides/Slides.pptx)
 
 ## 4. Libraries used
 
@@ -174,6 +388,11 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
 -   📝 [Optimistic concurrency for pessimistic times](https://event-driven.io/en/optimistic_concurrency_for_pessimistic_times/?utm_source=event_sourcing_net)
 -   📝 [Outbox, Inbox patterns and delivery guarantees explained](https://event-driven.io/en/outbox_inbox_patterns_and_delivery_guarantees_explained/?utm_source=event_sourcing_net)
 -   📝 [Saga and Process Manager - distributed processes in practice](https://event-driven.io/en/saga_process_manager_distributed_transactions/?utm_source=event_sourcing_net)
+
+Slides:
+-   👨🏼‍🏫 **Practical Event Sourcing with Marten** - [EN](./Slides/EventSourcing_with_Marten_EN.pptx), [PL](./Slides/EventSourcing_with_Marten_PL.pptx)
+-   👨🏼‍🏫 **Ligths and Shades of Event-Driven Design** -  [EN](./Slides/Lights_And_Shades_Of_Event-Driven_Design.pptx), [PL](./Slides/SegFault-Blaski_i_Cienie.pptx)
+-   👨🏼‍🏫 **Adventures in Event Sourcing and CQRS** - [PL](./Slides/Slides.pptx)
 
 ## 6. Event Store - Marten
 
@@ -216,8 +435,7 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
             var versionNumber = 3;
             var events = documentSession.Events.FetchStream(streamId, version: versionNumber);
             ```
--   **Event stream aggregation** - events that were stored can be aggregated to form the entity once again. During the aggregation, process events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first, an empty entity instance is being created (by calling default constructor). Then events based on the order of appearance (timestamp) are being applied on the entity instance by calling proper Apply methods.
-    -   **[Aggregation general rules](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Aggregate/AggregationRules.cs)**
+-   **Event stream aggregation** - events that were stored can be aggregated to form the entity once again. During the aggregation, process events are taken by the stream id and then replied event by event (so eg. NewTaskAdded, DescriptionOfTaskChanged, TaskRemoved). At first, an empty entity instance is being created (by calling default constructor). Then events based on the order of appearance are being applied on the entity instance by calling proper Apply methods.
     -   **[Online Aggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs)** - online aggregation is a process when entity instance is being constructed on the fly from events. Events are taken from the database and then aggregation is being done. The biggest advantage of online aggregation is that it always gets the most recent business logic. So after the change, it's automatically reflected and it's not needed to do any migration or updates.
     -   **[Inline Aggregation (Snapshot)](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Aggregate/InlineAggregationStorage.cs)** - inline aggregation happens when we take the snapshot of the entity from the DB. In that case, it's not needed to get all events. Marten stores the snapshot as a document. This is good for performance reasons because only one record is being materialized. The con of using inline aggregation is that after business logic has changed records need to be reaggregated.
     -   **[Reaggregation](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Aggregate/Reaggregation.cs)** - one of the biggest advantages of the event sourcing is flexibility to business logic updates. It's not needed to perform complex migration. For online aggregation it's not needed to perform reaggregation - it's being made always automatically. The inline aggregation needs to be reaggregated. It can be done by performing online aggregation on all stream events and storing the result as a snapshot.

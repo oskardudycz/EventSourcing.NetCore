@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Core.Events;
 
 namespace Core.Aggregates
 {
-    public abstract class Aggregate: IAggregate
+    public abstract class Aggregate: Aggregate<Guid>, IAggregate
     {
-        public Guid Id { get; protected set; }
+    }
+
+    public abstract class Aggregate<T>: IAggregate<T>
+    {
+        public T Id { get; protected set; }
 
         public int Version { get; protected set; }
 
@@ -15,6 +18,8 @@ namespace Core.Aggregates
 
         //for serialization purposes
         protected Aggregate() { }
+
+        public virtual void When(object @event) { }
 
         public IEvent[] DequeueUncommittedEvents()
         {
