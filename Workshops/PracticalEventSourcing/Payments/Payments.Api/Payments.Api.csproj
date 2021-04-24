@@ -5,15 +5,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Ardalis.GuardClauses" Version="3.0.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.0">
+        <PackageReference Include="Ardalis.GuardClauses" Version="3.1.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.5">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.5" />
     </ItemGroup>
 
     <ItemGroup>

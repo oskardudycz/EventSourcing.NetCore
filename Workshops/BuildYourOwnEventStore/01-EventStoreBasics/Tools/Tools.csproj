@@ -8,7 +8,7 @@
         <PackageReference Include="Dapper" Version="2.0.78" />
         <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
         <PackageReference Include="Marten" Version="4.0.0-alpha.8" />
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Marten" Version="5.0.0" />
         <PackageReference Include="Simple.Migrations" Version="0.9.21" />
         <PackageReference Include="xunit" Version="2.4.1" />

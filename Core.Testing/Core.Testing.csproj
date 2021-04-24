@@ -6,14 +6,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
         <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
         <PackageReference Include="NSubstitute" Version="4.2.2" />
         <PackageReference Include="xunit" Version="2.4.1" />
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.5" />
     </ItemGroup>
 
     <ItemGroup>
