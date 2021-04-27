@@ -11,7 +11,7 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
     - [1.3 What is Stream?](#13-what-is-stream)
     - [1.4 Event representation](#14-event-representation)
     - [1.5 Event Storage](#15-event-storage)
-    - [1.6 Stream state aggregation](#16-stream-state-aggregation)
+    - [1.6 Retrieving the current state from events](#16-retrieving-the-current-state-from-events)
   - [2. Support](#2-support)
   - [3. Prerequisites](#3-prerequisites)
   - [4. Libraries used](#4-libraries-used)
@@ -121,7 +121,7 @@ Event Sourcing is not related to any type of storage implementation. As long as 
 Read more in my article:
 -   📝 [What if I told you that Relational Databases are in fact Event Stores?](https://event-driven.io/en/relational_databases_are_event_stores/=event_sourcing_net)
 
-### 1.6 Stream state aggregation
+### 1.6 Retrieving the current state from events
 
 In Event Sourcing, the state is stored in events. Events are logically grouped into streams. Streams can be thought of as the entities' representation. Traditionally (e.g. in relational or document approach), each entity is stored as a separate record.
 
@@ -184,11 +184,13 @@ All of those events shares the stream id (`"streamId": "INV/2021/11/01"`), and h
 
 We can get to conclusion that in Event Sourcing entity is represented by stream, so sequence of event correlated by the stream id ordered by stream position.
 
-To get the current state of entity we need to perform the stream aggregation process. This can be done with the following the steps:
+To get the current state of entity we need to perform the stream aggregation process. We're translating the set of events into a single entity. This can be done with the following the steps:
 1. Read all events for the specific stream.
-2. Order them ascending by the stream position.
+2. Order them ascending in the order of appearance (by the event's stream position).
 3. Construct the empty object of the entity type (e.g. with default constructor).
 4. Apply each event on the entity.
+
+This process is called also _stream aggregation_ or _state rehydration_.
 
 We could implement that as:
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Tracing;
 using Core.Aggregates;
 using FluentAssertions;
 using Xunit;
