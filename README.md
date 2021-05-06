@@ -55,6 +55,9 @@ Thanks for that, no business data is lost. Each operation results in the event s
 
 In this repository I'm showing different aspects, patterns around Event Sourcing. From the basic to advanced practices.
 
+Read more in my article:
+-   📝 [How using events helps in a teams' autonomy](https://event-driven.io/en/how_using_events_help_in_teams_autonomy/)
+
 ### 1.2 What is Event?
 
 Events, represent facts in the past. They carry information about something accomplished. It should be named in the past tense, e.g. _"user added"_, _"order confirmed"_. Events are not directed to a specific recipient - they're broadcasted information. It's like telling a story at a party. We hope that someone listens to us, but we may quickly realise that no one is paying attention.
@@ -527,6 +530,7 @@ The simplest way to start is **installing the [project template](https://github.
 ## 12. Other resources
 
 ### 12.1 Introduction
+-   📝 [Event Store - A Beginner’s Guide to Event Sourcing](https://www.eventstore.com/event-sourcing)
 -   🎞 [Greg Young - CQRS & Event Sourcing](https://youtube.com/watch?v=JHGkaShoyNs)
 -   📝 [Jay Kreps - Why local state is a fundamental primitive in stream processing](https://www.oreilly.com/ideas/why-local-state-is-a-fundamental-primitive-in-stream-processing)
 -   📝 [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
