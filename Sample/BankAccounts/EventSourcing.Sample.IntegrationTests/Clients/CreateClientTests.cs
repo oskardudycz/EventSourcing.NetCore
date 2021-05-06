@@ -2,8 +2,8 @@
 using System.Net;
 using System.Threading.Tasks;
 using EventSourcing.Sample.Clients.Contracts.Clients.Commands;
-using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
 using EventSourcing.Sample.Clients.Contracts.Clients.Queries;
+using EventSourcing.Sample.Clients.Contracts.Clients.ValueObjects;
 using EventSourcing.Sample.IntegrationTests.Infrastructure;
 using EventSourcing.Sample.Transactions.Views.Clients;
 using FluentAssertions;
@@ -28,11 +28,7 @@ namespace EventSourcing.Sample.IntegrationTests.Clients
             // prepare command
             var command = new CreateClient(
                 null,
-                new ClientInfo
-                {
-                    Email = "test@test.pl",
-                    Name = "test"
-                });
+                new ClientInfo("test@test.pl","test"));
 
             // send create command
             var commandResponse = await _sut.Client.PostAsync(ApiUrl, command.ToJsonStringContent());

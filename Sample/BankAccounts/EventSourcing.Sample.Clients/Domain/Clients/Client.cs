@@ -1,7 +1,7 @@
 using System;
 using Core.Aggregates;
-using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
 using EventSourcing.Sample.Clients.Contracts.Clients.Events;
+using EventSourcing.Sample.Clients.Contracts.Clients.ValueObjects;
 
 namespace EventSourcing.Sample.Clients.Domain.Clients
 {
@@ -21,11 +21,7 @@ namespace EventSourcing.Sample.Clients.Domain.Clients
             Name = name;
             Email = email;
 
-            Enqueue(new ClientCreated(id, new ClientInfo
-            {
-                Email = email,
-                Name = name
-            }));
+            Enqueue(new ClientCreated(id, new ClientInfo(email,name)));
         }
 
         public void Update(ClientInfo clientInfo)

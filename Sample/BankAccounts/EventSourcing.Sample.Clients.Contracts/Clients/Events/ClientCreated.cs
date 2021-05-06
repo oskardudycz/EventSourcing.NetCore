@@ -1,18 +1,11 @@
 using System;
 using Core.Events;
-using EventSourcing.Sample.Clients.Contracts.Clients.DTOs;
+using EventSourcing.Sample.Clients.Contracts.Clients.ValueObjects;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Events
 {
-    public class ClientCreated: IEvent
-    {
-        public Guid ClientId { get; }
-        public ClientInfo Data { get; }
-
-        public ClientCreated(Guid clientId, ClientInfo data)
-        {
-            ClientId = clientId;
-            Data = data;
-        }
-    }
+    public record ClientCreated (
+        Guid ClientId,
+        ClientInfo Data
+    ): IEvent;
 }

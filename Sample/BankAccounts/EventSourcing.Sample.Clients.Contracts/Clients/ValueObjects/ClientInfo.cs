@@ -1,8 +1,7 @@
-namespace EventSourcing.Sample.Clients.Contracts.Clients.DTOs
+namespace EventSourcing.Sample.Clients.Contracts.Clients.ValueObjects
 {
-    public class ClientInfo
-    {
-        public string Name { get; set; }
-        public string Email { get; set; }
-    }
+    public record ClientInfo(
+        string Name,
+        string Email
+    );
 }
