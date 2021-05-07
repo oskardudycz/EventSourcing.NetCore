@@ -5,8 +5,8 @@ namespace Core.Streaming.Kafka.Consumers
 {
     public class KafkaConsumerConfig
     {
-        public ConsumerConfig ConsumerConfig { get; set; }
-        public string[] Topics { get; set; }
+        public ConsumerConfig? ConsumerConfig { get; set; }
+        public string[]? Topics { get; set; }
     }
 
     public static class KafkaConsumerConfigExtensions

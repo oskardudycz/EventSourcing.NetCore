@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Baseline.Dates;
 using Core.Commands;
 using Core.Repositories;
 using Marten;

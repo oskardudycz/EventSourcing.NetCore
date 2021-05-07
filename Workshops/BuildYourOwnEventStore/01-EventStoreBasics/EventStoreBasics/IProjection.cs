@@ -12,18 +12,18 @@ namespace EventStoreBasics
 
     public abstract class Projection : IProjection
     {
-        private readonly Dictionary<Type, Action<object>> Handlers = new Dictionary<Type, Action<object>>();
+        private readonly Dictionary<Type, Action<object>> handlers = new Dictionary<Type, Action<object>>();
 
-        public Type[] Handles => Handlers.Keys.ToArray();
+        public Type[] Handles => handlers.Keys.ToArray();
 
         protected void Projects<TEvent>(Action<TEvent> action)
         {
-            Handlers.Add(typeof(TEvent), @event => action((TEvent) @event));
+            handlers.Add(typeof(TEvent), @event => action((TEvent) @event));
         }
 
         public void Handle(object @event)
         {
-            Handlers[@event.GetType()](@event);
+            handlers[@event.GetType()](@event);
         }
     }
 }

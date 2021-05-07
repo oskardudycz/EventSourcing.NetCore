@@ -10,6 +10,6 @@ namespace Shipments.Storage
         {
         }
 
-        public DbSet<Package> Packages { get; set; }
+        public DbSet<Package> Packages { get; set; } = default!;
     }
 }

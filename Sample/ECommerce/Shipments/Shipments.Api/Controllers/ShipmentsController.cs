@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Shipments.Packages;
-using Shipments.Packages.Commands;
+using Shipments.Packages.Requests;
 
 namespace Shipments.Api.Controllers
 {

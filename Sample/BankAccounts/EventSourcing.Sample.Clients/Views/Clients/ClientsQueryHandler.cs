@@ -12,36 +12,29 @@ namespace EventSourcing.Sample.Clients.Views.Clients
 {
     public class ClientsQueryHandler:
         IQueryHandler<GetClients, List<ClientListItem>>,
-        IQueryHandler<GetClient, ClientItem>
+        IQueryHandler<GetClient, ClientItem?>
     {
-        private IQueryable<Client> Clients;
+        private IQueryable<Client> clients;
 
         public ClientsQueryHandler(ClientsDbContext dbContext)
         {
-            Clients = dbContext.Clients;
+            clients = dbContext.Clients;
         }
 
-        public Task<List<ClientListItem>> Handle(GetClients query, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<List<ClientListItem>> Handle(GetClients query,
+            CancellationToken cancellationToken = default)
         {
-            return Clients
-                .Select(client => new ClientListItem
-                {
-                    Id = client.Id,
-                    Name = client.Name
-                })
+            return clients
+                .Select(client => new ClientListItem(client.Id, client.Name))
                 .ToListAsync(cancellationToken);
         }
 
-        public Task<ClientItem> Handle(GetClient query, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<ClientItem?> Handle(GetClient query,
+            CancellationToken cancellationToken = default)
         {
-            return Clients
-                .Select(client => new ClientItem
-                {
-                    Id = client.Id,
-                    Name = client.Name,
-                    Email = client.Email
-                })
-                .SingleOrDefaultAsync(client => client.Id == query.Id, cancellationToken);
+            return clients
+                .Select(client => new ClientItem(client.Id, client.Name, client.Email))
+                .SingleOrDefaultAsync(client => client.Id == query.Id, cancellationToken)!;
         }
     }
 }

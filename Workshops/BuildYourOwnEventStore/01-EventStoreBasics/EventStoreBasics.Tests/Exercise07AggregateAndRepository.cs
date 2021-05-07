@@ -11,7 +11,7 @@ namespace EventStoreBasics.Tests
 
         class User : Aggregate
         {
-            public string Name { get; private set; }
+            public string Name { get; private set; } = default!;
 
             public User(Guid id, string name)
             {

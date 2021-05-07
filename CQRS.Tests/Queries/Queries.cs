@@ -25,16 +25,16 @@ namespace CQRS.Tests.Queries
 
         public class QueryBus: IQueryBus
         {
-            private readonly IMediator _mediator;
+            private readonly IMediator mediator;
 
             public QueryBus(IMediator mediator)
             {
-                _mediator = mediator;
+                this.mediator = mediator;
             }
 
             public Task<TResponse> Send<TResponse>(IQuery<TResponse> command)
             {
-                return _mediator.Send(command);
+                return mediator.Send(command);
             }
         }
 
@@ -55,16 +55,16 @@ namespace CQRS.Tests.Queries
 
         public class IssueApplicationService: IIssueApplicationService
         {
-            private readonly IQueryBus _queryBus;
+            private readonly IQueryBus queryBus;
 
             public IssueApplicationService(IQueryBus queryBus)
             {
-                _queryBus = queryBus;
+                this.queryBus = queryBus;
             }
 
             public Task<List<string>> GetIssuesNames(GetIssuesNamesQuery query)
             {
-                return _queryBus.Send(query);
+                return queryBus.Send(query);
             }
         }
 
@@ -80,22 +80,22 @@ namespace CQRS.Tests.Queries
 
             public AppReadModel(params string[] issues)
             {
-                this.issues = issues?.ToList();
+                this.issues = issues.ToList();
             }
         }
 
         public class CreateIssueCommandHandler: IQueryHandler<GetIssuesNamesQuery, List<string>>
         {
-            private readonly IAppReadModel _readModel;
+            private readonly IAppReadModel readModel;
 
             public CreateIssueCommandHandler(IAppReadModel readModel)
             {
-                _readModel = readModel;
+                this.readModel = readModel;
             }
 
             public Task<List<string>> Handle(GetIssuesNamesQuery query, CancellationToken cancellationToken = default(CancellationToken))
             {
-                return Task.Run(() => _readModel.Issues
+                return Task.Run(() => readModel.Issues
                     .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
                     .ToList(), cancellationToken);
             }

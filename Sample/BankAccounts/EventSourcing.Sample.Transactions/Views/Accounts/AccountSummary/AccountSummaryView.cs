@@ -1,5 +1,4 @@
 using System;
-using EventSourcing.Sample.Clients.Contracts.Clients.Events;
 using EventSourcing.Sample.Transactions.Contracts.Accounts.Events;
 using EventSourcing.Sample.Transactions.Contracts.Transactions.Events;
 
@@ -10,7 +9,7 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.AccountSummary
         public Guid Id { get; set; }
         public Guid AccountId { get; set; }
         public Guid ClientId { get; set; }
-        public string Number { get; set; }
+        public string Number { get; set; } = default!;
         public decimal Balance { get; set; }
         public int TransactionsCount { get; set; }
 

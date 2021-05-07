@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Ardalis.GuardClauses;
 using Core.Aggregates;
-using Marten.Events;
 using SmartHome.Temperature.TemperatureMeasurements.Events;
 
 namespace SmartHome.Temperature.TemperatureMeasurements
@@ -12,7 +11,7 @@ namespace SmartHome.Temperature.TemperatureMeasurements
         public DateTimeOffset Started { get; set; }
         public DateTimeOffset? LastRecorded { get; set; }
 
-        public List<decimal> Mesurements { get; set; }
+        public List<decimal> Mesurements { get; set; } = default!;
 
         // For serialization
         public TemperatureMeasurement() { }

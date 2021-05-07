@@ -10,8 +10,8 @@ namespace Core.Streaming.Consumers
     //See more: https://www.stevejgordon.co.uk/asp-net-core-2-ihostedservice
     public class ExternalEventConsumerBackgroundWorker: IHostedService
     {
-        private Task executingTask;
-        private CancellationTokenSource cts;
+        private Task? executingTask;
+        private CancellationTokenSource? cts;
         private readonly IExternalEventConsumer externalEventConsumer;
         private readonly ILogger<ExternalEventConsumerBackgroundWorker> logger;
 
@@ -47,7 +47,7 @@ namespace Core.Streaming.Consumers
             }
 
             // Signal cancellation to the executing method
-            cts.Cancel();
+            cts?.Cancel();
 
             // Wait until the issue completes or the stop token triggers
             await Task.WhenAny(executingTask, Task.Delay(-1, cancellationToken));

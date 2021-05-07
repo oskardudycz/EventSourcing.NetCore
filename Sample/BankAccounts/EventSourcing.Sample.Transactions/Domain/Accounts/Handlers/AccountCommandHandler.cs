@@ -4,12 +4,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
 using Core.Events;
+using Core.Exceptions;
 using Core.Marten.Aggregates;
 using EventSourcing.Sample.Transactions.Contracts.Accounts.Commands;
 using EventSourcing.Sample.Transactions.Contracts.Transactions.Commands;
 using EventSourcing.Sample.Transactions.Views.Clients;
 using Marten;
 using Marten.Events;
+using Marten.Util;
 using MediatR;
 
 namespace EventSourcing.Sample.Transactions.Domain.Accounts.Handlers
@@ -22,7 +24,7 @@ namespace EventSourcing.Sample.Transactions.Domain.Accounts.Handlers
         private readonly IAccountNumberGenerator accountNumberGenerator;
         private readonly IEventBus eventBus;
 
-        private IEventStore store => session.Events;
+        private IEventStore Store => session.Events;
 
         public AccountCommandHandler(
             IDocumentSession session,
@@ -48,19 +50,22 @@ namespace EventSourcing.Sample.Transactions.Domain.Accounts.Handlers
 
         public async Task<Unit> Handle(MakeTransfer command, CancellationToken cancellationToken = default)
         {
-            var accountFrom = await store.AggregateStreamAsync<Account>(command.FromAccountId, token: cancellationToken);
+            var (fromAccountId, toAccountId, amount) = command;
+            var accountFrom = await Store.AggregateStreamAsync<Account>(fromAccountId, token: cancellationToken)
+                              ?? throw AggregateNotFoundException.For<Account>(fromAccountId);
 
-            accountFrom.RecordOutflow(command.ToAccountId, command.Amount);
+            accountFrom.RecordOutflow(toAccountId, amount);
 
             var accountFromEvents = accountFrom.DequeueUncommittedEvents();
-            store.Append(accountFrom.Id, accountFromEvents);
+            Store.Append(accountFrom.Id, accountFromEvents);
 
-            var accountTo = await store.AggregateStreamAsync<Account>(command.ToAccountId, token: cancellationToken);
+            var accountTo = await Store.AggregateStreamAsync<Account>(toAccountId, token: cancellationToken)
+                            ?? throw AggregateNotFoundException.For<Account>(toAccountId);
 
-            accountTo.RecordInflow(command.FromAccountId, command.Amount);
+            accountTo.RecordInflow(fromAccountId, amount);
 
             var accountToEvents = accountFrom.DequeueUncommittedEvents();
-            store.Append(accountTo.Id, accountTo);
+            Store.Append(accountTo.Id, accountTo);
 
             await session.SaveChangesAsync(cancellationToken);
 

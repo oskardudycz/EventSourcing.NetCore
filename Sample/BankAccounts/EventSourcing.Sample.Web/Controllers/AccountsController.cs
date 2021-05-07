@@ -12,27 +12,27 @@ namespace EventSourcing.Web.Sample.Controllers
     [Route("api/[controller]")]
     public class AccountsController: Controller
     {
-        private readonly ICommandBus _commandBus;
-        private readonly IQueryBus _queryBus;
+        private readonly ICommandBus commandBus;
+        private readonly IQueryBus queryBus;
 
         public AccountsController(ICommandBus commandBus, IQueryBus queryBus)
         {
-            _commandBus = commandBus;
-            _queryBus = queryBus;
+            this.commandBus = commandBus;
+            this.queryBus = queryBus;
         }
 
         // GET api/values
         [HttpGet]
         public Task<AccountSummary> Get(Guid accountId)
         {
-            return _queryBus.Send<GetAccount, AccountSummary>(new GetAccount(accountId));
+            return queryBus.Send<GetAccount, AccountSummary>(new GetAccount(accountId));
         }
 
         // POST api/values
         [HttpPost]
         public Task Post([FromBody]CreateNewAccount command)
         {
-            return _commandBus.Send(command);
+            return commandBus.Send(command);
         }
     }
 }

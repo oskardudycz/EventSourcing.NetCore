@@ -4,12 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Orders.Orders;
 using Orders.Orders.Events;
 using Core.Testing;
 using FluentAssertions;
 using Orders.Api.Requests.Carts;
-using Orders.Products.ValueObjects;
 using Shipments.Api.Tests.Core;
 using Xunit;
 
@@ -17,28 +15,29 @@ namespace Orders.Api.Tests.Orders
 {
     public class InitOrderFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = "/api/Orders";
+        protected override string ApiUrl => "/api/Orders";
 
         public readonly Guid ClientId = Guid.NewGuid();
 
-        public readonly List<PricedProductItemRequest> ProductItems = new List<PricedProductItemRequest>
+        public readonly List<PricedProductItemRequest> ProductItems = new()
         {
             new PricedProductItemRequest {ProductId = Guid.NewGuid(), Quantity = 10, UnitPrice = 3},
             new PricedProductItemRequest {ProductId = Guid.NewGuid(), Quantity = 3, UnitPrice = 7}
         };
 
-        public decimal TotalPrice => ProductItems.Sum(pi => pi.Quantity * pi.UnitPrice);
+        public decimal TotalPrice => ProductItems.Sum(pi => pi.Quantity!.Value * pi.UnitPrice!.Value);
 
         public readonly DateTime TimeBeforeSending = DateTime.UtcNow;
 
-        public HttpResponseMessage CommandResponse;
+        public HttpResponseMessage CommandResponse = default!;
 
         public override async Task InitializeAsync()
         {
-            CommandResponse = await PostAsync(new InitOrderRequest
-            {
-                ClientId = ClientId, ProductItems = ProductItems, TotalPrice = TotalPrice
-            });
+            CommandResponse = await PostAsync(new InitOrderRequest(
+                ClientId,
+                ProductItems,
+                TotalPrice
+            ));
         }
     }
 
@@ -71,7 +70,7 @@ namespace Orders.Api.Tests.Orders
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldPublish_OrderInitializedEvent()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             fixture.PublishedInternalEventsOfType<OrderInitialized>()
                 .Should()

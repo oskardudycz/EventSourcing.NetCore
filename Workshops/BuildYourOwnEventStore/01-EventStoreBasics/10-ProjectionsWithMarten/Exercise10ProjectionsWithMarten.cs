@@ -2,7 +2,6 @@ using System;
 using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Marten;
-using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 using Xunit;
 
@@ -12,7 +11,7 @@ namespace EventStoreBasics.Tests
     {
         public class User: Aggregate
         {
-            public string Name { get; private set; }
+            public string Name { get; private set; } = default!;
 
             // added only for dapper deserialization needs
             public User() { }
@@ -71,7 +70,7 @@ namespace EventStoreBasics.Tests
 
         public class Order: Aggregate
         {
-            public string Number { get; private set; }
+            public string Number { get; private set; } = default!;
 
             public decimal Amount { get; private set; }
 
@@ -113,7 +112,7 @@ namespace EventStoreBasics.Tests
         public class UserDashboard
         {
             public Guid Id { get; set; }
-            public string UserName { get; set; }
+            public string UserName { get; set; } = default!;
             public int OrdersCount { get; set; }
             public decimal TotalAmount { get; set; }
         }

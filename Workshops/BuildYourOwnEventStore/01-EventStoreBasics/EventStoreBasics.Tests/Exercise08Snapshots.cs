@@ -16,7 +16,7 @@ namespace EventStoreBasics.Tests
     {
         class User : Aggregate
         {
-            public string Name { get; private set; }
+            public string Name { get; private set; } = default!;
 
             // added only for dapper deserialization needs
             private User() {}
@@ -177,16 +177,16 @@ namespace EventStoreBasics.Tests
 
             users.Count().Should().Be(2);
 
-            Expression<Func<User, bool>> userEqualTo(User userToCompare)
+            Expression<Func<User, bool>> UserEqualTo(User userToCompare)
             {
                 return x => x.Id == userToCompare.Id
                             && x.Name == userToCompare.Name
                             && x.Version == userToCompare.Version;
             }
 
-            users.Should().Contain(userEqualTo(firstMatchingUser));
-            users.Should().Contain(userEqualTo(secondMatchingUser));
-            users.Should().NotContain(userEqualTo(notMatchingUser));
+            users.Should().Contain(UserEqualTo(firstMatchingUser));
+            users.Should().Contain(UserEqualTo(secondMatchingUser));
+            users.Should().NotContain(UserEqualTo(notMatchingUser));
         }
     }
 }

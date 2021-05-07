@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
-using Core.Storage;
 using MediatR;
 using SmartHome.Temperature.TemperatureMeasurements.Commands;
 
@@ -43,7 +42,7 @@ namespace SmartHome.Temperature.TemperatureMeasurements
 
             var reservation = await repository.Find(command.MeasurementId, cancellationToken);
 
-            reservation.Record(command.Temperature);
+            reservation!.Record(command.Temperature);
 
             await repository.Update(reservation, cancellationToken);
 

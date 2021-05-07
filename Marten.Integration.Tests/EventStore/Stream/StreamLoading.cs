@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Marten.Integration.Tests.TestsInfrasructure;
+using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
 using Xunit;
 
@@ -8,28 +8,22 @@ namespace Marten.Integration.Tests.EventStore.Stream
 {
     public class StreamLoading: MartenTest
     {
-        public class IssueCreated
-        {
-            public Guid Id { get; set; }
-            public Guid IssueId { get; set; }
-            public string Description { get; set; }
-        }
+        public record IssueCreated(
+            Guid IssueId,
+            string Description
+        );
 
-        public class IssueUpdated
-        {
-            public Guid Id { get; set; }
-            public Guid IssueId { get; set; }
-            public string Description { get; set; }
-        }
-
-        public class IssuesList { }
+        public record IssueUpdated(
+            Guid IssueId,
+            string Description
+        );
 
         private readonly Guid issueId = Guid.NewGuid();
 
         private Guid GetExistingStreamId()
         {
-            var @event = new IssueCreated { IssueId = issueId, Description = "Description" };
-            var streamId = EventStore.StartStream<IssuesList>(@event).Id;
+            var @event = new IssueCreated(issueId, "Description");
+            var streamId = EventStore.StartStream(@event).Id;
             Session.SaveChanges();
 
             return streamId;
@@ -56,7 +50,7 @@ namespace Marten.Integration.Tests.EventStore.Stream
             var streamId = GetExistingStreamId();
 
             //When
-            EventStore.Append(streamId, new IssueUpdated { Id = Guid.NewGuid(), IssueId = issueId, Description = "New Description" });
+            EventStore.Append(streamId, new IssueUpdated(issueId, "New Description"));
             Session.SaveChanges();
 
             //Then

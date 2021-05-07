@@ -12,14 +12,14 @@ namespace MediatR.Tests.Publishing
     {
         public class ServiceLocator
         {
-            private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
+            private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
-                => Services.Add(type, implementations.ToList());
+                => services.Add(type, implementations.ToList());
 
             public List<object> Get(Type type)
             {
-                return Services[type];
+                return services[type];
             }
         }
 
@@ -45,32 +45,32 @@ namespace MediatR.Tests.Publishing
 
         public class IssueCreatedHandler: INotificationHandler<IssueCreated>
         {
-            private readonly IssuesList _issuesList;
+            private readonly IssuesList issuesList;
 
             public IssueCreatedHandler(IssuesList issuesList)
             {
-                _issuesList = issuesList;
+                this.issuesList = issuesList;
             }
 
             public Task Handle(IssueCreated @event, CancellationToken cancellationToken = default(CancellationToken))
             {
-                _issuesList.Issues.Add(@event.IssueName);
+                issuesList.Issues.Add(@event.IssueName);
                 return Task.CompletedTask;
             }
         }
 
         private readonly IMediator mediator;
-        private readonly IssuesList _issuesList = new IssuesList();
+        private readonly IssuesList issuesList = new IssuesList();
 
         public MoreThanOneHandler()
         {
-            var eventHandler = new IssueCreatedHandler(_issuesList);
+            var eventHandler = new IssueCreatedHandler(issuesList);
 
             var serviceLocator = new ServiceLocator();
             serviceLocator.Register(typeof(IEnumerable<INotificationHandler<IssueCreated>>),
                 new object[] { new List<INotificationHandler<IssueCreated>> { eventHandler, eventHandler } });
 
-            mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
+            mediator = new Mediator(type => serviceLocator.Get(type).Single());
         }
 
         [Fact]
@@ -83,8 +83,8 @@ namespace MediatR.Tests.Publishing
             await mediator.Publish(@event);
 
             //Then
-            _issuesList.Issues.Count.Should().Be.EqualTo(2);
-            _issuesList.Issues.Should().Have.SameValuesAs("cleaning", "cleaning");
+            issuesList.Issues.Count.Should().Be.EqualTo(2);
+            issuesList.Issues.Should().Have.SameValuesAs("cleaning", "cleaning");
         }
     }
 }

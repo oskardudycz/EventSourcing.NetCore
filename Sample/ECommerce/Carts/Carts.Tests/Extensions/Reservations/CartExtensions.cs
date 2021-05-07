@@ -31,8 +31,9 @@ namespace Carts.Tests.Extensions.Reservations
         {
             var @event = cart.PublishedEvent<CartInitialized>();
 
+            @event.Should().NotBeNull();
             @event.Should().BeOfType<CartInitialized>();
-            @event.CartId.Should().Be(id);
+            @event!.CartId.Should().Be(id);
             @event.ClientId.Should().Be(clientId);
             @event.CartStatus.Should().Be(CartStatus.Pending);
 

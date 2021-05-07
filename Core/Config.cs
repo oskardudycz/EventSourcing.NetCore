@@ -27,7 +27,7 @@ namespace Core
         private static IServiceCollection AddMediatR(this IServiceCollection services)
         {
             return services.AddScoped<IMediator, Mediator>()
-                .AddTransient<ServiceFactory>(sp => sp.GetService);
+                .AddTransient<ServiceFactory>(sp => sp.GetRequiredService!);
         }
     }
 }

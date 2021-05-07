@@ -23,16 +23,16 @@ namespace CQRS.Tests.Commands
 
         public class CommandBus: ICommandBus
         {
-            private readonly IMediator _mediator;
+            private readonly IMediator mediator;
 
             public CommandBus(IMediator mediator)
             {
-                _mediator = mediator;
+                this.mediator = mediator;
             }
 
             public Task Send(ICommand command)
             {
-                return _mediator.Send(command);
+                return mediator.Send(command);
             }
         }
 
@@ -53,16 +53,16 @@ namespace CQRS.Tests.Commands
 
         public class IssueApplicationService: IIssueApplicationService
         {
-            private readonly ICommandBus _commandBus;
+            private readonly ICommandBus commandBus;
 
             public IssueApplicationService(ICommandBus commandBus)
             {
-                _commandBus = commandBus;
+                this.commandBus = commandBus;
             }
 
             public Task CreateIssue(CreateIssueCommand command)
             {
-                return _commandBus.Send(command);
+                return commandBus.Send(command);
             }
         }
 
@@ -83,16 +83,16 @@ namespace CQRS.Tests.Commands
 
         public class CreateIssueCommandHandler: ICommandHandler<CreateIssueCommand>
         {
-            private readonly IAppWrtiteModel _writeModel;
+            private readonly IAppWrtiteModel writeModel;
 
             public CreateIssueCommandHandler(IAppWrtiteModel writeModel)
             {
-                _writeModel = writeModel;
+                this.writeModel = writeModel;
             }
 
             public Task<Unit> Handle(CreateIssueCommand message, CancellationToken cancellationToken = default)
             {
-                _writeModel.Issues.Add(message.Name);
+                writeModel.Issues.Add(message.Name);
                 return Unit.Task;
             }
         }

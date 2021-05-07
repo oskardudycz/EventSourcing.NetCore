@@ -2,7 +2,6 @@ using FluentAssertions;
 using Carts.Carts;
 using Carts.Carts.Events;
 using Carts.Tests.Builders;
-using Carts.Tests.Extensions;
 using Core.Testing;
 using Xunit;
 
@@ -28,8 +27,9 @@ namespace Carts.Tests.Carts
 
             var @event = cart.PublishedEvent<CartConfirmed>();
 
+            @event.Should().NotBeNull();
             @event.Should().BeOfType<CartConfirmed>();
-            @event.CartId.Should().Be(cart.Id);
+            @event!.CartId.Should().Be(cart.Id);
         }
     }
 }

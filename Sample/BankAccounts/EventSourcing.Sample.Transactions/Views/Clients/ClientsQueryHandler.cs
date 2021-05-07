@@ -6,18 +6,18 @@ using Marten;
 
 namespace EventSourcing.Sample.Transactions.Views.Clients
 {
-    public class ClientsQueryHandler: IQueryHandler<GetClientView, ClientView>
+    public class ClientsQueryHandler: IQueryHandler<GetClientView, ClientView?>
     {
-        private IDocumentSession _session;
+        private IDocumentSession session;
 
         public ClientsQueryHandler(IDocumentSession session)
         {
-            _session = session;
+            this.session = session;
         }
 
-        public Task<ClientView> Handle(GetClientView query, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<ClientView?> Handle(GetClientView query, CancellationToken cancellationToken = default)
         {
-            return _session
+            return session
                 .Query<ClientView>()
                 .SingleOrDefaultAsync(client => client.Id == query.Id, cancellationToken);
         }

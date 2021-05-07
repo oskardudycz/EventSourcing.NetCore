@@ -1,6 +1,4 @@
-using System;
 using Marten.Events.Aggregation;
-using Marten.Events.Projections;
 using MeetingsManagement.Meetings.Events;
 using MeetingsManagement.Meetings.Views;
 

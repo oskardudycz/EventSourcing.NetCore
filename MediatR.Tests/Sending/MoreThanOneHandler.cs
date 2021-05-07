@@ -12,14 +12,14 @@ namespace MediatR.Tests.Sending
     {
         public class ServiceLocator
         {
-            private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
+            private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
-                => Services.Add(type, implementations.ToList());
+                => services.Add(type, implementations.ToList());
 
             public List<object> Get(Type type)
             {
-                return Services[type];
+                return services[type];
             }
         }
 
@@ -29,7 +29,7 @@ namespace MediatR.Tests.Sending
 
             public IssuesList(params string[] issues)
             {
-                Issues = issues?.ToList();
+                Issues = issues.ToList();
             }
         }
 
@@ -45,33 +45,33 @@ namespace MediatR.Tests.Sending
 
         public class CreateIssueCommandHandler: IRequestHandler<CreateIssueCommand>
         {
-            private readonly IssuesList _issuesList;
+            private readonly IssuesList issuesList;
 
             public CreateIssueCommandHandler(IssuesList issuesList)
             {
-                _issuesList = issuesList;
+                this.issuesList = issuesList;
             }
 
             public Task<Unit> Handle(CreateIssueCommand command, CancellationToken cancellationToken = default(CancellationToken))
             {
-                _issuesList.Issues.Add(command.IssueName);
+                issuesList.Issues.Add(command.IssueName);
                 return Unit.Task;
             }
         }
 
         private readonly IMediator mediator;
-        private readonly IssuesList _issuesList = new IssuesList();
+        private readonly IssuesList issuesList = new IssuesList();
 
         public MoreThanOneHandler()
         {
-            var commandHandler = new CreateIssueCommandHandler(_issuesList);
+            var commandHandler = new CreateIssueCommandHandler(issuesList);
 
             var serviceLocator = new ServiceLocator();
             serviceLocator.Register(typeof(IRequestHandler<CreateIssueCommand, Unit>), commandHandler, commandHandler);
             //Registration needed internally by MediatR
             serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<CreateIssueCommand, Unit>>), new List<IPipelineBehavior<CreateIssueCommand, Unit>>());
 
-            mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
+            mediator = new Mediator(type => serviceLocator.Get(type).Single());
         }
 
         [Fact]
@@ -84,8 +84,8 @@ namespace MediatR.Tests.Sending
             await mediator.Send(query);
 
             //Then
-            _issuesList.Issues.Count.Should().Be.EqualTo(1);
-            _issuesList.Issues.Should().Have.SameValuesAs("cleaning");
+            issuesList.Issues.Count.Should().Be.EqualTo(1);
+            issuesList.Issues.Should().Have.SameValuesAs("cleaning");
         }
     }
 }

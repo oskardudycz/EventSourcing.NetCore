@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <AssemblyName>EventSourcing.Sample.Transactions.Contracts</AssemblyName>
-        <PackageId>EventSourcing.Sample.Transactions.Contracts</PackageId>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>

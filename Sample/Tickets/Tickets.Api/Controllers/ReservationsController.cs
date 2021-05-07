@@ -40,7 +40,7 @@ namespace Tickets.Api.Controllers
         [HttpGet("{id}")]
         public Task<ReservationDetails> Get(Guid id)
         {
-            return queryBus.Send<GetReservationById, ReservationDetails>(GetReservationById.Create(id));
+            return queryBus.Send<GetReservationById, ReservationDetails>(new GetReservationById(id));
         }
 
         [HttpGet]

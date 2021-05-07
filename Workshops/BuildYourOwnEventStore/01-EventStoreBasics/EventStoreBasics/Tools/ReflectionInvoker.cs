@@ -5,7 +5,7 @@ namespace EventStoreBasics.Tools
 {
     public static class ReflectionInvoker
     {
-        public static object InvokeIfExists<T>(this T item, string methodName, object param)
+        public static void InvokeIfExists<T>(this T item, string methodName, object param) where T : notnull
         {
             var method = item.GetType()
                     .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -19,10 +19,10 @@ namespace EventStoreBasics.Tools
                         })
                     .SingleOrDefault();
 
-            return method?.Invoke(item, new [] { param });
+            method?.Invoke(item, new [] { param });
         }
 
-        public static void SetIfExists<T>(this T item, string propertyName, object value)
+        public static void SetIfExists<T>(this T item, string propertyName, object value) where T : notnull
         {
             item.GetType()
                 .GetProperty(propertyName)?

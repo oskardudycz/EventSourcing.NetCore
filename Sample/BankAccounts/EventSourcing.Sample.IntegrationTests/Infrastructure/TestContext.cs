@@ -10,19 +10,14 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
 {
     public class TestContext: IDisposable
     {
-        private TestServer _server;
+        private TestServer server;
         public HttpClient Client { get; private set; }
 
         public TestContext()
         {
-            SetUpClient();
-        }
-
-        private void SetUpClient()
-        {
             var projectDir = Directory.GetCurrentDirectory();
 
-            _server = new TestServer(new WebHostBuilder()
+            server = new TestServer(new WebHostBuilder()
                 .UseEnvironment("Tests")
                 .UseContentRoot(projectDir)
                 .UseConfiguration(new ConfigurationBuilder()
@@ -32,12 +27,12 @@ namespace EventSourcing.Sample.IntegrationTests.Infrastructure
                 )
                 .UseStartup<Startup>());
 
-            Client = _server.CreateClient();
+            Client = server.CreateClient();
         }
 
         public void Dispose()
         {
-            _server?.Dispose();
+            server?.Dispose();
             Client?.Dispose();
         }
     }

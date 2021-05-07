@@ -31,8 +31,9 @@ namespace Tickets.Tests.Extensions.Reservations
         {
             var @event = reservation.PublishedEvent<TentativeReservationCreated>();
 
+            @event.Should().NotBeNull();
             @event.Should().BeOfType<TentativeReservationCreated>();
-            @event.ReservationId.Should().Be(id);
+            @event!.ReservationId.Should().Be(id);
             @event.Number.Should().Be(number);
             @event.SeatId.Should().Be(seatId);
 

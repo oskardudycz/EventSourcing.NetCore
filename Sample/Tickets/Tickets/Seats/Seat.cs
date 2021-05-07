@@ -10,5 +10,12 @@ namespace Tickets.Seats
         public string Number { get; private set; }
 
         public decimal Price { get; private set; }
+
+        public Seat(Guid concertId, string number, decimal price)
+        {
+            ConcertId = concertId;
+            Number = number;
+            Price = price;
+        }
     }
 }

@@ -16,47 +16,45 @@ namespace EventSourcing.Sample.Web.Controllers
     [Route("api/[controller]")]
     public class ClientsController: Controller
     {
-        private readonly ICommandBus _commandBus;
-        private readonly IQueryBus _queryBus;
+        private readonly ICommandBus commandBus;
+        private readonly IQueryBus queryBus;
 
         public ClientsController(ICommandBus commandBus, IQueryBus queryBus)
         {
-            _commandBus = commandBus;
-            _queryBus = queryBus;
+            this.commandBus = commandBus;
+            this.queryBus = queryBus;
         }
 
         [HttpGet]
         public Task<List<ClientListItem>> Get()
         {
-            return _queryBus.Send<GetClients, List<ClientListItem>>(new GetClients());
+            return queryBus.Send<GetClients, List<ClientListItem>>(new GetClients());
         }
 
         [HttpGet("{id}")]
         public Task<ClientItem> Get(Guid id)
         {
-            return _queryBus.Send<GetClient, ClientItem>(new GetClient(id));
+            return queryBus.Send<GetClient, ClientItem>(new GetClient(id));
         }
 
         [HttpGet]
         [Route("{id}/accounts")]
         public Task<IEnumerable<AccountSummary>> GetAccounts(Guid id)
         {
-            return _queryBus.Send<GetAccounts, IEnumerable<AccountSummary>>(new GetAccounts(id));
+            return queryBus.Send<GetAccounts, IEnumerable<AccountSummary>>(new GetAccounts(id));
         }
 
         [HttpGet]
         [Route("{id}/view")]
         public Task<ClientView> GetClientView(Guid id)
         {
-            return _queryBus.Send<GetClientView, ClientView>(new GetClientView(id));
+            return queryBus.Send<GetClientView, ClientView>(new GetClientView(id));
         }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]CreateClient command)
         {
-            command.Id = command.Id ?? Guid.NewGuid();
-
-            await _commandBus.Send(command);
+            await commandBus.Send(command);
 
             return Created("api/Clients", command.Id);
         }
@@ -64,7 +62,7 @@ namespace EventSourcing.Sample.Web.Controllers
         [HttpPut("{id}")]
         public Task Put(Guid id, [FromBody]ClientInfo clientInfo)
         {
-            return _commandBus.Send(new UpdateClient(id, clientInfo));
+            return commandBus.Send(new UpdateClient(id, clientInfo));
         }
 
         // POST api/values
@@ -72,7 +70,7 @@ namespace EventSourcing.Sample.Web.Controllers
         [HttpDelete("{id}")]
         public Task Post(Guid id)
         {
-            return _commandBus.Send(new DeleteClient(id));
+            return commandBus.Send(new DeleteClient(id));
         }
     }
 }

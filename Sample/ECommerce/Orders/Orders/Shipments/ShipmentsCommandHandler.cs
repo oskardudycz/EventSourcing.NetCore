@@ -4,7 +4,6 @@ using Core.Commands;
 using Core.Requests;
 using MediatR;
 using Orders.Shipments.Commands;
-using RestSharp;
 
 namespace Orders.Shipments
 {
@@ -23,7 +22,7 @@ namespace Orders.Shipments
         public async Task<Unit> Handle(SendPackage command, CancellationToken cancellationToken)
         {
             await externalCommandBus.Post(
-                externalServicesConfig.PaymentsUrl,
+                externalServicesConfig.PaymentsUrl!,
                 "payments",
                 command,
                 cancellationToken);

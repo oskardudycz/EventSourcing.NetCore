@@ -4,13 +4,10 @@ using Core.Queries;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Queries
 {
-    public class ClientListItem
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-    }
+    public record ClientListItem (
+        Guid Id,
+        string Name
+    );
 
-    public class GetClients: IQuery<List<ClientListItem>>
-    {
-    }
+    public record GetClients: IQuery<List<ClientListItem>>;
 }

@@ -6,7 +6,6 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using SmartHome.Temperature.MotionSensors.Commands;
 using SmartHome.Temperature.MotionSensors.Queries;
-using SmartHome.Temperature.TemperatureMeasurements;
 
 namespace SmartHome.Temperature.MotionSensors
 {

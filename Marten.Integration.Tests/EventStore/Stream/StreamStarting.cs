@@ -1,33 +1,34 @@
 using System;
 using Marten.Exceptions;
-using Marten.Integration.Tests.TestsInfrasructure;
+using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Stream
 {
+    public record IssueCreated(
+        Guid IssueId,
+        string Description
+    );
+
+    public record IssueUpdated(
+        Guid IssueId,
+        string Description
+    );
+
+    public record Issue(
+        Guid IssueId,
+        string Description
+    );
+
     public class StreamStarting: MartenTest
     {
-        public class IssueCreated
-        {
-            public Guid IssueId { get; set; }
-            public string Description { get; set; }
-        }
-
-        public class IssueUpdated
-        {
-            public Guid IssueId { get; set; }
-            public string Description { get; set; }
-        }
-
-        public class IssuesList { }
-
         [Fact (Skip = "Skipped because of https://github.com/JasperFx/marten/issues/1648")]
         public void GivenNoEvents_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
         {
-            var @event = new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description" };
+            var @event = new IssueCreated(Guid.NewGuid(), "Description");
 
-            var streamId = EventStore.StartStream<IssuesList>(@event.IssueId);
+            var streamId = EventStore.StartStream(@event.IssueId);
 
             Session.SaveChanges();
 
@@ -37,9 +38,9 @@ namespace Marten.Integration.Tests.EventStore.Stream
         [Fact]
         public void GivenOneEvent_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
         {
-            var @event = new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description" };
+            var @event = new IssueCreated(Guid.NewGuid(), "Description");
 
-            var streamId = EventStore.StartStream<IssuesList>(@event.IssueId, @event);
+            var streamId = EventStore.StartStream(@event.IssueId, @event);
 
             streamId.Should().Not.Be.Null();
 
@@ -49,15 +50,15 @@ namespace Marten.Integration.Tests.EventStore.Stream
         [Fact]
         public void GivenStartedStream_WhenStartStreamIsBeingCalledAgain_ThenExceptionIsThrown()
         {
-            var @event = new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description" };
+            var @event = new IssueCreated(Guid.NewGuid(), "Description");
 
-            var streamId = EventStore.StartStream<IssuesList>(@event.IssueId, @event);
+            var streamId = EventStore.StartStream(@event.IssueId, @event);
 
             Session.SaveChanges();
 
             Assert.Throws<ExistingStreamIdCollisionException>(() =>
             {
-                EventStore.StartStream<IssuesList>(@event.IssueId, @event);
+                EventStore.StartStream(@event.IssueId, @event);
                 Session.SaveChanges();
             });
         }
@@ -65,7 +66,7 @@ namespace Marten.Integration.Tests.EventStore.Stream
         [Fact]
         public void GivenOneEvent_WhenEventsArePublishedWithStreamId_ThenEventsAreSavedWithoutErrorAndStreamIsStarted()
         {
-            var @event = new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description" };
+            var @event = new IssueCreated(Guid.NewGuid(), "Description");
             var streamId = Guid.NewGuid();
 
             EventStore.Append(streamId, @event);
@@ -84,11 +85,11 @@ namespace Marten.Integration.Tests.EventStore.Stream
             var taskId = Guid.NewGuid();
             var events = new object[]
             {
-                    new IssueCreated {IssueId = taskId, Description = "Description1"},
-                    new IssueUpdated {IssueId = taskId, Description = "Description2"}
+                    new IssueCreated(taskId, "Description1"),
+                    new IssueUpdated(taskId, "Description2")
             };
 
-            var streamId = EventStore.StartStream<IssuesList>(events);
+            var streamId = EventStore.StartStream(events);
 
             streamId.Should().Not.Be.Null();
 

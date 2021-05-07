@@ -7,9 +7,9 @@ namespace EventSourcing.Sample.Clients.Domain.Clients
 {
     public class Client: Aggregate
     {
-        public string Name { get; private set; }
+        public string Name { get; private set; } = default!;
 
-        public string Email { get; private set; }
+        public string Email { get; private set; } = default!;
 
         public Client()
         {

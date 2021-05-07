@@ -21,30 +21,25 @@ namespace Core.Testing
     public class TestContext<TStartup>: IDisposable
         where TStartup : class
     {
-        public HttpClient Client { get; private set; }
+        public HttpClient Client { get; }
 
-        private TestServer server;
+        private readonly TestServer server;
 
-        private readonly EventsLog eventsLog = new EventsLog();
-        private readonly DummyExternalEventProducer externalEventProducer = new DummyExternalEventProducer();
-        private readonly DummyExternalCommandBus externalCommandBus = new DummyExternalCommandBus();
+        private readonly EventsLog eventsLog = new();
+        private readonly DummyExternalEventProducer externalEventProducer = new();
+        private readonly DummyExternalCommandBus externalCommandBus = new();
 
-        private readonly Func<string, Dictionary<string, string>> getConfiguration = fixtureName => new Dictionary<string, string>();
+        private readonly Func<string, Dictionary<string, string>> getConfiguration = _ => new Dictionary<string, string>();
 
-        public TestContext(Func<string, Dictionary<string, string>> getConfiguration = null)
+        public TestContext(Func<string, Dictionary<string, string>>? getConfiguration = null)
         {
             if (getConfiguration != null)
             {
                 this.getConfiguration = getConfiguration;
             }
-            SetUpClient();
-        }
+            var fixtureName = new StackTrace().GetFrame(3)!.GetMethod()!.DeclaringType!.Name;
 
-        private void SetUpClient()
-        {
-            var fixtureName = new StackTrace().GetFrame(3).GetMethod().DeclaringType.Name;
-
-            var configuration = getConfiguration(fixtureName);
+            var configuration = this.getConfiguration(fixtureName);
             var projectDir = Directory.GetCurrentDirectory();
 
             server = new TestServer(new WebHostBuilder()

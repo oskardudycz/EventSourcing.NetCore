@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +5,7 @@ using Ardalis.GuardClauses;
 using Carts.Carts.Events;
 using Carts.Carts.Events.External;
 using Core.Events;
+using Core.Exceptions;
 using Marten;
 
 namespace Carts.Carts
@@ -29,7 +29,8 @@ namespace Carts.Carts
 
         public async Task Handle(CartConfirmed @event, CancellationToken cancellationToken)
         {
-            var cart = await querySession.LoadAsync<Cart>(@event.CartId, cancellationToken);
+            var cart = await querySession.LoadAsync<Cart>(@event.CartId, cancellationToken)
+                ?? throw  AggregateNotFoundException.For<Cart>(@event.CartId);
 
             var externalEvent = CartFinalized.Create(
                 @event.CartId,

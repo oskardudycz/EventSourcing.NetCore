@@ -7,11 +7,11 @@ namespace MeetingsManagement.Meetings
 {
     public class Meeting: Aggregate
     {
-        public string Name { get; private set; }
+        public string Name { get; private set; } = default!;
 
         public DateTime Created { get; private set; }
 
-        public DateRange Occurs { get; private set; }
+        public DateRange? Occurs { get; private set; }
 
         public Meeting()
         {
@@ -19,7 +19,7 @@ namespace MeetingsManagement.Meetings
 
         public static Meeting New(Guid id, string name)
         {
-            return new Meeting(id, name, DateTime.UtcNow);
+            return new(id, name, DateTime.UtcNow);
         }
 
         public Meeting(Guid id, string name, DateTime created)

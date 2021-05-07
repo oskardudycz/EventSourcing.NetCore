@@ -9,20 +9,13 @@ namespace EventStoreBasics.Tests
 {
     public class Exercise03CreateAppendEventFunction
     {
-        public class User
-        {
-            public string Name { get; set; }
-        }
+        public record User(
+            string Name
+        );
 
-        public class UserCreated
-        {
-            public string Name { get; }
-
-            public UserCreated(string name)
-            {
-                Name = name;
-            }
-        }
+        public record UserCreated(
+            string Name
+        );
 
         private readonly NpgsqlConnection databaseConnection;
         private readonly PostgresSchemaProvider schemaProvider;
@@ -67,12 +60,12 @@ namespace EventStoreBasics.Tests
             result.Should().BeTrue();
 
             var wasStreamCreated = databaseConnection.QuerySingle<bool>(
-                "select exists (select 1 from streams where id = @streamId)", new { streamId }
+                "select exists (select 1 from streams where id = @streamId)", new {streamId}
             );
             wasStreamCreated.Should().BeTrue();
 
             var wasEventAppended = databaseConnection.QuerySingle<bool>(
-                "select exists (select 1 from events where stream_id = @streamId)", new { streamId }
+                "select exists (select 1 from events where stream_id = @streamId)", new {streamId}
             );
             wasEventAppended.Should().BeTrue();
         }

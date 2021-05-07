@@ -12,7 +12,7 @@ namespace EventStoreBasics.Tests.Tools
     {
         private readonly NpgsqlConnection databaseConnection;
 
-        const string GetTableColumnsSQL =
+        const string GetTableColumnsSql =
             @"SELECT column_name AS name, data_type AS type
               FROM INFORMATION_SCHEMA.COLUMNS
               WHERE
@@ -20,7 +20,7 @@ namespace EventStoreBasics.Tests.Tools
                   -- get only tables from current schema named as current test class
                   AND table_schema in (select schemas[1] from (select current_schemas(false) as schemas) as currentschema)";
 
-        private const string FunctionExistsSQL =
+        private const string FunctionExistsSql =
             @"select exists(select * from pg_proc where proname = @functionName);";
 
         public PostgresSchemaProvider(NpgsqlConnection databaseConnection)
@@ -33,9 +33,9 @@ namespace EventStoreBasics.Tests.Tools
         /// </summary>
         /// <param name="tableName">table name</param>
         /// <returns></returns>
-        public Table GetTable(string tableName)
+        public Table? GetTable(string tableName)
         {
-            var columns =  databaseConnection.Query<Column>(GetTableColumnsSQL, new { tableName });
+            var columns =  databaseConnection.Query<Column>(GetTableColumnsSql, new { tableName }).ToList();
 
             return columns.Any() ? new Table(tableName, columns) : null;
         }
@@ -47,7 +47,7 @@ namespace EventStoreBasics.Tests.Tools
         /// <returns></returns>
         public bool FunctionExists(string functionName)
         {
-            return databaseConnection.QuerySingle<bool>(FunctionExistsSQL, new {functionName});
+            return databaseConnection.QuerySingle<bool>(FunctionExistsSql, new {functionName});
         }
     }
 
@@ -71,7 +71,7 @@ namespace EventStoreBasics.Tests.Tools
             Columns = columns;
         }
 
-        public Column GetColumn(string columnName)
+        public Column? GetColumn(string columnName)
         {
             return Columns.SingleOrDefault(column => column.Name == columnName);
         }
@@ -85,7 +85,7 @@ namespace EventStoreBasics.Tests.Tools
         public const string GuidType = "uuid";
         public const string LongType = "bigint";
         public const string StringType = "text";
-        public const string JSONType = "jsonb";
+        public const string JsonType = "jsonb";
         public const string DateTimeType = "timestamp with time zone";
 
         /// <summary>

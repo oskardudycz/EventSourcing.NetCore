@@ -9,7 +9,7 @@ namespace EventStoreBasics.Tests.Tools
         public static NpgsqlConnection GetFreshDbConnection()
         {
             // get the test class name that will be used as POSTGRES schema
-            var testClassName = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
+            var testClassName = new StackTrace().GetFrame(1)!.GetMethod()!.DeclaringType!.Name;
             // each test will have it's own schema name to run have data isolation and not interfere other tests
             var connection = new NpgsqlConnection(Settings.ConnectionString + $"Search Path= '{testClassName}'");
 

@@ -8,18 +8,18 @@ using Marten;
 
 namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
 {
-    public class GetAccountHandler: IQueryHandler<GetAccount, Contracts.Accounts.ValueObjects.AccountSummary>
+    public class GetAccountHandler: IQueryHandler<GetAccount, Contracts.Accounts.ValueObjects.AccountSummary?>
     {
-        private readonly IDocumentSession _session;
+        private readonly IDocumentSession session;
 
         public GetAccountHandler(IDocumentSession session)
         {
-            _session = session;
+            this.session = session;
         }
 
-        public Task<Contracts.Accounts.ValueObjects.AccountSummary> Handle(GetAccount message, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<Contracts.Accounts.ValueObjects.AccountSummary?> Handle(GetAccount message, CancellationToken cancellationToken = default)
         {
-            return _session
+            return session
                 .Query<AccountSummaryView>()
                 .Select(a => new Contracts.Accounts.ValueObjects.AccountSummary
                 {

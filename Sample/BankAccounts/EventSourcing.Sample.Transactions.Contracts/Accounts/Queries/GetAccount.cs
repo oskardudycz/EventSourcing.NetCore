@@ -4,13 +4,7 @@ using EventSourcing.Sample.Transactions.Contracts.Accounts.ValueObjects;
 
 namespace EventSourcing.Sample.Transactions.Contracts.Accounts.Queries
 {
-    public class GetAccount: IQuery<AccountSummary>
-    {
-        public Guid AccountId { get; private set; }
-
-        public GetAccount(Guid accountId)
-        {
-            AccountId = accountId;
-        }
-    }
+    public record GetAccount (
+        Guid AccountId
+    ): IQuery<AccountSummary>;
 }

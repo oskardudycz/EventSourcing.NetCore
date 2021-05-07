@@ -4,15 +4,8 @@ using EventSourcing.Sample.Clients.Contracts.Clients.ValueObjects;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Commands
 {
-    public class UpdateClient: ICommand
-    {
-        public Guid Id { get; }
-        public ClientInfo Data { get; }
-
-        public UpdateClient(Guid id, ClientInfo data)
-        {
-            Id = id;
-            Data = data;
-        }
-    }
+    public record UpdateClient(
+        Guid Id,
+        ClientInfo Data
+    ): ICommand;
 }

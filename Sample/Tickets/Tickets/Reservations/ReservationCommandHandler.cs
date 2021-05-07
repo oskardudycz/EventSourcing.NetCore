@@ -2,11 +2,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Core.Commands;
+using Core.Exceptions;
 using Core.Repositories;
-using Core.Storage;
 using MediatR;
 using Tickets.Reservations.Commands;
-using Tickets.Reservations.Events;
 
 namespace Tickets.Reservations
 {
@@ -50,7 +49,8 @@ namespace Tickets.Reservations
         {
             Guard.Against.Null(command, nameof(command));
 
-            var reservation = await repository.Find(command.ReservationId, cancellationToken);
+            var reservation = await repository.Find(command.ReservationId, cancellationToken)
+                              ?? throw AggregateNotFoundException.For<Reservation>(command.ReservationId);
 
             reservation.ChangeSeat(command.SeatId);
 
@@ -63,7 +63,8 @@ namespace Tickets.Reservations
         {
             Guard.Against.Null(command, nameof(command));
 
-            var reservation = await repository.Find(command.ReservationId, cancellationToken);
+            var reservation = await repository.Find(command.ReservationId, cancellationToken)
+                              ?? throw AggregateNotFoundException.For<Reservation>(command.ReservationId);
 
             reservation.Confirm();
 
@@ -76,7 +77,8 @@ namespace Tickets.Reservations
         {
             Guard.Against.Null(command, nameof(command));
 
-            var reservation = await repository.Find(command.ReservationId, cancellationToken);
+            var reservation = await repository.Find(command.ReservationId, cancellationToken)
+                              ?? throw AggregateNotFoundException.For<Reservation>(command.ReservationId);
 
             reservation.Cancel();
 

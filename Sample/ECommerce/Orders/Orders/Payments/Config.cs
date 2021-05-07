@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Orders.Orders;
 using Orders.Payments.Commands;
 
 namespace Orders.Payments

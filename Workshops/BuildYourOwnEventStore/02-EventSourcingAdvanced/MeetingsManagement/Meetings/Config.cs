@@ -20,7 +20,7 @@ namespace MeetingsManagement.Meetings
 
             services.AddScoped<IRequestHandler<ScheduleMeeting, Unit>, MeetingCommandHandler>();
 
-            services.AddScoped<IRequestHandler<GetMeeting, MeetingView>, MeetingQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMeeting, MeetingView?>, MeetingQueryHandler>();
         }
 
         public static void ConfigureMarten(StoreOptions options)

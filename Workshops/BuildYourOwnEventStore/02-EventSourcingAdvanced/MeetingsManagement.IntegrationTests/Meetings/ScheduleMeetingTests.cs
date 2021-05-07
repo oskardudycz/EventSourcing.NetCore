@@ -16,14 +16,14 @@ namespace MeetingsManagement.IntegrationTests.Meetings
 {
     public class ScheduleMeetingFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = MeetingsManagementApi.MeetingsUrl;
+        protected override string ApiUrl => MeetingsManagementApi.MeetingsUrl;
 
         public readonly Guid MeetingId = Guid.NewGuid();
         public readonly string MeetingName = "Event Sourcing Workshop";
         public readonly DateTime Start = DateTime.UtcNow;
         public readonly DateTime End = DateTime.UtcNow;
 
-        public HttpResponseMessage CommandResponse;
+        public HttpResponseMessage CommandResponse = default!;
 
         public override async Task InitializeAsync()
         {

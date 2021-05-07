@@ -1,8 +1,7 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Commands;
 
-namespace Tickets.Reservations.Events
+namespace Tickets.Reservations.Commands
 {
     public class CancelReservation : ICommand
     {
@@ -13,11 +12,12 @@ namespace Tickets.Reservations.Events
             ReservationId = reservationId;
         }
 
-        public static CancelReservation Create(Guid reservationId)
+        public static CancelReservation Create(Guid? reservationId)
         {
-            Guard.Against.Default(reservationId, nameof(reservationId));
+            if (!reservationId.HasValue)
+                throw new ArgumentNullException(nameof(reservationId));
 
-            return new CancelReservation(reservationId);
+            return new CancelReservation(reservationId.Value);
         }
     }
 }

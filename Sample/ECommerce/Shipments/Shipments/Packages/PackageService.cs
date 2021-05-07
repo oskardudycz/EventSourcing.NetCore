@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Events;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Shipments.Packages.Commands;
 using Shipments.Packages.Events.External;
+using Shipments.Packages.Requests;
 using Shipments.Products;
 using Shipments.Storage;
 
@@ -54,7 +53,7 @@ namespace Shipments.Packages
             if (request.ProductItems?.Count == 0)
                 throw new ArgumentException("It's not possible to send package with empty product items");
 
-            if (!productAvailabilityService.IsEnoughOf(request.ProductItems.ToArray()))
+            if (!productAvailabilityService.IsEnoughOf(request.ProductItems!.ToArray()))
             {
                 await Publish(new ProductWasOutOfStock(request.OrderId, DateTime.UtcNow));
                 throw new ArgumentOutOfRangeException(nameof(request.ProductItems), "Cannot send package - product was out of stock.");

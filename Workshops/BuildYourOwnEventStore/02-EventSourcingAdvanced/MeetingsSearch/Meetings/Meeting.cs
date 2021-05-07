@@ -6,11 +6,9 @@ namespace MeetingsSearch.Meetings
 {
     public class Meeting: Aggregate
     {
-        public string Name { get; protected set; }
+        public string Name { get; private set; } = default!;
 
-        public Meeting()
-        {
-        }
+        public Meeting() { }
 
         [JsonConstructor]
         public Meeting(Guid id, string name)

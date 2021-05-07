@@ -1,7 +1,6 @@
 using System;
 using Carts.Carts.Events;
 using Marten.Events.Aggregation;
-using Marten.Events.Projections;
 
 namespace Carts.Carts.Projections
 {

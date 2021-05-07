@@ -43,8 +43,8 @@ namespace Orders.Api.Controllers
             var command = Commands.InitOrder.Create(
                 orderId,
                 request.ClientId,
-                request.ProductItems.Select(
-                    pi => new PricedProductItem(pi.ProductId, pi.Quantity,pi.UnitPrice)).ToList(),
+                request.ProductItems?.Select(
+                    pi => PricedProductItem.Create(pi.ProductId, pi.Quantity,pi.UnitPrice)).ToList(),
                 request.TotalPrice
             );
 

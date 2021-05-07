@@ -72,10 +72,10 @@ namespace Core.Streaming.Kafka.Consumers
                 var message = consumer.Consume(cancellationToken);
 
                 // get event type from name storred in message.Key
-                var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Message.Key);
+                var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Message.Key)!;
 
                 // deserialize event
-                var @event = JsonConvert.DeserializeObject(message.Message.Value, eventType);
+                var @event = JsonConvert.DeserializeObject(message.Message.Value, eventType)!;
 
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -83,7 +83,7 @@ namespace Core.Streaming.Kafka.Consumers
                         scope.ServiceProvider.GetRequiredService<IEventBus>();
 
                     // publish event to internal event bus
-                    await eventBus.Publish(@event as IEvent);
+                    await eventBus.Publish((IEvent)@event);
                 }
             }
             catch (Exception e)

@@ -45,7 +45,7 @@ namespace EventStoreBasics.Tests
             var streamsTable = schemaProvider.GetTable(EventsTableName);
 
             streamsTable.Should().NotBeNull();
-            streamsTable.Name.Should().Be(EventsTableName);
+            streamsTable!.Name.Should().Be(EventsTableName);
         }
 
         /// <summary>
@@ -56,11 +56,11 @@ namespace EventStoreBasics.Tests
         public void EventsTable_ShouldHave_IdColumn()
         {
             var idColumn = schemaProvider
-                .GetTable(EventsTableName)
+                .GetTable(EventsTableName)?
                 .GetColumn(IdColumnName);
 
             idColumn.Should().NotBeNull();
-            idColumn.Name.Should().Be(IdColumnName);
+            idColumn!.Name.Should().Be(IdColumnName);
             idColumn.Type.Should().Be(Column.GuidType);
         }
 
@@ -72,12 +72,12 @@ namespace EventStoreBasics.Tests
         public void EventsTable_ShouldHave_DataColumn_WithJsonType()
         {
             var dataColumn = schemaProvider
-                .GetTable(EventsTableName)
+                .GetTable(EventsTableName)?
                 .GetColumn(DataColumnName);
 
             dataColumn.Should().NotBeNull();
-            dataColumn.Name.Should().Be(DataColumnName);
-            dataColumn.Type.Should().Be(Column.JSONType);
+            dataColumn!.Name.Should().Be(DataColumnName);
+            dataColumn!.Type.Should().Be(Column.JsonType);
         }
 
         /// <summary>
@@ -88,11 +88,11 @@ namespace EventStoreBasics.Tests
         public void EventsTable_ShouldHave_StreamIdColumn_WithGuidType()
         {
             var dataColumn = schemaProvider
-                .GetTable(EventsTableName)
+                .GetTable(EventsTableName)?
                 .GetColumn(StreamIdColumnName);
 
             dataColumn.Should().NotBeNull();
-            dataColumn.Name.Should().Be(StreamIdColumnName);
+            dataColumn!.Name.Should().Be(StreamIdColumnName);
             dataColumn.Type.Should().Be(Column.GuidType);
         }
 
@@ -104,11 +104,11 @@ namespace EventStoreBasics.Tests
         public void EventsTable_ShouldHave_TypeColumn_WithStringType()
         {
             var typeColumn = schemaProvider
-                .GetTable(EventsTableName)
+                .GetTable(EventsTableName)?
                 .GetColumn(TypeColumnName);
 
             typeColumn.Should().NotBeNull();
-            typeColumn.Name.Should().Be(TypeColumnName);
+            typeColumn!.Name.Should().Be(TypeColumnName);
             typeColumn.Type.Should().Be(Column.StringType);
         }
 
@@ -120,11 +120,11 @@ namespace EventStoreBasics.Tests
         public void EventsTable_ShouldHave_VersionColumn_WithLongType()
         {
             var versionColumn = schemaProvider
-                .GetTable(EventsTableName)
+                .GetTable(EventsTableName)?
                 .GetColumn(VersionColumnName);
 
             versionColumn.Should().NotBeNull();
-            versionColumn.Name.Should().Be(VersionColumnName);
+            versionColumn!.Name.Should().Be(VersionColumnName);
             versionColumn.Type.Should().Be(Column.LongType);
         }
 
@@ -136,11 +136,11 @@ namespace EventStoreBasics.Tests
         public void EventsTable_ShouldHave_CreatedColumn_WithDateTimeType()
         {
             var createdColumn = schemaProvider
-                .GetTable(EventsTableName)
+                .GetTable(EventsTableName)?
                 .GetColumn(CreatedColumnName);
 
             createdColumn.Should().NotBeNull();
-            createdColumn.Name.Should().Be(CreatedColumnName);
+            createdColumn!.Name.Should().Be(CreatedColumnName);
             createdColumn.Type.Should().Be(Column.DateTimeType);
         }
 

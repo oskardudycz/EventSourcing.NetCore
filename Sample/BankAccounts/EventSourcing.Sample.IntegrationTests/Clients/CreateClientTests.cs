@@ -13,13 +13,13 @@ namespace EventSourcing.Sample.IntegrationTests.Clients
 {
     public class CreateClientTests
     {
-        private readonly TestContext _sut;
+        private readonly TestContext sut;
 
         private const string ApiUrl = "/api/Clients";
 
         public CreateClientTests()
         {
-            _sut = new TestContext();
+            sut = new TestContext();
         }
 
         [Fact]
@@ -27,11 +27,11 @@ namespace EventSourcing.Sample.IntegrationTests.Clients
         {
             // prepare command
             var command = new CreateClient(
-                null,
+                Guid.NewGuid(),
                 new ClientInfo("test@test.pl","test"));
 
             // send create command
-            var commandResponse = await _sut.Client.PostAsync(ApiUrl, command.ToJsonStringContent());
+            var commandResponse = await sut.Client.PostAsync(ApiUrl, command.ToJsonStringContent());
 
             commandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -46,7 +46,7 @@ namespace EventSourcing.Sample.IntegrationTests.Clients
             var query = new GetClient(createdId);
 
             //send query
-            var queryResponse = await _sut.Client.GetAsync(ApiUrl + $"/{createdId}/view");
+            var queryResponse = await sut.Client.GetAsync(ApiUrl + $"/{createdId}/view");
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();
             queryResponse.Should().NotBeNull();

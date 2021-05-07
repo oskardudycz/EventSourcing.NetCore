@@ -8,16 +8,13 @@ namespace Core.Aggregates
     {
     }
 
-    public abstract class Aggregate<T>: IAggregate<T>
+    public abstract class Aggregate<T>: IAggregate<T> where T : notnull
     {
-        public T Id { get; protected set; }
+        public T Id { get; protected set; } = default!;
 
         public int Version { get; protected set; }
 
         [NonSerialized] private readonly Queue<IEvent> uncommittedEvents = new Queue<IEvent>();
-
-        //for serialization purposes
-        protected Aggregate() { }
 
         public virtual void When(object @event) { }
 

@@ -21,10 +21,10 @@ namespace MeetingsSearch.Storage
             this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         }
 
-        public async Task<T> Find(Guid id, CancellationToken cancellationToken)
+        public async Task<T?> Find(Guid id, CancellationToken cancellationToken)
         {
             var response = await elasticClient.GetAsync<T>(id, ct: cancellationToken);
-            return response.Source;
+            return response?.Source;
         }
 
         public Task Add(T aggregate, CancellationToken cancellationToken)

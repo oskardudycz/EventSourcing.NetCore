@@ -10,6 +10,6 @@ namespace EventSourcing.Sample.Clients.Storage
         {
         }
 
-        public DbSet<Client> Clients { get; set; }
+        public DbSet<Client> Clients { get; set; } = default!;
     }
 }

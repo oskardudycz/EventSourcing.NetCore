@@ -75,7 +75,7 @@ namespace EventStoreBasics.Tests
             var streamsTable = schemaProvider.GetTable(StreamsTableName);
 
             streamsTable.Should().NotBeNull();
-            streamsTable.Name.Should().Be(StreamsTableName);
+            streamsTable!.Name.Should().Be(StreamsTableName);
         }
 
         /// <summary>
@@ -85,11 +85,11 @@ namespace EventStoreBasics.Tests
         public void StreamsTable_ShouldHave_IdColumn()
         {
             var idColumn = schemaProvider
-                .GetTable(StreamsTableName)
+                .GetTable(StreamsTableName)?
                 .GetColumn(IdColumnName);
 
             idColumn.Should().NotBeNull();
-            idColumn.Name.Should().Be(IdColumnName);
+            idColumn!.Name.Should().Be(IdColumnName);
             idColumn.Type.Should().Be(Column.GuidType);
         }
 
@@ -100,11 +100,11 @@ namespace EventStoreBasics.Tests
         public void StreamsTable_ShouldHave_TypeColumn_WithStringType()
         {
             var typeColumn = schemaProvider
-                .GetTable(StreamsTableName)
+                .GetTable(StreamsTableName)?
                 .GetColumn(TypeColumnName);
 
             typeColumn.Should().NotBeNull();
-            typeColumn.Name.Should().Be(TypeColumnName);
+            typeColumn!.Name.Should().Be(TypeColumnName);
             typeColumn.Type.Should().Be(Column.StringType);
         }
 
@@ -115,11 +115,11 @@ namespace EventStoreBasics.Tests
         public void StreamsTable_ShouldHave_VersionColumn_WithLongType()
         {
             var versionColumn = schemaProvider
-                .GetTable(StreamsTableName)
+                .GetTable(StreamsTableName)?
                 .GetColumn(VersionColumnName);
 
             versionColumn.Should().NotBeNull();
-            versionColumn.Name.Should().Be(VersionColumnName);
+            versionColumn!.Name.Should().Be(VersionColumnName);
             versionColumn.Type.Should().Be(Column.LongType);
         }
 

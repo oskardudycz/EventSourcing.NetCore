@@ -7,14 +7,14 @@ namespace CQRS.Tests.TestsInfrasructure
 {
     public class ServiceLocator
     {
-        private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
+        private readonly Dictionary<Type, List<object>> services = new();
 
         public void Register(Type type, params object[] implementations)
-            => Services.Add(type, implementations.ToList());
+            => services.Add(type, implementations.ToList());
 
         public List<object> Get(Type type)
         {
-            return Services[type];
+            return services[type];
         }
 
         public void RegisterCommandHandler<TCommand, TCommandHandler>(TCommandHandler commandHandler)
@@ -36,7 +36,7 @@ namespace CQRS.Tests.TestsInfrasructure
 
         public IMediator GetMediator()
         {
-            return new Mediator(type => Get(type).FirstOrDefault());
+            return new Mediator(type => Get(type).Single());
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Core.Repositories
 {
     public interface IRepository<T> where T : IAggregate
     {
-        Task<T> Find(Guid id, CancellationToken cancellationToken);
+        Task<T?> Find(Guid id, CancellationToken cancellationToken);
 
         Task Add(T aggregate, CancellationToken cancellationToken);
 

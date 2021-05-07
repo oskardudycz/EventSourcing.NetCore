@@ -27,8 +27,9 @@ namespace Tickets.Tests.Reservations
 
             var @event = reservation.PublishedEvent<ReservationConfirmed>();
 
+            @event.Should().NotBeNull();
             @event.Should().BeOfType<ReservationConfirmed>();
-            @event.ReservationId.Should().Be(reservation.Id);
+            @event!.ReservationId.Should().Be(reservation.Id);
         }
     }
 }

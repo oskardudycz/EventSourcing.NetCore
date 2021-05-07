@@ -20,7 +20,7 @@ namespace Carts.Carts.ValueObjects
             UnitPrice = unitPrice;
         }
 
-        public static PricedProductItem Create(Guid productId, int quantity, decimal unitPrice)
+        public static PricedProductItem Create(Guid? productId, int? quantity, decimal? unitPrice)
         {
             return Create(
                 ProductItem.Create(productId, quantity),
@@ -28,15 +28,15 @@ namespace Carts.Carts.ValueObjects
             );
         }
 
-        public static PricedProductItem Create(ProductItem productItem, decimal unitPrice)
+        public static PricedProductItem Create(ProductItem productItem, decimal? unitPrice)
         {
-            Guard.Against.Null(productItem, nameof(productItem));
-            Guard.Against.NegativeOrZero(unitPrice, nameof(unitPrice));
-
-            return new PricedProductItem(
-                productItem,
-                unitPrice
-            );
+            return unitPrice switch
+            {
+                null => throw new ArgumentNullException(nameof(unitPrice)),
+                <= 0 => throw new ArgumentOutOfRangeException(nameof(unitPrice),
+                    "Unit price has to be positive number"),
+                _ => new PricedProductItem(productItem, unitPrice.Value)
+            };
         }
 
         public bool MatchesProductAndPrice(PricedProductItem pricedProductItem)

@@ -5,8 +5,8 @@ namespace Core.Streaming.Kafka.Producers
 {
     public class KafkaProducerConfig
     {
-        public ProducerConfig ProducerConfig { get; set; }
-        public string Topic { get; set; }
+        public ProducerConfig? ProducerConfig { get; set; }
+        public string? Topic { get; set; }
     }
 
     public static class KafkaProducerConfigExtensions

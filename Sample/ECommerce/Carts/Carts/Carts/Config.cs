@@ -35,7 +35,7 @@ namespace Carts.Carts
 
         private static void AddQueryHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<GetCartById, CartDetails>, CartQueryHandler>();
+            services.AddScoped<IRequestHandler<GetCartById, CartDetails?>, CartQueryHandler>();
             services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
             services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, CartQueryHandler>();
             services

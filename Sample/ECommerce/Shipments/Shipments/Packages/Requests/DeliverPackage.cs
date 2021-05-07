@@ -1,9 +1,8 @@
 using System;
 
-namespace Shipments.Packages.Commands
+namespace Shipments.Packages.Requests
 {
-    public class DeliverPackage
-    {
-        public Guid Id { get; set; }
-    }
+    public record DeliverPackage(
+        Guid Id
+    );
 }
