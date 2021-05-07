@@ -9,7 +9,7 @@ namespace Tickets.Reservations
     {
         public Guid SeatId { get; private set; }
 
-        public string Number { get; private set; }
+        public string Number { get; private set; } = default!;
 
         public ReservationStatus Status { get; private set; }
 

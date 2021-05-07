@@ -10,36 +10,19 @@ namespace EventStoreBasics.Tests
 
     public class Exercise04EventStoreMethods
     {
-        class User
-        {
-            public Guid Id { get; set; }
-            public string Name { get; set; }
-        }
+        public record User(
+            string Name
+        );
 
-        class UserCreated
-        {
-            public Guid UserId { get; }
-            public string UserName { get; }
+        public record UserCreated(
+            Guid UserId,
+            string UserName
+        );
 
-            public UserCreated(Guid userId, string userName)
-            {
-                UserId = userId;
-                UserName = userName;
-            }
-        }
-
-
-        class UserNameUpdated
-        {
-            public Guid UserId { get; }
-            public string UserName { get; }
-
-            public UserNameUpdated(Guid userId, string userName)
-            {
-                UserId = userId;
-                UserName = userName;
-            }
-        }
+        public record UserNameUpdated(
+            Guid UserId,
+            string UserName
+        );
 
         private readonly NpgsqlConnection databaseConnection;
         private readonly EventStore eventStore;
@@ -68,7 +51,8 @@ namespace EventStoreBasics.Tests
 
             var streamState = eventStore.GetStreamState(streamId);
 
-            streamState.Id.Should().Be(streamId);
+            streamState.Should().NotBeNull();
+            streamState!.Id.Should().Be(streamId);
             streamState.Type.Should().Be(typeof(User));
             streamState.Version.Should().Be(1);
         }

@@ -19,14 +19,14 @@ namespace Tickets.Api.Tests.Reservations
 {
     public class CreateTentativeReservationFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = "/api/Reservations";
+        protected override string ApiUrl => "/api/Reservations";
 
         protected override Dictionary<string, string> GetConfiguration(string fixtureName) =>
             TestConfiguration.Get(fixtureName);
 
         public readonly Guid SeatId = Guid.NewGuid();
 
-        public HttpResponseMessage CommandResponse;
+        public HttpResponseMessage CommandResponse = default!;
 
         public override async Task InitializeAsync()
         {
@@ -64,7 +64,7 @@ namespace Tickets.Api.Tests.Reservations
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldPublish_TentativeReservationCreated()
         {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             fixture.PublishedInternalEventsOfType<TentativeReservationCreated>()
                 .Should()
@@ -80,7 +80,7 @@ namespace Tickets.Api.Tests.Reservations
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldCreate_ReservationDetailsReadModel()
         {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             // prepare query
             var query = $"{createdReservationId}";
@@ -102,7 +102,7 @@ namespace Tickets.Api.Tests.Reservations
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldCreate_ReservationList()
         {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             //send query
             var queryResponse = await fixture.GetAsync();
@@ -132,7 +132,7 @@ namespace Tickets.Api.Tests.Reservations
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldCreate_ReservationHistory()
         {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             // prepare query
             var query = $"{createdReservationId}/history";

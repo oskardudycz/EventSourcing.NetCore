@@ -22,13 +22,13 @@ namespace EventStoreBasics
 
         private void CreateStreamsTable()
         {
-            const string CreatStreamsTableSQL =
+            const string creatStreamsTableSql =
                 @"CREATE TABLE IF NOT EXISTS streams(
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       type           TEXT                      NOT NULL,
                       version        BIGINT                    NOT NULL
                   );";
-            databaseConnection.Execute(CreatStreamsTableSQL);
+            databaseConnection.Execute(creatStreamsTableSql);
         }
 
         private void CreateEventsTable()

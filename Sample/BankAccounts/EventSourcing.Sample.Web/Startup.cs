@@ -60,17 +60,18 @@ namespace EventSourcing.Web.Sample
 
             ConfigureMarten(services);
 
-            ConfigureEF(services);
+            ConfigureEf(services);
 
-            ConfigureCQRS(services);
+            ConfigureCqrs(services);
         }
 
-        private static void ConfigureCQRS(IServiceCollection services)
+        private static void ConfigureCqrs(IServiceCollection services)
         {
             services.AddScoped<IRequestHandler<CreateNewAccount, Unit>, AccountCommandHandler>();
             services.AddScoped<IRequestHandler<MakeTransfer, Unit>, AccountCommandHandler>();
             services.AddScoped<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
-            services.AddScoped<IRequestHandler<GetAccount, AccountSummary>, GetAccountHandler>();
+            services.AddScoped<IRequestHandler<GetAccount, AccountSummary?>, GetAccountHandler>();
+            services.AddScoped<IRequestHandler<GetAccountsSummary, AllAccountsSummary?>, GetAccountsSummaryHandler>();
 
             services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>();
             services.AddScoped<INotificationHandler<ClientUpdated>, ClientsEventHandler>();
@@ -81,8 +82,8 @@ namespace EventSourcing.Web.Sample
             services.AddScoped<IRequestHandler<DeleteClient, Unit>, ClientsCommandHandler>();
 
             services.AddScoped<IRequestHandler<GetClients, List<ClientListItem>>, EventSourcing.Sample.Clients.Views.Clients.ClientsQueryHandler>();
-            services.AddScoped<IRequestHandler<GetClient, ClientItem>, EventSourcing.Sample.Clients.Views.Clients.ClientsQueryHandler>();
-            services.AddScoped<IRequestHandler<GetClientView, ClientView>, ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetClient, ClientItem?>, EventSourcing.Sample.Clients.Views.Clients.ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetClientView, ClientView?>, ClientsQueryHandler>();
         }
 
         private void ConfigureMarten(IServiceCollection services)
@@ -118,7 +119,7 @@ namespace EventSourcing.Web.Sample
             });
         }
 
-        private void ConfigureEF(IServiceCollection services)
+        private void ConfigureEf(IServiceCollection services)
         {
             services.AddDbContext<ClientsDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("ClientsDatabase")));
         }
@@ -139,7 +140,7 @@ namespace EventSourcing.Web.Sample
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Event Sourcing Example V1");
             });
 
-            app.ApplicationServices.GetService<ClientsDbContext>().Database.Migrate();
+            app.ApplicationServices.GetRequiredService<ClientsDbContext>().Database.Migrate();
         }
     }
 }

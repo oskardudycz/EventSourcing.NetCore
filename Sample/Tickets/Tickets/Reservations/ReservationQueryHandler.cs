@@ -1,8 +1,8 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
+using Core.Exceptions;
 using Core.Queries;
 using Marten;
 using Marten.Pagination;
@@ -27,9 +27,10 @@ namespace Tickets.Reservations
             this.querySession = querySession;
         }
 
-        public Task<ReservationDetails> Handle(GetReservationById request, CancellationToken cancellationToken)
+        public async Task<ReservationDetails> Handle(GetReservationById request, CancellationToken cancellationToken)
         {
-            return querySession.LoadAsync<ReservationDetails>(request.ReservationId, cancellationToken);
+            return await querySession.LoadAsync<ReservationDetails>(request.ReservationId, cancellationToken)
+                ?? throw AggregateNotFoundException.For<ReservationDetails>(request.ReservationId);
         }
 
         public Task<IPagedList<ReservationShortInfo>> Handle(GetReservations request, CancellationToken cancellationToken)
@@ -45,9 +46,10 @@ namespace Tickets.Reservations
                 .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
         }
 
-        public Task<ReservationDetails> Handle(GetReservationAtVersion request, CancellationToken cancellationToken)
+        public async Task<ReservationDetails> Handle(GetReservationAtVersion request, CancellationToken cancellationToken)
         {
-            return querySession.Events.AggregateStreamAsync<ReservationDetails>(request.ReservationId, request.Version, token: cancellationToken);
+            return await querySession.Events.AggregateStreamAsync<ReservationDetails>(request.ReservationId, request.Version, token: cancellationToken)
+                   ?? throw AggregateNotFoundException.For<ReservationDetails>(request.ReservationId);
         }
     }
 }

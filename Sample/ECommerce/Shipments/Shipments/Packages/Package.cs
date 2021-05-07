@@ -9,7 +9,7 @@ namespace Shipments.Packages
         public Guid Id { get; set; }
         public Guid OrderId { get; set; }
 
-        public List<ProductItem> ProductItems { get; set; }
+        public List<ProductItem> ProductItems { get; set; } = default!;
 
         public DateTime SentAt { get; set; }
     }

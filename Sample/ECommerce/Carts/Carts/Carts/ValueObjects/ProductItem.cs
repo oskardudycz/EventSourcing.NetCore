@@ -15,12 +15,17 @@ namespace Carts.Carts.ValueObjects
             Quantity = quantity;
         }
 
-        public static ProductItem Create(Guid productId, int quantity)
+        public static ProductItem Create(Guid? productId, int? quantity)
         {
-            Guard.Against.Default(productId, nameof(productId));
-            Guard.Against.NegativeOrZero(quantity, nameof(quantity));
+            if (!productId.HasValue)
+                throw new ArgumentNullException(nameof(productId));
 
-            return new ProductItem(productId, quantity);
+            return quantity switch
+            {
+                null => throw new ArgumentNullException(nameof(quantity)),
+                <= 0 => throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity has to be a positive number"),
+                _ => new ProductItem(productId.Value, quantity.Value)
+            };
         }
 
         public ProductItem MergeWith(ProductItem productItem)

@@ -4,16 +4,16 @@ using Marten.Events;
 using Npgsql;
 using Xunit;
 
-namespace Marten.Integration.Tests.TestsInfrasructure
+namespace Marten.Integration.Tests.TestsInfrastructure
 {
     [Collection("Marten")]
     public abstract class MartenTest: IDisposable
     {
-        protected readonly IDocumentSession Session;
+        protected readonly IDocumentSession Session = default!;
 
         protected IEventStore EventStore
         {
-            get { return Session.Events; }
+            get { return Session!.Events; }
         }
 
         protected readonly string SchemaName = "sch" + Guid.NewGuid().ToString().Replace("-", string.Empty);
@@ -28,7 +28,7 @@ namespace Marten.Integration.Tests.TestsInfrasructure
                 Session = CreateSession();
         }
 
-        protected virtual IDocumentSession CreateSession(Action<StoreOptions> storeOptions = null)
+        protected virtual IDocumentSession CreateSession(Action<StoreOptions>? storeOptions = null)
         {
             return DocumentSessionProvider.Get(SchemaName, storeOptions);
         }

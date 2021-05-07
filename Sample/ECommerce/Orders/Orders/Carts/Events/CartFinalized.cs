@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Core.Events;
-using Orders.Products;
 using Orders.Products.ValueObjects;
 
 namespace Orders.Carts.Events

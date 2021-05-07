@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.Repositories;
-using Core.Storage;
 
 namespace Tickets.Tests.Stubs.Storage
 {
@@ -18,7 +17,7 @@ namespace Tickets.Tests.Stubs.Storage
             Aggregates = aggregates.ToDictionary(ks=> ks.Id, vs => vs);
         }
 
-        public Task<T> Find(Guid id, CancellationToken cancellationToken)
+        public Task<T?> Find(Guid id, CancellationToken cancellationToken)
         {
             return Task.FromResult(Aggregates.GetValueOrDefault(id));
         }

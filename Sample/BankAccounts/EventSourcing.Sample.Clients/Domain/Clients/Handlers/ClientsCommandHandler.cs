@@ -18,35 +18,35 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
         private readonly ClientsDbContext dbContext;
         private readonly IEventBus eventBus;
 
-        private DbSet<Client> Clients;
+        private DbSet<Client> clients;
 
         public ClientsCommandHandler(
             ClientsDbContext dbContext,
             IEventBus eventBus)
         {
             this.dbContext = dbContext;
-            Clients = dbContext.Clients;
+            clients = dbContext.Clients;
             this.eventBus = eventBus;
         }
 
-        public async Task<Unit> Handle(CreateClient command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Unit> Handle(CreateClient command, CancellationToken cancellationToken = default)
         {
             var client = new Client(
-                command.Id.Value,
+                command.Id,
                 command.Data.Name,
                 command.Data.Email
             );
 
-            await Clients.AddAsync(client, cancellationToken);
+            await clients.AddAsync(client, cancellationToken);
 
             await SaveAndPublish(client, cancellationToken);
 
             return Unit.Value;
         }
 
-        public async Task<Unit> Handle(UpdateClient command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Unit> Handle(UpdateClient command, CancellationToken cancellationToken = default)
         {
-            var client = await Clients.FindAsync(command.Id);
+            var client = await clients.FindAsync(command.Id);
 
             client.Update(command.Data);
 
@@ -57,9 +57,9 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
             return Unit.Value;
         }
 
-        public async Task<Unit> Handle(DeleteClient command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Unit> Handle(DeleteClient command, CancellationToken cancellationToken = default)
         {
-            var client = await Clients.FindAsync(command.Id);
+            var client = await clients.FindAsync(command.Id);
 
             dbContext.Remove(client);
 
@@ -68,7 +68,7 @@ namespace EventSourcing.Sample.Clients.Domain.Clients.Handlers
             return Unit.Value;
         }
 
-        private async Task SaveAndPublish(Client client, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task SaveAndPublish(Client client, CancellationToken cancellationToken = default)
         {
             await dbContext.SaveChangesAsync(cancellationToken);
 

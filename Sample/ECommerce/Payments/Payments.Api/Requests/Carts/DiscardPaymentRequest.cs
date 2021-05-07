@@ -1,5 +1,3 @@
-using System;
-using Core.Commands;
 using Payments.Payments.Enums;
 
 namespace Payments.Api.Requests.Carts

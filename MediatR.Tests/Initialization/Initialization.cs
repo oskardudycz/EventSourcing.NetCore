@@ -28,7 +28,7 @@ namespace MediatR.Tests.Initialization
             {
                 //Given
                 //When
-                var mediator = new Mediator(type => ServiceLocator.Get(type).FirstOrDefault());
+                var mediator = new Mediator(type => ServiceLocator.Get(type).Single());
 
                 mediator.Should().Not.Be.Null();
             });

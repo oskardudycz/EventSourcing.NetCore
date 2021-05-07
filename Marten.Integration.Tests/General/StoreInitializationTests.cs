@@ -1,4 +1,3 @@
-using System.Linq;
 using Npgsql;
 using SharpTestsEx;
 using Xunit;

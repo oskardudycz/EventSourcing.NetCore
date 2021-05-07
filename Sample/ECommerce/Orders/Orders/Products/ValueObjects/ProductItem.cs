@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 
 namespace Orders.Products.ValueObjects
 {

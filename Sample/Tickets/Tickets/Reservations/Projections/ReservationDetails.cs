@@ -1,6 +1,5 @@
 using System;
 using Marten.Events.Aggregation;
-using Marten.Events.Projections;
 using Tickets.Reservations.Events;
 
 namespace Tickets.Reservations.Projections
@@ -9,11 +8,9 @@ namespace Tickets.Reservations.Projections
     {
         public Guid Id { get; set; }
 
-        public string Number { get; set; }
+        public string Number { get; set; } = default!;
 
         public Guid SeatId { get; set; }
-
-        public string SeatNumber { get; set; }
 
         public ReservationStatus Status { get; set; }
 

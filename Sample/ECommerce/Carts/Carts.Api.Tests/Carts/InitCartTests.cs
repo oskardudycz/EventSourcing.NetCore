@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -20,7 +19,7 @@ namespace Carts.Api.Tests.Carts
 
         public readonly Guid ClientId = Guid.NewGuid();
 
-        public HttpResponseMessage CommandResponse;
+        public HttpResponseMessage CommandResponse = default!;
 
         public override async Task InitializeAsync()
         {
@@ -57,7 +56,7 @@ namespace Carts.Api.Tests.Carts
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldPublish_CartInitializedEvent()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             fixture.PublishedInternalEventsOfType<CartInitialized>()
                 .Should()
@@ -73,7 +72,7 @@ namespace Carts.Api.Tests.Carts
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldCreate_Cart()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             // prepare query
             var query = $"{createdId}";

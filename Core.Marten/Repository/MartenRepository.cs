@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
@@ -23,7 +22,7 @@ namespace Core.Storage
             this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         }
 
-        public Task<T> Find(Guid id, CancellationToken cancellationToken)
+        public Task<T?> Find(Guid id, CancellationToken cancellationToken)
         {
             return documentSession.Events.AggregateStreamAsync<T>(id, token:cancellationToken);
         }

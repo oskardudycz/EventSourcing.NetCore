@@ -12,14 +12,14 @@ namespace MediatR.Tests.Sending
     {
         public class ServiceLocator
         {
-            private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
+            private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
-                => Services.Add(type, implementations.ToList());
+                => services.Add(type, implementations.ToList());
 
             public List<object> Get(Type type)
             {
-                return Services[type];
+                return services[type];
             }
         }
 
@@ -45,16 +45,16 @@ namespace MediatR.Tests.Sending
 
         public class GetIssuesNamesQueryHandler: IRequestHandler<GetIssuesNamesQuery, List<string>>
         {
-            private readonly IssuesList _issuesList;
+            private readonly IssuesList issuesList;
 
             public GetIssuesNamesQueryHandler(IssuesList issuesList)
             {
-                _issuesList = issuesList;
+                this.issuesList = issuesList;
             }
 
             public Task<List<string>> Handle(GetIssuesNamesQuery query, CancellationToken cancellationToken = default)
             {
-                return Task.Run(() => _issuesList.Issues
+                return Task.Run(() => issuesList.Issues
                     .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
                     .ToList(), cancellationToken);
             }
@@ -72,7 +72,7 @@ namespace MediatR.Tests.Sending
             //Registration needed internally by MediatR
             serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<GetIssuesNamesQuery, List<string>>>), new List<IPipelineBehavior<GetIssuesNamesQuery, List<string>>>());
 
-            mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
+            mediator = new Mediator(type => serviceLocator.Get(type).Single());
         }
 
         [Fact]

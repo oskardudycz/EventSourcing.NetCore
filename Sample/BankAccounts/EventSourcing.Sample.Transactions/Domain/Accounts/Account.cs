@@ -12,7 +12,7 @@ namespace EventSourcing.Sample.Transactions.Domain.Accounts
 
         public decimal Balance { get; private set; }
 
-        public string Number { get; private set; }
+        public string Number { get; private set; } = default!;
 
         public Account()
         {
@@ -20,12 +20,11 @@ namespace EventSourcing.Sample.Transactions.Domain.Accounts
 
         public Account(Guid clientId, IAccountNumberGenerator accountNumberGenerator)
         {
-            var @event = new NewAccountCreated
-            {
-                AccountId = Guid.NewGuid(),
-                ClientId = clientId,
-                Number = accountNumberGenerator.Generate()
-            };
+            var @event = new NewAccountCreated(
+                Guid.NewGuid(),
+                clientId,
+                accountNumberGenerator.Generate()
+            );
 
             Apply(@event);
             Enqueue(@event);
@@ -33,7 +32,11 @@ namespace EventSourcing.Sample.Transactions.Domain.Accounts
 
         public void RecordInflow(Guid fromId, decimal amount)
         {
-            var @event = new NewInflowRecorded(fromId, Id, new Inflow(amount, DateTime.Now));
+            var @event = new NewInflowRecorded(
+                fromId,
+                Id,
+                new Inflow(amount, DateTime.Now)
+            );
 
             Apply(@event);
             Enqueue(@event);

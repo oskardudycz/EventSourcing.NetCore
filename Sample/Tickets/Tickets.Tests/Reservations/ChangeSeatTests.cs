@@ -1,6 +1,5 @@
 using System;
 using FluentAssertions;
-using Tickets.Reservations;
 using Tickets.Reservations.Events;
 using Tickets.Tests.Builders;
 using Tickets.Tests.Extensions;
@@ -30,8 +29,9 @@ namespace Tickets.Tests.Reservations
 
             var @event = reservation.PublishedEvent<ReservationSeatChanged>();
 
+            @event.Should().NotBeNull();
             @event.Should().BeOfType<ReservationSeatChanged>();
-            @event.ReservationId.Should().Be(reservation.Id);
+            @event!.ReservationId.Should().Be(reservation.Id);
             @event.SeatId.Should().Be(newSeatId);
         }
     }

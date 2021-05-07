@@ -2,6 +2,7 @@ using System;
 using Dapper.Contrib.Extensions;
 using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
+using Newtonsoft.Json;
 using Npgsql;
 using SimpleMigrations;
 using SimpleMigrations.DatabaseProvider;
@@ -13,11 +14,9 @@ namespace EventStoreBasics.Tests
     {
         public class User: Aggregate
         {
-            public string Name { get; private set; }
+            public string Name { get; private set; } = default!;
 
-            // added only for dapper deserialization needs
-            private User() { }
-
+            [JsonConstructor]
             public User(Guid id, string name)
             {
                 var @event = new UserCreated(id, name);
@@ -46,38 +45,21 @@ namespace EventStoreBasics.Tests
             }
         }
 
-        public class UserCreated
-        {
-            public Guid UserId { get; }
-            public string UserName { get; }
+        public record UserCreated(
+            Guid UserId,
+            string UserName
+        );
 
-            public UserCreated(Guid userId, string userName)
-            {
-                UserId = userId;
-                UserName = userName;
-            }
-        }
-
-        public class UserNameUpdated
-        {
-            public Guid UserId { get; }
-            public string UserName { get; }
-
-            public UserNameUpdated(Guid userId, string userName)
-            {
-                UserId = userId;
-                UserName = userName;
-            }
-        }
+        public record UserNameUpdated(
+            Guid UserId,
+            string UserName
+        );
 
         public class Order: Aggregate
         {
-            public string Number { get; private set; }
+            public string Number { get; private set; } = default!;
 
             public decimal Amount { get; private set; }
-
-            // added only for dapper deserialization needs
-            private Order() { }
 
             public Order(Guid id, Guid userId, string number, decimal price)
             {
@@ -95,37 +77,19 @@ namespace EventStoreBasics.Tests
             }
         }
 
-        public class OrderCreated
-        {
-            public Guid OrderId { get; }
-            public Guid UserId { get; }
-            public string Number { get; }
-            public decimal Amount { get; }
+        public record OrderCreated(
+            Guid OrderId,
+            Guid UserId,
+            string Number,
+            decimal Amount
+        );
 
-            public OrderCreated(Guid orderId, Guid userId, string number, decimal amount)
-            {
-                OrderId = orderId;
-                UserId = userId;
-                Number = number;
-                Amount = amount;
-            }
-        }
-
-        public class UserDashboard
-        {
-            public Guid Id { get; }
-            public string UserName { get; }
-            public int OrdersCount { get; }
-            public decimal TotalAmount { get; }
-
-            public UserDashboard(Guid id, string userName, int ordersCount, decimal totalAmount)
-            {
-                Id = id;
-                UserName = userName;
-                OrdersCount = ordersCount;
-                TotalAmount = totalAmount;
-            }
-        }
+        public record UserDashboard(
+            Guid Id,
+            string UserName,
+            int OrdersCount,
+            decimal TotalAmount
+        );
 
         public class UserDashboardProjection: Projection
         {

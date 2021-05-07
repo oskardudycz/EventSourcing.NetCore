@@ -8,7 +8,6 @@ using Meetings.IntegrationTests.MeetingsManagement;
 using MeetingsManagement.Api;
 using MeetingsManagement.Meetings.Commands;
 using MeetingsManagement.Meetings.Events;
-using MeetingsManagement.Meetings.Queries;
 using MeetingsManagement.Meetings.Views;
 using Xunit;
 
@@ -16,12 +15,12 @@ namespace MeetingsManagement.IntegrationTests.Meetings
 {
     public class CreateMeetingFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = MeetingsManagementApi.MeetingsUrl;
+        protected override string ApiUrl => MeetingsManagementApi.MeetingsUrl;
 
         public readonly Guid MeetingId = Guid.NewGuid();
         public readonly string MeetingName = "Event Sourcing Workshop";
 
-        public HttpResponseMessage CommandResponse;
+        public HttpResponseMessage CommandResponse = default!;
 
         public override async Task InitializeAsync()
         {

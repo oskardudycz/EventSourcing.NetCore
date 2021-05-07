@@ -27,7 +27,7 @@ namespace Shipments
         public static void ConfigureShipmentsModule(this IServiceProvider serviceProvider)
         {
             // Kids, don't try this at production
-            serviceProvider.GetService<ShipmentsDbContext>().Database.Migrate();
+            serviceProvider.GetRequiredService<ShipmentsDbContext>().Database.Migrate();
         }
     }
 }

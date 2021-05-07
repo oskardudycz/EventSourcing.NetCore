@@ -13,25 +13,25 @@ namespace MeetingsManagement.Api.Controllers
     [Route("api/[controller]")]
     public class MeetingsController: Controller
     {
-        private readonly ICommandBus _commandBus;
-        private readonly IQueryBus _queryBus;
+        private readonly ICommandBus commandBus;
+        private readonly IQueryBus queryBus;
 
         public MeetingsController(ICommandBus commandBus, IQueryBus queryBus)
         {
-            _commandBus = commandBus;
-            _queryBus = queryBus;
+            this.commandBus = commandBus;
+            this.queryBus = queryBus;
         }
 
         [HttpGet("{id}")]
         public Task<MeetingView> Get(Guid id)
         {
-            return _queryBus.Send<GetMeeting, MeetingView>(new GetMeeting(id));
+            return queryBus.Send<GetMeeting, MeetingView>(new GetMeeting(id));
         }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]CreateMeeting command)
         {
-            await _commandBus.Send(command);
+            await commandBus.Send(command);
 
             return Created("api/Meetings", command.Id);
         }
@@ -40,7 +40,7 @@ namespace MeetingsManagement.Api.Controllers
         public async Task<IActionResult> Post(Guid id, [FromBody]DateRange occurs)
         {
             var command = new ScheduleMeeting(id, occurs);
-            await _commandBus.Send(command);
+            await commandBus.Send(command);
 
             return Ok();
         }

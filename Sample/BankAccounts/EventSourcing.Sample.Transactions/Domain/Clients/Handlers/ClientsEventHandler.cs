@@ -13,7 +13,7 @@ namespace EventSourcing.Sample.Transactions.Domain.Clients.Handlers
     {
         private readonly IDocumentSession session;
 
-        private Marten.Events.IEventStore store => session.Events;
+        private Marten.Events.IEventStore Store => session.Events;
 
         public ClientsEventHandler(IDocumentSession session)
         {
@@ -22,19 +22,19 @@ namespace EventSourcing.Sample.Transactions.Domain.Clients.Handlers
 
         public Task Handle(ClientCreated @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            store.Append(@event.ClientId, @event);
+            Store.Append(@event.ClientId, @event);
             return session.SaveChangesAsync(cancellationToken);
         }
 
         public Task Handle(ClientUpdated @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            store.Append(@event.ClientId, @event);
+            Store.Append(@event.ClientId, @event);
             return session.SaveChangesAsync(cancellationToken);
         }
 
         public Task Handle(ClientDeleted @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            store.Append(@event.ClientId, @event);
+            Store.Append(@event.ClientId, @event);
             return session.SaveChangesAsync(cancellationToken);
         }
     }

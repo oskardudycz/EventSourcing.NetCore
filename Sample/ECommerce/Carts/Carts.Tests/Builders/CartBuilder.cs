@@ -6,7 +6,7 @@ namespace Carts.Tests.Builders
 {
     internal class CartBuilder
     {
-        private Func<Cart> build  = () => null;
+        private Func<Cart> build  = () => new Cart();
 
         public CartBuilder Initialized()
         {
@@ -24,7 +24,7 @@ namespace Carts.Tests.Builders
             return this;
         }
 
-        public static CartBuilder Create() => new CartBuilder();
+        public static CartBuilder Create() => new();
 
         public Cart Build()
         {

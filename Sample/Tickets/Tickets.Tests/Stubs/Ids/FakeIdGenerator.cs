@@ -1,5 +1,4 @@
 using System;
-using Core.Aggregates;
 using Core.Ids;
 
 namespace Tickets.Tests.Stubs.Ids

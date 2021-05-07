@@ -16,7 +16,7 @@ namespace Carts.Carts
 
         public CartStatus Status { get; private set; }
 
-        public IList<PricedProductItem> ProductItems { get; private set; }
+        public IList<PricedProductItem> ProductItems { get; private set; } = default!;
 
         public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 
@@ -121,6 +121,9 @@ namespace Carts.Carts
 
             var existingProductItem = FindProductItemMatchingWith(@event.ProductItem);
 
+            if (existingProductItem == null)
+                return;
+
             if (existingProductItem.HasTheSameQuantity(productItemToBeRemoved))
             {
                 ProductItems.Remove(existingProductItem);
@@ -151,7 +154,7 @@ namespace Carts.Carts
             Status = CartStatus.Confirmed;
         }
 
-        private PricedProductItem FindProductItemMatchingWith(PricedProductItem productItem)
+        private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)
         {
             return ProductItems
                 .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));

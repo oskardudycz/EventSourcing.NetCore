@@ -1,14 +1,13 @@
 using System;
 using Core.Aggregates;
 using Tickets.Reservations;
-using Tickets.Tests.Stubs.Ids;
 using Tickets.Tests.Stubs.Reservations;
 
 namespace Tickets.Tests.Builders
 {
     internal class ReservationBuilder
     {
-        private Func<Reservation> build  = () => null;
+        private Func<Reservation> build  = () => new Reservation();
 
         public ReservationBuilder Tentative()
         {

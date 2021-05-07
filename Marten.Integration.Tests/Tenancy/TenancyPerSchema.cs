@@ -8,25 +8,25 @@ namespace Marten.Integration.Tests.Tenancy
 {
     public interface ITenancyPerSchemaStoreFactory
     {
-        IDocumentStore Get(string tenantId);
+        IDocumentStore Get(string? tenantId);
     }
 
     public class TenancyPerSchemaStoreFactory : IDisposable, ITenancyPerSchemaStoreFactory
     {
         private readonly Action<string, StoreOptions> configure;
-        private readonly ConcurrentDictionary<string, DocumentStore> stores = new ConcurrentDictionary<string, DocumentStore>();
+        private readonly ConcurrentDictionary<string, DocumentStore> stores = new ();
 
         public TenancyPerSchemaStoreFactory(Action<string, StoreOptions> configure)
         {
             this.configure = configure;
         }
 
-        public IDocumentStore Get(string tenant)
+        public IDocumentStore Get(string? tenant)
         {
-            return stores.GetOrAdd(tenant, (tenantId) =>
+            return stores.GetOrAdd(tenant ?? "NO-TENANT", tenantId =>
             {
                 var storeOptions = new StoreOptions();
-                configure?.Invoke(tenantId, storeOptions);
+                configure.Invoke(tenantId, storeOptions);
                 return new DocumentStore(storeOptions);
             });
         }
@@ -43,7 +43,7 @@ namespace Marten.Integration.Tests.Tenancy
     public class DummyTenancyContext
     {
         // this should be normally taken from the http context or other
-        public string TenantId { get; set; }
+        public string? TenantId { get; set; }
     }
 
     public class TenancyPerSchemaSessionFactory: ISessionFactory
@@ -68,11 +68,10 @@ namespace Marten.Integration.Tests.Tenancy
         }
     }
 
-    public class TestDocumentForTenancy
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-    }
+    public record TestDocumentForTenancy(
+        Guid Id,
+        string Name
+    );
 
     public class TenancyPerSchema
     {
@@ -95,7 +94,7 @@ namespace Marten.Integration.Tests.Tenancy
 
                     using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
                     {
-                        session.Insert(new TestDocumentForTenancy{ Id = Guid.NewGuid(), Name = FirstTenant});
+                        session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), FirstTenant));
                         session.SaveChanges();
                     }
                 }
@@ -107,7 +106,7 @@ namespace Marten.Integration.Tests.Tenancy
 
                     using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
                     {
-                        session.Insert(new TestDocumentForTenancy {Id = Guid.NewGuid(), Name = SecondTenant});
+                        session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), SecondTenant));
                         session.SaveChanges();
                     }
                 }

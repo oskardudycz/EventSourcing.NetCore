@@ -4,9 +4,6 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Core.Queries;
 using Marten;
-using Marten.Linq;
-using Marten.Pagination;
-using MediatR;
 using SmartHome.Temperature.TemperatureMeasurements.Queries;
 
 namespace SmartHome.Temperature.TemperatureMeasurements

@@ -14,7 +14,7 @@ namespace EventStoreBasics.Tests
     {
         class User : Aggregate
         {
-            public string Name { get; private set; }
+            public string Name { get; private set; } = default!;
 
             // added only for dapper deserialization needs
             private User() {}
@@ -74,7 +74,7 @@ namespace EventStoreBasics.Tests
 
         class Order : Aggregate
         {
-            public string Number { get; private set; }
+            public string Number { get; private set; } = default!;
 
             public decimal Amount { get; private set; }
 

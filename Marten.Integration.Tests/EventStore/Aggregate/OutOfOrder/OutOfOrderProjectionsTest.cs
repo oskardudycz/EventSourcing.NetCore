@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Marten.Integration.Tests.TestsInfrasructure;
+using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
 using Xunit;
 
@@ -9,65 +8,45 @@ namespace Marten.Integration.Tests.EventStore.Projections
 {
     public class OutOfOrderProjectionsTest: MartenTest
     {
-        public interface IIssueEvent
-        {
-            Guid IssueId { get; set; }
+        public record IssueCreated(
+            Guid IssueId,
+            string Description,
+            int IssueVersion
+        );
 
-            int IssueVersion { get; set; }
-        }
+        public record IssueUpdated(
+            Guid IssueId,
+            string Description,
+            int IssueVersion
+        );
 
-        public class IssueCreated: IIssueEvent
-        {
-            public Guid IssueId { get; set; }
-            public string Description { get; set; }
-
-            public int IssueVersion { get; set; }
-        }
-
-        public class IssueUpdated: IIssueEvent
-        {
-            public Guid IssueId { get; set; }
-            public string Description { get; set; }
-
-            public int IssueVersion { get; set; }
-        }
-
-        public class Issue
-        {
-            public Guid IssueId { get; set; }
-
-            public string Description { get; set; }
-        }
+        public record Issue(
+            Guid IssueId,
+            string Description
+        );
 
         public class IssuesList
         {
             public Guid Id { get; set; }
-            public List<Issue> List { get; private set; }
-
-            public IssuesList()
-            {
-                List = new List<Issue>();
-            }
+            public Dictionary<Guid, Issue> Issues { get; } = new();
 
             public void Apply(IssueCreated @event)
             {
-                List.Add(new Issue { IssueId = @event.IssueId, Description = @event.Description });
+                var (issueId, description, _) = @event;
+                Issues.Add(issueId, new Issue(issueId, description));
             }
 
             public void Apply(IssueUpdated @event)
             {
-                var issue = List.SingleOrDefault(t => t.IssueId == @event.IssueId);
-
-                if (issue == null)
-                {
+                if (!Issues.ContainsKey(@event.IssueId))
                     return;
-                }
 
-                issue.Description = @event.Description;
+                Issues[@event.IssueId] = Issues[@event.IssueId]
+                    with {Description = @event.Description};
             }
         }
 
-        protected override IDocumentSession CreateSession(Action<StoreOptions> setStoreOptions)
+        protected override IDocumentSession CreateSession(Action<StoreOptions>? setStoreOptions = null)
         {
             var store = DocumentStore.For(options =>
             {
@@ -76,7 +55,7 @@ namespace Marten.Integration.Tests.EventStore.Projections
                 options.DatabaseSchemaName = SchemaName;
                 options.Events.DatabaseSchemaName = SchemaName;
 
-                //It's needed to manualy set that inline aggegation should be applied
+                //It's needed to manually set that inline aggregation should be applied
                 options.Events.Projections.SelfAggregate<IssuesList>();
             });
 
@@ -89,13 +68,13 @@ namespace Marten.Integration.Tests.EventStore.Projections
             var firstTaskId = Guid.NewGuid();
             var secondTaskId = Guid.NewGuid();
 
-            var events = new IIssueEvent[]
+            var events = new object[]
             {
-                new IssueUpdated {IssueId = firstTaskId, Description = "Final First Issue Description", IssueVersion = 4 },
-                new IssueCreated {IssueId = firstTaskId, Description = "First Issue", IssueVersion = 1 },
-                new IssueCreated {IssueId = secondTaskId, Description = "Second Issue 2", IssueVersion = 2 },
-                new IssueUpdated {IssueId = firstTaskId, Description = "Intermediate First Issue Description", IssueVersion = 3},
-                new IssueUpdated {IssueId = secondTaskId, Description = "Final Second Issue Description", IssueVersion = 5},
+                new IssueUpdated(firstTaskId,  "Final First Issue Description", 4),
+                new IssueCreated(firstTaskId,  "First Issue", 1),
+                new IssueCreated(secondTaskId, "Second Issue 2", 2),
+                new IssueUpdated(firstTaskId,  "Intermediate First Issue Description", 3),
+                new IssueUpdated(secondTaskId, "Final Second Issue Description", 4),
             };
 
             //1. Create events
@@ -112,8 +91,8 @@ namespace Marten.Integration.Tests.EventStore.Projections
             issuesListFromLiveAggregation.Should().Not.Be.Null();
             issuesListFromInlineAggregation.Should().Not.Be.Null();
 
-            issuesListFromLiveAggregation.List.Count.Should().Be.EqualTo(2);
-            issuesListFromLiveAggregation.List.Count.Should().Be.EqualTo(issuesListFromInlineAggregation.List.Count);
+            issuesListFromLiveAggregation!.Issues.Count.Should().Be.EqualTo(2);
+            issuesListFromLiveAggregation!.Issues.Count.Should().Be.EqualTo(issuesListFromInlineAggregation!.Issues.Count);
         }
     }
 }

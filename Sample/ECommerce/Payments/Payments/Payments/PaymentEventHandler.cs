@@ -34,7 +34,7 @@ namespace Payments.Payments
 
             var externalEvent = PaymentFinalized.Create(
                 @event.PaymentId,
-                payment.OrderId,
+                payment!.OrderId,
                 payment.Amount,
                 @event.CompletedAt
             );
@@ -48,7 +48,7 @@ namespace Payments.Payments
 
             var externalEvent = PaymentFailed.Create(
                 @event.PaymentId,
-                payment.OrderId,
+                payment!.OrderId,
                 payment.Amount,
                 @event.DiscardedAt,
                 PaymentFailReason.Discarded
@@ -63,7 +63,7 @@ namespace Payments.Payments
 
             var externalEvent = PaymentFailed.Create(
                 @event.PaymentId,
-                payment.OrderId,
+                payment!.OrderId,
                 payment.Amount,
                 @event.TimedOutAt,
                 PaymentFailReason.Discarded

@@ -8,8 +8,8 @@ using Core.Testing;
 using FluentAssertions;
 using Shipments.Api.Tests.Core;
 using Shipments.Packages;
-using Shipments.Packages.Commands;
 using Shipments.Packages.Events.External;
+using Shipments.Packages.Requests;
 using Shipments.Products;
 using Xunit;
 
@@ -37,11 +37,11 @@ namespace Shipments.Api.Tests.Packages
             }
         };
 
-        public HttpResponseMessage CommandResponse;
+        public HttpResponseMessage CommandResponse = default!;
 
         public override async Task InitializeAsync()
         {
-            CommandResponse = await PostAsync(new SendPackage {OrderId = OrderId, ProductItems = ProductItems});
+            CommandResponse = await PostAsync(new SendPackage(OrderId, ProductItems));
         }
     }
 
@@ -74,7 +74,7 @@ namespace Shipments.Api.Tests.Packages
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldPublish_PackageWasSentEvent()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             fixture.PublishedInternalEventsOfType<PackageWasSent>()
                 .Should()
@@ -94,7 +94,7 @@ namespace Shipments.Api.Tests.Packages
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldCreate_Package()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             // prepare query
             var query = $"{createdId}";

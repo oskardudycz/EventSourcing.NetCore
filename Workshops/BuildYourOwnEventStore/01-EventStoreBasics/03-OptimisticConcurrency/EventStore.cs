@@ -28,13 +28,13 @@ namespace EventStoreBasics
             var eventId = Guid.NewGuid();
 
             //2. Serialize event data to JSON
-            string eventData = null; // TODO: Add here @event serialization
+            string eventData = null!; // TODO: Add here @event serialization
 
             //3. Send event type
-            string eventType = null; // TODO: Add here getting event type name
+            string eventType = null!; // TODO: Add here getting event type name
 
             //4. Send stream type
-            string streamType = null; // TODO: Add here getting stream type
+            string streamType = null!; // TODO: Add here getting stream type
 
             return databaseConnection.QuerySingle<bool>(
                 "SELECT append_event(@Id, @Data::jsonb, @Type, @StreamId, @StreamType, @ExpectedVersion)",
@@ -53,18 +53,18 @@ namespace EventStoreBasics
 
         private void CreateStreamsTable()
         {
-            const string CreatStreamsTableSQL =
+            const string creatStreamsTableSql =
                 @"CREATE TABLE IF NOT EXISTS streams(
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       type           TEXT                      NOT NULL,
                       version        BIGINT                    NOT NULL
                   );";
-            databaseConnection.Execute(CreatStreamsTableSQL);
+            databaseConnection.Execute(creatStreamsTableSql);
         }
 
         private void CreateEventsTable()
         {
-            const string CreatEventsTableSQL =
+            const string creatEventsTableSql =
                 @"CREATE TABLE IF NOT EXISTS events(
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       data           JSONB                     NOT NULL,
@@ -75,12 +75,12 @@ namespace EventStoreBasics
                       FOREIGN KEY(stream_id) REFERENCES streams(id),
                       CONSTRAINT events_stream_and_version UNIQUE(stream_id, version)
                 );";
-            databaseConnection.Execute(CreatEventsTableSQL);
+            databaseConnection.Execute(creatEventsTableSql);
         }
 
         private void CreateAppendEventFunction()
         {
-            const string AppendEventFunctionSQL =
+            const string appendEventFunctionSql =
                 @"CREATE OR REPLACE FUNCTION append_event(id uuid, data jsonb, type text, stream_id uuid, stream_type text, expected_stream_version bigint default null) RETURNS boolean
                 LANGUAGE plpgsql
                 AS $$
@@ -108,7 +108,7 @@ namespace EventStoreBasics
                     RETURN TRUE;
                 END;
                 $$;";
-            databaseConnection.Execute(AppendEventFunctionSQL);
+            databaseConnection.Execute(appendEventFunctionSql);
         }
 
         public void Dispose()

@@ -10,14 +10,14 @@ namespace MediatR.Tests.Sending
     {
         public class ServiceLocator
         {
-            private readonly Dictionary<Type, List<object>> Services = new Dictionary<Type, List<object>>();
+            private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
 
             public void Register(Type type, params object[] implementations)
-                => Services.Add(type, implementations.ToList());
+                => services.Add(type, implementations.ToList());
 
             public List<object> Get(Type type)
             {
-                return Services[type];
+                return services[type];
             }
         }
 
@@ -48,7 +48,7 @@ namespace MediatR.Tests.Sending
             {
                 //Given
                 var serviceLocator = new ServiceLocator();
-                var mediator = new Mediator(type => serviceLocator.Get(type).FirstOrDefault());
+                var mediator = new Mediator(type => serviceLocator.Get(type).Single());
 
                 var @event = new IssueCreated("cleaning");
 

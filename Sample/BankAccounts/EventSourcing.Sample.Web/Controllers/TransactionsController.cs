@@ -11,20 +11,20 @@ namespace EventSourcing.Sample.Web.Controllers
     [Route("api/[controller]")]
     public class TransactionsController: Controller
     {
-        private readonly ICommandBus _commandBus;
-        private readonly IQueryBus _queryBus;
+        private readonly ICommandBus commandBus;
+        private readonly IQueryBus queryBus;
 
         public TransactionsController(ICommandBus commandBus, IQueryBus queryBus)
         {
-            _commandBus = commandBus;
-            _queryBus = queryBus;
+            this.commandBus = commandBus;
+            this.queryBus = queryBus;
         }
 
         // POST api/values
         [HttpPost]
         public Task Post([FromBody]MakeTransfer command)
         {
-            return _commandBus.Send(command);
+            return commandBus.Send(command);
         }
     }
 }

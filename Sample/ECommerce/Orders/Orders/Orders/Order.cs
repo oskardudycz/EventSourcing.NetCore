@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Core.Aggregates;
 using Orders.Orders.Enums;
 using Orders.Orders.Events;
-using Orders.Products;
 using Orders.Products.ValueObjects;
 
 namespace Orders.Orders
@@ -12,9 +11,9 @@ namespace Orders.Orders
     {
         public Guid? ClientId { get; private set; }
 
-        public IReadOnlyList<PricedProductItem> ProductItems { get; private set; }
+        public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = default!;
 
-        public decimal TotalPrice { get; private set; }
+        public decimal TotalPrice { get; private set; } = 0;
 
         public OrderStatus Status { get; private set; }
 

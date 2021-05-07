@@ -21,7 +21,7 @@ namespace Payments.Api.Tests.Payments
 
         public readonly DateTime TimeBeforeSending = DateTime.UtcNow;
 
-        public HttpResponseMessage CommandResponse;
+        public HttpResponseMessage CommandResponse = default!;
 
         public override async Task InitializeAsync()
         {
@@ -58,7 +58,7 @@ namespace Payments.Api.Tests.Payments
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldPublish_PaymentInitializedEvent()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             fixture.PublishedInternalEventsOfType<PaymentRequested>()
                 .Should()

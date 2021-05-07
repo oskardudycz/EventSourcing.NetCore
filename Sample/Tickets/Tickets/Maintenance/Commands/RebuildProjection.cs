@@ -1,3 +1,4 @@
+using System;
 using Ardalis.GuardClauses;
 using Core.Commands;
 
@@ -13,9 +14,10 @@ namespace Tickets.Maintenance.Commands
         }
 
 
-        public static RebuildProjection Create(string viewName)
+        public static RebuildProjection Create(string? viewName)
         {
-            Guard.Against.NullOrEmpty(viewName, nameof(viewName));
+            if (viewName == null)
+                throw new ArgumentNullException(nameof(viewName));
 
             return new RebuildProjection(viewName);
         }

@@ -11,16 +11,16 @@ namespace EventSourcing.Sample.Transactions.Views.Accounts.Handlers
 {
     public class GetAccountsHandler: IQueryHandler<GetAccounts, IEnumerable<Contracts.Accounts.ValueObjects.AccountSummary>>
     {
-        private readonly IDocumentSession _session;
+        private readonly IDocumentSession session;
 
         public GetAccountsHandler(IDocumentSession session)
         {
-            _session = session;
+            this.session = session;
         }
 
         public async Task<IEnumerable<Contracts.Accounts.ValueObjects.AccountSummary>> Handle(GetAccounts message, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = await _session.Query<AccountSummaryView>()
+            var result = await session.Query<AccountSummaryView>()
                 .Select(
                     a => new Contracts.Accounts.ValueObjects.AccountSummary
                     {

@@ -27,8 +27,9 @@ namespace Tickets.Tests.Reservations
 
             var @event = reservation.PublishedEvent<ReservationCancelled>();
 
+            @event.Should().NotBeNull();
             @event.Should().BeOfType<ReservationCancelled>();
-            @event.ReservationId.Should().Be(reservation.Id);
+            @event!.ReservationId.Should().Be(reservation.Id);
         }
 
         [Fact]

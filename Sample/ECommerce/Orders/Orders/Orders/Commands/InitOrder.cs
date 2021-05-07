@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Ardalis.GuardClauses;
 using Core.Commands;
-using Orders.Products;
 using Orders.Products.ValueObjects;
 
 namespace Orders.Orders.Commands
@@ -11,9 +10,7 @@ namespace Orders.Orders.Commands
     {
         public Guid OrderId { get; }
         public Guid ClientId { get; }
-
         public IReadOnlyList<PricedProductItem> ProductItems { get; }
-
         public decimal TotalPrice { get; }
 
         private InitOrder(
@@ -29,18 +26,22 @@ namespace Orders.Orders.Commands
         }
 
         public static InitOrder Create(
-            Guid orderId,
-            Guid clientId,
-            IReadOnlyList<PricedProductItem> productItems,
-            decimal totalPrice
+            Guid? orderId,
+            Guid? clientId,
+            IReadOnlyList<PricedProductItem>? productItems,
+            decimal? totalPrice
         )
         {
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.Default(clientId, nameof(clientId));
-            Guard.Against.NullOrEmpty(productItems, nameof(productItems));
-            Guard.Against.NegativeOrZero(totalPrice, nameof(totalPrice));
+            if (!orderId.HasValue)
+                throw new ArgumentNullException(nameof(orderId));
+            if (!clientId.HasValue)
+                throw new ArgumentNullException(nameof(clientId));
+            if (productItems == null)
+                throw new ArgumentNullException(nameof(productItems));
+            if (!totalPrice.HasValue)
+                throw new ArgumentNullException(nameof(productItems));
 
-            return new InitOrder(orderId, clientId, productItems, totalPrice);
+            return new InitOrder(orderId.Value, clientId.Value, productItems, totalPrice.Value);
         }
     }
 }

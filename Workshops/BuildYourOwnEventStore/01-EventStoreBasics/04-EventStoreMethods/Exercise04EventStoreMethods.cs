@@ -9,35 +9,20 @@ namespace EventStoreBasics.Tests
 {
     public class Exercise04EventStoreMethods
     {
-        public class User
-        {
-            public Guid Id { get; set; }
-            public string Name { get; set; }
-        }
+        public record User(
+            Guid Id,
+            string UserName
+        );
 
-        public class UserCreated
-        {
-            public Guid UserId { get; }
-            public string UserName { get; }
+        public record UserCreated(
+            Guid UserId,
+            string UserName
+        );
 
-            public UserCreated(Guid userId, string userName)
-            {
-                UserId = userId;
-                UserName = userName;
-            }
-        }
-
-        public class UserNameUpdated
-        {
-            public Guid UserId { get; }
-            public string UserName { get; }
-
-            public UserNameUpdated(Guid userId, string userName)
-            {
-                UserId = userId;
-                UserName = userName;
-            }
-        }
+        public record UserNameUpdated(
+            Guid UserId,
+            string UserName
+        );
 
         private readonly NpgsqlConnection databaseConnection;
         private readonly EventStore eventStore;

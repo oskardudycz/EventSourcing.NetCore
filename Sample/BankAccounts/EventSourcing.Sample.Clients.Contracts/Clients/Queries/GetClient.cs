@@ -3,20 +3,13 @@ using Core.Queries;
 
 namespace EventSourcing.Sample.Clients.Contracts.Clients.Queries
 {
-    public class ClientItem
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-    }
+    public record ClientItem(
+        Guid Id,
+        string Name,
+        string Email
+    );
 
-    public class GetClient: IQuery<ClientItem>
-    {
-        public Guid Id { get; }
-
-        public GetClient(Guid id)
-        {
-            Id = id;
-        }
-    }
+    public record GetClient(
+        Guid Id
+    ): IQuery<ClientItem>;
 }

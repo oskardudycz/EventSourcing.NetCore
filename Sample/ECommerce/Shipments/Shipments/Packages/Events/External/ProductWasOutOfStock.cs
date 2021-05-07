@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using Core.Events;
-using Shipments.Products;
 
 namespace Shipments.Packages.Events.External
 {

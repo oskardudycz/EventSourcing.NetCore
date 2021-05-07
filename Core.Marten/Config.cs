@@ -11,7 +11,7 @@ namespace Core.Marten
     {
         private const string DefaultSchema = "public";
 
-        public string ConnectionString { get; set; }
+        public string ConnectionString { get; set; } = default!;
 
         public string WriteModelSchema { get; set; } = DefaultSchema;
         public string ReadModelSchema { get; set; } = DefaultSchema;
@@ -26,7 +26,7 @@ namespace Core.Marten
         private const string DefaultConfigKey = "EventStore";
 
         public static IServiceCollection AddMarten(this IServiceCollection services, IConfiguration config,
-            Action<StoreOptions> configureOptions = null)
+            Action<StoreOptions>? configureOptions = null)
         {
             var martenConfig = config.GetSection(DefaultConfigKey).Get<Config>();
 
@@ -49,7 +49,7 @@ namespace Core.Marten
         }
 
         private static void SetStoreOptions(StoreOptions options, Config config,
-            Action<StoreOptions> configureOptions = null)
+            Action<StoreOptions>? configureOptions = null)
         {
             options.Connection(config.ConnectionString);
             options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;

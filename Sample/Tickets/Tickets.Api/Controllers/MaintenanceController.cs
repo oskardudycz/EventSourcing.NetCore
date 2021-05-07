@@ -1,11 +1,9 @@
-using System;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Core.Commands;
 using Microsoft.AspNetCore.Mvc;
 using Tickets.Api.Requests;
 using Tickets.Maintenance.Commands;
-using Tickets.Reservations.Events;
 
 namespace Tickets.Api.Controllers
 {

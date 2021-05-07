@@ -1,10 +1,7 @@
 using System;
 using FluentAssertions;
 using Tickets.Reservations;
-using Tickets.Reservations.Events;
-using Tickets.Tests.Extensions;
 using Tickets.Tests.Extensions.Reservations;
-using Tickets.Tests.Stubs.Ids;
 using Tickets.Tests.Stubs.Reservations;
 using Xunit;
 

@@ -1,7 +1,7 @@
 using System;
 using Core.Commands;
 
-namespace Tickets.Reservations.Events
+namespace Tickets.Reservations.Commands
 {
     public class ConfirmReservation : ICommand
     {
@@ -12,9 +12,12 @@ namespace Tickets.Reservations.Events
             ReservationId = reservationId;
         }
 
-        public static ConfirmReservation Create(Guid reservationId)
+        public static ConfirmReservation Create(Guid? reservationId)
         {
-            return new ConfirmReservation(reservationId);
+            if (!reservationId.HasValue)
+                throw new ArgumentNullException(nameof(reservationId));
+
+            return new ConfirmReservation(reservationId.Value);
         }
     }
 }

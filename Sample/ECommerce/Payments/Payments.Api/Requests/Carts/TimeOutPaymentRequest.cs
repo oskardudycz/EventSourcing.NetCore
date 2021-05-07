@@ -1,5 +1,4 @@
 using System;
-using Core.Commands;
 
 namespace Payments.Api.Requests.Carts
 {

@@ -43,14 +43,14 @@ namespace Core.Tests
     public class Invoice: Aggregate<string>
     {
         public double Amount { get; private set; }
-        public string Number { get; private set; }
+        public string Number { get; private set; } = default!;
 
         public InvoiceStatus Status { get; private set; }
 
-        public Person IssuedTo { get; private set; }
+        public Person IssuedTo { get; private set; } = default!;
         public DateTime InitiatedAt { get; private set; }
 
-        public string IssuedBy { get; private set; }
+        public string? IssuedBy { get; private set; }
         public DateTime IssuedAt { get; private set; }
 
         public InvoiceSendMethod SentVia { get; private set; }

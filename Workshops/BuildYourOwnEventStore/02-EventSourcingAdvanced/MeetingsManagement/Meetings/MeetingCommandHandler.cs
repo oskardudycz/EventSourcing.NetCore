@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Exceptions;
 using Core.Repositories;
 using MediatR;
 using MeetingsManagement.Meetings.Commands;
@@ -32,7 +33,8 @@ namespace MeetingsManagement.Meetings
 
         public async Task<Unit> Handle(ScheduleMeeting request, CancellationToken cancellationToken)
         {
-            var meeting = await repository.Find(request.MeetingId, cancellationToken);
+            var meeting = await repository.Find(request.MeetingId, cancellationToken)
+                ?? throw AggregateNotFoundException.For<Meeting>(request.MeetingId);
 
             meeting.Schedule(request.Occurs);
 

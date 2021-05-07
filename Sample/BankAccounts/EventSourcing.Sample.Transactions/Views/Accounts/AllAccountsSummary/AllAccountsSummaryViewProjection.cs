@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using EventSourcing.Sample.Transactions.Contracts.Accounts.Events;
 using EventSourcing.Sample.Transactions.Contracts.Transactions.Events;
 using Marten;

@@ -11,7 +11,7 @@ namespace EventStoreBasics
 
     public abstract class Projection: IProjection
     {
-        public Type[] Handles { get; set; }
+        public Type[] Handles { get; set; } = default!;
 
         protected void Projects<TEvent>(Action<TEvent> action)
         {

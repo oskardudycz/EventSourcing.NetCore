@@ -17,11 +17,15 @@ namespace Orders.Orders.Commands
             CancellationReason = cancellationReason;
         }
 
-        public static CancelOrder Create(Guid orderId, OrderCancellationReason cancellationReason)
+        public static CancelOrder Create(Guid? orderId, OrderCancellationReason? cancellationReason)
         {
-            Guard.Against.Default(orderId, nameof(orderId));
+            if (!orderId.HasValue)
+                throw new ArgumentNullException(nameof(orderId));
 
-            return new CancelOrder(orderId, cancellationReason);
+            if (!cancellationReason.HasValue)
+                throw new ArgumentNullException(nameof(cancellationReason));
+
+            return new CancelOrder(orderId.Value, cancellationReason.Value);
         }
     }
 }

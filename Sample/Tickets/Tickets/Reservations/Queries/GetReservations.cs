@@ -1,4 +1,3 @@
-using System;
 using Ardalis.GuardClauses;
 using Core.Queries;
 using Marten.Pagination;

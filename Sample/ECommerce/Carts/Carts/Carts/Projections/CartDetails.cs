@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ardalis.GuardClauses;
 using Carts.Carts.Events;
 using Carts.Carts.ValueObjects;
-using Carts.Pricing;
 using Core.Extensions;
 using Marten.Events.Aggregation;
-using Marten.Events.Projections;
 
 namespace Carts.Carts.Projections
 {
@@ -18,7 +15,7 @@ namespace Carts.Carts.Projections
 
         public CartStatus Status { get; set; }
 
-        public IList<PricedProductItem> ProductItems { get; set; }
+        public IList<PricedProductItem> ProductItems { get; set; } = default!;
 
         public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 
@@ -62,6 +59,9 @@ namespace Carts.Carts.Projections
 
             var existingProductItem = FindProductItemMatchingWith(@event.ProductItem);
 
+            if(existingProductItem == null)
+                return;
+
             if (existingProductItem.HasTheSameQuantity(productItemToBeRemoved))
             {
                 ProductItems.Remove(existingProductItem);
@@ -81,7 +81,7 @@ namespace Carts.Carts.Projections
             Status = CartStatus.Confirmed;
         }
 
-        private PricedProductItem FindProductItemMatchingWith(PricedProductItem productItem)
+        private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)
         {
             return ProductItems
                 .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));

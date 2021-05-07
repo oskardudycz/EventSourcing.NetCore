@@ -1,5 +1,4 @@
 using Core.Marten;
-using Core.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tickets.Maintenance;

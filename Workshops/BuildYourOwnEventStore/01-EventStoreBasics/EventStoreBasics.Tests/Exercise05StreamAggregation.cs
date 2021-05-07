@@ -12,7 +12,7 @@ namespace EventStoreBasics.Tests
         class User
         {
             public Guid Id { get; private set; }
-            public string Name { get; private set; }
+            public string Name { get; private set; } = default!;
             public long Version { get; private set; }
 
             public User(Guid id, string name)
