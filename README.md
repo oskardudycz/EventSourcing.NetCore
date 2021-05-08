@@ -488,24 +488,24 @@ I prepared the self-paced training Kit for the Event Sourcing. See more in the [
 
 It's split into two parts:
 
-**Event Sourcing basics** - it teaches the event store basics by showing how to build your Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projections, snapshots, and finishes with the `Marten` basics. See more in [here](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/).
+**Event Sourcing basics** - it teaches the event store basics by showing how to build your Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projections, snapshots, and finishes with the `Marten` basics. See more in [here](./Workshops/BuildYourOwnEventStore/).
 
-1. [Streams Table](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/01-CreateStreamsTable)
-2. [Events Table](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/02-CreateEventsTable)
-3. [Appending Events](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/03-CreateAppendEventFunction)
-4. [Optimistic Concurrency Handling](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/03-OptimisticConcurrency)
-5. [Event Store Methods](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/04-EventStoreMethods)
-6. [Stream Aggregation](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/05-StreamAggregation)
-7. [Time Travelling](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/06-TimeTraveling)
-8. [Aggregate and Repositories](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/07-AggregateAndRepository)
-9. [Snapshots](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/08-Snapshots)
-10. [Projections](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/09-Projections)
-11. [Projections With Marten](./Workshops/BuildYourOwnEventStore/01-EventStoreBasics/10-ProjectionsWithMarten)
+1. [Streams Table](./Workshops/BuildYourOwnEventStore/01-CreateStreamsTable)
+2. [Events Table](./Workshops/BuildYourOwnEventStore/02-CreateEventsTable)
+3. [Appending Events](./Workshops/BuildYourOwnEventStore/03-CreateAppendEventFunction)
+4. [Optimistic Concurrency Handling](./Workshops/BuildYourOwnEventStore/03-OptimisticConcurrency)
+5. [Event Store Methods](./Workshops/BuildYourOwnEventStore/04-EventStoreMethods)
+6. [Stream Aggregation](./Workshops/BuildYourOwnEventStore/05-StreamAggregation)
+7. [Time Travelling](./Workshops/BuildYourOwnEventStore/06-TimeTraveling)
+8. [Aggregate and Repositories](./Workshops/BuildYourOwnEventStore/07-AggregateAndRepository)
+9. [Snapshots](./Workshops/BuildYourOwnEventStore/08-Snapshots)
+10. [Projections](./Workshops/BuildYourOwnEventStore/09-Projections)
+11. [Projections With Marten](./Workshops/BuildYourOwnEventStore/10-ProjectionsWithMarten)
 
 **Event Sourcing advanced topics** - it's a real-world sample of the microservices written in Event-Driven design. It explains the topics of modularity, eventual consistency. Shows practical usage of WebApi, Marten as Event Store, Kafka as Event bus and ElasticSearch as one of the read stores. See more in [here](./Workshops/BuildYourOwnEventStore/02-EventSourcingAdvanced/).
 
-1. [Meetings Management Module](./Workshops/BuildYourOwnEventStore/02-EventSourcingAdvanced/MeetingsManagement) - the module responsible for creating, updating meeting details. Written in `Marten` in **Event Sourcing** pattern. Provides both write model (with Event Sourced aggregates) and read model with projections.
-2. [Meetings Search Module](./Workshops/BuildYourOwnEventStore/02-EventSourcingAdvanced/MeetingsSearch) - responsible for searching and advanced filtering. Uses `ElasticSearch` as storage (because of its advanced searching capabilities). It's a read module that's listening for the events published by the Meetings Management Module.
+1. [Meetings Management Module](./Workshops/Sample/MeetingsManagement) - the module responsible for creating, updating meeting details. Written in `Marten` in **Event Sourcing** pattern. Provides both write model (with Event Sourced aggregates) and read model with projections.
+2. [Meetings Search Module](./Workshops/Sample/MeetingsSearch) - responsible for searching and advanced filtering. Uses `ElasticSearch` as storage (because of its advanced searching capabilities). It's a read module that's listening for the events published by the Meetings Management Module.
 
 ## 11. NuGet packages to help you get started.
 
