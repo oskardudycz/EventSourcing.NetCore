@@ -12,7 +12,7 @@ namespace MediatR.Tests.Sending
     {
         public class ServiceLocator
         {
-            private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
+            private readonly Dictionary<Type, List<object>> services = new();
 
             public void Register(Type type, params object[] implementations)
                 => services.Add(type, implementations.ToList());
@@ -71,7 +71,7 @@ namespace MediatR.Tests.Sending
             //Registration needed internally by MediatR
             serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<CreateIssueCommand, Unit>>), new List<IPipelineBehavior<CreateIssueCommand, Unit>>());
 
-            mediator = new Mediator(type => serviceLocator.Get(type).Single());
+            mediator = new Mediator(type => serviceLocator.Get(type).First());
         }
 
         [Fact]
