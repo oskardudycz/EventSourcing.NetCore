@@ -36,27 +36,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workshops", "Workshops", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MeetingsManagement", "MeetingsManagement", "{A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsSearch.Api", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsSearch.Api\MeetingsSearch.Api.csproj", "{431FF491-256F-4B29-8190-8363A2187CEA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsManagement.Api", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsManagement.Api\MeetingsManagement.Api.csproj", "{3BF46F7C-D492-4CA3-BF62-90EA62288012}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsManagement", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsManagement\MeetingsManagement.csproj", "{A67B74EF-CEF3-45C5-99C8-064BA640C7E4}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsSearch", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsSearch\MeetingsSearch.csproj", "{2D79A980-392C-4AB9-8056-B1B50B988900}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsManagement.IntegrationTests", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsManagement.IntegrationTests\MeetingsManagement.IntegrationTests.csproj", "{81CE8853-7B41-4F4E-B2C2-6522FD3A54F7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingsSearch.IntegrationTests", "Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\MeetingsSearch.IntegrationTests\MeetingsSearch.IntegrationTests.csproj", "{58C58B11-441E-46CD-AB12-DD2F51C1B992}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{E15B4D4B-1527-446F-8613-A09B230D6643}"
 ProjectSection(SolutionItems) = preProject
 	Workshops\BuildYourOwnEventStore\docker\docker-compose.yml = Workshops\BuildYourOwnEventStore\docker\docker-compose.yml
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{F755E316-140C-4A73-9586-06860521C1B6}"
-	ProjectSection(SolutionItems) = preProject
-		Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\docker\docker-compose.yml = Workshops\BuildYourOwnEventStore\02-EventSourcingAdvanced\docker\docker-compose.yml
-	EndProjectSection
+ProjectSection(SolutionItems) = preProject
+	Sample\MeetingsManagement\docker\docker-compose.yml = Sample\MeetingsManagement\docker\docker-compose.yml
+EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tickets", "Tickets", "{3C628C0A-71AD-4C41-9977-A33F89C0751B}"
 EndProject
@@ -215,30 +203,6 @@ Global
 		{215691EC-51FB-4BD2-A46C-396094727054}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{215691EC-51FB-4BD2-A46C-396094727054}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{215691EC-51FB-4BD2-A46C-396094727054}.Release|Any CPU.Build.0 = Release|Any CPU
-		{431FF491-256F-4B29-8190-8363A2187CEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{431FF491-256F-4B29-8190-8363A2187CEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{431FF491-256F-4B29-8190-8363A2187CEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{431FF491-256F-4B29-8190-8363A2187CEA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3BF46F7C-D492-4CA3-BF62-90EA62288012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3BF46F7C-D492-4CA3-BF62-90EA62288012}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3BF46F7C-D492-4CA3-BF62-90EA62288012}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3BF46F7C-D492-4CA3-BF62-90EA62288012}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A67B74EF-CEF3-45C5-99C8-064BA640C7E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A67B74EF-CEF3-45C5-99C8-064BA640C7E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A67B74EF-CEF3-45C5-99C8-064BA640C7E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A67B74EF-CEF3-45C5-99C8-064BA640C7E4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D79A980-392C-4AB9-8056-B1B50B988900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D79A980-392C-4AB9-8056-B1B50B988900}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D79A980-392C-4AB9-8056-B1B50B988900}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D79A980-392C-4AB9-8056-B1B50B988900}.Release|Any CPU.Build.0 = Release|Any CPU
-		{81CE8853-7B41-4F4E-B2C2-6522FD3A54F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{81CE8853-7B41-4F4E-B2C2-6522FD3A54F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{81CE8853-7B41-4F4E-B2C2-6522FD3A54F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{81CE8853-7B41-4F4E-B2C2-6522FD3A54F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{58C58B11-441E-46CD-AB12-DD2F51C1B992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58C58B11-441E-46CD-AB12-DD2F51C1B992}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58C58B11-441E-46CD-AB12-DD2F51C1B992}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58C58B11-441E-46CD-AB12-DD2F51C1B992}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1ED20C13-1748-4D53-8D62-C66405F1FCE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1ED20C13-1748-4D53-8D62-C66405F1FCE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1ED20C13-1748-4D53-8D62-C66405F1FCE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -465,12 +429,6 @@ Global
 		{E942A5A1-2B6E-41A0-8445-C5A38D955611} = {107B18E3-65C8-4A6C-976D-7EEED6A6D318}
 		{7532F3EB-D50F-490C-A1E1-4E0B882281FD} = {107B18E3-65C8-4A6C-976D-7EEED6A6D318}
 		{215691EC-51FB-4BD2-A46C-396094727054} = {107B18E3-65C8-4A6C-976D-7EEED6A6D318}
-		{431FF491-256F-4B29-8190-8363A2187CEA} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
-		{3BF46F7C-D492-4CA3-BF62-90EA62288012} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
-		{A67B74EF-CEF3-45C5-99C8-064BA640C7E4} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
-		{2D79A980-392C-4AB9-8056-B1B50B988900} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
-		{81CE8853-7B41-4F4E-B2C2-6522FD3A54F7} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
-		{58C58B11-441E-46CD-AB12-DD2F51C1B992} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
 		{F755E316-140C-4A73-9586-06860521C1B6} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
 		{3C628C0A-71AD-4C41-9977-A33F89C0751B} = {A7186B6B-D56D-4AEF-B6B7-FAA827764C34}
 		{1ED20C13-1748-4D53-8D62-C66405F1FCE0} = {3C628C0A-71AD-4C41-9977-A33F89C0751B}
