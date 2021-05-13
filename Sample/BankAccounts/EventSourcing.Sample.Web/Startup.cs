@@ -121,7 +121,8 @@ namespace EventSourcing.Web.Sample
 
         private void ConfigureEf(IServiceCollection services)
         {
-            services.AddDbContext<ClientsDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("ClientsDatabase")));
+            services.AddDbContext<ClientsDbContext>(
+                options => options.UseNpgsql(Configuration.GetConnectionString("ClientsDatabase")));
         }
 
         public void Configure(IApplicationBuilder app)

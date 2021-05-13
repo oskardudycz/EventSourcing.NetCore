@@ -25,7 +25,7 @@ namespace Payments.Api.Tests.Payments
 
         public override async Task InitializeAsync()
         {
-            CommandResponse = await PostAsync(new RequestPaymentRequest {OrderId = OrderId, Amount = Amount});
+            CommandResponse = await Post(new RequestPaymentRequest {OrderId = OrderId, Amount = Amount});
         }
     }
 

@@ -34,12 +34,12 @@ namespace MeetingsManagement.IntegrationTests.Meetings
             );
 
             // send create command
-            await PostAsync( createCommand);
+            await Post( createCommand);
 
             var occurs = DateRange.Create(Start, End);
 
             // send schedule meeting request
-            CommandResponse = await PostAsync($"{MeetingId}/schedule", occurs);
+            CommandResponse = await Post($"{MeetingId}/schedule", occurs);
         }
     }
 
@@ -73,7 +73,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings
             var query = new GetMeeting(fixture.MeetingId);
 
             //send query
-            var queryResponse = await fixture.GetAsync($"{fixture.MeetingId}");
+            var queryResponse = await fixture.Get($"{fixture.MeetingId}");
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();

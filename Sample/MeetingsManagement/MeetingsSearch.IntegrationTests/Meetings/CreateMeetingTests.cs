@@ -43,7 +43,7 @@ namespace MeetingsSearch.IntegrationTests.Meetings
         public async Task MeetingCreated_ShouldUpdateReadModel()
         {
             //send query
-            var queryResponse = await fixture.GetAsync($"{MeetingsSearchApi.MeetingsUrl}");
+            var queryResponse = await fixture.Get($"{MeetingsSearchApi.MeetingsUrl}");
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();

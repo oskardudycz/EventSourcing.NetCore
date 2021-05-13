@@ -18,8 +18,27 @@ using Shipments.Api.Tests.Core;
 
 namespace Core.Testing
 {
-    public class TestContext<TStartup>: IDisposable
+    public class TestContext<TStartup>: TestContext
         where TStartup : class
+    {
+        public TestContext(
+            Func<string, Dictionary<string, string>>? getConfiguration = null,
+            Action<IServiceCollection>? setupServices = null,
+            Func<IWebHostBuilder, IWebHostBuilder>? setupWebHostBuilder = null
+        ): base(getConfiguration, setupServices, (webHostBuilder =>
+        {
+            SetupWebHostBuilder(webHostBuilder);
+            setupWebHostBuilder?.Invoke(webHostBuilder);
+            return webHostBuilder;
+        }))
+        {
+        }
+
+        private static IWebHostBuilder SetupWebHostBuilder(IWebHostBuilder webHostBuilder)
+            => webHostBuilder.UseStartup<TStartup>();
+    }
+
+    public class TestContext: IDisposable
     {
         public HttpClient Client { get; }
 
@@ -29,47 +48,50 @@ namespace Core.Testing
         private readonly DummyExternalEventProducer externalEventProducer = new();
         private readonly DummyExternalCommandBus externalCommandBus = new();
 
-        private readonly Func<string, Dictionary<string, string>> getConfiguration = _ => new Dictionary<string, string>();
+        private readonly Func<string, Dictionary<string, string>> getConfiguration =
+            _ => new Dictionary<string, string>();
 
-        public TestContext(Func<string, Dictionary<string, string>>? getConfiguration = null)
+        public TestContext(
+            Func<string, Dictionary<string, string>>? getConfiguration = null,
+            Action<IServiceCollection>? setupServices = null,
+            Func<IWebHostBuilder, IWebHostBuilder>? setupWebHostBuilder = null
+        )
         {
             if (getConfiguration != null)
             {
                 this.getConfiguration = getConfiguration;
             }
+
             var fixtureName = new StackTrace().GetFrame(3)!.GetMethod()!.DeclaringType!.Name;
 
             var configuration = this.getConfiguration(fixtureName);
-            var projectDir = Directory.GetCurrentDirectory();
 
-            server = new TestServer(new WebHostBuilder()
-                .UseEnvironment("Tests")
-                .UseContentRoot(projectDir)
-                .UseConfiguration(new ConfigurationBuilder()
-                    .SetBasePath(projectDir)
-                    .AddJsonFile("appsettings.json", true)
-                    .AddInMemoryCollection(configuration)
-                    .Build()
-                )
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton(eventsLog);
-                    services.AddSingleton(typeof(INotificationHandler<>), typeof(EventListener<>));
-                    services.AddSingleton<IExternalEventProducer>(externalEventProducer);
-                    services.AddSingleton<IExternalCommandBus>(externalCommandBus);
-                    services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
-                })
-                .UseStartup<TStartup>());
+            setupWebHostBuilder ??= webHostBuilder => webHostBuilder;
+            server = new TestServer(setupWebHostBuilder(TestWebHostBuilder.Create(configuration, services =>
+            {
+                ConfigureTestServices(services);
+                setupServices?.Invoke(services);
+            })));
+
 
             Client = server.CreateClient();
         }
 
-        public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>() where TEvent: IExternalEvent
+        protected void ConfigureTestServices(IServiceCollection services)
+        {
+            services.AddSingleton(eventsLog);
+            services.AddSingleton(typeof(INotificationHandler<>), typeof(EventListener<>));
+            services.AddSingleton<IExternalEventProducer>(externalEventProducer);
+            services.AddSingleton<IExternalCommandBus>(externalCommandBus);
+            services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
+        }
+
+        public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent
         {
             return externalEventProducer.PublishedEvents.OfType<TEvent>().ToList();
         }
 
-        public IReadOnlyCollection<TCommand> PublishedExternalCommandOfType<TCommand>() where TCommand: ICommand
+        public IReadOnlyCollection<TCommand> PublishedExternalCommandOfType<TCommand>() where TCommand : ICommand
         {
             return externalCommandBus.SentCommands.OfType<TCommand>().ToList();
         }

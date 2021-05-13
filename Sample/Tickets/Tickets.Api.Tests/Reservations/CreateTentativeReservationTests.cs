@@ -31,7 +31,7 @@ namespace Tickets.Api.Tests.Reservations
         public override async Task InitializeAsync()
         {
             // send create command
-            CommandResponse = await PostAsync(new CreateTentativeReservationRequest {SeatId = SeatId});
+            CommandResponse = await Post(new CreateTentativeReservationRequest {SeatId = SeatId});
         }
     }
 
@@ -86,7 +86,7 @@ namespace Tickets.Api.Tests.Reservations
             var query = $"{createdReservationId}";
 
             //send query
-            var queryResponse = await fixture.GetAsync(query);
+            var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();
@@ -105,7 +105,7 @@ namespace Tickets.Api.Tests.Reservations
             var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
             //send query
-            var queryResponse = await fixture.GetAsync();
+            var queryResponse = await fixture.Get();
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();
@@ -138,7 +138,7 @@ namespace Tickets.Api.Tests.Reservations
             var query = $"{createdReservationId}/history";
 
             //send query
-            var queryResponse = await fixture.GetAsync(query);
+            var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();

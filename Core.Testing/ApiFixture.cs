@@ -1,39 +1,53 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Events;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Core.Testing
 {
-    public abstract class ApiFixture<TStartup>: IAsyncLifetime where TStartup : class
+    public abstract class ApiFixture<TStartup>: ApiFixture where TStartup : class
     {
-        protected readonly TestContext<TStartup> Sut;
+        public override TestContext CreateTestContext() =>
+            new TestContext<TStartup>(GetConfiguration, SetupServices, SetupWebHostBuilder);
+    }
+
+    public abstract class ApiFixture: IAsyncLifetime
+    {
+        protected readonly TestContext Sut;
 
         private HttpClient Client => Sut.Client;
 
         protected abstract string ApiUrl { get; }
 
-        protected virtual Dictionary<string,string> GetConfiguration(string fixtureName)
-            => new Dictionary<string, string>();
+        protected virtual Dictionary<string, string> GetConfiguration(string fixtureName) => new();
+
+        protected virtual Action<IServiceCollection>? SetupServices => null;
+
+        protected virtual Func<IWebHostBuilder, IWebHostBuilder>? SetupWebHostBuilder => null;
 
         protected ApiFixture()
         {
-            Sut = new TestContext<TStartup>(GetConfiguration);
+            Sut = CreateTestContext();
         }
+
+        public virtual TestContext CreateTestContext() => new(GetConfiguration, SetupServices, SetupWebHostBuilder);
 
         public virtual Task InitializeAsync() => Task.CompletedTask;
 
         public virtual Task DisposeAsync() => Task.CompletedTask;
 
-        public Task<HttpResponseMessage> GetAsync(string path = "")
+        public Task<HttpResponseMessage> Get(string path = "")
         {
             return Client.GetAsync(
                 $"{ApiUrl}/{path}"
             );
         }
 
-        protected Task<HttpResponseMessage> PostAsync(string path, object request)
+        public Task<HttpResponseMessage> Post(string path, object request)
         {
             return Client.PostAsync(
                 $"{ApiUrl}/{path}",
@@ -41,15 +55,15 @@ namespace Core.Testing
             );
         }
 
-        protected Task<HttpResponseMessage> PostAsync(object request)
+        public Task<HttpResponseMessage> Post(object request)
         {
-            return PostAsync(string.Empty, request);
+            return Post(string.Empty, request);
         }
 
-        public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>() where TEvent: IExternalEvent
+        public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent
             => Sut.PublishedExternalEventsOfType<TEvent>();
 
-        public IReadOnlyCollection<TEvent> PublishedInternalEventsOfType<TEvent>() where TEvent: IEvent
+        public IReadOnlyCollection<TEvent> PublishedInternalEventsOfType<TEvent>() where TEvent : IEvent
             => Sut.PublishedInternalEventsOfType<TEvent>();
     }
 }

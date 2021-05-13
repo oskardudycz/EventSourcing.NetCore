@@ -31,7 +31,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings
             );
 
             // send create command
-            CommandResponse = await PostAsync(command);
+            CommandResponse = await Post(command);
         }
     }
 
@@ -80,7 +80,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings
             var query = $"{fixture.MeetingId}";
 
             //send query
-            var queryResponse = await fixture.GetAsync(query);
+            var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();

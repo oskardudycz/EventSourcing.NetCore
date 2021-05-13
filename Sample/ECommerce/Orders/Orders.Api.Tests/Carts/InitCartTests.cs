@@ -33,7 +33,7 @@ namespace Orders.Api.Tests.Orders
 
         public override async Task InitializeAsync()
         {
-            CommandResponse = await PostAsync(new InitOrderRequest(
+            CommandResponse = await Post(new InitOrderRequest(
                 ClientId,
                 ProductItems,
                 TotalPrice

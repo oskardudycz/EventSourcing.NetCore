@@ -41,7 +41,7 @@ namespace Shipments.Api.Tests.Packages
 
         public override async Task InitializeAsync()
         {
-            CommandResponse = await PostAsync(new SendPackage(OrderId, ProductItems));
+            CommandResponse = await Post(new SendPackage(OrderId, ProductItems));
         }
     }
 
@@ -100,7 +100,7 @@ namespace Shipments.Api.Tests.Packages
             var query = $"{createdId}";
 
             //send query
-            var queryResponse = await fixture.GetAsync(query);
+            var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();

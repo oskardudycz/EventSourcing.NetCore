@@ -23,7 +23,7 @@ namespace Carts.Api.Tests.Carts
 
         public override async Task InitializeAsync()
         {
-            CommandResponse = await PostAsync(new InitCartRequest {ClientId = ClientId });
+            CommandResponse = await Post(new InitCartRequest {ClientId = ClientId });
         }
     }
 
@@ -78,7 +78,7 @@ namespace Carts.Api.Tests.Carts
             var query = $"{createdId}";
 
             //send query
-            var queryResponse = await fixture.GetAsync(query);
+            var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var queryResult = await queryResponse.Content.ReadAsStringAsync();
