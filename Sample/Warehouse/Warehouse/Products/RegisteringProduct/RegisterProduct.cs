@@ -30,8 +30,7 @@ namespace Warehouse.Products.RegisteringProduct
             );
 
             if (await productWithSKUExists(command.SKU, ct))
-                throw new ArgumentOutOfRangeException(
-                    nameof(command.SKU),
+                throw new InvalidOperationException(
                     $"Product with SKU `{command.SKU} already exists.");
 
             await addProduct(product, ct);
@@ -42,20 +41,10 @@ namespace Warehouse.Products.RegisteringProduct
     {
         public Guid ProductId { get;}
 
-        /// <summary>
-        /// The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers.
-        /// </summary>
-        /// <returns></returns>
         public SKU SKU { get; }
 
-        /// <summary>
-        /// The area where a cashier works
-        /// </summary>
         public string Name { get; }
 
-        /// <summary>
-        /// Current cashier working on the cash register
-        /// </summary>
         public string? Description { get; }
 
         private RegisterProduct(Guid productId, SKU sku, string name, string? description)
@@ -70,7 +59,6 @@ namespace Warehouse.Products.RegisteringProduct
         {
             if (!id.HasValue) throw new ArgumentNullException(nameof(id));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            if (description == null) throw new ArgumentNullException(nameof(description));
 
             return new RegisterProduct(id.Value, SKU.Create(sku), name, description);
         }

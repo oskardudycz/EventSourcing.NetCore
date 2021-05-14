@@ -43,7 +43,7 @@ namespace Warehouse.Core.Extensions
         {
             context.Response.StatusCode = (int)statusCode;
 
-            if (result != null)
+            if (result == null)
                 return;
 
             await context.Response.WriteAsJsonAsync(result);

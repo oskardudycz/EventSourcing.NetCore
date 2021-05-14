@@ -1,8 +1,8 @@
+using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using Warehouse;
 
 var builder = Host.CreateDefaultBuilder(args)
@@ -11,25 +11,15 @@ var builder = Host.CreateDefaultBuilder(args)
         webBuilder
             .ConfigureServices(services =>
             {
-                services.AddMvcCore()
-                    .AddApiExplorer()
-                    .AddAuthorization()
+                services.AddRouting()
                     .AddCors()
-                    .AddDataAnnotations()
-                    .AddFormatterMappings();
-
-                services
-                    .AddWarehouseServices()
-                    .AddSwaggerGen(c =>
-                    {
-                        c.SwaggerDoc("v1", new OpenApiInfo {Title = "Warehouse.Api", Version = "v1"});
-                    });
+                    .AddAuthorization()
+                    .AddWarehouseServices();
             })
             .Configure(app =>
             {
-                app.UseSwagger()
-                    .UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CashRegisters.Api v1"))
-                    .UseHttpsRedirection()
+                app.UseHttpsRedirection()
+                    .UseMiddleware(typeof(ExceptionHandlingMiddleware))
                     .UseRouting()
                     .UseAuthorization()
                     .UseEndpoints(endpoints =>

@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Warehouse.Core.Commands;
 using Warehouse.Core.Extensions;
@@ -19,13 +18,6 @@ namespace Warehouse.Products.RegisteringProduct
         {
             endpoints.MapPost("api/products/", async context =>
             {
-                // var dbContext = WarehouseDBContextFactory.Create();
-                //
-                // var handler = new HandleRegisterProduct(
-                //     dbContext.AddAndSave,
-                //     dbContext.ProductWithSKUExists
-                // );
-
                 var (sku, name, description) = await context.FromBody<RegisterProductRequest>();
                 var productId = Guid.NewGuid();
 

@@ -58,7 +58,7 @@ namespace Warehouse.Products.GettingProducts
             if (page <= 0)
                 throw new ArgumentOutOfRangeException(nameof(page));
 
-            return new GetProducts(filter, page.Value);
+            return new (filter, page.Value);
         }
 
         public void Deconstruct(out string? filter, out int page)

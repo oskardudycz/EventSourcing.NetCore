@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Core.WebApi.Middlewares.ExceptionHandling;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,23 +14,23 @@ namespace Warehouse.Api.Tests
             webHostBuilder
                 .ConfigureServices(services =>
                 {
-                    services.AddMvcCore()
+                    services.AddRouting()
                         .AddAuthorization()
                         .AddCors()
-                        .AddDataAnnotations()
-                        .AddFormatterMappings();
-
-                    services.AddWarehouseServices();
+                        .AddWarehouseServices();
                 })
                 .Configure(app =>
                 {
                     app.UseHttpsRedirection()
+                        .UseMiddleware(typeof(ExceptionHandlingMiddleware))
                         .UseRouting()
                         .UseAuthorization()
                         .UseEndpoints(endpoints => { endpoints.UseWarehouseEndpoints(); });
 
                     // Kids, do not try this at home!
-                    app.ApplicationServices.GetRequiredService<WarehouseDBContext>().Database.Migrate();
+                    var database = app.ApplicationServices.GetRequiredService<WarehouseDBContext>().Database;
+                    database.Migrate();
+                    database.ExecuteSqlRaw("TRUNCATE TABLE \"Product\"");
                 });
 
             return webHostBuilder;

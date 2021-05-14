@@ -33,7 +33,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Products" />
+      <Folder Include="Products\GettingProductDetails" />
+      <Folder Include="Products\GettingProducts" />
     </ItemGroup>
 
     <ItemGroup>
