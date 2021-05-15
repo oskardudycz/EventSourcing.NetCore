@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Tickets.Api.Requests;
 using Tickets.Api.Responses;
 using Tickets.Reservations.Commands;
-using Tickets.Reservations.Events;
 using Tickets.Reservations.Projections;
 using Tickets.Reservations.Queries;
 

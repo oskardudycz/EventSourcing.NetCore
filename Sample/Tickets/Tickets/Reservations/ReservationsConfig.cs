@@ -5,7 +5,6 @@ using Marten.Pagination;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Tickets.Reservations.Commands;
-using Tickets.Reservations.Events;
 using Tickets.Reservations.Projections;
 using Tickets.Reservations.Queries;
 

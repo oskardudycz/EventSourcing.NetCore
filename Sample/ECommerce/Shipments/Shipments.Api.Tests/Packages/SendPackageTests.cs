@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Testing;
 using FluentAssertions;
-using Shipments.Api.Tests.Core;
 using Shipments.Packages;
 using Shipments.Packages.Events.External;
 using Shipments.Packages.Requests;
@@ -58,15 +57,11 @@ namespace Shipments.Api.Tests.Packages
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_PackageId()
         {
-            var commandResponse = fixture.CommandResponse;
-            commandResponse.EnsureSuccessStatusCode();
+            var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
-            var commandResult = await commandResponse.Content.ReadAsStringAsync();
-            commandResult.Should().NotBeNull();
-
-            var createdId = commandResult.FromJson<Guid>();
+            var createdId = await commandResponse.GetResultFromJson<Guid>();
             createdId.Should().NotBeEmpty();
         }
 
@@ -103,10 +98,7 @@ namespace Shipments.Api.Tests.Packages
             var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
-            var queryResult = await queryResponse.Content.ReadAsStringAsync();
-            queryResult.Should().NotBeNull();
-
-            var packageDetails = queryResult.FromJson<Package>();
+            var packageDetails = await queryResponse.GetResultFromJson<Package>();
             packageDetails.Id.Should().Be(createdId);
             packageDetails.OrderId.Should().Be(fixture.OrderId);
             packageDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);

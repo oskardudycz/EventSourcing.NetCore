@@ -8,7 +8,6 @@ using Orders.Orders.Events;
 using Core.Testing;
 using FluentAssertions;
 using Orders.Api.Requests.Carts;
-using Shipments.Api.Tests.Core;
 using Xunit;
 
 namespace Orders.Api.Tests.Orders
@@ -59,10 +58,7 @@ namespace Orders.Api.Tests.Orders
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
-            var commandResult = await commandResponse.Content.ReadAsStringAsync();
-            commandResult.Should().NotBeNull();
-
-            var createdId = commandResult.FromJson<Guid>();
+            var createdId = await commandResponse.GetResultFromJson<Guid>();
             createdId.Should().NotBeEmpty();
         }
 

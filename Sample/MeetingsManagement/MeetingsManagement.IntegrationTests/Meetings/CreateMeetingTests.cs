@@ -53,10 +53,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
-            var commandResult = await commandResponse.Content.ReadAsStringAsync();
-            commandResult.Should().NotBeNull();
-
-            var createdId = commandResult.FromJson<Guid>();
+            var createdId = await commandResponse.GetResultFromJson<Guid>();
             createdId.Should().Be(fixture.MeetingId);
         }
 
@@ -83,10 +80,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings
             var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
-            var queryResult = await queryResponse.Content.ReadAsStringAsync();
-            queryResult.Should().NotBeNull();
-
-            var meetingSummary = queryResult.FromJson<MeetingView>();
+            var meetingSummary =  await queryResponse.GetResultFromJson<MeetingView>();
             meetingSummary.Id.Should().Be(fixture.MeetingId);
             meetingSummary.Name.Should().Be(fixture.MeetingName);
         }

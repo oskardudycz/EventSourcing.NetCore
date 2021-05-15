@@ -6,7 +6,6 @@ using Core.Testing;
 using FluentAssertions;
 using Payments.Api.Requests.Carts;
 using Payments.Payments.Events;
-using Shipments.Api.Tests.Core;
 using Xunit;
 
 namespace Payments.Api.Tests.Payments
@@ -47,10 +46,7 @@ namespace Payments.Api.Tests.Payments
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
-            var commandResult = await commandResponse.Content.ReadAsStringAsync();
-            commandResult.Should().NotBeNull();
-
-            var createdId = commandResult.FromJson<Guid>();
+            var createdId = await commandResponse.GetResultFromJson<Guid>();
             createdId.Should().NotBeEmpty();
         }
 

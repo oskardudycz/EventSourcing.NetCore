@@ -39,6 +39,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj" />
         <ProjectReference Include="..\EventSourcing.Sample.Clients.Contracts\EventSourcing.Sample.Clients.Contracts.csproj" />
         <ProjectReference Include="..\EventSourcing.Sample.Transactions.Contracts\EventSourcing.Sample.Transactions.Contracts.csproj" />
         <ProjectReference Include="..\EventSourcing.Sample.Web\EventSourcing.Sample.Web.csproj" />

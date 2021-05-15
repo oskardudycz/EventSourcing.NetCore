@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Queries;
 using Tickets.Reservations.Projections;
 

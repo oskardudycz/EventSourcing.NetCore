@@ -8,14 +8,13 @@ using Carts.Carts.Events;
 using Carts.Carts.Projections;
 using Core.Testing;
 using FluentAssertions;
-using Shipments.Api.Tests.Core;
 using Xunit;
 
 namespace Carts.Api.Tests.Carts
 {
     public class InitCartFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = "/api/Carts";
+        protected override string ApiUrl => "/api/Carts";
 
         public readonly Guid ClientId = Guid.NewGuid();
 
@@ -40,15 +39,11 @@ namespace Carts.Api.Tests.Carts
         [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_CartId()
         {
-            var commandResponse = fixture.CommandResponse;
-            commandResponse.EnsureSuccessStatusCode();
+            var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
-            var commandResult = await commandResponse.Content.ReadAsStringAsync();
-            commandResult.Should().NotBeNull();
-
-            var createdId = commandResult.FromJson<Guid>();
+            var createdId = await commandResponse.GetResultFromJson<Guid>();
             createdId.Should().NotBeEmpty();
         }
 
@@ -81,10 +76,7 @@ namespace Carts.Api.Tests.Carts
             var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
-            var queryResult = await queryResponse.Content.ReadAsStringAsync();
-            queryResult.Should().NotBeNull();
-
-            var cartDetails = queryResult.FromJson<CartDetails>();
+            var cartDetails = await queryResponse.GetResultFromJson<CartDetails>();
             cartDetails.Id.Should().Be(createdId);
             cartDetails.Status.Should().Be(CartStatus.Pending);
             cartDetails.ClientId.Should().Be(fixture.ClientId);

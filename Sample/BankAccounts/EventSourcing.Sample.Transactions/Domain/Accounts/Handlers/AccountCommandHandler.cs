@@ -11,7 +11,6 @@ using EventSourcing.Sample.Transactions.Contracts.Transactions.Commands;
 using EventSourcing.Sample.Transactions.Views.Clients;
 using Marten;
 using Marten.Events;
-using Marten.Util;
 using MediatR;
 
 namespace EventSourcing.Sample.Transactions.Domain.Accounts.Handlers

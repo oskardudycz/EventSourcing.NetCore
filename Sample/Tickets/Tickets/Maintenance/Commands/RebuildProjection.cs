@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Commands;
 
 namespace Tickets.Maintenance.Commands

@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Testing;
 using FluentAssertions;
-using Shipments.Api.Tests.Core;
 using Tickets.Api.Requests;
 using Tickets.Api.Responses;
 using Tickets.Api.Tests.Config;
@@ -53,10 +52,7 @@ namespace Tickets.Api.Tests.Reservations
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
-            var commandResult = await commandResponse.Content.ReadAsStringAsync();
-            commandResult.Should().NotBeNull();
-
-            var createdId = commandResult.FromJson<Guid>();
+            var createdId = await commandResponse.GetResultFromJson<Guid>();
             createdId.Should().NotBeEmpty();
         }
 
@@ -89,10 +85,7 @@ namespace Tickets.Api.Tests.Reservations
             var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
-            var queryResult = await queryResponse.Content.ReadAsStringAsync();
-            queryResult.Should().NotBeNull();
-
-            var reservationDetails = queryResult.FromJson<ReservationDetails>();
+            var reservationDetails =  await queryResponse.GetResultFromJson<ReservationDetails>();
             reservationDetails.Id.Should().Be(createdReservationId);
             reservationDetails.Number.Should().NotBeNull().And.NotBeEmpty();
             reservationDetails.Status.Should().Be(ReservationStatus.Tentative);
@@ -108,10 +101,7 @@ namespace Tickets.Api.Tests.Reservations
             var queryResponse = await fixture.Get();
             queryResponse.EnsureSuccessStatusCode();
 
-            var queryResult = await queryResponse.Content.ReadAsStringAsync();
-            queryResult.Should().NotBeNull();
-
-            var reservationPagedList = queryResult.FromJson<PagedListResponse<ReservationShortInfo>>();
+            var reservationPagedList = await queryResponse.GetResultFromJson<PagedListResponse<ReservationShortInfo>>();
 
             reservationPagedList.Should().NotBeNull();
             reservationPagedList.Items.Should().NotBeNull();
@@ -141,10 +131,7 @@ namespace Tickets.Api.Tests.Reservations
             var queryResponse = await fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
-            var queryResult = await queryResponse.Content.ReadAsStringAsync();
-            queryResult.Should().NotBeNull();
-
-            var reservationPagedList = queryResult.FromJson<PagedListResponse<ReservationHistory>>();
+            var reservationPagedList = await queryResponse.GetResultFromJson<PagedListResponse<ReservationHistory>>();
 
             reservationPagedList.Should().NotBeNull();
             reservationPagedList.Items.Should().NotBeNull();

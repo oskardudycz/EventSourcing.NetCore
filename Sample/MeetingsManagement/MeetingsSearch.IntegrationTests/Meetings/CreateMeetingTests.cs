@@ -43,15 +43,12 @@ namespace MeetingsSearch.IntegrationTests.Meetings
         public async Task MeetingCreated_ShouldUpdateReadModel()
         {
             //send query
+            await Task.Delay(5000);
+
             var queryResponse = await fixture.Get($"{MeetingsSearchApi.MeetingsUrl}");
             queryResponse.EnsureSuccessStatusCode();
 
-            var queryResult = await queryResponse.Content.ReadAsStringAsync();
-            queryResult.Should().NotBeNull();
-
-            await Task.Delay(5000);
-
-            var meetings = queryResult.FromJson<IReadOnlyCollection<Meeting>>();
+            var meetings = await queryResponse.GetResultFromJson<IReadOnlyCollection<Meeting>>();
             meetings.Should().Contain(meeting =>
                 meeting.Id == fixture.MeetingId
                 && meeting.Name == fixture.MeetingName
