@@ -21,12 +21,12 @@ namespace Warehouse.Products
                     var dbContext = s.GetRequiredService<WarehouseDBContext>();
                     return new HandleRegisterProduct(dbContext.AddAndSave, dbContext.ProductWithSKUExists);
                 })
-                .AddQueryHandler<GetProducts, IReadOnlyList<Product>, HandleGetProducts>(s =>
+                .AddQueryHandler<GetProducts, IReadOnlyList<ProductListItem>, HandleGetProducts>(s =>
                 {
                     var dbContext = s.GetRequiredService<WarehouseDBContext>();
                     return new HandleGetProducts(dbContext.Set<Product>().AsNoTracking());
                 })
-                .AddQueryHandler<GetProductDetails, Product?, HandleGetProductDetails>(s =>
+                .AddQueryHandler<GetProductDetails, ProductDetails?, HandleGetProductDetails>(s =>
                 {
                     var dbContext = s.GetRequiredService<WarehouseDBContext>();
                     return new HandleGetProductDetails(dbContext.Set<Product>().AsNoTracking());

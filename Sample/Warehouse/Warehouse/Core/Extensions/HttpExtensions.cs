@@ -1,36 +1,79 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 
 namespace Warehouse.Core.Extensions
 {
     public static class HttpExtensions
     {
-        public static T FromRoute<T>(this HttpContext context, string name)
+        public static string FromRoute(this HttpContext context, string name)
         {
-            var value = context.Request.RouteValues[name];
+            var routeValue = context.Request.RouteValues[name];
 
-            if (value is not T typedValue)
+            if (routeValue == null)
+                throw new ArgumentNullException(name);
+
+            if (routeValue is not string stringValue)
                 throw new ArgumentOutOfRangeException(name);
 
-            return typedValue;
+            return stringValue;
         }
 
-        public static T FromQuery<T>(this HttpContext context, string name)
+        public static T FromRoute<T>(this HttpContext context, string name)
+            where T: struct
         {
-            var value = context.Request.Query[name];
+            var routeValue = context.Request.RouteValues[name];
 
-            if (value is not T typedValue)
-                throw new ArgumentOutOfRangeException(name);
+            return ConvertTo<T>(routeValue, name) ?? throw new ArgumentNullException(name);
+        }
 
-            return typedValue;
+        public static string? FromQuery(this HttpContext context, string name)
+        {
+            var stringValues = context.Request.Query[name];
+
+            return !StringValues.IsNullOrEmpty(stringValues)
+                ? stringValues.ToString()
+                : null;
+        }
+
+
+        public static T? FromQuery<T>(this HttpContext context, string name)
+            where T: struct
+        {
+            var stringValues = context.Request.Query[name];
+
+            return !StringValues.IsNullOrEmpty(stringValues)
+                ? ConvertTo<T>(stringValues.ToString(), name)
+                : null;
         }
 
         public static async Task<T> FromBody<T>(this HttpContext context)
         {
             return await context.Request.ReadFromJsonAsync<T>() ??
-                throw new ArgumentNullException("request");
+                   throw new ArgumentNullException("request");
+        }
+
+        public static T? ConvertTo<T>(object? value, string name)
+            where T: struct
+        {
+            if (value == null)
+                return null;
+
+            T? result;
+            try
+            {
+                result = (T?) TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value);
+            }
+            catch
+            {
+                throw new ArgumentOutOfRangeException(name);
+            }
+
+            return result;
         }
 
         public static Task OK<T>(this HttpContext context, T result)
@@ -39,7 +82,11 @@ namespace Warehouse.Core.Extensions
         public static Task Created<T>(this HttpContext context, T result)
             => context.ReturnJSON(result, HttpStatusCode.Created);
 
-        public static async Task ReturnJSON<T>(this HttpContext context, T result, HttpStatusCode statusCode = HttpStatusCode.OK)
+        public static void NotFound(this HttpContext context)
+            => context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+
+        public static async Task ReturnJSON<T>(this HttpContext context, T result,
+            HttpStatusCode statusCode = HttpStatusCode.OK)
         {
             context.Response.StatusCode = (int)statusCode;
 

@@ -19,7 +19,13 @@ namespace Warehouse.Products.GettingProductDetails
                 var query = GetProductDetails.Create(productId);
 
                 var result = await context
-                    .SendQuery<GetProductDetails, Product?>(query);
+                    .SendQuery<GetProductDetails, ProductDetails?>(query);
+
+                if (result == null)
+                {
+                    context.NotFound();
+                    return;
+                }
 
                 await context.OK(result);
             });

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Warehouse.Products.Primitives
@@ -7,6 +8,7 @@ namespace Warehouse.Products.Primitives
     {
         public string Value { get; init; }
 
+        [JsonConstructor]
         private SKU(string value)
         {
             Value = value;

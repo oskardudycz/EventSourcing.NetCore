@@ -9,14 +9,14 @@ using Xunit;
 
 namespace Warehouse.Api.Tests.Products.RegisteringProduct
 {
-    public class RegisteringProduct
+    public class RegisteringProductTests
     {
         public class RegisterProductFixture: ApiFixture
         {
             protected override string ApiUrl => "/api/products";
 
             protected override Func<IWebHostBuilder, IWebHostBuilder> SetupWebHostBuilder =>
-                WarehouseTestWebHostBuilder.Configure;
+                whb => WarehouseTestWebHostBuilder.Configure(whb, nameof(RegisterProductFixture));
         }
 
         public class RegisterProductTests: IClassFixture<RegisterProductFixture>
@@ -78,7 +78,7 @@ namespace Warehouse.Api.Tests.Products.RegisteringProduct
             private static string ValidSKU => $"CC{DateTime.Now.Ticks}";
             private const string ValidDescription = "VALID_DESCRIPTION";
 
-            public static TheoryData<RegisterProductRequest> ValidRequests = new ()
+            public static TheoryData<RegisterProductRequest> ValidRequests = new()
             {
                 new RegisterProductRequest(ValidSKU, ValidName, ValidDescription),
                 new RegisterProductRequest(ValidSKU, ValidName, null)

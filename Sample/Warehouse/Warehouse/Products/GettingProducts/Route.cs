@@ -16,12 +16,14 @@ namespace Warehouse.Products.GettingProducts
                 // var dbContext = WarehouseDBContextFactory.Create();
                 // var handler = new HandleGetProducts(dbContext.Set<Product>().AsQueryable());
 
-                var filter = context.FromQuery<string?>("filter");
-                var page = context.FromQuery<int?>("page");
-                var query = GetProducts.Create(filter, page);
+                var filter = context.FromQuery("filter");
+                var page = context.FromQuery<int>("page");
+                var pageSize = context.FromQuery<int>("pageSize");
 
-                var result = context
-                    .SendQuery<GetProducts, IReadOnlyList<Product>>(query);
+                var query = GetProducts.Create(filter, page, pageSize);
+
+                var result = await context
+                    .SendQuery<GetProducts, IReadOnlyList<ProductListItem>>(query);
 
                 await context.OK(result);
             });

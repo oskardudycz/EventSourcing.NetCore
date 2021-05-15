@@ -8,9 +8,8 @@ using Warehouse.Core.Queries;
 
 namespace Warehouse.Products.GettingProducts
 {
-    internal class HandleGetProducts : IQueryHandler<GetProducts, IReadOnlyList<Product>>
+    internal class HandleGetProducts : IQueryHandler<GetProducts, IReadOnlyList<ProductListItem>>
     {
-        private const int PageSize = 10;
         private readonly IQueryable<Product> products;
 
         public HandleGetProducts(IQueryable<Product> products)
@@ -18,9 +17,9 @@ namespace Warehouse.Products.GettingProducts
             this.products = products;
         }
 
-        public async ValueTask<IReadOnlyList<Product>> Handle(GetProducts query, CancellationToken ct)
+        public async ValueTask<IReadOnlyList<ProductListItem>> Handle(GetProducts query, CancellationToken ct)
         {
-            var (filter, page) = query;
+            var (filter, page, pageSize) = query;
 
             var filteredProducts = string.IsNullOrEmpty(filter)
                 ? products
@@ -33,38 +32,56 @@ namespace Warehouse.Products.GettingProducts
 
             // await is needed because of https://github.com/dotnet/efcore/issues/21793#issuecomment-667096367
             return await filteredProducts
-                .Skip(PageSize * page - 1)
-                .Take(PageSize)
+                .Skip(pageSize * (page - 1))
+                .Take(pageSize)
+                .Select(p => new ProductListItem(p.Id, p.Sku.Value, p.Name))
                 .ToListAsync(ct);
         }
     }
 
     public record GetProducts
     {
+        private const int DefaultPage = 1;
+        private const int DefaultPageSize = 10;
+
         public string? Filter { get; }
 
         public int Page { get; }
 
-        private GetProducts(string? filter, int page)
+        public int PageSize { get; }
+
+        private GetProducts(string? filter, int page, int pageSize)
         {
             Filter = filter;
             Page = page;
+            PageSize = pageSize;
         }
 
-        public static GetProducts Create(string? filter, int? page)
+        public static GetProducts Create(string? filter, int? page, int? pageSize)
         {
-            page ??= 1;
+            page ??= DefaultPage;
+            pageSize ??= DefaultPageSize;
 
             if (page <= 0)
                 throw new ArgumentOutOfRangeException(nameof(page));
 
-            return new (filter, page.Value);
+            if (pageSize <= 0)
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            return new (filter, page.Value, pageSize.Value);
         }
 
-        public void Deconstruct(out string? filter, out int page)
+        public void Deconstruct(out string? filter, out int page, out int pageSize)
         {
             filter = Filter;
             page = Page;
+            pageSize = PageSize;
         }
-    };
+    }
+
+    public record ProductListItem(
+        Guid Id,
+        string Sku,
+        string Name
+    );
 }

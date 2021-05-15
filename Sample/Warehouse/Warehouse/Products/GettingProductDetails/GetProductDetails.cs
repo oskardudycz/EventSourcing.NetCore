@@ -8,7 +8,7 @@ using Warehouse.Core.Queries;
 
 namespace Warehouse.Products.GettingProductDetails
 {
-    internal class HandleGetProductDetails: IQueryHandler<GetProductDetails, Product?>
+    internal class HandleGetProductDetails: IQueryHandler<GetProductDetails, ProductDetails?>
     {
         private readonly IQueryable<Product> products;
 
@@ -17,11 +17,21 @@ namespace Warehouse.Products.GettingProductDetails
             this.products = products;
         }
 
-        public async ValueTask<Product?> Handle(GetProductDetails query, CancellationToken ct)
+        public async ValueTask<ProductDetails?> Handle(GetProductDetails query, CancellationToken ct)
         {
             // await is needed because of https://github.com/dotnet/efcore/issues/21793#issuecomment-667096367
-            return await products
+            var product = await products
                 .SingleOrDefaultAsync(p => p.Id == query.ProductId, ct);
+
+            if (product == null)
+                return null;
+
+            return new ProductDetails(
+                product.Id,
+                product.Sku.Value,
+                product.Name,
+                product.Description
+            );
         }
     }
 
@@ -37,4 +47,11 @@ namespace Warehouse.Products.GettingProductDetails
         public static GetProductDetails Create(Guid productId)
             => new(productId.AssertNotEmpty(nameof(productId)));
     }
+
+    public record ProductDetails(
+        Guid Id,
+        string Sku,
+        string Name,
+        string? Description
+    );
 }
