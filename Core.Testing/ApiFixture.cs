@@ -31,6 +31,7 @@ namespace Core.Testing
 
         protected ApiFixture()
         {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
             Sut = CreateTestContext();
         }
 
