@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 
 namespace Warehouse.Core.Extensions
 {
@@ -23,7 +24,7 @@ namespace Warehouse.Core.Extensions
         }
 
         public static T FromRoute<T>(this HttpContext context, string name)
-            where T: struct
+            where T : struct
         {
             var routeValue = context.Request.RouteValues[name];
 
@@ -41,7 +42,7 @@ namespace Warehouse.Core.Extensions
 
 
         public static T? FromQuery<T>(this HttpContext context, string name)
-            where T: struct
+            where T : struct
         {
             var stringValues = context.Request.Query[name];
 
@@ -57,7 +58,7 @@ namespace Warehouse.Core.Extensions
         }
 
         public static T? ConvertTo<T>(object? value, string name)
-            where T: struct
+            where T : struct
         {
             if (value == null)
                 return null;
@@ -65,7 +66,7 @@ namespace Warehouse.Core.Extensions
             T? result;
             try
             {
-                result = (T?) TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value);
+                result = (T?)TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value);
             }
             catch
             {
@@ -78,8 +79,12 @@ namespace Warehouse.Core.Extensions
         public static Task OK<T>(this HttpContext context, T result)
             => context.ReturnJSON(result);
 
-        public static Task Created<T>(this HttpContext context, T result)
-            => context.ReturnJSON(result, HttpStatusCode.Created);
+        public static Task Created<T>(this HttpContext context, T id, string? location = null)
+        {
+            context.Response.Headers[HeaderNames.Location] = location ?? $"{context.Request.Path}{id}";
+
+            return context.ReturnJSON(id, HttpStatusCode.Created);
+        }
 
         public static void NotFound(this HttpContext context)
             => context.Response.StatusCode = (int)HttpStatusCode.NotFound;

@@ -43,6 +43,8 @@ namespace Warehouse.Api.Tests.Products.RegisteringProduct
 
                 var createdId = await response.GetResultFromJson<Guid>();
                 createdId.Should().NotBeEmpty();
+
+                response.Headers.Location.Should().Be($"/api/products/{createdId}");
             }
 
             [Theory]
