@@ -1,5 +1,4 @@
-﻿using Castle.Core.Configuration;
-using Core.WebApi.Middlewares.ExceptionHandling;
+﻿using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +17,6 @@ namespace Warehouse.Api.Tests
                 .ConfigureServices(services =>
                 {
                     services.AddRouting()
-                        .AddAuthorization()
-                        .AddCors()
                         .AddWarehouseServices()
                         .AddTransient<DbContextOptions<WarehouseDBContext>>(s =>
                         {
@@ -33,15 +30,13 @@ namespace Warehouse.Api.Tests
                 })
                 .Configure(app =>
                 {
-                    app.UseHttpsRedirection()
-                        .UseMiddleware(typeof(ExceptionHandlingMiddleware))
+                    app.UseMiddleware(typeof(ExceptionHandlingMiddleware))
                         .UseRouting()
-                        .UseAuthorization()
-                        .UseEndpoints(endpoints => { endpoints.UseWarehouseEndpoints(); });
+                        .UseEndpoints(endpoints => { endpoints.UseWarehouseEndpoints(); })
+                        .ConfigureWarehouse();
 
                     // Kids, do not try this at home!
                     var database = app.ApplicationServices.GetRequiredService<WarehouseDBContext>().Database;
-                    database.Migrate();
                     database.ExecuteSqlRaw("TRUNCATE TABLE \"Product\"");
                 });
 

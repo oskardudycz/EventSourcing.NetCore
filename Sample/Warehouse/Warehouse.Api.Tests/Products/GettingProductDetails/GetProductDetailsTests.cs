@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Core.Testing;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Warehouse.Products.GettingProductDetails;
-using Warehouse.Products.GettingProducts;
 using Warehouse.Products.RegisteringProduct;
 using Xunit;
 

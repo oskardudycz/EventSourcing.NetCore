@@ -12,20 +12,17 @@ var builder = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services =>
             {
                 services.AddRouting()
-                    .AddCors()
-                    .AddAuthorization()
                     .AddWarehouseServices();
             })
             .Configure(app =>
             {
-                app.UseHttpsRedirection()
-                    .UseMiddleware(typeof(ExceptionHandlingMiddleware))
+                app.UseMiddleware(typeof(ExceptionHandlingMiddleware))
                     .UseRouting()
-                    .UseAuthorization()
                     .UseEndpoints(endpoints =>
                     {
                         endpoints.UseWarehouseEndpoints();
-                    });
+                    })
+                    .ConfigureWarehouse();
             });
     })
     .Build();
