@@ -54,8 +54,11 @@ namespace Core.Marten
         {
             options.Connection(config.ConnectionString);
             options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
-            options.Events.DatabaseSchemaName = config.WriteModelSchema;
-            options.DatabaseSchemaName = config.ReadModelSchema;
+
+            var schemaName = Environment.GetEnvironmentVariable("SchemaName");
+            options.Events.DatabaseSchemaName = schemaName ?? config.WriteModelSchema;
+            options.DatabaseSchemaName = schemaName ?? config.ReadModelSchema;
+
             options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters,
                 enumStorage: EnumStorage.AsString);
             options.Events.Daemon.Mode = config.DaemonMode;

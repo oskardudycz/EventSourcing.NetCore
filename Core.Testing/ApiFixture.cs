@@ -31,6 +31,8 @@ namespace Core.Testing
 
         protected ApiFixture()
         {
+            Environment.SetEnvironmentVariable("SchemaName", GetType().Name.ToLower());
+
             Sut = CreateTestContext();
         }
 

@@ -15,7 +15,7 @@ namespace Core.Testing
             configureServices ??= _ => { };
 
             return new WebHostBuilder()
-                .UseEnvironment("Tests")
+                .UseEnvironment("Development")
                 .UseContentRoot(projectDir)
                 .UseConfiguration(new ConfigurationBuilder()
                     .SetBasePath(projectDir)
