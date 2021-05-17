@@ -4,6 +4,7 @@ using System.Linq;
 using Marten.Events.Aggregation;
 using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
+using Weasel.Postgresql;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections

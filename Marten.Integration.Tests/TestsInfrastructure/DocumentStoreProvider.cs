@@ -1,4 +1,5 @@
 ﻿using System;
+using Weasel.Postgresql;
 
 namespace Marten.Integration.Tests.TestsInfrastructure
 {

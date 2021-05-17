@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
+using Weasel.Postgresql;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections

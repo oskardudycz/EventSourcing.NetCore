@@ -49,14 +49,14 @@ namespace Tickets.Reservations
                 x.IsUnique = true;
 
                 // Partial index by supplying a condition
-                x.Where = "(data ->> 'Status') != 'Cancelled'";
+                x.Predicate = "(data ->> 'Status') != 'Cancelled'";
             });
             options.Schema.For<Reservation>().Index(x => x.Number, x =>
             {
                 x.IsUnique = true;
 
                 // Partial index by supplying a condition
-                x.Where = "(data ->> 'Status') != 'Cancelled'";
+                x.Predicate = "(data ->> 'Status') != 'Cancelled'";
             });
 
 

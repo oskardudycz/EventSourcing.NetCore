@@ -4,6 +4,7 @@ using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Weasel.Postgresql;
 
 namespace Core.Marten
 {
@@ -57,7 +58,6 @@ namespace Core.Marten
             options.DatabaseSchemaName = config.ReadModelSchema;
             options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters,
                 enumStorage: EnumStorage.AsString);
-            options.PLV8Enabled = false;
             options.Events.Daemon.Mode = config.DaemonMode;
 
             configureOptions?.Invoke(options);

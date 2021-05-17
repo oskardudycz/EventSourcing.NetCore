@@ -1,5 +1,6 @@
 using Npgsql;
 using SharpTestsEx;
+using Weasel.Postgresql;
 using Xunit;
 
 namespace Marten.Integration.Tests.General

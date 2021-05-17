@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten" Version="4.0.0-alpha.10" />
+        <PackageReference Include="Marten" Version="4.0.0-alpha.11" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.5">
             <PrivateAssets>all</PrivateAssets>
