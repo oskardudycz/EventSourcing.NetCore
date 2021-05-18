@@ -45,6 +45,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_MeetingId()
         {
             var commandResponse = fixture.CommandResponse;
@@ -57,6 +58,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public void CreateCommand_ShouldPublish_MeetingCreateEvent()
         {
             // assert MeetingCreated event was produced to external bus
@@ -68,6 +70,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings
         }
 
         [Fact]
+        [Trait("Category", "Exercise")]
         public async Task CreateCommand_ShouldUpdateReadModel()
         {
             // prepare query
