@@ -1,29 +1,14 @@
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
 using Warehouse;
-
-var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureWebHostDefaults(webBuilder =>
-    {
-        webBuilder
-            .ConfigureServices(services =>
-            {
-                services.AddRouting()
-                    .AddWarehouseServices();
-            })
-            .Configure(app =>
-            {
-                app.UseMiddleware(typeof(ExceptionHandlingMiddleware))
-                    .UseRouting()
-                    .UseEndpoints(endpoints =>
-                    {
-                        endpoints.UseWarehouseEndpoints();
-                    })
-                    .ConfigureWarehouse();
-            });
-    })
-    .Build();
-builder.Run();
