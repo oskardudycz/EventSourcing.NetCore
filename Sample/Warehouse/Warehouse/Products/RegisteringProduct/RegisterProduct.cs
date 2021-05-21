@@ -57,8 +57,10 @@ namespace Warehouse.Products.RegisteringProduct
 
         public static RegisterProduct Create(Guid? id, string? sku, string? name, string? description)
         {
-            if (!id.HasValue) throw new ArgumentNullException(nameof(id));
-            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (!id.HasValue || id == Guid.Empty) throw new ArgumentOutOfRangeException(nameof(id));
+            if (string.IsNullOrEmpty(sku)) throw new ArgumentOutOfRangeException(nameof(sku));
+            if (string.IsNullOrEmpty(name)) throw new ArgumentOutOfRangeException(nameof(name));
+            if (description is "") throw new ArgumentOutOfRangeException(nameof(name));
 
             return new RegisterProduct(id.Value, SKU.Create(sku), name, description);
         }
