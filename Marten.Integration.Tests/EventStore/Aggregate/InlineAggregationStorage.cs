@@ -46,7 +46,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             return base.CreateSession(options =>
             {
                 //It's needed to manually set that inline aggregation should be applied
-                options.Events.Projections.SelfAggregate<IssuesList>();
+                options.Projections.SelfAggregate<IssuesList>();
             });
         }
 

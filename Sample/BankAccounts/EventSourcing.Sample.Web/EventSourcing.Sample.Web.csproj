@@ -20,8 +20,8 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="5.10.3" />
-        <PackageReference Include="Marten" Version="4.0.0-alpha.11" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.5">
+        <PackageReference Include="Marten" Version="4.0.0-rc.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.7">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -32,12 +32,12 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.7" />
         <PackageReference Include="MediatR" Version="9.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
         <PackageReference Include="System.Data.Common" Version="4.3.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.5" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.7" />
     </ItemGroup>
 
     <ItemGroup>

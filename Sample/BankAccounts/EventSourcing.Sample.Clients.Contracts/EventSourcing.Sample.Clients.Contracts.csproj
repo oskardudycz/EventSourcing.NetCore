@@ -8,7 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="5.10.3" />
-        <PackageReference Include="Marten" Version="4.0.0-alpha.11" />
+        <PackageReference Include="Marten" Version="4.0.0-rc.2" />
     </ItemGroup>
 
     <ItemGroup>

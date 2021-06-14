@@ -36,7 +36,7 @@ namespace Payments.Payments
         internal static void ConfigurePayments(this StoreOptions options)
         {
             // Snapshots
-            options.Events.Projections.SelfAggregate<Payment>();
+            options.Projections.SelfAggregate<Payment>();
         }
     }
 }

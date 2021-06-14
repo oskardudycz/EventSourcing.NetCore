@@ -43,7 +43,7 @@ namespace Tickets.Reservations
         internal static void ConfigureReservations(this StoreOptions options)
         {
             // Snapshots
-            options.Events.Projections.SelfAggregate<Reservation>();
+            options.Projections.SelfAggregate<Reservation>();
             options.Schema.For<Reservation>().Index(x => x.SeatId, x =>
             {
                 x.IsUnique = true;
@@ -63,11 +63,11 @@ namespace Tickets.Reservations
             // options.Schema.For<Reservation>().UniqueIndex(x => x.SeatId);
 
             // projections
-            options.Events.Projections.Add<ReservationDetailsProjection>();
-            options.Events.Projections.Add<ReservationShortInfoProjection>();
+            options.Projections.Add<ReservationDetailsProjection>();
+            options.Projections.Add<ReservationShortInfoProjection>();
 
             // transformation
-            options.Events.Projections.Add<ReservationHistoryTransformation>();
+            options.Projections.Add<ReservationHistoryTransformation>();
         }
     }
 }

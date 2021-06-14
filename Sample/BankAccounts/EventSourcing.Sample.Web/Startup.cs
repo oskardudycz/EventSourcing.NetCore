@@ -102,10 +102,10 @@ namespace EventSourcing.Web.Sample
                     options.Events.DatabaseSchemaName = schemaName;
                     options.DatabaseSchemaName = schemaName;
 
-                    options.Events.Projections.SelfAggregate<Account>();
-                    options.Events.Projections.Add<AllAccountsSummaryViewProjection>();
-                    options.Events.Projections.Add<AccountSummaryViewProjection>();
-                    options.Events.Projections.Add<ClientsViewProjection>();
+                    options.Projections.SelfAggregate<Account>();
+                    options.Projections.Add<AllAccountsSummaryViewProjection>();
+                    options.Projections.Add<AccountSummaryViewProjection>();
+                    options.Projections.Add<ClientsViewProjection>();
 
                     options.Events.AddEventType(typeof(NewAccountCreated));
                     options.Events.AddEventType(typeof(NewInflowRecorded));

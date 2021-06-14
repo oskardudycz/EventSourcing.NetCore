@@ -21,7 +21,7 @@ namespace Warehouse
 
         public static IApplicationBuilder ConfigureWarehouse(this IApplicationBuilder app)
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
             if (environment == "Development")
             {
