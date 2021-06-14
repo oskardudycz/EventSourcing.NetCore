@@ -36,7 +36,7 @@ namespace SmartHome.Temperature.TemperatureMeasurements
         internal static void ConfigureTemperatureMeasurements(this StoreOptions options)
         {
             // Snapshots
-            options.Events.Projections.SelfAggregate<TemperatureMeasurement>(ProjectionLifecycle.Async);
+            options.Projections.SelfAggregate<TemperatureMeasurement>(ProjectionLifecycle.Async);
         }
     }
 }

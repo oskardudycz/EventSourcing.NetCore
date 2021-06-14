@@ -50,13 +50,13 @@ namespace Carts.Carts
         internal static void ConfigureCarts(this StoreOptions options)
         {
             // Snapshots
-            options.Events.Projections.SelfAggregate<Cart>();
+            options.Projections.SelfAggregate<Cart>();
             // // projections
-            options.Events.Projections.Add<CartShortInfoProjection>();
-            options.Events.Projections.Add<CartDetailsProjection>();
+            options.Projections.Add<CartShortInfoProjection>();
+            options.Projections.Add<CartDetailsProjection>();
             //
             // // transformation
-            options.Events.Projections.Add<CartHistoryTransformation>();
+            options.Projections.Add<CartHistoryTransformation>();
         }
     }
 }

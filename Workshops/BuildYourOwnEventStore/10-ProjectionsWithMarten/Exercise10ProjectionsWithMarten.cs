@@ -3,6 +3,7 @@ using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Marten;
 using Marten.Events.Projections;
+using Weasel.Postgresql;
 using Xunit;
 
 namespace EventStoreBasics.Tests
@@ -165,9 +166,9 @@ namespace EventStoreBasics.Tests
                 options.Connection(Settings.ConnectionString);
                 options.AutoCreateSchemaObjects = AutoCreate.All;
                 options.DatabaseSchemaName = options.Events.DatabaseSchemaName = nameof(Exercise10ProjectionsWithMarten);
-                options.Events.Projections.SelfAggregate<User>();
-                options.Events.Projections.SelfAggregate<Order>();
-                options.Events.Projections.Add<UserDashboardProjection>();
+                options.Projections.SelfAggregate<User>();
+                options.Projections.SelfAggregate<Order>();
+                options.Projections.Add<UserDashboardProjection>();
             });
 
             documentSession = store.OpenSession();
@@ -197,7 +198,7 @@ namespace EventStoreBasics.Tests
             var userDashboard = documentSession.Load<UserDashboard>(user.Id);
 
             userDashboard.Should().NotBeNull();
-            userDashboard.Id.Should().Be(user.Id);
+            userDashboard!.Id.Should().Be(user.Id);
             userDashboard.UserName.Should().Be(user.Name);
             userDashboard.OrdersCount.Should().Be(2);
             userDashboard.TotalAmount.Should().Be(firstOrder.Amount + secondOrder.Amount);

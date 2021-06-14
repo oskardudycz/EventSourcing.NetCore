@@ -25,8 +25,8 @@ namespace MeetingsManagement.Meetings
 
         public static void ConfigureMarten(StoreOptions options)
         {
-            options.Events.Projections.SelfAggregate<Meeting>();
-            options.Events.Projections.Add(new MeetingViewProjection());
+            options.Projections.SelfAggregate<Meeting>();
+            options.Projections.Add(new MeetingViewProjection());
         }
     }
 }

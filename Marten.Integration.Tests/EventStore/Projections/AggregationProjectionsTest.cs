@@ -83,8 +83,8 @@ namespace Marten.Integration.Tests.EventStore.Projections
                 options.Events.DatabaseSchemaName = SchemaName;
 
                 //It's needed to manually set that inline aggregation should be applied
-                options.Events.Projections.SelfAggregate<IssuesList>();
-                options.Events.Projections.Add(new IssueDescriptionsProjection());
+                options.Projections.SelfAggregate<IssuesList>();
+                options.Projections.Add(new IssueDescriptionsProjection());
             });
 
             return store.OpenSession();

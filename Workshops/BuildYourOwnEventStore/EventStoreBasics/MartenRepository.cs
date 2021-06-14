@@ -15,7 +15,12 @@ namespace EventStoreBasics
 
         public T Find(Guid id)
         {
-            return documentSession.Events.AggregateStream<T>(id);
+            var aggregate = documentSession.Events.AggregateStream<T>(id);
+
+            if (aggregate == default)
+                throw new ArgumentNullException(nameof(aggregate));
+
+            return aggregate;
         }
 
         public void Add(T aggregate)

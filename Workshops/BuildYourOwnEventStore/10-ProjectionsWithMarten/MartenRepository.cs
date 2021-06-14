@@ -13,7 +13,7 @@ namespace EventStoreBasics
             this.documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
         }
 
-        public T Find(Guid id)
+        public T? Find(Guid id)
         {
             return documentSession.Events.AggregateStream<T>(id);
         }

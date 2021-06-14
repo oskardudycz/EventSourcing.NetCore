@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Ardalis.GuardClauses" Version="3.1.0" />
-        <PackageReference Include="Marten" Version="4.0.0-alpha.11" />
+        <PackageReference Include="Ardalis.GuardClauses" Version="3.2.0" />
+        <PackageReference Include="Marten" Version="4.0.0-rc.2" />
         <PackageReference Include="MediatR" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />

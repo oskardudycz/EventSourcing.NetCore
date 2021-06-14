@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Ardalis.GuardClauses" Version="3.1.0" />
+      <PackageReference Include="Ardalis.GuardClauses" Version="3.2.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
       <PackageReference Include="RestSharp" Version="106.11.7" />
     </ItemGroup>

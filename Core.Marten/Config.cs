@@ -61,7 +61,7 @@ namespace Core.Marten
 
             options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters,
                 enumStorage: EnumStorage.AsString);
-            options.Events.Daemon.Mode = config.DaemonMode;
+            options.Projections.AsyncMode = config.DaemonMode;
 
             configureOptions?.Invoke(options);
         }
