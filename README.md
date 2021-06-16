@@ -666,6 +666,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Denis Rosa (Couchbase) - Saga Pattern | Application Transactions Using Microservices](https://blog.couchbase.com/saga-pattern-implement-business-transactions-using-microservices-part/)
 
 ### 12.17 Domain Driven Design
+-   📖 [Eric Evans - DDD Reference](https://www.domainlanguage.com/ddd/reference/)
 -   📝 [Eric Evans - DDD and Microservices: At Last, Some Boundaries!](https://www.infoq.com/presentations/ddd-microservices-2016)
 -   📖 [Domain-Driven Design: The First 15 Years](https://leanpub.com/ddd_first_15_years/)
 -   🎞 [Jimmy Bogard - Domain-Driven Design: The Good Parts](https://www.youtube.com/watch?v=U6CeaA-Phqo)
