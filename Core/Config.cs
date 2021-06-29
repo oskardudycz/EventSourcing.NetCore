@@ -1,6 +1,7 @@
 using Core.Commands;
 using Core.Events;
 using Core.Events.External;
+using Core.Ids;
 using Core.Queries;
 using Core.Requests;
 using MediatR;
@@ -20,6 +21,8 @@ namespace Core
             services.TryAddScoped<IEventBus, EventBus>();
             services.TryAddScoped<IExternalEventProducer, NulloExternalEventProducer>();
             services.TryAddScoped<IExternalCommandBus, ExternalCommandBus>();
+
+            services.TryAddScoped<IIdGenerator, NulloIdGenerator>();
 
             return services;
         }
