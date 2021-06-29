@@ -1,9 +1,13 @@
+using System;
 using Carts.Carts.Commands;
+using Carts.Carts.Events;
+using Carts.Carts.Projections;
 // using Carts.Carts.Events;
 // using Carts.Carts.Projections;
 // using Carts.Carts.Queries;
 using Carts.Pricing;
 using Core.EventStoreDB.Repository;
+using Core.Marten.ExternalProjections;
 using Core.Repositories;
 // using Core.Storage;
 // using Marten;
@@ -32,6 +36,15 @@ namespace Carts.Carts
             services.AddScoped<IRequestHandler<AddProduct, Unit>, CartCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveProduct, Unit>, CartCommandHandler>();
             services.AddScoped<IRequestHandler<ConfirmCart, Unit>, CartCommandHandler>();
+        }
+
+        private static void AddProjections(IServiceCollection services)
+        {
+            services
+                .Project<CartInitialized, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
+                .Project<ProductAdded, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
+                .Project<ProductRemoved, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
+                .Project<CartConfirmed, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event));
         }
 
         // private static void AddQueryHandlers(IServiceCollection services)
