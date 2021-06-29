@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Core.Marten.Repository;
 using Core.Repositories;
-using Core.Storage;
 using Marten;
 using Marten.Events.Projections;
 using MediatR;

@@ -1,12 +1,13 @@
 using Carts.Carts.Commands;
-using Carts.Carts.Events;
-using Carts.Carts.Projections;
-using Carts.Carts.Queries;
+// using Carts.Carts.Events;
+// using Carts.Carts.Projections;
+// using Carts.Carts.Queries;
 using Carts.Pricing;
+using Core.EventStoreDB.Repository;
 using Core.Repositories;
-using Core.Storage;
-using Marten;
-using Marten.Pagination;
+// using Core.Storage;
+// using Marten;
+// using Marten.Pagination;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,11 +19,11 @@ namespace Carts.Carts
         {
             services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>();
 
-            services.AddScoped<IRepository<Cart>, MartenRepository<Cart>>();
+            services.AddScoped<IRepository<Cart>, EventStoreDBRepository<Cart>>();
 
             AddCommandHandlers(services);
-            AddQueryHandlers(services);
-            AddEventHandlers(services);
+            // AddQueryHandlers(services);
+            // AddEventHandlers(services);
         }
 
         private static void AddCommandHandlers(IServiceCollection services)
@@ -33,30 +34,30 @@ namespace Carts.Carts
             services.AddScoped<IRequestHandler<ConfirmCart, Unit>, CartCommandHandler>();
         }
 
-        private static void AddQueryHandlers(IServiceCollection services)
-        {
-            services.AddScoped<IRequestHandler<GetCartById, CartDetails?>, CartQueryHandler>();
-            services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
-            services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, CartQueryHandler>();
-            services
-                 .AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, CartQueryHandler>();
-        }
+        // private static void AddQueryHandlers(IServiceCollection services)
+        // {
+        //     services.AddScoped<IRequestHandler<GetCartById, CartDetails?>, CartQueryHandler>();
+        //     services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
+        //     services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, CartQueryHandler>();
+        //     services
+        //          .AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, CartQueryHandler>();
+        // }
+        //
+        // private static void AddEventHandlers(IServiceCollection services)
+        // {
+        //      services.AddScoped<INotificationHandler<CartConfirmed>, CartEventHandler>();
+        // }
 
-        private static void AddEventHandlers(IServiceCollection services)
-        {
-             services.AddScoped<INotificationHandler<CartConfirmed>, CartEventHandler>();
-        }
-
-        internal static void ConfigureCarts(this StoreOptions options)
-        {
-            // Snapshots
-            options.Projections.SelfAggregate<Cart>();
-            // // projections
-            options.Projections.Add<CartShortInfoProjection>();
-            options.Projections.Add<CartDetailsProjection>();
-            //
-            // // transformation
-            options.Projections.Add<CartHistoryTransformation>();
-        }
+        // internal static void ConfigureCarts(this StoreOptions options)
+        // {
+        //     // Snapshots
+        //     options.Projections.SelfAggregate<Cart>();
+        //     // // projections
+        //     options.Projections.Add<CartShortInfoProjection>();
+        //     options.Projections.Add<CartDetailsProjection>();
+        //     //
+        //     // // transformation
+        //     options.Projections.Add<CartHistoryTransformation>();
+        // }
     }
 }
