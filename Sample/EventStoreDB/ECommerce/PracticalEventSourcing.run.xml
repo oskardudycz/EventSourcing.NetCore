@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PracticalEventSourcing" type="CompoundRunConfigurationType">
+    <toRun name="Payments" type="DotNetProject" />
+    <toRun name="Orders" type="DotNetProject" />
+    <toRun name="Carts" type="DotNetProject" />
+    <toRun name="Shipments" type="DotNetProject" />
+    <method v="2" />
+  </configuration>
+</component>

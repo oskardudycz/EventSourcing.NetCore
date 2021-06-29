@@ -1,0 +1,128 @@
+version: "3"
+services:
+    postgres:
+        image: clkao/postgres-plv8
+        container_name: postgres
+        environment:
+            POSTGRES_PASSWORD: Password12!
+        ports:
+            - "5432:5432"
+        networks:
+            - postgres
+
+    pgadmin:
+        image: dpage/pgadmin4
+        container_name: pgadmin_container
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+        ports:
+            - "${PGADMIN_PORT:-5050}:80"
+        networks:
+            - postgres
+
+    #######################################################
+    #  Zookeeper
+    #######################################################
+    zookeeper:
+        image: confluentinc/cp-zookeeper:5.3.2
+        hostname: zookeeper
+        container_name: zookeeper
+        networks:
+            - kafka_network
+        ports:
+          - "2181:2181"
+          - "2888:2888"
+          - "3888:3888"
+        environment:
+          ZOOKEEPER_CLIENT_PORT: 2181
+          ZOOKEEPER_TICK_TIME: 2000
+
+    #######################################################
+    #  Kafka
+    #######################################################
+    kafka:
+        image: confluentinc/cp-kafka:5.3.2
+        hostname: kafka
+        container_name: kafka
+        depends_on:
+          - zookeeper
+        networks:
+            - kafka_network
+        ports:
+          - "9092:9092"
+        environment:    
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+          ADVERTISED_HOST_NAME: kafka
+          KAFKA_ADVERTISED_HOSTNAME: 127.0.0.1
+
+    #######################################################
+    #  Avro Schema Registry
+    #######################################################
+    schema_registry:
+        image: confluentinc/cp-schema-registry:5.3.2
+        container_name: schema_registry
+        hostname: schema_registry
+        ports:
+            - 8181:8181
+            - 8081:8081
+        depends_on:
+            - zookeeper
+        networks:
+            - kafka_network
+        environment:
+          SCHEMA_REGISTRY_HOST_NAME: schema_registry
+          SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+          SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
+          SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
+          SCHEMA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+          SCHEMA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
+
+    kafka_rest:
+        image: confluentinc/cp-kafka-rest:5.3.2
+        hostname: kafka_rest
+        ports:
+            - "8082:8082"
+        depends_on:
+            - schema_registry
+        networks:
+            - kafka_network
+        environment:
+            KAFKA_REST_BOOTSTRAP_SERVERS: kafka:9092
+            KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registry:8081
+            KAFKA_REST_HOST_NAME: kafka_rest
+            KAFKA_REST_LISTENERS: http://0.0.0.0:8082
+
+    kafka_topics_ui:
+        image: landoop/kafka-topics-ui
+        hostname: kafka-topics-ui
+        ports:
+            - "8000:8000"
+        environment:
+            # Required. Instructs the UI where it can find the Kafka REST Proxy.
+            KAFKA_REST_PROXY_URL: "http://kafka_rest:8082/"
+            # This instructs the docker image to use Caddy to proxy traffic to kafka-topics-ui.
+            PROXY: "true"
+            # kafka-topics-ui relies upon Kafka REST.
+            # This will instruct docker to wait until those services are up
+            # before attempting to start kafka-topics-ui.
+        networks:
+            - kafka_network
+        depends_on:
+            - kafka_rest
+
+networks:
+    postgres:
+        driver: bridge
+    kafka_network:
+        driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:
