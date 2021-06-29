@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.Events;
+using Core.EventStoreDB.Serialization;
 using Core.Reflection;
 using Core.Repositories;
 using EventStore.Client;
@@ -41,11 +42,7 @@ namespace Core.EventStoreDB.Repository
 
             await foreach (var @event in readResult)
             {
-                // get event type
-                var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(@event.Event.EventType);
-
-                // deserialize event
-                var eventData = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(@event.Event.Data.Span), eventType!);
+                var eventData = @event.Deserialize();
 
                 aggregate.When(eventData!);
             }
@@ -73,14 +70,7 @@ namespace Core.EventStoreDB.Repository
             var events = aggregate.DequeueUncommittedEvents();
 
             var eventsToStore = aggregate.DequeueUncommittedEvents()
-                .Select(
-                    @event => new EventData(
-                        Uuid.NewUuid(),
-                        @event.GetType().FullName!,
-                        Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@event)),
-                        Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new {}))
-                    )
-                ).ToArray();
+                .Select(EventStoreDBSerializer.ToJsonEventData).ToArray();
 
             await eventStore.AppendToStreamAsync(
                 $"{typeof(T).Name}-{aggregate.Id}",
