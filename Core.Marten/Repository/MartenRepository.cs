@@ -2,11 +2,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
-using Marten;
 using Core.Events;
 using Core.Repositories;
+using Marten;
 
-namespace Core.Storage
+namespace Core.Marten.Repository
 {
     public class MartenRepository<T>: IRepository<T> where T : class, IAggregate
     {

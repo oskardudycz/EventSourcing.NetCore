@@ -1,10 +1,7 @@
-using System.Runtime.CompilerServices;
 using Carts.Carts;
-using Core.Marten;
+using Core.EventStoreDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-[assembly: InternalsVisibleTo("Marten.Generated")]
 
 namespace Carts
 {
@@ -12,10 +9,7 @@ namespace Carts
     {
         public static void AddCartsModule(this IServiceCollection services, IConfiguration config)
         {
-            services.AddMarten(config, options =>
-            {
-                options.ConfigureCarts();
-            });
+            services.AddEventStoreDB(config);
             services.AddCarts();
         }
     }
