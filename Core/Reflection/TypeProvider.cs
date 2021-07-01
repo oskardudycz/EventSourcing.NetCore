@@ -17,7 +17,7 @@ namespace Core.Reflection
 
             return AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => referencedAssemblies.Contains(a.FullName))
-                .SelectMany(a => a.GetTypes().Where(x => x.Name == typeName))
+                .SelectMany(a => a.GetTypes().Where(x => x.FullName == typeName || x.Name == typeName))
                 .FirstOrDefault();
         }
     }

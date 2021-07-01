@@ -2,14 +2,19 @@ using System;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Carts.Api.Requests.Carts;
+using Carts.Carts.Projections;
+using Carts.Carts.Queries;
 // using Carts.Carts.Projections;
 // using Carts.Carts.Queries;
 using Carts.Carts.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
 using Core.Ids;
+using Core.Marten.Responses;
 // using Core.Marten.Responses;
 using Core.Queries;
+using Core.Responses;
+using Marten.Pagination;
 // using Core.Responses;
 // using Marten.Pagination;
 using Commands = Carts.Carts.Commands;
@@ -105,28 +110,28 @@ namespace Carts.Api.Controllers
             return Ok();
         }
 
-        // [HttpGet("{id}")]
-        // public Task<CartDetails> Get(Guid id)
-        // {
-        //     return queryBus.Send<GetCartById, CartDetails>(GetCartById.Create(id));
-        // }
-        //
-        // [HttpGet]
-        // public async Task<PagedListResponse<CartShortInfo>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
-        // {
-        //     var pagedList = await queryBus.Send<GetCarts, IPagedList<CartShortInfo>>(GetCarts.Create(pageNumber, pageSize));
-        //
-        //     return pagedList.ToResponse();
-        // }
-        //
-        //
-        // [HttpGet("{id}/history")]
-        // public async Task<PagedListResponse<CartHistory>> GetHistory(Guid id)
-        // {
-        //     var pagedList = await queryBus.Send<GetCartHistory, IPagedList<CartHistory>>(GetCartHistory.Create(id));
-        //
-        //     return pagedList.ToResponse();
-        // }
+        [HttpGet("{id}")]
+        public Task<CartDetails> Get(Guid id)
+        {
+            return queryBus.Send<GetCartById, CartDetails>(GetCartById.Create(id));
+        }
+
+        [HttpGet]
+        public async Task<PagedListResponse<CartShortInfo>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        {
+            var pagedList = await queryBus.Send<GetCarts, IPagedList<CartShortInfo>>(GetCarts.Create(pageNumber, pageSize));
+
+            return pagedList.ToResponse();
+        }
+
+
+        [HttpGet("{id}/history")]
+        public async Task<PagedListResponse<CartHistory>> GetHistory(Guid id)
+        {
+            var pagedList = await queryBus.Send<GetCartHistory, IPagedList<CartHistory>>(GetCartHistory.Create(id));
+
+            return pagedList.ToResponse();
+        }
         //
         // [HttpGet("{id}/versions")]
         // public Task<CartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion query)

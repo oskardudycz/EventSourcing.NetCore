@@ -27,9 +27,9 @@ namespace Core.Marten
         private const string DefaultConfigKey = "EventStore";
 
         public static IServiceCollection AddMarten(this IServiceCollection services, IConfiguration config,
-            Action<StoreOptions>? configureOptions = null)
+            Action<StoreOptions>? configureOptions = null, string configKey = DefaultConfigKey)
         {
-            var martenConfig = config.GetSection(DefaultConfigKey).Get<Config>();
+            var martenConfig = config.GetSection(configKey).Get<Config>();
 
             services
                 .AddScoped<IIdGenerator, MartenIdGenerator>();

@@ -7,14 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\..\Core.Marten\Core.Marten.csproj" />
-      <ProjectReference Include="..\..\..\..\..\Core\Core.csproj" />
-      <ProjectReference Include="..\..\..\..\..\Core.EventStoreDB\Core.EventStoreDB.csproj" />
+        <ProjectReference Include="..\..\..\..\..\Core\Core.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Core.EventStoreDB\Core.EventStoreDB.csproj"/>
+        <!-- Document part used for projections -->
+        <ProjectReference Include="..\..\..\..\..\Core.Marten\Core.Marten.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Ardalis.GuardClauses" Version="3.2.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
+        <PackageReference Include="Ardalis.GuardClauses" Version="3.2.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
