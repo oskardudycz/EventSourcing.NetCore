@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using Core;
-using Core.Streaming.Kafka;
+using Core.EventStoreDB;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,7 +35,7 @@ namespace Carts.Api
             });
 
             services
-                .AddKafkaProducer()
+                .AddEventStoreDBSubscriptionToAll("MainSubscription")
                 .AddCoreServices()
                 .AddCartsModule(config);
         }

@@ -13,8 +13,7 @@ namespace Core.EventStoreDB.Serialization
         public static object Deserialize(this ResolvedEvent resolvedEvent)
         {
             // get type
-            // TODO: Add type mapping
-            var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(resolvedEvent.Event.EventType);
+            var eventType = EventTypeMapper.ToType(resolvedEvent.Event.EventType);
 
             // deserialize event
             return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(resolvedEvent.Event.Data.Span), eventType!)!;
@@ -23,8 +22,7 @@ namespace Core.EventStoreDB.Serialization
         public static EventData ToJsonEventData(this IEvent @event) =>
             new(
                 Uuid.NewUuid(),
-                // TODO: Add type mapping
-                @event.GetType().FullName!,
+                EventTypeMapper.ToName(@event.GetType()),
                 Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@event)),
                 Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { }))
             );

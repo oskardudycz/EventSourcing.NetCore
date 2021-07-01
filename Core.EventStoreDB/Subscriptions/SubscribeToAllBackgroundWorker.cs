@@ -58,7 +58,6 @@ namespace Core.EventStoreDB.Subscriptions
             // Create a linked token so we can trigger cancellation outside of this token's cancellation
             cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-
             var checkpoint = await checkpointRepository.Load(subscriptionId, cts.Token);
 
             executingTask = SubscribeToAll(checkpoint, cts.Token);
@@ -117,16 +116,7 @@ namespace Core.EventStoreDB.Subscriptions
         {
             try
             {
-                if (resolvedEvent.Event.Data.Length == 0) {
-                    logger.LogInformation("Event without data received");
-                    return;
-                }
-
-                // TODO: do this in a smarter way, maybe using filter options
-                if (resolvedEvent.Event.EventType == typeof(CheckpointStored).FullName) {
-                    logger.LogInformation("Checkpoint event - ignoring");
-                    return;
-                }
+                if (IsEventWithEmptyData(resolvedEvent) || IsCheckpointEvent(resolvedEvent)) return;
 
                 using var scope = serviceProvider.CreateScope();
 
@@ -142,6 +132,28 @@ namespace Core.EventStoreDB.Subscriptions
             {
                 logger.LogInformation("Error consuming message: {ExceptionMessage}{ExceptionStackTrace}", e.Message, e.StackTrace);
             }
+        }
+
+        private bool IsEventWithEmptyData(ResolvedEvent resolvedEvent)
+        {
+            if (resolvedEvent.Event.Data.Length == 0)
+            {
+                logger.LogInformation("Event without data received");
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsCheckpointEvent(ResolvedEvent resolvedEvent)
+        {
+            if (resolvedEvent.Event.EventType == EventTypeMapper.ToName<CheckpointStored>())
+            {
+                logger.LogInformation("Checkpoint event - ignoring");
+                return true;
+            }
+
+            return false;
         }
 
         private void HandleDrop(StreamSubscription subscription, SubscriptionDroppedReason reason, Exception? exception)

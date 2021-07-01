@@ -31,8 +31,7 @@ namespace Core.EventStoreDB.Repository
         {
             var readResult = eventStore.ReadStreamAsync(
                 Direction.Forwards,
-                // TODO: Inject stream generation strategy
-                $"{typeof(T).Name}-{id}",
+                StreamNameMapper.ToStreamId<T>(id),
                 StreamPosition.Start,
                 cancellationToken: cancellationToken
             );
@@ -69,18 +68,16 @@ namespace Core.EventStoreDB.Repository
         {
             var events = aggregate.DequeueUncommittedEvents();
 
-            var eventsToStore = aggregate.DequeueUncommittedEvents()
+            var eventsToStore = events
                 .Select(EventStoreDBSerializer.ToJsonEventData).ToArray();
 
             await eventStore.AppendToStreamAsync(
-                $"{typeof(T).Name}-{aggregate.Id}",
+                StreamNameMapper.ToStreamId<T>(aggregate.Id),
                 // TODO: Add proper optimistic concurrency handling
                 StreamState.Any,
                 eventsToStore,
                 cancellationToken: cancellationToken
             );
-
-            await eventBus.Publish(events);
         }
     }
 }

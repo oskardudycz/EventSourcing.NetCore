@@ -1,17 +1,12 @@
-using System;
 using Carts.Carts.Commands;
 using Carts.Carts.Events;
 using Carts.Carts.Projections;
-// using Carts.Carts.Events;
-// using Carts.Carts.Projections;
-// using Carts.Carts.Queries;
+using Carts.Carts.Queries;
 using Carts.Pricing;
 using Core.EventStoreDB.Repository;
 using Core.Marten.ExternalProjections;
 using Core.Repositories;
-// using Core.Storage;
-// using Marten;
-// using Marten.Pagination;
+using Marten.Pagination;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,7 +21,8 @@ namespace Carts.Carts
             services.AddScoped<IRepository<Cart>, EventStoreDBRepository<Cart>>();
 
             AddCommandHandlers(services);
-            // AddQueryHandlers(services);
+            AddProjections(services);
+            AddQueryHandlers(services);
             // AddEventHandlers(services);
         }
 
@@ -45,32 +41,31 @@ namespace Carts.Carts
                 .Project<ProductAdded, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
                 .Project<ProductRemoved, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
                 .Project<CartConfirmed, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event));
+
+            services
+                .Project<CartInitialized, CartShortInfo>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
+                .Project<ProductAdded, CartShortInfo>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
+                .Project<ProductRemoved, CartShortInfo>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
+                .Project<CartConfirmed, CartShortInfo>(@event => @event.CartId, (@event, cart) => cart.Apply(@event));
+
+            services
+                .Project<CartInitialized, CartHistory>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
+                .Project<ProductAdded, CartHistory>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
+                .Project<ProductRemoved, CartHistory>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
+                .Project<CartConfirmed, CartHistory>(@event => @event.CartId, (@event, cart) => cart.Apply(@event));
         }
 
-        // private static void AddQueryHandlers(IServiceCollection services)
-        // {
-        //     services.AddScoped<IRequestHandler<GetCartById, CartDetails?>, CartQueryHandler>();
-        //     services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
-        //     services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, CartQueryHandler>();
-        //     services
-        //          .AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, CartQueryHandler>();
-        // }
+        private static void AddQueryHandlers(IServiceCollection services)
+        {
+            services.AddScoped<IRequestHandler<GetCartById, CartDetails?>, CartQueryHandler>();
+            services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, CartQueryHandler>();
+            services.AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, CartQueryHandler>();
+            // services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
+        }
         //
         // private static void AddEventHandlers(IServiceCollection services)
         // {
         //      services.AddScoped<INotificationHandler<CartConfirmed>, CartEventHandler>();
-        // }
-
-        // internal static void ConfigureCarts(this StoreOptions options)
-        // {
-        //     // Snapshots
-        //     options.Projections.SelfAggregate<Cart>();
-        //     // // projections
-        //     options.Projections.Add<CartShortInfoProjection>();
-        //     options.Projections.Add<CartDetailsProjection>();
-        //     //
-        //     // // transformation
-        //     options.Projections.Add<CartHistoryTransformation>();
         // }
     }
 }
