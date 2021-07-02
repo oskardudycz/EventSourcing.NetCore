@@ -188,6 +188,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventStoreDB", "EventStoreDB", "{9C5C1CB3-B8CD-4CEE-A5F2-5983770C60BB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ECommerce", "ECommerce", "{8B6B9E43-F3F2-4F9E-A89C-E7B311B72A8D}"
+ProjectSection(SolutionItems) = preProject
+	Sample\EventStoreDB\ECommerce\README.md = Sample\EventStoreDB\ECommerce\README.md
+EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Carts", "Carts", "{923B37CD-DBD5-488D-B2B9-000C91F6B861}"
 EndProject

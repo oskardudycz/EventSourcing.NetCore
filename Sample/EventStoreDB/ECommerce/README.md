@@ -40,6 +40,7 @@ It uses:
 - Added [EventStoreDBRepository](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core.EventStoreDB/Repository/EventStoreDBRepository.cs) repository to load and store aggregate state,
 - Added separate [IProjection](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core/Projections/IProjection.cs) interface to handle the same way stream aggregation and materialised projections,
 - Thanks to that added dedicated [AggregateStream](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core.EventStoreDB/Events/AggregateStreamExtensions.cs#L12) method for stream aggregation
+- See [sample Aggregate](./Carts/Carts/Carts/Cart.cs)
 
 ## Read Model
 - Read models are rebuilt with eventual consistency using subscribe to all EventStoreDB feature,
@@ -49,13 +50,16 @@ It uses:
 - Added [MartenExternalProjection](https://github.com/oskardudycz/EventSourcing.NetCore/pull/49/files#diff-6d8dadf8ab81a9441836a5403632ef3616a1dc42788b5feae1c56a4f2321d4eeR12) as a sample how to project with [`left-fold`](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) into external storage. Another (e.g. ElasticSearch, EntityFramework) can be implemented the same way.
 
 ## Tests
-- Added sample of unit testing in `Carts.Tests`,
-- Added sample of integration testing in `Carts.Tests.Api`
+- Added sample of unit testing in [`Carts.Tests`](./Carts/Carts.Tests):
+  - [Aggregate unit tests](./Carts/Carts.Tests/Carts/InitCartTests.cs)
+  - [Command handler unit tests](./Carts/Carts.Tests/Carts/CommandHandlers/InitCardCommandHandlerTests.cs)
+- Added sample of integration testing in [`Carts.Api.Tests`](./Carts/Carts.Api.Tests)
+  - [API integration tests](./Carts/Carts.Api.Tests/Carts/InitCartTests.cs)
 
 ## Other
 - Added [EventTypeMapper](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core/Events/EventTypeMapper.cs) class to allow both convention-based mapping (by the .NET type name) and custom to handle event versioning,
 - Added [StreamNameMapper](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core/Events/StreamNameMapper.cs) class for convention-based id (and optional tenant) mapping based on the stream type and module,
-- IoC registration helpers - https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core.EventStoreDB/Config.cs,
+- IoC [registration helpers for EventStoreDB configuration](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core.EventStoreDB/Config.cs),
 
 
 ## Trivia
