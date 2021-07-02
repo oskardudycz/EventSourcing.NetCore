@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Carts.Api.Requests.Carts;
 using Carts.Carts;
 using Carts.Carts.Events;
+using Carts.Carts.Projections;
 //using Carts.Carts.Projections;
 using Core.Testing;
 using FluentAssertions;
@@ -49,40 +50,24 @@ namespace Carts.Api.Tests.Carts
 
         [Fact]
         [Trait("Category", "Exercise")]
-        public async Task CreateCommand_ShouldPublish_CartInitializedEvent()
+        public async Task CreateCommand_ShouldCreate_Cart()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            fixture.PublishedInternalEventsOfType<CartInitialized>()
-                .Should()
-                .HaveCount(1)
-                .And.Contain(@event =>
-                    @event.CartId == createdId
-                    && @event.ClientId == fixture.ClientId
-                    && @event.CartStatus == CartStatus.Pending
-                );
-        }
+            // prepare query
+            var query = $"{createdId}";
 
-        // [Fact]
-        // [Trait("Category", "Exercise")]
-        // public async Task CreateCommand_ShouldCreate_Cart()
-        // {
-        //     var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
-        //
-        //     // prepare query
-        //     var query = $"{createdId}";
-        //
-        //     //send query
-        //     var queryResponse = await fixture.Get(query);
-        //     queryResponse.EnsureSuccessStatusCode();
-        //
-        //     var cartDetails = await queryResponse.GetResultFromJson<CartDetails>();
-        //     cartDetails.Id.Should().Be(createdId);
-        //     cartDetails.Status.Should().Be(CartStatus.Pending);
-        //     cartDetails.ClientId.Should().Be(fixture.ClientId);
-        //     cartDetails.Version.Should().Be(1);
-        //     cartDetails.ProductItems.Should().BeEmpty();
-        //     cartDetails.TotalPrice.Should().Be(0);
-        // }
+            //send query
+            var queryResponse = await fixture.Get(query, 10);
+            queryResponse.EnsureSuccessStatusCode();
+
+            var cartDetails = await queryResponse.GetResultFromJson<CartDetails>();
+            cartDetails.Id.Should().Be(createdId);
+            cartDetails.Status.Should().Be(CartStatus.Pending);
+            cartDetails.ClientId.Should().Be(fixture.ClientId);
+            cartDetails.Version.Should().Be(1);
+            cartDetails.ProductItems.Should().BeEmpty();
+            cartDetails.TotalPrice.Should().Be(0);
+        }
     }
 }

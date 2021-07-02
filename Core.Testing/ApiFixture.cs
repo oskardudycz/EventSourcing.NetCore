@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.Events;
 using Microsoft.AspNetCore.Hosting;
@@ -42,11 +44,20 @@ namespace Core.Testing
 
         public virtual Task DisposeAsync() => Task.CompletedTask;
 
-        public Task<HttpResponseMessage> Get(string path = "")
+        public async Task<HttpResponseMessage> Get(string path = "", int maxNumberOfRetries = 0, int retryIntervalInMs = 1000)
         {
-            return Client.GetAsync(
-                $"{ApiUrl}/{path}"
-            );
+            HttpResponseMessage queryResponse;
+            var retryCount = maxNumberOfRetries;
+            do
+            {
+                queryResponse = await Client.GetAsync(
+                    $"{ApiUrl}/{path}"
+                );
+
+                if (queryResponse.StatusCode != HttpStatusCode.OK && retryCount > 0)
+                    Thread.Sleep(retryIntervalInMs);
+            } while (queryResponse.StatusCode != HttpStatusCode.OK && maxNumberOfRetries-- > 0);
+            return queryResponse;
         }
 
         public Task<HttpResponseMessage> Post(string path, object request)

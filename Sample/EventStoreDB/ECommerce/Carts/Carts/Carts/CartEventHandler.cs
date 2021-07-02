@@ -10,6 +10,7 @@
 //
 // namespace Carts.Carts
 // {
+//     TODO: Add example using EventStoreDB projection instead of that
 //     internal class CartEventHandler : IEventHandler<CartConfirmed>
 //     {
 //         private readonly IQuerySession querySession;

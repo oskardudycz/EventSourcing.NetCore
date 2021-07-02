@@ -20,5 +20,12 @@ namespace Core.Reflection
                 .SelectMany(a => a.GetTypes().Where(x => x.FullName == typeName || x.Name == typeName))
                 .FirstOrDefault();
         }
+
+        public static Type? GetFirstMatchingTypeFromCurrentDomainAssembly(string typeName)
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes().Where(x => x.FullName == typeName || x.Name == typeName))
+                .FirstOrDefault();
+        }
     }
 }

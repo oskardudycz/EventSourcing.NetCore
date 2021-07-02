@@ -32,7 +32,7 @@ namespace Core.Events
 
         public static Type ToType(string eventTypeName) => Instance.TypeMap.GetOrAdd(eventTypeName, (_) =>
         {
-            var type = TypeProvider.GetTypeFromAnyReferencingAssembly(eventTypeName.Replace("_", "."))!;
+            var type = TypeProvider.GetFirstMatchingTypeFromCurrentDomainAssembly(eventTypeName.Replace("_", "."))!;
 
             if (type == null)
                 throw new Exception($"Type map for '{eventTypeName}' wasn't found!");
