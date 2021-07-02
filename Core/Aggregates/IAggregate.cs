@@ -1,5 +1,6 @@
 using System;
 using Core.Events;
+using Core.Projections;
 
 namespace Core.Aggregates
 {
@@ -7,12 +8,10 @@ namespace Core.Aggregates
     {
     }
 
-    public interface IAggregate<out T>
+    public interface IAggregate<out T>: IProjection
     {
         T Id { get; }
         int Version { get; }
-
-        void When(object @event);
 
         IEvent[] DequeueUncommittedEvents();
     }

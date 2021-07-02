@@ -4,10 +4,11 @@ using System.Linq;
 using Carts.Carts.Events;
 using Carts.Carts.ValueObjects;
 using Core.Extensions;
+using Core.Projections;
 
 namespace Carts.Carts.Projections
 {
-    public class CartDetails
+    public class CartDetails: IProjection
     {
         public Guid Id { get; set; }
         public Guid ClientId { get; set; }
@@ -19,6 +20,26 @@ namespace Carts.Carts.Projections
         public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 
         public int Version { get; set; }
+
+
+        public void When(object @event)
+        {
+            switch (@event)
+            {
+               case CartInitialized cartInitialized:
+                   Apply(cartInitialized);
+                   return;
+               case ProductAdded cartInitialized:
+                   Apply(cartInitialized);
+                   return;
+               case ProductRemoved cartInitialized:
+                   Apply(cartInitialized);
+                   return;
+               case CartConfirmed cartInitialized:
+                   Apply(cartInitialized);
+                   return;
+            }
+        }
 
         public void Apply(CartInitialized @event)
         {
@@ -58,7 +79,7 @@ namespace Carts.Carts.Projections
 
             var existingProductItem = FindProductItemMatchingWith(@event.ProductItem);
 
-            if(existingProductItem == null)
+            if (existingProductItem == null)
                 return;
 
             if (existingProductItem.HasTheSameQuantity(productItemToBeRemoved))

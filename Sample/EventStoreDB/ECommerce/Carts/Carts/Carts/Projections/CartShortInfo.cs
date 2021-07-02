@@ -1,15 +1,35 @@
 using System;
 using Carts.Carts.Events;
+using Core.Projections;
 
 namespace Carts.Carts.Projections
 {
-    public class CartShortInfo
+    public class CartShortInfo: IProjection
     {
         public Guid Id { get; set; }
 
         public int TotalItemsCount { get; set; }
 
         public CartStatus Status { get; set; }
+
+        public void When(object @event)
+        {
+            switch (@event)
+            {
+                case CartInitialized cartInitialized:
+                    Apply(cartInitialized);
+                    return;
+                case ProductAdded cartInitialized:
+                    Apply(cartInitialized);
+                    return;
+                case ProductRemoved cartInitialized:
+                    Apply(cartInitialized);
+                    return;
+                case CartConfirmed cartInitialized:
+                    Apply(cartInitialized);
+                    return;
+            }
+        }
 
         public void Apply(CartInitialized @event)
         {

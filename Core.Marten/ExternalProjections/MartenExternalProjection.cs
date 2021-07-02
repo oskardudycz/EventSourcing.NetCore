@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Events;
+using Core.Projections;
 using Marten;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,22 +10,19 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Core.Marten.ExternalProjections
 {
     public class MartenExternalProjection<TEvent, TView>: IEventHandler<TEvent>
-        where TView: notnull
+        where TView: IProjection
         where TEvent: IEvent
     {
         private readonly IDocumentSession session;
         private readonly Func<TEvent, Guid> getId;
-        private readonly Action<TEvent, TView> apply;
 
         public MartenExternalProjection(
             IDocumentSession session,
-            Func<TEvent, Guid> getId,
-            Action<TEvent, TView> apply
+            Func<TEvent, Guid> getId
         )
         {
             this.session = session ?? throw new ArgumentNullException(nameof(session));
             this.getId = getId ?? throw new ArgumentNullException(nameof(getId));
-            this.apply = apply ?? throw new ArgumentNullException(nameof(apply));
         }
 
         public async Task Handle(TEvent @event, CancellationToken ct)
@@ -32,7 +30,7 @@ namespace Core.Marten.ExternalProjections
             var entity = (await session.LoadAsync<TView>(getId(@event), ct))
                          ?? (TView)Activator.CreateInstance(typeof(TView), true)!;
 
-            apply(@event, entity);
+            entity.When(@event);
 
             session.Store(entity);
 
@@ -42,15 +40,15 @@ namespace Core.Marten.ExternalProjections
 
     public static class MartenExternalProjectionConfig
     {
-        public static IServiceCollection Project<TEvent, TView>(this IServiceCollection services, Func<TEvent, Guid> getId, Action<TEvent, TView> apply)
-            where TView: notnull
+        public static IServiceCollection Project<TEvent, TView>(this IServiceCollection services, Func<TEvent, Guid> getId)
+            where TView: IProjection
             where TEvent: IEvent
         {
             services.AddTransient<INotificationHandler<TEvent>>(sp =>
             {
                 var session = sp.GetRequiredService<IDocumentSession>();
 
-                return new MartenExternalProjection<TEvent, TView>(session, getId, apply);
+                return new MartenExternalProjection<TEvent, TView>(session, getId);
             });
 
             return services;
