@@ -1,6 +1,6 @@
 using System;
 using Carts.Carts;
-using Carts.Carts.Events;
+using Carts.Carts.InitializingCart;
 using Core.Testing;
 using FluentAssertions;
 

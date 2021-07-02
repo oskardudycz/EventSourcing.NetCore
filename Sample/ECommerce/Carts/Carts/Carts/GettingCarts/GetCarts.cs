@@ -1,9 +1,11 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Carts.Carts.Projections;
 using Core.Queries;
+using Marten;
 using Marten.Pagination;
 
-namespace Carts.Carts.Queries
+namespace Carts.Carts.GettingCarts
 {
     public class GetCarts : IQuery<IPagedList<CartShortInfo>>
     {
@@ -22,6 +24,23 @@ namespace Carts.Carts.Queries
             Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
 
             return new GetCarts(pageNumber, pageSize);
+        }
+    }
+
+    internal class HandleGetCarts :
+        IQueryHandler<GetCarts, IPagedList<CartShortInfo>>
+    {
+        private readonly IDocumentSession querySession;
+
+        public HandleGetCarts(IDocumentSession querySession)
+        {
+            this.querySession = querySession;
+        }
+
+        public Task<IPagedList<CartShortInfo>> Handle(GetCarts request, CancellationToken cancellationToken)
+        {
+            return querySession.Query<CartShortInfo>()
+                .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
         }
     }
 }

@@ -3,30 +3,27 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Carts.Carts;
-using Carts.Carts.Commands;
+using Carts.Carts.InitializingCart;
 using Carts.Tests.Extensions.Reservations;
-using Carts.Tests.Stubs.Products;
 using Core.Testing;
 using FluentAssertions;
 using Xunit;
 
-namespace Carts.Tests.Carts.CommandHandlers
+namespace Carts.Tests.Carts.InitializingCart
 {
-    public class InitCardCommandHandlerTests
+    public class InitializeCardCommandHandlerTests
     {
         [Fact]
         public async Task ForInitCardCommand_ShouldAddNewCart()
         {
             // Given
             var repository = new FakeRepository<Cart>();
-            var productPriceCalculator = new FakeProductPriceCalculator();
 
-            var commandHandler = new CartCommandHandler(
-                repository,
-                productPriceCalculator
+            var commandHandler = new HandleInitializeCart(
+                repository
             );
 
-            var command = InitCart.Create(Guid.NewGuid(), Guid.NewGuid());
+            var command = InitializeCart.Create(Guid.NewGuid(), Guid.NewGuid());
 
             // When
             await commandHandler.Handle(command, CancellationToken.None);

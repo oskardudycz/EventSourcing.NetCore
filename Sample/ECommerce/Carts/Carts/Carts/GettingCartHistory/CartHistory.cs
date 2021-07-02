@@ -1,9 +1,12 @@
 using System;
-using Carts.Carts.Events;
+using Carts.Carts.AddingProduct;
+using Carts.Carts.ConfirmingCart;
+using Carts.Carts.InitializingCart;
+using Carts.Carts.RemovingProduct;
 using Marten.Events;
 using Marten.Events.Projections;
 
-namespace Carts.Carts.Projections
+namespace Carts.Carts.GettingCartHistory
 {
     public record CartHistory (
         Guid Id,

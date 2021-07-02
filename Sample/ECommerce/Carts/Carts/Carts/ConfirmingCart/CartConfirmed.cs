@@ -2,7 +2,7 @@ using System;
 using Ardalis.GuardClauses;
 using Core.Events;
 
-namespace Carts.Carts.Events
+namespace Carts.Carts.ConfirmingCart
 {
     public record CartConfirmed(
         Guid CartId,

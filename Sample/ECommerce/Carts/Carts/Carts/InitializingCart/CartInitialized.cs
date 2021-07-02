@@ -2,7 +2,7 @@ using System;
 using Ardalis.GuardClauses;
 using Core.Events;
 
-namespace Carts.Carts.Events
+namespace Carts.Carts.InitializingCart
 {
     public class CartInitialized: IEvent
     {

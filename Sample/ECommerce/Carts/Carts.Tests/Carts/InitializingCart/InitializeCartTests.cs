@@ -3,9 +3,9 @@ using Carts.Carts;
 using Carts.Tests.Extensions.Reservations;
 using Xunit;
 
-namespace Carts.Tests.Carts
+namespace Carts.Tests.Carts.InitializingCart
 {
-    public class InitCartTests
+    public class InitializeCartTests
     {
         [Fact]
         public void ForValidParams_ShouldCreateCartWithPendingStatus()
