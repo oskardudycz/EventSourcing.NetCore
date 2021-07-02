@@ -36,22 +36,22 @@ namespace Carts.Carts
         private static void AddProjections(IServiceCollection services)
         {
             services
-                .Project<CartInitialized, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
-                .Project<ProductAdded, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
-                .Project<ProductRemoved, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
-                .Project<CartConfirmed, CartDetails>(@event => @event.CartId, (@event, cart) => cart.Apply(@event));
+                .Project<CartInitialized, CartDetails>(@event => @event.CartId)
+                .Project<ProductAdded, CartDetails>(@event => @event.CartId)
+                .Project<ProductRemoved, CartDetails>(@event => @event.CartId)
+                .Project<CartConfirmed, CartDetails>(@event => @event.CartId);
 
             services
-                .Project<CartInitialized, CartShortInfo>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
-                .Project<ProductAdded, CartShortInfo>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
-                .Project<ProductRemoved, CartShortInfo>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
-                .Project<CartConfirmed, CartShortInfo>(@event => @event.CartId, (@event, cart) => cart.Apply(@event));
+                .Project<CartInitialized, CartShortInfo>(@event => @event.CartId)
+                .Project<ProductAdded, CartShortInfo>(@event => @event.CartId)
+                .Project<ProductRemoved, CartShortInfo>(@event => @event.CartId)
+                .Project<CartConfirmed, CartShortInfo>(@event => @event.CartId);
 
             services
-                .Project<CartInitialized, CartHistory>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
-                .Project<ProductAdded, CartHistory>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
-                .Project<ProductRemoved, CartHistory>(@event => @event.CartId, (@event, cart) => cart.Apply(@event))
-                .Project<CartConfirmed, CartHistory>(@event => @event.CartId, (@event, cart) => cart.Apply(@event));
+                .Project<CartInitialized, CartHistory>(@event => @event.CartId)
+                .Project<ProductAdded, CartHistory>(@event => @event.CartId)
+                .Project<ProductRemoved, CartHistory>(@event => @event.CartId)
+                .Project<CartConfirmed, CartHistory>(@event => @event.CartId);
         }
 
         private static void AddQueryHandlers(IServiceCollection services)

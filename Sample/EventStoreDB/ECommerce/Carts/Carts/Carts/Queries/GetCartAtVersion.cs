@@ -8,18 +8,17 @@ namespace Carts.Carts.Queries
     public class GetCartAtVersion : IQuery<CartDetails>
     {
         public Guid CartId { get; }
-        public int Version { get; }
+        public ulong Version { get; }
 
-        private GetCartAtVersion(Guid cartId, int version)
+        private GetCartAtVersion(Guid cartId, ulong version)
         {
             CartId = cartId;
             Version = version;
         }
 
-        public static GetCartAtVersion Create(Guid cartId, int version)
+        public static GetCartAtVersion Create(Guid cartId, ulong version)
         {
             Guard.Against.Default(cartId, nameof(cartId));
-            Guard.Against.Negative(version, nameof(version));
 
             return new GetCartAtVersion(cartId, version);
         }

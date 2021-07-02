@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.Events;
+using Core.EventStoreDB.Events;
 using Core.EventStoreDB.Serialization;
-using Core.Reflection;
 using Core.Repositories;
 using EventStore.Client;
-using Newtonsoft.Json;
 
 namespace Core.EventStoreDB.Repository
 {
@@ -27,26 +25,12 @@ namespace Core.EventStoreDB.Repository
             this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         }
 
-        public async Task<T?> Find(Guid id, CancellationToken cancellationToken)
+        public Task<T?> Find(Guid id, CancellationToken cancellationToken)
         {
-            var readResult = eventStore.ReadStreamAsync(
-                Direction.Forwards,
-                StreamNameMapper.ToStreamId<T>(id),
-                StreamPosition.Start,
-                cancellationToken: cancellationToken
+            return eventStore.AggregateStream<T>(
+                id,
+                cancellationToken
             );
-
-            // TODO: consider adding extension method for the aggregation and deserialisation
-            var aggregate = (T)Activator.CreateInstance(typeof(T), true)!;
-
-            await foreach (var @event in readResult)
-            {
-                var eventData = @event.Deserialize();
-
-                aggregate.When(eventData!);
-            }
-
-            return aggregate;
         }
 
         public Task Add(T aggregate, CancellationToken cancellationToken)
