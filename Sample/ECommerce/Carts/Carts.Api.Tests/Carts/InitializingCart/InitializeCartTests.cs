@@ -4,15 +4,15 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Carts.Api.Requests.Carts;
 using Carts.Carts;
-using Carts.Carts.Events;
-using Carts.Carts.Projections;
+using Carts.Carts.GettingCartById;
+using Carts.Carts.InitializingCart;
 using Core.Testing;
 using FluentAssertions;
 using Xunit;
 
 namespace Carts.Api.Tests.Carts
 {
-    public class InitCartFixture: ApiFixture<Startup>
+    public class InitializeCartFixture: ApiFixture<Startup>
     {
         protected override string ApiUrl => "/api/Carts";
 
@@ -26,11 +26,11 @@ namespace Carts.Api.Tests.Carts
         }
     }
 
-    public class InitCartTests: IClassFixture<InitCartFixture>
+    public class InitializeCartTests: IClassFixture<InitializeCartFixture>
     {
-        private readonly InitCartFixture fixture;
+        private readonly InitializeCartFixture fixture;
 
-        public InitCartTests(InitCartFixture fixture)
+        public InitializeCartTests(InitializeCartFixture fixture)
         {
             this.fixture = fixture;
         }

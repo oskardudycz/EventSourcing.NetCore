@@ -3,7 +3,7 @@ using Ardalis.GuardClauses;
 using Carts.Carts.ValueObjects;
 using Core.Events;
 
-namespace Carts.Carts.Events
+namespace Carts.Carts.RemovingProduct
 {
     public class ProductRemoved: IEvent
     {

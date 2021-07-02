@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Carts.Carts;
-using Carts.Carts.Events;
+using Carts.Carts.ConfirmingCart;
 using Carts.Tests.Builders;
 using Core.Testing;
 using Xunit;

@@ -2,7 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Carts.Api.Requests.Carts;
-using Carts.Carts.Projections;
+using Carts.Carts.GettingCartAtVersion;
+using Carts.Carts.GettingCartById;
+using Carts.Carts.GettingCartHistory;
+using Carts.Carts.GettingCarts;
+using Carts.Carts.InitializingCart;
 using Carts.Carts.Queries;
 using Carts.Carts.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +16,6 @@ using Core.Marten.Responses;
 using Core.Queries;
 using Core.Responses;
 using Marten.Pagination;
-using Commands = Carts.Carts.Commands;
 
 namespace Carts.Api.Controllers
 {
@@ -44,7 +47,7 @@ namespace Carts.Api.Controllers
 
             var cartId = idGenerator.New();
 
-            var command = Commands.InitCart.Create(
+            var command = InitializeCart.Create(
                 cartId,
                 request.ClientId
             );
@@ -60,7 +63,7 @@ namespace Carts.Api.Controllers
             Guard.Against.Null(request, nameof(request));
             Guard.Against.Null(request.ProductItem, nameof(request));
 
-            var command = Commands.AddProduct.Create(
+            var command = Carts.AddingProduct.AddProduct.Create(
                 id,
                 ProductItem.Create(
                     request.ProductItem.ProductId,
@@ -79,7 +82,7 @@ namespace Carts.Api.Controllers
             Guard.Against.Null(request, nameof(request));
             Guard.Against.Null(request.ProductItem, nameof(request));
 
-            var command = Commands.RemoveProduct.Create(
+            var command = Carts.RemovingProduct.RemoveProduct.Create(
                 id,
                 PricedProductItem.Create(
                     request.ProductItem.ProductId,
@@ -96,7 +99,7 @@ namespace Carts.Api.Controllers
         [HttpPut("{id}/confirmation")]
         public async Task<IActionResult> ConfirmCart(Guid id)
         {
-            var command = Commands.ConfirmCart.Create(
+            var command = Carts.ConfirmingCart.ConfirmCart.Create(
                 id
             );
 

@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Carts.Carts.Events;
+using Carts.Carts.AddingProduct;
+using Carts.Carts.ConfirmingCart;
+using Carts.Carts.InitializingCart;
+using Carts.Carts.RemovingProduct;
 using Carts.Carts.ValueObjects;
 using Core.Extensions;
 using Marten.Events.Aggregation;
 
-namespace Carts.Carts.Projections
+namespace Carts.Carts.GettingCartById
 {
     public class CartDetails
     {
