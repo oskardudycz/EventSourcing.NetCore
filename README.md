@@ -104,7 +104,7 @@ Sample event JSON can look like:
   {
     "issuedTo": {
       "name": "Oscar the Grouch",
-      "address": "123 Sesame Street",
+      "address": "123 Sesame Street"
     },
     "amount": 34.12,
     "number": "INV/2021/11/01",
@@ -342,8 +342,8 @@ In Marten `When` method is not needed. Marten uses naming convention and call th
 - have single parameter with event object,
 - have `void` type as the result.
 
-See full details in the:
-- [Generic stream aggregation example](/Core.Tests/AggregateWithWhenTests.cs
+See samples:
+- [Generic stream aggregation](/Core.Tests/AggregateWithWhenTests.cs)
 - [Marten](/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs) 
 - [EventStoreDB](/Core.EventStoreDB/Events/AggregateStreamExtensions.cs) 
 
@@ -389,6 +389,7 @@ You can also watch my presentation "Practical Event Sourcing with Marten":
 Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https://event-driven.io/?utm_source=event_sourcing_net) posts:
 -   📝 [What's the difference between a command and an event?](https://event-driven.io/en/whats_the_difference_between_event_and_command/?utm_source=event_sourcing_net)
 -   📝 [Events should be as small as possible, right?](https://event-driven.io/en/events_should_be_as_small_as_possible/?utm_source=event_sourcing_net)
+-   📝 [How to get the current entity state from events?](https://event-driven.io/en/how_to_get_the_current_entity_state_in_event_sourcing/)
 -   📝 [Why a bank account is not the best example of Event Sourcing?](https://event-driven.io/en/bank_account_event_sourcing/?utm_source=event_sourcing_net)
 -   📝 [How using events helps in a teams' autonomy](https://event-driven.io/en/how_using_events_help_in_teams_autonomy/?utm_source=event_sourcing_net)
 -   📝 [When not to use Event Sourcing?](https://event-driven.io/en/when_not_to_use_event_sourcing/?utm_source=event_sourcing_net)
