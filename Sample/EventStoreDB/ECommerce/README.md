@@ -1,4 +1,4 @@
-# E-Commerce sample of Event Sourcing with EvenStoreDB
+# E-Commerce sample of Event Sourcing with EventStoreDB
 
 Sample is showing the typical flow of the Event Sourcing app with [EventStoreDB](https://developers.eventstore.com).
 
