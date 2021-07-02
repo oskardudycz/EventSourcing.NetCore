@@ -343,8 +343,13 @@ In Marten `When` method is not needed. Marten uses naming convention and call th
 - have `void` type as the result.
 
 See full details in the:
-- [Generic stream aggregation example](/Core.Tests/AggregateWithWhenTests.cs)
+- [Generic stream aggregation example](/Core.Tests/AggregateWithWhenTests.cs
 - [Marten](/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs) 
+- [EventStoreDB](/Core.EventStoreDB/Events/AggregateStreamExtensions.cs) 
+
+
+Read more in my article:
+-   📝 [How to get the current entity state from events?](https://event-driven.io/en/how_to_get_the_current_entity_state_in_event_sourcing/)
 
 ## 2. Support
 
