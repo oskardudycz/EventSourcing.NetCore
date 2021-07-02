@@ -4,19 +4,14 @@ using Ardalis.GuardClauses;
 using Carts.Api.Requests.Carts;
 using Carts.Carts.Projections;
 using Carts.Carts.Queries;
-// using Carts.Carts.Projections;
-// using Carts.Carts.Queries;
 using Carts.Carts.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
 using Core.Ids;
 using Core.Marten.Responses;
-// using Core.Marten.Responses;
 using Core.Queries;
 using Core.Responses;
 using Marten.Pagination;
-// using Core.Responses;
-// using Marten.Pagination;
 using Commands = Carts.Carts.Commands;
 
 namespace Carts.Api.Controllers

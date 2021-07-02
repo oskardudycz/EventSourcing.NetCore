@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,8 +16,8 @@ namespace Carts.Carts
     internal class CartQueryHandler :
         IQueryHandler<GetCartById, CartDetails?>,
         IRequestHandler<GetCarts, IPagedList<CartShortInfo>>,
-        IRequestHandler<GetCartHistory, IPagedList<CartHistory>>//,
-        //IRequestHandler<GetCartAtVersion, CartDetails>
+        IRequestHandler<GetCartHistory, IPagedList<CartHistory>>,
+        IRequestHandler<GetCartAtVersion, CartDetails>
     {
         private readonly IDocumentSession querySession;
 
@@ -45,10 +46,7 @@ namespace Carts.Carts
                 .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
         }
 
-        // public async Task<CartDetails> Handle(GetCartAtVersion request, CancellationToken cancellationToken)
-        // {
-        //     return await querySession.Events.AggregateStreamAsync<CartDetails>(request.CartId, request.Version, token: cancellationToken)
-        //            ?? throw AggregateNotFoundException.For<Cart>(request.CartId);
-        // }
+        public Task<CartDetails> Handle(GetCartAtVersion request, CancellationToken cancellationToken)
+            => throw new NotImplementedException();
     }
 }

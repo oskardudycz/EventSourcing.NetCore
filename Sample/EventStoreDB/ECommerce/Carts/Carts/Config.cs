@@ -12,7 +12,7 @@ namespace Carts
         {
             services.AddEventStoreDB(config);
             // Document Part used for projections
-            services.AddMarten(config, configKey: "Marten");
+            services.AddMarten(config, configKey: "ReadModel_Marten");
             services.AddCarts();
         }
     }

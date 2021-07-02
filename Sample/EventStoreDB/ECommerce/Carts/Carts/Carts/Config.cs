@@ -23,7 +23,6 @@ namespace Carts.Carts
             AddCommandHandlers(services);
             AddProjections(services);
             AddQueryHandlers(services);
-            // AddEventHandlers(services);
         }
 
         private static void AddCommandHandlers(IServiceCollection services)
@@ -60,12 +59,7 @@ namespace Carts.Carts
             services.AddScoped<IRequestHandler<GetCartById, CartDetails?>, CartQueryHandler>();
             services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, CartQueryHandler>();
             services.AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, CartQueryHandler>();
-            // services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
+            services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
         }
-        //
-        // private static void AddEventHandlers(IServiceCollection services)
-        // {
-        //      services.AddScoped<INotificationHandler<CartConfirmed>, CartEventHandler>();
-        // }
     }
 }

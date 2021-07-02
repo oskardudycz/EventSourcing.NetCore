@@ -16,7 +16,6 @@ using Newtonsoft.Json;
 
 namespace Core.EventStoreDB.Subscriptions
 {
-    //See more: https://www.stevejgordon.co.uk/asp-net-core-2-ihostedservice
     public class SubscribeToAllBackgroundWorker: IHostedService
     {
         private Task? executingTask;
@@ -29,6 +28,7 @@ namespace Core.EventStoreDB.Subscriptions
         private readonly SubscriptionFilterOptions? filterOptions;
         private readonly Action<EventStoreClientOperationOptions>? configureOperation;
         private readonly UserCredentials? credentials;
+        private readonly object resubscribeLock = new();
 
         public SubscribeToAllBackgroundWorker(
             IServiceProvider serviceProvider,
@@ -51,20 +51,14 @@ namespace Core.EventStoreDB.Subscriptions
             this.filterOptions = filterOptions ?? new SubscriptionFilterOptions(EventTypeFilter.ExcludeSystemEvents());
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            logger.LogInformation("External Event Consumer started");
-
             // Create a linked token so we can trigger cancellation outside of this token's cancellation
             cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            var checkpoint = await checkpointRepository.Load(subscriptionId, cts.Token);
+            executingTask = SubscribeToAll(cts.Token);
 
-            executingTask = SubscribeToAll(checkpoint, cts.Token);
-
-            await executingTask;
-
-            logger.LogInformation("Subscription to all '{SubscriptionId}' started", subscriptionId);
+            return executingTask;
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
@@ -84,14 +78,19 @@ namespace Core.EventStoreDB.Subscriptions
             // Throw if cancellation triggered
             cancellationToken.ThrowIfCancellationRequested();
 
-            logger.LogInformation("Subscription to all '{SubscriptionId}' stoped", subscriptionId);
+            logger.LogInformation("Subscription to all '{SubscriptionId}' stopped", subscriptionId);
             logger.LogInformation("External Event Consumer stopped");
         }
 
-        private Task SubscribeToAll(ulong? checkpoint, CancellationToken ct)
+        private async Task SubscribeToAll(CancellationToken ct)
         {
-            return checkpoint != null
-                ? eventStoreClient.SubscribeToAllAsync(
+            logger.LogInformation("Subscription to all '{SubscriptionId}'", subscriptionId);
+
+            var checkpoint = await checkpointRepository.Load(subscriptionId, ct);
+
+            if (checkpoint != null)
+            {
+                await eventStoreClient.SubscribeToAllAsync(
                     new Position(checkpoint.Value, checkpoint.Value),
                     HandleEvent,
                     false,
@@ -100,8 +99,11 @@ namespace Core.EventStoreDB.Subscriptions
                     configureOperation,
                     credentials,
                     ct
-                )
-                : eventStoreClient.SubscribeToAllAsync(
+                );
+            }
+            else
+            {
+                await eventStoreClient.SubscribeToAllAsync(
                     HandleEvent,
                     false,
                     HandleDrop,
@@ -110,6 +112,9 @@ namespace Core.EventStoreDB.Subscriptions
                     credentials,
                     ct
                 );
+            }
+
+            logger.LogInformation("Subscription to all '{SubscriptionId}' started", subscriptionId);
         }
 
         private async Task HandleEvent(StreamSubscription subscription, ResolvedEvent resolvedEvent, CancellationToken ct)
@@ -118,6 +123,7 @@ namespace Core.EventStoreDB.Subscriptions
             {
                 if (IsEventWithEmptyData(resolvedEvent) || IsCheckpointEvent(resolvedEvent)) return;
 
+                // Create scope to have proper handling of scoped services
                 using var scope = serviceProvider.CreateScope();
 
                 var eventBus =
@@ -130,33 +136,29 @@ namespace Core.EventStoreDB.Subscriptions
             }
             catch (Exception e)
             {
-                logger.LogInformation("Error consuming message: {ExceptionMessage}{ExceptionStackTrace}", e.Message, e.StackTrace);
+                logger.LogError("Error consuming message: {ExceptionMessage}{ExceptionStackTrace}", e.Message, e.StackTrace);
             }
         }
 
         private bool IsEventWithEmptyData(ResolvedEvent resolvedEvent)
         {
-            if (resolvedEvent.Event.Data.Length == 0)
-            {
-                logger.LogInformation("Event without data received");
-                return true;
-            }
+            if (resolvedEvent.Event.Data.Length != 0) return false;
 
-            return false;
+            logger.LogInformation("Event without data received");
+            return true;
+
         }
 
         private bool IsCheckpointEvent(ResolvedEvent resolvedEvent)
         {
-            if (resolvedEvent.Event.EventType == EventTypeMapper.ToName<CheckpointStored>())
-            {
-                logger.LogInformation("Checkpoint event - ignoring");
-                return true;
-            }
+            if (resolvedEvent.Event.EventType != EventTypeMapper.ToName<CheckpointStored>()) return false;
 
-            return false;
+            logger.LogInformation("Checkpoint event - ignoring");
+            return true;
+
         }
 
-        private void HandleDrop(StreamSubscription subscription, SubscriptionDroppedReason reason, Exception? exception)
+        private void HandleDrop(StreamSubscription _, SubscriptionDroppedReason reason, Exception? exception)
         {
             logger.LogWarning(
                 exception,
@@ -165,17 +167,39 @@ namespace Core.EventStoreDB.Subscriptions
                 reason
             );
 
-            using (NoSynchronizationContextScope.Enter())
+            Resubscribe();
+        }
+
+        private void Resubscribe()
+        {
+            while (true)
             {
-                Resubscribe(subscription).Wait();
+                var resubscribed = false;
+                try
+                {
+                    Monitor.Enter(resubscribeLock);
+
+                    using (NoSynchronizationContextScope.Enter())
+                    {
+                        SubscribeToAll(cts!.Token).Wait();
+                    }
+
+                    resubscribed = true;
+                }
+                catch (Exception exception)
+                {
+                    logger.LogWarning(exception, "Failed to resubscribe to all '{SubscriptionId}' dropped with '{ExceptionMessage}{ExceptionStackTrace}'", subscriptionId, exception.Message, exception.StackTrace);
+                }
+                finally
+                {
+                    Monitor.Exit(resubscribeLock);
+                }
+
+                if (resubscribed)
+                    break;
+
+                Thread.Sleep(1000);
             }
         }
-
-        private Task Resubscribe(StreamSubscription subscription)
-        {
-            // TODO: Add resubscribe code here
-            return Task.CompletedTask;
-        }
-
     }
 }
