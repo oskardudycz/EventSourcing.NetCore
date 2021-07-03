@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Carts.Carts.ValueObjects;
+using Carts.Carts.Products;
 
 namespace Carts.Pricing
 {

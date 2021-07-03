@@ -7,8 +7,9 @@ using Core.Commands;
 using Core.Ids;
 using Core.Queries;
 using Orders.Api.Requests.Carts;
-using Orders.Products.ValueObjects;
-using Commands = Orders.Orders.Commands;
+using Orders.Orders.CompletingOrder;
+using Orders.Orders.InitializingOrder;
+using Orders.Products;
 
 namespace Orders.Api.Controllers
 {
@@ -40,7 +41,7 @@ namespace Orders.Api.Controllers
 
             var orderId = idGenerator.New();
 
-            var command = Commands.InitOrder.Create(
+            var command = InitializeOrder.Create(
                 orderId,
                 request.ClientId,
                 request.ProductItems?.Select(
@@ -58,7 +59,7 @@ namespace Orders.Api.Controllers
         {
             Guard.Against.Null(request, nameof(request));
 
-            var command = Commands.RecordOrderPayment.Create(
+            var command = Orders.RecordingOrderPayment.RecordOrderPayment.Create(
                 id,
                 request.PaymentId,
                 request.PaymentRecordedAt
@@ -74,7 +75,7 @@ namespace Orders.Api.Controllers
         {
             Guard.Against.Null(request, nameof(request));
 
-            var command = Commands.CancelOrder.Create(
+            var command = Orders.CancellingOrder.CancelOrder.Create(
                 id,
                 request.CancellationReason
             );
@@ -87,7 +88,7 @@ namespace Orders.Api.Controllers
         [HttpPut("{id}/confirmation")]
         public async Task<IActionResult> ConfirmOrder(Guid id)
         {
-            var command = Commands.CompleteOrder.Create(
+            var command = CompleteOrder.Create(
                 id
             );
 

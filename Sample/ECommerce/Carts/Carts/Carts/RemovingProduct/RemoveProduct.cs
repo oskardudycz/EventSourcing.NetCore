@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Carts.Carts.ValueObjects;
+using Carts.Carts.Products;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;

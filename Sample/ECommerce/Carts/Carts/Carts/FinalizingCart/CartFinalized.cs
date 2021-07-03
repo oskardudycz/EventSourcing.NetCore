@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Carts.Carts.ConfirmingCart;
-using Carts.Carts.ValueObjects;
+using Carts.Carts.Products;
 using Core.Events;
 using Core.Exceptions;
 using Marten;

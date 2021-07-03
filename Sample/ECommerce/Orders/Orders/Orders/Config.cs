@@ -1,13 +1,16 @@
 using Core.Marten.Repository;
-using Orders.Orders.Commands;
 using Core.Repositories;
 using Marten;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Orders.Carts.Events;
-using Orders.Orders.Events;
-using Orders.Payments.Events;
-using Orders.Shipments.Events;
+using Orders.Carts.FinalizingCart;
+using Orders.Orders.CancellingOrder;
+using Orders.Orders.CompletingOrder;
+using Orders.Orders.InitializingOrder;
+using Orders.Orders.RecordingOrderPayment;
+using Orders.Payments.FinalizingPayment;
+using Orders.Shipments.OutOfStockProduct;
+using Orders.Shipments.SendingPackage;
 
 namespace Orders.Orders
 {
@@ -22,10 +25,10 @@ namespace Orders.Orders
 
         private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
-            return services.AddScoped<IRequestHandler<InitOrder, Unit>, OrderCommandHandler>()
-                .AddScoped<IRequestHandler<RecordOrderPayment, Unit>, OrderCommandHandler>()
-                .AddScoped<IRequestHandler<CompleteOrder, Unit>, OrderCommandHandler>()
-                .AddScoped<IRequestHandler<CancelOrder, Unit>, OrderCommandHandler>();
+            return services.AddScoped<IRequestHandler<InitializeOrder, Unit>, HandleInitializeOrder>()
+                .AddScoped<IRequestHandler<RecordOrderPayment, Unit>, HandleRecordOrderPayment>()
+                .AddScoped<IRequestHandler<CompleteOrder, Unit>, HandleCompleteOrder>()
+                .AddScoped<IRequestHandler<CancelOrder, Unit>, HandleCancelOrder>();
         }
 
         private static IServiceCollection AddEventHandlers(this IServiceCollection services)

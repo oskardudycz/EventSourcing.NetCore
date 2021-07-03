@@ -4,8 +4,8 @@ using System.Linq;
 using Carts.Carts.AddingProduct;
 using Carts.Carts.ConfirmingCart;
 using Carts.Carts.InitializingCart;
+using Carts.Carts.Products;
 using Carts.Carts.RemovingProduct;
-using Carts.Carts.ValueObjects;
 using Core.Extensions;
 using Marten.Events.Aggregation;
 
