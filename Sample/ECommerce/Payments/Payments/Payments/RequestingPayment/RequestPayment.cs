@@ -1,8 +1,12 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Core.Commands;
+using Core.Repositories;
+using MediatR;
 
-namespace Payments.Payments.Commands
+namespace Payments.Payments.RequestingPayment
 {
     public class RequestPayment: ICommand
     {
@@ -33,6 +37,28 @@ namespace Payments.Payments.Commands
             Guard.Against.NegativeOrZero(amount, nameof(amount));
 
             return new RequestPayment(paymentId, orderId, amount);
+        }
+    }
+    public class HandleRequestPayment:
+        ICommandHandler<RequestPayment>
+    {
+        private readonly IRepository<Payment> paymentRepository;
+
+        public HandleRequestPayment(
+            IRepository<Payment> paymentRepository)
+        {
+            Guard.Against.Null(paymentRepository, nameof(paymentRepository));
+
+            this.paymentRepository = paymentRepository;
+        }
+
+        public async Task<Unit> Handle(RequestPayment command, CancellationToken cancellationToken)
+        {
+            var payment = Payment.Initialize(command.PaymentId, command.OrderId, command.Amount);
+
+            await paymentRepository.Add(payment, cancellationToken);
+
+            return Unit.Value;
         }
     }
 }

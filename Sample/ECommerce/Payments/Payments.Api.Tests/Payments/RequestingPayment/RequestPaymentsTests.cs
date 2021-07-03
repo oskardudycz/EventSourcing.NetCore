@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Core.Testing;
 using FluentAssertions;
 using Payments.Api.Requests.Carts;
-using Payments.Payments.Events;
+using Payments.Payments.RequestingPayment;
 using Xunit;
 
-namespace Payments.Api.Tests.Payments
+namespace Payments.Api.Tests.Payments.RequestingPayment
 {
     public class RequestPaymentsTestsFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = "/api/Payments";
+        protected override string ApiUrl => "/api/Payments";
 
         public readonly Guid OrderId = Guid.NewGuid();
 

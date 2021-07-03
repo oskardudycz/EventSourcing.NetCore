@@ -1,7 +1,9 @@
 using System;
 using Core.Aggregates;
-using Payments.Payments.Enums;
-using Payments.Payments.Events;
+using Payments.Payments.CompletingPayment;
+using Payments.Payments.DiscardingPayment;
+using Payments.Payments.RequestingPayment;
+using Payments.Payments.TimingOutPayment;
 
 namespace Payments.Payments
 {

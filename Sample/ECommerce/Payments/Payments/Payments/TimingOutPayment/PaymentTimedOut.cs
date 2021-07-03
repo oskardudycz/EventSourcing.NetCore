@@ -1,27 +1,27 @@
 using System;
 using Ardalis.GuardClauses;
-using Core.Commands;
+using Core.Events;
 
-namespace Payments.Payments.Commands
+namespace Payments.Payments.TimingOutPayment
 {
-    public class TimeOutPayment: ICommand
+    public class PaymentTimedOut: IEvent
     {
         public Guid PaymentId { get; }
 
         public DateTime TimedOutAt { get; }
 
-        private TimeOutPayment(Guid paymentId, DateTime timedOutAt)
+        private PaymentTimedOut(Guid paymentId, DateTime timedOutAt)
         {
             PaymentId = paymentId;
             TimedOutAt = timedOutAt;
         }
 
-        public static TimeOutPayment Create(Guid paymentId, DateTime timedOutAt)
+        public static PaymentTimedOut Create(Guid paymentId, in DateTime timedOutAt)
         {
             Guard.Against.Default(paymentId, nameof(paymentId));
             Guard.Against.Default(timedOutAt, nameof(timedOutAt));
 
-            return new TimeOutPayment(paymentId, timedOutAt);
+            return new PaymentTimedOut(paymentId, timedOutAt);
         }
     }
 }

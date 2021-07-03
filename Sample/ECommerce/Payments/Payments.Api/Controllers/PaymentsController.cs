@@ -6,7 +6,7 @@ using Core.Commands;
 using Core.Ids;
 using Core.Queries;
 using Payments.Api.Requests.Carts;
-using Commands = Payments.Payments.Commands;
+using Payments.Payments.TimingOutPayment;
 
 namespace Payments.Api.Controllers
 {
@@ -38,7 +38,7 @@ namespace Payments.Api.Controllers
 
             var paymentId = idGenerator.New();
 
-            var command = Commands.RequestPayment.Create(
+            var command = Payments.RequestingPayment.RequestPayment.Create(
                 paymentId,
                 request.OrderId,
                 request.Amount
@@ -52,7 +52,7 @@ namespace Payments.Api.Controllers
         [HttpPut("{id}/complete")]
         public async Task<IActionResult> CompletePayment(Guid id)
         {
-            var command = Commands.CompletePayment.Create(
+            var command = Payments.CompletingPayment.CompletePayment.Create(
                 id
             );
 
@@ -66,7 +66,7 @@ namespace Payments.Api.Controllers
         {
             Guard.Against.Null(request, nameof(request));
 
-            var command = Commands.DiscardPayment.Create(
+            var command = Payments.DiscardingPayment.DiscardPayment.Create(
                 id,
                 request.DiscardReason
             );
@@ -81,7 +81,7 @@ namespace Payments.Api.Controllers
         {
             Guard.Against.Null(request, nameof(request));
 
-            var command = Commands.TimeOutPayment.Create(
+            var command = TimeOutPayment.Create(
                 id,
                 request.TimedOutAt
             );
