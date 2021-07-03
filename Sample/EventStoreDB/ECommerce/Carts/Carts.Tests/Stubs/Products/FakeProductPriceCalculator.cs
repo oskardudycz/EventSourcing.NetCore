@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Carts.Carts.ValueObjects;
+using Carts.Carts.Products;
 using Carts.Pricing;
 
 namespace Carts.Tests.Stubs.Products

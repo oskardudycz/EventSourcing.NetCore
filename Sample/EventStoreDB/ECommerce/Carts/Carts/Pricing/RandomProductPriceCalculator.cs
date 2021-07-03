@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Ardalis.GuardClauses;
-using Carts.Carts.ValueObjects;
+using Carts.Carts.Products;
 
 namespace Carts.Pricing
 {

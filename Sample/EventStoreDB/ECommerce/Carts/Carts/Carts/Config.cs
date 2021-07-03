@@ -1,7 +1,12 @@
-using Carts.Carts.Commands;
-using Carts.Carts.Events;
-using Carts.Carts.Projections;
+using Carts.Carts.AddingProduct;
+using Carts.Carts.ConfirmingCart;
+using Carts.Carts.GettingCartAtVersion;
+using Carts.Carts.GettingCartById;
+using Carts.Carts.GettingCartHistory;
+using Carts.Carts.GettingCarts;
+using Carts.Carts.InitializingCart;
 using Carts.Carts.Queries;
+using Carts.Carts.RemovingProduct;
 using Carts.Pricing;
 using Core.EventStoreDB.Repository;
 using Core.Marten.ExternalProjections;
@@ -27,10 +32,10 @@ namespace Carts.Carts
 
         private static void AddCommandHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<InitCart, Unit>, CartCommandHandler>();
-            services.AddScoped<IRequestHandler<AddProduct, Unit>, CartCommandHandler>();
-            services.AddScoped<IRequestHandler<RemoveProduct, Unit>, CartCommandHandler>();
-            services.AddScoped<IRequestHandler<ConfirmCart, Unit>, CartCommandHandler>();
+            services.AddScoped<IRequestHandler<InitializeCart, Unit>, HandleInitializeCart>();
+            services.AddScoped<IRequestHandler<AddProduct, Unit>, HandleAddProduct>();
+            services.AddScoped<IRequestHandler<RemoveProduct, Unit>, HandleRemoveProduct>();
+            services.AddScoped<IRequestHandler<ConfirmCart, Unit>, HandleConfirmCart>();
         }
 
         private static void AddProjections(IServiceCollection services)
@@ -56,10 +61,10 @@ namespace Carts.Carts
 
         private static void AddQueryHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<GetCartById, CartDetails?>, CartQueryHandler>();
-            services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, CartQueryHandler>();
-            services.AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, CartQueryHandler>();
-            services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, CartQueryHandler>();
+            services.AddScoped<IRequestHandler<GetCartById, CartDetails?>, HandleGetCartById>();
+            services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, HandleGetCarts>();
+            services.AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, HandleGetCartHistory>();
+            services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, HandleGetCartAtVersion>();
         }
     }
 }
