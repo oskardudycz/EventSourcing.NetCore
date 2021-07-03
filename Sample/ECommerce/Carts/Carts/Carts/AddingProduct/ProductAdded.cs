@@ -1,6 +1,6 @@
 using System;
 using Ardalis.GuardClauses;
-using Carts.Carts.ValueObjects;
+using Carts.Carts.Products;
 using Core.Events;
 
 namespace Carts.Carts.AddingProduct

@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Orders.Payments.Commands;
+using Orders.Payments.DiscardingPayment;
+using Orders.Payments.RequestingPayment;
 
 namespace Orders.Payments
 {
@@ -8,8 +9,8 @@ namespace Orders.Payments
     {
         internal static IServiceCollection AddPayments(this IServiceCollection services)
         {
-            return services.AddScoped<IRequestHandler<DiscardPayment, Unit>, PaymentsCommandHandler>()
-                .AddScoped<IRequestHandler<RequestPayment, Unit>, PaymentsCommandHandler>();
+            return services.AddScoped<IRequestHandler<DiscardPayment, Unit>, HandleDiscardPayment>()
+                .AddScoped<IRequestHandler<RequestPayment, Unit>, HandleRequestPayment>();
         }
     }
 }

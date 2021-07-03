@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Carts.Carts.ValueObjects;
+using Carts.Carts.Products;
 using Carts.Pricing;
 using Core.Commands;
 using Core.Repositories;

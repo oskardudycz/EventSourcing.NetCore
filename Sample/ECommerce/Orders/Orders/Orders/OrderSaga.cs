@@ -5,15 +5,17 @@ using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Events;
 using Core.Ids;
-using Orders.Carts.Events;
-using Orders.Orders.Commands;
-using Orders.Orders.Enums;
-using Orders.Orders.Events;
-using Orders.Payments.Commands;
-using Orders.Payments.Events;
-using Orders.Products.ValueObjects;
-using Orders.Shipments.Commands;
-using Orders.Shipments.Events;
+using Orders.Carts.FinalizingCart;
+using Orders.Orders.CancellingOrder;
+using Orders.Orders.CompletingOrder;
+using Orders.Orders.InitializingOrder;
+using Orders.Orders.RecordingOrderPayment;
+using Orders.Payments.DiscardingPayment;
+using Orders.Payments.FinalizingPayment;
+using Orders.Payments.RequestingPayment;
+using Orders.Products;
+using Orders.Shipments.OutOfStockProduct;
+using Orders.Shipments.SendingPackage;
 
 namespace Orders.Orders
 {
@@ -43,7 +45,7 @@ namespace Orders.Orders
         {
             var orderId = idGenerator.New();
 
-            return commandBus.Send(InitOrder.Create(orderId, @event.ClientId, @event.ProductItems, @event.TotalPrice));
+            return commandBus.Send(InitializeOrder.Create(orderId, @event.ClientId, @event.ProductItems, @event.TotalPrice));
         }
 
         public Task Handle(OrderInitialized @event, CancellationToken cancellationToken)

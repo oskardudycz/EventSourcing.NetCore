@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Orders.Shipments.Commands;
+using Orders.Shipments.SendingPackage;
 
 namespace Orders.Shipments
 {
@@ -8,7 +8,7 @@ namespace Orders.Shipments
     {
         internal static IServiceCollection AddShipments(this IServiceCollection services)
         {
-            return services.AddScoped<IRequestHandler<SendPackage, Unit>, ShipmentsCommandHandler>();
+            return services.AddScoped<IRequestHandler<SendPackage, Unit>, HandleSendPackage>();
         }
     }
 }

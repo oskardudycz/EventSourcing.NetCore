@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Core.Aggregates;
-using Orders.Orders.Enums;
-using Orders.Orders.Events;
-using Orders.Products.ValueObjects;
+using Orders.Orders.CancellingOrder;
+using Orders.Orders.CompletingOrder;
+using Orders.Orders.InitializingOrder;
+using Orders.Orders.RecordingOrderPayment;
+using Orders.Products;
 
 namespace Orders.Orders
 {
