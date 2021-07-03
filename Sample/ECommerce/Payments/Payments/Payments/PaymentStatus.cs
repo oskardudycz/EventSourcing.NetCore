@@ -1,4 +1,4 @@
-namespace Payments.Payments.Enums
+namespace Payments.Payments
 {
     public enum PaymentStatus
     {

@@ -1,4 +1,4 @@
-namespace Payments.Payments.Enums
+namespace Payments.Payments.FailingPayment
 {
     public enum PaymentFailReason
     {

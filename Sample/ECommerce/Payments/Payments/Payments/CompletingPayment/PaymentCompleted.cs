@@ -2,7 +2,7 @@ using System;
 using Ardalis.GuardClauses;
 using Core.Events;
 
-namespace Payments.Payments.Events
+namespace Payments.Payments.CompletingPayment
 {
     public class PaymentCompleted: IEvent
     {

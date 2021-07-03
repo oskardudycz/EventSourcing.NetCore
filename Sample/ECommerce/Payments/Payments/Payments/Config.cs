@@ -1,10 +1,14 @@
 using Core.Marten.Repository;
-using Payments.Payments.Commands;
 using Core.Repositories;
 using Marten;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Payments.Payments.Events;
+using Payments.Payments.CompletingPayment;
+using Payments.Payments.DiscardingPayment;
+using Payments.Payments.FailingPayment;
+using Payments.Payments.FinalizingPayment;
+using Payments.Payments.RequestingPayment;
+using Payments.Payments.TimingOutPayment;
 
 namespace Payments.Payments
 {
@@ -20,17 +24,17 @@ namespace Payments.Payments
 
         private static void AddCommandHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<RequestPayment, Unit>, PaymentCommandHandler>();
-            services.AddScoped<IRequestHandler<CompletePayment, Unit>, PaymentCommandHandler>();
-            services.AddScoped<IRequestHandler<DiscardPayment, Unit>, PaymentCommandHandler>();
-            services.AddScoped<IRequestHandler<TimeOutPayment, Unit>, PaymentCommandHandler>();
+            services.AddScoped<IRequestHandler<RequestPayment, Unit>, HandleRequestPayment>();
+            services.AddScoped<IRequestHandler<CompletePayment, Unit>, HandleCompletePayment>();
+            services.AddScoped<IRequestHandler<DiscardPayment, Unit>, HandleDiscardPayment>();
+            services.AddScoped<IRequestHandler<TimeOutPayment, Unit>, HandleTimeOutPayment>();
         }
 
         private static void AddEventHandlers(IServiceCollection services)
         {
-             services.AddScoped<INotificationHandler<PaymentCompleted>, PaymentEventHandler>();
-             services.AddScoped<INotificationHandler<PaymentDiscarded>, PaymentEventHandler>();
-             services.AddScoped<INotificationHandler<PaymentTimedOut>, PaymentEventHandler>();
+             services.AddScoped<INotificationHandler<PaymentCompleted>, TransformIntoPaymentFinalized>();
+             services.AddScoped<INotificationHandler<PaymentDiscarded>, TransformIntoPaymentFailed>();
+             services.AddScoped<INotificationHandler<PaymentTimedOut>, TransformIntoPaymentFailed>();
         }
 
         internal static void ConfigurePayments(this StoreOptions options)

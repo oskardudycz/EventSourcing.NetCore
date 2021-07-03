@@ -1,9 +1,8 @@
 using System;
 using Ardalis.GuardClauses;
 using Core.Events;
-using Payments.Payments.Enums;
 
-namespace Payments.Payments.Events
+namespace Payments.Payments.DiscardingPayment
 {
     public class PaymentDiscarded: IEvent
     {

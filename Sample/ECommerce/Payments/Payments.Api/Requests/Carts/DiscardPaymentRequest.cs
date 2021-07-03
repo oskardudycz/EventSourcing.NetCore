@@ -1,4 +1,4 @@
-using Payments.Payments.Enums;
+using Payments.Payments.DiscardingPayment;
 
 namespace Payments.Api.Requests.Carts
 {
