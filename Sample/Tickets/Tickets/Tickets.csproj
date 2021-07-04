@@ -7,18 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Concerts\Commands" />
-      <Folder Include="Concerts\Events" />
-      <Folder Include="Concerts\Queries" />
-      <Folder Include="Seats\Commands" />
-      <Folder Include="Seats\Events" />
-      <Folder Include="Seats\Queries" />
-      <Folder Include="Tickets\Commands" />
-      <Folder Include="Tickets\Events" />
-      <Folder Include="Tickets\Queries" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\..\Core.Marten\Core.Marten.csproj" />
       <ProjectReference Include="..\..\..\Core\Core.csproj" />
     </ItemGroup>
