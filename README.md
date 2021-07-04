@@ -15,7 +15,7 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
   - [2. Support](#2-support)
   - [3. Prerequisites](#3-prerequisites)
   - [4. Tools used](#4-tools-used)
-  - [5. Fully working sample application](#5-fully-working-sample-application)
+  - [5. Samples](#5-samples)
   - [6. Self-paced training Kit](#6-self-paced-training-kit)
   - [7. Articles](#7-articles)
   - [8. Event Store - Marten](#8-event-store---marten)
@@ -364,18 +364,15 @@ Feel free to [create an issue](https://github.com/oskardudycz/EventSourcing.NetC
 For running the Event Store examples you need to have:
 
 1. .NET 5 installed - https://dotnet.microsoft.com/download/dotnet/5.0
-2. Postgres DB. You can get it by:
--   Installing [Docker](https://store.docker.com/search?type=edition&offering=community), going to the `docker` folder and running:
+2. [Docker](https://store.docker.com/search?type=edition&offering=community) installed. Then going to the `docker` folder and running:
 
 ```
 docker-compose up
 ```
--   Installing a most recent version of the Postgres DB (eg. from <https://www.postgresql.org/download/>).
 
 **More information about using .NET Core, WebApi and Docker you can find in my other tutorials:** [WebApi with .NET](https://github.com/oskardudycz/WebApiWith.NETCore)
 
-
-You can also watch my presentation "Practical Event Sourcing with Marten":
+You can also watch my presentation _"Practical Event Sourcing with Marten"_:
 
 <a href="https://www.youtube.com/watch?v=L_ized5xwww&list=PLw-VZz_H4iio9b_NrH25gPKjr2MAS2YgC&index=7" target="_blank"><img src="https://img.youtube.com/vi/L_ized5xwww/0.jpg" alt="Practical Event Sourcing with Marten (EN)" width="320" height="240" border="10" /></a>
 
@@ -391,9 +388,9 @@ and discussion with [Yves Lorphelin](https://github.com/ylorph/) about CQRS:
 4. [Kafka](https://github.com/jbogard/MediatR) - External Durable Message Bus to integrate services
 5. [ElasticSearch](https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/elasticsearch-net-getting-started.html) - Read Models
 
-## 5. Fully working sample application
+## 5. Samples
 
-See also fully working samples of Event Sourcing and CQRS applications in [Samples folder](https://github.com/oskardudycz/EventSourcing.NetCore/tree/main/Sample).
+See also fully working, real-world samples of Event Sourcing and CQRS applications in [Samples folder](https://github.com/oskardudycz/EventSourcing.NetCore/tree/main/Sample).
 
 - **[ECommerce with Marten](./Sample/ECommerce)**
   - typical Event Sourcing and CQRS flow,
@@ -439,8 +436,6 @@ See also fully working samples of Event Sourcing and CQRS applications in [Sampl
 ## 6. Self-paced training Kit
 
 I prepared the self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Workshops/BuildYourOwnEventStore/Readme.md).
-
-It's split into two parts:
 
 **Event Sourcing basics** - it teaches the event store basics by showing how to build your Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projections, snapshots, and finishes with the `Marten` basics. See more in [here](./Workshops/BuildYourOwnEventStore/).
 
