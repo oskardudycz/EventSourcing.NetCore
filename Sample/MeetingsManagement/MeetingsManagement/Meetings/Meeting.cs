@@ -1,6 +1,7 @@
 using System;
 using Core.Aggregates;
-using MeetingsManagement.Meetings.Events;
+using MeetingsManagement.Meetings.CreatingMeeting;
+using MeetingsManagement.Meetings.SchedulingMeeting;
 using MeetingsManagement.Meetings.ValueObjects;
 
 namespace MeetingsManagement.Meetings

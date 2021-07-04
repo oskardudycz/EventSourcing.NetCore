@@ -5,7 +5,7 @@ using Core.Aggregates;
 using Core.Events;
 using Core.Repositories;
 
-namespace MeetingsSearch.Storage
+namespace Core.ElasticSearch.Repository
 {
     public class ElasticSearchRepository<T>: IRepository<T> where T : class, IAggregate, new()
     {

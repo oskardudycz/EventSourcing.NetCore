@@ -4,14 +4,13 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Testing;
 using FluentAssertions;
-using Meetings.IntegrationTests.MeetingsManagement;
 using MeetingsManagement.Api;
-using MeetingsManagement.Meetings.Commands;
+using MeetingsManagement.Meetings.CreatingMeeting;
+using MeetingsManagement.Meetings.GettingMeeting;
 using MeetingsManagement.Meetings.ValueObjects;
-using MeetingsManagement.Meetings.Views;
 using Xunit;
 
-namespace MeetingsManagement.IntegrationTests.Meetings
+namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
 {
     public class ScheduleMeetingFixture: ApiFixture<Startup>
     {

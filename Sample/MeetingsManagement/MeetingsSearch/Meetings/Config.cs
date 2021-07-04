@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using Core.ElasticSearch.Repository;
 using Core.Repositories;
 using MediatR;
-using MeetingsSearch.Meetings.Events;
-using MeetingsSearch.Meetings.Queries;
-using MeetingsSearch.Storage;
+using MeetingsSearch.Meetings.CreatingMeeting;
+using MeetingsSearch.Meetings.SearchingMeetings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MeetingsSearch.Meetings
@@ -13,8 +13,8 @@ namespace MeetingsSearch.Meetings
         public static void AddMeeting(this IServiceCollection services)
         {
             services.AddScoped<IRepository<Meeting>, ElasticSearchRepository<Meeting>>();
-            services.AddScoped<INotificationHandler<MeetingCreated>, MeetingEventHandler>();
-            services.AddScoped<IRequestHandler<SearchMeetings, IReadOnlyCollection<Meeting>>, MeetingQueryHandler>();
+            services.AddScoped<INotificationHandler<MeetingCreated>, HandleMeetingCreated>();
+            services.AddScoped<IRequestHandler<SearchMeetings, IReadOnlyCollection<Meeting>>, HandleSearchMeetings>();
         }
     }
 }

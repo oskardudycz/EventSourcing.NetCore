@@ -2,7 +2,7 @@ using System;
 using Core.Events;
 using MeetingsManagement.Meetings.ValueObjects;
 
-namespace MeetingsManagement.Meetings.Events
+namespace MeetingsManagement.Meetings.SchedulingMeeting
 {
     public class MeetingScheduled: IEvent
     {

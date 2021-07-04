@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
+
 
     <ItemGroup>
         <PackageReference Include="NEST" Version="7.13.0" />
@@ -13,8 +14,9 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
+
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core.ElasticSearch\Core.ElasticSearch.csproj" />
-      <ProjectReference Include="..\..\..\Core\Core.csproj" />
+      <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
+
 </Project>

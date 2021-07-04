@@ -3,16 +3,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Queries;
 using Marten;
-using MeetingsManagement.Meetings.Queries;
-using MeetingsManagement.Meetings.Views;
 
-namespace MeetingsManagement.Meetings
+namespace MeetingsManagement.Meetings.GettingMeeting
 {
-    internal class MeetingQueryHandler: IQueryHandler<GetMeeting, MeetingView?>
+    public record GetMeeting(
+        Guid Id
+    ): IQuery<MeetingView>;
+
+
+    internal class HandleGetMeeting: IQueryHandler<GetMeeting, MeetingView?>
     {
         private readonly IDocumentSession session;
 
-        public MeetingQueryHandler(
+        public HandleGetMeeting(
             IDocumentSession session
         )
         {

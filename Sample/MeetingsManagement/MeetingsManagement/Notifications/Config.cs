@@ -1,5 +1,6 @@
 using MediatR;
-using MeetingsManagement.Meetings.Events;
+using MeetingsManagement.Meetings.CreatingMeeting;
+using MeetingsManagement.Notifications.NotifyingByEvent;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MeetingsManagement.Notifications

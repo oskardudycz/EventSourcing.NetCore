@@ -2,10 +2,9 @@ using Core.Marten.Repository;
 using Core.Repositories;
 using Marten;
 using MediatR;
-using MeetingsManagement.Meetings.Commands;
-using MeetingsManagement.Meetings.Projections;
-using MeetingsManagement.Meetings.Queries;
-using MeetingsManagement.Meetings.Views;
+using MeetingsManagement.Meetings.CreatingMeeting;
+using MeetingsManagement.Meetings.GettingMeeting;
+using MeetingsManagement.Meetings.SchedulingMeeting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MeetingsManagement.Meetings
@@ -16,11 +15,11 @@ namespace MeetingsManagement.Meetings
         {
             services.AddScoped<IRepository<Meeting>, MartenRepository<Meeting>>();
 
-            services.AddScoped<IRequestHandler<CreateMeeting, Unit>, MeetingCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateMeeting, Unit>, HandleCreateMeeting>();
 
-            services.AddScoped<IRequestHandler<ScheduleMeeting, Unit>, MeetingCommandHandler>();
+            services.AddScoped<IRequestHandler<ScheduleMeeting, Unit>, HandleScheduleMeeting>();
 
-            services.AddScoped<IRequestHandler<GetMeeting, MeetingView?>, MeetingQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMeeting, MeetingView?>, HandleGetMeeting>();
         }
 
         public static void ConfigureMarten(StoreOptions options)

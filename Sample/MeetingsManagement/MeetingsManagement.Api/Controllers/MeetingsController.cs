@@ -2,10 +2,10 @@ using System;
 using System.Threading.Tasks;
 using Core.Commands;
 using Core.Queries;
-using MeetingsManagement.Meetings.Commands;
-using MeetingsManagement.Meetings.Queries;
+using MeetingsManagement.Meetings.CreatingMeeting;
+using MeetingsManagement.Meetings.GettingMeeting;
+using MeetingsManagement.Meetings.SchedulingMeeting;
 using MeetingsManagement.Meetings.ValueObjects;
-using MeetingsManagement.Meetings.Views;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeetingsManagement.Api.Controllers

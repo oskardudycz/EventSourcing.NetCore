@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Events;
-using MeetingsManagement.Meetings.Events;
+using MeetingsManagement.Meetings.CreatingMeeting;
 
-namespace MeetingsManagement.Notifications
+namespace MeetingsManagement.Notifications.NotifyingByEvent
 {
     public class EmailNotifier: IEventHandler<MeetingCreated>
     {

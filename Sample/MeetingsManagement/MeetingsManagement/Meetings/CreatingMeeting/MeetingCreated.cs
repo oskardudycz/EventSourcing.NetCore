@@ -1,7 +1,7 @@
 using System;
 using Core.Events;
 
-namespace MeetingsManagement.Meetings.Events
+namespace MeetingsManagement.Meetings.CreatingMeeting
 {
     public class MeetingCreated: IExternalEvent
     {

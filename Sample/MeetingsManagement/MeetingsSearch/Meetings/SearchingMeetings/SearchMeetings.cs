@@ -3,17 +3,26 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Queries;
-using MeetingsSearch.Meetings.Queries;
 
-namespace MeetingsSearch.Meetings
+namespace MeetingsSearch.Meetings.SearchingMeetings
 {
-    internal class MeetingQueryHandler: IQueryHandler<SearchMeetings, IReadOnlyCollection<Meeting>>
+    public class SearchMeetings: IQuery<IReadOnlyCollection<Meeting>>
+    {
+        public string Filter { get; }
+
+        public SearchMeetings(string filter)
+        {
+            Filter = filter;
+        }
+    }
+
+    internal class HandleSearchMeetings: IQueryHandler<SearchMeetings, IReadOnlyCollection<Meeting>>
     {
         private const int MaxItemsCount = 1000;
 
         private readonly Nest.IElasticClient elasticClient;
 
-        public MeetingQueryHandler(
+        public HandleSearchMeetings(
             Nest.IElasticClient elasticClient
         )
         {

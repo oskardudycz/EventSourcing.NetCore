@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Core.Testing;
 using FluentAssertions;
 using MeetingsSearch.Meetings;
-using MeetingsSearch.Meetings.Events;
+using MeetingsSearch.Meetings.CreatingMeeting;
 using Xunit;
 
 namespace MeetingsSearch.IntegrationTests.Meetings

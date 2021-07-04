@@ -1,16 +1,28 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Events;
 using Core.Repositories;
-using MeetingsSearch.Meetings.Events;
 
-namespace MeetingsSearch.Meetings
+namespace MeetingsSearch.Meetings.CreatingMeeting
 {
-    internal class MeetingEventHandler: IEventHandler<MeetingCreated>
+    internal class MeetingCreated: IEvent
+    {
+        public Guid MeetingId { get; }
+        public string Name { get; }
+
+        public MeetingCreated(Guid meetingId, string name)
+        {
+            MeetingId = meetingId;
+            Name = name;
+        }
+    }
+
+    internal class HandleMeetingCreated: IEventHandler<MeetingCreated>
     {
         private readonly IRepository<Meeting> repository;
 
-        public MeetingEventHandler(IRepository<Meeting> repository)
+        public HandleMeetingCreated(IRepository<Meeting> repository)
         {
             this.repository = repository;
         }

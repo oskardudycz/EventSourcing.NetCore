@@ -1,4 +1,4 @@
-namespace Meetings.IntegrationTests.MeetingsManagement
+namespace MeetingsManagement.IntegrationTests.Meetings
 {
     public class MeetingsManagementApi
     {
