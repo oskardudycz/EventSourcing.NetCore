@@ -1,6 +1,6 @@
 using System;
 using Core.Aggregates;
-using SmartHome.Temperature.MotionSensors.Events;
+using SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 
 namespace SmartHome.Temperature.MotionSensors
 {

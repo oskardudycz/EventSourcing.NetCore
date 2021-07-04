@@ -3,7 +3,7 @@ using Ardalis.GuardClauses;
 using Core.Events;
 using Newtonsoft.Json;
 
-namespace SmartHome.Temperature.MotionSensors.Events
+namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor
 {
     public class MotionSensorInstalled : IEvent
     {

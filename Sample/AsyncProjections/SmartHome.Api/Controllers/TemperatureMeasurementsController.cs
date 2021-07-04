@@ -7,8 +7,9 @@ using Core.Ids;
 using Core.Queries;
 using Microsoft.AspNetCore.Mvc;
 using SmartHome.Temperature.TemperatureMeasurements;
-using SmartHome.Temperature.TemperatureMeasurements.Commands;
-using SmartHome.Temperature.TemperatureMeasurements.Queries;
+using SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasurements;
+using SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
+using SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
 
 namespace SmartHome.Api
 {

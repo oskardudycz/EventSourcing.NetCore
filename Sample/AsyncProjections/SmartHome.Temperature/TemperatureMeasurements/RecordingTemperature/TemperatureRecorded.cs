@@ -3,7 +3,7 @@ using Ardalis.GuardClauses;
 using Core.Events;
 using Newtonsoft.Json;
 
-namespace SmartHome.Temperature.TemperatureMeasurements.Events
+namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature
 {
     public class TemperatureRecorded : IEvent
     {

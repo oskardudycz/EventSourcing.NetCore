@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using Ardalis.GuardClauses;
 using Core.Aggregates;
-using SmartHome.Temperature.TemperatureMeasurements.Events;
+using SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
+using SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
 
 namespace SmartHome.Temperature.TemperatureMeasurements
 {

@@ -5,8 +5,9 @@ using Marten;
 using Marten.Events.Projections;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using SmartHome.Temperature.TemperatureMeasurements.Commands;
-using SmartHome.Temperature.TemperatureMeasurements.Queries;
+using SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasurements;
+using SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
+using SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
 
 namespace SmartHome.Temperature.TemperatureMeasurements
 {
@@ -22,15 +23,15 @@ namespace SmartHome.Temperature.TemperatureMeasurements
 
         private static void AddCommandHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<StartTemperatureMeasurement, Unit>, TemperatureSummaryCommandHandler>();
-            services.AddScoped<IRequestHandler<RecordTemperature, Unit>, TemperatureSummaryCommandHandler>();
+            services.AddScoped<IRequestHandler<StartTemperatureMeasurement, Unit>, HandleStartTemperatureMeasurement>();
+            services.AddScoped<IRequestHandler<RecordTemperature, Unit>, HandleRecordTemperature>();
         }
 
         private static void AddQueryHandlers(IServiceCollection services)
         {
             services
                 .AddScoped<IRequestHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>,
-                    TemperatureSummaryQueryHandler>();
+                    HandleGetTemperatureMeasurements>();
         }
 
         internal static void ConfigureTemperatureMeasurements(this StoreOptions options)

@@ -4,8 +4,9 @@ using Core.Repositories;
 using Marten;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using SmartHome.Temperature.MotionSensors.Commands;
-using SmartHome.Temperature.MotionSensors.Queries;
+using SmartHome.Temperature.MotionSensors.GettingMotionSensor;
+using SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
+using SmartHome.Temperature.MotionSensors.RebuildingMotionSensorsViews;
 
 namespace SmartHome.Temperature.MotionSensors
 {
@@ -21,15 +22,14 @@ namespace SmartHome.Temperature.MotionSensors
 
         private static void AddCommandHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<InstallMotionSensor, Unit>, MotionSensorCommandHandler>();
-            services.AddScoped<IRequestHandler<RebuildMotionSensorsViews, Unit>, MotionSensorCommandHandler>();
+            services.AddScoped<IRequestHandler<InstallMotionSensor, Unit>, HandleInstallMotionSensor>();
+            services.AddScoped<IRequestHandler<RebuildMotionSensorsViews, Unit>, HandleRebuildMotionSensorsViews>();
         }
 
         private static void AddQueryHandlers(IServiceCollection services)
         {
             services
-                .AddScoped<IRequestHandler<GetMotionSensors, IReadOnlyList<MotionSensor>>,
-                    MotionSensorQueryHandler>();
+                .AddScoped<IRequestHandler<GetMotionSensors, IReadOnlyList<MotionSensor>>, HandleGetMotionSensors>();
         }
 
         internal static void ConfigureMotionSensors(this StoreOptions options)

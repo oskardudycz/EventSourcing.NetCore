@@ -4,15 +4,22 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Core.Queries;
 using Marten;
-using SmartHome.Temperature.TemperatureMeasurements.Queries;
 
-namespace SmartHome.Temperature.TemperatureMeasurements
+namespace SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasurements
 {
-    public class TemperatureSummaryQueryHandler: IQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>
+    public class GetTemperatureMeasurements: IQuery<IReadOnlyList<TemperatureMeasurement>>
+    {
+        public static GetTemperatureMeasurements Create()
+        {
+            return new();
+        }
+    }
+
+    public class HandleGetTemperatureMeasurements: IQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>
     {
         private readonly IDocumentSession querySession;
 
-        public TemperatureSummaryQueryHandler(IDocumentSession querySession)
+        public HandleGetTemperatureMeasurements(IDocumentSession querySession)
         {
             Guard.Against.Null(querySession, nameof(querySession));
 

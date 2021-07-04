@@ -6,8 +6,9 @@ using Core.Ids;
 using Core.Queries;
 using Microsoft.AspNetCore.Mvc;
 using SmartHome.Temperature.MotionSensors;
-using SmartHome.Temperature.MotionSensors.Commands;
-using SmartHome.Temperature.MotionSensors.Queries;
+using SmartHome.Temperature.MotionSensors.GettingMotionSensor;
+using SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
+using SmartHome.Temperature.MotionSensors.RebuildingMotionSensorsViews;
 
 namespace SmartHome.Api
 {

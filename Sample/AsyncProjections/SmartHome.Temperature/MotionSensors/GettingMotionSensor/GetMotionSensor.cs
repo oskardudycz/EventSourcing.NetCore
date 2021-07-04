@@ -4,15 +4,24 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Core.Queries;
 using Marten;
-using SmartHome.Temperature.MotionSensors.Queries;
 
-namespace SmartHome.Temperature.MotionSensors
+namespace SmartHome.Temperature.MotionSensors.GettingMotionSensor
 {
-    public class MotionSensorQueryHandler : IQueryHandler<GetMotionSensors, IReadOnlyList<MotionSensor>>
+    public class GetMotionSensors : IQuery<IReadOnlyList<MotionSensor>>
+    {
+        private GetMotionSensors(){ }
+
+        public static GetMotionSensors Create()
+        {
+            return new();
+        }
+    }
+
+    public class HandleGetMotionSensors : IQueryHandler<GetMotionSensors, IReadOnlyList<MotionSensor>>
     {
         private readonly IDocumentSession querySession;
 
-        public MotionSensorQueryHandler(IDocumentSession querySession)
+        public HandleGetMotionSensors(IDocumentSession querySession)
         {
             Guard.Against.Null(querySession, nameof(querySession));
 
