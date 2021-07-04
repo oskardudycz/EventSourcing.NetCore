@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Aggregates;
 using Core.Events;
 using Core.EventStoreDB.Serialization;
 using Core.Projections;

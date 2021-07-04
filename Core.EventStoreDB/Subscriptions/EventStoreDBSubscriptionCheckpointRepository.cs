@@ -46,6 +46,7 @@ namespace Core.EventStoreDB.Subscriptions
 
             try
             {
+                // store new checkpoint expecting stream to exist
                 await eventStoreClient.AppendToStreamAsync(
                     streamName,
                     StreamState.StreamExists,
@@ -55,6 +56,9 @@ namespace Core.EventStoreDB.Subscriptions
             }
             catch (WrongExpectedVersionException)
             {
+                // WrongExpectedVersionException means that stream did not exist
+                // Set the checkpoint stream to have at most 1 event
+                // using stream metadata $maxCount property
                 await eventStoreClient.SetStreamMetadataAsync(
                     streamName,
                     StreamState.NoStream,
@@ -62,6 +66,7 @@ namespace Core.EventStoreDB.Subscriptions
                     cancellationToken: ct
                 );
 
+                // append event again expecting stream to not exist
                 await eventStoreClient.AppendToStreamAsync(
                     streamName,
                     StreamState.NoStream,
