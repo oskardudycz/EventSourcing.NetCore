@@ -1,7 +1,7 @@
 using System;
 using FluentAssertions;
 using Tickets.Reservations;
-using Tickets.Reservations.Events;
+using Tickets.Reservations.CreatingTentativeReservation;
 
 namespace Tickets.Tests.Extensions.Reservations
 {

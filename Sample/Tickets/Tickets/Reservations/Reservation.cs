@@ -1,7 +1,11 @@
 using System;
 using Ardalis.GuardClauses;
 using Core.Aggregates;
-using Tickets.Reservations.Events;
+using Tickets.Reservations.CancellingReservation;
+using Tickets.Reservations.ChangingReservationSeat;
+using Tickets.Reservations.ConfirmingReservation;
+using Tickets.Reservations.CreatingTentativeReservation;
+using Tickets.Reservations.NumberGeneration;
 
 namespace Tickets.Reservations
 {

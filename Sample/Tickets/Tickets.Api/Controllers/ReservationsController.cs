@@ -8,9 +8,14 @@ using Marten.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Tickets.Api.Requests;
 using Tickets.Api.Responses;
-using Tickets.Reservations.Commands;
-using Tickets.Reservations.Projections;
-using Tickets.Reservations.Queries;
+using Tickets.Reservations.CancellingReservation;
+using Tickets.Reservations.ChangingReservationSeat;
+using Tickets.Reservations.ConfirmingReservation;
+using Tickets.Reservations.CreatingTentativeReservation;
+using Tickets.Reservations.GettingReservationAtVersion;
+using Tickets.Reservations.GettingReservationById;
+using Tickets.Reservations.GettingReservationHistory;
+using Tickets.Reservations.GettingReservations;
 
 namespace Tickets.Api.Controllers
 {
