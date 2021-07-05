@@ -15,11 +15,11 @@ Sample is showing the typical flow of the Event Sourcing app with [EventStoreDB]
 1. Go to [docker](./docker) and run: `docker-compose up`.
 2. Wait until all dockers got are downloaded and running.
 3. You should automatically get:
-    - Postgres DB running
+    - EventStoreDB UI (for event store): http://localhost:2113/
+    - Postgres DB running (for read models)
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `admin@pgadmin.org`, Password: `admin`
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
-    - EventStoreDB UI: http://localhost:2113/
 4. Open, build and run `ECommerce.sln` solution.
 	- Swagger should be available at: http://localhost:5000/index.html
 
