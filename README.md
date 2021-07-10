@@ -408,7 +408,7 @@ See also fully working, real-world samples of Event Sourcing and CQRS applicatio
   - Builds read models using [Subscription to `$all`](https://developers.eventstore.com/clients/grpc/subscribing-to-streams/#subscribing-to-all).
   - Read models are stored as Marten documents.
 
-- **[Warehouse](./Sample/AsyncProjections/)**
+- **[Warehouse](./Sample/Warehouse)**
   - simplest CQRS flow using .NET 5 Endpoints,
   - example of how and where to use C# Records, Nullable Reference Types, etc,
   - No Event Sourcing! Using Entity Framework to show that CQRS is not bounded to Event Sourcing or any type of storage,
