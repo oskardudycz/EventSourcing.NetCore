@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Warehouse.Core.Commands;
 using Warehouse.Core.Entities;
+using Warehouse.Core.Extensions;
 using Warehouse.Core.Queries;
 using Warehouse.Products.GettingProductDetails;
 using Warehouse.Products.GettingProducts;
@@ -35,7 +38,7 @@ namespace Warehouse.Products
 
         public static IEndpointRouteBuilder UseProductsEndpoints(this IEndpointRouteBuilder endpoints) =>
             endpoints
-                .UseRegisterProductEndpoint()
+                .MapCommand<RegisterProduct>(HttpMethod.Post, "/api/products", HttpStatusCode.Created)
                 .UseGetProductsEndpoint()
                 .UseGetProductDetailsEndpoint();
 

@@ -8,7 +8,19 @@ namespace Warehouse.Core.Commands
 {
     public interface ICommandHandler<in T>
     {
-        ValueTask Handle(T command, CancellationToken token);
+        ValueTask<CommandResult> Handle(T command, CancellationToken token);
+    }
+
+    public record CommandResult
+    {
+        public object? Result { get; }
+
+        private CommandResult(object? result = null)
+            => Result = result;
+
+        public static CommandResult None => new();
+
+        public static CommandResult Of(object result) => new(result);
     }
 
     public static class CommandHandlerConfiguration
@@ -37,7 +49,7 @@ namespace Warehouse.Core.Commands
             => context.RequestServices.GetRequiredService<ICommandHandler<T>>();
 
 
-        public static ValueTask SendCommand<T>(this HttpContext context, T command)
+        public static ValueTask<CommandResult> SendCommand<T>(this HttpContext context, T command)
             => context.GetCommandHandler<T>()
                 .Handle(command, context.RequestAborted);
     }
