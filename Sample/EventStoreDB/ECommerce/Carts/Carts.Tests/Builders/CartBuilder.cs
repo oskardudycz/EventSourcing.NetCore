@@ -1,25 +1,22 @@
 using System;
+using System.Collections.Generic;
 using Core.Aggregates;
 using Carts.Carts;
+using Carts.Carts.InitializingCart;
+using Core.Events;
 
 namespace Carts.Tests.Builders
 {
     internal class CartBuilder
     {
-        private Func<Cart> build  = () => new Cart();
+        private readonly Queue<IEvent> eventsToApply = new();
 
         public CartBuilder Initialized()
         {
             var cartId = Guid.NewGuid();
             var clientId = Guid.NewGuid();
 
-            // When
-            var cart = Cart.Initialize(
-                cartId,
-                clientId
-            );
-
-            build = () => cart;
+            eventsToApply.Enqueue(new CartInitialized(cartId, clientId, CartStatus.Pending));
 
             return this;
         }
@@ -28,8 +25,13 @@ namespace Carts.Tests.Builders
 
         public Cart Build()
         {
-            var cart = build();
-            ((IAggregate)cart).DequeueUncommittedEvents();
+            var cart = (Cart) Activator.CreateInstance(typeof(Cart), true)!;
+
+            foreach (var @event in eventsToApply)
+            {
+                cart.When(@event);
+            }
+
             return cart;
         }
     }

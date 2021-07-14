@@ -30,7 +30,25 @@ namespace Carts.Carts
             return new Cart(cartId, clientId);
         }
 
-        public Cart(){}
+        private Cart(){}
+        public override void When(object @event)
+        {
+            switch (@event)
+            {
+                case CartInitialized cartInitialized:
+                    Apply(cartInitialized);
+                    return;
+                case ProductAdded cartInitialized:
+                    Apply(cartInitialized);
+                    return;
+                case ProductRemoved cartInitialized:
+                    Apply(cartInitialized);
+                    return;
+                case CartConfirmed cartInitialized:
+                    Apply(cartInitialized);
+                    return;
+            }
+        }
 
         private Cart(
             Guid id,
@@ -46,7 +64,7 @@ namespace Carts.Carts
             Apply(@event);
         }
 
-        public void Apply(CartInitialized @event)
+        private void Apply(CartInitialized @event)
         {
             Version++;
 
@@ -74,7 +92,7 @@ namespace Carts.Carts
             Apply(@event);
         }
 
-        public void Apply(ProductAdded @event)
+        private void Apply(ProductAdded @event)
         {
             Version++;
 
@@ -116,7 +134,7 @@ namespace Carts.Carts
             Apply(@event);
         }
 
-        public void Apply(ProductRemoved @event)
+        private void Apply(ProductRemoved @event)
         {
             Version++;
 
@@ -150,7 +168,7 @@ namespace Carts.Carts
             Apply(@event);
         }
 
-        public void Apply(CartConfirmed @event)
+        private void Apply(CartConfirmed @event)
         {
             Version++;
 
