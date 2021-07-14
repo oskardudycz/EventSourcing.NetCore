@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Core.Events;
-using Core.Reflection;
 using EventStore.Client;
 using Newtonsoft.Json;
 

@@ -14,15 +14,15 @@ namespace Core.Threading
 
         public struct Disposable: IDisposable
         {
-            private readonly SynchronizationContext? _synchronizationContext;
+            private readonly SynchronizationContext? synchronizationContext;
 
             public Disposable(SynchronizationContext? synchronizationContext)
             {
-                _synchronizationContext = synchronizationContext;
+                this.synchronizationContext = synchronizationContext;
             }
 
             public void Dispose() =>
-                SynchronizationContext.SetSynchronizationContext(_synchronizationContext);
+                SynchronizationContext.SetSynchronizationContext(synchronizationContext);
         }
     }
 }

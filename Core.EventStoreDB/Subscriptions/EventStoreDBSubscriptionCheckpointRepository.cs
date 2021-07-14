@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Events;
 using Core.EventStoreDB.Serialization;
-using Core.Subscriptions;
 using EventStore.Client;
 
 namespace Core.EventStoreDB.Subscriptions

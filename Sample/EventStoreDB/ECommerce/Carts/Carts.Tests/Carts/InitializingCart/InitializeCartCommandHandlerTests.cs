@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Carts.Tests.Carts.InitializingCart
 {
-    public class InitializeCardCommandHandlerTests
+    public class InitializeCartCommandHandlerTests
     {
         [Fact]
         public async Task ForInitCardCommand_ShouldAddNewCart()

@@ -21,7 +21,7 @@ Sample is showing the typical flow of the Event Sourcing app with [EventStoreDB]
         - Login: `admin@pgadmin.org`, Password: `admin`
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
 4. Open, build and run `ECommerce.sln` solution.
-	- Swagger should be available at: http://localhost:5000/index.html
+    - Swagger should be available at: http://localhost:5000/index.html
 
 
 ## Overview
@@ -31,35 +31,35 @@ It uses:
 - Stores events from Aggregate method results to EventStoreDB,
 - Builds read models using [Subscription to `$all`](https://developers.eventstore.com/clients/grpc/subscribing-to-streams/#subscribing-to-all).
 - Read models are stored as [Marten](https://martendb.io/) documents.
-- App has Swagger and predefined [docker-compose](https://github.com/oskardudycz/EventSourcing.NetCore/pull/49/files#diff-bd9579f0d00fbcbca25416ada9698a7f38fdd91b710c1651e0849d56843a6b45) to run and play with samples.
+- App has Swagger and predefined [docker-compose](./docker/docker-compose.yml) to run and play with samples.
 
 ## Write Model
 
 - Most of the write model infrastructure was reused from other samples,
 - Added new project `Core.EventStoreDB` for specific EventStoreDB code,
-- Added [EventStoreDBRepository](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core.EventStoreDB/Repository/EventStoreDBRepository.cs) repository to load and store aggregate state,
-- Added separate [IProjection](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core/Projections/IProjection.cs) interface to handle the same way stream aggregation and materialised projections,
-- Thanks to that added dedicated [AggregateStream](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core.EventStoreDB/Events/AggregateStreamExtensions.cs#L12) method for stream aggregation
+- Added [EventStoreDBRepository](./Core/Core.EventStoreDB/Repository/EventStoreDBRepository.cs) repository to load and store aggregate state,
+- Added separate [IProjection](./Core/Core/Projections/IProjection.cs) interface to handle the same way stream aggregation and materialised projections,
+- Thanks to that added dedicated [AggregateStream](./Core/Core.EventStoreDB/Events/AggregateStreamExtensions.cs#L12) method for stream aggregation
 - See [sample Aggregate](./Carts/Carts/Carts/Cart.cs)
 
 ## Read Model
 - Read models are rebuilt with eventual consistency using subscribe to all EventStoreDB feature,
-- Added hosted service [SubscribeToAllBackgroundWorker](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core.EventStoreDB/Subscriptions/SubscribeToAllBackgroundWorker.cs) to handle subscribing to all. It handles checkpointing and simple retries if the connection was dropped.
-- Added [ISubscriptionCheckpointRepository](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core/Subscriptions/ISubscriptionCheckpointRepository.cs) for handling Subscription checkpointing.
-- Added checkpointing to EventStoreDB stream with [EventStoreDBSubscriptionCheckpointRepository](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core.EventStoreDB/Subscriptions/EventStoreDBSubscriptionCheckpointRepository.cs) and dummy in-memory checkpointer [InMemorySubscriptionCheckpointRepository](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core/Subscriptions/InMemorySubscriptionCheckpointRepository.cs),
-- Added [MartenExternalProjection](https://github.com/oskardudycz/EventSourcing.NetCore/pull/49/files#diff-6d8dadf8ab81a9441836a5403632ef3616a1dc42788b5feae1c56a4f2321d4eeR12) as a sample how to project with [`left-fold`](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) into external storage. Another (e.g. ElasticSearch, EntityFramework) can be implemented the same way.
+- Added hosted service [SubscribeToAllBackgroundWorker](./Core/Core.EventStoreDB/Subscriptions/SubscribeToAllBackgroundWorker.cs) to handle subscribing to all. It handles checkpointing and simple retries if the connection was dropped.
+- Added [ISubscriptionCheckpointRepository](./Core/Core.EventStoreDB/Subscriptions/ISubscriptionCheckpointRepository.cs) for handling Subscription checkpointing.
+- Added checkpointing to EventStoreDB stream with [EventStoreDBSubscriptionCheckpointRepository](./Core/Core.EventStoreDB/Subscriptions/EventStoreDBSubscriptionCheckpointRepository.cs) and dummy in-memory checkpointer [InMemorySubscriptionCheckpointRepository](./Core/Core.EventStoreDB/Subscriptions/InMemorySubscriptionCheckpointRepository.cs),
+- Added [MartenExternalProjection](./Core/Core.Marten/ExternalProjections/MartenExternalProjection.cs) as a sample how to project with [`left-fold`](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) into external storage. Another (e.g. ElasticSearch, EntityFramework) can be implemented the same way.
 
 ## Tests
 - Added sample of unit testing in [`Carts.Tests`](./Carts/Carts.Tests):
-  - [Aggregate unit tests](./Carts/Carts.Tests/Carts/InitCartTests.cs)
-  - [Command handler unit tests](./Carts/Carts.Tests/Carts/CommandHandlers/InitCardCommandHandlerTests.cs)
+    - [Aggregate unit tests](./Carts/Carts.Tests/Carts/InitializingCart/InitializeCartTests.cs)
+    - [Command handler unit tests](./Carts/Carts.Tests/Carts/InitializingCart/InitializeCartCommandHandlerTests.cs)
 - Added sample of integration testing in [`Carts.Api.Tests`](./Carts/Carts.Api.Tests)
-  - [API integration tests](./Carts/Carts.Api.Tests/Carts/InitCartTests.cs)
+    - [API integration tests](./Carts/Carts.Api.Tests/Carts/InitializingCart/InitializeCartTests.cs)
 
 ## Other
-- Added [EventTypeMapper](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core/Events/EventTypeMapper.cs) class to allow both convention-based mapping (by the .NET type name) and custom to handle event versioning,
-- Added [StreamNameMapper](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core/Events/StreamNameMapper.cs) class for convention-based id (and optional tenant) mapping based on the stream type and module,
-- IoC [registration helpers for EventStoreDB configuration](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Core.EventStoreDB/Config.cs),
+- Added [EventTypeMapper](./Core/Core/Events/EventTypeMapper.cs) class to allow both convention-based mapping (by the .NET type name) and custom to handle event versioning,
+- Added [StreamNameMapper](./Core/Core/Events/StreamNameMapper.cs) class for convention-based id (and optional tenant) mapping based on the stream type and module,
+- IoC [registration helpers for EventStoreDB configuration](./Core/Core.EventStoreDB/Config.cs),
 
 
 ## Trivia

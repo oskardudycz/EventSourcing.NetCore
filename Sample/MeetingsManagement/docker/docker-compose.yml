@@ -29,7 +29,9 @@ services:
         networks:
             - esnetwork
     kibana:
-        image: docker.elastic.co/kibana/kibana:6.3.0
+        image: docker.elastic.co/kibana/kibana:7.13.3
+        volumes:
+          - ./kibana.yml:/usr/share/kibana/config/kibana.yml
         ports:
             - "5601:5601"
         networks:

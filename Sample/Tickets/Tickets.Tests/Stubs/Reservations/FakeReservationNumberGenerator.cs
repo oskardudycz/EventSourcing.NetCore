@@ -1,5 +1,4 @@
 using System;
-using Tickets.Reservations;
 using Tickets.Reservations.NumberGeneration;
 
 namespace Tickets.Tests.Stubs.Reservations

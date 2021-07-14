@@ -1,6 +1,5 @@
 using System;
 using Core.EventStoreDB.Subscriptions;
-using Core.Subscriptions;
 using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;

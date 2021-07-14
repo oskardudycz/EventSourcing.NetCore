@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Core.Subscriptions
+namespace Core.EventStoreDB.Subscriptions
 {
     public class InMemorySubscriptionCheckpointRepository: ISubscriptionCheckpointRepository
     {

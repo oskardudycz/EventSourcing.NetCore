@@ -1,18 +1,13 @@
 using System;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Events;
-using Core.Events.External;
 using Core.EventStoreDB.Serialization;
-using Core.Reflection;
-using Core.Subscriptions;
 using Core.Threading;
 using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace Core.EventStoreDB.Subscriptions
 {

@@ -1,19 +1,20 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Aggregates;
+using Core.ElasticSearch.Indices;
 using Core.Events;
-using Core.Repositories;
+using Nest;
+using IAggregate = Core.Aggregates.IAggregate;
 
 namespace Core.ElasticSearch.Repository
 {
-    public class ElasticSearchRepository<T>: IRepository<T> where T : class, IAggregate, new()
+    public class ElasticSearchRepository<T>: Repositories.IRepository<T> where T : class, IAggregate, new()
     {
-        private readonly Nest.IElasticClient elasticClient;
+        private readonly IElasticClient elasticClient;
         private readonly IEventBus eventBus;
 
         public ElasticSearchRepository(
-            Nest.IElasticClient elasticClient,
+            IElasticClient elasticClient,
             IEventBus eventBus
         )
         {
@@ -29,12 +30,12 @@ namespace Core.ElasticSearch.Repository
 
         public Task Add(T aggregate, CancellationToken cancellationToken)
         {
-            return elasticClient.IndexAsync(aggregate, i => i.Id(aggregate.Id), cancellationToken);
+            return elasticClient.IndexAsync(aggregate, i => i.Id(aggregate.Id).Index(IndexNameMapper.ToIndexName<T>()), cancellationToken);
         }
 
         public Task Update(T aggregate, CancellationToken cancellationToken)
         {
-            return elasticClient.UpdateAsync<T>(aggregate.Id, i => i.Doc(aggregate), cancellationToken);
+            return elasticClient.UpdateAsync<T>(aggregate.Id, i => i.Doc(aggregate).Index(IndexNameMapper.ToIndexName<T>()), cancellationToken);
         }
 
         public Task Delete(T aggregate, CancellationToken cancellationToken)

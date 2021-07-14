@@ -7,7 +7,6 @@ using Core.EventStoreDB.Events;
 using Core.Exceptions;
 using Core.Queries;
 using EventStore.Client;
-using Marten;
 
 namespace Carts.Carts.GettingCartAtVersion
 {

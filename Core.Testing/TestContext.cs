@@ -105,8 +105,8 @@ namespace Core.Testing
 
         public void Dispose()
         {
-            server?.Dispose();
-            Client?.Dispose();
+            server.Dispose();
+            Client.Dispose();
         }
 
         public IReadOnlyCollection<TEvent> PublishedInternalEventsOfType<TEvent>()
