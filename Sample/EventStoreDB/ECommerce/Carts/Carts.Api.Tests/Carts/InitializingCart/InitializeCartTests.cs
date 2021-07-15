@@ -35,7 +35,7 @@ namespace Carts.Api.Tests.Carts.InitializingCart
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_CartId()
         {
             var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
@@ -47,7 +47,7 @@ namespace Carts.Api.Tests.Carts.InitializingCart
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldCreate_Cart()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();

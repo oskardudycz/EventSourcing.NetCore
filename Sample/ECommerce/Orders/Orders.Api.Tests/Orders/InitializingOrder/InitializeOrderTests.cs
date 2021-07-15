@@ -50,7 +50,7 @@ namespace Orders.Api.Tests.Orders
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_OrderId()
         {
             var commandResponse = fixture.CommandResponse;
@@ -63,7 +63,7 @@ namespace Orders.Api.Tests.Orders
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldPublish_OrderInitializedEvent()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
@@ -83,7 +83,7 @@ namespace Orders.Api.Tests.Orders
         }
 
         // [Fact]
-        // [Trait("Category", "Exercise")]
+        // [Trait("Category", "Acceptance")]
         // public async Task CreateCommand_ShouldCreate_Order()
         // {
         //     var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();

@@ -54,7 +54,7 @@ namespace Shipments.Api.Tests.Packages
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_PackageId()
         {
             var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
@@ -66,7 +66,7 @@ namespace Shipments.Api.Tests.Packages
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldPublish_PackageWasSentEvent()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
@@ -86,7 +86,7 @@ namespace Shipments.Api.Tests.Packages
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldCreate_Package()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();

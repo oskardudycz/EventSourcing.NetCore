@@ -88,7 +88,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "SkipCI")]
         public void Repository_FullFlow_ShouldSucceed()
         {
             var streamId = Guid.NewGuid();

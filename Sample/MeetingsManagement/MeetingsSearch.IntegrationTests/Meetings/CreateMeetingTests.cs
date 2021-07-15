@@ -39,7 +39,7 @@ namespace MeetingsSearch.IntegrationTests.Meetings
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task MeetingCreated_ShouldUpdateReadModel()
         {
             //send query

@@ -46,7 +46,7 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_ReservationId()
         {
             var commandResponse = fixture.CommandResponse;
@@ -59,7 +59,7 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldPublish_TentativeReservationCreated()
         {
             var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
@@ -75,7 +75,7 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldCreate_ReservationDetailsReadModel()
         {
             var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
@@ -94,7 +94,7 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldCreate_ReservationList()
         {
             var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
@@ -121,7 +121,7 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
 
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldCreate_ReservationHistory()
         {
             var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
