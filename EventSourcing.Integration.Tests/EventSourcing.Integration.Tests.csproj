@@ -4,6 +4,8 @@
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <VSTestLogger>trx%3bLogFileName=$(MSBuildProjectName).trx</VSTestLogger>
+        <VSTestResultsDirectory>$(MSBuildThisFileDirectory)/bin/TestResults/$(TargetFramework)</VSTestResultsDirectory>
     </PropertyGroup>
 
     <ItemGroup>

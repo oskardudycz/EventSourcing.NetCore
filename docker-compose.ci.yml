@@ -1,0 +1,69 @@
+version: "3"
+services:
+    #######################################################
+    #  Postgres
+    #######################################################
+    postgres:
+        image: clkao/postgres-plv8
+        container_name: postgres
+        environment:
+            POSTGRES_PASSWORD: Password12!
+        ports:
+            - "5432:5432"
+        networks:
+            - pg_network
+
+    pgadmin:
+        image: dpage/pgadmin4
+        container_name: pgadmin
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.org}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+        ports:
+            - "${PGADMIN_PORT:-5050}:80"
+        networks:
+            - pg_network
+
+    #######################################################
+    #  Elastic Search
+    #######################################################
+    elasticsearch:
+        container_name: elastic_search
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.13.3
+        environment:
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - elastic-data:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        networks:
+            - esnetwork
+
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.13.3
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elastic_search:9200
+        ports:
+            - "5601:5601"
+        networks:
+            - esnetwork
+        depends_on:
+            - elasticsearch
+
+networks:
+    esnetwork:
+        driver: bridge
+    pg_network:
+        driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:
+    elastic-data:

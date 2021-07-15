@@ -14,7 +14,7 @@ namespace Core.Testing
         /// <returns>deserialized object</returns>
         public static T FromJson<T>(this string json)
         {
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json)!;
         }
 
         /// <summary>

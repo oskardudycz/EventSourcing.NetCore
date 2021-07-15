@@ -1,5 +1,8 @@
 version: "3"
 services:
+    #######################################################
+    #  Postgres
+    #######################################################
     postgres:
         image: clkao/postgres-plv8
         container_name: postgres
@@ -21,17 +24,32 @@ services:
         networks:
             - postgres
 
+    #######################################################
+    #  Elastic Search
+    #######################################################
     elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
+        container_name: elastic_search
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.13.3
+        environment:
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - elastic-data:/usr/share/elasticsearch/data
         ports:
             - "9200:9200"
             - "9300:9300"
         networks:
             - esnetwork
+
     kibana:
         image: docker.elastic.co/kibana/kibana:7.13.3
-        volumes:
-          - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elastic_search:9200
         ports:
             - "5601:5601"
         networks:
@@ -49,10 +67,10 @@ services:
         networks:
             - kafka_network
         ports:
-          - "2181:2181"
+            - "2181:2181"
         environment:
-          ZOOKEEPER_CLIENT_PORT: 2181
-          ZOOKEEPER_TICK_TIME: 2000
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
 
     #######################################################
     #  Kafka
@@ -62,20 +80,20 @@ services:
         hostname: kafka
         container_name: kafka
         depends_on:
-          - zookeeper
+            - zookeeper
         networks:
             - kafka_network
         ports:
-          - "9092:9092"
-        environment:    
-          KAFKA_BROKER_ID: 1
-          KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
-          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-          KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-          ADVERTISED_HOST_NAME: kafka
-          KAFKA_ADVERTISED_HOSTNAME: 127.0.0.1
+            - "9092:9092"
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+            ADVERTISED_HOST_NAME: kafka
+            KAFKA_ADVERTISED_HOSTNAME: 127.0.0.1
 
     #######################################################
     #  Avro Schema Registry
@@ -92,12 +110,12 @@ services:
         networks:
             - kafka_network
         environment:
-          SCHEMA_REGISTRY_HOST_NAME: schema_registry
-          SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
-          SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
-          SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
-          SCHEMA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
-          SCHEMA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
+            SCHEMA_REGISTRY_HOST_NAME: schema_registry
+            SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+            SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
+            SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
+            SCHEMA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+            SCHEMA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
 
     kafka_rest:
         image: confluentinc/cp-kafka-rest:5.3.2
@@ -144,5 +162,4 @@ networks:
 volumes:
     postgres:
     pgadmin:
-    esdata:
-        driver: local
+    elastic-data:

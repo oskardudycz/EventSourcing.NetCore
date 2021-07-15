@@ -9,7 +9,7 @@ services:
         ports:
             - "5432:5432"
         networks:
-            - es_network
+            - pg_network
         healthcheck:
           test: "pg_isready -U postgres"
           interval: 10s
@@ -25,18 +25,7 @@ services:
         ports:
             - "${PGADMIN_PORT:-5050}:80"
         networks:
-            - es_network
-
-    backend: 
-        image: oskardudycz/eventsourcing.netcore
-        container_name: event_sourcing_sample
-        ports:
-            - "5555:5000"
-        depends_on:
-          postgres:
-            condition: service_healthy
-        networks:
-            - es_network
+            - pg_network
 networks:
-  es_network:
+  pg_network:
      driver: bridge
