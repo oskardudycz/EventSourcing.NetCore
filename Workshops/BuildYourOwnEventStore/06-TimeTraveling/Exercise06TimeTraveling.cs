@@ -77,7 +77,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "SkipCI")]
         public void AggregateStream_ShouldReturnSpecifiedVersionOfTheStream()
         {
             var streamId = Guid.NewGuid();

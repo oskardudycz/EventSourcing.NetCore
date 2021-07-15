@@ -36,7 +36,7 @@ namespace EventStoreBasics.Tests
         /// Verifies if Stream table was created
         /// </summary>
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "SkipCI")]
         public void StreamsTable_ShouldBeCreated()
         {
             var streamsTable = schemaProvider.GetTable(StreamsTableName);
@@ -49,7 +49,7 @@ namespace EventStoreBasics.Tests
         /// Verifies if Stream table has Id column of type Guid
         /// </summary>
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "SkipCI")]
         public void StreamsTable_ShouldHave_IdColumn()
         {
             var idColumn = schemaProvider
@@ -65,7 +65,7 @@ namespace EventStoreBasics.Tests
         /// Verifies if Stream table has Type column of type String
         /// </summary>
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "SkipCI")]
         public void StreamsTable_ShouldHave_TypeColumn_WithStringType()
         {
             var typeColumn = schemaProvider
@@ -81,7 +81,7 @@ namespace EventStoreBasics.Tests
         /// Verifies if Stream table has Version column of type Long
         /// </summary>
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "SkipCI")]
         public void StreamsTable_ShouldHave_VersionColumn_WithLongType()
         {
             var versionColumn = schemaProvider

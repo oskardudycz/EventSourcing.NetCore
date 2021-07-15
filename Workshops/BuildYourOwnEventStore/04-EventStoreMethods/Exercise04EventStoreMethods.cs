@@ -42,7 +42,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "SkipCI")]
         public void GetStreamState_ShouldReturnProperStreamInfo()
         {
             var streamId = Guid.NewGuid();
@@ -58,7 +58,7 @@ namespace EventStoreBasics.Tests
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "SkipCI")]
         public void GetEvents_ShouldReturnAppendedEvents()
         {
             var streamId = Guid.NewGuid();

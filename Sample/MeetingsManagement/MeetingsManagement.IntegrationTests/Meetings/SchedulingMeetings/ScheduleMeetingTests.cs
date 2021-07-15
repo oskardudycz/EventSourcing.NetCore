@@ -52,7 +52,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateMeeting_ShouldReturn_CreatedStatus_With_MeetingId()
         {
             var commandResponse = fixture.CreateMeetingCommandResponse.EnsureSuccessStatusCode();
@@ -63,7 +63,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task ScheduleMeeting_ShouldSucceed()
         {
             var commandResponse = fixture.ScheduleMeetingCommandResponse.EnsureSuccessStatusCode();
@@ -74,7 +74,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task ScheduleMeeting_ShouldUpdateReadModel()
         {
             //send query

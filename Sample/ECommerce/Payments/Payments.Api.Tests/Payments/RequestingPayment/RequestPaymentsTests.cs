@@ -38,7 +38,7 @@ namespace Payments.Api.Tests.Payments.RequestingPayment
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_PaymentId()
         {
             var commandResponse = fixture.CommandResponse;
@@ -51,7 +51,7 @@ namespace Payments.Api.Tests.Payments.RequestingPayment
         }
 
         [Fact]
-        [Trait("Category", "Exercise")]
+        [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldPublish_PaymentInitializedEvent()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
@@ -67,7 +67,7 @@ namespace Payments.Api.Tests.Payments.RequestingPayment
         }
 
         // [Fact]
-        // [Trait("Category", "Exercise")]
+        // [Trait("Category", "Acceptance")]
         // public async Task CreateCommand_ShouldCreate_Payment()
         // {
         //     var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
