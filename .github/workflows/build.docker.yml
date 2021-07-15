@@ -1,4 +1,4 @@
-name: Build
+name: Build and publish Docker
 
 on: [push]
 
@@ -9,14 +9,6 @@ jobs:
         steps:
             - name: Check Out Repo
               uses: actions/checkout@v1
-
-            - name: Setup .NET Core
-              uses: actions/setup-dotnet@v1
-              with:
-                  dotnet-version: "5.0.100"
-
-            - name: Build with dotnet
-              run: dotnet build --configuration Release ./EventSourcing.NetCore.sln
 
             - name: Login to DockerHub
               uses: docker/login-action@v1

@@ -1,0 +1,44 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check Out Repo
+              uses: actions/checkout@v1
+
+            - name: Start containers
+              run: docker-compose -f "docker-compose.ci.yml" up -d
+
+            - name: Setup .NET Core
+              uses: actions/setup-dotnet@v1
+              with:
+                  dotnet-version: "5.0.x"
+
+            - name: Restore NuGet packages
+              run: dotnet restore
+
+            - name: Build
+              run: dotnet build --configuration Release --no-restore
+
+            - name: Run tests
+              run: dotnet test --configuration Release --no-build --filter FullyQualifiedName~Tests --logger "trx;LogFileName=test-results.trx"
+
+            - name: Publish test results
+              uses: dorny/test-reporter@v1
+              if: success() || failure()
+              with:
+                name: Tests Results
+                reporter: dotnet-trx
+                path: '**/test-results.trx'
+
+            - name: Stop containers
+              if: always()
+              run: docker-compose -f "docker-compose.yml" down
