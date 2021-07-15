@@ -193,6 +193,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.EventStoreDB", "Core.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.ElasticSearch", "Core.ElasticSearch\Core.ElasticSearch.csproj", "{B32E504C-C17A-419B-A705-6B876EF44854}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{F078A982-331A-4EB6-B6F8-34464359B05D}"
+ProjectSection(SolutionItems) = preProject
+	.github\workflows\build.docker.yml = .github\workflows\build.docker.yml
+	.github\workflows\build.dotnet.yml = .github\workflows\build.dotnet.yml
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
