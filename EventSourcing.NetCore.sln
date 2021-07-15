@@ -12,7 +12,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A406B86-7F72-4773-B99C-545CCACC92B0}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		docker-compose.yml = docker-compose.yml
 		DOCKERFILE = DOCKERFILE
 		README.md = README.md
 	EndProjectSection
@@ -28,9 +27,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventSourcing.Integration.Tests", "EventSourcing.Integration.Tests\EventSourcing.Integration.Tests.csproj", "{215691EC-51FB-4BD2-A46C-396094727054}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{821D8306-C110-45AB-BDF7-AA80FDA942CE}"
-	ProjectSection(SolutionItems) = preProject
-		docker\docker-compose.yml = docker\docker-compose.yml
-	EndProjectSection
+ProjectSection(SolutionItems) = preProject
+	docker-compose.yml = docker-compose.yml
+	docker-compose.build.yml = docker-compose.build.yml
+	docker-compose.ci.yml = docker-compose.ci.yml
+EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workshops", "Workshops", "{CEEE5F74-121E-437F-B3B4-4E7C65482644}"
 EndProject
