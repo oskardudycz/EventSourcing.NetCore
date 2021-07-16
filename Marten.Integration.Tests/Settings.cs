@@ -1,4 +1,8 @@
-﻿namespace Marten.Integration.Tests
+﻿using Xunit;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+
+namespace Marten.Integration.Tests
 {
     public static class Settings
     {
