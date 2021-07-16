@@ -38,6 +38,7 @@ jobs:
                 name: Tests Results
                 reporter: dotnet-trx
                 path: '**/test-results.trx'
+                fail-on-error: 'false'
 
             - name: Stop containers
               if: always()
