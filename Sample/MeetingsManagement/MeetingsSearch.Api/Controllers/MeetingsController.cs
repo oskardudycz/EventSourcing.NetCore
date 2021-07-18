@@ -5,7 +5,7 @@ using MeetingsSearch.Meetings;
 using MeetingsSearch.Meetings.SearchingMeetings;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MeetingsManagement.Api.Controllers
+namespace MeetingsSearch.Api.Controllers
 {
     [Route("api/[controller]")]
     public class MeetingsController: Controller

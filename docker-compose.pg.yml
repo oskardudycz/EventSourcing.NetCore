@@ -24,19 +24,6 @@ services:
         networks:
             - pg_network
 
-    backend:
-        build:
-            dockerfile: Dockerfile
-            context: .
-        container_name: event_sourcing_sample
-        ports:
-            - "5555:5000"
-        depends_on:
-          postgres:
-            condition: service_healthy
-        networks:
-            - pg_network
-
 networks:
     pg_network:
         driver: bridge

@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Testing;
 using FluentAssertions;
+using MeetingsSearch.Api;
 using MeetingsSearch.Meetings;
 using MeetingsSearch.Meetings.CreatingMeeting;
 using Xunit;
 
-namespace MeetingsSearch.IntegrationTests.Meetings
+namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
 {
     public class CreateMeetingFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = MeetingsSearchApi.MeetingsUrl;
+        protected override string ApiUrl => MeetingsSearchApi.MeetingsUrl;
 
         public readonly Guid MeetingId = Guid.NewGuid();
         public readonly string MeetingName = "Event Sourcing Workshop";
@@ -43,9 +44,7 @@ namespace MeetingsSearch.IntegrationTests.Meetings
         public async Task MeetingCreated_ShouldUpdateReadModel()
         {
             //send query
-            await Task.Delay(5000);
-
-            var queryResponse = await fixture.Get($"{MeetingsSearchApi.MeetingsUrl}");
+            var queryResponse = await fixture.Get(maxNumberOfRetries: 10);
             queryResponse.EnsureSuccessStatusCode();
 
             var meetings = await queryResponse.GetResultFromJson<IReadOnlyCollection<Meeting>>();

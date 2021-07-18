@@ -2,7 +2,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace MeetingsSearch
+namespace MeetingsSearch.Api
 {
     public class Program
     {
