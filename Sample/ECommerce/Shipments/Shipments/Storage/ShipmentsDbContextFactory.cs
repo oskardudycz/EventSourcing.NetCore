@@ -2,13 +2,12 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Shipments.Storage;
 
-namespace EventSourcing.Sample.Clients.Storage
+namespace Shipments.Storage
 {
-    internal class ClientsDbContextFactory: IDesignTimeDbContextFactory<ShipmentsDbContext>
+    internal class ShipmentsDbContextFactory: IDesignTimeDbContextFactory<ShipmentsDbContext>
     {
-        public ClientsDbContextFactory()
+        public ShipmentsDbContextFactory()
         {
         }
 
@@ -27,9 +26,9 @@ namespace EventSourcing.Sample.Clients.Storage
                     .SetBasePath(AppContext.BaseDirectory)
                     .AddJsonFile("appsettings.json")
                     .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: false)
-                    //.AddEnvironmentVariables()
+                    .AddEnvironmentVariables()
                     .Build()
-                    .GetConnectionString("ClientsDatabase");
+                    .GetConnectionString("ShipmentsDatabase");
 
             optionsBuilder.UseNpgsql(connectionString);
 

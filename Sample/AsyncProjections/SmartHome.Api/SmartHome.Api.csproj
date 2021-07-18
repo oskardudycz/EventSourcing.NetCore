@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Core.WebApi\Core.WebApi.csproj" />
       <ProjectReference Include="..\SmartHome.Temperature\SmartHome.Temperature.csproj" />
     </ItemGroup>
 
