@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.ElasticSearch.Indices;
 using Core.Queries;
 
 namespace MeetingsSearch.Meetings.SearchingMeetings
@@ -32,7 +33,8 @@ namespace MeetingsSearch.Meetings.SearchingMeetings
         public async Task<IReadOnlyCollection<Meeting>> Handle(SearchMeetings query, CancellationToken cancellationToken)
         {
             var response = await elasticClient.SearchAsync<Meeting>(
-                s => s.Query(q => q.QueryString(d => d.Query(query.Filter))).Size(MaxItemsCount), cancellationToken);
+                s => s.Index(IndexNameMapper.ToIndexName<Meeting>())
+                    .Query(q => q.QueryString(d => d.Query(query.Filter))).Size(MaxItemsCount), cancellationToken);
 
             return response.Documents;
         }

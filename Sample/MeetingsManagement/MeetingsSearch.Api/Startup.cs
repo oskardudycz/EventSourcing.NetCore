@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-namespace MeetingsSearch
+namespace MeetingsSearch.Api
 {
     public class Startup
     {

@@ -35,7 +35,6 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj" />
         <ProjectReference Include="..\MeetingsSearch.Api\MeetingsSearch.Api.csproj" />
-        <ProjectReference Include="..\MeetingsSearch\MeetingsSearch.csproj" />
     </ItemGroup>
 
     <ItemGroup>

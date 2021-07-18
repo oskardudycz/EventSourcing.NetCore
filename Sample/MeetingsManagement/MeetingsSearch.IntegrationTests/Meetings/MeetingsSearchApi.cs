@@ -1,4 +1,4 @@
-namespace MeetingsSearch.IntegrationTests
+namespace MeetingsSearch.IntegrationTests.Meetings
 {
     public class MeetingsSearchApi
     {
