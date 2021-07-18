@@ -44,7 +44,7 @@ namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
         public async Task MeetingCreated_ShouldUpdateReadModel()
         {
             //send query
-            var queryResponse = await fixture.Get(maxNumberOfRetries: 10);
+            var queryResponse = await fixture.Get(maxNumberOfRetries: 10, retryIntervalInMs: 2000);
             queryResponse.EnsureSuccessStatusCode();
 
             var meetings = await queryResponse.GetResultFromJson<IReadOnlyCollection<Meeting>>();

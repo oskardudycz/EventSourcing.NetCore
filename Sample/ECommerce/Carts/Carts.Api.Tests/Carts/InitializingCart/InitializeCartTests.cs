@@ -10,7 +10,7 @@ using Core.Testing;
 using FluentAssertions;
 using Xunit;
 
-namespace Carts.Api.Tests.Carts
+namespace Carts.Api.Tests.Carts.InitializingCart
 {
     public class InitializeCartFixture: ApiFixture<Startup>
     {
@@ -37,7 +37,7 @@ namespace Carts.Api.Tests.Carts
 
         [Fact]
         [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_CartId()
+        public async Task IntializeCart_ShouldReturn_CreatedStatus_With_CartId()
         {
             var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -49,7 +49,7 @@ namespace Carts.Api.Tests.Carts
 
         [Fact]
         [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldPublish_CartInitializedEvent()
+        public async Task IntializeCart_ShouldPublish_CartInitializedEvent()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
@@ -65,7 +65,7 @@ namespace Carts.Api.Tests.Carts
 
         [Fact]
         [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldCreate_Cart()
+        public async Task IntializeCart_ShouldCreate_Cart()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
