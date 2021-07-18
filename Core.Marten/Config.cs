@@ -1,5 +1,6 @@
 using System;
 using Core.Ids;
+using Core.Threading;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Microsoft.Extensions.Configuration;
@@ -42,10 +43,13 @@ namespace Core.Marten
                 })
                 .InitializeStore();
 
-            if (martenConfig.ShouldRecreateDatabase)
-                documentStore.Advanced.Clean.CompletelyRemoveAll();
+                if (martenConfig.ShouldRecreateDatabase)
+                    documentStore.Advanced.Clean.CompletelyRemoveAll();
 
-            documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
+                using (NoSynchronizationContextScope.Enter())
+                {
+                    documentStore.Schema.ApplyAllConfiguredChangesToDatabase().Wait();
+                }
 
             return services;
         }
