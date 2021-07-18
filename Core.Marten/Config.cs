@@ -4,6 +4,7 @@ using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Weasel.Core;
 using Weasel.Postgresql;
 
 namespace Core.Marten
@@ -41,10 +42,10 @@ namespace Core.Marten
                 })
                 .InitializeStore();
 
-                if (martenConfig.ShouldRecreateDatabase)
-                    documentStore.Advanced.Clean.CompletelyRemoveAll();
+            if (martenConfig.ShouldRecreateDatabase)
+                documentStore.Advanced.Clean.CompletelyRemoveAll();
 
-                documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
+            documentStore.Schema.ApplyAllConfiguredChangesToDatabase();
 
             return services;
         }

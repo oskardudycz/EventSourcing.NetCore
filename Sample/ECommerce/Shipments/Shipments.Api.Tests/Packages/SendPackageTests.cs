@@ -16,13 +16,13 @@ namespace Shipments.Api.Tests.Packages
 {
     public class SendPackageFixture: ApiFixture<Startup>
     {
-        protected override string ApiUrl { get; } = "/api/Shipments";
+        protected override string ApiUrl => "/api/Shipments";
 
         public readonly Guid OrderId = Guid.NewGuid();
 
         public readonly DateTime TimeBeforeSending = DateTime.UtcNow;
 
-        public readonly List<ProductItem> ProductItems = new List<ProductItem>
+        public readonly List<ProductItem> ProductItems = new()
         {
             new ProductItem
             {

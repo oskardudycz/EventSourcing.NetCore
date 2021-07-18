@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Core.WebApi\Core.WebApi.csproj" />
       <ProjectReference Include="..\Tickets\Tickets.csproj" />
     </ItemGroup>
 

@@ -17,7 +17,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="5.10.3" />
-        <PackageReference Include="Marten" Version="4.0.0-rc.2" />
+        <PackageReference Include="Marten" Version="4.0.0-rc.3" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
@@ -36,11 +36,5 @@
         <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj" />
         <ProjectReference Include="..\MeetingsManagement.Api\MeetingsManagement.Api.csproj" />
         <ProjectReference Include="..\MeetingsManagement\MeetingsManagement.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Update="appsettings.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
     </ItemGroup>
 </Project>

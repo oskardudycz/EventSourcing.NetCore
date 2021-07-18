@@ -21,13 +21,17 @@ namespace Shipments
         private static IServiceCollection AddEntityFramework(this IServiceCollection services, IConfiguration config)
         {
             return services.AddDbContext<ShipmentsDbContext>(
-                options => options.UseNpgsql(config.GetConnectionString("ShipmentsDatabase")));
+                options => options.UseNpgsql("name=ConnectionStrings:ShipmentsDatabase"));
         }
 
         public static void ConfigureShipmentsModule(this IServiceProvider serviceProvider)
         {
-            // Kids, don't try this at production
-            serviceProvider.GetRequiredService<ShipmentsDbContext>().Database.Migrate();
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
+            if (environment == "Development")
+            {
+                serviceProvider.GetRequiredService<ShipmentsDbContext>().Database.Migrate();
+            }
         }
     }
 }
