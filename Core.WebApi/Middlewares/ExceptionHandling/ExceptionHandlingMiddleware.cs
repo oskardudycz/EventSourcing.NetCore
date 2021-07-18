@@ -35,6 +35,7 @@ namespace Core.WebApi.Middlewares.ExceptionHandling
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             logger.LogError(exception, exception.Message);
+            Console.WriteLine(exception.Message);
 
             var codeInfo = ExceptionToHttpStatusMapper.Map(exception);
 
