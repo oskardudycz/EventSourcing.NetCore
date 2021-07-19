@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Core.Ids;
 using Core.Threading;
 using Marten;
@@ -43,6 +44,15 @@ namespace Core.Marten
                 })
                 .InitializeStore();
 
+            SetupSchema(documentStore, martenConfig, 1);
+
+            return services;
+        }
+
+        private static void SetupSchema(IDocumentStore documentStore, Config martenConfig, int retryLeft = 1)
+        {
+            try
+            {
                 if (martenConfig.ShouldRecreateDatabase)
                     documentStore.Advanced.Clean.CompletelyRemoveAll();
 
@@ -50,8 +60,14 @@ namespace Core.Marten
                 {
                     documentStore.Schema.ApplyAllConfiguredChangesToDatabase().Wait();
                 }
+            }
+            catch
+            {
+                if (retryLeft == 0) throw;
 
-            return services;
+                Thread.Sleep(1000);
+                SetupSchema(documentStore, martenConfig, --retryLeft);
+            }
         }
 
         private static void SetStoreOptions(StoreOptions options, Config config,
