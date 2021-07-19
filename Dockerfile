@@ -10,6 +10,7 @@ WORKDIR /app
 
 COPY ./Core/Core.csproj ./Core/
 COPY ./Core.Marten/Core.Marten.csproj ./Core.Marten/
+COPY ./Core.WebApi/Core.WebApi.csproj ./Core.WebApi/
 COPY ./Sample/Tickets/Tickets/Tickets.csproj ./Sample/Tickets/Tickets/
 COPY ./Sample/Tickets/Tickets.Api/ ./Sample/Tickets/Tickets.Api/
 
@@ -19,6 +20,7 @@ RUN dotnet restore ./Sample/Tickets/Tickets.Api/Tickets.Api.csproj
 # Copy project files
 COPY ./Core ./Core
 COPY ./Core.Marten ./Core.Marten
+COPY ./Core.WebApi ./Core.WebApi
 COPY ./Sample/Tickets/Tickets ./Sample/Tickets/Tickets
 COPY ./Sample/Tickets/Tickets.Api ./Sample/Tickets/Tickets.Api
 

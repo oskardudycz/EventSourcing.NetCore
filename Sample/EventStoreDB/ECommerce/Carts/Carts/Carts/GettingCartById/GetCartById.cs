@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
+using Core.Exceptions;
 using Core.Queries;
 using Marten;
 
@@ -25,7 +26,7 @@ namespace Carts.Carts.GettingCartById
     }
 
     internal class HandleGetCartById :
-        IQueryHandler<GetCartById, CartDetails?>
+        IQueryHandler<GetCartById, CartDetails>
     {
         private readonly IDocumentSession querySession;
 
@@ -34,9 +35,11 @@ namespace Carts.Carts.GettingCartById
             this.querySession = querySession;
         }
 
-        public Task<CartDetails?> Handle(GetCartById request, CancellationToken cancellationToken)
+        public async Task<CartDetails> Handle(GetCartById request, CancellationToken cancellationToken)
         {
-            return querySession.LoadAsync<CartDetails>(request.CartId, cancellationToken);
+            var cart = await querySession.LoadAsync<CartDetails>(request.CartId, cancellationToken);
+
+            return cart ?? throw AggregateNotFoundException.For<Cart>(request.CartId);
         }
     }
 }

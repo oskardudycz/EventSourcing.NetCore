@@ -15,7 +15,7 @@ namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
         protected override string ApiUrl => MeetingsSearchApi.MeetingsUrl;
 
         public readonly Guid MeetingId = Guid.NewGuid();
-        public readonly string MeetingName = "Event Sourcing Workshop";
+        public readonly string MeetingName = $"Event Sourcing Workshop {DateTime.Now.Ticks}";
 
         public override async Task InitializeAsync()
         {
@@ -44,7 +44,14 @@ namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
         public async Task MeetingCreated_ShouldUpdateReadModel()
         {
             //send query
-            var queryResponse = await fixture.Get(maxNumberOfRetries: 15, retryIntervalInMs: 2000);
+            var queryResponse = await fixture.Get(
+                $"?filter={fixture.MeetingName}",
+                maxNumberOfRetries: 10,
+                retryIntervalInMs: 1000,
+                check: async response =>
+                    response.IsSuccessStatusCode
+                    && (await response.Content.ReadAsStringAsync()).Contains(fixture.MeetingName));
+
             queryResponse.EnsureSuccessStatusCode();
 
             var meetings = await queryResponse.GetResultFromJson<IReadOnlyCollection<Meeting>>();
