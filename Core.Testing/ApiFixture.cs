@@ -49,17 +49,17 @@ namespace Core.Testing
             HttpResponseMessage queryResponse;
             var retryCount = maxNumberOfRetries;
 
-            var doCheck = check ?? (response => new (response.StatusCode != HttpStatusCode.OK));
+            var doCheck = check ?? (response => new (response.StatusCode == HttpStatusCode.OK));
             do
             {
                 queryResponse = await Client.GetAsync(
                     $"{ApiUrl}/{path}"
                 );
 
-                var succeeded = await doCheck(queryResponse);
-                if (succeeded || retryCount == 0)
+                if (retryCount == 0 || (await doCheck(queryResponse)))
                     break;
 
+                await Task.Delay(retryIntervalInMs);
                 retryCount--;
             } while (true);
             return queryResponse;
