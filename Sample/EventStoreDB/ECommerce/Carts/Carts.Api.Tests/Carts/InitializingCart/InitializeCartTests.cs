@@ -56,7 +56,9 @@ namespace Carts.Api.Tests.Carts.InitializingCart
             var query = $"{createdId}";
 
             //send query
-            var queryResponse = await fixture.Get(query, 10);
+            var queryResponse = await fixture.Get(query, 10,
+                check: response => new(response.StatusCode == HttpStatusCode.Created));
+
             queryResponse.EnsureSuccessStatusCode();
 
             var cartDetails = await queryResponse.GetResultFromJson<CartDetails>();
