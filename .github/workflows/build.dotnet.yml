@@ -29,7 +29,7 @@ jobs:
               run: dotnet build --configuration Release --no-restore
 
             - name: Run tests
-              run: dotnet test --configuration Release --no-build --filter Category!=SkipCI --logger "trx;LogFileName=test-results.trx" < /dev/null
+              run: dotnet test --configuration Release --no-build --filter Category!=SkipCI --logger "trx;LogFileName=test-results.trx"
 
             - name: Publish test results
               uses: dorny/test-reporter@v1
