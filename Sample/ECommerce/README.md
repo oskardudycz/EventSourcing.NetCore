@@ -25,7 +25,7 @@
 14. You should automatically get:
     - Postgres DB running
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
-        - Login: `admin@pgadmin.org`, Password: `admin`
+        - Login: `pgadmin4@pgadmin.org`, Password: `admin`
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
     - Kafka
     - Kafka ide for browsing topics. Available at: http://localhost:8000
