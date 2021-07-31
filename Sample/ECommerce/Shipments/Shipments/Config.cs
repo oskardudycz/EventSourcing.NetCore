@@ -1,4 +1,5 @@
 using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,13 +25,14 @@ namespace Shipments
                 options => options.UseNpgsql("name=ConnectionStrings:ShipmentsDatabase"));
         }
 
-        public static void ConfigureShipmentsModule(this IServiceProvider serviceProvider)
+        public static void ConfigureShipmentsModule(this IApplicationBuilder app)
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
             if (environment == "Development")
             {
-                serviceProvider.GetRequiredService<ShipmentsDbContext>().Database.Migrate();
+                using var serviceScope = app.ApplicationServices.CreateScope();
+                serviceScope.ServiceProvider.GetRequiredService<ShipmentsDbContext>().Database.Migrate();
             }
         }
     }

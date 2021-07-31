@@ -64,7 +64,7 @@ namespace Shipments.Api
                 c.RoutePrefix = string.Empty;
             });
 
-            app.ApplicationServices.ConfigureShipmentsModule();
+            app.ConfigureShipmentsModule();
         }
     }
 }
