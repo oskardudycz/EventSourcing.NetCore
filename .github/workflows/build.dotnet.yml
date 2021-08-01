@@ -31,12 +31,11 @@ jobs:
             - name: Run tests
               run: dotnet test --configuration Release --no-build --filter Category!=SkipCI --logger "trx;LogFileName=test-results.trx"
 
-            - name: Publish test results
-              uses: dorny/test-reporter@v1
+            - name: Upload test results
+              uses: actions/upload-artifact@v2
               if: success() || failure()
               with:
-                name: Tests Results
-                reporter: dotnet-trx
+                name: test-results
                 path: '**/test-results.trx'
                 fail-on-error: 'false'
 
