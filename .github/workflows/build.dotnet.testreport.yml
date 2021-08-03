@@ -7,16 +7,16 @@ on:
       - completed
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Tests Results
+          artifact: test-results
+          reporter: dotnet-trx
+          path: '**/test-results.trx'
+          fail-on-error: 'false'
 
-        steps:
-            - name: Publish test results
-              uses: dorny/test-reporter@v1
-              if: success() || failure()
-              with:
-                name: Tests Results
-                artifact: test-results
-                reporter: dotnet-trx
-                path: '**/test-results.trx'
-                fail-on-error: 'false'
