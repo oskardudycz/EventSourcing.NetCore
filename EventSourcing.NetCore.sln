@@ -197,6 +197,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{F078A982-331A-
 ProjectSection(SolutionItems) = preProject
 	.github\workflows\build.dotnet.yml = .github\workflows\build.dotnet.yml
 	.github\workflows\publish.docker.yml = .github\workflows\publish.docker.yml
+	.github\workflows\build.dotnet.testreport.yml = .github\workflows\build.dotnet.testreport.yml
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marten.Integration.Tests", "Marten.Integration.Tests\Marten.Integration.Tests.csproj", "{D9D67A6C-FE95-4864-B8F1-BD2689134590}"
