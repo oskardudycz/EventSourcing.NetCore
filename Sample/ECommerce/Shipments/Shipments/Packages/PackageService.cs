@@ -65,7 +65,7 @@ namespace Shipments.Packages
                 OrderId = request.OrderId,
                 ProductItems = request.ProductItems.Select(pi =>
                     new ProductItem {Id = Guid.NewGuid(), ProductId = pi.ProductId, Quantity = pi.Quantity}).ToList(),
-                SentAt = DateTime.Now
+                SentAt = DateTime.UtcNow
             };
 
             await Packages.AddAsync(package, cancellationToken);
