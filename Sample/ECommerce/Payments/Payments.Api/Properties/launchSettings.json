@@ -11,6 +11,7 @@
         "PaymentsApi": {
             "commandName": "Project",
             "launchBrowser": true,
+            "applicationUrl": "http://localhost:5502",
             "launchUrl": "http://localhost:5502",
             "environmentVariables": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
