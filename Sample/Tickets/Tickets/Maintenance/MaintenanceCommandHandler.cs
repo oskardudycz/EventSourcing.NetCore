@@ -1,14 +1,15 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
+using Core.Commands;
 using Marten;
 using MediatR;
 using Tickets.Maintenance.Commands;
 
-namespace Tickets.Reservations
+namespace Tickets.Maintenance
 {
     public class MaintenanceCommandHandler:
-        IRequestHandler<RebuildProjection, Unit>
+        ICommandHandler<RebuildProjection>
     {
         private readonly IDocumentStore documentStore;
 

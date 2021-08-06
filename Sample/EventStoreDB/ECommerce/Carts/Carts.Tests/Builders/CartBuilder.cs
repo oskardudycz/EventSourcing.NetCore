@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Core.Aggregates;
 using Carts.Carts;
 using Carts.Carts.InitializingCart;
 using Core.Events;

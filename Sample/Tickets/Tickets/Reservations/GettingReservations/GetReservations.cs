@@ -29,7 +29,7 @@ namespace Tickets.Reservations.GettingReservations
     }
 
     internal class HandleGetReservations:
-        IRequestHandler<GetReservations, IPagedList<ReservationShortInfo>>
+        IQueryHandler<GetReservations, IPagedList<ReservationShortInfo>>
     {
         private readonly IDocumentSession querySession;
 

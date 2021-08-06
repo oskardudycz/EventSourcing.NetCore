@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using Core.Commands;
 using Core.Marten.Repository;
+using Core.Queries;
 using Core.Repositories;
 using Marten;
 using Marten.Events.Projections;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasurements;
 using SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
@@ -23,15 +24,13 @@ namespace SmartHome.Temperature.TemperatureMeasurements
 
         private static void AddCommandHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<StartTemperatureMeasurement, Unit>, HandleStartTemperatureMeasurement>();
-            services.AddScoped<IRequestHandler<RecordTemperature, Unit>, HandleRecordTemperature>();
+            services.AddCommandHandler<StartTemperatureMeasurement, HandleStartTemperatureMeasurement>()
+                    .AddCommandHandler<RecordTemperature, HandleRecordTemperature>();
         }
 
         private static void AddQueryHandlers(IServiceCollection services)
         {
-            services
-                .AddScoped<IRequestHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>,
-                    HandleGetTemperatureMeasurements>();
+            services.AddQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>, HandleGetTemperatureMeasurements>();
         }
 
         internal static void ConfigureTemperatureMeasurements(this StoreOptions options)

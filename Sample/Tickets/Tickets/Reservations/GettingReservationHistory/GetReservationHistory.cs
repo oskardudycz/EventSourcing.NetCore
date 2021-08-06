@@ -33,7 +33,7 @@ namespace Tickets.Reservations.GettingReservationHistory
     }
 
     internal class HandleGetReservationHistory :
-        IRequestHandler<GetReservationHistory, IPagedList<ReservationHistory>>
+        IQueryHandler<GetReservationHistory, IPagedList<ReservationHistory>>
     {
         private readonly IDocumentSession querySession;
 

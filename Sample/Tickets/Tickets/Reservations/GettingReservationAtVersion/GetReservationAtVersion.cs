@@ -31,7 +31,7 @@ namespace Tickets.Reservations.GettingReservationAtVersion
     }
 
     internal class HandleGetReservationAtVersion :
-        IRequestHandler<GetReservationAtVersion, ReservationDetails>
+        IQueryHandler<GetReservationAtVersion, ReservationDetails>
     {
         private readonly IDocumentSession querySession;
 

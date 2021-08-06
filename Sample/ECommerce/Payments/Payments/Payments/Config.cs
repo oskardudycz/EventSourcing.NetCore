@@ -1,7 +1,8 @@
+using Core.Commands;
+using Core.Events;
 using Core.Marten.Repository;
 using Core.Repositories;
 using Marten;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Payments.Payments.CompletingPayment;
 using Payments.Payments.DiscardingPayment;
@@ -16,25 +17,26 @@ namespace Payments.Payments
     {
         internal static void AddPayments(this IServiceCollection services)
         {
-            services.AddScoped<IRepository<Payment>, MartenRepository<Payment>>();
-
-            AddCommandHandlers(services);
-            AddEventHandlers(services);
+            services.AddScoped<IRepository<Payment>, MartenRepository<Payment>>()
+                .AddCommandHandlers()
+                .AddEventHandlers();
         }
 
-        private static void AddCommandHandlers(IServiceCollection services)
+        private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<RequestPayment, Unit>, HandleRequestPayment>();
-            services.AddScoped<IRequestHandler<CompletePayment, Unit>, HandleCompletePayment>();
-            services.AddScoped<IRequestHandler<DiscardPayment, Unit>, HandleDiscardPayment>();
-            services.AddScoped<IRequestHandler<TimeOutPayment, Unit>, HandleTimeOutPayment>();
+            return services
+                .AddCommandHandler<RequestPayment, HandleRequestPayment>()
+                .AddCommandHandler<CompletePayment, HandleCompletePayment>()
+                .AddCommandHandler<DiscardPayment, HandleDiscardPayment>()
+                .AddCommandHandler<TimeOutPayment, HandleTimeOutPayment>();
         }
 
-        private static void AddEventHandlers(IServiceCollection services)
+        private static IServiceCollection AddEventHandlers(this IServiceCollection services)
         {
-             services.AddScoped<INotificationHandler<PaymentCompleted>, TransformIntoPaymentFinalized>();
-             services.AddScoped<INotificationHandler<PaymentDiscarded>, TransformIntoPaymentFailed>();
-             services.AddScoped<INotificationHandler<PaymentTimedOut>, TransformIntoPaymentFailed>();
+             return services
+                 .AddEventHandler<PaymentCompleted, TransformIntoPaymentFinalized>()
+                 .AddEventHandler<PaymentDiscarded, TransformIntoPaymentFailed>()
+                 .AddEventHandler<PaymentTimedOut, TransformIntoPaymentFailed>();
         }
 
         internal static void ConfigurePayments(this StoreOptions options)
