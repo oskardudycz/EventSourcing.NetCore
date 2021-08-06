@@ -9,11 +9,13 @@ using Carts.Carts.InitializingCart;
 using Carts.Carts.Queries;
 using Carts.Carts.RemovingProduct;
 using Carts.Pricing;
+using Core.Commands;
+using Core.Events;
 using Core.Marten.Repository;
+using Core.Queries;
 using Core.Repositories;
 using Marten;
 using Marten.Pagination;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Carts.Carts
@@ -33,23 +35,23 @@ namespace Carts.Carts
 
         private static void AddCommandHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<InitializeCart, Unit>, HandleInitializeCart>();
-            services.AddScoped<IRequestHandler<AddProduct, Unit>, HandleAddProduct>();
-            services.AddScoped<IRequestHandler<RemoveProduct, Unit>, HandleRemoveProduct>();
-            services.AddScoped<IRequestHandler<ConfirmCart, Unit>, HandleConfirmCart>();
+            services.AddCommandHandler<InitializeCart, HandleInitializeCart>()
+                    .AddCommandHandler<AddProduct, HandleAddProduct>()
+                    .AddCommandHandler<RemoveProduct, HandleRemoveProduct>()
+                    .AddCommandHandler<ConfirmCart, HandleConfirmCart>();
         }
 
         private static void AddQueryHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<GetCartById, CartDetails?>, HandleGetCartById>();
-            services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, HandleGetCartAtVersion>();
-            services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, HandleGetCarts>();
-            services.AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, HandleGetCartHistory>();
+            services.AddQueryHandler<GetCartById, CartDetails?, HandleGetCartById>()
+                    .AddQueryHandler<GetCartAtVersion, CartDetails, HandleGetCartAtVersion>()
+                    .AddQueryHandler<GetCarts, IPagedList<CartShortInfo>, HandleGetCarts>()
+                    .AddQueryHandler<GetCartHistory, IPagedList<CartHistory>, HandleGetCartHistory>();
         }
 
         private static void AddEventHandlers(IServiceCollection services)
         {
-            services.AddScoped<INotificationHandler<CartConfirmed>, HandleCartFinalized>();
+            services.AddEventHandler<CartConfirmed, HandleCartFinalized>();
         }
 
         internal static void ConfigureCarts(this StoreOptions options)

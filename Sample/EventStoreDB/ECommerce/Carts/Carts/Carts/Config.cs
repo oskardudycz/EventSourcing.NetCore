@@ -8,11 +8,12 @@ using Carts.Carts.InitializingCart;
 using Carts.Carts.Queries;
 using Carts.Carts.RemovingProduct;
 using Carts.Pricing;
+using Core.Commands;
 using Core.EventStoreDB.Repository;
 using Core.Marten.ExternalProjections;
+using Core.Queries;
 using Core.Repositories;
 using Marten.Pagination;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Carts.Carts
@@ -21,24 +22,23 @@ namespace Carts.Carts
     {
         internal static void AddCarts(this IServiceCollection services)
         {
-            services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>();
-
-            services.AddScoped<IRepository<Cart>, EventStoreDBRepository<Cart>>();
-
-            AddCommandHandlers(services);
-            AddProjections(services);
-            AddQueryHandlers(services);
+            services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>()
+                    .AddScoped<IRepository<Cart>, EventStoreDBRepository<Cart>>()
+                    .AddCommandHandlers()
+                    .AddProjections()
+                    .AddQueryHandlers();
         }
 
-        private static void AddCommandHandlers(IServiceCollection services)
+        private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<InitializeCart, Unit>, HandleInitializeCart>();
-            services.AddScoped<IRequestHandler<AddProduct, Unit>, HandleAddProduct>();
-            services.AddScoped<IRequestHandler<RemoveProduct, Unit>, HandleRemoveProduct>();
-            services.AddScoped<IRequestHandler<ConfirmCart, Unit>, HandleConfirmCart>();
+            return services
+                .AddCommandHandler<InitializeCart, HandleInitializeCart>()
+                .AddCommandHandler<AddProduct, HandleAddProduct>()
+                .AddCommandHandler<RemoveProduct, HandleRemoveProduct>()
+                .AddCommandHandler<ConfirmCart, HandleConfirmCart>();
         }
 
-        private static void AddProjections(IServiceCollection services)
+        private static IServiceCollection AddProjections(this IServiceCollection services)
         {
             services
                 .Project<CartInitialized, CartDetails>(@event => @event.CartId)
@@ -57,14 +57,17 @@ namespace Carts.Carts
                 .Project<ProductAdded, CartHistory>(@event => @event.CartId)
                 .Project<ProductRemoved, CartHistory>(@event => @event.CartId)
                 .Project<CartConfirmed, CartHistory>(@event => @event.CartId);
+
+            return services;
         }
 
-        private static void AddQueryHandlers(IServiceCollection services)
+        private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<GetCartById, CartDetails>, HandleGetCartById>();
-            services.AddScoped<IRequestHandler<GetCarts, IPagedList<CartShortInfo>>, HandleGetCarts>();
-            services.AddScoped<IRequestHandler<GetCartHistory, IPagedList<CartHistory>>, HandleGetCartHistory>();
-            services.AddScoped<IRequestHandler<GetCartAtVersion, CartDetails>, HandleGetCartAtVersion>();
+            return services
+                .AddQueryHandler<GetCartById, CartDetails, HandleGetCartById>()
+                .AddQueryHandler<GetCarts, IPagedList<CartShortInfo>, HandleGetCarts>()
+                .AddQueryHandler<GetCartHistory, IPagedList<CartHistory>, HandleGetCartHistory>()
+                .AddQueryHandler<GetCartAtVersion, CartDetails, HandleGetCartAtVersion>();
         }
     }
 }

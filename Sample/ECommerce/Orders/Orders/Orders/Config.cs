@@ -1,7 +1,8 @@
+using Core.Commands;
+using Core.Events;
 using Core.Marten.Repository;
 using Core.Repositories;
 using Marten;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Orders.Carts.FinalizingCart;
 using Orders.Orders.CancellingOrder;
@@ -25,21 +26,21 @@ namespace Orders.Orders
 
         private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
-            return services.AddScoped<IRequestHandler<InitializeOrder, Unit>, HandleInitializeOrder>()
-                .AddScoped<IRequestHandler<RecordOrderPayment, Unit>, HandleRecordOrderPayment>()
-                .AddScoped<IRequestHandler<CompleteOrder, Unit>, HandleCompleteOrder>()
-                .AddScoped<IRequestHandler<CancelOrder, Unit>, HandleCancelOrder>();
+            return services.AddCommandHandler<InitializeOrder, HandleInitializeOrder>()
+                           .AddCommandHandler<RecordOrderPayment, HandleRecordOrderPayment>()
+                           .AddCommandHandler<CompleteOrder, HandleCompleteOrder>()
+                           .AddCommandHandler<CancelOrder, HandleCancelOrder>();
         }
 
         private static IServiceCollection AddEventHandlers(this IServiceCollection services)
         {
-            return services.AddScoped<INotificationHandler<CartFinalized>, OrderSaga>()
-                .AddScoped<INotificationHandler<OrderInitialized>, OrderSaga>()
-                .AddScoped<INotificationHandler<PaymentFinalized>, OrderSaga>()
-                .AddScoped<INotificationHandler<PackageWasSent>, OrderSaga>()
-                .AddScoped<INotificationHandler<ProductWasOutOfStock>, OrderSaga>()
-                .AddScoped<INotificationHandler<OrderCancelled>, OrderSaga>()
-                .AddScoped<INotificationHandler<OrderPaymentRecorded>, OrderSaga>();
+            return services.AddEventHandler<CartFinalized, OrderSaga>()
+                           .AddEventHandler<OrderInitialized, OrderSaga>()
+                           .AddEventHandler<PaymentFinalized, OrderSaga>()
+                           .AddEventHandler<PackageWasSent, OrderSaga>()
+                           .AddEventHandler<ProductWasOutOfStock, OrderSaga>()
+                           .AddEventHandler<OrderCancelled, OrderSaga>()
+                           .AddEventHandler<OrderPaymentRecorded, OrderSaga>();
         }
 
         internal static void ConfigureOrders(this StoreOptions options)

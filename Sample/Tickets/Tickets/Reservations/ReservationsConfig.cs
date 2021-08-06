@@ -1,8 +1,9 @@
+using Core.Commands;
 using Core.Marten.Repository;
+using Core.Queries;
 using Core.Repositories;
 using Marten;
 using Marten.Pagination;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Tickets.Reservations.CancellingReservation;
 using Tickets.Reservations.ChangingReservationSeat;
@@ -18,31 +19,31 @@ namespace Tickets.Reservations
 {
     internal static class ReservationsConfig
     {
-
         internal static void AddReservations(this IServiceCollection services)
         {
-            services.AddScoped<IReservationNumberGenerator, ReservationNumberGenerator>();
-
-            services.AddScoped<IRepository<Reservation>, MartenRepository<Reservation>>();
-
-            AddCommandHandlers(services);
-            AddQueryHandlers(services);
+            services
+                .AddScoped<IReservationNumberGenerator, ReservationNumberGenerator>()
+                .AddScoped<IRepository<Reservation>, MartenRepository<Reservation>>()
+                .AddCommandHandlers()
+                .AddQueryHandlers();
         }
 
-        private static void AddCommandHandlers(IServiceCollection services)
+        private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<CreateTentativeReservation, Unit>, HandleCreateTentativeReservation>();
-            services.AddScoped<IRequestHandler<ChangeReservationSeat, Unit>, HandleChangeReservationSeat>();
-            services.AddScoped<IRequestHandler<ConfirmReservation, Unit>, HandleConfirmReservation>();
-            services.AddScoped<IRequestHandler<CancelReservation, Unit>, HandleCancelReservation>();
+            return services
+                .AddCommandHandler<CreateTentativeReservation, HandleCreateTentativeReservation>()
+                .AddCommandHandler<ChangeReservationSeat,HandleChangeReservationSeat>()
+                .AddCommandHandler<ConfirmReservation, HandleConfirmReservation>()
+                .AddCommandHandler<CancelReservation, HandleCancelReservation>();
         }
 
-        private static void AddQueryHandlers(IServiceCollection services)
+        private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<GetReservationById, ReservationDetails>, HandleGetReservationById>();
-            services.AddScoped<IRequestHandler<GetReservationAtVersion, ReservationDetails>, HandleGetReservationAtVersion>();
-            services.AddScoped<IRequestHandler<GetReservations, IPagedList<ReservationShortInfo>>, HandleGetReservations>();
-            services.AddScoped<IRequestHandler<GetReservationHistory, IPagedList<ReservationHistory>>, HandleGetReservationHistory>();
+            return services
+                .AddQueryHandler<GetReservationById, ReservationDetails, HandleGetReservationById>()
+                .AddQueryHandler<GetReservationAtVersion, ReservationDetails, HandleGetReservationAtVersion>()
+                .AddQueryHandler<GetReservations, IPagedList<ReservationShortInfo>, HandleGetReservations>()
+                .AddQueryHandler<GetReservationHistory, IPagedList<ReservationHistory>, HandleGetReservationHistory>();
         }
 
         internal static void ConfigureReservations(this StoreOptions options)

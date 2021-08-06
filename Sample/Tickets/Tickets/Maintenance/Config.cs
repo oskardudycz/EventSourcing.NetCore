@@ -1,3 +1,4 @@
+using Core.Commands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Tickets.Maintenance.Commands;
@@ -15,7 +16,7 @@ namespace Tickets.Maintenance
 
         private static void AddCommandHandlers(IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<RebuildProjection, Unit>, MaintenanceCommandHandler>();
+            services.AddCommandHandler<RebuildProjection, MaintenanceCommandHandler>();
         }
     }
 }
