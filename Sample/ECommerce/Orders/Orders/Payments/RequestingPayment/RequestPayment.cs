@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Requests;
 using MediatR;
@@ -22,8 +21,10 @@ namespace Orders.Payments.RequestingPayment
 
         public static RequestPayment Create(Guid orderId, decimal amount)
         {
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.NegativeOrZero(amount, nameof(amount));
+            if (orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
+            if (amount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
 
             return new RequestPayment(orderId, amount);
         }

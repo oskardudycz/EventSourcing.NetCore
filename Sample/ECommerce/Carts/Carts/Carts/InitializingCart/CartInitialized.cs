@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 
 namespace Carts.Carts.InitializingCart
@@ -21,9 +20,12 @@ namespace Carts.Carts.InitializingCart
 
         public static CartInitialized Create(Guid cartId, Guid clientId, CartStatus cartStatus)
         {
-            Guard.Against.Default(cartId, nameof(cartId));
-            Guard.Against.Default(clientId, nameof(clientId));
-            Guard.Against.Default(cartStatus, nameof(cartStatus));
+            if (cartId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(cartId));
+            if (clientId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(clientId));
+            if (cartStatus == default)
+                throw new ArgumentOutOfRangeException(nameof(cartStatus));
 
             return new CartInitialized(cartId, clientId, cartStatus);
         }

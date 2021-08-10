@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -22,8 +21,10 @@ namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature
 
         public static RecordTemperature Create(Guid measurementId, decimal temperature)
         {
-            Guard.Against.Default(measurementId, nameof(measurementId));
-            Guard.Against.OutOfRange(temperature, nameof(temperature), -273, Decimal.MaxValue);
+            if (measurementId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(measurementId));
+            if (temperature < -273)
+                throw new ArgumentOutOfRangeException(nameof(temperature));
 
             return new RecordTemperature(measurementId, temperature);
         }
@@ -38,15 +39,11 @@ namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature
             IRepository<TemperatureMeasurement> repository
         )
         {
-            Guard.Against.Null(repository, nameof(repository));
-
             this.repository = repository;
         }
 
         public async Task<Unit> Handle(RecordTemperature command, CancellationToken cancellationToken)
         {
-            Guard.Against.Null(command, nameof(command));
-
             var reservation = await repository.Find(command.MeasurementId, cancellationToken);
 
             reservation!.Record(command.Temperature);

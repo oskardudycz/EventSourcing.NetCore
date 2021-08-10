@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Ardalis.GuardClauses;
 using Core.Events;
 using Orders.Products;
 
@@ -38,11 +37,16 @@ namespace Orders.Orders.InitializingOrder
             decimal totalPrice,
             DateTime initializedAt)
         {
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.Default(clientId, nameof(clientId));
-            Guard.Against.NullOrEmpty(productItems, nameof(productItems));
-            Guard.Against.NegativeOrZero(totalPrice, nameof(totalPrice));
-            Guard.Against.Default(initializedAt, nameof(initializedAt));
+            if (orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
+            if (clientId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(clientId));
+            if (productItems.Count == 0)
+                throw new ArgumentOutOfRangeException(nameof(productItems.Count));
+            if (totalPrice <= 0)
+                throw new ArgumentOutOfRangeException(nameof(totalPrice));
+            if (initializedAt == default)
+                throw new ArgumentOutOfRangeException(nameof(initializedAt));
 
             return new OrderInitialized(orderId, clientId, productItems, totalPrice, initializedAt);
         }

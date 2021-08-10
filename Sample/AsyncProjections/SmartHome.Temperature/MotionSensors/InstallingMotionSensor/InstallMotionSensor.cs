@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -23,7 +22,8 @@ namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor
             Guid motionSensorId
         )
         {
-            Guard.Against.Default(motionSensorId, nameof(motionSensorId));
+            if (motionSensorId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(motionSensorId));
 
             return new InstallMotionSensor(motionSensorId);
         }
@@ -43,8 +43,6 @@ namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor
 
         public async Task<Unit> Handle(InstallMotionSensor command, CancellationToken cancellationToken)
         {
-            Guard.Against.Null(command, nameof(command));
-
             var reservation = MotionSensor.Install(
                 command.MotionSensorId
             );

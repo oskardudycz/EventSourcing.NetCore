@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Events;
 using Core.Ids;
@@ -33,9 +32,6 @@ namespace Orders.Orders
 
         public OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus)
         {
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
-            Guard.Against.Null(commandBus, nameof(commandBus));
-
             this.idGenerator = idGenerator;
             this.commandBus = commandBus;
         }

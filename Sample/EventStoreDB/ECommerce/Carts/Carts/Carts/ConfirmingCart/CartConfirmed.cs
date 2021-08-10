@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 
 namespace Carts.Carts.ConfirmingCart
@@ -11,8 +10,10 @@ namespace Carts.Carts.ConfirmingCart
     {
         public static CartConfirmed Create(Guid cartId, DateTime confirmedAt)
         {
-            Guard.Against.Default(cartId, nameof(cartId));
-            Guard.Against.Default(confirmedAt, nameof(confirmedAt));
+            if (cartId == Guid.Empty)
+                throw new ArgumentNullException(nameof(cartId));
+            if (confirmedAt == default)
+                throw new ArgumentNullException(nameof(confirmedAt));
 
             return new CartConfirmed(cartId, confirmedAt);
         }

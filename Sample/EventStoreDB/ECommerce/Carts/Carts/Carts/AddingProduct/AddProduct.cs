@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Carts.Carts.Products;
 using Carts.Pricing;
 using Core.Commands;
@@ -22,12 +21,14 @@ namespace Carts.Carts.AddingProduct
             CartId = cartId;
             ProductItem = productItem;
         }
-        public static AddProduct Create(Guid cartId, ProductItem productItem)
+        public static AddProduct Create(Guid? cartId, ProductItem? productItem)
         {
-            Guard.Against.Default(cartId, nameof(cartId));
-            Guard.Against.Null(productItem, nameof(productItem));
+            if (cartId == null || cartId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(cartId));
+            if (productItem == null)
+                throw new ArgumentOutOfRangeException(nameof(productItem));
 
-            return new AddProduct(cartId, productItem);
+            return new AddProduct(cartId.Value, productItem);
         }
     }
 

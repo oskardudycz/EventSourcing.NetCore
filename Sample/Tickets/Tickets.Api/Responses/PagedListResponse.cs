@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Ardalis.GuardClauses;
 using Marten.Pagination;
 using Newtonsoft.Json;
 
@@ -27,9 +26,6 @@ namespace Tickets.Api.Responses
     {
         public static PagedListResponse<T> From<T>(IPagedList<T> pagedList)
         {
-            Guard.Against.Null(pagedList, nameof(PagedListResponse<T>.Items));
-            Guard.Against.Negative(pagedList.TotalItemCount, nameof(PagedListResponse<T>.TotalItemCount));
-
             return new PagedListResponse<T>(pagedList, pagedList.TotalItemCount, pagedList.HasNextPage);
         }
     }

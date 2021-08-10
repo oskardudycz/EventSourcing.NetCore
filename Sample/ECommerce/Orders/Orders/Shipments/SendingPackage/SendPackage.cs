@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Requests;
 using MediatR;
@@ -30,8 +29,10 @@ namespace Orders.Shipments.SendingPackage
             IReadOnlyList<ProductItem> productItems
         )
         {
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.NullOrEmpty(productItems, nameof(productItems));
+            if (orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
+            if (productItems.Count == 0)
+                throw new ArgumentOutOfRangeException(nameof(productItems.Count));
 
             return new SendPackage(orderId, productItems);
         }

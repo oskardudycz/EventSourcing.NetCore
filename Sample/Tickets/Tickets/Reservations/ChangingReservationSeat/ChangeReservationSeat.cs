@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Exceptions;
 using Core.Repositories;
@@ -48,8 +47,6 @@ namespace Tickets.Reservations.ChangingReservationSeat
 
         public async Task<Unit> Handle(ChangeReservationSeat command, CancellationToken cancellationToken)
         {
-            Guard.Against.Null(command, nameof(command));
-
             var reservation = await repository.Find(command.ReservationId, cancellationToken)
                               ?? throw AggregateNotFoundException.For<Reservation>(command.ReservationId);
 

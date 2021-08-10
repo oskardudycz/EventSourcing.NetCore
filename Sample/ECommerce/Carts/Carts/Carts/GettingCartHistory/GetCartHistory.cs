@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Carts.Carts.GettingCartHistory;
 using Core.Queries;
 using Marten;
@@ -25,8 +24,10 @@ namespace Carts.Carts.Queries
 
         public static GetCartHistory Create(Guid cartId,int pageNumber = 1, int pageSize = 20)
         {
-            Guard.Against.NegativeOrZero(pageNumber, nameof(pageNumber));
-            Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
+            if (pageNumber <= 0)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber));
+            if (pageSize is <= 0 or > 100)
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
 
             return new GetCartHistory(cartId, pageNumber, pageSize);
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
 using Core.Ids;
@@ -25,28 +24,22 @@ namespace Orders.Api.Controllers
             IQueryBus queryBus,
             IIdGenerator idGenerator)
         {
-            Guard.Against.Null(commandBus, nameof(commandBus));
-            Guard.Against.Null(queryBus, nameof(queryBus));
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
-
             this.commandBus = commandBus;
             this.queryBus = queryBus;
             this.idGenerator = idGenerator;
         }
 
         [HttpPost]
-        public async Task<IActionResult> InitOrder([FromBody] InitOrderRequest request)
+        public async Task<IActionResult> InitOrder([FromBody] InitOrderRequest? request)
         {
-            Guard.Against.Null(request, nameof(request));
-
             var orderId = idGenerator.New();
 
             var command = InitializeOrder.Create(
                 orderId,
-                request.ClientId,
-                request.ProductItems?.Select(
+                request?.ClientId,
+                request?.ProductItems?.Select(
                     pi => PricedProductItem.Create(pi.ProductId, pi.Quantity,pi.UnitPrice)).ToList(),
-                request.TotalPrice
+                request?.TotalPrice
             );
 
             await commandBus.Send(command);
@@ -55,14 +48,12 @@ namespace Orders.Api.Controllers
         }
 
         [HttpPost("{id}/products")]
-        public async Task<IActionResult> RecordOrderPayment(Guid id, [FromBody] RecordOrderPaymentRequest request)
+        public async Task<IActionResult> RecordOrderPayment(Guid id, [FromBody] RecordOrderPaymentRequest? request)
         {
-            Guard.Against.Null(request, nameof(request));
-
             var command = Orders.RecordingOrderPayment.RecordOrderPayment.Create(
                 id,
-                request.PaymentId,
-                request.PaymentRecordedAt
+                request?.PaymentId,
+                request?.PaymentRecordedAt
             );
 
             await commandBus.Send(command);
@@ -71,13 +62,11 @@ namespace Orders.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> CancelOrder(Guid id, [FromBody] CancelOrderRequest request)
+        public async Task<IActionResult> CancelOrder(Guid id, [FromBody] CancelOrderRequest? request)
         {
-            Guard.Against.Null(request, nameof(request));
-
             var command = Orders.CancellingOrder.CancelOrder.Create(
                 id,
-                request.CancellationReason
+                request?.CancellationReason
             );
 
             await commandBus.Send(command);

@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Requests;
 using MediatR;
@@ -22,7 +21,8 @@ namespace Orders.Payments.DiscardingPayment
 
         public static DiscardPayment Create(Guid paymentId)
         {
-            Guard.Against.Default(paymentId, nameof(paymentId));
+            if (paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
 
             return new DiscardPayment(paymentId, DiscardReason.OrderCancelled);
         }

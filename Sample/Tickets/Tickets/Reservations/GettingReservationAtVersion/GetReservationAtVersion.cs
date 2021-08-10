@@ -1,11 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Exceptions;
 using Core.Queries;
 using Marten;
-using MediatR;
 using Tickets.Reservations.GettingReservationById;
 
 namespace Tickets.Reservations.GettingReservationAtVersion
@@ -23,8 +21,10 @@ namespace Tickets.Reservations.GettingReservationAtVersion
 
         public static GetReservationAtVersion Create(Guid reservationId, int version)
         {
-            Guard.Against.Default(reservationId, nameof(reservationId));
-            Guard.Against.Negative(version, nameof(version));
+            if (reservationId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(reservationId));
+            if (version < 0)
+                throw new ArgumentOutOfRangeException(nameof(version));
 
             return new GetReservationAtVersion(reservationId, version);
         }

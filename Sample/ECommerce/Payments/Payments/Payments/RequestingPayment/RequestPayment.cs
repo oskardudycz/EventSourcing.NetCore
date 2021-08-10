@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -27,16 +26,19 @@ namespace Payments.Payments.RequestingPayment
             Amount = amount;
         }
         public static RequestPayment Create(
-            Guid paymentId,
-            Guid orderId,
-            decimal amount
+            Guid? paymentId,
+            Guid? orderId,
+            decimal? amount
         )
         {
-            Guard.Against.Default(paymentId, nameof(paymentId));
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.NegativeOrZero(amount, nameof(amount));
+            if (paymentId == null || paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
+            if (orderId == null || orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
+            if (amount is null or <= 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
 
-            return new RequestPayment(paymentId, orderId, amount);
+            return new RequestPayment(paymentId.Value, orderId.Value, amount.Value);
         }
     }
     public class HandleRequestPayment:
@@ -47,8 +49,6 @@ namespace Payments.Payments.RequestingPayment
         public HandleRequestPayment(
             IRepository<Payment> paymentRepository)
         {
-            Guard.Against.Null(paymentRepository, nameof(paymentRepository));
-
             this.paymentRepository = paymentRepository;
         }
 

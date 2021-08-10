@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Events;
 using Marten;
 using Payments.Payments.CompletingPayment;
@@ -27,10 +26,14 @@ namespace Payments.Payments.FinalizingPayment
         }
         public static PaymentFinalized Create(Guid paymentId, Guid orderId, decimal amount, DateTime finalizedAt)
         {
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.Default(paymentId, nameof(paymentId));
-            Guard.Against.NegativeOrZero(amount, nameof(amount));
-            Guard.Against.Default(finalizedAt, nameof(finalizedAt));
+            if (paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
+            if (orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
+            if (amount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+            if (finalizedAt == default)
+                throw new ArgumentOutOfRangeException(nameof(finalizedAt));
 
             return new PaymentFinalized(paymentId, orderId, amount, finalizedAt);
         }
@@ -46,8 +49,6 @@ namespace Payments.Payments.FinalizingPayment
             IQuerySession querySession
             )
         {
-            Guard.Against.Null(eventBus, nameof(eventBus));
-
             this.eventBus = eventBus;
             this.querySession = querySession;
         }

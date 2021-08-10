@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -20,12 +19,14 @@ namespace Payments.Payments.TimingOutPayment
             TimedOutAt = timedOutAt;
         }
 
-        public static TimeOutPayment Create(Guid paymentId, DateTime timedOutAt)
+        public static TimeOutPayment Create(Guid? paymentId, DateTime? timedOutAt)
         {
-            Guard.Against.Default(paymentId, nameof(paymentId));
-            Guard.Against.Default(timedOutAt, nameof(timedOutAt));
+            if (paymentId == null || paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
+            if (timedOutAt == null || timedOutAt == default(DateTime))
+                throw new ArgumentOutOfRangeException(nameof(timedOutAt));
 
-            return new TimeOutPayment(paymentId, timedOutAt);
+            return new TimeOutPayment(paymentId.Value, timedOutAt.Value);
         }
     }
     public class HandleTimeOutPayment:
@@ -36,8 +37,6 @@ namespace Payments.Payments.TimingOutPayment
         public HandleTimeOutPayment(
             IRepository<Payment> paymentRepository)
         {
-            Guard.Against.Null(paymentRepository, nameof(paymentRepository));
-
             this.paymentRepository = paymentRepository;
         }
 

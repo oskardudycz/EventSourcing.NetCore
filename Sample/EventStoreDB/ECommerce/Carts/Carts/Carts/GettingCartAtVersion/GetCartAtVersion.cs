@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Carts.Carts.GettingCartById;
 using Core.EventStoreDB.Events;
 using Core.Exceptions;
@@ -21,11 +20,14 @@ namespace Carts.Carts.GettingCartAtVersion
             Version = version;
         }
 
-        public static GetCartAtVersion Create(Guid cartId, ulong version)
+        public static GetCartAtVersion Create(Guid? cartId, ulong? version)
         {
-            Guard.Against.Default(cartId, nameof(cartId));
+            if (cartId == null || cartId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(cartId));
+            if (version == null)
+                throw new ArgumentOutOfRangeException(nameof(version));
 
-            return new GetCartAtVersion(cartId, version);
+            return new GetCartAtVersion(cartId.Value, version.Value);
         }
     }
 

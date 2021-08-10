@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -17,11 +16,12 @@ namespace Carts.Carts.ConfirmingCart
             CartId = cartId;
         }
 
-        public static ConfirmCart Create(Guid cartId)
+        public static ConfirmCart Create(Guid? cartId)
         {
-            Guard.Against.Default(cartId, nameof(cartId));
+            if (cartId == null || cartId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(cartId));
 
-            return new ConfirmCart(cartId);
+            return new ConfirmCart(cartId.Value);
         }
     }
 

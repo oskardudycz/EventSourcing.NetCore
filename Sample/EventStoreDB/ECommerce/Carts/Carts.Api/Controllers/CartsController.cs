@@ -1,13 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Carts.Api.Requests.Carts;
 using Carts.Carts.GettingCartAtVersion;
 using Carts.Carts.GettingCartById;
 using Carts.Carts.GettingCartHistory;
 using Carts.Carts.GettingCarts;
 using Carts.Carts.Products;
-using Carts.Carts.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
 using Core.Ids;
@@ -30,25 +28,19 @@ namespace Carts.Api.Controllers
             IQueryBus queryBus,
             IIdGenerator idGenerator)
         {
-            Guard.Against.Null(commandBus, nameof(commandBus));
-            Guard.Against.Null(queryBus, nameof(queryBus));
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
-
             this.commandBus = commandBus;
             this.queryBus = queryBus;
             this.idGenerator = idGenerator;
         }
 
         [HttpPost]
-        public async Task<IActionResult> InitializeCart([FromBody] InitializeCartRequest request)
+        public async Task<IActionResult> InitializeCart([FromBody] InitializeCartRequest? request)
         {
-            Guard.Against.Null(request, nameof(request));
-
             var cartId = idGenerator.New();
 
             var command = Carts.InitializingCart.InitializeCart.Create(
                 cartId,
-                request.ClientId
+                request?.ClientId
             );
 
             await commandBus.Send(command);
@@ -57,16 +49,13 @@ namespace Carts.Api.Controllers
         }
 
         [HttpPost("{id}/products")]
-        public async Task<IActionResult> AddProduct(Guid id, [FromBody] AddProductRequest request)
+        public async Task<IActionResult> AddProduct(Guid id, [FromBody] AddProductRequest? request)
         {
-            Guard.Against.Null(request, nameof(request));
-            Guard.Against.Null(request.ProductItem, nameof(request));
-
             var command = Carts.AddingProduct.AddProduct.Create(
                 id,
                 ProductItem.Create(
-                    request.ProductItem.ProductId,
-                    request.ProductItem.Quantity
+                    request?.ProductItem?.ProductId,
+                    request?.ProductItem?.Quantity
                 )
             );
 
@@ -78,15 +67,12 @@ namespace Carts.Api.Controllers
         [HttpDelete("{id}/products")]
         public async Task<IActionResult> RemoveProduct(Guid id, [FromBody] RemoveProductRequest request)
         {
-            Guard.Against.Null(request, nameof(request));
-            Guard.Against.Null(request.ProductItem, nameof(request));
-
             var command = Carts.RemovingProduct.RemoveProduct.Create(
                 id,
                 PricedProductItem.Create(
-                    request.ProductItem.ProductId,
-                    request.ProductItem.Quantity,
-                    request.ProductItem.UnitPrice
+                    request?.ProductItem?.ProductId,
+                    request?.ProductItem?.Quantity,
+                    request?.ProductItem?.UnitPrice
                 )
             );
 
@@ -131,10 +117,9 @@ namespace Carts.Api.Controllers
         }
 
         [HttpGet("{id}/versions")]
-        public Task<CartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion query)
+        public Task<CartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion? query)
         {
-            Guard.Against.Null(query, nameof(query));
-            return queryBus.Send<GetCartAtVersion, CartDetails>(GetCartAtVersion.Create(id, query.Version));
+            return queryBus.Send<GetCartAtVersion, CartDetails>(GetCartAtVersion.Create(id, query?.Version));
         }
     }
 }

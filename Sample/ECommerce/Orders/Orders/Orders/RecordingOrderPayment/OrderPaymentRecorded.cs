@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Ardalis.GuardClauses;
 using Core.Events;
 using Orders.Products;
 
@@ -39,11 +38,16 @@ namespace Orders.Orders.RecordingOrderPayment
             decimal amount,
             DateTime recordedAt)
         {
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.Default(paymentId, nameof(paymentId));
-            Guard.Against.NullOrEmpty(productItems, nameof(productItems));
-            Guard.Against.NegativeOrZero(amount, nameof(amount));
-            Guard.Against.Default(recordedAt, nameof(recordedAt));
+            if (orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
+            if (paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
+            if (productItems.Count == 0)
+                throw new ArgumentOutOfRangeException(nameof(productItems.Count));
+            if (amount > 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+            if (recordedAt == default)
+                throw new ArgumentOutOfRangeException(nameof(recordedAt));
 
             return new OrderPaymentRecorded(
                 orderId,

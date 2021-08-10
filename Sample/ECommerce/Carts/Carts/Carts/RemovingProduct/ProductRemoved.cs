@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Carts.Carts.Products;
 using Core.Events;
 
@@ -19,8 +18,8 @@ namespace Carts.Carts.RemovingProduct
 
         public static ProductRemoved Create(Guid cartId, PricedProductItem productItem)
         {
-            Guard.Against.Default(cartId, nameof(cartId));
-            Guard.Against.Null(productItem, nameof(productItem));
+            if (cartId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(cartId));
 
             return new ProductRemoved(cartId, productItem);
         }

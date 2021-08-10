@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Marten;
 using MediatR;
@@ -34,8 +33,6 @@ namespace SmartHome.Temperature.MotionSensors.RebuildingMotionSensorsViews
         {
             var cmd = new NpgsqlCommand("DELETE FROM smart_home_read.mt_doc_motionsensor", session.Connection);
             await cmd.ExecuteNonQueryAsync(cancellationToken);
-
-            Guard.Against.Null(command, nameof(command));
 
             using (var daemon = session.DocumentStore.BuildProjectionDaemon())
             {

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Queries;
 using Marten;
 
@@ -21,8 +20,6 @@ namespace SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasur
 
         public HandleGetTemperatureMeasurements(IDocumentSession querySession)
         {
-            Guard.Against.Null(querySession, nameof(querySession));
-
             this.querySession = querySession;
         }
 

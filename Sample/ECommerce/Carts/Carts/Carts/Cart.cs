@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ardalis.GuardClauses;
 using Carts.Carts.AddingProduct;
 using Carts.Carts.ConfirmingCart;
 using Carts.Carts.InitializingCart;
@@ -60,9 +59,6 @@ namespace Carts.Carts
             IProductPriceCalculator productPriceCalculator,
             ProductItem productItem)
         {
-            Guard.Against.Null(productPriceCalculator, nameof(productPriceCalculator));
-            Guard.Against.Null(productItem, nameof(productItem));
-
             if(Status != CartStatus.Pending)
                 throw new InvalidOperationException($"Adding product for the cart in '{Status}' status is not allowed.");
 
@@ -97,8 +93,6 @@ namespace Carts.Carts
         public void RemoveProduct(
             PricedProductItem productItemToBeRemoved)
         {
-            Guard.Against.Null(productItemToBeRemoved, nameof(productItemToBeRemoved));
-
             if(Status != CartStatus.Pending)
                 throw new InvalidOperationException($"Removing product from the cart in '{Status}' status is not allowed.");
 

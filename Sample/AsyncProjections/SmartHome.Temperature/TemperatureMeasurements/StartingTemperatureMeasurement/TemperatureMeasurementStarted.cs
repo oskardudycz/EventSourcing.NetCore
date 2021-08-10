@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 using Newtonsoft.Json;
 
@@ -19,7 +18,8 @@ namespace SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasu
 
         public static TemperatureMeasurementStarted Create(Guid measurementId)
         {
-            Guard.Against.Default(measurementId, nameof(measurementId));
+            if (measurementId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(measurementId));
 
             return new TemperatureMeasurementStarted(measurementId, DateTimeOffset.UtcNow);
         }

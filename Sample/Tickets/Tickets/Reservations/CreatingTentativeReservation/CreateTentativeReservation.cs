@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -42,17 +41,12 @@ namespace Tickets.Reservations.CreatingTentativeReservation
             IReservationNumberGenerator reservationNumberGenerator
         )
         {
-            Guard.Against.Null(repository, nameof(repository));
-            Guard.Against.Null(reservationNumberGenerator, nameof(reservationNumberGenerator));
-
             this.repository = repository;
             this.reservationNumberGenerator = reservationNumberGenerator;
         }
 
         public async Task<Unit> Handle(CreateTentativeReservation command, CancellationToken cancellationToken)
         {
-            Guard.Against.Null(command, nameof(command));
-
             var reservation = Reservation.CreateTentative(
                 command.ReservationId,
                 reservationNumberGenerator,

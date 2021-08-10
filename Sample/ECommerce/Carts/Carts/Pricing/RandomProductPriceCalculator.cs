@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ardalis.GuardClauses;
 using Carts.Carts.Products;
 
 namespace Carts.Pricing
@@ -10,7 +9,8 @@ namespace Carts.Pricing
     {
         public IReadOnlyList<PricedProductItem> Calculate(params ProductItem[] productItems)
         {
-            Guard.Against.Zero(productItems.Length, "Product items count");
+            if (productItems.Length == 0)
+                throw new ArgumentOutOfRangeException(nameof(productItems.Length));
 
             var random = new Random();
 

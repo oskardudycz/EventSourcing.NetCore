@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Carts.Api.Requests.Carts;
 using Carts.Carts.GettingCartAtVersion;
 using Carts.Carts.GettingCartById;
@@ -31,10 +30,6 @@ namespace Carts.Api.Controllers
             IQueryBus queryBus,
             IIdGenerator idGenerator)
         {
-            Guard.Against.Null(commandBus, nameof(commandBus));
-            Guard.Against.Null(queryBus, nameof(queryBus));
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
-
             this.commandBus = commandBus;
             this.queryBus = queryBus;
             this.idGenerator = idGenerator;
@@ -43,7 +38,8 @@ namespace Carts.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> InitCart([FromBody] InitCartRequest request)
         {
-            Guard.Against.Null(request, nameof(request));
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
 
             var cartId = idGenerator.New();
 
@@ -60,14 +56,14 @@ namespace Carts.Api.Controllers
         [HttpPost("{id}/products")]
         public async Task<IActionResult> AddProduct(Guid id, [FromBody] AddProductRequest request)
         {
-            Guard.Against.Null(request, nameof(request));
-            Guard.Against.Null(request.ProductItem, nameof(request));
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
 
             var command = Carts.AddingProduct.AddProduct.Create(
                 id,
                 ProductItem.Create(
-                    request.ProductItem.ProductId,
-                    request.ProductItem.Quantity
+                    request.ProductItem?.ProductId,
+                    request.ProductItem?.Quantity
                 )
             );
 
@@ -77,17 +73,14 @@ namespace Carts.Api.Controllers
         }
 
         [HttpDelete("{id}/products")]
-        public async Task<IActionResult> RemoveProduct(Guid id, [FromBody] RemoveProductRequest request)
+        public async Task<IActionResult> RemoveProduct(Guid id, [FromBody] RemoveProductRequest? request)
         {
-            Guard.Against.Null(request, nameof(request));
-            Guard.Against.Null(request.ProductItem, nameof(request));
-
             var command = Carts.RemovingProduct.RemoveProduct.Create(
                 id,
                 PricedProductItem.Create(
-                    request.ProductItem.ProductId,
-                    request.ProductItem.Quantity,
-                    request.ProductItem.UnitPrice
+                    request?.ProductItem?.ProductId,
+                    request?.ProductItem?.Quantity,
+                    request?.ProductItem?.UnitPrice
                 )
             );
 
@@ -132,10 +125,9 @@ namespace Carts.Api.Controllers
         }
 
         [HttpGet("{id}/versions")]
-        public Task<CartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion query)
+        public Task<CartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion? query)
         {
-            Guard.Against.Null(query, nameof(query));
-            return queryBus.Send<GetCartAtVersion, CartDetails>(GetCartAtVersion.Create(id, query.Version));
+            return queryBus.Send<GetCartAtVersion, CartDetails>(GetCartAtVersion.Create(id, query?.Version));
         }
     }
 }

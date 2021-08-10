@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Ardalis.GuardClauses;
 using Core.Aggregates;
 using SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 using SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
@@ -28,7 +27,8 @@ namespace SmartHome.Temperature.TemperatureMeasurements
 
         private TemperatureMeasurement(Guid measurementId)
         {
-            Guard.Against.Default(measurementId, nameof(measurementId));
+            if (measurementId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(measurementId));
 
             var @event = TemperatureMeasurementStarted.Create(
                 measurementId
@@ -40,7 +40,8 @@ namespace SmartHome.Temperature.TemperatureMeasurements
 
         public void Record(decimal temperature)
         {
-            Guard.Against.OutOfRange(temperature, nameof(temperature), -273, Decimal.MaxValue);
+            if (temperature < -273)
+                throw new ArgumentOutOfRangeException(nameof(temperature));
 
             var @event = TemperatureRecorded.Create(
                 Id,
