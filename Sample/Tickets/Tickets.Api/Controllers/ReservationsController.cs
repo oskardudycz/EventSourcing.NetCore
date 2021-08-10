@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Ids;
 using Core.Queries;
@@ -32,10 +31,6 @@ namespace Tickets.Api.Controllers
             IQueryBus queryBus,
             IIdGenerator idGenerator)
         {
-            Guard.Against.Null(commandBus, nameof(commandBus));
-            Guard.Against.Null(queryBus, nameof(queryBus));
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
-
             this.commandBus = commandBus;
             this.queryBus = queryBus;
             this.idGenerator = idGenerator;
@@ -67,14 +62,17 @@ namespace Tickets.Api.Controllers
         [HttpGet("{id}/versions")]
         public Task<ReservationDetails> GetVersion(Guid id, [FromQuery] GetReservationDetailsAtVersion request)
         {
-            Guard.Against.Null(request, nameof(request));
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
             return queryBus.Send<GetReservationAtVersion, ReservationDetails>(GetReservationAtVersion.Create(id, request.Version));
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateTentative([FromBody] CreateTentativeReservationRequest request)
         {
-            Guard.Against.Null(request, nameof(request));
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
 
             var reservationId = idGenerator.New();
 
@@ -92,7 +90,8 @@ namespace Tickets.Api.Controllers
         [HttpPost("{id}/seat")]
         public async Task<IActionResult> ChangeSeat(Guid id, [FromBody] ChangeSeatRequest request)
         {
-            Guard.Against.Null(request, nameof(request));
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
 
             var command = ChangeReservationSeat.Create(
                 id,

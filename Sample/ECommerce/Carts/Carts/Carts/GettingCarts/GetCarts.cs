@@ -1,6 +1,6 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Queries;
 using Marten;
 using Marten.Pagination;
@@ -18,12 +18,14 @@ namespace Carts.Carts.GettingCarts
             PageSize = pageSize;
         }
 
-        public static GetCarts Create(int pageNumber = 1, int pageSize = 20)
+        public static GetCarts Create(int? pageNumber = 1, int? pageSize = 20)
         {
-            Guard.Against.NegativeOrZero(pageNumber, nameof(pageNumber));
-            Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
+            if (pageNumber is null or <= 0)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber));
+            if (pageSize is null or <= 0 or > 100)
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            return new GetCarts(pageNumber, pageSize);
+            return new GetCarts(pageNumber.Value, pageSize.Value);
         }
     }
 

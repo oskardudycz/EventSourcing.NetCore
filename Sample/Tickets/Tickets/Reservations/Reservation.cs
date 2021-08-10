@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Aggregates;
 using Tickets.Reservations.CancellingReservation;
 using Tickets.Reservations.ChangingReservationSeat;
@@ -36,9 +35,10 @@ namespace Tickets.Reservations
             IReservationNumberGenerator numberGenerator,
             Guid seatId)
         {
-            Guard.Against.Null(id, nameof(id));
-            Guard.Against.Null(numberGenerator, nameof(numberGenerator));
-            Guard.Against.Default(seatId, nameof(seatId));
+            if (id == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(id));
+            if (seatId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(seatId));
 
             var reservationNumber = numberGenerator.Next();
 
@@ -55,7 +55,8 @@ namespace Tickets.Reservations
 
         public void ChangeSeat(Guid newSeatId)
         {
-            Guard.Against.Default(newSeatId, nameof(newSeatId));
+            if (newSeatId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(newSeatId));
 
             if(Status != ReservationStatus.Tentative)
                 throw new InvalidOperationException($"Changing seat for the reservation in '{Status}' status is not allowed.");

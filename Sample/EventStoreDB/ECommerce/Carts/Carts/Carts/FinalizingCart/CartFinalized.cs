@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Carts.Carts.ConfirmingCart;
 using Carts.Carts.Products;
 using Core.Events;
@@ -59,9 +58,6 @@ namespace Carts.Carts.FinalizingCart
             IEventBus eventBus
         )
         {
-            Guard.Against.Null(querySession, nameof(querySession));
-            Guard.Against.Null(eventBus, nameof(eventBus));
-
             this.querySession = querySession;
             this.eventBus = eventBus;
         }

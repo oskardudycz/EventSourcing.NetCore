@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Ids;
 using Core.Queries;
@@ -25,10 +24,6 @@ namespace SmartHome.Api
             IQueryBus queryBus,
             IIdGenerator idGenerator)
         {
-            Guard.Against.Null(commandBus, nameof(commandBus));
-            Guard.Against.Null(queryBus, nameof(queryBus));
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
-
             this.commandBus = commandBus;
             this.queryBus = queryBus;
             this.idGenerator = idGenerator;
@@ -44,8 +39,6 @@ namespace SmartHome.Api
         public async Task<IActionResult> Start()
         {
             var measurementId = idGenerator.New();
-
-            Guard.Against.Default(measurementId, nameof(measurementId));
 
             var command = StartTemperatureMeasurement.Create(
                 measurementId

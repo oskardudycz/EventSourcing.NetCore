@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -17,11 +16,12 @@ namespace Orders.Orders.CompletingOrder
             OrderId = orderId;
         }
 
-        public static CompleteOrder Create(Guid orderId)
+        public static CompleteOrder Create(Guid? orderId)
         {
-            Guard.Against.Default(orderId, nameof(orderId));
+            if (orderId == null || orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
 
-            return new CompleteOrder(orderId);
+            return new CompleteOrder(orderId.Value);
         }
     }
 
@@ -32,8 +32,6 @@ namespace Orders.Orders.CompletingOrder
 
         public HandleCompleteOrder(IRepository<Order> orderRepository)
         {
-            Guard.Against.Null(orderRepository, nameof(orderRepository));
-
             this.orderRepository = orderRepository;
         }
 

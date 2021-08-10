@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 using Newtonsoft.Json;
 
@@ -26,8 +25,10 @@ namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor
             DateTime installedAt
         )
         {
-            Guard.Against.Default(motionSensorId, nameof(motionSensorId));
-            Guard.Against.Default(installedAt, nameof(installedAt));
+            if (motionSensorId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(motionSensorId));
+            if (installedAt == default)
+                throw new ArgumentOutOfRangeException(nameof(installedAt));
 
             return new MotionSensorInstalled(motionSensorId, installedAt);
         }

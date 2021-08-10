@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Queries;
 using Marten;
 
@@ -18,7 +17,8 @@ namespace Carts.Carts.GettingCartById
 
         public static GetCartById Create(Guid cartId)
         {
-            Guard.Against.Default(cartId, nameof(cartId));
+            if (cartId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(cartId));
 
             return new GetCartById(cartId);
         }

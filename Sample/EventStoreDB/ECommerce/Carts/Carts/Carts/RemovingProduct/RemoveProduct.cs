@@ -14,15 +14,20 @@ namespace Carts.Carts.RemovingProduct
 
         public PricedProductItem ProductItem { get; }
 
-        private RemoveProduct(Guid cardId, PricedProductItem productItem)
+        private RemoveProduct(Guid cartId, PricedProductItem productItem)
         {
-            CartId = cardId;
+            CartId = cartId;
             ProductItem = productItem;
         }
 
-        public static RemoveProduct Create(Guid cardId, PricedProductItem productItem)
+        public static RemoveProduct Create(Guid? cartId, PricedProductItem? productItem)
         {
-            return new(cardId, productItem);
+            if (cartId == null || cartId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(cartId));
+            if (productItem == null)
+                throw new ArgumentOutOfRangeException(nameof(productItem));
+
+            return new(cartId.Value, productItem);
         }
     }
 

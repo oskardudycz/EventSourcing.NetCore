@@ -1,10 +1,9 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Queries;
 using Marten;
 using Marten.Pagination;
-using MediatR;
 
 namespace Tickets.Reservations.GettingReservations
 {
@@ -21,8 +20,10 @@ namespace Tickets.Reservations.GettingReservations
 
         public static GetReservations Create(int pageNumber = 1, int pageSize = 20)
         {
-            Guard.Against.NegativeOrZero(pageNumber, nameof(pageNumber));
-            Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
+            if (pageNumber <= 0)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber));
+            if (pageSize is <= 0 or > 100)
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
 
             return new GetReservations(pageNumber, pageSize);
         }

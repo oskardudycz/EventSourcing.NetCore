@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -19,11 +18,12 @@ namespace Payments.Payments.CompletingPayment
             PaymentId = paymentId;
         }
 
-        public static CompletePayment Create(Guid paymentId)
+        public static CompletePayment Create(Guid? paymentId)
         {
-            Guard.Against.Default(paymentId, nameof(paymentId));
+            if (paymentId == null || paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
 
-            return new CompletePayment(paymentId);
+            return new CompletePayment(paymentId.Value);
         }
     }
 
@@ -35,8 +35,6 @@ namespace Payments.Payments.CompletingPayment
         public HandleCompletePayment(
             IRepository<Payment> paymentRepository)
         {
-            Guard.Against.Null(paymentRepository, nameof(paymentRepository));
-
             this.paymentRepository = paymentRepository;
         }
 

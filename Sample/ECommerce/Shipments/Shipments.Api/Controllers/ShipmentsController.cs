@@ -17,8 +17,11 @@ namespace Shipments.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Send([FromBody]SendPackage request)
+        public async Task<IActionResult> Send([FromBody]SendPackage? request)
         {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
              var package = await packageService.SendPackage(request);
 
              return Created("api/Reservations", package.Id);

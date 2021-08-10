@@ -5,7 +5,6 @@ using Carts.Carts.GettingCartById;
 using Carts.Carts.GettingCartHistory;
 using Carts.Carts.GettingCarts;
 using Carts.Carts.InitializingCart;
-using Carts.Carts.Queries;
 using Carts.Carts.RemovingProduct;
 using Carts.Pricing;
 using Core.Commands;

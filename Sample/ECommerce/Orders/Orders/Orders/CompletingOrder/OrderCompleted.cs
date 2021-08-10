@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 
 namespace Orders.Orders.CompletingOrder
@@ -18,8 +17,10 @@ namespace Orders.Orders.CompletingOrder
 
         public static OrderCompleted Create(Guid orderId, DateTime completedAt)
         {
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.Default(completedAt, nameof(completedAt));
+            if (orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
+            if (completedAt == default)
+                throw new ArgumentOutOfRangeException(nameof(completedAt));
 
             return new OrderCompleted(orderId, completedAt);
         }

@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Marten;
 using MediatR;
@@ -20,12 +19,8 @@ namespace Tickets.Maintenance
 
         public async Task<Unit> Handle(RebuildProjection command, CancellationToken cancellationToken)
         {
-            Guard.Against.Null(command, nameof(command));
-
-            using (var daemon = documentStore.BuildProjectionDaemon())
-            {
-                await daemon.RebuildProjection(command.ViewName, cancellationToken);
-            }
+            using var daemon = documentStore.BuildProjectionDaemon();
+            await daemon.RebuildProjection(command.ViewName, cancellationToken);
 
             return Unit.Value;
         }

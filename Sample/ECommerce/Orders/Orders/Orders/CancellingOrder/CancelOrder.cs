@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -39,8 +38,6 @@ namespace Orders.Orders.CancellingOrder
 
         public HandleCancelOrder(IRepository<Order> orderRepository)
         {
-            Guard.Against.Null(orderRepository, nameof(orderRepository));
-
             this.orderRepository = orderRepository;
         }
 

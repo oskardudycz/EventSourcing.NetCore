@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -22,8 +21,10 @@ namespace Carts.Carts.InitializingCart
 
         public static InitializeCart Create(Guid cartId, Guid clientId)
         {
-            Guard.Against.Default(cartId, nameof(cartId));
-            Guard.Against.Default(clientId, nameof(clientId));
+            if (cartId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(cartId));
+            if (clientId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(clientId));
 
             return new InitializeCart(cartId, clientId);
         }

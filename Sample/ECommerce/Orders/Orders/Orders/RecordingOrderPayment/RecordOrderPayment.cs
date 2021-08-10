@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -22,13 +21,16 @@ namespace Orders.Orders.RecordingOrderPayment
             PaymentId = paymentId;
             PaymentRecordedAt = paymentRecordedAt;
         }
-        public static RecordOrderPayment Create(Guid orderId, Guid paymentId, DateTime paymentRecordedAt)
+        public static RecordOrderPayment Create(Guid? orderId, Guid? paymentId, DateTime? paymentRecordedAt)
         {
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.Default(paymentId, nameof(paymentId));
-            Guard.Against.Default(paymentRecordedAt, nameof(paymentRecordedAt));
+            if (orderId == null || orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
+            if (paymentId == null || paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
+            if (paymentRecordedAt == null || paymentRecordedAt == default(DateTime))
+                throw new ArgumentOutOfRangeException(nameof(paymentRecordedAt));
 
-            return new RecordOrderPayment(orderId, paymentId, paymentRecordedAt);
+            return new RecordOrderPayment(orderId.Value, paymentId.Value, paymentRecordedAt.Value);
         }
     }
     public class HandleRecordOrderPayment :
@@ -38,8 +40,6 @@ namespace Orders.Orders.RecordingOrderPayment
 
         public HandleRecordOrderPayment(IRepository<Order> orderRepository)
         {
-            Guard.Against.Null(orderRepository, nameof(orderRepository));
-
             this.orderRepository = orderRepository;
         }
 

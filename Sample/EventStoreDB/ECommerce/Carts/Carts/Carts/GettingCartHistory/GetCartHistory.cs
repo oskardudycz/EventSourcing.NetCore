@@ -2,13 +2,11 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
-using Carts.Carts.GettingCartHistory;
 using Core.Queries;
 using Marten;
 using Marten.Pagination;
 
-namespace Carts.Carts.Queries
+namespace Carts.Carts.GettingCartHistory
 {
     public class GetCartHistory : IQuery<IPagedList<CartHistory>>
     {
@@ -23,12 +21,16 @@ namespace Carts.Carts.Queries
             PageSize = pageSize;
         }
 
-        public static GetCartHistory Create(Guid cartId,int pageNumber = 1, int pageSize = 20)
+        public static GetCartHistory Create(Guid? cartId, int? pageNumber = 1, int? pageSize = 20)
         {
-            Guard.Against.NegativeOrZero(pageNumber, nameof(pageNumber));
-            Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
+            if (cartId == null || cartId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(cartId));
+            if (pageNumber is null or <= 0)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber));
+            if (pageSize is null or <= 0 or > 100)
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            return new GetCartHistory(cartId, pageNumber, pageSize);
+            return new GetCartHistory(cartId.Value, pageNumber.Value, pageSize.Value);
         }
     }
 

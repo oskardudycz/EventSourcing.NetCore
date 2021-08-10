@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 using Newtonsoft.Json;
 
@@ -23,8 +22,10 @@ namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature
 
         public static TemperatureRecorded Create(Guid measurementId, decimal temperature)
         {
-            Guard.Against.Default(measurementId, nameof(measurementId));
-            Guard.Against.OutOfRange(temperature, nameof(temperature), -273, decimal.MaxValue);
+            if (measurementId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(measurementId));
+            if (temperature < -273)
+                throw new ArgumentOutOfRangeException(nameof(temperature));
 
             return new TemperatureRecorded(measurementId, temperature, DateTimeOffset.UtcNow);
         }

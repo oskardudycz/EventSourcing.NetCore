@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Queries;
 using Marten;
 
@@ -23,8 +22,6 @@ namespace SmartHome.Temperature.MotionSensors.GettingMotionSensor
 
         public HandleGetMotionSensors(IDocumentSession querySession)
         {
-            Guard.Against.Null(querySession, nameof(querySession));
-
             this.querySession = querySession;
         }
 

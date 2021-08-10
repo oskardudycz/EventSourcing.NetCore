@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 using Newtonsoft.Json;
 
@@ -19,8 +18,10 @@ namespace Tickets.Reservations.ChangingReservationSeat
 
         public static ReservationSeatChanged Create(Guid reservationId, Guid seatId)
         {
-            Guard.Against.Default(reservationId, nameof(reservationId));
-            Guard.Against.Default(seatId, nameof(seatId));
+            if (reservationId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(reservationId));
+            if (seatId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(seatId));
 
             return new ReservationSeatChanged(
                 reservationId,

@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 
 namespace Payments.Payments.TimingOutPayment
@@ -18,8 +17,10 @@ namespace Payments.Payments.TimingOutPayment
 
         public static PaymentTimedOut Create(Guid paymentId, in DateTime timedOutAt)
         {
-            Guard.Against.Default(paymentId, nameof(paymentId));
-            Guard.Against.Default(timedOutAt, nameof(timedOutAt));
+            if (paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
+            if (timedOutAt == default)
+                throw new ArgumentOutOfRangeException(nameof(timedOutAt));
 
             return new PaymentTimedOut(paymentId, timedOutAt);
         }

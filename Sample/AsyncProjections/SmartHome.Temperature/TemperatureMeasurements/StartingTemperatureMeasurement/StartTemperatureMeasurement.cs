@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -19,7 +18,8 @@ namespace SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasu
 
         public static StartTemperatureMeasurement Create(Guid measurementId)
         {
-            Guard.Against.Default(measurementId, nameof(measurementId));
+            if (measurementId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(measurementId));
 
             return new StartTemperatureMeasurement(measurementId);
         }

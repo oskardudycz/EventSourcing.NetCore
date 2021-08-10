@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
 using Core.Ids;
@@ -22,26 +21,20 @@ namespace Payments.Api.Controllers
             IQueryBus queryBus,
             IIdGenerator idGenerator)
         {
-            Guard.Against.Null(commandBus, nameof(commandBus));
-            Guard.Against.Null(queryBus, nameof(queryBus));
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
-
             this.commandBus = commandBus;
             this.queryBus = queryBus;
             this.idGenerator = idGenerator;
         }
 
         [HttpPost]
-        public async Task<IActionResult> RequestPayment([FromBody] RequestPaymentRequest request)
+        public async Task<IActionResult> RequestPayment([FromBody] RequestPaymentRequest? request)
         {
-            Guard.Against.Null(request, nameof(request));
-
             var paymentId = idGenerator.New();
 
             var command = Payments.RequestingPayment.RequestPayment.Create(
                 paymentId,
-                request.OrderId,
-                request.Amount
+                request?.OrderId,
+                request?.Amount
             );
 
             await commandBus.Send(command);
@@ -62,13 +55,11 @@ namespace Payments.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DiscardPayment(Guid id, [FromBody] DiscardPaymentRequest request)
+        public async Task<IActionResult> DiscardPayment(Guid id, [FromBody] DiscardPaymentRequest? request)
         {
-            Guard.Against.Null(request, nameof(request));
-
             var command = Payments.DiscardingPayment.DiscardPayment.Create(
                 id,
-                request.DiscardReason
+                request?.DiscardReason
             );
 
             await commandBus.Send(command);
@@ -77,13 +68,11 @@ namespace Payments.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> TimeoutPayment(Guid id, [FromBody] TimeOutPaymentRequest request)
+        public async Task<IActionResult> TimeoutPayment(Guid id, [FromBody] TimeOutPaymentRequest? request)
         {
-            Guard.Against.Null(request, nameof(request));
-
             var command = TimeOutPayment.Create(
                 id,
-                request.TimedOutAt
+                request?.TimedOutAt
             );
 
             await commandBus.Send(command);

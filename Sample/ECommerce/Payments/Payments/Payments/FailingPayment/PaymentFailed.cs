@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Events;
 using Marten;
 using Payments.Payments.DiscardingPayment;
@@ -62,8 +61,6 @@ namespace Payments.Payments.FailingPayment
             IQuerySession querySession
             )
         {
-            Guard.Against.Null(eventBus, nameof(eventBus));
-
             this.eventBus = eventBus;
             this.querySession = querySession;
         }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -43,7 +42,7 @@ namespace Orders.Orders.InitializingOrder
             if (productItems == null)
                 throw new ArgumentNullException(nameof(productItems));
             if (!totalPrice.HasValue)
-                throw new ArgumentNullException(nameof(productItems));
+                throw new ArgumentNullException(nameof(totalPrice));
 
             return new InitializeOrder(orderId.Value, clientId.Value, productItems, totalPrice.Value);
         }
@@ -55,8 +54,6 @@ namespace Orders.Orders.InitializingOrder
 
         public HandleInitializeOrder(IRepository<Order> orderRepository)
         {
-            Guard.Against.Null(orderRepository, nameof(orderRepository));
-
             this.orderRepository = orderRepository;
         }
 

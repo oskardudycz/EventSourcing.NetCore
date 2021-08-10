@@ -10,7 +10,7 @@ using Orders.Api.Requests.Carts;
 using Orders.Orders.InitializingOrder;
 using Xunit;
 
-namespace Orders.Api.Tests.Orders
+namespace Orders.Api.Tests.Orders.InitializingOrder
 {
     public class InitializeOrderFixture: ApiFixture<Startup>
     {
@@ -51,7 +51,7 @@ namespace Orders.Api.Tests.Orders
 
         [Fact]
         [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_OrderId()
+        public async Task InitializeOrder_ShouldReturn_CreatedStatus_With_OrderId()
         {
             var commandResponse = fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
@@ -64,7 +64,7 @@ namespace Orders.Api.Tests.Orders
 
         [Fact]
         [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldPublish_OrderInitializedEvent()
+        public async Task InitializeOrder_ShouldPublish_OrderInitializedEvent()
         {
             var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
@@ -86,13 +86,13 @@ namespace Orders.Api.Tests.Orders
         // [Trait("Category", "Acceptance")]
         // public async Task CreateCommand_ShouldCreate_Order()
         // {
-        //     var createdId = await fixture.CommandResponse.GetResultFromJSON<Guid>();
+        //     var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
         //
         //     // prepare query
         //     var query = $"{createdId}";
         //
         //     //send query
-        //     var queryResponse = await fixture.GetAsync(query);
+        //     var queryResponse = await fixture.Get(query);
         //     queryResponse.EnsureSuccessStatusCode();
         //
         //     var queryResult = await queryResponse.Content.ReadAsStringAsync();

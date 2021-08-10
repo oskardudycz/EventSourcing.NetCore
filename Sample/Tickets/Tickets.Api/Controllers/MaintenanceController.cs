@@ -1,5 +1,5 @@
+using System;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Microsoft.AspNetCore.Mvc;
 using Tickets.Api.Requests;
@@ -15,15 +15,14 @@ namespace Tickets.Api.Controllers
         public MaintenanceController(
             ICommandBus commandBus)
         {
-            Guard.Against.Null(commandBus, nameof(commandBus));
-
             this.commandBus = commandBus;
         }
 
         [HttpPost("projections/rebuild")]
         public async Task<IActionResult> Rebuild([FromBody] RebuildProjectionRequest request)
         {
-            Guard.Against.Null(request, nameof(request));
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
 
             var command = RebuildProjection.Create(
                 request.ProjectionName

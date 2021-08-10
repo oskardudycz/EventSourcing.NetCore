@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 using Newtonsoft.Json;
 
@@ -21,9 +20,12 @@ namespace Tickets.Reservations.CreatingTentativeReservation
 
         public static TentativeReservationCreated Create(Guid reservationId, Guid seatId, string number)
         {
-            Guard.Against.Default(reservationId, nameof(reservationId));
-            Guard.Against.Default(seatId, nameof(seatId));
-            Guard.Against.NullOrWhiteSpace(number, nameof(number));
+            if (reservationId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(reservationId));
+            if (seatId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(seatId));
+            if (string.IsNullOrWhiteSpace(number))
+                throw new ArgumentOutOfRangeException(nameof(number));
 
             return new TentativeReservationCreated(reservationId, seatId, number);
         }

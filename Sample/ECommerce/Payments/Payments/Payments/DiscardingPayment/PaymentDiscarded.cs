@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 
 namespace Payments.Payments.DiscardingPayment
@@ -20,8 +19,10 @@ namespace Payments.Payments.DiscardingPayment
 
         public static PaymentDiscarded Create(Guid paymentId, DiscardReason discardReason, DateTime discardedAt)
         {
-            Guard.Against.Default(paymentId, nameof(paymentId));
-            Guard.Against.Default(discardedAt, nameof(discardedAt));
+            if (paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
+            if (discardedAt == default)
+                throw new ArgumentOutOfRangeException(nameof(discardedAt));
 
             return new PaymentDiscarded(paymentId, discardReason, discardedAt);
         }

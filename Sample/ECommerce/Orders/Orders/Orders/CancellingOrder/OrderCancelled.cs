@@ -1,5 +1,4 @@
 using System;
-using Ardalis.GuardClauses;
 using Core.Events;
 
 namespace Orders.Orders.CancellingOrder
@@ -27,10 +26,14 @@ namespace Orders.Orders.CancellingOrder
             OrderCancellationReason orderCancellationReason,
             DateTime cancelledAt)
         {
-            Guard.Against.Default(orderId, nameof(orderId));
-            Guard.Against.Default(paymentId, nameof(paymentId));
-            Guard.Against.Default(orderCancellationReason, nameof(orderCancellationReason));
-            Guard.Against.Default(cancelledAt, nameof(cancelledAt));
+            if (orderId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(orderId));
+            if (paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
+            if (orderCancellationReason == default)
+                throw new ArgumentOutOfRangeException(nameof(orderCancellationReason));
+            if (cancelledAt == default)
+                throw new ArgumentOutOfRangeException(nameof(cancelledAt));
 
             return new OrderCancelled(orderId, paymentId, orderCancellationReason, cancelledAt);
         }

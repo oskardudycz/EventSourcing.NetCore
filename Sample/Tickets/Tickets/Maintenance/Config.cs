@@ -1,8 +1,6 @@
 using Core.Commands;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Tickets.Maintenance.Commands;
-using Tickets.Reservations;
 
 namespace Tickets.Maintenance
 {

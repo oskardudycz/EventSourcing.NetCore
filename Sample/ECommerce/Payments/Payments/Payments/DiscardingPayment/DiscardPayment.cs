@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Core.Commands;
 using Core.Repositories;
 using MediatR;
@@ -20,11 +19,14 @@ namespace Payments.Payments.DiscardingPayment
             DiscardReason = discardReason;
         }
 
-        public static DiscardPayment Create(Guid paymentId, DiscardReason discardReason)
+        public static DiscardPayment Create(Guid? paymentId, DiscardReason? discardReason)
         {
-            Guard.Against.Default(paymentId, nameof(paymentId));
+            if (paymentId == null || paymentId == Guid.Empty)
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
+            if (discardReason is null or default(DiscardReason))
+                throw new ArgumentOutOfRangeException(nameof(paymentId));
 
-            return new DiscardPayment(paymentId, discardReason);
+            return new DiscardPayment(paymentId.Value, discardReason.Value);
         }
     }
 
@@ -36,8 +38,6 @@ namespace Payments.Payments.DiscardingPayment
         public HandleDiscardPayment(
             IRepository<Payment> paymentRepository)
         {
-            Guard.Against.Null(paymentRepository, nameof(paymentRepository));
-
             this.paymentRepository = paymentRepository;
         }
 
