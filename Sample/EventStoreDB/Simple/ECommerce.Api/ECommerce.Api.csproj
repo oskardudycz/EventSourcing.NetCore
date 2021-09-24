@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,6 +12,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\..\Core.WebApi\Core.WebApi.csproj" />
+      <ProjectReference Include="..\ECommerce\ECommerce.csproj" />
     </ItemGroup>
 
 </Project>
