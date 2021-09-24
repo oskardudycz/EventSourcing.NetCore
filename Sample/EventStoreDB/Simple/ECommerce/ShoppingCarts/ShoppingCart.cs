@@ -27,7 +27,6 @@ namespace ECommerce.ShoppingCarts
         Guid ClientId,
         ShoppingCartStatus Status,
         DateTime? ConfirmedAt
-        //IList<PricedProductItem> ProductItems
     )
     {
         private ShoppingCart(): this(default, default, default, default) { }
@@ -36,16 +35,19 @@ namespace ECommerce.ShoppingCarts
         {
             return @event switch
             {
-                ShoppingCartInitialized(var cartId, var clientId, var cartStatus) => entity with
-                {
-                    Id = cartId,
-                    ClientId = clientId,
-                    Status = cartStatus
-                },
-                ShoppingCartConfirmed (_, var confirmedAt) => entity with
-                {
-                    Status = ShoppingCartStatus.Confirmed, ConfirmedAt = confirmedAt
-                },
+                ShoppingCartInitialized(var cartId, var clientId, var cartStatus) =>
+                    entity with
+                    {
+                        Id = cartId,
+                        ClientId = clientId,
+                        Status = cartStatus
+                    },
+                ShoppingCartConfirmed (_, var confirmedAt) =>
+                    entity with
+                    {
+                        Status = ShoppingCartStatus.Confirmed,
+                        ConfirmedAt = confirmedAt
+                    },
                 _ => entity
             };
         }
