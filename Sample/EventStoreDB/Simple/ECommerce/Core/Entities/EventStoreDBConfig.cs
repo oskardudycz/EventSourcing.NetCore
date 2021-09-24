@@ -1,0 +1,30 @@
+﻿using EventStore.Client;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ECommerce.Core.Entities
+{
+    public class EventStoreDBConfig
+    {
+        public string ConnectionString { get; set; } = default!;
+    }
+
+    public record EventStoreDBOptions(
+        bool UseInternalCheckpointing = true
+    );
+
+    public static class EventStoreDBConfigExtensions
+    {
+        private const string DefaultConfigKey = "EventStore";
+
+        public static IServiceCollection AddEventStoreDB(this IServiceCollection services, IConfiguration config, EventStoreDBOptions? options = null)
+        {
+            var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
+
+            services.AddSingleton(
+                new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)));
+
+            return services;
+        }
+    }
+}
