@@ -17,29 +17,6 @@ namespace ECommerce.ShoppingCarts.ConfirmingCart
 
             return new ConfirmCart(cartId.Value);
         }
-    }
-
-    internal class HandleConfirmCart: ICommandHandler<ConfirmCart>
-    {
-        private readonly IEventStoreDBRepository<ShoppingCart> repository;
-
-        public HandleConfirmCart(IEventStoreDBRepository<ShoppingCart> repository)
-        {
-            this.repository = repository;
-        }
-
-        public async ValueTask Handle(ConfirmCart command, CancellationToken ct)
-        {
-            var shoppingCart = await repository.Find(
-                command.ShoppingCartId,
-                ShoppingCart.When,
-                ct
-            );
-
-            var @event = Handle(shoppingCart, command);
-
-            await repository.Append(command.ShoppingCartId, @event, ct);
-        }
 
         public static ShoppingCartConfirmed Handle(ShoppingCart shoppingCart, ConfirmCart command)
         {
