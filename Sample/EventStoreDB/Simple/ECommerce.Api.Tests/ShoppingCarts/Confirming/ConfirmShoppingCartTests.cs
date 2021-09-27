@@ -7,11 +7,13 @@ using ECommerce.Api.Requests;
 using FluentAssertions;
 using Xunit;
 
-namespace ECommerce.Api.Tests.InitializingShoppingCart
+namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
 {
-    public class InitializeShoppingCartFixture: ApiFixture<Startup>
+    public class ConfirmShoppingCartFixture: ApiFixture<Startup>
     {
         protected override string ApiUrl => "/api/ShoppingCarts";
+
+        public Guid CartId { get; private set; }
 
         public readonly Guid ClientId = Guid.NewGuid();
 
@@ -19,29 +21,32 @@ namespace ECommerce.Api.Tests.InitializingShoppingCart
 
         public override async Task InitializeAsync()
         {
-            CommandResponse = await Post(new InitializeShoppingCartRequest(ClientId));
+            var initializeResponse = await Post(new InitializeShoppingCartRequest(ClientId));
+            initializeResponse.EnsureSuccessStatusCode();
+
+            CartId = await initializeResponse.GetResultFromJson<Guid>();
+
+            CommandResponse = await Put($"{CartId}/confirmation");
         }
     }
 
-    public class InitializeShoppingCartTests: IClassFixture<InitializeShoppingCartFixture>
+    public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
     {
-        private readonly InitializeShoppingCartFixture fixture;
+        private readonly ConfirmShoppingCartFixture fixture;
 
-        public InitializeShoppingCartTests(InitializeShoppingCartFixture fixture)
+        public ConfirmShoppingCartTests(ConfirmShoppingCartFixture fixture)
         {
             this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_CartId()
+        public Task ConfirmCommand_ShouldReturn_OK()
         {
             var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
-            commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            // get created record id
-            var createdId = await commandResponse.GetResultFromJson<Guid>();
-            createdId.Should().NotBeEmpty();
+            return Task.CompletedTask;
         }
 
         // [Fact]

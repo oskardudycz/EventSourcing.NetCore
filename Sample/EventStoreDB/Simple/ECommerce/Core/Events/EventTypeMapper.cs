@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using ECommerce.Core.Reflection;
+using System.Linq;
 
-namespace Core.Events
+namespace ECommerce.Core.Events
 {
     public class EventTypeMapper
     {
@@ -10,16 +10,6 @@ namespace Core.Events
 
         private readonly ConcurrentDictionary<Type, string> TypeNameMap = new();
         private readonly ConcurrentDictionary<string, Type> TypeMap = new();
-
-        public static void AddCustomMap<T>(string mappedEventTypeName) => AddCustomMap(typeof(T), mappedEventTypeName);
-
-        public static void AddCustomMap(Type eventType, string mappedEventTypeName)
-        {
-            Instance.TypeNameMap.AddOrUpdate(eventType, mappedEventTypeName, (_, _) => mappedEventTypeName);
-            Instance.TypeMap.AddOrUpdate(mappedEventTypeName, eventType, (_, _) => eventType);
-        }
-
-        public static string ToName<TEventType>() => ToName(typeof(TEventType));
 
         public static string ToName(Type eventType) => Instance.TypeNameMap.GetOrAdd(eventType, (_) =>
         {
@@ -32,14 +22,21 @@ namespace Core.Events
 
         public static Type ToType(string eventTypeName) => Instance.TypeMap.GetOrAdd(eventTypeName, (_) =>
         {
-            var type = TypeProvider.GetFirstMatchingTypeFromCurrentDomainAssembly(eventTypeName.Replace("_", "."))!;
+            var type = GetFirstMatchingTypeFromCurrentDomainAssembly(eventTypeName.Replace("_", "."))!;
 
             if (type == null)
-                throw new Exception($"Type map for '{eventTypeName}' wasn't found!");
+                throw new Exception($"Type for '{eventTypeName}' wasn't found!");
 
             Instance.TypeNameMap.AddOrUpdate(type, eventTypeName, (_, _) => eventTypeName);
 
             return type;
         });
+
+        private static Type? GetFirstMatchingTypeFromCurrentDomainAssembly(string typeName)
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes().Where(x => x.FullName == typeName || x.Name == typeName))
+                .FirstOrDefault();
+        }
     }
 }

@@ -1,24 +1,20 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using ECommerce.Core.Commands;
-using ECommerce.Core.Entities;
 
-namespace ECommerce.ShoppingCarts.ConfirmingCart
+namespace ECommerce.ShoppingCarts.Confirming
 {
-    public record ConfirmCart(
+    public record ConfirmShoppingCart(
         Guid ShoppingCartId
     )
     {
-        public static ConfirmCart From(Guid? cartId)
+        public static ConfirmShoppingCart From(Guid? cartId)
         {
             if (cartId == null || cartId == Guid.Empty)
                 throw new ArgumentOutOfRangeException(nameof(cartId));
 
-            return new ConfirmCart(cartId.Value);
+            return new ConfirmShoppingCart(cartId.Value);
         }
 
-        public static ShoppingCartConfirmed Handle(ShoppingCart shoppingCart, ConfirmCart command)
+        public static ShoppingCartConfirmed Handle(ShoppingCart shoppingCart, ConfirmShoppingCart command)
         {
             if(shoppingCart.Status != ShoppingCartStatus.Pending)
                 throw new InvalidOperationException($"Confirming cart in '{shoppingCart.Status}' status is not allowed.");

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Api.Requests;
+using ECommerce.ShoppingCarts.Confirming;
 using ECommerce.ShoppingCarts.Initializing;
 
 namespace ECommerce.Api.Controllers
@@ -67,17 +68,20 @@ namespace ECommerce.Api.Controllers
         //     return Ok();
         // }
         //
-        // [HttpPut("{id}/confirmation")]
-        // public async Task<IActionResult> ConfirmCart(Guid id)
-        // {
-        //     var command = Carts.ConfirmingCart.ConfirmCart.Create(
-        //         id
-        //     );
-        //
-        //     await commandBus.Send(command);
-        //
-        //     return Ok();
-        // }
+        [HttpPut("{id}/confirmation")]
+        public async Task<IActionResult> ConfirmCart(
+            [FromServices] Func<ConfirmShoppingCart, CancellationToken, ValueTask> handle,
+            Guid id,
+            CancellationToken ct
+            )
+        {
+            var command =
+                ConfirmShoppingCart.From(id);
+
+            await handle(command, ct);
+
+            return Ok();
+        }
         //
         // [HttpGet("{id}")]
         // public Task<CartDetails> Get(Guid id)
