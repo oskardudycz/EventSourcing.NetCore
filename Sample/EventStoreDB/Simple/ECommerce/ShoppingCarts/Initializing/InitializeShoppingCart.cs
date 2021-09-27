@@ -20,23 +20,6 @@ namespace ECommerce.ShoppingCarts.Initializing
 
             return new InitializeShoppingCart(cartId.Value, clientId.Value);
         }
-    }
-
-    public class HandleInitializeShoppingCart : ICommandHandler<InitializeShoppingCart>
-    {
-        private readonly IEventStoreDBRepository<ShoppingCart> repository;
-
-        public HandleInitializeShoppingCart(IEventStoreDBRepository<ShoppingCart> repository)
-        {
-            this.repository = repository;
-        }
-
-        public async ValueTask Handle(InitializeShoppingCart command, CancellationToken ct)
-        {
-            var @event = Handle(command);
-
-            await repository.Append(command.ShoppingCartId, @event, ct);
-        }
 
         public static ShoppingCartInitialized Handle(InitializeShoppingCart command)
         {

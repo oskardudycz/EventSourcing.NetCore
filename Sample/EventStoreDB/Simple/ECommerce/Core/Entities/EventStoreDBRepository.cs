@@ -10,11 +10,11 @@ namespace ECommerce.Core.Entities
 {
     public interface IEventStoreDBRepository<T> where T: notnull
     {
-        Task<T> Find(Guid id, Func<T, object, T> when, CancellationToken cancellationToken);
-        Task Append(Guid id, object @event, CancellationToken cancellationToken);
+        Task<T> Find(Func<T?, object, T> when, string id, CancellationToken cancellationToken);
+        Task Append(string id, object @event, CancellationToken cancellationToken);
     }
 
-    public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T: notnull
+    public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T: class
     {
         private readonly EventStoreClient eventStore;
 
@@ -25,30 +25,28 @@ namespace ECommerce.Core.Entities
             this.eventStore = eventStore ?? throw new ArgumentNullException(nameof(eventStore));
         }
 
-        public async Task<T> Find(Guid id, Func<T, object, T> when, CancellationToken cancellationToken)
+        public async Task<T> Find(Func<T?, object, T> when, string id, CancellationToken cancellationToken)
         {
             var readResult = eventStore.ReadStreamAsync(
                 Direction.Forwards,
-                StreamNameMapper.ToStreamId<T>(id),
+                id,
                 StreamPosition.Start,
                 cancellationToken: cancellationToken
             );
 
-            var aggregate = (T)Activator.CreateInstance(typeof(T), true)!;
-
-            return await readResult
+            return (await readResult
                 .Select(@event => @event.Deserialize())
                 .AggregateAsync(
-                    aggregate,
+                    default,
                     when,
                     cancellationToken
-                );
+                ))!;
         }
 
-        public async Task Append(Guid id, object @event, CancellationToken cancellationToken)
+        public async Task Append(string id, object @event, CancellationToken cancellationToken)
         {
             await eventStore.AppendToStreamAsync(
-                StreamNameMapper.ToStreamId<T>(id),
+                id,
                 // TODO: Add proper optimistic concurrency handling
                 StreamState.Any,
                 new[] { @event.ToJsonEventData() },

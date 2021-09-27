@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ECommerce.ShoppingCarts
 {
@@ -26,29 +24,22 @@ namespace ECommerce.ShoppingCarts
         Guid Id,
         Guid ClientId,
         ShoppingCartStatus Status,
-        DateTime? ConfirmedAt
+        DateTime? ConfirmedAt = null
     )
     {
-        private ShoppingCart(): this(default, default, default, default) { }
-
-        public static ShoppingCart When(ShoppingCart entity, object @event)
+        public static ShoppingCart When(ShoppingCart? entity, object @event)
         {
             return @event switch
             {
                 ShoppingCartInitialized(var cartId, var clientId, var cartStatus) =>
-                    entity with
-                    {
-                        Id = cartId,
-                        ClientId = clientId,
-                        Status = cartStatus
-                    },
+                    new ShoppingCart(cartId, clientId, cartStatus),
                 ShoppingCartConfirmed (_, var confirmedAt) =>
-                    entity with
+                    entity! with
                     {
                         Status = ShoppingCartStatus.Confirmed,
                         ConfirmedAt = confirmedAt
                     },
-                _ => entity
+                _ => entity!
             };
         }
     }
