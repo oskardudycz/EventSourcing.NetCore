@@ -11,6 +11,8 @@ namespace ECommerce.Core.Events
         private readonly ConcurrentDictionary<Type, string> TypeNameMap = new();
         private readonly ConcurrentDictionary<string, Type> TypeMap = new();
 
+        public static string ToName<TEventType>() => ToName(typeof(TEventType));
+
         public static string ToName(Type eventType) => Instance.TypeNameMap.GetOrAdd(eventType, (_) =>
         {
             var eventTypeName = eventType.FullName!.Replace(".", "_");

@@ -7,6 +7,9 @@ namespace ECommerce.Core.Serialisation
 {
     public static class EventStoreDBSerializer
     {
+        public static T Deserialize<T>(this ResolvedEvent resolvedEvent)
+            => (T)Deserialize(resolvedEvent);
+
         public static object Deserialize(this ResolvedEvent resolvedEvent)
         {
             // get type
