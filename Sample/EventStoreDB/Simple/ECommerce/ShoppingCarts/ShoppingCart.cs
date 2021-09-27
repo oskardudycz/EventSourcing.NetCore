@@ -31,8 +31,9 @@ namespace ECommerce.ShoppingCarts
         {
             return @event switch
             {
-                ShoppingCartInitialized(var cartId, var clientId, var cartStatus) =>
+                ShoppingCartInitialized (var cartId, var clientId, var cartStatus) =>
                     new ShoppingCart(cartId, clientId, cartStatus),
+
                 ShoppingCartConfirmed (_, var confirmedAt) =>
                     entity! with
                     {
@@ -42,5 +43,8 @@ namespace ECommerce.ShoppingCarts
                 _ => entity!
             };
         }
+
+        public static string MapToStreamId(Guid shoppingCartId)
+            => $"shopping_cart-{shoppingCartId}";
     }
 }

@@ -1,7 +1,6 @@
-﻿using Core.Events;
-using ECommerce.Core.Commands;
+﻿using ECommerce.Core.Commands;
 using ECommerce.Core.Entities;
-using ECommerce.ShoppingCarts.ConfirmingCart;
+using ECommerce.ShoppingCarts.Confirming;
 using ECommerce.ShoppingCarts.Initializing;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,11 +13,11 @@ namespace ECommerce.ShoppingCarts
                 .AddTransient<IEventStoreDBRepository<ShoppingCart>, EventStoreDBRepository<ShoppingCart>>()
                 .AddCreateCommandHandler<ShoppingCart, InitializeShoppingCart>(
                     InitializeShoppingCart.Handle,
-                    command => StreamNameMapper.ToStreamId<ShoppingCart>(command.ShoppingCartId)
+                    command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                 )
-                .AddUpdateCommandHandler<ShoppingCart, ConfirmCart>(
-                    ConfirmCart.Handle,
-                    command => StreamNameMapper.ToStreamId<ShoppingCart>(command.ShoppingCartId),
+                .AddUpdateCommandHandler<ShoppingCart, ConfirmShoppingCart>(
+                    ConfirmShoppingCart.Handle,
+                    command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
                     ShoppingCart.When
                 );
     }
