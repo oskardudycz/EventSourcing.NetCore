@@ -14,7 +14,6 @@ namespace ECommerce.Api.Core
         private readonly Func<CancellationToken, Task> perform;
 
         public BackgroundWorker(
-            IServiceProvider serviceProvider,
             ILogger<BackgroundWorker> logger,
             Func<CancellationToken, Task> perform
         )

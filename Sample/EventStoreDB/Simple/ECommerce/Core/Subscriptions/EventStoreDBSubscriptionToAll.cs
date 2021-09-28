@@ -5,63 +5,67 @@ using ECommerce.Core.Events;
 using ECommerce.Core.Serialisation;
 using ECommerce.Core.Threading;
 using EventStore.Client;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Core.Subscriptions
 {
+    public class EventStoreDBSubscriptionToAllOptions
+    {
+        public string SubscriptionId { get; set; } = Guid.NewGuid().ToString();
+
+        public SubscriptionFilterOptions FilterOptions { get; set; } =
+            new(EventTypeFilter.ExcludeSystemEvents());
+
+        public Action<EventStoreClientOperationOptions>? ConfigureOperation { get; set; }
+        public UserCredentials? Credentials { get; set; }
+
+        public bool ResolveLinkTos { get; set; }
+    }
+
     public class EventStoreDBSubscriptionToAll
     {
-        private readonly IServiceProvider serviceProvider;
+        private readonly IEventBus eventBus;
         private readonly EventStoreClient eventStoreClient;
         private readonly ISubscriptionCheckpointRepository checkpointRepository;
         private readonly ILogger<EventStoreDBSubscriptionToAll> logger;
-        private readonly string subscriptionId;
-        private readonly SubscriptionFilterOptions? filterOptions;
-        private readonly Action<EventStoreClientOperationOptions>? configureOperation;
-        private readonly UserCredentials? credentials;
+        private EventStoreDBSubscriptionToAllOptions subscriptionOptions = default!;
+        private string SubscriptionId => subscriptionOptions.SubscriptionId;
         private readonly object resubscribeLock = new();
-        private CancellationToken? cancellationToken;
+        private CancellationToken cancellationToken;
 
         public EventStoreDBSubscriptionToAll(
-            IServiceProvider serviceProvider,
             EventStoreClient eventStoreClient,
+            IEventBus eventBus,
             ISubscriptionCheckpointRepository checkpointRepository,
-            ILogger<EventStoreDBSubscriptionToAll> logger,
-            string subscriptionId,
-            SubscriptionFilterOptions? filterOptions = null,
-            Action<EventStoreClientOperationOptions>? configureOperation = null,
-            UserCredentials? credentials = null
+            ILogger<EventStoreDBSubscriptionToAll> logger
         )
         {
-            this.serviceProvider = serviceProvider?? throw new ArgumentNullException(nameof(serviceProvider));
+            this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
             this.eventStoreClient = eventStoreClient ?? throw new ArgumentNullException(nameof(eventStoreClient));
-            this.checkpointRepository = checkpointRepository?? throw new ArgumentNullException(nameof(checkpointRepository));
+            this.checkpointRepository =
+                checkpointRepository ?? throw new ArgumentNullException(nameof(checkpointRepository));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.subscriptionId = subscriptionId;
-            this.configureOperation = configureOperation;
-            this.credentials = credentials;
-            this.filterOptions = filterOptions ?? new SubscriptionFilterOptions(EventTypeFilter.ExcludeSystemEvents());
         }
 
-        private async Task SubscribeToAll(CancellationToken ct)
+        public async Task SubscribeToAll(EventStoreDBSubscriptionToAllOptions subscriptionOptions, CancellationToken ct)
         {
+            this.subscriptionOptions = subscriptionOptions;
             cancellationToken = ct;
 
-            logger.LogInformation("Subscription to all '{SubscriptionId}'", subscriptionId);
+            logger.LogInformation("Subscription to all '{SubscriptionId}'", subscriptionOptions.SubscriptionId);
 
-            var checkpoint = await checkpointRepository.Load(subscriptionId, ct);
+            var checkpoint = await checkpointRepository.Load(SubscriptionId, ct);
 
             if (checkpoint != null)
             {
                 await eventStoreClient.SubscribeToAllAsync(
                     new Position(checkpoint.Value, checkpoint.Value),
                     HandleEvent,
-                    false,
+                    subscriptionOptions.ResolveLinkTos,
                     HandleDrop,
-                    filterOptions,
-                    configureOperation,
-                    credentials,
+                    subscriptionOptions.FilterOptions,
+                    subscriptionOptions.ConfigureOperation,
+                    subscriptionOptions.Credentials,
                     ct
                 );
             }
@@ -71,63 +75,43 @@ namespace ECommerce.Core.Subscriptions
                     HandleEvent,
                     false,
                     HandleDrop,
-                    filterOptions,
-                    configureOperation,
-                    credentials,
+                    subscriptionOptions.FilterOptions,
+                    subscriptionOptions.ConfigureOperation,
+                    subscriptionOptions.Credentials,
                     ct
                 );
             }
 
-            logger.LogInformation("Subscription to all '{SubscriptionId}' started", subscriptionId);
+            logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
         }
 
-        private async Task HandleEvent(StreamSubscription subscription, ResolvedEvent resolvedEvent, CancellationToken ct)
+        private async Task HandleEvent(StreamSubscription subscription, ResolvedEvent resolvedEvent,
+            CancellationToken ct)
         {
             try
             {
                 if (IsEventWithEmptyData(resolvedEvent) || IsCheckpointEvent(resolvedEvent)) return;
 
-                // Create scope to have proper handling of scoped services
-                using var scope = serviceProvider.CreateScope();
-
-                var eventBus =
-                    scope.ServiceProvider.GetRequiredService<IEventBus>();
-
                 // publish event to internal event bus
                 await eventBus.Publish(resolvedEvent.Deserialize(), ct);
 
-                await checkpointRepository.Store(subscriptionId, resolvedEvent.Event.Position.CommitPosition, ct);
+                await checkpointRepository.Store(SubscriptionId, resolvedEvent.Event.Position.CommitPosition, ct);
             }
             catch (Exception e)
             {
-                logger.LogError("Error consuming message: {ExceptionMessage}{ExceptionStackTrace}", e.Message, e.StackTrace);
+                logger.LogError("Error consuming message: {ExceptionMessage}{ExceptionStackTrace}", e.Message,
+                    e.StackTrace);
+
+                throw;
             }
-        }
-
-        private bool IsEventWithEmptyData(ResolvedEvent resolvedEvent)
-        {
-            if (resolvedEvent.Event.Data.Length != 0) return false;
-
-            logger.LogInformation("Event without data received");
-            return true;
-
-        }
-
-        private bool IsCheckpointEvent(ResolvedEvent resolvedEvent)
-        {
-            if (resolvedEvent.Event.EventType != EventTypeMapper.ToName<CheckpointStored>()) return false;
-
-            logger.LogInformation("Checkpoint event - ignoring");
-            return true;
-
         }
 
         private void HandleDrop(StreamSubscription _, SubscriptionDroppedReason reason, Exception? exception)
         {
-            logger.LogWarning(
+            logger.LogError(
                 exception,
                 "Subscription to all '{SubscriptionId}' dropped with '{Reason}'",
-                subscriptionId,
+                SubscriptionId,
                 reason
             );
 
@@ -145,14 +129,16 @@ namespace ECommerce.Core.Subscriptions
 
                     using (NoSynchronizationContextScope.Enter())
                     {
-                        SubscribeToAll(cancellationToken!.Value).Wait();
+                        SubscribeToAll(subscriptionOptions, cancellationToken).Wait(cancellationToken);
                     }
 
                     resubscribed = true;
                 }
                 catch (Exception exception)
                 {
-                    logger.LogWarning(exception, "Failed to resubscribe to all '{SubscriptionId}' dropped with '{ExceptionMessage}{ExceptionStackTrace}'", subscriptionId, exception.Message, exception.StackTrace);
+                    logger.LogWarning(exception,
+                        "Failed to resubscribe to all '{SubscriptionId}' dropped with '{ExceptionMessage}{ExceptionStackTrace}'",
+                        SubscriptionId, exception.Message, exception.StackTrace);
                 }
                 finally
                 {
@@ -164,6 +150,22 @@ namespace ECommerce.Core.Subscriptions
 
                 Thread.Sleep(1000);
             }
+        }
+
+        private bool IsEventWithEmptyData(ResolvedEvent resolvedEvent)
+        {
+            if (resolvedEvent.Event.Data.Length != 0) return false;
+
+            logger.LogInformation("Event without data received");
+            return true;
+        }
+
+        private bool IsCheckpointEvent(ResolvedEvent resolvedEvent)
+        {
+            if (resolvedEvent.Event.EventType != EventTypeMapper.ToName<CheckpointStored>()) return false;
+
+            logger.LogInformation("Checkpoint event - ignoring");
+            return true;
         }
     }
 }

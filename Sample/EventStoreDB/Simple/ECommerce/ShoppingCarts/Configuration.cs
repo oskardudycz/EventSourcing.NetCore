@@ -2,6 +2,7 @@
 using ECommerce.Core.Entities;
 using ECommerce.ShoppingCarts.Confirming;
 using ECommerce.ShoppingCarts.Initializing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.ShoppingCarts
@@ -20,5 +21,9 @@ namespace ECommerce.ShoppingCarts
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
                     ShoppingCart.When
                 );
+
+        public static void SetupShoppingCartsReadModels(this ModelBuilder modelBuilder) {}
+            // => modelBuilder.Entity<Product>()
+            //     .OwnsOne(p => p.Sku);
     }
 }

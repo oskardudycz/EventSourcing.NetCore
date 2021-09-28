@@ -1,8 +1,9 @@
-﻿using EventStore.Client;
+﻿using ECommerce.Core.Subscriptions;
+using EventStore.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ECommerce.Core.Entities
+namespace ECommerce.Core
 {
     public class EventStoreDBConfig
     {
@@ -22,7 +23,14 @@ namespace ECommerce.Core.Entities
             var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
 
             services.AddSingleton(
-                new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)));
+                new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
+                .AddTransient<EventStoreDBSubscriptionToAll, EventStoreDBSubscriptionToAll>();
+
+            if (options?.UseInternalCheckpointing != false)
+            {
+                services
+                    .AddTransient<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
+            }
 
             return services;
         }

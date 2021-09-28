@@ -1,4 +1,6 @@
 ﻿using Core.WebApi.Middlewares.ExceptionHandling;
+using ECommerce.Api.Core;
+using ECommerce.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,7 +28,9 @@ namespace ECommerce.Api
                 {
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ECommerce.Api", Version = "v1" });
                 })
-                .AddECommerceModule(Configuration);
+                .AddCoreServices(Configuration)
+                .AddECommerceModule()
+                .AddEventStoreDBSubscriptionToAll();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

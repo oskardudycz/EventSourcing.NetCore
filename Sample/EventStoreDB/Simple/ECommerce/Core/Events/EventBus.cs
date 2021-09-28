@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.Retry;
 
 namespace ECommerce.Core.Events
 {
@@ -18,27 +20,35 @@ namespace ECommerce.Core.Events
     public class EventBus: IEventBus
     {
         private readonly IServiceProvider serviceProvider;
+        private readonly AsyncRetryPolicy retryPolicy;
         private static readonly ConcurrentDictionary<Type, MethodInfo> PublishMethods = new();
 
-        public EventBus(IServiceProvider serviceProvider)
+        public EventBus(
+            IServiceProvider serviceProvider,
+            AsyncRetryPolicy retryPolicy
+        )
         {
             this.serviceProvider = serviceProvider;
+            this.retryPolicy = retryPolicy;
         }
 
         public async Task Publish<TEvent>(TEvent @event, CancellationToken ct)
         {
-            var eventHandlers = serviceProvider.GetServices<IEventHandler<TEvent>>();
+            using var scope = serviceProvider.CreateScope();
+
+            var eventHandlers = scope.ServiceProvider.GetServices<IEventHandler<TEvent>>();
 
             foreach (var eventHandler in eventHandlers)
             {
-                await eventHandler.Handle(@event, ct);
+                await retryPolicy.ExecuteAsync(token =>
+                    eventHandler.Handle(@event, token), ct);
             }
         }
 
         public Task Publish(object @event, CancellationToken ct)
         {
             return (Task)GetGenericPublishFor(@event)
-                .Invoke(this, new[] {@event, ct})!;
+                .Invoke(this, new[] { @event, ct })!;
         }
 
         private static MethodInfo GetGenericPublishFor(object @event)
@@ -50,5 +60,12 @@ namespace ECommerce.Core.Events
                     .MakeGenericMethod(eventType)
             );
         }
+    }
+
+    public static class EventBusExtensions
+    {
+        public static IServiceCollection AddEventBus(this IServiceCollection services)
+            => services.AddSingleton<IEventBus, EventBus>(sp =>
+                new EventBus(sp, Policy.Handle<Exception>().RetryAsync(3)));
     }
 }
