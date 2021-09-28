@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ECommerce.Core.Serialisation;
+using ECommerce.Core.Subscriptions;
 using EventStore.Client;
 
 namespace ECommerce.Core.Entities
@@ -10,6 +11,7 @@ namespace ECommerce.Core.Entities
     public interface IEventStoreDBRepository<T> where T: notnull
     {
         Task<T> Find(Func<T?, object, T> when, string id, CancellationToken cancellationToken);
+
         Task Append(string id, object @event, CancellationToken cancellationToken);
     }
 

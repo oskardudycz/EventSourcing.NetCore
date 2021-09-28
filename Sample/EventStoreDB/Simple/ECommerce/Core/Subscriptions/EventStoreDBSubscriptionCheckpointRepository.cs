@@ -7,7 +7,11 @@ using EventStore.Client;
 
 namespace ECommerce.Core.Subscriptions
 {
-    public record CheckpointStored(string SubscriptionId, ulong? Position, DateTime CheckpointedAt);
+    public record CheckpointStored(
+        string SubscriptionId,
+        ulong? Position,
+        DateTime CheckpointedAt
+    );
 
     public class EventStoreDBSubscriptionCheckpointRepository: ISubscriptionCheckpointRepository
     {
