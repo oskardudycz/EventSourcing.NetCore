@@ -1,8 +1,11 @@
-﻿using Core.WebApi.Middlewares.ExceptionHandling;
+﻿using System;
+using Core.WebApi.Middlewares.ExceptionHandling;
 using ECommerce.Api.Core;
 using ECommerce.Core;
+using ECommerce.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -51,6 +54,12 @@ namespace ECommerce.Api
                 {
                     endpoints.MapControllers();
                 });
+
+            if (env.IsDevelopment())
+            {
+                // Kids do not try this at production
+                app.ApplicationServices.GetRequiredService<ECommerceDBContext>().Database.Migrate();
+            }
         }
     }
 }
