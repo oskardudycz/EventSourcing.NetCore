@@ -57,8 +57,7 @@ namespace ECommerce.Api
 
             if (env.IsDevelopment())
             {
-                // Kids do not try this at production
-                app.ApplicationServices.GetRequiredService<ECommerceDBContext>().Database.Migrate();
+                app.ApplicationServices.UseECommerceModule();
             }
         }
     }

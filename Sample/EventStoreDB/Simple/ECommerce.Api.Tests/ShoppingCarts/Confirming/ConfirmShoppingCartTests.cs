@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Testing;
 using ECommerce.Api.Requests;
+using ECommerce.ShoppingCarts;
+using ECommerce.ShoppingCarts.GettingCartById;
 using FluentAssertions;
 using Xunit;
 
@@ -41,7 +43,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
 
         [Fact]
         [Trait("Category", "Acceptance")]
-        public Task ConfirmCommand_ShouldReturn_OK()
+        public Task Put_Should_Return_OK()
         {
             var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -49,28 +51,25 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
             return Task.CompletedTask;
         }
 
-        // [Fact]
-        // [Trait("Category", "Acceptance")]
-        // public async Task CreateCommand_ShouldCreate_Cart()
-        // {
-        //     var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
-        //
-        //     // prepare query
-        //     var query = $"{createdId}";
-        //
-        //     //send query
-        //     var queryResponse = await fixture.Get(query, 10,
-        //         check: response => new(response.StatusCode == HttpStatusCode.Created));
-        //
-        //     queryResponse.EnsureSuccessStatusCode();
-        //
-        //     var cartDetails = await queryResponse.GetResultFromJson<CartDetails>();
-        //     cartDetails.Id.Should().Be(createdId);
-        //     cartDetails.Status.Should().Be(CartStatus.Pending);
-        //     cartDetails.ClientId.Should().Be(fixture.ClientId);
-        //     cartDetails.Version.Should().Be(1);
-        //     cartDetails.ProductItems.Should().BeEmpty();
-        //     cartDetails.TotalPrice.Should().Be(0);
-        // }
+        [Fact]
+        [Trait("Category", "Acceptance")]
+        public async Task Put_Should_Confirm_ShoppingCart()
+        {
+            // prepare query
+            var query = $"{fixture.CartId}";
+
+            //send query
+            var queryResponse = await fixture.Get(query, 30,
+                check: async response => (await response.GetResultFromJson<ShoppingCartDetails>()).Version != 1);
+
+            queryResponse.EnsureSuccessStatusCode();
+
+            var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
+            cartDetails.Should().NotBeNull();
+            cartDetails.Id.Should().Be(fixture.CartId);
+            cartDetails.Status.Should().Be(ShoppingCartStatus.Confirmed);
+            cartDetails.ClientId.Should().Be(fixture.ClientId);
+            cartDetails.Version.Should().Be(2);
+        }
     }
 }

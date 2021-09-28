@@ -18,5 +18,12 @@ namespace ECommerce
                 .AddDbContext<ECommerceDBContext>(
                     options => options.UseNpgsql("name=ConnectionStrings:ECommerceDB"))
                 .AddSingleton<Func<Guid>>(Guid.NewGuid);
+
+        public static void UseECommerceModule(this IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            using var dbContext = scope.ServiceProvider.GetRequiredService<ECommerceDBContext>();
+            dbContext.Database.Migrate();
+        }
     }
 }
