@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts.Confirming;
+using ECommerce.ShoppingCarts.GettingCartById;
+using ECommerce.ShoppingCarts.GettingCarts;
 using ECommerce.ShoppingCarts.Initializing;
 
 namespace ECommerce.Api.Controllers
@@ -82,34 +85,22 @@ namespace ECommerce.Api.Controllers
 
             return Ok();
         }
-        //
-        // [HttpGet("{id}")]
-        // public Task<CartDetails> Get(Guid id)
-        // {
-        //     return queryBus.Send<GetCartById, CartDetails>(GetCartById.Create(id));
-        // }
-        //
-        // [HttpGet]
-        // public async Task<PagedListResponse<CartShortInfo>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
-        // {
-        //     var pagedList = await queryBus.Send<GetCarts, IPagedList<CartShortInfo>>(GetCarts.Create(pageNumber, pageSize));
-        //
-        //     return pagedList.ToResponse();
-        // }
-        //
-        //
-        // [HttpGet("{id}/history")]
-        // public async Task<PagedListResponse<CartHistory>> GetHistory(Guid id)
-        // {
-        //     var pagedList = await queryBus.Send<GetCartHistory, IPagedList<CartHistory>>(GetCartHistory.Create(id));
-        //
-        //     return pagedList.ToResponse();
-        // }
-        //
-        // [HttpGet("{id}/versions")]
-        // public Task<CartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion? query)
-        // {
-        //     return queryBus.Send<GetCartAtVersion, CartDetails>(GetCartAtVersion.Create(id, query?.Version));
-        // }
+
+        [HttpGet("{id}")]
+        public Task<ShoppingCartDetails> Get(
+            [FromServices] Func<GetCartById, CancellationToken, Task<ShoppingCartDetails>> query,
+            Guid id,
+            CancellationToken ct
+        ) =>
+            query(GetCartById.From(id), ct);
+
+        [HttpGet]
+        public Task<IReadOnlyList<ShoppingCartShortInfo>> Get(
+            [FromServices] Func<GetCarts, CancellationToken, Task<IReadOnlyList<ShoppingCartShortInfo>>> query,
+            CancellationToken ct,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20
+        ) =>
+            query(GetCarts.From(pageNumber, pageSize), ct);
     }
 }

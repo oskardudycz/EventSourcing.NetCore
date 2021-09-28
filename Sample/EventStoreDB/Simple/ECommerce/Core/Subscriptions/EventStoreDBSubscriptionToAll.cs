@@ -11,7 +11,7 @@ namespace ECommerce.Core.Subscriptions
 {
     public class EventStoreDBSubscriptionToAllOptions
     {
-        public string SubscriptionId { get; set; } = Guid.NewGuid().ToString();
+        public string SubscriptionId { get; set; } = "default";
 
         public SubscriptionFilterOptions FilterOptions { get; set; } =
             new(EventTypeFilter.ExcludeSystemEvents());
