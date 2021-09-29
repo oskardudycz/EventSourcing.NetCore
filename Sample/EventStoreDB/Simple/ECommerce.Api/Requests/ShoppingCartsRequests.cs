@@ -15,7 +15,8 @@ namespace ECommerce.Api.Requests
 
     public record AddProductRequest(
         Guid? ShoppingCartId,
-        ProductItemRequest? ProductItem
+        ProductItemRequest? ProductItem,
+        uint? Version
     );
 
     public record PricedProductItemRequest(
@@ -26,6 +27,11 @@ namespace ECommerce.Api.Requests
 
     public record RemoveProductRequest(
         Guid? ShoppingCartId,
-        PricedProductItemRequest? ProductItem
+        PricedProductItemRequest? ProductItem,
+        uint? Version
+    );
+
+    public record ConfirmShoppingCartRequest(
+        uint? Version
     );
 }

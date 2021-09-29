@@ -13,6 +13,8 @@ namespace ECommerce.Core.Entities
         Task<TEntity> Find(Func<TEntity?, object, TEntity> when, string id, CancellationToken cancellationToken);
 
         Task Append(string id, object @event, CancellationToken cancellationToken);
+
+        Task Append(string id, object @event, uint version, CancellationToken cancellationToken);
     }
 
     public class EventStoreDBRepository<TEntity>: IEventStoreDBRepository<TEntity> where TEntity: class
@@ -51,6 +53,39 @@ namespace ECommerce.Core.Entities
         public async Task Append(
             string id,
             object @event,
+            CancellationToken cancellationToken
+        )
+
+        {
+            await eventStore.AppendToStreamAsync(
+                id,
+                // TODO: Add proper optimistic concurrency handling
+                StreamState.NoStream,
+                new[] { @event.ToJsonEventData() },
+                cancellationToken: cancellationToken
+            );
+        }
+
+
+        public async Task Append(
+            string id,
+            object @event,
+            uint version,
+            CancellationToken cancellationToken
+        )
+        {
+            await eventStore.AppendToStreamAsync(
+                id,
+                StreamRevision.FromInt64(version),
+                new[] { @event.ToJsonEventData() },
+                cancellationToken: cancellationToken
+            );
+        }
+
+        private async Task Append(
+            string id,
+            object @event,
+            uint? version,
             CancellationToken cancellationToken
         )
         {

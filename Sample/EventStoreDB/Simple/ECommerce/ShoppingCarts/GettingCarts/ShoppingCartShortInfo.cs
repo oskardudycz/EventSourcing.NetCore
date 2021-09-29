@@ -24,7 +24,7 @@ namespace ECommerce.ShoppingCarts.GettingCarts
                 ClientId = clientId,
                 TotalItemsCount = 0,
                 Status = shoppingCartStatus,
-                Version = 1
+                Version = 0
             };
         }
 

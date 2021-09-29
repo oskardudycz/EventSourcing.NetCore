@@ -65,7 +65,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Initializing
             cartDetails.Id.Should().Be(createdId);
             cartDetails.Status.Should().Be(ShoppingCartStatus.Pending);
             cartDetails.ClientId.Should().Be(fixture.ClientId);
-            cartDetails.Version.Should().Be(1);
+            cartDetails.Version.Should().Be(0);
         }
     }
 }

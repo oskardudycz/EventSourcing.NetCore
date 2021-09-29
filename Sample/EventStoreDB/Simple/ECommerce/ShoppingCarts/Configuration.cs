@@ -30,16 +30,19 @@ namespace ECommerce.ShoppingCarts
                             command,
                             shoppingCart),
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
+                    command => command.Version,
                     ShoppingCart.When
                 )
                 .AddUpdateCommandHandler<RemoveProductItemFromShoppingCart, ShoppingCart>(
                     RemoveProductItemFromShoppingCart.Handle,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
+                    command => command.Version,
                     ShoppingCart.When
                 )
                 .AddUpdateCommandHandler<ConfirmShoppingCart, ShoppingCart>(
                     ConfirmShoppingCart.Handle,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
+                    command => command.Version,
                     ShoppingCart.When
                 )
                 .For<ShoppingCartDetails, ECommerceDbContext>(

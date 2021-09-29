@@ -31,7 +31,7 @@ namespace ECommerce.ShoppingCarts.GettingCartById
                 Id = shoppingCartId,
                 ClientId = clientId,
                 Status = shoppingCartStatus,
-                Version = 1
+                Version = 0
             };
         }
 

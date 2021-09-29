@@ -26,6 +26,7 @@ namespace ECommerce.Core.Commands
             IEventStoreDBRepository<TEntity> repository,
             Func<TCommand, TEntity, object> handle,
             Func<TCommand, string> getId,
+            Func<TCommand, uint> getVersion,
             Func<TEntity?, object, TEntity> when,
             TCommand command,
             CancellationToken ct
@@ -36,7 +37,7 @@ namespace ECommerce.Core.Commands
 
             var @event = handle(command, entity);
 
-            await repository.Append(id, @event, ct);
+            await repository.Append(id, @event, getVersion(command), ct);
         }
 
         public static IServiceCollection AddCreateCommandHandler<TCommand, TEntity>(
@@ -65,14 +66,16 @@ namespace ECommerce.Core.Commands
             this IServiceCollection services,
             Func<TCommand, TEntity, object> handle,
             Func<TCommand, string> getId,
+            Func<TCommand, uint> getVersion,
             Func<TEntity?, object, TEntity> when
         ) where TEntity : notnull
-            => AddUpdateCommandHandler(services, _ =>  handle, getId, when);
+            => AddUpdateCommandHandler(services, _ =>  handle, getId, getVersion, when);
 
         public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
             Func<IServiceProvider, Func<TCommand, TEntity, object>> handle,
             Func<TCommand, string> getId,
+            Func<TCommand, uint> getVersion,
             Func<TEntity?, object, TEntity> when
         ) where TEntity : notnull
             => services
@@ -80,7 +83,7 @@ namespace ECommerce.Core.Commands
                 {
                     var repository = sp.GetRequiredService<IEventStoreDBRepository<TEntity>>();
                     return async (command, ct) =>
-                        await HandleUpdateCommand(repository, handle(sp), getId, when, command, ct);
+                        await HandleUpdateCommand(repository, handle(sp), getId, getVersion, when, command, ct);
                 });
 
 
