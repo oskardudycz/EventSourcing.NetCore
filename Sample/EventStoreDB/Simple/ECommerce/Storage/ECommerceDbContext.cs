@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace ECommerce.Storage
 {
-    public class ECommerceDBContext: DbContext
+    public class ECommerceDbContext: DbContext
     {
-        public ECommerceDBContext(DbContextOptions<ECommerceDBContext> options)
+        public ECommerceDbContext(DbContextOptions<ECommerceDbContext> options)
             : base(options)
         {
 
@@ -19,19 +19,19 @@ namespace ECommerce.Storage
         }
     }
 
-    public class ECommerceDBContextFactory: IDesignTimeDbContextFactory<ECommerceDBContext>
+    public class ECommerceDBContextFactory: IDesignTimeDbContextFactory<ECommerceDbContext>
     {
-        public ECommerceDBContext CreateDbContext(params string[] args)
+        public ECommerceDbContext CreateDbContext(params string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ECommerceDBContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<ECommerceDbContext>();
 
             if (optionsBuilder.IsConfigured)
-                return new ECommerceDBContext(optionsBuilder.Options);
+                return new ECommerceDbContext(optionsBuilder.Options);
 
             optionsBuilder.UseNpgsql(
                 "PORT = 5432; HOST = 127.0.0.1; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'");
 
-            return new ECommerceDBContext(optionsBuilder.Options);
+            return new ECommerceDbContext(optionsBuilder.Options);
         }
     }
 }

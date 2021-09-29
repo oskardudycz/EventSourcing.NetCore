@@ -35,19 +35,17 @@ namespace ECommerce.Core.Events
 
         public async Task Publish<TEvent>(TEvent @event, CancellationToken ct)
         {
-            var eventHandlerTypes = GetAllEventHandlerTypesFor(typeof(TEvent));
+            using var scope = serviceProvider.CreateScope();
 
-            foreach (var eventHandlerType in eventHandlerTypes)
+            var eventHandlers =
+                scope.ServiceProvider.GetServices<IEventHandler<TEvent>>();
+
+            foreach (var eventHandler in eventHandlers)
             {
-                await retryPolicy.ExecuteAsync(async token =>
-                {
-                    using var scope = serviceProvider.CreateScope();
-
-                    var eventHandler = (IEventHandler<TEvent>)
-                        scope.ServiceProvider.GetRequiredService(eventHandlerType);
-
-                    await eventHandler.Handle(@event, token);
-                }, ct);
+                // await retryPolicy.ExecuteAsync(async token =>
+                // {
+                    await eventHandler.Handle(@event, ct);
+                //}, ct);
             }
         }
 
@@ -65,18 +63,6 @@ namespace ECommerce.Core.Events
                     .Single(m => m.Name == nameof(Publish) && m.GetGenericArguments().Any())
                     .MakeGenericMethod(eventType)
             );
-        }
-
-        private static IEnumerable<Type> GetAllEventHandlerTypesFor(Type eventType)
-        {
-            var generic = typeof(IEventHandler<>);
-            var eventHandlerInterface = generic.MakeGenericType(eventType);
-
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a =>
-                    a.GetTypes()
-                        .Where(type => eventHandlerInterface.IsAssignableFrom(type) && !type.IsInterface)
-                );
         }
     }
 

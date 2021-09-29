@@ -15,14 +15,14 @@ namespace ECommerce
         public static IServiceCollection AddECommerceModule(this IServiceCollection services)
             => services
                 .AddShoppingCartsModule()
-                .AddDbContext<ECommerceDBContext>(
+                .AddDbContext<ECommerceDbContext>(
                     options => options.UseNpgsql("name=ConnectionStrings:ECommerceDB"))
                 .AddSingleton<Func<Guid>>(Guid.NewGuid);
 
         public static void UseECommerceModule(this IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
-            using var dbContext = scope.ServiceProvider.GetRequiredService<ECommerceDBContext>();
+            using var dbContext = scope.ServiceProvider.GetRequiredService<ECommerceDbContext>();
             dbContext.Database.Migrate();
         }
     }

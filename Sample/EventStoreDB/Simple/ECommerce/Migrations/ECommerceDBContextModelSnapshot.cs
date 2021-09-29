@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ECommerce.Migrations
 {
-    [DbContext(typeof(ECommerceDBContext))]
+    [DbContext(typeof(ECommerceDbContext))]
     partial class ECommerceDBContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -52,6 +52,9 @@ namespace ECommerce.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("TotalItemsCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Version")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

@@ -3,19 +3,19 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ECommerce.Core.Serialisation;
-using ECommerce.Core.Subscriptions;
 using EventStore.Client;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.Core.Entities
 {
-    public interface IEventStoreDBRepository<T> where T: notnull
+    public interface IEventStoreDBRepository<TEntity> where TEntity: notnull
     {
-        Task<T> Find(Func<T?, object, T> when, string id, CancellationToken cancellationToken);
+        Task<TEntity> Find(Func<TEntity?, object, TEntity> when, string id, CancellationToken cancellationToken);
 
         Task Append(string id, object @event, CancellationToken cancellationToken);
     }
 
-    public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T: class
+    public class EventStoreDBRepository<TEntity>: IEventStoreDBRepository<TEntity> where TEntity: class
     {
         private readonly EventStoreClient eventStore;
 
@@ -26,7 +26,11 @@ namespace ECommerce.Core.Entities
             this.eventStore = eventStore ?? throw new ArgumentNullException(nameof(eventStore));
         }
 
-        public async Task<T> Find(Func<T?, object, T> when, string id, CancellationToken cancellationToken)
+        public async Task<TEntity> Find(
+            Func<TEntity?, object, TEntity> when,
+            string id,
+            CancellationToken cancellationToken
+        )
         {
             var readResult = eventStore.ReadStreamAsync(
                 Direction.Forwards,
@@ -44,7 +48,11 @@ namespace ECommerce.Core.Entities
                 ))!;
         }
 
-        public async Task Append(string id, object @event, CancellationToken cancellationToken)
+        public async Task Append(
+            string id,
+            object @event,
+            CancellationToken cancellationToken
+        )
         {
             await eventStore.AppendToStreamAsync(
                 id,
@@ -54,5 +62,12 @@ namespace ECommerce.Core.Entities
                 cancellationToken: cancellationToken
             );
         }
+    }
+
+    public static class EventStoreDBRepository
+    {
+        public static IServiceCollection AddEventStoreDBRepository<TEntity>(this IServiceCollection services)
+            where TEntity : class
+            => services.AddTransient<IEventStoreDBRepository<TEntity>, EventStoreDBRepository<TEntity>>();
     }
 }
