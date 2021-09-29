@@ -36,7 +36,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Initializing
 
         [Fact]
         [Trait("Category", "Acceptance")]
-        public async Task Post_ShouldReturn_CreatedStatus_With_CartId()
+        public async Task Post_Should_Return_CreatedStatus_With_CartId()
         {
             var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);

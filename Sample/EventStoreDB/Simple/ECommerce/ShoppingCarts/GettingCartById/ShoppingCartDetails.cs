@@ -1,9 +1,4 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using ECommerce.Core.Events;
-using ECommerce.Core.Projections;
-using ECommerce.Storage;
 
 namespace ECommerce.ShoppingCarts.GettingCartById
 {
@@ -19,38 +14,25 @@ namespace ECommerce.ShoppingCarts.GettingCartById
         public int Version { get; set; }
     }
 
-    public class ShoppingCartDetailsProjection :
-        EntityFrameworkProjection<ShoppingCartDetails>,
-        IEventHandler<ShoppingCartInitialized>,
-        IEventHandler<ShoppingCartConfirmed>
+    public static class ShoppingCartDetailsProjection
     {
-        public ShoppingCartDetailsProjection(ECommerceDBContext dbContext) : base(dbContext)
-        {
-        }
-
-        public Task Handle(ShoppingCartInitialized @event, CancellationToken ct)
+        public static ShoppingCartDetails Handle(ShoppingCartInitialized @event)
         {
             var (shoppingCartId, clientId, shoppingCartStatus) = @event;
 
-            return Add(
-                new ShoppingCartDetails
-                {
-                    Id = shoppingCartId,
-                    ClientId = clientId,
-                    Status = shoppingCartStatus,
-                    Version = 1
-                }, ct);
+            return new ShoppingCartDetails
+            {
+                Id = shoppingCartId,
+                ClientId = clientId,
+                Status = shoppingCartStatus,
+                Version = 1
+            };
         }
 
-        public Task Handle(ShoppingCartConfirmed @event, CancellationToken ct)
+        public static void Handle(ShoppingCartConfirmed @event, ShoppingCartDetails view)
         {
-            var (cartId, _) = @event;
-
-            return Update(cartId, entity =>
-            {
-                entity.Status = ShoppingCartStatus.Confirmed;
-                entity.Version++;
-            }, ct);
+            view.Status = ShoppingCartStatus.Confirmed;
+            view.Version++;
         }
     }
 }

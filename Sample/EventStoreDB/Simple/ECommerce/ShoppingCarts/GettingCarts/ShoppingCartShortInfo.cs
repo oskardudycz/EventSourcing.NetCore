@@ -1,9 +1,4 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using ECommerce.Core.Events;
-using ECommerce.Core.Projections;
-using ECommerce.Storage;
 
 namespace ECommerce.ShoppingCarts.GettingCarts
 {
@@ -13,40 +8,29 @@ namespace ECommerce.ShoppingCarts.GettingCarts
         public Guid ClientId { get; set; }
         public int TotalItemsCount { get; set; }
         public ShoppingCartStatus Status { get; set; }
+        public int Version { get; set; }
     }
 
-    public class ShoppingCartShortInfoProjection:
-        EntityFrameworkProjection<ShoppingCartShortInfo>,
-        IEventHandler<ShoppingCartInitialized>,
-        IEventHandler<ShoppingCartConfirmed>
+    public class ShoppingCartShortInfoProjection
     {
-        public ShoppingCartShortInfoProjection(ECommerceDBContext dbContext)
-            : base(dbContext)
-        {
-        }
-
-        public Task Handle(ShoppingCartInitialized @event, CancellationToken ct)
+        public static ShoppingCartShortInfo Handle(ShoppingCartInitialized @event)
         {
             var (shoppingCartId, clientId, shoppingCartStatus) = @event;
 
-            return Add(
-                new ShoppingCartShortInfo
-                {
-                    Id = shoppingCartId,
-                    ClientId = clientId,
-                    TotalItemsCount = 0,
-                    Status = shoppingCartStatus
-                }, ct);
+            return new ShoppingCartShortInfo
+            {
+                Id = shoppingCartId,
+                ClientId = clientId,
+                TotalItemsCount = 0,
+                Status = shoppingCartStatus,
+                Version = 1
+            };
         }
 
-        public Task Handle(ShoppingCartConfirmed @event, CancellationToken ct)
+        public static void Handle(ShoppingCartConfirmed @event, ShoppingCartShortInfo view)
         {
-            var (cartId, _) = @event;
-
-            return Update(cartId, entity =>
-            {
-                entity.Status = ShoppingCartStatus.Confirmed;
-            }, ct);
+            view.Status = ShoppingCartStatus.Confirmed;
+            view.Version++;
         }
     }
 }

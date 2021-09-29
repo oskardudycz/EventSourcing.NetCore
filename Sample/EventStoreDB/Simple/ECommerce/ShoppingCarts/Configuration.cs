@@ -18,7 +18,7 @@ namespace ECommerce.ShoppingCarts
     {
         public static IServiceCollection AddShoppingCartsModule(this IServiceCollection services)
             => services
-                .AddTransient<IEventStoreDBRepository<ShoppingCart>, EventStoreDBRepository<ShoppingCart>>()
+                .AddEventStoreDBRepository<ShoppingCart>()
                 .AddCreateCommandHandler<ShoppingCart, InitializeShoppingCart>(
                     InitializeShoppingCart.Handle,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
@@ -28,19 +28,23 @@ namespace ECommerce.ShoppingCarts
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
                     ShoppingCart.When
                 )
-                .AddProjection<ShoppingCartDetailsProjection>(
-                    typeof(ShoppingCartInitialized),
-                    typeof(ShoppingCartConfirmed)
+                .For<ShoppingCartDetails, ECommerceDbContext>(
+                    builder => builder
+                        .AddOn<ShoppingCartInitialized>(ShoppingCartDetailsProjection.Handle)
+                        .UpdateOn<ShoppingCartConfirmed>(
+                            e => e.CartId,
+                            ShoppingCartDetailsProjection.Handle
+                        )
+                        .QueryWith<GetCartById>(GetCartById.Handle)
                 )
-                .AddEntityFrameworkQueryHandler<ECommerceDBContext, GetCartById, ShoppingCartDetails>(
-                    GetCartById.Handle
-                )
-                .AddProjection<ShoppingCartShortInfoProjection>(
-                    typeof(ShoppingCartInitialized),
-                    typeof(ShoppingCartConfirmed)
-                )
-                .AddEntityFrameworkQueryHandler<ECommerceDBContext, GetCarts, ShoppingCartShortInfo>(
-                    GetCarts.Handle
+                .For<ShoppingCartShortInfo, ECommerceDbContext>(
+                    builder => builder
+                        .AddOn<ShoppingCartInitialized>(ShoppingCartShortInfoProjection.Handle)
+                        .UpdateOn<ShoppingCartConfirmed>(
+                            e => e.CartId,
+                            ShoppingCartShortInfoProjection.Handle
+                        )
+                        .QueryWith<GetCarts>(GetCarts.Handle)
                 );
 
         public static void SetupShoppingCartsReadModels(this ModelBuilder modelBuilder)

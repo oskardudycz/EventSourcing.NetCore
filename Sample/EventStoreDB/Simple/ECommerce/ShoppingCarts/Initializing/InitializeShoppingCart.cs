@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using ECommerce.Core.Commands;
-using ECommerce.Core.Entities;
 
 namespace ECommerce.ShoppingCarts.Initializing
 {

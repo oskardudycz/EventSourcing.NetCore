@@ -10,16 +10,16 @@ namespace ECommerce.Core.Queries
 {
     public static class QueryHandler
     {
-        public static IServiceCollection AddEntityFrameworkQueryHandler<TDBContext, TQuery, TResult>(
+        public static IServiceCollection AddEntityFrameworkQueryHandler<TDbContext, TQuery, TResult>(
             this IServiceCollection services,
             Func<IQueryable<TResult>, TQuery, CancellationToken, Task<TResult>> handler
         )
-            where TDBContext : DbContext where TResult : class
+            where TDbContext : DbContext where TResult : class
             =>
                 services.AddQueryHandler<TQuery, TResult>(sp =>
                 {
                     var queryable =
-                        sp.GetRequiredService<TDBContext>()
+                        sp.GetRequiredService<TDbContext>()
                             .Set<TResult>()
                             .AsNoTracking()
                             .AsQueryable();

@@ -60,7 +60,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
 
             //send query
             var queryResponse = await fixture.Get(query, 30,
-                check: async response => (await response.GetResultFromJson<ShoppingCartDetails>()).Version != 1);
+                check: async response => (await response.GetResultFromJson<ShoppingCartDetails>())?.Version != 1);
 
             queryResponse.EnsureSuccessStatusCode();
 
