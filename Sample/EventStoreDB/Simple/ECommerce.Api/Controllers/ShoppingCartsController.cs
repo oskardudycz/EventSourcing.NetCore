@@ -4,10 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Api.Requests;
+using ECommerce.ShoppingCarts.AddingProductItem;
 using ECommerce.ShoppingCarts.Confirming;
 using ECommerce.ShoppingCarts.GettingCartById;
 using ECommerce.ShoppingCarts.GettingCarts;
 using ECommerce.ShoppingCarts.Initializing;
+using ECommerce.ShoppingCarts.ProductItems;
+using ECommerce.ShoppingCarts.RemovingProductItem;
 
 namespace ECommerce.Api.Controllers
 {
@@ -37,40 +40,57 @@ namespace ECommerce.Api.Controllers
             return Created("api/ShoppingCarts", cartId);
         }
 
-        // [HttpPost("{id}/products")]
-        // public async Task<IActionResult> AddProduct(
-        //     [FromRoute] Guid id, [FromBody] AddProductRequest? request)
-        // {
-        //     var command = Carts.AddingProduct.AddProduct.Create(
-        //         id,
-        //         ProductItem.Create(
-        //             request?.ProductItem?.ProductId,
-        //             request?.ProductItem?.Quantity
-        //         )
-        //     );
-        //
-        //     await commandBus.Send(command);
-        //
-        //     return Ok();
-        // }
-        //
-        // [HttpDelete("{id}/products")]
-        // public async Task<IActionResult> RemoveProduct(Guid id, [FromBody] RemoveProductRequest request)
-        // {
-        //     var command = Carts.RemovingProduct.RemoveProduct.Create(
-        //         id,
-        //         PricedProductItem.Create(
-        //             request?.ProductItem?.ProductId,
-        //             request?.ProductItem?.Quantity,
-        //             request?.ProductItem?.UnitPrice
-        //         )
-        //     );
-        //
-        //     await commandBus.Send(command);
-        //
-        //     return Ok();
-        // }
-        //
+        [HttpPost("{id}/products")]
+        public async Task<IActionResult> AddProduct(
+            [FromServices] Func<AddProductItemToShoppingCart, CancellationToken, ValueTask> handle,
+            [FromRoute] Guid id,
+            [FromBody] AddProductRequest? request,
+            CancellationToken ct
+        )
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            var command = AddProductItemToShoppingCart.From(
+                id,
+                ProductItem.From(
+                    request.ProductItem?.ProductId,
+                    request.ProductItem?.Quantity
+                )
+            );
+
+            await handle(command, ct);
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}/products")]
+        public async Task<IActionResult> RemoveProduct(
+            [FromServices] Func<RemoveProductItemFromShoppingCart, CancellationToken, ValueTask> handle,
+            Guid id,
+            [FromBody] RemoveProductRequest request,
+            CancellationToken ct
+        )
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            var command = RemoveProductItemFromShoppingCart.From(
+                id,
+                PricedProductItem.From(
+                    ProductItem.From(
+                        request.ProductItem?.ProductId,
+                        request.ProductItem?.Quantity
+                    ),
+                    request.ProductItem?.UnitPrice
+                )
+            );
+
+            await handle(command, ct);
+
+            return Ok();
+        }
+
         [HttpPut("{id}/confirmation")]
         public async Task<IActionResult> ConfirmCart(
             [FromServices] Func<ConfirmShoppingCart, CancellationToken, ValueTask> handle,

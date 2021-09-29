@@ -1,11 +1,8 @@
 ﻿using System;
-using ECommerce.Core;
-using ECommerce.Core.Entities;
-using ECommerce.Core.Events;
+using ECommerce.Pricing;
 using ECommerce.ShoppingCarts;
 using ECommerce.Storage;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce
@@ -15,6 +12,7 @@ namespace ECommerce
         public static IServiceCollection AddECommerceModule(this IServiceCollection services)
             => services
                 .AddShoppingCartsModule()
+                .AddPricingModule()
                 .AddDbContext<ECommerceDbContext>(
                     options => options.UseNpgsql("name=ConnectionStrings:ECommerceDB"))
                 .AddSingleton<Func<Guid>>(Guid.NewGuid);

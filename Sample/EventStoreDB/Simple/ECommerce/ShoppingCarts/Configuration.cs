@@ -4,10 +4,13 @@ using ECommerce.Core.Entities;
 using ECommerce.Core.Events;
 using ECommerce.Core.Projections;
 using ECommerce.Core.Queries;
+using ECommerce.Pricing.ProductPricing;
+using ECommerce.ShoppingCarts.AddingProductItem;
 using ECommerce.ShoppingCarts.Confirming;
 using ECommerce.ShoppingCarts.GettingCartById;
 using ECommerce.ShoppingCarts.GettingCarts;
 using ECommerce.ShoppingCarts.Initializing;
+using ECommerce.ShoppingCarts.RemovingProductItem;
 using ECommerce.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,11 +22,25 @@ namespace ECommerce.ShoppingCarts
         public static IServiceCollection AddShoppingCartsModule(this IServiceCollection services)
             => services
                 .AddEventStoreDBRepository<ShoppingCart>()
-                .AddCreateCommandHandler<ShoppingCart, InitializeShoppingCart>(
+                .AddCreateCommandHandler<InitializeShoppingCart, ShoppingCart>(
                     InitializeShoppingCart.Handle,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                 )
-                .AddUpdateCommandHandler<ShoppingCart, ConfirmShoppingCart>(
+                .AddUpdateCommandHandler<AddProductItemToShoppingCart, ShoppingCart>(
+                    sp=> (command, shoppingCart) =>
+                        AddProductItemToShoppingCart.Handle(
+                            sp.GetRequiredService<IProductPriceCalculator>(),
+                            command,
+                            shoppingCart),
+                    command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
+                    ShoppingCart.When
+                )
+                .AddUpdateCommandHandler<RemoveProductItemFromShoppingCart, ShoppingCart>(
+                    RemoveProductItemFromShoppingCart.Handle,
+                    command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
+                    ShoppingCart.When
+                )
+                .AddUpdateCommandHandler<ConfirmShoppingCart, ShoppingCart>(
                     ConfirmShoppingCart.Handle,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
                     ShoppingCart.When
@@ -32,7 +49,7 @@ namespace ECommerce.ShoppingCarts
                     builder => builder
                         .AddOn<ShoppingCartInitialized>(ShoppingCartDetailsProjection.Handle)
                         .UpdateOn<ShoppingCartConfirmed>(
-                            e => e.CartId,
+                            e => e.ShoppingCartId,
                             ShoppingCartDetailsProjection.Handle
                         )
                         .QueryWith<GetCartById>(GetCartById.Handle)
@@ -41,7 +58,15 @@ namespace ECommerce.ShoppingCarts
                     builder => builder
                         .AddOn<ShoppingCartInitialized>(ShoppingCartShortInfoProjection.Handle)
                         .UpdateOn<ShoppingCartConfirmed>(
-                            e => e.CartId,
+                            e => e.ShoppingCartId,
+                            ShoppingCartShortInfoProjection.Handle
+                        )
+                        .UpdateOn<ProductItemAddedToShoppingCart>(
+                            e => e.ShoppingCartId,
+                            ShoppingCartShortInfoProjection.Handle
+                        )
+                        .UpdateOn<ProductItemRemovedFromShoppingCart>(
+                            e => e.ShoppingCartId,
                             ShoppingCartShortInfoProjection.Handle
                         )
                         .QueryWith<GetCarts>(GetCarts.Handle)
