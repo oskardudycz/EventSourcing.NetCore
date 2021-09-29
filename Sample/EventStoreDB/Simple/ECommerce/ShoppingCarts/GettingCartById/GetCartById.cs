@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.ShoppingCarts.GettingCartById
 {
     public record GetCartById(
-        Guid CartId
+        Guid ShoppingCartId
     )
     {
         public static GetCartById From(Guid cartId)
@@ -26,7 +26,7 @@ namespace ECommerce.ShoppingCarts.GettingCartById
         {
             return shoppingCarts
                 .SingleOrDefaultAsync(
-                    x => x.Id == query.CartId, ct
+                    x => x.Id == query.ShoppingCartId, ct
                 );
         }
     }

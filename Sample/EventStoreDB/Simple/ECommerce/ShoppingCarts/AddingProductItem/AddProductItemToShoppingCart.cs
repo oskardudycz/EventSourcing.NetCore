@@ -1,7 +1,4 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using ECommerce.Core.Commands;
 using ECommerce.Pricing.ProductPricing;
 using ECommerce.ShoppingCarts.ProductItems;
 

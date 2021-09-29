@@ -7,6 +7,7 @@ namespace ECommerce.ShoppingCarts.GettingCarts
         public Guid Id { get; set; }
         public Guid ClientId { get; set; }
         public int TotalItemsCount { get; set; }
+        public decimal TotalPrice { get; set; }
         public ShoppingCartStatus Status { get; set; }
         public int Version { get; set; }
     }
@@ -32,14 +33,18 @@ namespace ECommerce.ShoppingCarts.GettingCarts
             view.Status = ShoppingCartStatus.Confirmed;
             view.Version++;
         }
+
         public static void Handle(ProductItemAddedToShoppingCart @event, ShoppingCartShortInfo view)
         {
             view.TotalItemsCount += @event.ProductItem.Quantity;
+            view.TotalPrice += @event.ProductItem.TotalPrice;
             view.Version++;
         }
+
         public static void Handle(ProductItemRemovedFromShoppingCart @event, ShoppingCartShortInfo view)
         {
             view.TotalItemsCount -= @event.ProductItem.Quantity;
+            view.TotalPrice -= @event.ProductItem.TotalPrice;
             view.Version++;
         }
     }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ECommerce.Core.Events;
 using ECommerce.Core.Queries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.Core.Projections
@@ -45,11 +46,17 @@ namespace ECommerce.Core.Projections
 
         public EntityFrameworkProjectionBuilder<TView, TDbContext> UpdateOn<TEvent>(
             Func<TEvent, object> getViewId,
-            Action<TEvent, TView> handler)
+            Action<TEvent, TView> handler,
+            Func<EntityEntry<TView>, CancellationToken, Task>? prepare = null)
         {
             services.AddSingleton(getViewId);
             services.AddSingleton(handler);
             services.AddTransient<IEventHandler<TEvent>, UpdateProjection<TView, TEvent, TDbContext>>();
+
+            if (prepare != null)
+            {
+                services.AddSingleton(prepare);
+            }
 
             return this;
         }
@@ -105,22 +112,26 @@ namespace ECommerce.Core.Projections
         private readonly TDbContext dbContext;
         private readonly Func<TEvent, object> getViewId;
         private readonly Action<TEvent, TView> update;
+        private readonly Func<EntityEntry<TView>, CancellationToken, Task>? prepare;
 
         public UpdateProjection(
             TDbContext dbContext,
             Func<TEvent, object> getViewId,
-            Action<TEvent, TView> update
-        )
+            Action<TEvent, TView> update,
+            Func<EntityEntry<TView>, CancellationToken, Task>? prepare = null)
         {
             this.dbContext = dbContext;
             this.getViewId = getViewId;
             this.update = update;
+            this.prepare = prepare;
         }
 
         public async Task Handle(TEvent @event, CancellationToken ct)
         {
             var viewId = getViewId(@event);
             var view = await dbContext.FindAsync<TView>(new [] {viewId}, ct);
+
+            prepare?.Invoke(dbContext.Entry(view), ct);
 
             update(@event, view);
 
