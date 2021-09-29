@@ -56,7 +56,8 @@ namespace ECommerce.Api.Controllers
                 ProductItem.From(
                     request.ProductItem?.ProductId,
                     request.ProductItem?.Quantity
-                )
+                ),
+                request.Version
             );
 
             await handle(command, ct);
@@ -83,7 +84,8 @@ namespace ECommerce.Api.Controllers
                         request.ProductItem?.Quantity
                     ),
                     request.ProductItem?.UnitPrice
-                )
+                ),
+                request.Version
             );
 
             await handle(command, ct);
@@ -95,11 +97,15 @@ namespace ECommerce.Api.Controllers
         public async Task<IActionResult> ConfirmCart(
             [FromServices] Func<ConfirmShoppingCart, CancellationToken, ValueTask> handle,
             Guid id,
+            [FromBody] ConfirmShoppingCartRequest request,
             CancellationToken ct
             )
         {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
             var command =
-                ConfirmShoppingCart.From(id);
+                ConfirmShoppingCart.From(id, request.Version);
 
             await handle(command, ct);
 

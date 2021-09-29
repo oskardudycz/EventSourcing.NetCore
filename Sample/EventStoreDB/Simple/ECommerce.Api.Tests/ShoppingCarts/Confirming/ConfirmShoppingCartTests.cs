@@ -28,7 +28,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
 
             ShoppingCartId = await initializeResponse.GetResultFromJson<Guid>();
 
-            CommandResponse = await Put($"{ShoppingCartId}/confirmation");
+            CommandResponse = await Put($"{ShoppingCartId}/confirmation", new ConfirmShoppingCartRequest(0));
         }
     }
 
@@ -60,7 +60,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
 
             //send query
             var queryResponse = await fixture.Get(query, 30,
-                check: async response => (await response.GetResultFromJson<ShoppingCartDetails>())?.Version != 1);
+                check: async response => (await response.GetResultFromJson<ShoppingCartDetails>())?.Version == 1);
 
             queryResponse.EnsureSuccessStatusCode();
 
@@ -69,7 +69,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
             cartDetails.Id.Should().Be(fixture.ShoppingCartId);
             cartDetails.Status.Should().Be(ShoppingCartStatus.Confirmed);
             cartDetails.ClientId.Should().Be(fixture.ClientId);
-            cartDetails.Version.Should().Be(2);
+            cartDetails.Version.Should().Be(1);
         }
     }
 }
