@@ -30,7 +30,7 @@ namespace Warehouse.Api.Tests
                 })
                 .Configure(app =>
                 {
-                    app.UseMiddleware(typeof(ExceptionHandlingMiddleware))
+                    app.UseExceptionHandlingMiddleware()
                         .UseRouting()
                         .UseEndpoints(endpoints => { endpoints.UseWarehouseEndpoints(); })
                         .ConfigureWarehouse();

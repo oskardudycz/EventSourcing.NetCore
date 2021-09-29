@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Api.Testing;
 using Core.Testing;
 using FluentAssertions;
 using Payments.Api.Requests.Carts;
@@ -10,7 +11,7 @@ using Xunit;
 
 namespace Payments.Api.Tests.Payments.RequestingPayment
 {
-    public class RequestPaymentsTestsFixture: ApiFixture<Startup>
+    public class RequestPaymentsTestsFixture: ApiWithEventsFixture<Startup>
     {
         protected override string ApiUrl => "/api/Payments";
 

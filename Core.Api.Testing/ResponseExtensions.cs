@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 
-namespace Core.Testing
+namespace Core.Api.Testing
 {
     public static class ResponseExtensions
     {

@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Api.Testing;
 using Core.Testing;
 using FluentAssertions;
 using MeetingsManagement.Api;
@@ -11,7 +12,7 @@ using Xunit;
 
 namespace MeetingsManagement.IntegrationTests.Meetings.CreatingMeeting
 {
-    public class CreateMeetingFixture: ApiFixture<Startup>
+    public class CreateMeetingFixture: ApiWithEventsFixture<Startup>
     {
         protected override string ApiUrl => MeetingsManagementApi.MeetingsUrl;
 

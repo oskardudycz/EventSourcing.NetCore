@@ -16,7 +16,7 @@ var builder = Host.CreateDefaultBuilder(args)
             })
             .Configure(app =>
             {
-                app.UseMiddleware(typeof(ExceptionHandlingMiddleware))
+                app.UseExceptionHandlingMiddleware()
                     .UseRouting()
                     .UseEndpoints(endpoints =>
                     {

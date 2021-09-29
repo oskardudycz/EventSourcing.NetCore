@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Api.Testing;
 using Core.Testing;
 using FluentAssertions;
 using Tickets.Api.Requests;
@@ -18,7 +19,7 @@ using Xunit;
 
 namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
 {
-    public class CreateTentativeReservationFixture: ApiFixture<Startup>
+    public class CreateTentativeReservationFixture: ApiWithEventsFixture<Startup>
     {
         protected override string ApiUrl => "/api/Reservations";
 

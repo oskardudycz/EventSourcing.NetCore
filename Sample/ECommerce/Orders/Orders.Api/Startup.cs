@@ -1,4 +1,6 @@
+using System.Net;
 using Core;
+using Core.Exceptions;
 using Core.Streaming.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
@@ -45,7 +47,11 @@ namespace Orders.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMiddleware(typeof(ExceptionHandlingMiddleware));
+            app.UseExceptionHandlingMiddleware(exception => exception switch
+            {
+                AggregateNotFoundException _ => HttpStatusCode.NotFound,
+                _ => HttpStatusCode.InternalServerError
+            });
 
             app.UseRouting();
 

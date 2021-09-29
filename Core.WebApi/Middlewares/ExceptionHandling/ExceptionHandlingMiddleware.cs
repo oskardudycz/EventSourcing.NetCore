@@ -1,9 +1,10 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Shipments.Api.Exceptions;
 
 namespace Core.WebApi.Middlewares.ExceptionHandling
 {
@@ -13,8 +14,10 @@ namespace Core.WebApi.Middlewares.ExceptionHandling
 
         private readonly ILogger logger;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next,
-            ILoggerFactory loggerFactory)
+        public ExceptionHandlingMiddleware(
+            RequestDelegate next,
+            ILoggerFactory loggerFactory
+        )
         {
             this.next = next;
             logger = loggerFactory.CreateLogger<ExceptionHandlingMiddleware>();
@@ -43,6 +46,31 @@ namespace Core.WebApi.Middlewares.ExceptionHandling
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)codeInfo.Code;
             return context.Response.WriteAsync(result);
+        }
+    }
+
+    public class HttpExceptionWrapper
+    {
+        public int StatusCode { get; }
+
+        public string Error { get; }
+
+        public HttpExceptionWrapper(int statusCode, string error)
+        {
+            StatusCode = statusCode;
+            Error = error;
+        }
+    }
+
+    public static class ExceptionHandlingMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseExceptionHandlingMiddleware(
+            this IApplicationBuilder app,
+            Func<Exception, HttpStatusCode>? customMap = null
+        )
+        {
+            ExceptionToHttpStatusMapper.CustomMap = customMap;
+            return app.UseMiddleware<ExceptionHandlingMiddleware>();
         }
     }
 }

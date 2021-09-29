@@ -6,13 +6,14 @@ using Carts.Api.Requests.Carts;
 using Carts.Carts;
 using Carts.Carts.GettingCartById;
 using Carts.Carts.InitializingCart;
+using Core.Api.Testing;
 using Core.Testing;
 using FluentAssertions;
 using Xunit;
 
 namespace Carts.Api.Tests.Carts.InitializingCart
 {
-    public class InitializeCartFixture: ApiFixture<Startup>
+    public class InitializeCartFixture: ApiWithEventsFixture<Startup>
     {
         protected override string ApiUrl => "/api/Carts";
 

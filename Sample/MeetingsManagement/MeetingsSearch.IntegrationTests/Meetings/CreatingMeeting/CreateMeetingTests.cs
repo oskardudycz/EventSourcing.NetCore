@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Core.Api.Testing;
 using Core.Testing;
 using FluentAssertions;
 using MeetingsSearch.Api;
@@ -10,7 +11,7 @@ using Xunit;
 
 namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
 {
-    public class CreateMeetingFixture: ApiFixture<Startup>
+    public class CreateMeetingFixture: ApiWithEventsFixture<Startup>
     {
         protected override string ApiUrl => MeetingsSearchApi.MeetingsUrl;
 
@@ -26,7 +27,7 @@ namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
             );
 
             // send meeting created event to internal event bus
-            await Sut.PublishInternalEvent(@event);
+            await PublishInternalEvent(@event);
         }
     }
 

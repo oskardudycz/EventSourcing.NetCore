@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Carts.Api.Requests.Carts;
 using Carts.Carts;
 using Carts.Carts.GettingCartById;
-using Core.Testing;
+using Core.Api.Testing;
 using FluentAssertions;
 using Xunit;
 

@@ -1,6 +1,8 @@
+using System.Net;
 using System.Runtime.CompilerServices;
 using Core;
 using Core.EventStoreDB;
+using Core.Exceptions;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -47,7 +49,11 @@ namespace Carts.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMiddleware(typeof(ExceptionHandlingMiddleware));
+            app.UseExceptionHandlingMiddleware(exception => exception switch
+            {
+                AggregateNotFoundException _ => HttpStatusCode.NotFound,
+                _ => HttpStatusCode.InternalServerError
+            });
 
             app.UseRouting();
 

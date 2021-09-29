@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using Core.Testing;
+using Core.Api.Testing;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Warehouse.Products.RegisteringProduct;

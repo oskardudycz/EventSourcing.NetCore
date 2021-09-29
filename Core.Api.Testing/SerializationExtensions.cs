@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Core.Testing
+namespace Core.Api.Testing
 {
     public static class SerializationExtensions
     {

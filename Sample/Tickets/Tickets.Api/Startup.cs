@@ -1,4 +1,6 @@
+using System.Net;
 using Core;
+using Core.Exceptions;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,7 +44,11 @@ namespace Tickets.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMiddleware(typeof(ExceptionHandlingMiddleware));
+            app.UseExceptionHandlingMiddleware(exception => exception switch
+            {
+                AggregateNotFoundException _ => HttpStatusCode.NotFound,
+                _ => HttpStatusCode.InternalServerError
+            });
 
             app.UseRouting();
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Api.Testing;
 using Core.Testing;
 using FluentAssertions;
 using Orders.Api.Requests.Carts;
@@ -12,7 +13,7 @@ using Xunit;
 
 namespace Orders.Api.Tests.Orders.InitializingOrder
 {
-    public class InitializeOrderFixture: ApiFixture<Startup>
+    public class InitializeOrderFixture: ApiWithEventsFixture<Startup>
     {
         protected override string ApiUrl => "/api/Orders";
 

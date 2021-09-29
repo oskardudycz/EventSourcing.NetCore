@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Api.Testing;
 using Core.Testing;
 using FluentAssertions;
 using Shipments.Packages;
@@ -14,7 +15,7 @@ using Xunit;
 
 namespace Shipments.Api.Tests.Packages
 {
-    public class SendPackageFixture: ApiFixture<Startup>
+    public class SendPackageFixture: ApiWithEventsFixture<Startup>
     {
         protected override string ApiUrl => "/api/Shipments";
 
