@@ -32,5 +32,15 @@ namespace ECommerce.ShoppingCarts.GettingCarts
             view.Status = ShoppingCartStatus.Confirmed;
             view.Version++;
         }
+        public static void Handle(ProductItemAddedToShoppingCart @event, ShoppingCartShortInfo view)
+        {
+            view.TotalItemsCount += @event.ProductItem.Quantity;
+            view.Version++;
+        }
+        public static void Handle(ProductItemRemovedFromShoppingCart @event, ShoppingCartShortInfo view)
+        {
+            view.TotalItemsCount -= @event.ProductItem.Quantity;
+            view.Version++;
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace ECommerce.Core.Commands
 
     public static class CommandHandlerExtensions
     {
-        public static async Task HandleCreateCommand<TEntity, TCommand>(
+        public static async Task HandleCreateCommand<TCommand, TEntity>(
             IEventStoreDBRepository<TEntity> repository,
             Func<TCommand, object> handle,
             Func<TCommand, string> getId,
@@ -27,9 +27,9 @@ namespace ECommerce.Core.Commands
             await repository.Append(entityId, @event, ct);
         }
 
-        public static async Task HandleUpdateCommand<TEntity, TCommand>(
+        public static async Task HandleUpdateCommand<TCommand, TEntity>(
             IEventStoreDBRepository<TEntity> repository,
-            Func<TEntity, TCommand, object> handle,
+            Func<TCommand, TEntity, object> handle,
             Func<TCommand, string> getId,
             Func<TEntity?, object, TEntity> when,
             TCommand command,
@@ -39,7 +39,7 @@ namespace ECommerce.Core.Commands
             var id = getId(command);
             var entity = await repository.Find(when, id, ct);
 
-            var @event = handle(entity, command);
+            var @event = handle(command, entity);
 
             await repository.Append(id, @event, ct);
         }
@@ -55,7 +55,7 @@ namespace ECommerce.Core.Commands
                         await commandHandler.Handle(command, ct);
                     });
 
-        public static IServiceCollection AddCreateCommandHandler<TEntity, TCommand>(
+        public static IServiceCollection AddCreateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
             Func<TCommand, object> handle,
             Func<TCommand, string> getId
@@ -69,9 +69,18 @@ namespace ECommerce.Core.Commands
                         await HandleCreateCommand(repository, handle, getId, command, ct);
                 });
 
-        public static IServiceCollection AddUpdateCommandHandler<TEntity, TCommand>(
+
+        public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
-            Func<TEntity, TCommand, object> handle,
+            Func<TCommand, TEntity, object> handle,
+            Func<TCommand, string> getId,
+            Func<TEntity?, object, TEntity> when
+        ) where TEntity : notnull
+            => AddUpdateCommandHandler(services, _ =>  handle, getId, when);
+
+        public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
+            this IServiceCollection services,
+            Func<IServiceProvider, Func<TCommand, TEntity, object>> handle,
             Func<TCommand, string> getId,
             Func<TEntity?, object, TEntity> when
         ) where TEntity : notnull
@@ -80,7 +89,7 @@ namespace ECommerce.Core.Commands
                 {
                     var repository = sp.GetRequiredService<IEventStoreDBRepository<TEntity>>();
                     return async (command, ct) =>
-                        await HandleUpdateCommand(repository, handle, getId, when, command, ct);
+                        await HandleUpdateCommand(repository, handle(sp), getId, when, command, ct);
                 });
 
 

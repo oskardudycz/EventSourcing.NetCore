@@ -42,10 +42,10 @@ namespace ECommerce.Core.Events
 
             foreach (var eventHandler in eventHandlers)
             {
-                // await retryPolicy.ExecuteAsync(async token =>
-                // {
-                    await eventHandler.Handle(@event, ct);
-                //}, ct);
+                await retryPolicy.ExecuteAsync(async token =>
+                {
+                    await eventHandler.Handle(@event, token);
+                }, ct);
             }
         }
 

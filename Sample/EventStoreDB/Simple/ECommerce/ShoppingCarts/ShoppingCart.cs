@@ -1,4 +1,5 @@
 ﻿using System;
+using ECommerce.ShoppingCarts.ProductItems;
 
 namespace ECommerce.ShoppingCarts
 {
@@ -15,8 +16,18 @@ namespace ECommerce.ShoppingCarts
         ShoppingCartStatus ShoppingCartStatus
     );
 
+    public record ProductItemAddedToShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    );
+
+    public record ProductItemRemovedFromShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    );
+
     public record ShoppingCartConfirmed(
-        Guid CartId,
+        Guid ShoppingCartId,
         DateTime ConfirmedAt
     );
 
@@ -24,6 +35,7 @@ namespace ECommerce.ShoppingCarts
         Guid Id,
         Guid ClientId,
         ShoppingCartStatus Status,
+        ProductItemsList ProductItems,
         DateTime? ConfirmedAt = null
     )
     {
@@ -32,7 +44,19 @@ namespace ECommerce.ShoppingCarts
             return @event switch
             {
                 ShoppingCartInitialized (var cartId, var clientId, var cartStatus) =>
-                    new ShoppingCart(cartId, clientId, cartStatus),
+                    new ShoppingCart(cartId, clientId, cartStatus, ProductItemsList.Empty()),
+
+                ProductItemAddedToShoppingCart (_, var productItem) =>
+                    entity! with
+                    {
+                        ProductItems = entity.ProductItems.Add(productItem)
+                    },
+
+                ProductItemRemovedFromShoppingCart (_, var productItem) =>
+                    entity! with
+                    {
+                        ProductItems = entity.ProductItems.Add(productItem)
+                    },
 
                 ShoppingCartConfirmed (_, var confirmedAt) =>
                     entity! with
