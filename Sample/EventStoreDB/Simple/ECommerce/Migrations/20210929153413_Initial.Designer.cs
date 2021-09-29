@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Migrations
 {
     [DbContext(typeof(ECommerceDbContext))]
-    [Migration("20210928142830_Initial")]
+    [Migration("20210929153413_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,9 +56,49 @@ namespace ECommerce.Migrations
                     b.Property<int>("TotalItemsCount")
                         .HasColumnType("integer");
 
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.ToTable("ShoppingCartShortInfo");
+                });
+
+            modelBuilder.Entity("ECommerce.ShoppingCarts.GettingCartById.ShoppingCartDetails", b =>
+                {
+                    b.OwnsMany("ECommerce.ShoppingCarts.GettingCartById.ShoppingCartDetailsProductItem", "ProductItems", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer")
+                                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Quantity")
+                                .HasColumnType("integer");
+
+                            b1.Property<Guid>("ShoppingCardId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<decimal>("UnitPrice")
+                                .HasColumnType("numeric");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ShoppingCardId");
+
+                            b1.ToTable("ShoppingCartDetailsProductItem");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ShoppingCardId");
+                        });
+
+                    b.Navigation("ProductItems");
                 });
 #pragma warning restore 612, 618
         }

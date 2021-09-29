@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Core.Testing;
+using Core.Api.Testing;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
@@ -15,7 +15,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
     {
         protected override string ApiUrl => "/api/ShoppingCarts";
 
-        public Guid CartId { get; private set; }
+        public Guid ShoppingCartId { get; private set; }
 
         public readonly Guid ClientId = Guid.NewGuid();
 
@@ -26,9 +26,9 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
             var initializeResponse = await Post(new InitializeShoppingCartRequest(ClientId));
             initializeResponse.EnsureSuccessStatusCode();
 
-            CartId = await initializeResponse.GetResultFromJson<Guid>();
+            ShoppingCartId = await initializeResponse.GetResultFromJson<Guid>();
 
-            CommandResponse = await Put($"{CartId}/confirmation");
+            CommandResponse = await Put($"{ShoppingCartId}/confirmation");
         }
     }
 
@@ -56,7 +56,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
         public async Task Put_Should_Confirm_ShoppingCart()
         {
             // prepare query
-            var query = $"{fixture.CartId}";
+            var query = $"{fixture.ShoppingCartId}";
 
             //send query
             var queryResponse = await fixture.Get(query, 30,
@@ -66,7 +66,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming
 
             var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
             cartDetails.Should().NotBeNull();
-            cartDetails.Id.Should().Be(fixture.CartId);
+            cartDetails.Id.Should().Be(fixture.ShoppingCartId);
             cartDetails.Status.Should().Be(ShoppingCartStatus.Confirmed);
             cartDetails.ClientId.Should().Be(fixture.ClientId);
             cartDetails.Version.Should().Be(2);

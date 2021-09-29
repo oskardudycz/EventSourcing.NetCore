@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using ECommerce.Core.Commands;
+﻿using ECommerce.Core.Commands;
 using ECommerce.Core.Entities;
-using ECommerce.Core.Events;
 using ECommerce.Core.Projections;
-using ECommerce.Core.Queries;
 using ECommerce.Pricing.ProductPricing;
 using ECommerce.ShoppingCarts.AddingProductItem;
 using ECommerce.ShoppingCarts.Confirming;
@@ -48,6 +45,16 @@ namespace ECommerce.ShoppingCarts
                 .For<ShoppingCartDetails, ECommerceDbContext>(
                     builder => builder
                         .AddOn<ShoppingCartInitialized>(ShoppingCartDetailsProjection.Handle)
+                        .UpdateOn<ProductItemAddedToShoppingCart>(
+                            e => e.ShoppingCartId,
+                            ShoppingCartDetailsProjection.Handle,
+                            (entry, ct) => entry.Collection(x => x.ProductItems).LoadAsync(ct)
+                        )
+                        .UpdateOn<ProductItemRemovedFromShoppingCart>(
+                            e => e.ShoppingCartId,
+                            ShoppingCartDetailsProjection.Handle,
+                            (entry, ct) => entry.Collection(x => x.ProductItems).LoadAsync(ct)
+                        )
                         .UpdateOn<ShoppingCartConfirmed>(
                             e => e.ShoppingCartId,
                             ShoppingCartDetailsProjection.Handle
@@ -57,15 +64,15 @@ namespace ECommerce.ShoppingCarts
                 .For<ShoppingCartShortInfo, ECommerceDbContext>(
                     builder => builder
                         .AddOn<ShoppingCartInitialized>(ShoppingCartShortInfoProjection.Handle)
-                        .UpdateOn<ShoppingCartConfirmed>(
-                            e => e.ShoppingCartId,
-                            ShoppingCartShortInfoProjection.Handle
-                        )
                         .UpdateOn<ProductItemAddedToShoppingCart>(
                             e => e.ShoppingCartId,
                             ShoppingCartShortInfoProjection.Handle
                         )
                         .UpdateOn<ProductItemRemovedFromShoppingCart>(
+                            e => e.ShoppingCartId,
+                            ShoppingCartShortInfoProjection.Handle
+                        )
+                        .UpdateOn<ShoppingCartConfirmed>(
                             e => e.ShoppingCartId,
                             ShoppingCartShortInfoProjection.Handle
                         )
@@ -78,7 +85,13 @@ namespace ECommerce.ShoppingCarts
                 .Entity<ShoppingCartShortInfo>();
 
             modelBuilder
-                .Entity<ShoppingCartDetails>();
+                .Entity<ShoppingCartDetails>()
+                .OwnsMany(e => e.ProductItems, a =>
+                {
+                    a.WithOwner().HasForeignKey("ShoppingCardId");
+                    a.Property<int>("Id").ValueGeneratedOnAdd();
+                    a.HasKey("Id");
+                });
         }
     }
 }

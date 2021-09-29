@@ -1,11 +1,8 @@
-﻿using System;
-using Core.WebApi.Middlewares.ExceptionHandling;
+﻿using Core.WebApi.Middlewares.ExceptionHandling;
 using ECommerce.Api.Core;
 using ECommerce.Core;
-using ECommerce.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

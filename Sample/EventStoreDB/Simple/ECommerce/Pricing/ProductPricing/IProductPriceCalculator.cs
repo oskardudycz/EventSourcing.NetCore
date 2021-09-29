@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using ECommerce.ShoppingCarts.ProductItems;
 
 namespace ECommerce.Pricing.ProductPricing

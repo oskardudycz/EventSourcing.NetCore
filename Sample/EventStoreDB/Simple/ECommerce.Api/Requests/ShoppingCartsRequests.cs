@@ -14,7 +14,7 @@ namespace ECommerce.Api.Requests
     }
 
     public record AddProductRequest(
-        Guid? CartId,
+        Guid? ShoppingCartId,
         ProductItemRequest? ProductItem
     );
 
@@ -25,7 +25,7 @@ namespace ECommerce.Api.Requests
     );
 
     public record RemoveProductRequest(
-        Guid? CartId,
+        Guid? ShoppingCartId,
         PricedProductItemRequest? ProductItem
     );
 }

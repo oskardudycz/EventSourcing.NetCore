@@ -6,11 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.Core.Commands
 {
-    public interface ICommandHandler<in T>
-    {
-        ValueTask Handle(T command, CancellationToken token);
-    }
-
     public static class CommandHandlerExtensions
     {
         public static async Task HandleCreateCommand<TCommand, TEntity>(
@@ -44,20 +39,16 @@ namespace ECommerce.Core.Commands
             await repository.Append(id, @event, ct);
         }
 
-        public static IServiceCollection AddCommandHandler<TCommand, TCommandHandler>(this IServiceCollection services)
-            where TCommandHandler: class, ICommandHandler<TCommand>
-            => services
-                .AddTransient<ICommandHandler<TCommand>, TCommandHandler>()
-                .AddTransient<Func<TCommand, CancellationToken, ValueTask>>((sp) =>
-                    async (command, ct) =>
-                    {
-                        var commandHandler = sp.GetRequiredService<ICommandHandler<TCommand>>();
-                        await commandHandler.Handle(command, ct);
-                    });
-
         public static IServiceCollection AddCreateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
             Func<TCommand, object> handle,
+            Func<TCommand, string> getId
+        ) where TEntity : notnull
+            => AddCreateCommandHandler<TCommand, TEntity>(services, _ =>  handle, getId);
+
+        public static IServiceCollection AddCreateCommandHandler<TCommand, TEntity>(
+            this IServiceCollection services,
+            Func<IServiceProvider, Func<TCommand, object>> handle,
             Func<TCommand, string> getId
         ) where TEntity : notnull
             => services
@@ -66,7 +57,7 @@ namespace ECommerce.Core.Commands
                     var repository = sp.GetRequiredService<IEventStoreDBRepository<TEntity>>();
 
                     return async (command, ct) =>
-                        await HandleCreateCommand(repository, handle, getId, command, ct);
+                        await HandleCreateCommand(repository, handle(sp), getId, command, ct);
                 });
 
 
