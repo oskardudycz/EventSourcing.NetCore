@@ -44,15 +44,15 @@ namespace ECommerce.Core.Commands
             this IServiceCollection services,
             Func<TCommand, object> handle,
             Func<TCommand, string> getId
-        ) where TEntity : notnull
-            => AddCreateCommandHandler<TCommand, TEntity>(services, _ =>  handle, getId);
+        ) where TEntity : notnull =>
+            AddCreateCommandHandler<TCommand, TEntity>(services, _ => handle, getId);
 
         public static IServiceCollection AddCreateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
             Func<IServiceProvider, Func<TCommand, object>> handle,
             Func<TCommand, string> getId
-        ) where TEntity : notnull
-            => services
+        ) where TEntity : notnull =>
+            services
                 .AddTransient<Func<TCommand, CancellationToken, ValueTask>>(sp =>
                 {
                     var repository = sp.GetRequiredService<IEventStoreDBRepository<TEntity>>();
@@ -68,8 +68,8 @@ namespace ECommerce.Core.Commands
             Func<TCommand, string> getId,
             Func<TCommand, uint> getVersion,
             Func<TEntity?, object, TEntity> when
-        ) where TEntity : notnull
-            => AddUpdateCommandHandler(services, _ =>  handle, getId, getVersion, when);
+        ) where TEntity : notnull =>
+            AddUpdateCommandHandler(services, _ => handle, getId, getVersion, when);
 
         public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
@@ -77,15 +77,13 @@ namespace ECommerce.Core.Commands
             Func<TCommand, string> getId,
             Func<TCommand, uint> getVersion,
             Func<TEntity?, object, TEntity> when
-        ) where TEntity : notnull
-            => services
+        ) where TEntity : notnull =>
+            services
                 .AddTransient<Func<TCommand, CancellationToken, ValueTask>>(sp =>
                 {
                     var repository = sp.GetRequiredService<IEventStoreDBRepository<TEntity>>();
                     return async (command, ct) =>
                         await HandleUpdateCommand(repository, handle(sp), getId, getVersion, when, command, ct);
                 });
-
-
     }
 }

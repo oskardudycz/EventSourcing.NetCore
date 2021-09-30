@@ -41,13 +41,15 @@ namespace ECommerce.ShoppingCarts.ProductItems
             return new ProductItemsList(clone);
         }
 
-
-        public PricedProductItem? Find(PricedProductItem productItem)
-            => items.SingleOrDefault(
+        public PricedProductItem? Find(PricedProductItem productItem) =>
+            items.SingleOrDefault(
                 pi => pi.MatchesProductAndUnitPrice(productItem)
             );
 
-        public static ProductItemsList Empty()
-            => new(new List<PricedProductItem>());
+        public static ProductItemsList Empty() =>
+            new(new List<PricedProductItem>());
+
+        public override string ToString() =>
+            $"[{string.Join(", ", items.Select(pi => pi.ToString()))}]";
     }
 }

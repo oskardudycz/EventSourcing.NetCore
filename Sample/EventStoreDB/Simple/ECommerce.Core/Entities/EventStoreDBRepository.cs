@@ -59,7 +59,6 @@ namespace ECommerce.Core.Entities
         {
             await eventStore.AppendToStreamAsync(
                 id,
-                // TODO: Add proper optimistic concurrency handling
                 StreamState.NoStream,
                 new[] { @event.ToJsonEventData() },
                 cancellationToken: cancellationToken
@@ -81,28 +80,13 @@ namespace ECommerce.Core.Entities
                 cancellationToken: cancellationToken
             );
         }
-
-        private async Task Append(
-            string id,
-            object @event,
-            uint? version,
-            CancellationToken cancellationToken
-        )
-        {
-            await eventStore.AppendToStreamAsync(
-                id,
-                // TODO: Add proper optimistic concurrency handling
-                StreamState.Any,
-                new[] { @event.ToJsonEventData() },
-                cancellationToken: cancellationToken
-            );
-        }
     }
 
     public static class EventStoreDBRepository
     {
-        public static IServiceCollection AddEventStoreDBRepository<TEntity>(this IServiceCollection services)
-            where TEntity : class
-            => services.AddTransient<IEventStoreDBRepository<TEntity>, EventStoreDBRepository<TEntity>>();
+        public static IServiceCollection AddEventStoreDBRepository<TEntity>(
+            this IServiceCollection services
+        ) where TEntity : class =>
+            services.AddTransient<IEventStoreDBRepository<TEntity>, EventStoreDBRepository<TEntity>>();
     }
 }

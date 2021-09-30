@@ -3,13 +3,6 @@ using ECommerce.ShoppingCarts.ProductItems;
 
 namespace ECommerce.ShoppingCarts
 {
-    public enum ShoppingCartStatus
-    {
-        Pending = 1,
-        Confirmed = 2,
-        Cancelled = 3
-    }
-
     public record ShoppingCartInitialized(
         Guid ShoppingCartId,
         Guid ClientId,
@@ -30,6 +23,13 @@ namespace ECommerce.ShoppingCarts
         Guid ShoppingCartId,
         DateTime ConfirmedAt
     );
+
+    public enum ShoppingCartStatus
+    {
+        Pending = 1,
+        Confirmed = 2,
+        Cancelled = 3
+    }
 
     public record ShoppingCart(
         Guid Id,
@@ -55,7 +55,7 @@ namespace ECommerce.ShoppingCarts
                 ProductItemRemovedFromShoppingCart (_, var productItem) =>
                     entity! with
                     {
-                        ProductItems = entity.ProductItems.Add(productItem)
+                        ProductItems = entity.ProductItems.Remove(productItem)
                     },
 
                 ShoppingCartConfirmed (_, var confirmedAt) =>
@@ -68,7 +68,7 @@ namespace ECommerce.ShoppingCarts
             };
         }
 
-        public static string MapToStreamId(Guid shoppingCartId)
-            => $"shopping_cart-{shoppingCartId}";
+        public static string MapToStreamId(Guid shoppingCartId) =>
+            $"shopping_cart-{shoppingCartId}";
     }
 }

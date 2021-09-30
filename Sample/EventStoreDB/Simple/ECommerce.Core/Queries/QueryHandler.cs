@@ -46,8 +46,10 @@ namespace ECommerce.Core.Queries
                         handler(queryable, query, ct);
                 });
 
-        public static IServiceCollection AddQueryHandler<TQuery, TResult>(this IServiceCollection services,
-            Func<IServiceProvider, Func<TQuery, CancellationToken, Task<TResult>>> setup)
-            => services.AddTransient(setup);
+        public static IServiceCollection AddQueryHandler<TQuery, TResult>(
+            this IServiceCollection services,
+            Func<IServiceProvider, Func<TQuery, CancellationToken, Task<TResult>>> setup
+        ) =>
+            services.AddTransient(setup);
     }
 }
