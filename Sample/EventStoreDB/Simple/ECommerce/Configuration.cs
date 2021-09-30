@@ -9,8 +9,8 @@ namespace ECommerce
 {
     public static class Configuration
     {
-        public static IServiceCollection AddECommerceModule(this IServiceCollection services)
-            => services
+        public static IServiceCollection AddECommerceModule(this IServiceCollection services) =>
+            services
                 .AddShoppingCartsModule()
                 .AddPricingModule()
                 .AddDbContext<ECommerceDbContext>(

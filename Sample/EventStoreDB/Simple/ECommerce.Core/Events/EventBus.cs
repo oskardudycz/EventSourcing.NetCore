@@ -67,8 +67,8 @@ namespace ECommerce.Core.Events
 
     public static class EventBusExtensions
     {
-        public static IServiceCollection AddEventBus(this IServiceCollection services)
-            => services.AddSingleton<IEventBus, EventBus>(sp =>
+        public static IServiceCollection AddEventBus(this IServiceCollection services) =>
+            services.AddSingleton<IEventBus, EventBus>(sp =>
                 new EventBus(sp, Policy.Handle<Exception>().RetryAsync(3)));
     }
 }

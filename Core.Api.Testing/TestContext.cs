@@ -24,8 +24,8 @@ namespace Core.Api.Testing
         {
         }
 
-        private static IWebHostBuilder SetupWebHostBuilder(IWebHostBuilder webHostBuilder)
-            => webHostBuilder.UseStartup<TStartup>();
+        private static IWebHostBuilder SetupWebHostBuilder(IWebHostBuilder webHostBuilder) =>
+            webHostBuilder.UseStartup<TStartup>();
     }
 
     public class TestContext: IDisposable

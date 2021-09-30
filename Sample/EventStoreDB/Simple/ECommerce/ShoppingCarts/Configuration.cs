@@ -16,19 +16,20 @@ namespace ECommerce.ShoppingCarts
 {
     public static class Configuration
     {
-        public static IServiceCollection AddShoppingCartsModule(this IServiceCollection services)
-            => services
+        public static IServiceCollection AddShoppingCartsModule(this IServiceCollection services) =>
+            services
                 .AddEventStoreDBRepository<ShoppingCart>()
                 .AddCreateCommandHandler<InitializeShoppingCart, ShoppingCart>(
                     InitializeShoppingCart.Handle,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                 )
                 .AddUpdateCommandHandler<AddProductItemToShoppingCart, ShoppingCart>(
-                    sp=> (command, shoppingCart) =>
-                        AddProductItemToShoppingCart.Handle(
-                            sp.GetRequiredService<IProductPriceCalculator>(),
-                            command,
-                            shoppingCart),
+                    sp =>
+                        (command, shoppingCart) =>
+                            AddProductItemToShoppingCart.Handle(
+                                sp.GetRequiredService<IProductPriceCalculator>(),
+                                command,
+                                shoppingCart),
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
                     command => command.Version,
                     ShoppingCart.When
