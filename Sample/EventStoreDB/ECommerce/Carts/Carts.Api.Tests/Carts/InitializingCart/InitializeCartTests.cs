@@ -8,6 +8,7 @@ using Carts.Carts.GettingCartById;
 using Core.Api.Testing;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Carts.Api.Tests.Carts.InitializingCart
 {
@@ -19,26 +20,24 @@ namespace Carts.Api.Tests.Carts.InitializingCart
 
         public HttpResponseMessage CommandResponse = default!;
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             CommandResponse = await Post(new InitializeCartRequest {ClientId = ClientId });
         }
     }
 
-    public class InitializeCartTests: IClassFixture<InitCartFixture>
+    public class InitializeCartTests: ApiTest<InitCartFixture>
     {
-        private readonly InitCartFixture fixture;
-
-        public InitializeCartTests(InitCartFixture fixture)
+        public InitializeCartTests(InitCartFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_CartId()
         {
-            var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
+            var commandResponse = Fixture.CommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
@@ -50,13 +49,13 @@ namespace Carts.Api.Tests.Carts.InitializingCart
         [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldCreate_Cart()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
             // prepare query
             var query = $"{createdId}";
 
             //send query
-            var queryResponse = await fixture.Get(query, 10,
+            var queryResponse = await Fixture.Get(query, 10,
                 check: response => new(response.StatusCode == HttpStatusCode.Created));
 
             queryResponse.EnsureSuccessStatusCode();
@@ -64,7 +63,7 @@ namespace Carts.Api.Tests.Carts.InitializingCart
             var cartDetails = await queryResponse.GetResultFromJson<CartDetails>();
             cartDetails.Id.Should().Be(createdId);
             cartDetails.Status.Should().Be(CartStatus.Pending);
-            cartDetails.ClientId.Should().Be(fixture.ClientId);
+            cartDetails.ClientId.Should().Be(Fixture.ClientId);
             cartDetails.Version.Should().Be(1);
             cartDetails.ProductItems.Should().BeEmpty();
             cartDetails.TotalPrice.Should().Be(0);

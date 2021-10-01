@@ -5,6 +5,7 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit.Abstractions;
 
 namespace Core.Api.Testing
 {
@@ -14,13 +15,18 @@ namespace Core.Api.Testing
         public TestContext(
             Func<string, Dictionary<string, string>>? getConfiguration = null,
             Action<IServiceCollection>? setupServices = null,
-            Func<IWebHostBuilder, IWebHostBuilder>? setupWebHostBuilder = null
-        ): base(getConfiguration, setupServices, (webHostBuilder =>
-        {
-            SetupWebHostBuilder(webHostBuilder);
-            setupWebHostBuilder?.Invoke(webHostBuilder);
-            return webHostBuilder;
-        }))
+            Func<IWebHostBuilder, IWebHostBuilder>? setupWebHostBuilder = null,
+            ITestOutputHelper? testOutputHelper = null
+        ): base(
+            getConfiguration,
+            setupServices,
+            (webHostBuilder =>
+            {
+                SetupWebHostBuilder(webHostBuilder);
+                setupWebHostBuilder?.Invoke(webHostBuilder);
+                return webHostBuilder;
+            }),
+            testOutputHelper)
         {
         }
 
@@ -34,33 +40,48 @@ namespace Core.Api.Testing
 
         public readonly TestServer Server;
 
-        private readonly Func<string, Dictionary<string, string>> getConfiguration =
-            _ => new Dictionary<string, string>();
+        private readonly string fixtureName;
 
         public TestContext(
             Func<string, Dictionary<string, string>>? getConfiguration = null,
             Action<IServiceCollection>? setupServices = null,
-            Func<IWebHostBuilder, IWebHostBuilder>? setupWebHostBuilder = null
+            Func<IWebHostBuilder, IWebHostBuilder>? setupWebHostBuilder = null,
+            ITestOutputHelper? testOutputHelper = null
         )
         {
-            if (getConfiguration != null)
-            {
-                this.getConfiguration = getConfiguration;
-            }
+            fixtureName = new StackTrace().GetFrame(3)!.GetMethod()!.DeclaringType!.Name;
 
-            var fixtureName = new StackTrace().GetFrame(3)!.GetMethod()!.DeclaringType!.Name;
-
-            var configuration = this.getConfiguration(fixtureName);
-
-            setupWebHostBuilder ??= webHostBuilder => webHostBuilder;
-            Server = new TestServer(setupWebHostBuilder(TestWebHostBuilder.Create(configuration, services =>
-            {
-                ConfigureTestServices(services);
-                setupServices?.Invoke(services);
-            })));
-
+            Server = CreateTestServer(
+                setupServices,
+                setupWebHostBuilder,
+                getConfiguration ?? (_ => new Dictionary<string, string>()),
+                testOutputHelper
+            );
 
             Client = Server.CreateClient();
+        }
+
+        private TestServer CreateTestServer(
+            Action<IServiceCollection>? setupServices,
+            Func<IWebHostBuilder, IWebHostBuilder>? setupWebHostBuilder,
+            Func<string, Dictionary<string, string>> getConfiguration,
+            ITestOutputHelper? testOutputHelper)
+        {
+            setupWebHostBuilder ??= webHostBuilder => webHostBuilder;
+            var configuration = getConfiguration(fixtureName);
+            return new TestServer(
+                setupWebHostBuilder
+                (
+                    TestWebHostBuilder.Create(
+                        configuration,
+                        services =>
+                        {
+                            ConfigureTestServices(services);
+                            setupServices?.Invoke(services);
+                        },
+                        testOutputHelper)
+                )
+            );
         }
 
         protected virtual void ConfigureTestServices(IServiceCollection services)

@@ -16,6 +16,7 @@ using Tickets.Reservations.GettingReservationById;
 using Tickets.Reservations.GettingReservationHistory;
 using Tickets.Reservations.GettingReservations;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
 {
@@ -30,27 +31,25 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
 
         public HttpResponseMessage CommandResponse = default!;
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             // send create command
             CommandResponse = await Post(new CreateTentativeReservationRequest {SeatId = SeatId});
         }
     }
 
-    public class CreateTentativeReservationTests: IClassFixture<CreateTentativeReservationFixture>
+    public class CreateTentativeReservationTests: ApiTest<CreateTentativeReservationFixture>
     {
-        private readonly CreateTentativeReservationFixture fixture;
-
-        public CreateTentativeReservationTests(CreateTentativeReservationFixture fixture)
+        public CreateTentativeReservationTests(CreateTentativeReservationFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_ReservationId()
         {
-            var commandResponse = fixture.CommandResponse;
+            var commandResponse = Fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
@@ -63,14 +62,14 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
         [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldPublish_TentativeReservationCreated()
         {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdReservationId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            fixture.PublishedInternalEventsOfType<TentativeReservationCreated>()
+            Fixture.PublishedInternalEventsOfType<TentativeReservationCreated>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>
                     @event.ReservationId == createdReservationId
-                    && @event.SeatId == fixture.SeatId
+                    && @event.SeatId == Fixture.SeatId
                     && !string.IsNullOrEmpty(@event.Number)
                 );
         }
@@ -79,13 +78,13 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
         [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldCreate_ReservationDetailsReadModel()
         {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdReservationId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
             // prepare query
             var query = $"{createdReservationId}";
 
             //send query
-            var queryResponse = await fixture.Get(query);
+            var queryResponse = await Fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var reservationDetails =  await queryResponse.GetResultFromJson<ReservationDetails>();
@@ -98,10 +97,10 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
         [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldCreate_ReservationList()
         {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdReservationId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
             //send query
-            var queryResponse = await fixture.Get();
+            var queryResponse = await Fixture.Get();
             queryResponse.EnsureSuccessStatusCode();
 
             var reservationPagedList = await queryResponse.GetResultFromJson<PagedListResponse<ReservationShortInfo>>();
@@ -125,13 +124,13 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
         [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldCreate_ReservationHistory()
         {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdReservationId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
             // prepare query
             var query = $"{createdReservationId}/history";
 
             //send query
-            var queryResponse = await fixture.Get(query);
+            var queryResponse = await Fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var reservationPagedList = await queryResponse.GetResultFromJson<PagedListResponse<ReservationHistory>>();

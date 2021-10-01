@@ -12,6 +12,7 @@ using Shipments.Packages.Events.External;
 using Shipments.Packages.Requests;
 using Shipments.Products;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Shipments.Api.Tests.Packages
 {
@@ -39,26 +40,24 @@ namespace Shipments.Api.Tests.Packages
 
         public HttpResponseMessage CommandResponse = default!;
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             CommandResponse = await Post(new SendPackage(OrderId, ProductItems));
         }
     }
 
-    public class SendPackageTests: IClassFixture<SendPackageFixture>
+    public class SendPackageTests: ApiTest<SendPackageFixture>
     {
-        private readonly SendPackageFixture fixture;
-
-        public SendPackageTests(SendPackageFixture fixture)
+        public SendPackageTests(SendPackageFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Acceptance")]
         public async Task SendPackage_ShouldReturn_CreatedStatus_With_PackageId()
         {
-            var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
+            var commandResponse = Fixture.CommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
@@ -70,18 +69,18 @@ namespace Shipments.Api.Tests.Packages
         [Trait("Category", "Acceptance")]
         public async Task SendPackage_ShouldPublish_PackageWasSentEvent()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            fixture.PublishedInternalEventsOfType<PackageWasSent>()
+            Fixture.PublishedInternalEventsOfType<PackageWasSent>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>
                     @event.PackageId == createdId
-                    && @event.OrderId == fixture.OrderId
-                    && @event.SentAt > fixture.TimeBeforeSending
-                    && @event.ProductItems.Count == fixture.ProductItems.Count
+                    && @event.OrderId == Fixture.OrderId
+                    && @event.SentAt > Fixture.TimeBeforeSending
+                    && @event.ProductItems.Count == Fixture.ProductItems.Count
                     && @event.ProductItems.All(
-                        pi => fixture.ProductItems.Exists(
+                        pi => Fixture.ProductItems.Exists(
                             expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
                 );
         }
@@ -90,22 +89,22 @@ namespace Shipments.Api.Tests.Packages
         [Trait("Category", "Acceptance")]
         public async Task SendPackage_ShouldCreate_Package()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
             // prepare query
             var query = $"{createdId}";
 
             //send query
-            var queryResponse = await fixture.Get(query);
+            var queryResponse = await Fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var packageDetails = await queryResponse.GetResultFromJson<Package>();
             packageDetails.Id.Should().Be(createdId);
-            packageDetails.OrderId.Should().Be(fixture.OrderId);
-            packageDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);
+            packageDetails.OrderId.Should().Be(Fixture.OrderId);
+            packageDetails.SentAt.Should().BeAfter(Fixture.TimeBeforeSending);
             packageDetails.ProductItems.Should().NotBeEmpty();
             packageDetails.ProductItems.All(
-                pi => fixture.ProductItems.Exists(
+                pi => Fixture.ProductItems.Exists(
                     expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
                 .Should().BeTrue();
         }

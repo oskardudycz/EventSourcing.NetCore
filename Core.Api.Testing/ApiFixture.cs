@@ -7,18 +7,19 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Core.Api.Testing
 {
     public abstract class ApiFixture<TStartup>: ApiFixture where TStartup : class
     {
-        public override TestContext CreateTestContext() =>
-            new TestContext<TStartup>(GetConfiguration, SetupServices, SetupWebHostBuilder);
+        public override TestContext CreateTestContext(ITestOutputHelper testOutputHelper) =>
+            new TestContext<TStartup>(GetConfiguration, SetupServices, SetupWebHostBuilder, testOutputHelper);
     }
 
-    public abstract class ApiFixture: IAsyncLifetime
+    public abstract class ApiFixture: IAsyncDisposable
     {
-        protected readonly TestContext Sut;
+        protected TestContext Sut = default!;
 
         protected HttpClient Client => Sut.Client;
 
@@ -32,25 +33,37 @@ namespace Core.Api.Testing
 
         protected virtual Func<IWebHostBuilder, IWebHostBuilder>? SetupWebHostBuilder => null;
 
+
         protected ApiFixture()
         {
             Environment.SetEnvironmentVariable("SchemaName", GetType().Name.ToLower());
-
-            Sut = CreateTestContext();
         }
 
-        public virtual TestContext CreateTestContext() => new(GetConfiguration, SetupServices, SetupWebHostBuilder);
+        public virtual TestContext CreateTestContext(ITestOutputHelper testOutputHelper) =>
+            new(
+                GetConfiguration,
+                SetupServices,
+                SetupWebHostBuilder,
+                testOutputHelper
+            );
 
-        public virtual Task InitializeAsync() => Task.CompletedTask;
+        public Task InitializeAsync(ITestOutputHelper testOutputHelper)
+        {
+            Sut = CreateTestContext(testOutputHelper);
+            return Setup();
+        }
 
-        public virtual Task DisposeAsync() => Task.CompletedTask;
+        protected abstract Task Setup();
 
-        public async Task<HttpResponseMessage> Get(string path = "", int maxNumberOfRetries = 0, int retryIntervalInMs = 1000, Func<HttpResponseMessage, ValueTask<bool>>? check = null)
+        public virtual ValueTask DisposeAsync() => new ();
+
+        public async Task<HttpResponseMessage> Get(string path = "", int maxNumberOfRetries = 0,
+            int retryIntervalInMs = 1000, Func<HttpResponseMessage, ValueTask<bool>>? check = null)
         {
             HttpResponseMessage queryResponse;
             var retryCount = maxNumberOfRetries;
 
-            var doCheck = check ?? (response => new (response.StatusCode == HttpStatusCode.OK));
+            var doCheck = check ?? (response => new(response.StatusCode == HttpStatusCode.OK));
             do
             {
                 queryResponse = await Client.GetAsync(
@@ -63,6 +76,7 @@ namespace Core.Api.Testing
                 await Task.Delay(retryIntervalInMs);
                 retryCount--;
             } while (true);
+
             return queryResponse;
         }
 
@@ -83,8 +97,8 @@ namespace Core.Api.Testing
         {
             return Client.PutAsync(
                 $"{ApiUrl}/{path}",
-                request != null ?
-                    request.ToJsonStringContent()
+                request != null
+                    ? request.ToJsonStringContent()
                     : new StringContent(string.Empty)
             );
         }

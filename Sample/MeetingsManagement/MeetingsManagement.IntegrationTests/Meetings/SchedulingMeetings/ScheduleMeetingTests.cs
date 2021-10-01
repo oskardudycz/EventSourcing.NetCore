@@ -9,6 +9,7 @@ using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.GettingMeeting;
 using MeetingsManagement.Meetings.ValueObjects;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
 {
@@ -24,7 +25,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
         public HttpResponseMessage CreateMeetingCommandResponse = default!;
         public HttpResponseMessage ScheduleMeetingCommandResponse = default!;
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             // prepare command
             var createCommand = new CreateMeeting(
@@ -42,20 +43,18 @@ namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
         }
     }
 
-    public class ScheduleMeetingTests: IClassFixture<ScheduleMeetingFixture>
+    public class ScheduleMeetingTests: ApiTest<ScheduleMeetingFixture>
     {
-        private readonly ScheduleMeetingFixture fixture;
-
-        public ScheduleMeetingTests(ScheduleMeetingFixture fixture)
+        public ScheduleMeetingTests(ScheduleMeetingFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Acceptance")]
         public async Task CreateMeeting_ShouldReturn_CreatedStatus_With_MeetingId()
         {
-            var commandResponse = fixture.CreateMeetingCommandResponse.EnsureSuccessStatusCode();
+            var commandResponse = Fixture.CreateMeetingCommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             var createdId = await commandResponse.GetResultFromJson<Guid>();
@@ -66,7 +65,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
         [Trait("Category", "Acceptance")]
         public async Task ScheduleMeeting_ShouldSucceed()
         {
-            var commandResponse = fixture.ScheduleMeetingCommandResponse.EnsureSuccessStatusCode();
+            var commandResponse = Fixture.ScheduleMeetingCommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var createdId = await commandResponse.GetResultFromJson<string>();
@@ -78,14 +77,14 @@ namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
         public async Task ScheduleMeeting_ShouldUpdateReadModel()
         {
             //send query
-            var queryResponse = await fixture.Get($"{fixture.MeetingId}");
+            var queryResponse = await Fixture.Get($"{Fixture.MeetingId}");
             queryResponse.EnsureSuccessStatusCode();
 
             var meeting = await queryResponse.GetResultFromJson<MeetingView>();
-            meeting.Id.Should().Be(fixture.MeetingId);
-            meeting.Name.Should().Be(fixture.MeetingName);
-            meeting.Start.Should().Be(fixture.Start);
-            meeting.End.Should().Be(fixture.End);
+            meeting.Id.Should().Be(Fixture.MeetingId);
+            meeting.Name.Should().Be(Fixture.MeetingName);
+            meeting.Start.Should().Be(Fixture.Start);
+            meeting.End.Should().Be(Fixture.End);
         }
     }
 }

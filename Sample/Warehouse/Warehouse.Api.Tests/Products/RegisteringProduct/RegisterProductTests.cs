@@ -6,6 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Warehouse.Products.RegisteringProduct;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Warehouse.Api.Tests.Products.RegisteringProduct
 {
@@ -17,15 +18,15 @@ namespace Warehouse.Api.Tests.Products.RegisteringProduct
 
             protected override Func<IWebHostBuilder, IWebHostBuilder> SetupWebHostBuilder =>
                 whb => WarehouseTestWebHostBuilder.Configure(whb, nameof(RegisterProductFixture));
+
+            protected override Task Setup() => Task.CompletedTask;
         }
 
-        public class RegisterProductTests: IClassFixture<RegisterProductFixture>
+        public class RegisterProductTests: ApiTest<RegisterProductFixture>
         {
-            private readonly RegisterProductFixture fixture;
-
-            public RegisterProductTests(RegisterProductFixture fixture)
+            public RegisterProductTests(RegisterProductFixture fixture, ITestOutputHelper outputHelper)
+                : base(fixture, outputHelper)
             {
-                this.fixture = fixture;
             }
 
             [Theory]
@@ -35,7 +36,7 @@ namespace Warehouse.Api.Tests.Products.RegisteringProduct
                 // Given
 
                 // When
-                var response = await fixture.Post(validRequest);
+                var response = await Fixture.Post(validRequest);
 
                 // Then
                 response.EnsureSuccessStatusCode()
@@ -52,7 +53,7 @@ namespace Warehouse.Api.Tests.Products.RegisteringProduct
                 // Given
 
                 // When
-                var response = await fixture.Post(invalidRequest);
+                var response = await Fixture.Post(invalidRequest);
 
                 // Then
                 response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -64,11 +65,11 @@ namespace Warehouse.Api.Tests.Products.RegisteringProduct
                 // Given
                 var request = new RegisterProductRequest("AA2039485", ValidName, ValidDescription);
 
-                var response = await fixture.Post(request);
+                var response = await Fixture.Post(request);
                 response.StatusCode.Should().Be(HttpStatusCode.Created);
 
                 // When
-                response = await fixture.Post(request);
+                response = await Fixture.Post(request);
 
                 // Then
                 response.StatusCode.Should().Be(HttpStatusCode.Conflict);

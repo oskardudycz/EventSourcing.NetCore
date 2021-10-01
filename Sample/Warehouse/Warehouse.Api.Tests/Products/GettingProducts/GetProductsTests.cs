@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Warehouse.Products.GettingProducts;
 using Warehouse.Products.RegisteringProduct;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Warehouse.Api.Tests.Products.GettingProducts
 {
@@ -21,7 +22,7 @@ namespace Warehouse.Api.Tests.Products.GettingProducts
 
         public IList<ProductListItem> RegisteredProducts = new List<ProductListItem>();
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             var productsToRegister = new[]
             {
@@ -44,13 +45,11 @@ namespace Warehouse.Api.Tests.Products.GettingProducts
         }
     }
 
-    public class GetProductsTests: IClassFixture<GetProductsFixture>
+    public class GetProductsTests: ApiTest<GetProductsFixture>
     {
-        private readonly GetProductsFixture fixture;
-
-        public GetProductsTests(GetProductsFixture fixture)
+        public GetProductsTests(GetProductsFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
@@ -59,7 +58,7 @@ namespace Warehouse.Api.Tests.Products.GettingProducts
             // Given
 
             // When
-            var response = await fixture.Get();
+            var response = await Fixture.Get();
 
             // Then
             response.EnsureSuccessStatusCode()
@@ -67,18 +66,18 @@ namespace Warehouse.Api.Tests.Products.GettingProducts
 
             var products = await response.GetResultFromJson<IReadOnlyList<ProductListItem>>();
             products.Should().NotBeEmpty();
-            products.Should().BeEquivalentTo(fixture.RegisteredProducts);
+            products.Should().BeEquivalentTo(Fixture.RegisteredProducts);
         }
 
         [Fact]
         public async Task ValidRequest_With_Filter_ShouldReturn_SubsetOfRecords()
         {
             // Given
-            var filteredRecord = fixture.RegisteredProducts.First();
-            var filter = fixture.RegisteredProducts.First().Sku.Substring(1);
+            var filteredRecord = Fixture.RegisteredProducts.First();
+            var filter = Fixture.RegisteredProducts.First().Sku.Substring(1);
 
             // When
-            var response = await fixture.Get($"?filter={filter}");
+            var response = await Fixture.Get($"?filter={filter}");
 
             // Then
             response.EnsureSuccessStatusCode()
@@ -97,13 +96,13 @@ namespace Warehouse.Api.Tests.Products.GettingProducts
             // Given
             const int page = 2;
             const int pageSize = 1;
-            var filteredRecords = fixture.RegisteredProducts
+            var filteredRecords = Fixture.RegisteredProducts
                 .Skip(page - 1)
                 .Take(pageSize)
                 .ToList();
 
             // When
-            var response = await fixture.Get($"?page={page}&pageSize={pageSize}");
+            var response = await Fixture.Get($"?page={page}&pageSize={pageSize}");
 
             // Then
             response.EnsureSuccessStatusCode()
@@ -121,7 +120,7 @@ namespace Warehouse.Api.Tests.Products.GettingProducts
             var pageSize = -20;
 
             // When
-            var response = await fixture.Get($"?page={pageSize}");
+            var response = await Fixture.Get($"?page={pageSize}");
 
             // Then
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -135,7 +134,7 @@ namespace Warehouse.Api.Tests.Products.GettingProducts
             // Given
 
             // When
-            var response = await fixture.Get($"?page={pageSize}");
+            var response = await Fixture.Get($"?page={pageSize}");
 
             // Then
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

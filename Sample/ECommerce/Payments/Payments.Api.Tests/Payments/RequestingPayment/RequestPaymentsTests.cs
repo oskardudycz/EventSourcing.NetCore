@@ -8,6 +8,7 @@ using FluentAssertions;
 using Payments.Api.Requests.Carts;
 using Payments.Payments.RequestingPayment;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Payments.Api.Tests.Payments.RequestingPayment
 {
@@ -23,26 +24,24 @@ namespace Payments.Api.Tests.Payments.RequestingPayment
 
         public HttpResponseMessage CommandResponse = default!;
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             CommandResponse = await Post(new RequestPaymentRequest {OrderId = OrderId, Amount = Amount});
         }
     }
 
-    public class RequestPaymentsTestsTests: IClassFixture<RequestPaymentsTestsFixture>
+    public class RequestPaymentsTestsTests: ApiTest<RequestPaymentsTestsFixture>
     {
-        private readonly RequestPaymentsTestsFixture fixture;
-
-        public RequestPaymentsTestsTests(RequestPaymentsTestsFixture fixture)
+        public RequestPaymentsTestsTests(RequestPaymentsTestsFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Acceptance")]
         public async Task RequestPayment_ShouldReturn_CreatedStatus_With_PaymentId()
         {
-            var commandResponse = fixture.CommandResponse;
+            var commandResponse = Fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
@@ -55,15 +54,15 @@ namespace Payments.Api.Tests.Payments.RequestingPayment
         [Trait("Category", "Acceptance")]
         public async Task RequestPayment_ShouldPublish_PaymentInitializedEvent()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            fixture.PublishedInternalEventsOfType<PaymentRequested>()
+            Fixture.PublishedInternalEventsOfType<PaymentRequested>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>
                     @event.PaymentId == createdId
-                    && @event.OrderId == fixture.OrderId
-                    && @event.Amount == fixture.Amount
+                    && @event.OrderId == Fixture.OrderId
+                    && @event.Amount == Fixture.Amount
                 );
         }
 

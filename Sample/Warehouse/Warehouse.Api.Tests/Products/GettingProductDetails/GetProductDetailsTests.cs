@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Warehouse.Products.GettingProductDetails;
 using Warehouse.Products.RegisteringProduct;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Warehouse.Api.Tests.Products.GettingProductDetails
 {
@@ -19,9 +20,9 @@ namespace Warehouse.Api.Tests.Products.GettingProductDetails
 
         public ProductDetails ExistingProduct = default!;
 
-        public Guid ProductId = default!;
+        public Guid ProductId;
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             var registerProduct = new RegisterProductRequest("IN11111", "ValidName", "ValidDescription");
             var registerResponse = await Post(registerProduct);
@@ -36,13 +37,11 @@ namespace Warehouse.Api.Tests.Products.GettingProductDetails
         }
     }
 
-    public class GetProductDetailsTests: IClassFixture<GetProductDetailsFixture>
+    public class GetProductDetailsTests: ApiTest<GetProductDetailsFixture>
     {
-        private readonly GetProductDetailsFixture fixture;
-
-        public GetProductDetailsTests(GetProductDetailsFixture fixture)
+        public GetProductDetailsTests(GetProductDetailsFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
@@ -51,7 +50,7 @@ namespace Warehouse.Api.Tests.Products.GettingProductDetails
             // Given
 
             // When
-            var response = await fixture.Get(fixture.ProductId.ToString());
+            var response = await Fixture.Get(Fixture.ProductId.ToString());
 
             // Then
             response.EnsureSuccessStatusCode()
@@ -59,7 +58,7 @@ namespace Warehouse.Api.Tests.Products.GettingProductDetails
 
             var product = await response.GetResultFromJson<ProductDetails>();
             product.Should().NotBeNull();
-            product.Should().BeEquivalentTo(fixture.ExistingProduct);
+            product.Should().BeEquivalentTo(Fixture.ExistingProduct);
         }
 
         [Theory]
@@ -70,7 +69,7 @@ namespace Warehouse.Api.Tests.Products.GettingProductDetails
             // Given
 
             // When
-            var response = await fixture.Get($"{invalidId}");
+            var response = await Fixture.Get($"{invalidId}");
 
             // Then
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -83,7 +82,7 @@ namespace Warehouse.Api.Tests.Products.GettingProductDetails
             var notExistingId = Guid.NewGuid();
 
             // When
-            var response = await fixture.Get($"{notExistingId}");
+            var response = await Fixture.Get($"{notExistingId}");
 
             // Then
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);

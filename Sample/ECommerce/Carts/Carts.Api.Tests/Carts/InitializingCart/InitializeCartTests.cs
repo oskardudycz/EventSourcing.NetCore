@@ -10,6 +10,8 @@ using Core.Api.Testing;
 using Core.Testing;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Carts.Api.Tests.Carts.InitializingCart
 {
@@ -21,26 +23,24 @@ namespace Carts.Api.Tests.Carts.InitializingCart
 
         public HttpResponseMessage CommandResponse = default!;
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             CommandResponse = await Post(new InitCartRequest {ClientId = ClientId });
         }
     }
 
-    public class InitializeCartTests: IClassFixture<InitializeCartFixture>
+    public class InitializeCartTests: ApiTest<InitializeCartFixture>
     {
-        private readonly InitializeCartFixture fixture;
-
-        public InitializeCartTests(InitializeCartFixture fixture)
+        public InitializeCartTests(InitializeCartFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Acceptance")]
         public async Task IntializeCart_ShouldReturn_CreatedStatus_With_CartId()
         {
-            var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
+            var commandResponse = Fixture.CommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
@@ -52,14 +52,14 @@ namespace Carts.Api.Tests.Carts.InitializingCart
         [Trait("Category", "Acceptance")]
         public async Task IntializeCart_ShouldPublish_CartInitializedEvent()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            fixture.PublishedInternalEventsOfType<CartInitialized>()
+            Fixture.PublishedInternalEventsOfType<CartInitialized>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>
                     @event.CartId == createdId
-                    && @event.ClientId == fixture.ClientId
+                    && @event.ClientId == Fixture.ClientId
                     && @event.CartStatus == CartStatus.Pending
                 );
         }
@@ -68,19 +68,19 @@ namespace Carts.Api.Tests.Carts.InitializingCart
         [Trait("Category", "Acceptance")]
         public async Task IntializeCart_ShouldCreate_Cart()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
             // prepare query
             var query = $"{createdId}";
 
             //send query
-            var queryResponse = await fixture.Get(query);
+            var queryResponse = await Fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var cartDetails = await queryResponse.GetResultFromJson<CartDetails>();
             cartDetails.Id.Should().Be(createdId);
             cartDetails.Status.Should().Be(CartStatus.Pending);
-            cartDetails.ClientId.Should().Be(fixture.ClientId);
+            cartDetails.ClientId.Should().Be(Fixture.ClientId);
             cartDetails.Version.Should().Be(1);
             cartDetails.ProductItems.Should().BeEmpty();
             cartDetails.TotalPrice.Should().Be(0);

@@ -9,16 +9,17 @@ using Core.Requests;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Shipments.Api.Tests.Core;
+using Xunit.Abstractions;
 
 namespace Core.Testing
 {
-    public abstract class ApiWithEventsFixture<TStartup>: Api.Testing.ApiFixture<TStartup> where TStartup : class
+    public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where TStartup : class
     {
         private readonly EventsLog eventsLog = new();
         private readonly DummyExternalEventProducer externalEventProducer = new();
         private readonly DummyExternalCommandBus externalCommandBus = new();
 
-        public override TestContext CreateTestContext() =>
+        public override TestContext CreateTestContext(ITestOutputHelper testOutputHelper) =>
             new TestContext<TStartup>(GetConfiguration, (services) =>
             {
                 SetupServices?.Invoke(services);
@@ -28,7 +29,7 @@ namespace Core.Testing
                 services.AddSingleton<IExternalCommandBus>(externalCommandBus);
                 services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
 
-            }, SetupWebHostBuilder);
+            }, SetupWebHostBuilder, testOutputHelper);
 
 
 
@@ -55,7 +56,7 @@ namespace Core.Testing
         }
     }
 
-    public abstract class ApiWithEventsFixture: Api.Testing.ApiFixture
+    public abstract class ApiWithEventsFixture: ApiFixture
     {
     }
 }

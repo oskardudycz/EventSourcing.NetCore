@@ -9,6 +9,7 @@ using MeetingsManagement.Api;
 using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.GettingMeeting;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace MeetingsManagement.IntegrationTests.Meetings.CreatingMeeting
 {
@@ -21,7 +22,7 @@ namespace MeetingsManagement.IntegrationTests.Meetings.CreatingMeeting
 
         public HttpResponseMessage CommandResponse = default!;
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             // prepare command
             var command = new CreateMeeting(
@@ -34,26 +35,24 @@ namespace MeetingsManagement.IntegrationTests.Meetings.CreatingMeeting
         }
     }
 
-    public class CreateMeetingTests: IClassFixture<CreateMeetingFixture>
+    public class CreateMeetingTests: ApiTest<CreateMeetingFixture>
     {
-        private readonly CreateMeetingFixture fixture;
-
-        public CreateMeetingTests(CreateMeetingFixture fixture)
+        public CreateMeetingTests(CreateMeetingFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Acceptance")]
         public async Task CreateCommand_ShouldReturn_CreatedStatus_With_MeetingId()
         {
-            var commandResponse = fixture.CommandResponse;
+            var commandResponse = Fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // get created record id
             var createdId = await commandResponse.GetResultFromJson<Guid>();
-            createdId.Should().Be(fixture.MeetingId);
+            createdId.Should().Be(Fixture.MeetingId);
         }
 
         [Fact]
@@ -61,10 +60,10 @@ namespace MeetingsManagement.IntegrationTests.Meetings.CreatingMeeting
         public void CreateCommand_ShouldPublish_MeetingCreateEvent()
         {
             // assert MeetingCreated event was produced to external bus
-            fixture.PublishedExternalEventsOfType<MeetingCreated>()
+            Fixture.PublishedExternalEventsOfType<MeetingCreated>()
                .Should().Contain(@event =>
-                   @event.MeetingId == fixture.MeetingId
-                   && @event.Name == fixture.MeetingName
+                   @event.MeetingId == Fixture.MeetingId
+                   && @event.Name == Fixture.MeetingName
                );
         }
 
@@ -73,15 +72,15 @@ namespace MeetingsManagement.IntegrationTests.Meetings.CreatingMeeting
         public async Task CreateCommand_ShouldUpdateReadModel()
         {
             // prepare query
-            var query = $"{fixture.MeetingId}";
+            var query = $"{Fixture.MeetingId}";
 
             //send query
-            var queryResponse = await fixture.Get(query);
+            var queryResponse = await Fixture.Get(query);
             queryResponse.EnsureSuccessStatusCode();
 
             var meetingSummary =  await queryResponse.GetResultFromJson<MeetingView>();
-            meetingSummary.Id.Should().Be(fixture.MeetingId);
-            meetingSummary.Name.Should().Be(fixture.MeetingName);
+            meetingSummary.Id.Should().Be(Fixture.MeetingId);
+            meetingSummary.Name.Should().Be(Fixture.MeetingName);
         }
     }
 }

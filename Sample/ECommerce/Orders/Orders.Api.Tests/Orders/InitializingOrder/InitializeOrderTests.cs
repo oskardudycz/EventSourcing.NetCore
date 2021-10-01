@@ -10,6 +10,7 @@ using FluentAssertions;
 using Orders.Api.Requests.Carts;
 using Orders.Orders.InitializingOrder;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Orders.Api.Tests.Orders.InitializingOrder
 {
@@ -31,7 +32,7 @@ namespace Orders.Api.Tests.Orders.InitializingOrder
 
         public HttpResponseMessage CommandResponse = default!;
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             CommandResponse = await Post(new InitOrderRequest(
                 ClientId,
@@ -41,20 +42,18 @@ namespace Orders.Api.Tests.Orders.InitializingOrder
         }
     }
 
-    public class InitializeOrderTests: IClassFixture<InitializeOrderFixture>
+    public class InitializeOrderTests: ApiTest<InitializeOrderFixture>
     {
-        private readonly InitializeOrderFixture fixture;
-
-        public InitializeOrderTests(InitializeOrderFixture fixture)
+        public InitializeOrderTests(InitializeOrderFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "Acceptance")]
         public async Task InitializeOrder_ShouldReturn_CreatedStatus_With_OrderId()
         {
-            var commandResponse = fixture.CommandResponse;
+            var commandResponse = Fixture.CommandResponse;
             commandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
@@ -67,18 +66,18 @@ namespace Orders.Api.Tests.Orders.InitializingOrder
         [Trait("Category", "Acceptance")]
         public async Task InitializeOrder_ShouldPublish_OrderInitializedEvent()
         {
-            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+            var createdId = await Fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            fixture.PublishedInternalEventsOfType<OrderInitialized>()
+            Fixture.PublishedInternalEventsOfType<OrderInitialized>()
                 .Should()
                 .HaveCount(1)
                 .And.Contain(@event =>
                     @event.OrderId == createdId
-                    && @event.ClientId == fixture.ClientId
-                    && @event.InitializedAt > fixture.TimeBeforeSending
-                    && @event.ProductItems.Count == fixture.ProductItems.Count
+                    && @event.ClientId == Fixture.ClientId
+                    && @event.InitializedAt > Fixture.TimeBeforeSending
+                    && @event.ProductItems.Count == Fixture.ProductItems.Count
                     && @event.ProductItems.All(
-                        pi => fixture.ProductItems.Exists(
+                        pi => Fixture.ProductItems.Exists(
                             expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
                 );
         }

@@ -8,6 +8,7 @@ using MeetingsSearch.Api;
 using MeetingsSearch.Meetings;
 using MeetingsSearch.Meetings.CreatingMeeting;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
 {
@@ -18,7 +19,7 @@ namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
         public readonly Guid MeetingId = Guid.NewGuid();
         public readonly string MeetingName = $"Event Sourcing Workshop {DateTime.Now.Ticks}";
 
-        public override async Task InitializeAsync()
+        protected override async Task Setup()
         {
             // prepare event
             var @event = new MeetingCreated(
@@ -31,13 +32,11 @@ namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
         }
     }
 
-    public class CreateMeetingTests: IClassFixture<CreateMeetingFixture>
+    public class CreateMeetingTests: ApiTest<CreateMeetingFixture>
     {
-        private readonly CreateMeetingFixture fixture;
-
-        public CreateMeetingTests(CreateMeetingFixture fixture)
+        public CreateMeetingTests(CreateMeetingFixture fixture, ITestOutputHelper outputHelper)
+            : base(fixture, outputHelper)
         {
-            this.fixture = fixture;
         }
 
         [Fact]
@@ -45,20 +44,20 @@ namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
         public async Task MeetingCreated_ShouldUpdateReadModel()
         {
             //send query
-            var queryResponse = await fixture.Get(
-                $"?filter={fixture.MeetingName}",
+            var queryResponse = await Fixture.Get(
+                $"?filter={Fixture.MeetingName}",
                 maxNumberOfRetries: 10,
                 retryIntervalInMs: 1000,
                 check: async response =>
                     response.IsSuccessStatusCode
-                    && (await response.Content.ReadAsStringAsync()).Contains(fixture.MeetingName));
+                    && (await response.Content.ReadAsStringAsync()).Contains(Fixture.MeetingName));
 
             queryResponse.EnsureSuccessStatusCode();
 
             var meetings = await queryResponse.GetResultFromJson<IReadOnlyCollection<Meeting>>();
             meetings.Should().Contain(meeting =>
-                meeting.Id == fixture.MeetingId
-                && meeting.Name == fixture.MeetingName
+                meeting.Id == Fixture.MeetingId
+                && meeting.Name == Fixture.MeetingName
             );
         }
     }
