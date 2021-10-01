@@ -205,6 +205,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Api.Testing", "Core.Api.Testing\Core.Api.Testing.csproj", "{825A40DB-5AB5-4565-AADB-28AC760D0A43}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simple", "Simple", "{11DD4963-5BB4-4E1B-9475-8EB10C822BFC}"
+ProjectSection(SolutionItems) = preProject
+	Sample\EventStoreDB\Simple\README.md = Sample\EventStoreDB\Simple\README.md
+EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Api", "Sample\EventStoreDB\Simple\ECommerce.Api\ECommerce.Api.csproj", "{414D1D34-1002-4159-B738-DF3EE042F9FD}"
 EndProject
