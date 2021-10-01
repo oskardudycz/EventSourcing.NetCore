@@ -101,8 +101,6 @@ namespace ECommerce.Core.Subscriptions
             {
                 logger.LogError("Error consuming message: {ExceptionMessage}{ExceptionStackTrace}", e.Message,
                     e.StackTrace);
-
-                throw;
             }
         }
 
