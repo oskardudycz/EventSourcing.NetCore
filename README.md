@@ -48,11 +48,13 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
     - [13.12 Testing](#1312-testing)
     - [13.13 CQRS](#1313-cqrs)
     - [13.14 Tools](#1314-tools)
-    - [13.15 Event Sourcing vs Messaging](#1315-event-sourcing-vs-messaging)
     - [13.15 Event processing](#1315-event-processing)
     - [13.16 Distributed processes](#1316-distributed-processes)
     - [13.17 Domain Driven Design](#1317-domain-driven-design)
-    - [13.18 Architecture Weekly](#1318-architecture-weekly)
+    - [13.18 Whitepapers](#1318-whitepapers)
+    - [13.19 This is NOT Event Sourcing (but Event Streaming)](#1319-this-is-not-event-sourcing-but-event-streaming)
+    - [13.20 Event Sourcing Concerns](#1320-event-sourcing-concerns)
+    - [13.21 Architecture Weekly](#1321-architecture-weekly)
 
 
 ## 1. Event Sourcing
@@ -497,7 +499,7 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
 -   📝 [When not to use Event Sourcing?](https://event-driven.io/en/when_not_to_use_event_sourcing/?utm_source=event_sourcing_net)
 -   📝 [How to (not) do the events versioning?](https://event-driven.io/en/how_to_do_event_versioning/?utm_source=event_sourcing_net)
 -   📝 [CQRS facts and myths explained](https://event-driven.io/en/cqrs_facts_and_myths_explained/?utm_source=event_sourcing_net)
--   📝 [How to slice the codebase effectively?](https://event-driven.io/en/how_to_slice_the_codebase_effectively/?utm_source=event_sourcing_net).
+-   📝 [How to slice the codebase effectively?](https://event-driven.io/en/how_to_slice_the_codebase_effectively/?utm_source=event_sourcing_net)
 -   📝 [Can command return a value?](https://event-driven.io/en/can_command_return_a_value/?utm_source=event_sourcing_net)
 -   📝 [Notes about C# records and Nullable Reference Types](https://event-driven.io/en/notes_about_csharp_records_and_nullable_reference_types/?utm_source=event_sourcing_net)
 -   📝 [How to create projections of events for nested object structures?](https://event-driven.io/en/how_to_create_projections_of_events_for_nested_object_structures/?utm_source=event_sourcing_net)
@@ -608,16 +610,18 @@ The simplest way to start is **installing the [project template](https://github.
 ## 13. Other resources
 
 ### 13.1 Introduction
--   📝 [Event Store - A Beginner’s Guide to Event Sourcing](https://www.eventstore.com/event-sourcing)
+-   📝 [Event Store - A Beginner's Guide to Event Sourcing](https://www.eventstore.com/event-sourcing)
 -   🎞 [Greg Young - CQRS & Event Sourcing](https://youtube.com/watch?v=JHGkaShoyNs)
--   📝 [Jay Kreps - Why local state is a fundamental primitive in stream processing](https://www.oreilly.com/ideas/why-local-state-is-a-fundamental-primitive-in-stream-processing)
--   📝 [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
 -   📰 [Lorenzo Nicora - A visual introduction to event sourcing and cqrs](https://www.slideshare.net/LorenzoNicora/a-visual-introduction-to-event-sourcing-and-cqrs)
 -   🎞 [Mathew McLoughlin - An Introduction to CQRS and Event Sourcing Patterns](https://www.youtube.com/watch?v=9a1PqwFrMP0)
 -   🎞 [Emily Stamey - Hey Boss, Event Sourcing Could Fix That!](https://www.youtube.com/watch?v=mw7D6OJpsIA)
 -   🎞 [Derek Comartin - Event Sourcing Example & Explained in plain English](https://www.youtube.com/watch?v=AUj4M-st3ic)
 -   🎞 [Duncan Jones - Introduction to event sourcing and CQRS](https://www.youtube.com/watch?v=kpM5gCLF1Zc)
 -   🎞 [Roman Sachse - Event Sourcing - Do it yourself series](https://www.youtube.com/playlist?list=PL-nSd-yeckKh7Ts5EKChek7iXcgyUGDHa)
+-   📝 [Jay Kreps - Why local state is a fundamental primitive in stream processing](https://www.oreilly.com/ideas/why-local-state-is-a-fundamental-primitive-in-stream-processing)
+-   📝 [Jay Kreps - The Log: What every software engineer should know about real-time data's unifying abstraction](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)
+-   🎞 [Duncan Jones - Event Sourcing and CQRS on Azure serverless functions](https://www.youtube.com/watch?v=jIbfm9TuzIE)
+-   📝 [Christian Stettler - Domain Events vs. Event Sourcing](https://www.innoq.com/en/blog/domain-events-versus-event-sourcing/)
 -   🎞 [Martin Fowler - The Many Meanings of Event-Driven Architecture](https://www.youtube.com/watch?v=STKCRSUsyP0&t=822s)
 -   📝 [Martin Fowler - Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html)
 -   📝 [Dennis Doomen - 16 design guidelines for successful Event Sourcing](https://www.continuousimprover.com/2020/06/guidelines-event-sourcing.html)
@@ -628,11 +632,18 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Joseph Choe - Event Sourcing, Part 1: User Registration](https://josephchoe.com/event-sourcing-part-1)
 -   🎞 [Steven Van Beelen - Intro to Event-Driven Microservices using DDD, CQRS & Event sourcing](https://www.youtube.com/watch?v=F0g5B4F9MMs)
 -   📝 [Yves Lorphelin - The Inevitable Event-Centric Book ](https://github.com/ylorph/The-Inevitable-Event-Centric-Book/issues)
+-   📝 [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
+
+
+<a href='#event-sourcing-on-production' id='event-sourcing-on-production' class='anchor' aria-hidden='true'></a>
 
 ### 13.2 Event Sourcing on production
+-   🎞 [Alexey Zimarev - Event Sourcing in Production](https://youtu.be/DDefPUCB9ao?t=238)
 -   📝 [Leo Gorodinski - Scaling Event-Sourcing at Jet](https://medium.com/@eulerfx/scaling-event-sourcing-at-jet-9c873cac33b8)
 -   📝 [EventStoreDB - Customers' case studies](https://www.eventstore.com/case-studies)
 -   🎞 [P. Avery, R. Reta - Scaling Event Sourcing for Netflix Downloads](https://www.youtube.com/watch?v=rsSld8NycCU)
+-   📝 [Netflix - Scaling Event Sourcing for Netflix Downloads, Episode 1](https://netflixtechblog.com/scaling-event-sourcing-for-netflix-downloads-episode-1-6bc1595c5595)
+-   📝 [Netflix - Scaling Event Sourcing for Netflix Downloads, Episode 2](https://netflixtechblog.com/scaling-event-sourcing-for-netflix-downloads-episode-2-ce1b54d46eec)
 -   📝 [M. Overeem, M. Spoor, S. Jansen, S. Brinkkemper - An Empirical Characterization of Event Sourced Systems and Their Schema Evolution -- Lessons from Industry](https://arxiv.org/abs/2104.01146)
 -   🎞 [Michiel Overeem - Event Sourcing after launch](https://www.youtube.com/watch?v=JzWJI8kW2kc)
 -   🎞 [Greg Young - A Decade of DDD, CQRS, Event Sourcing](https://m.youtube.com/watch?v=LDW0QWie21s)
@@ -640,12 +651,14 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Thomas Weiss - Planet-scale event sourcing with Azure Cosmos DB](https://medium.com/@thomasweiss_io/planet-scale-event-sourcing-with-azure-cosmos-db-48a557757c8d)
 -   🎞 [D. Kuzenski, N. Piani - Beyond APIs: Re-architected System Integrations as Event Sourced](https://www.youtube.com/watch?v=MX4_41yLuG0)
 -   🎞 [Greg Young - Why Event Sourced Systems Fail](https://www.youtube.com/watch?v=FKFu78ZEIi8)
+-   🎞 [Joris Kuipers - Day 2 problems in CQRS and event sourcing](https://www.youtube.com/watch?v=73KxyTUU4nU)
 -   🎞 [Kacper Gunia - War Story: How a Large Corporation Used DDD to Replace a Loyalty System](https://www.youtube.com/watch?v=a1pRsAi9UVs)
 -   🎞 [Vladik Khononov - The Dark Side of Events](https://www.youtube.com/watch?v=URYPpY3SgS8)
--   📝 [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont’s](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
+-   📝 [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont's](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
 -   🎞 [Dennis Doomen - An Event Sourcing Retrospective - The Good, The Bad and the Ugly](https://www.youtube.com/watch?v=goknSHnTD4M)
 -   🎞 [David Schmitz - Event Sourcing You are doing it wrong](https://www.youtube.com/watch?v=GzrZworHpIk)
 -   📝 [Dennis Doomen - A recipe for gradually migrating from CRUD to Event Sourcing](https://www.eventstore.com/blog/a-recipe-for-gradually-migrating-from-crud-to-event-sourcing)
+-   🎞 [Nat Pryce - Mistakes made adopting event sourcing (and how we recovered)](https://www.youtube.com/watch?v=osk0ZBdBbx4)
 
 ### 13.3 Projections 
 -   📝 [Alexey Zimarev - Projections in Event Sourcing](https://zimarev.com/blog/event-sourcing/projections/)
@@ -665,8 +678,12 @@ The simplest way to start is **installing the [project template](https://github.
 
 ### 13.6 Storage
 -   📝 [Greg Young - Building an Event Storage](https://cqrs.wordpress.com/documents/building-event-storage/)
+-   📝 [Adam Warski - Implementing event sourcing using a relational database](https://softwaremill.com/implementing-event-sourcing-using-a-relational-database/)
+-   🎞 [Greg Young - How an EventStore actually works](https://www.youtube.com/watch?v=YUjO1wM0PZM)
 -   🎞 [Andrii Litvinov - Event driven systems backed by MongoDB](https://www.youtube.com/watch?v=w8Z-kPz1cXw)
 -   📝 [Dave Remy - Turning the database inside out with Event Store](https://www.eventstore.com/blog/turning-the-database-inside-out)
+-   📝 [AWS Architecture Blog - How The Mill Adventure Implemented Event Sourcing at Scale Using DynamoDB](https://aws.amazon.com/blogs/architecture/how-the-mill-adventure-implemented-event-sourcing-at-scale-using-dynamodb/)
+-   🎞 [Sander Molenkamp: Practical CQRS and Event Sourcing on Azure](https://www.youtube.com/watch?v=3XcB-5CrRe8)
 
 ### 13.7 Design & Modeling
 -   📝 [Mathias Verraes - DDD and Messaging Architectures](http://verraes.net/2019/05/ddd-msg-arch/)
@@ -701,6 +718,8 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Julie Lerman - Data Points - CQRS and EF Data Models](https://msdn.microsoft.com/en-us/magazine/mt788619.aspx)
 -   📝 [Marco Bürckel - Some thoughts on using CQRS without Event Sourcing](https://medium.com/@mbue/some-thoughts-on-using-cqrs-without-event-sourcing-938b878166a2)
 -   📝 [Bertrand Meyer - Eiffel: a language for software engineering (CQRS introduced)](http://laser.inf.ethz.ch/2012/slides/Meyer/eiffel_laser_2013.pdf)
+-   🎞 [Udi Dahan - CQRS – but different](https://vimeo.com/131199089)
+-   📝 [Greg Young - CQRS, Task Based UIs, Event Sourcing agh!](http://codebetter.com/gregyoung/2010/02/16/cqrs-task-based-uis-event-sourcing-agh/)
 
 ### 13.14 Tools
 -   🛠️ [Marten - .NET Transactional Document DB and Event Store on PostgreSQL](https://eventuous.dev/)
@@ -709,10 +728,6 @@ The simplest way to start is **installing the [project template](https://github.
 -   🛠️ [Eventuous - Event Sourcing for .NET](https://eventuous.dev/)
 -   🛠️ [SQLStreamStore - Stream Store library targeting RDBMS based implementations for .NET ](https://github.com/SQLStreamStore/SQLStreamStore)
 -   🛠️ [Equinox - .NET Event Sourcing library with CosmosDB, EventStoreDB, SqlStreamStore and integration test backends](https://github.com/jet/equinox)
-
-### 13.15 Event Sourcing vs Messaging
--   📝 [Kacper Gunia - EventStoreDB vs Kafka](https://domaincentric.net/blog/eventstoredb-vs-kafka)
--   📝 [Vijay Nair - Axon and Kafka - How does Axon compare to Apache Kafka?](https://axoniq.io/blog-overview/axon-and-kafka-how-does-axon-compare-to-apache-kafka)
 
 ### 13.15 Event processing
 -   📝 [Kamil Grzybek - The Outbox Pattern](http://www.kamilgrzybek.com/design/the-outbox-pattern/)
@@ -724,7 +739,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Alvaro Herrera - Implement SKIP LOCKED for row-level locks](https://www.depesz.com/2014/10/10/waiting-for-9-5-implement-skip-locked-for-row-level-locks/)
 
 ### 13.16 Distributed processes
--   📝 [Hector Garcaa-Molrna, Kenneth Salem - Sagas](https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
+-   📝 [Héctor García-Molina, Kenneth Salem - Sagas](https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
 -   🎞 [Caitie McCaffrey - Applying the Saga Pattern](https://www.youtube.com/watch?v=xDuwrtwYHu8)
 -   🎞 [Udi Dahan - If (domain logic) then CQRS or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
 -   🎞 [Gregor Hohpe - Starbucks Does Not Use Two-Phase Commit](https://www.enterpriseintegrationpatterns.com/ramblings/18_starbucks.html)
@@ -750,7 +765,56 @@ The simplest way to start is **installing the [project template](https://github.
 -   📖 [DDD Quickly](https://www.infoq.com/minibooks/domain-driven-design-quickly)
 -   📝 [Vaughn Vernon - Reactive DDD: Modeling Uncertainty](https://www.infoq.com/presentations/reactive-ddd-distributed-systems)
 
-### 13.18 Architecture Weekly
+### 13.18 Whitepapers
+-   📖 [Pat Helland - Immutability Changes Everything](http://cidrdb.org/cidr2015/Papers/CIDR15_Paper16.pdf)
+-   📖 [C. Mohan, D. Haderle, B. Lindsay, H. Pirahesh and P. Schwarz - ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging](http://db.csail.mit.edu/madden/html/aries.pdf)
+-   📖 [P. O'Neil, E. Cheng, D. Gawlick, E. O'Neil - The Log-Structured Merge-Tree (LSM-Tree)](https://www.cs.umb.edu/~poneil/lsmtree.pdf)
+-   📖 [S. Copei, A. Zündorf - Commutative Event Sourcing vs. Triple Graph Grammars](https://arxiv.org/abs/2101.08626)
+
+<a href='#this-is-not-event-sourcing' id='this-is-not-event-sourcing' class='anchor' aria-hidden='true'></a>
+
+### 13.19 This is NOT Event Sourcing (but Event Streaming)
+-   📝 [Confluent - Event sourcing, CQRS, stream processing and Apache Kafka: What's the connection?](https://www.confluent.io/blog/event-sourcing-cqrs-stream-processing-apache-kafka-whats-connection/)
+-   🎞 [InfoQ - Building Microservices with Event Sourcing and CQRS](https://www.infoq.com/presentations/microservices-event-sourcing-cqrs/)
+-   📝 [Chris Kiehl - Don't Let the Internet Dupe You, Event Sourcing is Hard](https://chriskiehl.com/article/event-sourcing-is-hard)
+-   📝 [AWS - Event sourcing pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/service-per-team.html)
+-   📝 [Andela - Building Scalable Applications Using Event Sourcing and CQRS](https://andela.com/insights/building-scalable-applications-using-event-sourcing-and-cqrs/)
+-   📝 [WiX Engineering - The Reactive Monolith - How to Move from CRUD to Event Sourcing](https://www.wix.engineering/post/the-reactive-monolith-how-to-move-from-crud-to-event-sourcing)
+-   📝 [Nexocode - CQRS and Event Sourcing as an antidote for problems with retrieving application states](https://nexocode.com/blog/posts/cqrs-and-event-sourcing/)
+-   📝 [coMakeIT - Event sourcing and CQRS in Action](https://www.comakeit.com/blog/event-sourcing-and-cqrs-in-action/)
+-   📝 [Debezium - Distributed Data for Microservices — Event Sourcing vs. Change Data Capture](https://debezium.io/blog/2020/02/10/event-sourcing-vs-cdc/)
+-   📝 [Codurance - CQRS and Event Sourcing for dummies](https://www.codurance.com/publications/2015/07/18/cqrs-and-event-sourcing-for-dummies)
+-   📝 [Slalom Build - Event Sourcing with AWS Lambda](https://www.slalombuild.com/blueprint-articles/lambda)
+-   📝 [AWS Prescriptive Guidance - Decompose monoliths into microservices by using CQRS and event sourcing](https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/decompose-monoliths-into-microservices-by-using-cqrs-and-event-sourcing.html)
+-   📝 [Zartis - Event Sourcing with CQRS](https://www.zartis.com/event-sourcing-with-cqrs/)
+-   📝 [Nordstrom - Event-sourcing at Nordstrom: Part 1](https://medium.com/tech-at-nordstrom/adventures-in-event-sourced-architecture-part-1-cc21d06187c7)
+-   📝 [Nordstrom - Event-sourcing at Nordstrom: Part 2](https://medium.com/tech-at-nordstrom/event-sourcing-at-nordstrom-part-2-f64c416d1885)
+-   🎞 [Techtter - CQRS - Event Sourcing || Deep Dive on Building Event Driven Systems](https://www.youtube.com/watch?v=3TwLEoLtpw0)
+-   🎞 [Tech Mind Factory - Event Sourcing with Azure SQL and Entity Framework Core](https://www.youtube.com/watch?v=-BhDW3GeSqg)
+-   🎞 [Tech Primers - Event Sourcing & CQRS | Stock Exchange Microservices Architecture | System Design Primer](https://www.youtube.com/watch?v=E-7TBZxmkXE)
+-   🎞 [International JavaScript Conference - DDD, event sourcing and CQRS – theory and practice](https://www.youtube.com/watch?v=rolfJR9ERxo)
+-   🎞 [Event Sourcing in NodeJS / Typescript - ESaucy](https://www.youtube.com/watch?v=3TMRIzxWF_8)
+-   🎞 [Kansas City Spring User Group - Event Sourcing from Scratch with Apache Kafka and Spring](https://www.youtube.com/watch?v=pRUxU5OSB0c)
+-   🎞 [jeeconf - Building event sourced systems with Kafka Streams](https://www.youtube.com/watch?v=b17l7LvrTco)
+-   🎞 [Jfokus - Event sourcing in practise - lessons learned](https://www.youtube.com/watch?v=_d4mAi3qkDA)
+-   🎞 [MecaHumArduino - Event Sourcing on AWS - Serverless Patterns YOU HAVE To Know About](https://www.youtube.com/watch?v=NvuZoDfuoBc)
+-   🎞 [Oracle Developers - Event Sourcing, Distributed Systems, and CQRS with Java EE](https://www.youtube.com/watch?v=yql-VL1rJWY)
+-   🎞 [Creating a Blueprint for Microservices and Event Sourcing on AWS](https://itnext.io/creating-a-blueprint-for-microservices-and-event-sourcing-on-aws-291d4d5a5817)
+-   🎞 [Azure Cosmos DB Conf - Implementing an Event Sourcing strategy on Azure](https://channel9.msdn.com/Events/Azure-Cosmos-DB/Azure-Cosmos-DB-Conf/Implementing-an-Event-Sourcing-strategy-on-Azure)
+-   📝 [CosmosDB DevBlog - Create a Java Azure Cosmos DB Function Trigger using Visual Studio Code in 2 minutes!](https://devblogs.microsoft.com/cosmosdb/create-a-java-azure-cosmos-db-function-trigger-using-visual-studio-code-in-2-minutes/)
+
+### 13.20 Event Sourcing Concerns
+-   📝 [Kacper Gunia - EventStoreDB vs Kafka](https://domaincentric.net/blog/eventstoredb-vs-kafka)
+-   📝 [Vijay Nair - Axon and Kafka - How does Axon compare to Apache Kafka?](https://axoniq.io/blog-overview/axon-and-kafka-how-does-axon-compare-to-apache-kafka)
+-   📝 [Jesper Hammarbäck - Apache Kafka is not for Event Sourcing](https://serialized.io/blog/apache-kafka-is-not-for-event-sourcing/)
+-   🎞 [Udi Dahan - Event Sourcing @ DDDEU 2020 Keynote](https://channel9.msdn.com/Events/Azure-Cosmos-DB/Azure-Cosmos-DB-Conf/Implementing-an-Event-Sourcing-strategy-on-Azure)
+-   📝 [Vikas Hazrati - Event Sourcing – Does it make sense for your business?](https://blog.knoldus.com/event-sourcing-does-it-make-sense-for-your-business/)
+-   📝 [Mikhail Shilkov - Event Sourcing and IO Complexity](https://mikhail.io/2016/11/event-sourcing-and-io-complexity/)
+-   📝 [Dennis Doomen - The Ugly of Event Sourcing - Real-world Production Issues](https://www.linkedin.com/pulse/ugly-event-sourcing-real-world-production-issues-dennis-doomen/)
+-   📝 [Hugo Rocha - What they don’t tell you about event sourcing](https://medium.com/@hugo.oliveira.rocha/what-they-dont-tell-you-about-event-sourcing-6afc23c69e9a)
+-   📝 [Oskar uit de Bos - Stop overselling Event Sourcing as the silver bullet to microservice architectures](https://medium.com/swlh/stop-overselling-event-sourcing-as-the-silver-bullet-to-microservice-architectures-f43ca25ff9e7)
+
+### 13.21 Architecture Weekly
 If you're interested in Architecture resources, check my other repository: https://github.com/oskardudycz/ArchitectureWeekly/.
 
 It contains a weekly updated list of materials I found valuable and educational.

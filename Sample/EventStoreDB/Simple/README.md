@@ -2,7 +2,7 @@
 
 The PR is adding a new sample that contains the simple Event Sourcing setup with EventStoreDB. For the Read Model, Postgres and Entity Framework are used.
 
-You can watch the webinar on YouTube when I'm explaining the details of the implementation:
+You can watch the webinar on YouTube where I'm explaining the details of the implementation:
 
 <a href="https://www.youtube.com/watch?v=rqYPVzjoxqI" target="_blank"><img src="https://img.youtube.com/vi/rqYPVzjoxqI/0.jpg" alt="Practical introduction to Event Sourcing with EventStoreDB" width="320" height="240" border="10" /></a>
 
