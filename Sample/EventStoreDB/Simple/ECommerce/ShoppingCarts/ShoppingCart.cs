@@ -39,34 +39,43 @@ namespace ECommerce.ShoppingCarts
         DateTime? ConfirmedAt = null
     )
     {
-        public static ShoppingCart When(ShoppingCart? entity, object @event)
+        public static ShoppingCart When(ShoppingCart entity, object @event)
         {
             return @event switch
             {
                 ShoppingCartInitialized (var cartId, var clientId, var cartStatus) =>
-                    new ShoppingCart(cartId, clientId, cartStatus, ProductItemsList.Empty()),
+                    entity with
+                    {
+                        Id = cartId,
+                        ClientId = clientId,
+                        Status = cartStatus,
+                        ProductItems = ProductItemsList.Empty()
+                    },
 
                 ProductItemAddedToShoppingCart (_, var productItem) =>
-                    entity! with
+                    entity with
                     {
                         ProductItems = entity.ProductItems.Add(productItem)
                     },
 
                 ProductItemRemovedFromShoppingCart (_, var productItem) =>
-                    entity! with
+                    entity with
                     {
                         ProductItems = entity.ProductItems.Remove(productItem)
                     },
 
                 ShoppingCartConfirmed (_, var confirmedAt) =>
-                    entity! with
+                    entity with
                     {
                         Status = ShoppingCartStatus.Confirmed,
                         ConfirmedAt = confirmedAt
                     },
-                _ => entity!
+                _ => entity
             };
         }
+
+        public static ShoppingCart Default() =>
+            new (default, default, default, ProductItemsList.Empty(), default);
 
         public static string MapToStreamId(Guid shoppingCartId) =>
             $"shopping_cart-{shoppingCartId}";

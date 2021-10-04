@@ -30,18 +30,21 @@ namespace ECommerce.ShoppingCarts
                                 sp.GetRequiredService<IProductPriceCalculator>(),
                                 command,
                                 shoppingCart),
+                    ShoppingCart.Default,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
                     command => command.Version,
                     ShoppingCart.When
                 )
                 .AddUpdateCommandHandler<RemoveProductItemFromShoppingCart, ShoppingCart>(
                     RemoveProductItemFromShoppingCart.Handle,
+                    ShoppingCart.Default,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
                     command => command.Version,
                     ShoppingCart.When
                 )
                 .AddUpdateCommandHandler<ConfirmShoppingCart, ShoppingCart>(
                     ConfirmShoppingCart.Handle,
+                    ShoppingCart.Default,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
                     command => command.Version,
                     ShoppingCart.When
