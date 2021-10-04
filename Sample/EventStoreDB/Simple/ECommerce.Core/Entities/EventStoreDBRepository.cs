@@ -8,16 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.Core.Entities
 {
-    public interface IEventStoreDBRepository<TEntity> where TEntity: notnull
-    {
-        Task<TEntity> Find(Func<TEntity?, object, TEntity> when, string id, CancellationToken cancellationToken);
-
-        Task Append(string id, object @event, CancellationToken cancellationToken);
-
-        Task Append(string id, object @event, uint version, CancellationToken cancellationToken);
-    }
-
-    public class EventStoreDBRepository<TEntity>: IEventStoreDBRepository<TEntity> where TEntity: class
+    public class EventStoreDBRepository<TEntity>
     {
         private readonly EventStoreClient eventStore;
 
@@ -29,7 +20,8 @@ namespace ECommerce.Core.Entities
         }
 
         public async Task<TEntity> Find(
-            Func<TEntity?, object, TEntity> when,
+            Func<TEntity, object, TEntity> when,
+            Func<TEntity> getDefault,
             string id,
             CancellationToken cancellationToken
         )
@@ -44,7 +36,7 @@ namespace ECommerce.Core.Entities
             return (await readResult
                 .Select(@event => @event.Deserialize())
                 .AggregateAsync(
-                    default,
+                    getDefault(),
                     when,
                     cancellationToken
                 ))!;
@@ -87,6 +79,6 @@ namespace ECommerce.Core.Entities
         public static IServiceCollection AddEventStoreDBRepository<TEntity>(
             this IServiceCollection services
         ) where TEntity : class =>
-            services.AddTransient<IEventStoreDBRepository<TEntity>, EventStoreDBRepository<TEntity>>();
+            services.AddTransient<EventStoreDBRepository<TEntity>, EventStoreDBRepository<TEntity>>();
     }
 }
