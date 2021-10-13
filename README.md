@@ -802,6 +802,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   🎞 [Creating a Blueprint for Microservices and Event Sourcing on AWS](https://itnext.io/creating-a-blueprint-for-microservices-and-event-sourcing-on-aws-291d4d5a5817)
 -   🎞 [Azure Cosmos DB Conf - Implementing an Event Sourcing strategy on Azure](https://channel9.msdn.com/Events/Azure-Cosmos-DB/Azure-Cosmos-DB-Conf/Implementing-an-Event-Sourcing-strategy-on-Azure)
 -   📝 [CosmosDB DevBlog - Create a Java Azure Cosmos DB Function Trigger using Visual Studio Code in 2 minutes!](https://devblogs.microsoft.com/cosmosdb/create-a-java-azure-cosmos-db-function-trigger-using-visual-studio-code-in-2-minutes/)
+-   📝 [Towards Data Science - The Design of an Event Store](https://towardsdatascience.com/the-design-of-an-event-store-8c751c47db6f)
 
 ### 13.20 Event Sourcing Concerns
 -   📝 [Kacper Gunia - EventStoreDB vs Kafka](https://domaincentric.net/blog/eventstoredb-vs-kafka)
