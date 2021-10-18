@@ -19,10 +19,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="5.10.3" />
-        <PackageReference Include="Marten" Version="4.0.0-rc.3" />
+        <PackageReference Include="FluentAssertions" Version="6.1.0" />
+        <PackageReference Include="Marten" Version="4.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
         <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
         <PackageReference Include="SharpTestsEx" Version="2.0.0" />
         <PackageReference Include="xunit" Version="2.4.1" />

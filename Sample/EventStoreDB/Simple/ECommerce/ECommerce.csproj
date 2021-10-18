@@ -15,12 +15,12 @@
 
         <PackageReference Include="EventStore.Client.Grpc.Streams" Version="21.2.0" />
 
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.7">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.10">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
     </ItemGroup>
 
     <ItemGroup>

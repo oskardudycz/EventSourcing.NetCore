@@ -58,7 +58,7 @@ namespace Core.Marten
 
                 using (NoSynchronizationContextScope.Enter())
                 {
-                    documentStore.Schema.ApplyAllConfiguredChangesToDatabase().Wait();
+                    documentStore.Schema.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
                 }
             }
             catch
