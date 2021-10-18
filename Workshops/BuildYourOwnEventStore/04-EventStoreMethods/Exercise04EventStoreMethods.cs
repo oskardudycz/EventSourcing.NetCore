@@ -70,7 +70,7 @@ namespace EventStoreBasics.Tests
 
             var events = eventStore.GetEvents(streamId);
 
-            events.Should().HaveCount(2);
+            events.Cast<object>().Should().HaveCount(2);
 
             events.OfType<UserCreated>().Should().Contain(
                 e => e.UserId == userCreated.UserId && e.UserName == userCreated.UserName);

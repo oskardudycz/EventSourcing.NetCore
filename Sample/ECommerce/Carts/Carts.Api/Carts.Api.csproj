@@ -7,14 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.5" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.8">
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.10">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
     </ItemGroup>
 
     <ItemGroup>
