@@ -194,7 +194,6 @@ namespace EventsVersioning.Tests.Transformations
             deserializedEvents[1].Client.Should().Be(eventV2.Client);
             deserializedEvents[1].Status.Should().Be(ShoppingCartStatus.Initialized);
 
-
             deserializedEvents[2].ShoppingCartId.Should().Be(eventV3.ShoppingCartId);
             deserializedEvents[2].Client.Should().Be(eventV3.Client);
             deserializedEvents[2].Status.Should().Be(eventV3.Status);
