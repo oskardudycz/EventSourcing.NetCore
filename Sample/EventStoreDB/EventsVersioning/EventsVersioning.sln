@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.V1", "ECommerce.V1\ECommerce.V1.csproj", "{94989AB6-E4A9-4453-AA58-821C2E94E58F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsVersioning.Tests", "EventsVersioning.Tests\EventsVersioning.Tests.csproj", "{F83C220D-F15E-44C1-9167-3AC3D8BF45DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94989AB6-E4A9-4453-AA58-821C2E94E58F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94989AB6-E4A9-4453-AA58-821C2E94E58F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94989AB6-E4A9-4453-AA58-821C2E94E58F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94989AB6-E4A9-4453-AA58-821C2E94E58F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F83C220D-F15E-44C1-9167-3AC3D8BF45DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F83C220D-F15E-44C1-9167-3AC3D8BF45DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F83C220D-F15E-44C1-9167-3AC3D8BF45DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F83C220D-F15E-44C1-9167-3AC3D8BF45DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
