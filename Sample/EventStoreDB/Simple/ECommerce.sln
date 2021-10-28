@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce", "ECommerce\ECommerce.csproj", "{7AA17923-7368-449B-95E6-5A64C1FAF4B6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Api", "ECommerce.Api\ECommerce.Api.csproj", "{A5F8DE31-400A-4E3F-81FB-08A62E48E9E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce", "ECommerce\ECommerce.csproj", "{7AA17923-7368-449B-95E6-5A64C1FAF4B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Api.Tests", "ECommerce.Api.Tests\ECommerce.Api.Tests.csproj", "{1F59AAB3-7391-4742-9D8B-AE10DBA0BA4C}"
 EndProject
