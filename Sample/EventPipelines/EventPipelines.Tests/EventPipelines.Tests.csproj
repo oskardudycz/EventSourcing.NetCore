@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\EventPipelines.MediatR\EventPipelines.MediatR.csproj" />
       <ProjectReference Include="..\EventPipelines\EventPipelines.csproj" />
     </ItemGroup>
 

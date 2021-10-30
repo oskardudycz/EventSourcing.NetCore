@@ -3,30 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventPipelines.MediatR;
 using FluentAssertions;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace EventPipelines.Tests
 {
-    public class PureFunctionsWithIoCTest
+    public class PureFunctionsWithMediatRTest
     {
         public record UserAdded(
             string FirstName,
             string LastName,
             bool IsAdmin
-        );
+        ) : INotification;
 
         public record AdminAdded(
             string FirstName,
             string LastName
-        );
+        ) : INotification;
 
         public record AdminGrantedInTenant(
             string FirstName,
             string LastName,
             string TenantName
-        );
+        ) : INotification;
 
         public static class AdminPipeline
         {
@@ -57,11 +59,14 @@ namespace EventPipelines.Tests
 
         private readonly IServiceProvider sp;
 
-        public PureFunctionsWithIoCTest()
+        public PureFunctionsWithMediatRTest()
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection
                 .AddEventBus()
+                .RouteEventsFromMediatR()
+                .AddScoped<IMediator, Mediator>()
+                .AddTransient<ServiceFactory>(s => t => s.GetService(t)!)
                 .Filter<UserAdded>(AdminPipeline.IsAdmin)
                 .Transform<UserAdded, AdminAdded>(AdminPipeline.ToAdminAdded)
                 .Handle<AdminAdded>(AdminPipeline.Handle)
@@ -74,7 +79,7 @@ namespace EventPipelines.Tests
         [Fact]
         public async Task ShouldWork()
         {
-            var eventBus = sp.GetRequiredService<IEventBus>();
+            var eventBus = sp.GetRequiredService<IMediator>();
 
             await eventBus.Publish(new UserAdded("Oskar", "TheGrouch", false), CancellationToken.None);
 

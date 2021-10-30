@@ -15,12 +15,10 @@ namespace EventPipelines.Tests
             bool IsAdmin
         );
 
-
         public record AdminAdded(
             string FirstName,
             string LastName
         );
-
 
         public record AdminGrantedInTenant(
             string FirstName,
