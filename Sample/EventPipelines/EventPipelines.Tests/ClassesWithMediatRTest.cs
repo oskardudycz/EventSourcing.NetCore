@@ -1,30 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventPipelines.MediatR;
 using FluentAssertions;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace EventPipelines.Tests
 {
-    public class ClassesWithBuilderTest
+    public class ClassesWithMediatRTest
     {
         public record UserAdded(
             string FirstName,
             string LastName,
             bool IsAdmin
-        );
+        ) : INotification;
 
         public record AdminAdded(
             string FirstName,
             string LastName
-        );
+        ) : INotification;
 
         public record AdminGrantedInTenant(
             string FirstName,
             string LastName,
             string TenantName
-        );
+        ) : INotification;
 
         public class AdminStorage
         {
@@ -88,30 +92,36 @@ namespace EventPipelines.Tests
             }
         }
 
-        private readonly EventHandlersBuilder builder;
-        private readonly AdminStorage adminStorage;
+        private readonly IServiceProvider sp;
 
-        public ClassesWithBuilderTest()
+        public ClassesWithMediatRTest()
         {
-            adminStorage = new AdminStorage();
+            var serviceCollection = new ServiceCollection();
+            serviceCollection
+                .AddSingleton<AdminStorage>()
+                .AddEventBus()
+                .RouteEventsFromMediatR()
+                .AddScoped<IMediator, Mediator>()
+                .AddTransient<ServiceFactory>(s => t => s.GetService(t)!)
+                .AddEventHandler<IsAdmin>()
+                .AddEventHandler<ToAdminAdded>()
+                .AddEventHandler<HandleAdminAdded>()
+                .AddEventHandler<SendToTenants>()
+                .AddEventHandler<HandleAdminGrantedInTenant>();
 
-            builder = EventHandlersBuilder
-                .Setup()
-                .Handle(new IsAdmin())
-                .Handle(new ToAdminAdded())
-                .Handle(new HandleAdminAdded(adminStorage))
-                .Handle(new SendToTenants())
-                .Handle(new HandleAdminGrantedInTenant(adminStorage));
+            sp = serviceCollection.BuildServiceProvider();
         }
 
         [Fact]
         public async Task ShouldWork()
         {
-            var eventBus = new EventBus(builder.Build());
+            var eventBus = sp.GetRequiredService<IMediator>();
 
             await eventBus.Publish(new UserAdded("Oskar", "TheGrouch", false), CancellationToken.None);
 
             await eventBus.Publish(new UserAdded("Big", "Bird", true), CancellationToken.None);
+
+            var adminStorage = sp.GetRequiredService<AdminStorage>();
 
             adminStorage.AdminsInTenants.Should().HaveCount(3);
             adminStorage.GlobalAdmins.Should().HaveCount(1);
