@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ using Xunit;
 
 namespace EventPipelines.Tests
 {
-    public class PureFunctionsTest
+    public class PureFunctionsWithBuilderTest
     {
         public record UserAdded(
             string FirstName,
@@ -56,23 +57,26 @@ namespace EventPipelines.Tests
                 AdminsInTenants.Add(@event);
         }
 
-        private readonly EventHandlersBuilder builder;
+        private readonly IServiceProvider sp;
 
-        public PureFunctionsTest()
+        public PureFunctionsWithBuilderTest()
         {
-            builder = EventHandlersBuilder
-                .Setup()
+            var serviceCollection = new ServiceCollection();
+            serviceCollection
+                .AddEventBus()
                 .Filter<UserAdded>(AdminPipeline.IsAdmin)
                 .Transform<UserAdded, AdminAdded>(AdminPipeline.ToAdminAdded)
                 .Handle<AdminAdded>(AdminPipeline.Handle)
                 .Transform<UserAdded, List<AdminGrantedInTenant>>(AdminPipeline.SendToTenants)
                 .Handle<AdminGrantedInTenant>(AdminPipeline.Handle);
+
+            sp = serviceCollection.BuildServiceProvider();
         }
 
         [Fact]
         public async Task ShouldWork()
         {
-            var eventBus = new EventBus(builder.Build());
+            var eventBus = sp.GetRequiredService<IEventBus>();
 
             await eventBus.Publish(new UserAdded("Oskar", "TheGrouch", false), CancellationToken.None);
 
