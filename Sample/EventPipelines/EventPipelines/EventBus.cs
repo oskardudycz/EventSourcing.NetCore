@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace EventPipelines
 {
-    public delegate ValueTask EventDelegate(object? @event, CancellationToken ct);
-
     public interface IEventBus
     {
         Task Publish(object @event, CancellationToken ct);
@@ -17,31 +16,38 @@ namespace EventPipelines
     {
         Type CanHandle { get; }
 
-        ValueTask Handle(object @event, EventDelegate onNext, CancellationToken ct);
+        ValueTask<object?> Handle(object @event, CancellationToken ct);
     }
 
     public interface IEventHandler<in TEvent>: IEventHandler
-        where TEvent: notnull
     {
         Type IEventHandler.CanHandle => typeof(TEvent);
 
-        async ValueTask IEventHandler.Handle(object @event, EventDelegate onNext, CancellationToken ct)
+        async ValueTask<object?> IEventHandler.Handle(object @event, CancellationToken ct)
         {
             await Handle((TEvent)@event, ct);
-            await onNext(@event, ct);
+            return @event;
         }
 
         ValueTask Handle(TEvent @event, CancellationToken ct);
     }
 
     public class EventHandlerWrapper<TEvent>: IEventHandler<TEvent>
-        where TEvent: notnull
     {
         private readonly Func<TEvent, CancellationToken, ValueTask> handler;
 
         public EventHandlerWrapper(Func<TEvent, CancellationToken, ValueTask> handler)
         {
             this.handler = handler;
+        }
+
+        public EventHandlerWrapper(Action<TEvent> handler)
+        {
+            this.handler = (@event, _) =>
+            {
+                handler(@event);
+                return ValueTask.CompletedTask;
+            };
         }
 
         public ValueTask Handle(TEvent @event, CancellationToken ct) =>
@@ -52,10 +58,9 @@ namespace EventPipelines
     {
         Type IEventHandler.CanHandle => typeof(TEvent);
 
-        async ValueTask IEventHandler.Handle(object @event, EventDelegate onNext, CancellationToken ct)
+        async ValueTask<object?> IEventHandler.Handle(object @event, CancellationToken ct)
         {
-            var transformed = await Handle((TEvent)@event, ct);
-            await onNext(transformed, ct);
+            return await Handle((TEvent)@event, ct);
         }
 
         ValueTask<TTransformedEvent> Handle(TEvent @event, CancellationToken ct);
@@ -71,31 +76,45 @@ namespace EventPipelines
             this.handler = handler;
         }
 
+        public EventTransformationWrapper(Func<TEvent, TTransformedEvent> handler)
+        {
+            this.handler = (@event, _) =>
+            {
+                var result = handler(@event);
+                return ValueTask.FromResult(result);
+            };
+        }
+
         public ValueTask<TTransformedEvent> Handle(TEvent @event, CancellationToken ct) =>
             handler(@event, ct);
+    }
+
+    public class EventTransformationWrapper<TEvent>: EventTransformationWrapper<TEvent, object>
+    {
+        public EventTransformationWrapper(Func<TEvent, CancellationToken, ValueTask<object>> handler) : base(handler)
+        {
+        }
+
+        public EventTransformationWrapper(Func<TEvent, object> handler) : base(handler)
+        {
+        }
     }
 
     public interface IEventFilter<in TEvent> : IEventHandler
     {
         Type IEventHandler.CanHandle => typeof(TEvent);
 
-        async ValueTask IEventHandler.Handle(object @event, EventDelegate onNext, CancellationToken ct)
+        async ValueTask<object?> IEventHandler.Handle(object @event, CancellationToken ct)
         {
             var matches = await Handle((TEvent)@event, ct);
 
-            if (!matches)
-            {
-                await onNext(null, ct);
-            }
-
-            await onNext(@event, ct);
+            return matches ? @event : null;
         }
 
         ValueTask<bool> Handle(TEvent @event, CancellationToken ct);
     }
 
     public class EventFilterWrapper<TEvent>: IEventFilter<TEvent>
-        where TEvent: notnull
     {
         private readonly Func<TEvent, CancellationToken, ValueTask<bool>> handler;
 
@@ -104,49 +123,59 @@ namespace EventPipelines
             this.handler = handler;
         }
 
+        public EventFilterWrapper(Func<TEvent, bool> handler)
+        {
+            this.handler = (@event, _) =>
+            {
+                var result = handler(@event);
+                return ValueTask.FromResult(result);
+            };
+        }
+
         public ValueTask<bool> Handle(TEvent @event, CancellationToken ct) =>
             handler(@event, ct);
     }
 
     public class EventBus: IEventBus
     {
-        private readonly IServiceProvider serviceProvider;
         private readonly IDictionary<Type, List<IEventHandler>> handlers;
 
         public EventBus(
-            IServiceProvider serviceProvider,
             IEnumerable<IEventHandler> handlers
         )
         {
-            this.serviceProvider = serviceProvider;
             this.handlers = handlers
                 .GroupBy(h => h.CanHandle)
                 .ToDictionary(h => h.Key, h => h.ToList());
         }
 
-        public Task Publish(object @event, CancellationToken ct)
+        public async Task Publish(object @event, CancellationToken ct)
         {
             var eventType = @event.GetType();
 
             if (!handlers.TryGetValue(eventType, out var eventHandlers))
                 return;
 
-            return Task.CompletedTask;
-        }
+            foreach (var handler in eventHandlers)
+            {
+                var result = await handler.Handle(@event, ct);
 
-        // {
-        //     using var scope = serviceProvider.CreateScope();
-        //
-        //     var eventHandlers = scope.ServiceProvider
-        //         .GetServices<Func<IServiceProvider, ResolvedEvent, CancellationToken, Task>>();
-        //
-        //     foreach (var handle in eventHandlers)
-        //     {
-        //         await retryPolicy.ExecuteAsync(async token =>
-        //         {
-        //             await handle(scope.ServiceProvider, @event, token);
-        //         }, ct);
-        //     }
+                if(result == null)
+                    break;
+
+                if (result == @event)
+                    continue;
+
+                if (result is IEnumerable enumerable)
+                {
+                    foreach (var newEvent in enumerable)
+                    {
+                        await Publish(newEvent, ct);
+                    }
+                    return;
+                }
+                await Publish(result, ct);
+            }
         }
     }
 }
