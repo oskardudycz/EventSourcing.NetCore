@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace EventPipelines.Tests
@@ -57,26 +55,23 @@ namespace EventPipelines.Tests
                 AdminsInTenants.Add(@event);
         }
 
-        private readonly IServiceProvider sp;
+        private readonly EventHandlersBuilder builder;
 
         public PureFunctionsWithBuilderTest()
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection
-                .AddEventBus()
+            builder = EventHandlersBuilder
+                .Setup()
                 .Filter<UserAdded>(AdminPipeline.IsAdmin)
                 .Transform<UserAdded, AdminAdded>(AdminPipeline.ToAdminAdded)
                 .Handle<AdminAdded>(AdminPipeline.Handle)
                 .Transform<UserAdded, List<AdminGrantedInTenant>>(AdminPipeline.SendToTenants)
                 .Handle<AdminGrantedInTenant>(AdminPipeline.Handle);
-
-            sp = serviceCollection.BuildServiceProvider();
         }
 
         [Fact]
         public async Task ShouldWork()
         {
-            var eventBus = sp.GetRequiredService<IEventBus>();
+            var eventBus = new EventBus(builder.Build());
 
             await eventBus.Publish(new UserAdded("Oskar", "TheGrouch", false), CancellationToken.None);
 

@@ -15,6 +15,10 @@ namespace EventPipelines
             where T : class, IEventHandler =>
             services.AddScoped<IEventHandler>(_ => eventHandler);
 
+        public static IServiceCollection AddEventHandler<T>(this IServiceCollection services)
+            where T : class, IEventHandler =>
+            services.AddScoped<IEventHandler, T>();
+
         public static IServiceCollection Handle<TEvent>(
             this IServiceCollection services,
             Action<TEvent> handler) =>
