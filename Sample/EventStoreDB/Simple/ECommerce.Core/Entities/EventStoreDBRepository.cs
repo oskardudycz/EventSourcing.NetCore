@@ -20,11 +20,10 @@ namespace ECommerce.Core.Entities
         }
 
         public async Task<TEntity> Find(
-            Func<TEntity, object, TEntity> when,
             Func<TEntity> getDefault,
+            Func<TEntity, object, TEntity> when,
             string id,
-            CancellationToken cancellationToken
-        )
+            CancellationToken cancellationToken)
         {
             var readResult = eventStore.ReadStreamAsync(
                 Direction.Forwards,
