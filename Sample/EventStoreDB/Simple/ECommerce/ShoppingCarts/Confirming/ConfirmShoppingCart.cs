@@ -20,7 +20,7 @@ namespace ECommerce.ShoppingCarts.Confirming
 
         public static ShoppingCartConfirmed Handle(ConfirmShoppingCart command, ShoppingCart shoppingCart)
         {
-            if(shoppingCart.Status != ShoppingCartStatus.Pending)
+            if(shoppingCart.IsClosed)
                 throw new InvalidOperationException($"Confirming cart in '{shoppingCart.Status}' status is not allowed.");
 
             return new ShoppingCartConfirmed(

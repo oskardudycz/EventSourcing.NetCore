@@ -16,14 +16,14 @@ namespace ECommerce.ShoppingCarts.GettingCarts
     {
         public static ShoppingCartShortInfo Handle(ShoppingCartInitialized @event)
         {
-            var (shoppingCartId, clientId, shoppingCartStatus) = @event;
+            var (shoppingCartId, clientId) = @event;
 
             return new ShoppingCartShortInfo
             {
                 Id = shoppingCartId,
                 ClientId = clientId,
                 TotalItemsCount = 0,
-                Status = shoppingCartStatus,
+                Status = ShoppingCartStatus.Pending,
                 Version = 0
             };
         }

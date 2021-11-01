@@ -5,8 +5,7 @@ namespace ECommerce.ShoppingCarts
 {
     public record ShoppingCartInitialized(
         Guid ShoppingCartId,
-        Guid ClientId,
-        ShoppingCartStatus ShoppingCartStatus
+        Guid ClientId
     );
 
     public record ProductItemAddedToShoppingCart(
@@ -28,7 +27,9 @@ namespace ECommerce.ShoppingCarts
     {
         Pending = 1,
         Confirmed = 2,
-        Cancelled = 3
+        Cancelled = 4,
+
+        Closed = Confirmed | Cancelled
     }
 
     public record ShoppingCart(
@@ -39,16 +40,18 @@ namespace ECommerce.ShoppingCarts
         DateTime? ConfirmedAt = null
     )
     {
+        public bool IsClosed { get; } = Status.HasFlag(ShoppingCartStatus.Closed);
+
         public static ShoppingCart When(ShoppingCart entity, object @event)
         {
             return @event switch
             {
-                ShoppingCartInitialized (var cartId, var clientId, var cartStatus) =>
+                ShoppingCartInitialized (var cartId, var clientId) =>
                     entity with
                     {
                         Id = cartId,
                         ClientId = clientId,
-                        Status = cartStatus,
+                        Status = ShoppingCartStatus.Pending,
                         ProductItems = ProductItemsList.Empty()
                     },
 
