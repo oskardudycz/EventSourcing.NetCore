@@ -23,8 +23,7 @@ namespace ECommerce.ShoppingCarts.Initializing
 
             return new ShoppingCartInitialized(
                 shoppingCartId,
-                clientId,
-                ShoppingCartStatus.Pending
+                clientId
             );
         }
     }

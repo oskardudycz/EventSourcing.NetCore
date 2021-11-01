@@ -24,13 +24,13 @@ namespace ECommerce.ShoppingCarts.GettingCartById
     {
         public static ShoppingCartDetails Handle(ShoppingCartInitialized @event)
         {
-            var (shoppingCartId, clientId, shoppingCartStatus) = @event;
+            var (shoppingCartId, clientId) = @event;
 
             return new ShoppingCartDetails
             {
                 Id = shoppingCartId,
                 ClientId = clientId,
-                Status = shoppingCartStatus,
+                Status = ShoppingCartStatus.Pending,
                 Version = 0
             };
         }

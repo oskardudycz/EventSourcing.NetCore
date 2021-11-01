@@ -30,7 +30,7 @@ namespace ECommerce.ShoppingCarts.AddingProductItem
         {
             var (cartId, productItem, _) = command;
 
-            if(shoppingCart.Status != ShoppingCartStatus.Pending)
+            if(shoppingCart.IsClosed)
                 throw new InvalidOperationException($"Adding product item for cart in '{shoppingCart.Status}' status is not allowed.");
 
             var pricedProductItem = productPriceCalculator.Calculate(productItem);

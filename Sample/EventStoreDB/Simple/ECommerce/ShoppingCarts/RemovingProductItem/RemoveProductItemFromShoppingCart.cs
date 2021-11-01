@@ -28,7 +28,7 @@ namespace ECommerce.ShoppingCarts.RemovingProductItem
         {
             var (cartId, productItem, _) = command;
 
-            if(shoppingCart.Status != ShoppingCartStatus.Pending)
+            if(shoppingCart.IsClosed)
                 throw new InvalidOperationException($"Adding product item for cart in '{shoppingCart.Status}' status is not allowed.");
 
             shoppingCart.ProductItems.Remove(productItem);
