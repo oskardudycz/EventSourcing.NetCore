@@ -22,25 +22,6 @@ namespace ECommerce.Core.Commands
             await repository.Append(entityId, @event, ct);
         }
 
-        public static async Task HandleUpdateCommand<TCommand, TEntity>(
-            EventStoreDBRepository<TEntity> repository,
-            Func<TCommand, TEntity, object> handle,
-            Func<TEntity> getDefault,
-            Func<TCommand, string> getId,
-            Func<TCommand, uint> getVersion,
-            Func<TEntity, object, TEntity> when,
-            TCommand command,
-            CancellationToken ct
-        ) where TEntity : notnull
-        {
-            var id = getId(command);
-            var entity = await repository.Find(when, getDefault, id, ct);
-
-            var @event = handle(command, entity);
-
-            await repository.Append(id, @event, getVersion(command), ct);
-        }
-
         public static IServiceCollection AddCreateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
             Func<TCommand, object> handle,
@@ -62,31 +43,46 @@ namespace ECommerce.Core.Commands
                         await HandleCreateCommand(repository, handle(sp), getId, command, ct);
                 });
 
-
         public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
+            Func<TEntity> getDefault,
+            Func<TEntity, object, TEntity> when,
             Func<TCommand, TEntity, object> handle,
-            Func<TEntity> getDefault,
             Func<TCommand, string> getId,
-            Func<TCommand, uint> getVersion,
-            Func<TEntity, object, TEntity> when
-        ) where TEntity : notnull =>
-            AddUpdateCommandHandler(services, _ => handle, getDefault, getId, getVersion, when);
+            Func<TCommand, uint> getVersion) where TEntity : notnull =>
+            AddUpdateCommandHandler(services, getDefault, when, _ => handle, getId, getVersion);
 
         public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
-            Func<IServiceProvider, Func<TCommand, TEntity, object>> handle,
             Func<TEntity> getDefault,
+            Func<TEntity, object, TEntity> when,
+            Func<IServiceProvider, Func<TCommand, TEntity, object>> handle,
             Func<TCommand, string> getId,
-            Func<TCommand, uint> getVersion,
-            Func<TEntity, object, TEntity> when
-        ) where TEntity : notnull =>
+            Func<TCommand, uint> getVersion) where TEntity : notnull =>
             services
                 .AddTransient<Func<TCommand, CancellationToken, ValueTask>>(sp =>
                 {
                     var repository = sp.GetRequiredService<EventStoreDBRepository<TEntity>>();
                     return async (command, ct) =>
-                        await HandleUpdateCommand(repository, handle(sp), getDefault, getId, getVersion, when, command, ct);
+                        await HandleUpdateCommand(repository, getDefault, when, handle(sp), getId, getVersion, command, ct);
                 });
+
+        public static async Task HandleUpdateCommand<TCommand, TEntity>(
+            EventStoreDBRepository<TEntity> repository,
+            Func<TEntity> getDefault,
+            Func<TEntity, object, TEntity> when,
+            Func<TCommand, TEntity, object> handle,
+            Func<TCommand, string> getId,
+            Func<TCommand, uint> getVersion,
+            TCommand command,
+            CancellationToken ct) where TEntity : notnull
+        {
+            var id = getId(command);
+            var entity = await repository.Find(getDefault, when, id, ct);
+
+            var @event = handle(command, entity);
+
+            await repository.Append(id, @event, getVersion(command), ct);
+        }
     }
 }

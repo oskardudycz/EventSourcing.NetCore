@@ -23,31 +23,31 @@ namespace ECommerce.ShoppingCarts
                     InitializeShoppingCart.Handle,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                 )
-                .AddUpdateCommandHandler<AddProductItemToShoppingCart, ShoppingCart>(
+                .AddUpdateCommandHandler<AddProductItemToShoppingCart, ShoppingCart>(ShoppingCart.Default,
+                    ShoppingCart.When,
                     sp =>
                         (command, shoppingCart) =>
                             AddProductItemToShoppingCart.Handle(
                                 sp.GetRequiredService<IProductPriceCalculator>(),
                                 command,
-                                shoppingCart),
-                    ShoppingCart.Default,
+                                shoppingCart
+                            ),
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
-                    command => command.Version,
-                    ShoppingCart.When
+                    command => command.Version
                 )
                 .AddUpdateCommandHandler<RemoveProductItemFromShoppingCart, ShoppingCart>(
-                    RemoveProductItemFromShoppingCart.Handle,
                     ShoppingCart.Default,
+                    ShoppingCart.When,
+                    RemoveProductItemFromShoppingCart.Handle,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
-                    command => command.Version,
-                    ShoppingCart.When
+                    command => command.Version
                 )
                 .AddUpdateCommandHandler<ConfirmShoppingCart, ShoppingCart>(
-                    ConfirmShoppingCart.Handle,
                     ShoppingCart.Default,
+                    ShoppingCart.When,
+                    ConfirmShoppingCart.Handle,
                     command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
-                    command => command.Version,
-                    ShoppingCart.When
+                    command => command.Version
                 )
                 .For<ShoppingCartDetails, ECommerceDbContext>(
                     builder => builder
