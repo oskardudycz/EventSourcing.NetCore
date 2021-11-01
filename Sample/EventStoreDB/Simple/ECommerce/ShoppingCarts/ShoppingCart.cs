@@ -81,6 +81,6 @@ namespace ECommerce.ShoppingCarts
             new (default, default, default, ProductItemsList.Empty(), default);
 
         public static string MapToStreamId(Guid shoppingCartId) =>
-            $"shopping_cart-{shoppingCartId}";
+            $"ShoppingCart-{shoppingCartId}";
     }
 }
