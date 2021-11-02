@@ -19,35 +19,35 @@ namespace ECommerce.ShoppingCarts
         public static IServiceCollection AddShoppingCartsModule(this IServiceCollection services) =>
             services
                 .AddEventStoreDBRepository<ShoppingCart>()
-                .AddCreateCommandHandler<InitializeShoppingCart, ShoppingCart>(
-                    InitializeShoppingCart.Handle,
-                    command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
-                )
-                .AddUpdateCommandHandler<AddProductItemToShoppingCart, ShoppingCart>(ShoppingCart.Default,
-                    ShoppingCart.When,
-                    sp =>
-                        (command, shoppingCart) =>
-                            AddProductItemToShoppingCart.Handle(
-                                sp.GetRequiredService<IProductPriceCalculator>(),
-                                command,
-                                shoppingCart
-                            ),
-                    command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
-                    command => command.Version
-                )
-                .AddUpdateCommandHandler<RemoveProductItemFromShoppingCart, ShoppingCart>(
+                .For<ShoppingCart>(
                     ShoppingCart.Default,
                     ShoppingCart.When,
-                    RemoveProductItemFromShoppingCart.Handle,
-                    command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
-                    command => command.Version
-                )
-                .AddUpdateCommandHandler<ConfirmShoppingCart, ShoppingCart>(
-                    ShoppingCart.Default,
-                    ShoppingCart.When,
-                    ConfirmShoppingCart.Handle,
-                    command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
-                    command => command.Version
+                    builder => builder
+                        .AddOn<InitializeShoppingCart>(
+                            InitializeShoppingCart.Handle,
+                            command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
+                        )
+                        .UpdateOn<AddProductItemToShoppingCart>(
+                            sp =>
+                                (command, shoppingCart) =>
+                                    AddProductItemToShoppingCart.Handle(
+                                        sp.GetRequiredService<IProductPriceCalculator>(),
+                                        command,
+                                        shoppingCart
+                                    ),
+                            command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
+                            command => command.Version
+                        )
+                        .UpdateOn<RemoveProductItemFromShoppingCart>(
+                            RemoveProductItemFromShoppingCart.Handle,
+                            command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
+                            command => command.Version
+                        )
+                        .UpdateOn<ConfirmShoppingCart>(
+                            ConfirmShoppingCart.Handle,
+                            command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
+                            command => command.Version
+                        )
                 )
                 .For<ShoppingCartDetails, ECommerceDbContext>(
                     builder => builder

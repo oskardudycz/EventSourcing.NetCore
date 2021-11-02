@@ -27,7 +27,7 @@ namespace ECommerce.Core.Commands
             Func<TCommand, object> handle,
             Func<TCommand, string> getId
         ) where TEntity : notnull =>
-            AddCreateCommandHandler<TCommand, TEntity>(services, _ => handle, getId);
+            services.AddCreateCommandHandler<TCommand, TEntity>(_ => handle, getId);
 
         public static IServiceCollection AddCreateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
@@ -50,7 +50,7 @@ namespace ECommerce.Core.Commands
             Func<TCommand, TEntity, object> handle,
             Func<TCommand, string> getId,
             Func<TCommand, uint> getVersion) where TEntity : notnull =>
-            AddUpdateCommandHandler(services, getDefault, when, _ => handle, getId, getVersion);
+            services.AddUpdateCommandHandler(getDefault, when, _ => handle, getId, getVersion);
 
         public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
             this IServiceCollection services,
@@ -64,7 +64,8 @@ namespace ECommerce.Core.Commands
                 {
                     var repository = sp.GetRequiredService<EventStoreDBRepository<TEntity>>();
                     return async (command, ct) =>
-                        await HandleUpdateCommand(repository, getDefault, when, handle(sp), getId, getVersion, command, ct);
+                        await HandleUpdateCommand(repository, getDefault, when, handle(sp), getId, getVersion, command,
+                            ct);
                 });
 
         public static async Task HandleUpdateCommand<TCommand, TEntity>(
@@ -83,6 +84,74 @@ namespace ECommerce.Core.Commands
             var @event = handle(command, entity);
 
             await repository.Append(id, @event, getVersion(command), ct);
+        }
+
+        public static IServiceCollection For<TEntity>(
+            this IServiceCollection services,
+            Func<TEntity> getDefault,
+            Func<TEntity, object, TEntity> when,
+            Action<CommandHandlersBuilder<TEntity>> setup
+        )
+            where TEntity : class
+        {
+            setup(new CommandHandlersBuilder<TEntity>(services, getDefault, when));
+            return services;
+        }
+
+        public class CommandHandlersBuilder<TEntity>
+            where TEntity : class
+        {
+            public readonly IServiceCollection services;
+            private readonly Func<TEntity> getDefault;
+            private readonly Func<TEntity, object, TEntity> when;
+
+            public CommandHandlersBuilder(
+                IServiceCollection services,
+                Func<TEntity> getDefault,
+                Func<TEntity, object, TEntity> when
+            )
+            {
+                this.services = services;
+                this.getDefault = getDefault;
+                this.when = when;
+            }
+
+            public CommandHandlersBuilder<TEntity> AddOn<TCommand>(
+                Func<TCommand, object> handle,
+                Func<TCommand, string> getId
+            )
+            {
+                services.AddCreateCommandHandler<TCommand, TEntity>(_ => handle, getId);
+                return this;
+            }
+
+            public CommandHandlersBuilder<TEntity> AddOn<TCommand>(
+                Func<IServiceProvider, Func<TCommand, object>> handle,
+                Func<TCommand, string> getId
+            )
+            {
+                services.AddCreateCommandHandler<TCommand, TEntity>(_ => handle, getId);
+                return this;
+            }
+
+            public CommandHandlersBuilder<TEntity> UpdateOn<TCommand>(
+                Func<TCommand, TEntity, object> handle,
+                Func<TCommand, string> getId,
+                Func<TCommand, uint> getVersion)
+            {
+                services.AddUpdateCommandHandler(getDefault, when, _ => handle, getId, getVersion);
+                return this;
+            }
+
+            public CommandHandlersBuilder<TEntity> UpdateOn<TCommand>(
+                Func<IServiceProvider, Func<TCommand, TEntity, object>> handle,
+                Func<TCommand, string> getId,
+                Func<TCommand, uint> getVersion
+            )
+            {
+                services.AddUpdateCommandHandler(getDefault, when, handle, getId, getVersion);
+                return this;
+            }
         }
     }
 }
