@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using ECommerce.Core.Serialisation;
-using ECommerce.Core.Subscriptions;
+﻿using ECommerce.Core.Subscriptions;
 using EventStore.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
