@@ -1,5 +1,4 @@
 ﻿using ECommerce.Core.Commands;
-using ECommerce.Core.Entities;
 using ECommerce.Core.Projections;
 using ECommerce.Pricing.ProductPricing;
 using ECommerce.ShoppingCarts.AddingProductItem;
@@ -18,7 +17,6 @@ namespace ECommerce.ShoppingCarts
     {
         public static IServiceCollection AddShoppingCartsModule(this IServiceCollection services) =>
             services
-                .AddEventStoreDBRepository<ShoppingCart>()
                 .For<ShoppingCart>(
                     ShoppingCart.Default,
                     ShoppingCart.When,
