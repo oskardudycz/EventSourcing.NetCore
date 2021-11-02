@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ECommerce.Core.EventStoreDB;
 using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
 
