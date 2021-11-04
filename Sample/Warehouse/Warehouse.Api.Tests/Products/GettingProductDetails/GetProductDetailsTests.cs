@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Core.Api.Testing;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
+using Warehouse.Api.Tests.Products.RegisteringProduct;
 using Warehouse.Products.GettingProductDetails;
-using Warehouse.Products.RegisteringProduct;
 using Xunit;
 
 namespace Warehouse.Api.Tests.Products.GettingProductDetails

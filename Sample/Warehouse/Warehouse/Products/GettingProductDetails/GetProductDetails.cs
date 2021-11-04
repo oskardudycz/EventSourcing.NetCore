@@ -19,7 +19,8 @@ namespace Warehouse.Products.GettingProductDetails
 
         public async ValueTask<ProductDetails?> Handle(GetProductDetails query, CancellationToken ct)
         {
-            // await is needed because of https://github.com/dotnet/efcore/issues/21793#issuecomment-667096367
+            // btw. SingleOrDefaultAsync do not work properly with NullableReferenceTypes
+            // See more in: https://github.com/dotnet/efcore/issues/21793#issuecomment-667096367
             var product = await products
                 .SingleOrDefaultAsync(p => p.Id == query.ProductId, ct);
 

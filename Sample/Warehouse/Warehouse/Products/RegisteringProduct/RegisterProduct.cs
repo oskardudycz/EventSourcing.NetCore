@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Warehouse.Core.Commands;
+using Warehouse.Core.Primitives;
 using Warehouse.Products.Primitives;
 
 namespace Warehouse.Products.RegisteringProduct
 {
-    internal class HandleRegisterProduct : ICommandHandler<RegisterProduct>
+    internal class HandleRegisterProduct: ICommandHandler<RegisterProduct>
     {
         private readonly Func<Product, CancellationToken, ValueTask> addProduct;
         private readonly Func<SKU, CancellationToken, ValueTask<bool>> productWithSKUExists;
@@ -20,49 +22,51 @@ namespace Warehouse.Products.RegisteringProduct
             this.productWithSKUExists = productWithSKUExists;
         }
 
-        public async ValueTask Handle(RegisterProduct command, CancellationToken ct)
+        public async ValueTask<CommandResult> Handle(RegisterProduct command, CancellationToken ct)
         {
+            var productId = Guid.NewGuid();
+            var (skuValue, name, description) = command;
+
+            var sku = SKU.Create(skuValue);
+
             var product = new Product(
-                command.ProductId,
-                command.SKU,
-                command.Name,
-                command.Description
+                productId,
+                sku,
+                name,
+                description
             );
 
-            if (await productWithSKUExists(command.SKU, ct))
+            if (await productWithSKUExists(sku, ct))
                 throw new InvalidOperationException(
-                    $"Product with SKU `{command.SKU} already exists.");
+                    $"Product with SKU `{command.Sku} already exists.");
 
             await addProduct(product, ct);
+
+            return CommandResult.Of(productId);
         }
     }
 
     public record RegisterProduct
     {
-        public Guid ProductId { get;}
-
-        public SKU SKU { get; }
+        public string Sku { get; }
 
         public string Name { get; }
 
         public string? Description { get; }
 
-        private RegisterProduct(Guid productId, SKU sku, string name, string? description)
+        [JsonConstructor]
+        public RegisterProduct(string? sku, string? name, string? description)
         {
-            ProductId = productId;
-            SKU = sku;
-            Name = name;
+            Sku = sku.AssertNotEmpty();
+            Name = name.AssertNotEmpty();
             Description = description;
         }
 
-        public static RegisterProduct Create(Guid? id, string? sku, string? name, string? description)
+        public void Deconstruct(out string sku, out string name, out string? description)
         {
-            if (!id.HasValue || id == Guid.Empty) throw new ArgumentOutOfRangeException(nameof(id));
-            if (string.IsNullOrEmpty(sku)) throw new ArgumentOutOfRangeException(nameof(sku));
-            if (string.IsNullOrEmpty(name)) throw new ArgumentOutOfRangeException(nameof(name));
-            if (description is "") throw new ArgumentOutOfRangeException(nameof(name));
-
-            return new RegisterProduct(id.Value, SKU.Create(sku), name, description);
+            sku = Sku;
+            name = Name;
+            description = Description;
         }
     }
 }
