@@ -52,7 +52,7 @@ namespace EventStoreBasics
                 AppendEvent<TStream>(aggregate.Id, @event, initialVersion++);
 
                 foreach (var projection in projections.Where(
-                    projection => projection.Handles.Contains(@event.GetType())))
+                             projection => projection.Handles.Contains(@event.GetType())))
                 {
                     projection.Handle(@event);
                 }
@@ -65,7 +65,8 @@ namespace EventStoreBasics
             return true;
         }
 
-        public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null) where TStream: notnull
+        public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null)
+            where TStream : notnull
         {
             return databaseConnection.QuerySingle<bool>(
                 "SELECT append_event(@Id, @Data::jsonb, @Type, @StreamId, @StreamType, @ExpectedVersion)",
@@ -82,7 +83,8 @@ namespace EventStoreBasics
             );
         }
 
-        public T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null) where T: notnull
+        public T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
+            where T : notnull
         {
             var aggregate = (T)Activator.CreateInstance(typeof(T), true)!;
 
@@ -118,12 +120,15 @@ namespace EventStoreBasics
 
         public IEnumerable GetEvents(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
         {
-            const string getStreamSql =
-                @"SELECT id, data, stream_id, type, version, created
+            var atStreamCondition = atStreamVersion != null ? "AND version <= @atStreamVersion" : string.Empty;
+            var atTimestampCondition = atTimestamp != null ? "AND created <= @atTimestamp" : string.Empty;
+
+            var getStreamSql =
+                @$"SELECT id, data, stream_id, type, version, created
                   FROM events
                   WHERE stream_id = @streamId
-                  AND (@atStreamVersion IS NULL OR version <= @atStreamVersion)
-                  AND (@atTimestamp IS NULL OR created <= @atTimestamp)
+                  {atStreamCondition}
+                  {atTimestampCondition}
                   ORDER BY version";
 
             return databaseConnection
