@@ -15,7 +15,7 @@ namespace Shipments.Packages
     {
         Task<Package> SendPackage(SendPackage request, CancellationToken cancellationToken = default);
         Task DeliverPackage(DeliverPackage request, CancellationToken cancellationToken = default);
-        Task<Package> GetById(Guid id);
+        Task<Package> GetById(Guid id, CancellationToken ct);
     }
 
     internal class PackageService: IPackageService
@@ -38,11 +38,17 @@ namespace Shipments.Packages
                                               throw new ArgumentNullException(nameof(productAvailabilityService));
         }
 
-        public Task<Package> GetById(Guid id)
+        public async Task<Package> GetById(Guid id, CancellationToken ct)
         {
-            return dbContext.Packages
+            var package = await dbContext.Packages
                 .Include(p => p.ProductItems)
-                .SingleOrDefaultAsync(p => p.Id == id);
+                .SingleOrDefaultAsync(p => p.Id == id, ct);
+
+
+            if (package == null)
+                throw new InvalidOperationException($"Package with id {id} wasn't found");
+
+            return package;
         }
 
         public async Task<Package> SendPackage(SendPackage request, CancellationToken cancellationToken = default)
@@ -82,7 +88,7 @@ namespace Shipments.Packages
 
         public async Task DeliverPackage(DeliverPackage request, CancellationToken cancellationToken = default)
         {
-            var package = await Packages.FindAsync(request.Id, cancellationToken);
+            var package = await GetById(request.Id, cancellationToken);
 
             Packages.Update(package);
 

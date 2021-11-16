@@ -18,16 +18,16 @@ namespace ECommerce.ShoppingCarts.GettingCartById
             return new GetCartById(cartId);
         }
 
-        public static Task<ShoppingCartDetails> Handle(
+        public static async Task<ShoppingCartDetails> Handle(
             IQueryable<ShoppingCartDetails> shoppingCarts,
             GetCartById query,
             CancellationToken ct
         )
         {
-            return shoppingCarts
+            return await shoppingCarts
                 .SingleOrDefaultAsync(
                     x => x.Id == query.ShoppingCartId, ct
-                );
+                ) ?? throw new InvalidOperationException();
         }
     }
 }

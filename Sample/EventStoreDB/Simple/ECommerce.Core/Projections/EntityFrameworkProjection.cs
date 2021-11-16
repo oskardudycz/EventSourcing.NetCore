@@ -131,6 +131,9 @@ namespace ECommerce.Core.Projections
             var viewId = getViewId(@event);
             var view = await dbContext.FindAsync<TView>(new [] {viewId}, ct);
 
+            if (view == null)
+                throw new InvalidOperationException($"{typeof(TView).Name} with id {viewId} wasn't found");
+
             prepare?.Invoke(dbContext.Entry(view), ct);
 
             update(@event, view);

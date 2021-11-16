@@ -113,12 +113,19 @@ namespace ECommerce.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public Task<ShoppingCartDetails> Get(
-            [FromServices] Func<GetCartById, CancellationToken, Task<ShoppingCartDetails>> query,
+        public async Task<IActionResult> Get(
+            [FromServices] Func<GetCartById, CancellationToken, Task<ShoppingCartDetails?>> query,
             Guid id,
             CancellationToken ct
-        ) =>
-            query(GetCartById.From(id), ct);
+        )
+        {
+            var result = await query(GetCartById.From(id), ct);
+
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
 
         [HttpGet]
         public Task<IReadOnlyList<ShoppingCartShortInfo>> Get(
