@@ -10,8 +10,8 @@ namespace Core.Api.Testing
         {
             var result = await response.Content.ReadAsStringAsync();
 
-            result.Should().NotBeNull()
-                .And.Should().NotBe(string.Empty);
+            result.Should().NotBeNull();
+            result.Should().NotBeEmpty();
 
             return result.FromJson<T>();
         }
