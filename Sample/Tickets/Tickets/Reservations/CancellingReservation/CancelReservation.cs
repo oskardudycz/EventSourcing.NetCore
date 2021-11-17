@@ -6,48 +6,47 @@ using Core.Exceptions;
 using Core.Repositories;
 using MediatR;
 
-namespace Tickets.Reservations.CancellingReservation
+namespace Tickets.Reservations.CancellingReservation;
+
+public class CancelReservation : ICommand
 {
-    public class CancelReservation : ICommand
+    public Guid ReservationId { get; }
+
+    private CancelReservation(Guid reservationId)
     {
-        public Guid ReservationId { get; }
-
-        private CancelReservation(Guid reservationId)
-        {
-            ReservationId = reservationId;
-        }
-
-        public static CancelReservation Create(Guid? reservationId)
-        {
-            if (!reservationId.HasValue)
-                throw new ArgumentNullException(nameof(reservationId));
-
-            return new CancelReservation(reservationId.Value);
-        }
+        ReservationId = reservationId;
     }
 
-    internal class HandleCancelReservation:
-        ICommandHandler<CancelReservation>
+    public static CancelReservation Create(Guid? reservationId)
     {
-        private readonly IRepository<Reservation> repository;
+        if (!reservationId.HasValue)
+            throw new ArgumentNullException(nameof(reservationId));
 
-        public HandleCancelReservation(
-            IRepository<Reservation> repository
-        )
-        {
-            this.repository = repository;
-        }
+        return new CancelReservation(reservationId.Value);
+    }
+}
 
-        public async Task<Unit> Handle(CancelReservation command, CancellationToken cancellationToken)
-        {
-            var reservation = await repository.Find(command.ReservationId, cancellationToken)
-                              ?? throw AggregateNotFoundException.For<Reservation>(command.ReservationId);
+internal class HandleCancelReservation:
+    ICommandHandler<CancelReservation>
+{
+    private readonly IRepository<Reservation> repository;
 
-            reservation.Cancel();
+    public HandleCancelReservation(
+        IRepository<Reservation> repository
+    )
+    {
+        this.repository = repository;
+    }
 
-            await repository.Update(reservation, cancellationToken);
+    public async Task<Unit> Handle(CancelReservation command, CancellationToken cancellationToken)
+    {
+        var reservation = await repository.Find(command.ReservationId, cancellationToken)
+                          ?? throw AggregateNotFoundException.For<Reservation>(command.ReservationId);
 
-            return Unit.Value;
-        }
+        reservation.Cancel();
+
+        await repository.Update(reservation, cancellationToken);
+
+        return Unit.Value;
     }
 }

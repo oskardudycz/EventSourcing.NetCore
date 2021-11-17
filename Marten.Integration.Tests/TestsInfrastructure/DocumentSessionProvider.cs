@@ -1,14 +1,13 @@
 using System;
 
-namespace Marten.Integration.Tests.TestsInfrastructure
-{
-    public static class DocumentSessionProvider
-    {
-        public static IDocumentSession Get(string? schemaName = null, Action<StoreOptions>? setOptions = null)
-        {
-            var store = DocumentStoreProvider.Get(schemaName, setOptions);
+namespace Marten.Integration.Tests.TestsInfrastructure;
 
-            return store.OpenSession();
-        }
+public static class DocumentSessionProvider
+{
+    public static IDocumentSession Get(string? schemaName = null, Action<StoreOptions>? setOptions = null)
+    {
+        var store = DocumentStoreProvider.Get(schemaName, setOptions);
+
+        return store.OpenSession();
     }
 }

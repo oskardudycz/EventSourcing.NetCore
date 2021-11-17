@@ -4,28 +4,27 @@ using System.Threading.Tasks;
 using Core.Queries;
 using Marten;
 
-namespace SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasurements
+namespace SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasurements;
+
+public class GetTemperatureMeasurements: IQuery<IReadOnlyList<TemperatureMeasurement>>
 {
-    public class GetTemperatureMeasurements: IQuery<IReadOnlyList<TemperatureMeasurement>>
+    public static GetTemperatureMeasurements Create()
     {
-        public static GetTemperatureMeasurements Create()
-        {
-            return new();
-        }
+        return new();
+    }
+}
+
+public class HandleGetTemperatureMeasurements: IQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>
+{
+    private readonly IDocumentSession querySession;
+
+    public HandleGetTemperatureMeasurements(IDocumentSession querySession)
+    {
+        this.querySession = querySession;
     }
 
-    public class HandleGetTemperatureMeasurements: IQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>
+    public Task<IReadOnlyList<TemperatureMeasurement>> Handle(GetTemperatureMeasurements request, CancellationToken cancellationToken)
     {
-        private readonly IDocumentSession querySession;
-
-        public HandleGetTemperatureMeasurements(IDocumentSession querySession)
-        {
-            this.querySession = querySession;
-        }
-
-        public Task<IReadOnlyList<TemperatureMeasurement>> Handle(GetTemperatureMeasurements request, CancellationToken cancellationToken)
-        {
-            return querySession.Query<TemperatureMeasurement>().ToListAsync(cancellationToken);
-        }
+        return querySession.Query<TemperatureMeasurement>().ToListAsync(cancellationToken);
     }
 }

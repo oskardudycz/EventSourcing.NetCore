@@ -5,41 +5,40 @@ using Core.Exceptions;
 using Core.Queries;
 using Marten;
 
-namespace Carts.Carts.GettingCartById
+namespace Carts.Carts.GettingCartById;
+
+public class GetCartById : IQuery<CartDetails>
 {
-    public class GetCartById : IQuery<CartDetails>
+    public Guid CartId { get; }
+
+    private GetCartById(Guid cartId)
     {
-        public Guid CartId { get; }
-
-        private GetCartById(Guid cartId)
-        {
-            CartId = cartId;
-        }
-
-        public static GetCartById Create(Guid? cartId)
-        {
-            if (cartId == null || cartId == Guid.Empty)
-                throw new ArgumentOutOfRangeException(nameof(cartId));
-
-            return new GetCartById(cartId.Value);
-        }
+        CartId = cartId;
     }
 
-    internal class HandleGetCartById :
-        IQueryHandler<GetCartById, CartDetails>
+    public static GetCartById Create(Guid? cartId)
     {
-        private readonly IDocumentSession querySession;
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
 
-        public HandleGetCartById(IDocumentSession querySession)
-        {
-            this.querySession = querySession;
-        }
+        return new GetCartById(cartId.Value);
+    }
+}
 
-        public async Task<CartDetails> Handle(GetCartById request, CancellationToken cancellationToken)
-        {
-            var cart = await querySession.LoadAsync<CartDetails>(request.CartId, cancellationToken);
+internal class HandleGetCartById :
+    IQueryHandler<GetCartById, CartDetails>
+{
+    private readonly IDocumentSession querySession;
 
-            return cart ?? throw AggregateNotFoundException.For<Cart>(request.CartId);
-        }
+    public HandleGetCartById(IDocumentSession querySession)
+    {
+        this.querySession = querySession;
+    }
+
+    public async Task<CartDetails> Handle(GetCartById request, CancellationToken cancellationToken)
+    {
+        var cart = await querySession.LoadAsync<CartDetails>(request.CartId, cancellationToken);
+
+        return cart ?? throw AggregateNotFoundException.For<Cart>(request.CartId);
     }
 }

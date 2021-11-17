@@ -4,75 +4,74 @@ using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
 using Xunit;
 
-namespace Marten.Integration.Tests.EventStore.Stream
+namespace Marten.Integration.Tests.EventStore.Stream;
+
+public class StreamLoading: MartenTest
 {
-    public class StreamLoading: MartenTest
+    public record IssueCreated(
+        Guid IssueId,
+        string Description
+    );
+
+    public record IssueUpdated(
+        Guid IssueId,
+        string Description
+    );
+
+    private readonly Guid issueId = Guid.NewGuid();
+
+    private Guid GetExistingStreamId()
     {
-        public record IssueCreated(
-            Guid IssueId,
-            string Description
-        );
+        var @event = new IssueCreated(issueId, "Description");
+        var streamId = EventStore.StartStream(@event).Id;
+        Session.SaveChanges();
 
-        public record IssueUpdated(
-            Guid IssueId,
-            string Description
-        );
+        return streamId;
+    }
 
-        private readonly Guid issueId = Guid.NewGuid();
+    [Fact]
+    public void GivenExistingStream_WithOneEventWhenStreamIsLoaded_ThenItLoadsOneEvent()
+    {
+        //Given
+        var streamId = GetExistingStreamId();
 
-        private Guid GetExistingStreamId()
-        {
-            var @event = new IssueCreated(issueId, "Description");
-            var streamId = EventStore.StartStream(@event).Id;
-            Session.SaveChanges();
+        //When
+        var events = EventStore.FetchStream(streamId);
 
-            return streamId;
-        }
+        //Then
+        events.Count.Should().Be.EqualTo(1);
+        events.First().Version.Should().Be.EqualTo(1);
+    }
 
-        [Fact]
-        public void GivenExistingStream_WithOneEventWhenStreamIsLoaded_ThenItLoadsOneEvent()
-        {
-            //Given
-            var streamId = GetExistingStreamId();
+    [Fact]
+    public void GivenExistingStreamWithOneEvent_WhenEventIsAppended_ThenItLoadsTwoEvents()
+    {
+        //Given
+        var streamId = GetExistingStreamId();
 
-            //When
-            var events = EventStore.FetchStream(streamId);
+        //When
+        EventStore.Append(streamId, new IssueUpdated(issueId, "New Description"));
+        Session.SaveChanges();
 
-            //Then
-            events.Count.Should().Be.EqualTo(1);
-            events.First().Version.Should().Be.EqualTo(1);
-        }
+        //Then
+        var events = EventStore.FetchStream(streamId);
 
-        [Fact]
-        public void GivenExistingStreamWithOneEvent_WhenEventIsAppended_ThenItLoadsTwoEvents()
-        {
-            //Given
-            var streamId = GetExistingStreamId();
+        events.Count.Should().Be.EqualTo(2);
+        events.Last().Version.Should().Be.EqualTo(2);
+    }
 
-            //When
-            EventStore.Append(streamId, new IssueUpdated(issueId, "New Description"));
-            Session.SaveChanges();
+    [Fact]
+    public void GivenExistingStreamWithOneEvent_WhenStreamIsLoadedByEventType_ThenItLoadsOneEvent()
+    {
+        //Given
+        var streamId = GetExistingStreamId();
+        var eventId = EventStore.FetchStream(streamId).Single().Id;
 
-            //Then
-            var events = EventStore.FetchStream(streamId);
+        //When
+        var @event = EventStore.Load<IssueCreated>(eventId);
 
-            events.Count.Should().Be.EqualTo(2);
-            events.Last().Version.Should().Be.EqualTo(2);
-        }
-
-        [Fact]
-        public void GivenExistingStreamWithOneEvent_WhenStreamIsLoadedByEventType_ThenItLoadsOneEvent()
-        {
-            //Given
-            var streamId = GetExistingStreamId();
-            var eventId = EventStore.FetchStream(streamId).Single().Id;
-
-            //When
-            var @event = EventStore.Load<IssueCreated>(eventId);
-
-            //Then
-            @event.Should().Not.Be.Null();
-            @event.Id.Should().Be.EqualTo(eventId);
-        }
+        //Then
+        @event.Should().Not.Be.Null();
+        @event.Id.Should().Be.EqualTo(eventId);
     }
 }

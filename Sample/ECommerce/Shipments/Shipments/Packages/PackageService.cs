@@ -9,107 +9,106 @@ using Shipments.Packages.Requests;
 using Shipments.Products;
 using Shipments.Storage;
 
-namespace Shipments.Packages
+namespace Shipments.Packages;
+
+public interface IPackageService
 {
-    public interface IPackageService
+    Task<Package> SendPackage(SendPackage request, CancellationToken cancellationToken = default);
+    Task DeliverPackage(DeliverPackage request, CancellationToken cancellationToken = default);
+    Task<Package> GetById(Guid id, CancellationToken ct);
+}
+
+internal class PackageService: IPackageService
+{
+    private readonly ShipmentsDbContext dbContext;
+    private readonly IEventBus eventBus;
+    private readonly IProductAvailabilityService productAvailabilityService;
+
+    private DbSet<Package> Packages => dbContext.Packages;
+
+    public PackageService(
+        ShipmentsDbContext dbContext,
+        IEventBus eventBus,
+        IProductAvailabilityService productAvailabilityService
+    )
     {
-        Task<Package> SendPackage(SendPackage request, CancellationToken cancellationToken = default);
-        Task DeliverPackage(DeliverPackage request, CancellationToken cancellationToken = default);
-        Task<Package> GetById(Guid id, CancellationToken ct);
+        this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        this.productAvailabilityService = productAvailabilityService ??
+                                          throw new ArgumentNullException(nameof(productAvailabilityService));
     }
 
-    internal class PackageService: IPackageService
+    public async Task<Package> GetById(Guid id, CancellationToken ct)
     {
-        private readonly ShipmentsDbContext dbContext;
-        private readonly IEventBus eventBus;
-        private readonly IProductAvailabilityService productAvailabilityService;
+        var package = await dbContext.Packages
+            .Include(p => p.ProductItems)
+            .SingleOrDefaultAsync(p => p.Id == id, ct);
 
-        private DbSet<Package> Packages => dbContext.Packages;
 
-        public PackageService(
-            ShipmentsDbContext dbContext,
-            IEventBus eventBus,
-            IProductAvailabilityService productAvailabilityService
-        )
+        if (package == null)
+            throw new InvalidOperationException($"Package with id {id} wasn't found");
+
+        return package;
+    }
+
+    public async Task<Package> SendPackage(SendPackage request, CancellationToken cancellationToken = default)
+    {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        if (request.ProductItems?.Count == 0)
+            throw new ArgumentException("It's not possible to send package with empty product items");
+
+        if (!productAvailabilityService.IsEnoughOf(request.ProductItems!.ToArray()))
         {
-            this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-            this.productAvailabilityService = productAvailabilityService ??
-                                              throw new ArgumentNullException(nameof(productAvailabilityService));
+            await Publish(new ProductWasOutOfStock(request.OrderId, DateTime.UtcNow));
+            throw new ArgumentOutOfRangeException(nameof(request.ProductItems), "Cannot send package - product was out of stock.");
         }
 
-        public async Task<Package> GetById(Guid id, CancellationToken ct)
+        var package = new Package
         {
-            var package = await dbContext.Packages
-                .Include(p => p.ProductItems)
-                .SingleOrDefaultAsync(p => p.Id == id, ct);
+            Id = Guid.NewGuid(),
+            OrderId = request.OrderId,
+            ProductItems = request.ProductItems.Select(pi =>
+                new ProductItem {Id = Guid.NewGuid(), ProductId = pi.ProductId, Quantity = pi.Quantity}).ToList(),
+            SentAt = DateTime.UtcNow
+        };
 
+        await Packages.AddAsync(package, cancellationToken);
 
-            if (package == null)
-                throw new InvalidOperationException($"Package with id {id} wasn't found");
+        var @event = new PackageWasSent(package.Id,
+            package.OrderId,
+            package.ProductItems,
+            package.SentAt);
 
-            return package;
-        }
+        await SaveChangesAndPublish(@event, cancellationToken);
 
-        public async Task<Package> SendPackage(SendPackage request, CancellationToken cancellationToken = default)
-        {
-            if (request == null)
-                throw new ArgumentNullException(nameof(request));
+        return package;
+    }
 
-            if (request.ProductItems?.Count == 0)
-                throw new ArgumentException("It's not possible to send package with empty product items");
+    public async Task DeliverPackage(DeliverPackage request, CancellationToken cancellationToken = default)
+    {
+        var package = await GetById(request.Id, cancellationToken);
 
-            if (!productAvailabilityService.IsEnoughOf(request.ProductItems!.ToArray()))
-            {
-                await Publish(new ProductWasOutOfStock(request.OrderId, DateTime.UtcNow));
-                throw new ArgumentOutOfRangeException(nameof(request.ProductItems), "Cannot send package - product was out of stock.");
-            }
+        Packages.Update(package);
 
-            var package = new Package
-            {
-                Id = Guid.NewGuid(),
-                OrderId = request.OrderId,
-                ProductItems = request.ProductItems.Select(pi =>
-                    new ProductItem {Id = Guid.NewGuid(), ProductId = pi.ProductId, Quantity = pi.Quantity}).ToList(),
-                SentAt = DateTime.UtcNow
-            };
+        await SaveChanges(cancellationToken);
+    }
 
-            await Packages.AddAsync(package, cancellationToken);
+    private async Task SaveChangesAndPublish(IEvent @event, CancellationToken cancellationToken = default)
+    {
+        await SaveChanges(cancellationToken);
 
-            var @event = new PackageWasSent(package.Id,
-                package.OrderId,
-                package.ProductItems,
-                package.SentAt);
+        await Publish(@event);
+    }
 
-            await SaveChangesAndPublish(@event, cancellationToken);
+    private async Task Publish(IEvent @event)
+    {
+        await eventBus.Publish(@event);
+    }
 
-            return package;
-        }
-
-        public async Task DeliverPackage(DeliverPackage request, CancellationToken cancellationToken = default)
-        {
-            var package = await GetById(request.Id, cancellationToken);
-
-            Packages.Update(package);
-
-            await SaveChanges(cancellationToken);
-        }
-
-        private async Task SaveChangesAndPublish(IEvent @event, CancellationToken cancellationToken = default)
-        {
-            await SaveChanges(cancellationToken);
-
-            await Publish(@event);
-        }
-
-        private async Task Publish(IEvent @event)
-        {
-            await eventBus.Publish(@event);
-        }
-
-        private Task SaveChanges(CancellationToken cancellationToken = default)
-        {
-            return dbContext.SaveChangesAsync(cancellationToken);
-        }
+    private Task SaveChanges(CancellationToken cancellationToken = default)
+    {
+        return dbContext.SaveChangesAsync(cancellationToken);
     }
 }

@@ -7,33 +7,32 @@ using Shipments.Packages;
 using Shipments.Products;
 using Shipments.Storage;
 
-namespace Shipments
+namespace Shipments;
+
+public static class Config
 {
-    public static class Config
+    public static IServiceCollection AddShipmentsModule(this IServiceCollection services, IConfiguration config)
     {
-        public static IServiceCollection AddShipmentsModule(this IServiceCollection services, IConfiguration config)
-        {
-            return services
-                .AddEntityFramework(config)
-                .AddPackages()
-                .AddProducts();
-        }
+        return services
+            .AddEntityFramework(config)
+            .AddPackages()
+            .AddProducts();
+    }
 
-        private static IServiceCollection AddEntityFramework(this IServiceCollection services, IConfiguration config)
-        {
-            return services.AddDbContext<ShipmentsDbContext>(
-                options => options.UseNpgsql("name=ConnectionStrings:ShipmentsDatabase"));
-        }
+    private static IServiceCollection AddEntityFramework(this IServiceCollection services, IConfiguration config)
+    {
+        return services.AddDbContext<ShipmentsDbContext>(
+            options => options.UseNpgsql("name=ConnectionStrings:ShipmentsDatabase"));
+    }
 
-        public static void ConfigureShipmentsModule(this IApplicationBuilder app)
-        {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+    public static void ConfigureShipmentsModule(this IApplicationBuilder app)
+    {
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
-            if (environment == "Development")
-            {
-                using var serviceScope = app.ApplicationServices.CreateScope();
-                serviceScope.ServiceProvider.GetRequiredService<ShipmentsDbContext>().Database.Migrate();
-            }
+        if (environment == "Development")
+        {
+            using var serviceScope = app.ApplicationServices.CreateScope();
+            serviceScope.ServiceProvider.GetRequiredService<ShipmentsDbContext>().Database.Migrate();
         }
     }
 }

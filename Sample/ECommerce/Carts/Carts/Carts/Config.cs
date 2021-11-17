@@ -18,52 +18,51 @@ using Marten;
 using Marten.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Carts.Carts
+namespace Carts.Carts;
+
+internal static class CartsConfig
 {
-    internal static class CartsConfig
+    internal static void AddCarts(this IServiceCollection services)
     {
-        internal static void AddCarts(this IServiceCollection services)
-        {
-            services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>();
+        services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>();
 
-            services.AddScoped<IRepository<Cart>, MartenRepository<Cart>>();
+        services.AddScoped<IRepository<Cart>, MartenRepository<Cart>>();
 
-            AddCommandHandlers(services);
-            AddQueryHandlers(services);
-            AddEventHandlers(services);
-        }
+        AddCommandHandlers(services);
+        AddQueryHandlers(services);
+        AddEventHandlers(services);
+    }
 
-        private static void AddCommandHandlers(IServiceCollection services)
-        {
-            services.AddCommandHandler<InitializeCart, HandleInitializeCart>()
-                    .AddCommandHandler<AddProduct, HandleAddProduct>()
-                    .AddCommandHandler<RemoveProduct, HandleRemoveProduct>()
-                    .AddCommandHandler<ConfirmCart, HandleConfirmCart>();
-        }
+    private static void AddCommandHandlers(IServiceCollection services)
+    {
+        services.AddCommandHandler<InitializeCart, HandleInitializeCart>()
+            .AddCommandHandler<AddProduct, HandleAddProduct>()
+            .AddCommandHandler<RemoveProduct, HandleRemoveProduct>()
+            .AddCommandHandler<ConfirmCart, HandleConfirmCart>();
+    }
 
-        private static void AddQueryHandlers(IServiceCollection services)
-        {
-            services.AddQueryHandler<GetCartById, CartDetails?, HandleGetCartById>()
-                    .AddQueryHandler<GetCartAtVersion, CartDetails, HandleGetCartAtVersion>()
-                    .AddQueryHandler<GetCarts, IPagedList<CartShortInfo>, HandleGetCarts>()
-                    .AddQueryHandler<GetCartHistory, IPagedList<CartHistory>, HandleGetCartHistory>();
-        }
+    private static void AddQueryHandlers(IServiceCollection services)
+    {
+        services.AddQueryHandler<GetCartById, CartDetails?, HandleGetCartById>()
+            .AddQueryHandler<GetCartAtVersion, CartDetails, HandleGetCartAtVersion>()
+            .AddQueryHandler<GetCarts, IPagedList<CartShortInfo>, HandleGetCarts>()
+            .AddQueryHandler<GetCartHistory, IPagedList<CartHistory>, HandleGetCartHistory>();
+    }
 
-        private static void AddEventHandlers(IServiceCollection services)
-        {
-            services.AddEventHandler<CartConfirmed, HandleCartFinalized>();
-        }
+    private static void AddEventHandlers(IServiceCollection services)
+    {
+        services.AddEventHandler<CartConfirmed, HandleCartFinalized>();
+    }
 
-        internal static void ConfigureCarts(this StoreOptions options)
-        {
-            // Snapshots
-            options.Projections.SelfAggregate<Cart>();
-            // // projections
-            options.Projections.Add<CartShortInfoProjection>();
-            options.Projections.Add<CartDetailsProjection>();
-            //
-            // // transformation
-            options.Projections.Add<CartHistoryTransformation>();
-        }
+    internal static void ConfigureCarts(this StoreOptions options)
+    {
+        // Snapshots
+        options.Projections.SelfAggregate<Cart>();
+        // // projections
+        options.Projections.Add<CartShortInfoProjection>();
+        options.Projections.Add<CartDetailsProjection>();
+        //
+        // // transformation
+        options.Projections.Add<CartHistoryTransformation>();
     }
 }

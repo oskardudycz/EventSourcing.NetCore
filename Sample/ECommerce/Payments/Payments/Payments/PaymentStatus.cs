@@ -1,9 +1,8 @@
-namespace Payments.Payments
+namespace Payments.Payments;
+
+public enum PaymentStatus
 {
-    public enum PaymentStatus
-    {
-        Pending,
-        Completed,
-        Failed
-    }
+    Pending,
+    Completed,
+    Failed
 }

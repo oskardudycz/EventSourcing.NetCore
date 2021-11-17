@@ -5,66 +5,65 @@ using Core.Events;
 using Marten;
 using Payments.Payments.CompletingPayment;
 
-namespace Payments.Payments.FinalizingPayment
+namespace Payments.Payments.FinalizingPayment;
+
+public class PaymentFinalized: IExternalEvent
 {
-    public class PaymentFinalized: IExternalEvent
+    public Guid OrderId { get; }
+
+    public Guid PaymentId { get; }
+
+    public decimal Amount { get; }
+
+    public DateTime FinalizedAt { get; }
+
+    private PaymentFinalized(Guid paymentId, Guid orderId, decimal amount, DateTime finalizedAt)
     {
-        public Guid OrderId { get; }
-
-        public Guid PaymentId { get; }
-
-        public decimal Amount { get; }
-
-        public DateTime FinalizedAt { get; }
-
-        private PaymentFinalized(Guid paymentId, Guid orderId, decimal amount, DateTime finalizedAt)
-        {
-            OrderId = orderId;
-            PaymentId = paymentId;
-            Amount = amount;
-            FinalizedAt = finalizedAt;
-        }
-        public static PaymentFinalized Create(Guid paymentId, Guid orderId, decimal amount, DateTime finalizedAt)
-        {
-            if (paymentId == Guid.Empty)
-                throw new ArgumentOutOfRangeException(nameof(paymentId));
-            if (orderId == Guid.Empty)
-                throw new ArgumentOutOfRangeException(nameof(orderId));
-            if (amount <= 0)
-                throw new ArgumentOutOfRangeException(nameof(amount));
-            if (finalizedAt == default)
-                throw new ArgumentOutOfRangeException(nameof(finalizedAt));
-
-            return new PaymentFinalized(paymentId, orderId, amount, finalizedAt);
-        }
+        OrderId = orderId;
+        PaymentId = paymentId;
+        Amount = amount;
+        FinalizedAt = finalizedAt;
     }
-    public class TransformIntoPaymentFinalized :
-        IEventHandler<PaymentCompleted>
+    public static PaymentFinalized Create(Guid paymentId, Guid orderId, decimal amount, DateTime finalizedAt)
     {
-        private readonly IEventBus eventBus;
-        private readonly IQuerySession querySession;
+        if (paymentId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(paymentId));
+        if (orderId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(orderId));
+        if (amount <= 0)
+            throw new ArgumentOutOfRangeException(nameof(amount));
+        if (finalizedAt == default)
+            throw new ArgumentOutOfRangeException(nameof(finalizedAt));
 
-        public TransformIntoPaymentFinalized(
-            IEventBus eventBus,
-            IQuerySession querySession
-            )
-        {
-            this.eventBus = eventBus;
-            this.querySession = querySession;
-        }
+        return new PaymentFinalized(paymentId, orderId, amount, finalizedAt);
+    }
+}
+public class TransformIntoPaymentFinalized :
+    IEventHandler<PaymentCompleted>
+{
+    private readonly IEventBus eventBus;
+    private readonly IQuerySession querySession;
 
-        public async Task Handle(PaymentCompleted @event, CancellationToken cancellationToken)
-        {
-            var payment = await querySession.LoadAsync<Payment>(@event.PaymentId, cancellationToken);
+    public TransformIntoPaymentFinalized(
+        IEventBus eventBus,
+        IQuerySession querySession
+    )
+    {
+        this.eventBus = eventBus;
+        this.querySession = querySession;
+    }
 
-            var externalEvent = PaymentFinalized.Create(
-                @event.PaymentId,
-                payment!.OrderId,
-                payment.Amount,
-                @event.CompletedAt
-            );
+    public async Task Handle(PaymentCompleted @event, CancellationToken cancellationToken)
+    {
+        var payment = await querySession.LoadAsync<Payment>(@event.PaymentId, cancellationToken);
 
-            await eventBus.Publish(externalEvent);
-        }
+        var externalEvent = PaymentFinalized.Create(
+            @event.PaymentId,
+            payment!.OrderId,
+            payment.Amount,
+            @event.CompletedAt
+        );
+
+        await eventBus.Publish(externalEvent);
     }
 }

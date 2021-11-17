@@ -3,30 +3,29 @@ using System.Linq;
 using Marten.Pagination;
 using Newtonsoft.Json;
 
-namespace Tickets.Api.Responses
+namespace Tickets.Api.Responses;
+
+public class PagedListResponse<T>
 {
-    public class PagedListResponse<T>
+    public IReadOnlyList<T> Items { get; }
+
+    public long TotalItemCount { get; }
+
+    public bool HasNextPage { get; }
+
+    [JsonConstructor]
+    internal PagedListResponse(IEnumerable<T> items, long totalItemCount, bool hasNextPage)
     {
-        public IReadOnlyList<T> Items { get; }
-
-        public long TotalItemCount { get; }
-
-        public bool HasNextPage { get; }
-
-        [JsonConstructor]
-        internal PagedListResponse(IEnumerable<T> items, long totalItemCount, bool hasNextPage)
-        {
-            Items = items.ToList();
-            TotalItemCount = totalItemCount;
-            HasNextPage = hasNextPage;
-        }
+        Items = items.ToList();
+        TotalItemCount = totalItemCount;
+        HasNextPage = hasNextPage;
     }
+}
 
-    public static class PagedListResponse
+public static class PagedListResponse
+{
+    public static PagedListResponse<T> From<T>(IPagedList<T> pagedList)
     {
-        public static PagedListResponse<T> From<T>(IPagedList<T> pagedList)
-        {
-            return new PagedListResponse<T>(pagedList, pagedList.TotalItemCount, pagedList.HasNextPage);
-        }
+        return new PagedListResponse<T>(pagedList, pagedList.TotalItemCount, pagedList.HasNextPage);
     }
 }

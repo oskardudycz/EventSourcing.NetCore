@@ -1,10 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Core.Events.External
+namespace Core.Events.External;
+
+public interface IExternalEventConsumer
 {
-    public interface IExternalEventConsumer
-    {
-        Task StartAsync(CancellationToken cancellationToken);
-    }
+    Task StartAsync(CancellationToken cancellationToken);
 }

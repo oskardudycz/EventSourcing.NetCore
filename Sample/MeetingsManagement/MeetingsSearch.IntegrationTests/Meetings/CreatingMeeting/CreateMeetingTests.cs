@@ -9,57 +9,56 @@ using MeetingsSearch.Meetings;
 using MeetingsSearch.Meetings.CreatingMeeting;
 using Xunit;
 
-namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting
+namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting;
+
+public class CreateMeetingFixture: ApiWithEventsFixture<Startup>
 {
-    public class CreateMeetingFixture: ApiWithEventsFixture<Startup>
+    protected override string ApiUrl => MeetingsSearchApi.MeetingsUrl;
+
+    public readonly Guid MeetingId = Guid.NewGuid();
+    public readonly string MeetingName = $"Event Sourcing Workshop {DateTime.Now.Ticks}";
+
+    public override async Task InitializeAsync()
     {
-        protected override string ApiUrl => MeetingsSearchApi.MeetingsUrl;
+        // prepare event
+        var @event = new MeetingCreated(
+            MeetingId,
+            MeetingName
+        );
 
-        public readonly Guid MeetingId = Guid.NewGuid();
-        public readonly string MeetingName = $"Event Sourcing Workshop {DateTime.Now.Ticks}";
+        // send meeting created event to internal event bus
+        await PublishInternalEvent(@event);
+    }
+}
 
-        public override async Task InitializeAsync()
-        {
-            // prepare event
-            var @event = new MeetingCreated(
-                MeetingId,
-                MeetingName
-            );
+public class CreateMeetingTests: IClassFixture<CreateMeetingFixture>
+{
+    private readonly CreateMeetingFixture fixture;
 
-            // send meeting created event to internal event bus
-            await PublishInternalEvent(@event);
-        }
+    public CreateMeetingTests(CreateMeetingFixture fixture)
+    {
+        this.fixture = fixture;
     }
 
-    public class CreateMeetingTests: IClassFixture<CreateMeetingFixture>
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task MeetingCreated_ShouldUpdateReadModel()
     {
-        private readonly CreateMeetingFixture fixture;
+        //send query
+        var queryResponse = await fixture.Get(
+            $"?filter={fixture.MeetingName}",
+            maxNumberOfRetries: 10,
+            retryIntervalInMs: 1000,
+            check: async response =>
+                response.IsSuccessStatusCode
+                && (await response.Content.ReadAsStringAsync()).Contains(fixture.MeetingName));
 
-        public CreateMeetingTests(CreateMeetingFixture fixture)
-        {
-            this.fixture = fixture;
-        }
+        queryResponse.EnsureSuccessStatusCode();
 
-        [Fact]
-        [Trait("Category", "Acceptance")]
-        public async Task MeetingCreated_ShouldUpdateReadModel()
-        {
-            //send query
-            var queryResponse = await fixture.Get(
-                $"?filter={fixture.MeetingName}",
-                maxNumberOfRetries: 10,
-                retryIntervalInMs: 1000,
-                check: async response =>
-                    response.IsSuccessStatusCode
-                    && (await response.Content.ReadAsStringAsync()).Contains(fixture.MeetingName));
-
-            queryResponse.EnsureSuccessStatusCode();
-
-            var meetings = await queryResponse.GetResultFromJson<IReadOnlyCollection<Meeting>>();
-            meetings.Should().Contain(meeting =>
-                meeting.Id == fixture.MeetingId
-                && meeting.Name == fixture.MeetingName
-            );
-        }
+        var meetings = await queryResponse.GetResultFromJson<IReadOnlyCollection<Meeting>>();
+        meetings.Should().Contain(meeting =>
+            meeting.Id == fixture.MeetingId
+            && meeting.Name == fixture.MeetingName
+        );
     }
 }

@@ -1,15 +1,14 @@
 using System;
 
-namespace EventStoreBasics
+namespace EventStoreBasics;
+
+public interface IRepository<T> where T : IAggregate
 {
-    public interface IRepository<T> where T : IAggregate
-    {
-        T Find(Guid id);
+    T Find(Guid id);
 
-        void Add(T aggregate);
+    void Add(T aggregate);
 
-        void Update(T aggregate);
+    void Update(T aggregate);
 
-        void Delete(T aggregate);
-    }
+    void Delete(T aggregate);
 }

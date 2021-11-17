@@ -7,116 +7,115 @@ using Orders.Orders.InitializingOrder;
 using Orders.Orders.RecordingOrderPayment;
 using Orders.Products;
 
-namespace Orders.Orders
+namespace Orders.Orders;
+
+public class Order: Aggregate
 {
-    public class Order: Aggregate
+    public Guid? ClientId { get; private set; }
+
+    public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = default!;
+
+    public decimal TotalPrice { get; private set; } = 0;
+
+    public OrderStatus Status { get; private set; }
+
+    public Guid? PaymentId { get; private set; }
+
+    public static Order Initialize(
+        Guid orderId,
+        Guid clientId,
+        IReadOnlyList<PricedProductItem> productItems,
+        decimal totalPrice)
     {
-        public Guid? ClientId { get; private set; }
+        return new Order(
+            orderId,
+            clientId,
+            productItems,
+            totalPrice
+        );
+    }
 
-        public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = default!;
+    public Order(){}
 
-        public decimal TotalPrice { get; private set; } = 0;
+    private Order(Guid id, Guid clientId, IReadOnlyList<PricedProductItem> productItems, decimal totalPrice)
+    {
+        var @event = OrderInitialized.Create(
+            id,
+            clientId,
+            productItems,
+            totalPrice,
+            DateTime.UtcNow
+        );
 
-        public OrderStatus Status { get; private set; }
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-        public Guid? PaymentId { get; private set; }
+    public void Apply(OrderInitialized @event)
+    {
+        Version++;
 
-        public static Order Initialize(
-            Guid orderId,
-            Guid clientId,
-            IReadOnlyList<PricedProductItem> productItems,
-            decimal totalPrice)
-        {
-            return new Order(
-                orderId,
-                clientId,
-                productItems,
-                totalPrice
-            );
-        }
+        Id = @event.OrderId;
+        ClientId = @event.ClientId;
+        ProductItems = @event.ProductItems;
+        Status = OrderStatus.Initialized;
+    }
 
-        public Order(){}
+    public void RecordPayment(Guid paymentId, DateTime recordedAt)
+    {
+        var @event = OrderPaymentRecorded.Create(
+            Id,
+            paymentId,
+            ProductItems,
+            TotalPrice,
+            recordedAt
+        );
 
-        private Order(Guid id, Guid clientId, IReadOnlyList<PricedProductItem> productItems, decimal totalPrice)
-        {
-            var @event = OrderInitialized.Create(
-                id,
-                clientId,
-                productItems,
-                totalPrice,
-                DateTime.UtcNow
-            );
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-            Enqueue(@event);
-            Apply(@event);
-        }
+    public void Apply(OrderPaymentRecorded @event)
+    {
+        Version++;
 
-        public void Apply(OrderInitialized @event)
-        {
-            Version++;
+        PaymentId = @event.PaymentId;
+        Status = OrderStatus.Paid;
+    }
 
-            Id = @event.OrderId;
-            ClientId = @event.ClientId;
-            ProductItems = @event.ProductItems;
-            Status = OrderStatus.Initialized;
-        }
+    public void Complete()
+    {
+        if(Status != OrderStatus.Paid)
+            throw new InvalidOperationException($"Cannot complete a not paid order.");
 
-        public void RecordPayment(Guid paymentId, DateTime recordedAt)
-        {
-            var @event = OrderPaymentRecorded.Create(
-                Id,
-                paymentId,
-                ProductItems,
-                TotalPrice,
-                recordedAt
-            );
+        var @event = OrderCompleted.Create(Id, DateTime.UtcNow);
 
-            Enqueue(@event);
-            Apply(@event);
-        }
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-        public void Apply(OrderPaymentRecorded @event)
-        {
-            Version++;
+    public void Apply(OrderCompleted @event)
+    {
+        Version++;
 
-            PaymentId = @event.PaymentId;
-            Status = OrderStatus.Paid;
-        }
+        Status = OrderStatus.Completed;
+    }
 
-        public void Complete()
-        {
-            if(Status != OrderStatus.Paid)
-                throw new InvalidOperationException($"Cannot complete a not paid order.");
+    public void Cancel(OrderCancellationReason cancellationReason)
+    {
+        if(OrderStatus.Closed.HasFlag(Status))
+            throw new InvalidOperationException($"Cannot cancel a closed order.");
 
-            var @event = OrderCompleted.Create(Id, DateTime.UtcNow);
+        var @event = OrderCancelled.Create(Id, PaymentId, cancellationReason, DateTime.UtcNow);
 
-            Enqueue(@event);
-            Apply(@event);
-        }
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-        public void Apply(OrderCompleted @event)
-        {
-            Version++;
+    public void Apply(OrderCancelled @event)
+    {
+        Version++;
 
-            Status = OrderStatus.Completed;
-        }
-
-        public void Cancel(OrderCancellationReason cancellationReason)
-        {
-            if(OrderStatus.Closed.HasFlag(Status))
-                throw new InvalidOperationException($"Cannot cancel a closed order.");
-
-            var @event = OrderCancelled.Create(Id, PaymentId, cancellationReason, DateTime.UtcNow);
-
-            Enqueue(@event);
-            Apply(@event);
-        }
-
-        public void Apply(OrderCancelled @event)
-        {
-            Version++;
-
-            Status = OrderStatus.Cancelled;
-        }
+        Status = OrderStatus.Cancelled;
     }
 }

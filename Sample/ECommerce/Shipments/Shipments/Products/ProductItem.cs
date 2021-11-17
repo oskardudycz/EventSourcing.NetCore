@@ -1,13 +1,12 @@
 using System;
 
-namespace Shipments.Products
+namespace Shipments.Products;
+
+public class ProductItem
 {
-    public class ProductItem
-    {
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public Guid ProductId { get; set; }
+    public Guid ProductId { get; set; }
 
-        public int Quantity { get; set; }
-    }
+    public int Quantity { get; set; }
 }

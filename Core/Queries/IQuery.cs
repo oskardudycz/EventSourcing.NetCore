@@ -1,8 +1,7 @@
 using MediatR;
 
-namespace Core.Queries
+namespace Core.Queries;
+
+public interface IQuery<out TResponse>: IRequest<TResponse>
 {
-    public interface IQuery<out TResponse>: IRequest<TResponse>
-    {
-    }
 }

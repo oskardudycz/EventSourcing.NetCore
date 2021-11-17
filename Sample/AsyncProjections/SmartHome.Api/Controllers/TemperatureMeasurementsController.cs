@@ -10,57 +10,56 @@ using SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasuremen
 using SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 using SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
 
-namespace SmartHome.Api
+namespace SmartHome.Api;
+
+[Route("api/temperature-measurements")]
+public class TemperatureMeasurementsController: Controller
 {
-    [Route("api/temperature-measurements")]
-    public class TemperatureMeasurementsController: Controller
+    private readonly ICommandBus commandBus;
+    private readonly IQueryBus queryBus;
+    private readonly IIdGenerator idGenerator;
+
+    public TemperatureMeasurementsController(
+        ICommandBus commandBus,
+        IQueryBus queryBus,
+        IIdGenerator idGenerator)
     {
-        private readonly ICommandBus commandBus;
-        private readonly IQueryBus queryBus;
-        private readonly IIdGenerator idGenerator;
+        this.commandBus = commandBus;
+        this.queryBus = queryBus;
+        this.idGenerator = idGenerator;
+    }
 
-        public TemperatureMeasurementsController(
-            ICommandBus commandBus,
-            IQueryBus queryBus,
-            IIdGenerator idGenerator)
-        {
-            this.commandBus = commandBus;
-            this.queryBus = queryBus;
-            this.idGenerator = idGenerator;
-        }
+    [HttpGet]
+    public Task<IReadOnlyList<TemperatureMeasurement>> Get()
+    {
+        return queryBus.Send<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>(GetTemperatureMeasurements.Create());
+    }
 
-        [HttpGet]
-        public Task<IReadOnlyList<TemperatureMeasurement>> Get()
-        {
-            return queryBus.Send<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>(GetTemperatureMeasurements.Create());
-        }
+    [HttpPost]
+    public async Task<IActionResult> Start()
+    {
+        var measurementId = idGenerator.New();
 
-        [HttpPost]
-        public async Task<IActionResult> Start()
-        {
-            var measurementId = idGenerator.New();
+        var command = StartTemperatureMeasurement.Create(
+            measurementId
+        );
 
-            var command = StartTemperatureMeasurement.Create(
-                measurementId
-            );
+        await commandBus.Send(command);
 
-            await commandBus.Send(command);
-
-            return Created("api/TemperatureMeasurements", measurementId);
-        }
+        return Created("api/TemperatureMeasurements", measurementId);
+    }
 
 
-        [HttpPost("{id}/temperatures")]
-        public async Task<IActionResult> Record(Guid id, [FromBody] decimal temperature)
-        {
-            var command = RecordTemperature.Create(
-                id,
-                temperature
-            );
+    [HttpPost("{id}/temperatures")]
+    public async Task<IActionResult> Record(Guid id, [FromBody] decimal temperature)
+    {
+        var command = RecordTemperature.Create(
+            id,
+            temperature
+        );
 
-            await commandBus.Send(command);
+        await commandBus.Send(command);
 
-            return Ok();
-        }
+        return Ok();
     }
 }

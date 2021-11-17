@@ -6,17 +6,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 [assembly: InternalsVisibleTo("Marten.Generated")]
 
-namespace Carts
+namespace Carts;
+
+public static class Config
 {
-    public static class Config
+    public static void AddCartsModule(this IServiceCollection services, IConfiguration config)
     {
-        public static void AddCartsModule(this IServiceCollection services, IConfiguration config)
+        services.AddMarten(config, options =>
         {
-            services.AddMarten(config, options =>
-            {
-                options.ConfigureCarts();
-            });
-            services.AddCarts();
-        }
+            options.ConfigureCarts();
+        });
+        services.AddCarts();
     }
 }

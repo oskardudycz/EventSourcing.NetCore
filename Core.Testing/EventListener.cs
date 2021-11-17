@@ -4,28 +4,27 @@ using System.Threading.Tasks;
 using Core.Events;
 using MediatR;
 
-namespace Shipments.Api.Tests.Core
+namespace Shipments.Api.Tests.Core;
+
+public class EventsLog
 {
-    public class EventsLog
+    public List<IEvent> PublishedEvents { get; } = new List<IEvent>();
+}
+
+public class EventListener<TEvent>: INotificationHandler<TEvent>
+    where TEvent : IEvent
+{
+    private readonly EventsLog eventsLog;
+
+    public EventListener(EventsLog eventsLog)
     {
-        public List<IEvent> PublishedEvents { get; } = new List<IEvent>();
+        this.eventsLog = eventsLog;
     }
 
-    public class EventListener<TEvent>: INotificationHandler<TEvent>
-        where TEvent : IEvent
+    public Task Handle(TEvent @event, CancellationToken cancellationToken)
     {
-        private readonly EventsLog eventsLog;
+        eventsLog.PublishedEvents.Add(@event);
 
-        public EventListener(EventsLog eventsLog)
-        {
-            this.eventsLog = eventsLog;
-        }
-
-        public Task Handle(TEvent @event, CancellationToken cancellationToken)
-        {
-            eventsLog.PublishedEvents.Add(@event);
-
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
     }
 }

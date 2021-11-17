@@ -2,18 +2,17 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 
-namespace Core.Api.Testing
+namespace Core.Api.Testing;
+
+public static class ResponseExtensions
 {
-    public static class ResponseExtensions
+    public static async Task<T> GetResultFromJson<T>(this HttpResponseMessage response)
     {
-        public static async Task<T> GetResultFromJson<T>(this HttpResponseMessage response)
-        {
-            var result = await response.Content.ReadAsStringAsync();
+        var result = await response.Content.ReadAsStringAsync();
 
-            result.Should().NotBeNull();
-            result.Should().NotBeEmpty();
+        result.Should().NotBeNull();
+        result.Should().NotBeEmpty();
 
-            return result.FromJson<T>();
-        }
+        return result.FromJson<T>();
     }
 }

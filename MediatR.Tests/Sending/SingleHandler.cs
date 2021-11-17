@@ -6,87 +6,86 @@ using System.Threading.Tasks;
 using SharpTestsEx;
 using Xunit;
 
-namespace MediatR.Tests.Sending
+namespace MediatR.Tests.Sending;
+
+public class SingleHandler
 {
-    public class SingleHandler
+    public class ServiceLocator
     {
-        public class ServiceLocator
+        private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
+
+        public void Register(Type type, params object[] implementations)
+            => services.Add(type, implementations.ToList());
+
+        public List<object> Get(Type type)
         {
-            private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
+            return services[type];
+        }
+    }
 
-            public void Register(Type type, params object[] implementations)
-                => services.Add(type, implementations.ToList());
+    public class IssuesList
+    {
+        public List<string> Issues { get; }
 
-            public List<object> Get(Type type)
-            {
-                return services[type];
-            }
+        public IssuesList(params string[] issues)
+        {
+            Issues = issues.ToList();
+        }
+    }
+
+    public class GetIssuesNamesQuery: IRequest<List<string>>
+    {
+        public string Filter { get; }
+
+        public GetIssuesNamesQuery(string filter)
+        {
+            Filter = filter;
+        }
+    }
+
+    public class GetIssuesNamesQueryHandler: IRequestHandler<GetIssuesNamesQuery, List<string>>
+    {
+        private readonly IssuesList issuesList;
+
+        public GetIssuesNamesQueryHandler(IssuesList issuesList)
+        {
+            this.issuesList = issuesList;
         }
 
-        public class IssuesList
+        public Task<List<string>> Handle(GetIssuesNamesQuery query, CancellationToken cancellationToken = default)
         {
-            public List<string> Issues { get; }
-
-            public IssuesList(params string[] issues)
-            {
-                Issues = issues.ToList();
-            }
+            return Task.Run(() => issuesList.Issues
+                .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
+                .ToList(), cancellationToken);
         }
+    }
 
-        public class GetIssuesNamesQuery: IRequest<List<string>>
-        {
-            public string Filter { get; }
+    private readonly IMediator mediator;
 
-            public GetIssuesNamesQuery(string filter)
-            {
-                Filter = filter;
-            }
-        }
+    public SingleHandler()
+    {
+        var queryHandler = new GetIssuesNamesQueryHandler(
+            new IssuesList("Cleaning main room", "Writing blog", "cleaning kitchen"));
 
-        public class GetIssuesNamesQueryHandler: IRequestHandler<GetIssuesNamesQuery, List<string>>
-        {
-            private readonly IssuesList issuesList;
+        var serviceLocator = new ServiceLocator();
+        serviceLocator.Register(typeof(IRequestHandler<GetIssuesNamesQuery, List<string>>), queryHandler);
+        //Registration needed internally by MediatR
+        serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<GetIssuesNamesQuery, List<string>>>), new List<IPipelineBehavior<GetIssuesNamesQuery, List<string>>>());
 
-            public GetIssuesNamesQueryHandler(IssuesList issuesList)
-            {
-                this.issuesList = issuesList;
-            }
+        mediator = new Mediator(type => serviceLocator.Get(type).Single());
+    }
 
-            public Task<List<string>> Handle(GetIssuesNamesQuery query, CancellationToken cancellationToken = default)
-            {
-                return Task.Run(() => issuesList.Issues
-                    .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
-                    .ToList(), cancellationToken);
-            }
-        }
+    [Fact]
+    public async void GivenRegisteredAsynchronousRequestHandler_WhenSendMethodIsBeingCalled_ThenReturnsProperResult()
+    {
+        //Given
+        var query = new GetIssuesNamesQuery("cleaning");
 
-        private readonly IMediator mediator;
+        //When
+        var result = await mediator.Send(query);
 
-        public SingleHandler()
-        {
-            var queryHandler = new GetIssuesNamesQueryHandler(
-                new IssuesList("Cleaning main room", "Writing blog", "cleaning kitchen"));
-
-            var serviceLocator = new ServiceLocator();
-            serviceLocator.Register(typeof(IRequestHandler<GetIssuesNamesQuery, List<string>>), queryHandler);
-            //Registration needed internally by MediatR
-            serviceLocator.Register(typeof(IEnumerable<IPipelineBehavior<GetIssuesNamesQuery, List<string>>>), new List<IPipelineBehavior<GetIssuesNamesQuery, List<string>>>());
-
-            mediator = new Mediator(type => serviceLocator.Get(type).Single());
-        }
-
-        [Fact]
-        public async void GivenRegisteredAsynchronousRequestHandler_WhenSendMethodIsBeingCalled_ThenReturnsProperResult()
-        {
-            //Given
-            var query = new GetIssuesNamesQuery("cleaning");
-
-            //When
-            var result = await mediator.Send(query);
-
-            //Then
-            result.Should().Have.Count.EqualTo(2);
-            result.Should().Have.SameValuesAs("Cleaning main room", "cleaning kitchen");
-        }
+        //Then
+        result.Should().Have.Count.EqualTo(2);
+        result.Should().Have.SameValuesAs("Cleaning main room", "cleaning kitchen");
     }
 }

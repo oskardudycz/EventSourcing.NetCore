@@ -1,8 +1,7 @@
-namespace Payments.Payments.DiscardingPayment
+namespace Payments.Payments.DiscardingPayment;
+
+public enum DiscardReason
 {
-    public enum DiscardReason
-    {
-        UnexpectedError = 0,
-        OrderCancelled = 1
-    }
+    UnexpectedError = 0,
+    OrderCancelled = 1
 }

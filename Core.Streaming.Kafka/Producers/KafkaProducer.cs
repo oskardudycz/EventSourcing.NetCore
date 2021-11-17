@@ -6,38 +6,37 @@ using Core.Events.External;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
-namespace Core.Streaming.Kafka.Producers
+namespace Core.Streaming.Kafka.Producers;
+
+public class KafkaProducer: IExternalEventProducer
 {
-    public class KafkaProducer: IExternalEventProducer
+    private readonly KafkaProducerConfig config;
+
+    public KafkaProducer(
+        IConfiguration configuration
+    )
     {
-        private readonly KafkaProducerConfig config;
+        if (configuration == null)
+            throw new ArgumentNullException(nameof(configuration));
 
-        public KafkaProducer(
-            IConfiguration configuration
-        )
+        // get configuration from appsettings.json
+        config = configuration.GetKafkaProducerConfig();
+    }
+
+    public async Task Publish(IExternalEvent @event)
+    {
+        using (var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build())
         {
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-
-            // get configuration from appsettings.json
-            config = configuration.GetKafkaProducerConfig();
-        }
-
-        public async Task Publish(IExternalEvent @event)
-        {
-            using (var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build())
-            {
-                await Task.Yield();
-                // publish event to kafka topic taken from config
-                var result = await p.ProduceAsync(config.Topic,
-                    new Message<string, string>
-                    {
-                        // store event type name in message Key
-                        Key = @event.GetType().Name,
-                        // serialize event to message Value
-                        Value = JsonConvert.SerializeObject(@event)
-                    });
-            }
+            await Task.Yield();
+            // publish event to kafka topic taken from config
+            var result = await p.ProduceAsync(config.Topic,
+                new Message<string, string>
+                {
+                    // store event type name in message Key
+                    Key = @event.GetType().Name,
+                    // serialize event to message Value
+                    Value = JsonConvert.SerializeObject(@event)
+                });
         }
     }
 }

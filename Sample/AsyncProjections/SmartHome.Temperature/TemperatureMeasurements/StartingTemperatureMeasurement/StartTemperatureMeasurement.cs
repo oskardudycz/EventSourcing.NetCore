@@ -5,48 +5,47 @@ using Core.Commands;
 using Core.Repositories;
 using MediatR;
 
-namespace SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement
+namespace SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
+
+public class StartTemperatureMeasurement: ICommand
 {
-    public class StartTemperatureMeasurement: ICommand
+    public Guid MeasurementId { get; }
+
+    private StartTemperatureMeasurement(Guid measurementId)
     {
-        public Guid MeasurementId { get; }
-
-        private StartTemperatureMeasurement(Guid measurementId)
-        {
-            MeasurementId = measurementId;
-        }
-
-        public static StartTemperatureMeasurement Create(Guid measurementId)
-        {
-            if (measurementId == Guid.Empty)
-                throw new ArgumentOutOfRangeException(nameof(measurementId));
-
-            return new StartTemperatureMeasurement(measurementId);
-        }
+        MeasurementId = measurementId;
     }
 
-
-    public class HandleStartTemperatureMeasurement:
-        ICommandHandler<StartTemperatureMeasurement>
+    public static StartTemperatureMeasurement Create(Guid measurementId)
     {
-        private readonly IRepository<TemperatureMeasurement> repository;
+        if (measurementId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(measurementId));
 
-        public HandleStartTemperatureMeasurement(
-            IRepository<TemperatureMeasurement> repository
-        )
-        {
-            this.repository = repository;
-        }
+        return new StartTemperatureMeasurement(measurementId);
+    }
+}
 
-        public async Task<Unit> Handle(StartTemperatureMeasurement command, CancellationToken cancellationToken)
-        {
-            var reservation = TemperatureMeasurement.Start(
-                command.MeasurementId
-            );
 
-            await repository.Add(reservation, cancellationToken);
+public class HandleStartTemperatureMeasurement:
+    ICommandHandler<StartTemperatureMeasurement>
+{
+    private readonly IRepository<TemperatureMeasurement> repository;
 
-            return Unit.Value;
-        }
+    public HandleStartTemperatureMeasurement(
+        IRepository<TemperatureMeasurement> repository
+    )
+    {
+        this.repository = repository;
+    }
+
+    public async Task<Unit> Handle(StartTemperatureMeasurement command, CancellationToken cancellationToken)
+    {
+        var reservation = TemperatureMeasurement.Start(
+            command.MeasurementId
+        );
+
+        await repository.Add(reservation, cancellationToken);
+
+        return Unit.Value;
     }
 }

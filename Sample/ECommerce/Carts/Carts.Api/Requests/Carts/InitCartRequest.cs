@@ -1,9 +1,8 @@
 using System;
 
-namespace Carts.Api.Requests.Carts
+namespace Carts.Api.Requests.Carts;
+
+public class InitCartRequest
 {
-    public class InitCartRequest
-    {
-        public Guid ClientId { get; set; }
-    }
+    public Guid ClientId { get; set; }
 }

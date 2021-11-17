@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace EventStoreBasics
+namespace EventStoreBasics;
+
+public interface IAggregate
 {
-    public interface IAggregate
-    {
-        Guid Id { get; }
-        int Version { get; }
-        IEnumerable<object> DequeueUncommittedEvents();
-    }
+    Guid Id { get; }
+    int Version { get; }
+    IEnumerable<object> DequeueUncommittedEvents();
 }

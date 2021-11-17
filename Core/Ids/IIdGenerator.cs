@@ -1,9 +1,8 @@
 using System;
 
-namespace Core.Ids
+namespace Core.Ids;
+
+public interface IIdGenerator
 {
-    public interface IIdGenerator
-    {
-        Guid New();
-    }
+    Guid New();
 }

@@ -5,45 +5,44 @@ using Core.Queries;
 using Marten;
 using Marten.Pagination;
 
-namespace Tickets.Reservations.GettingReservations
+namespace Tickets.Reservations.GettingReservations;
+
+public class GetReservations: IQuery<IPagedList<ReservationShortInfo>>
 {
-    public class GetReservations: IQuery<IPagedList<ReservationShortInfo>>
+    public int PageNumber { get; }
+    public int PageSize { get; }
+
+    private GetReservations(int pageNumber, int pageSize)
     {
-        public int PageNumber { get; }
-        public int PageSize { get; }
-
-        private GetReservations(int pageNumber, int pageSize)
-        {
-            PageNumber = pageNumber;
-            PageSize = pageSize;
-        }
-
-        public static GetReservations Create(int pageNumber = 1, int pageSize = 20)
-        {
-            if (pageNumber <= 0)
-                throw new ArgumentOutOfRangeException(nameof(pageNumber));
-            if (pageSize is <= 0 or > 100)
-                throw new ArgumentOutOfRangeException(nameof(pageSize));
-
-            return new GetReservations(pageNumber, pageSize);
-        }
+        PageNumber = pageNumber;
+        PageSize = pageSize;
     }
 
-    internal class HandleGetReservations:
-        IQueryHandler<GetReservations, IPagedList<ReservationShortInfo>>
+    public static GetReservations Create(int pageNumber = 1, int pageSize = 20)
     {
-        private readonly IDocumentSession querySession;
+        if (pageNumber <= 0)
+            throw new ArgumentOutOfRangeException(nameof(pageNumber));
+        if (pageSize is <= 0 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-        public HandleGetReservations(IDocumentSession querySession)
-        {
-            this.querySession = querySession;
-        }
+        return new GetReservations(pageNumber, pageSize);
+    }
+}
 
-        public Task<IPagedList<ReservationShortInfo>> Handle(GetReservations request,
-            CancellationToken cancellationToken)
-        {
-            return querySession.Query<ReservationShortInfo>()
-                .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
-        }
+internal class HandleGetReservations:
+    IQueryHandler<GetReservations, IPagedList<ReservationShortInfo>>
+{
+    private readonly IDocumentSession querySession;
+
+    public HandleGetReservations(IDocumentSession querySession)
+    {
+        this.querySession = querySession;
+    }
+
+    public Task<IPagedList<ReservationShortInfo>> Handle(GetReservations request,
+        CancellationToken cancellationToken)
+    {
+        return querySession.Query<ReservationShortInfo>()
+            .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
     }
 }

@@ -3,17 +3,16 @@ using System.Threading.Tasks;
 using Core.Events;
 using Core.Events.External;
 
-namespace Core.Testing
+namespace Core.Testing;
+
+public class DummyExternalEventProducer: IExternalEventProducer
 {
-    public class DummyExternalEventProducer: IExternalEventProducer
+    public IList<IExternalEvent> PublishedEvents { get; } = new List<IExternalEvent>();
+
+    public Task Publish(IExternalEvent @event)
     {
-        public IList<IExternalEvent> PublishedEvents { get; } = new List<IExternalEvent>();
+        PublishedEvents.Add(@event);
 
-        public Task Publish(IExternalEvent @event)
-        {
-            PublishedEvents.Add(@event);
-
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
     }
 }

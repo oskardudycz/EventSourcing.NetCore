@@ -1,7 +1,6 @@
-namespace EventStoreBasics
+namespace EventStoreBasics;
+
+public interface IEventStore
 {
-    public interface IEventStore
-    {
-        void Init();
-    }
+    void Init();
 }

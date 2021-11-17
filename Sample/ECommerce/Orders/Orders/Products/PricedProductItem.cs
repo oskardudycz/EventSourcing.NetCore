@@ -1,27 +1,26 @@
 using System;
 
-namespace Orders.Products
+namespace Orders.Products;
+
+public class PricedProductItem
 {
-    public class PricedProductItem
+    public Guid ProductId { get; }
+    public int Quantity { get; }
+    public decimal UnitPrice { get; }
+
+    private PricedProductItem(Guid productId, int quantity, decimal unitPrice)
     {
-        public Guid ProductId { get; }
-        public int Quantity { get; }
-        public decimal UnitPrice { get; }
+        ProductId = productId;
+        Quantity = quantity;
+        UnitPrice = unitPrice;
+    }
 
-        private PricedProductItem(Guid productId, int quantity, decimal unitPrice)
-        {
-            ProductId = productId;
-            Quantity = quantity;
-            UnitPrice = unitPrice;
-        }
-
-        public static PricedProductItem Create(Guid? productId, int? quantity, decimal? unitPrice)
-        {
-            return new (
-                productId ?? throw new ArgumentNullException(nameof(productId)),
-                quantity ?? throw new ArgumentNullException(nameof(quantity)),
-                unitPrice ?? throw new ArgumentNullException(nameof(unitPrice))
-            );
-        }
+    public static PricedProductItem Create(Guid? productId, int? quantity, decimal? unitPrice)
+    {
+        return new (
+            productId ?? throw new ArgumentNullException(nameof(productId)),
+            quantity ?? throw new ArgumentNullException(nameof(quantity)),
+            unitPrice ?? throw new ArgumentNullException(nameof(unitPrice))
+        );
     }
 }
