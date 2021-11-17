@@ -7,53 +7,50 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-namespace MeetingsManagement.Api
+namespace MeetingsManagement.Api;
+
+public class Startup
 {
-    public class Startup
+    private readonly IConfiguration config;
+
+    public Startup(IConfiguration config)
     {
-        private readonly IConfiguration config;
+        this.config = config;
+    }
 
-        public Startup(IConfiguration config)
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMvc().AddNewtonsoftJson();
+        services.AddControllers();
+
+        services.AddSwaggerGen(c =>
         {
-            this.config = config;
-        }
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Meeting Management", Version = "v1" });
+        });
 
-        public void ConfigureServices(IServiceCollection services)
+        services.AddCoreServices()
+            .AddKafkaProducerAndConsumer()
+            .AddMeetingsManagement(config);
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+
+        app.UseRouting();
+        app.UseEndpoints(endpoints =>
         {
-            services.AddMvc().AddNewtonsoftJson();
-            services.AddControllers();
+            endpoints.MapControllers();
+        });
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Meeting Management", Version = "v1" });
-            });
+        // Enable middleware to serve generated Swagger as a JSON endpoint.
+        app.UseSwagger();
 
-            services.AddCoreServices()
-                .AddKafkaProducerAndConsumer()
-                .AddMeetingsManagement(config);
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
+        app.UseSwaggerUI(c =>
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseRouting();
-            app.UseEndpoints(endpoints => {
-                endpoints.MapControllers();
-            });
-
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
-
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meeting Management V1");
-                c.RoutePrefix = string.Empty;
-            });
-        }
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meeting Management V1");
+            c.RoutePrefix = string.Empty;
+        });
     }
 }

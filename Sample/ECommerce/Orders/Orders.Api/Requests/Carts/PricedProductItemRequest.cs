@@ -1,13 +1,12 @@
 using System;
 
-namespace Orders.Api.Requests.Carts
+namespace Orders.Api.Requests.Carts;
+
+public class PricedProductItemRequest
 {
-    public class PricedProductItemRequest
-    {
-        public Guid? ProductId { get; set; }
+    public Guid? ProductId { get; set; }
 
-        public int? Quantity { get;  set; }
+    public int? Quantity { get;  set; }
 
-        public decimal? UnitPrice { get; set; }
-    }
+    public decimal? UnitPrice { get; set; }
 }

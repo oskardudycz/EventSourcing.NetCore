@@ -1,11 +1,10 @@
 using System;
 
-namespace Orders.Api.Requests.Carts
-{
-    public class RecordOrderPaymentRequest
-    {
-        public Guid PaymentId { get; set; }
+namespace Orders.Api.Requests.Carts;
 
-        public DateTime PaymentRecordedAt { get; set; }
-    }
+public class RecordOrderPaymentRequest
+{
+    public Guid PaymentId { get; set; }
+
+    public DateTime PaymentRecordedAt { get; set; }
 }

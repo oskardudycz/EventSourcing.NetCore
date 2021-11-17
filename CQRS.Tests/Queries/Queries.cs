@@ -7,120 +7,119 @@ using MediatR;
 using SharpTestsEx;
 using Xunit;
 
-namespace CQRS.Tests.Queries
+namespace CQRS.Tests.Queries;
+
+public class Queries
 {
-    public class Queries
+    public interface IQuery<out TResponse>: IRequest<TResponse>
+    { }
+
+    public interface IQueryHandler<in TQuery, TResponse>: IRequestHandler<TQuery, TResponse>
+        where TQuery : IQuery<TResponse>
+    { }
+
+    public interface IQueryBus
     {
-        public interface IQuery<out TResponse>: IRequest<TResponse>
-        { }
+        Task<TResponse> Send<TResponse>(IQuery<TResponse> command);
+    }
 
-        public interface IQueryHandler<in TQuery, TResponse>: IRequestHandler<TQuery, TResponse>
-            where TQuery : IQuery<TResponse>
-        { }
+    public class QueryBus: IQueryBus
+    {
+        private readonly IMediator mediator;
 
-        public interface IQueryBus
+        public QueryBus(IMediator mediator)
         {
-            Task<TResponse> Send<TResponse>(IQuery<TResponse> command);
+            this.mediator = mediator;
         }
 
-        public class QueryBus: IQueryBus
+        public Task<TResponse> Send<TResponse>(IQuery<TResponse> command)
         {
-            private readonly IMediator mediator;
+            return mediator.Send(command);
+        }
+    }
 
-            public QueryBus(IMediator mediator)
-            {
-                this.mediator = mediator;
-            }
+    public class GetIssuesNamesQuery: IQuery<List<string>>
+    {
+        public string Filter { get; }
 
-            public Task<TResponse> Send<TResponse>(IQuery<TResponse> command)
-            {
-                return mediator.Send(command);
-            }
+        public GetIssuesNamesQuery(string filter)
+        {
+            Filter = filter;
+        }
+    }
+
+    public interface IIssueApplicationService
+    {
+        Task<List<string>> GetIssuesNames(GetIssuesNamesQuery query);
+    }
+
+    public class IssueApplicationService: IIssueApplicationService
+    {
+        private readonly IQueryBus queryBus;
+
+        public IssueApplicationService(IQueryBus queryBus)
+        {
+            this.queryBus = queryBus;
         }
 
-        public class GetIssuesNamesQuery: IQuery<List<string>>
+        public Task<List<string>> GetIssuesNames(GetIssuesNamesQuery query)
         {
-            public string Filter { get; }
+            return queryBus.Send(query);
+        }
+    }
 
-            public GetIssuesNamesQuery(string filter)
-            {
-                Filter = filter;
-            }
+    public interface IAppReadModel
+    {
+        IQueryable<string> Issues { get; }
+    }
+
+    public class AppReadModel: IAppReadModel
+    {
+        private readonly IList<string> issues;
+        public IQueryable<string> Issues => issues.AsQueryable();
+
+        public AppReadModel(params string[] issues)
+        {
+            this.issues = issues.ToList();
+        }
+    }
+
+    public class CreateIssueCommandHandler: IQueryHandler<GetIssuesNamesQuery, List<string>>
+    {
+        private readonly IAppReadModel readModel;
+
+        public CreateIssueCommandHandler(IAppReadModel readModel)
+        {
+            this.readModel = readModel;
         }
 
-        public interface IIssueApplicationService
+        public Task<List<string>> Handle(GetIssuesNamesQuery query, CancellationToken cancellationToken = default(CancellationToken))
         {
-            Task<List<string>> GetIssuesNames(GetIssuesNamesQuery query);
+            return Task.Run(() => readModel.Issues
+                .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
+                .ToList(), cancellationToken);
         }
+    }
 
-        public class IssueApplicationService: IIssueApplicationService
-        {
-            private readonly IQueryBus queryBus;
+    [Fact]
+    public async void GivenCommandWithData_WhenCommandIsSendToApplicationService_ThenreadModelIsChanged()
+    {
+        var serviceLocator = new ServiceLocator();
 
-            public IssueApplicationService(IQueryBus queryBus)
-            {
-                this.queryBus = queryBus;
-            }
+        var readModel = new AppReadModel("Cleaning main room", "Writing blog", "cleaning kitchen");
+        var commandHandler = new CreateIssueCommandHandler(readModel);
+        serviceLocator.RegisterQueryHandler(commandHandler);
 
-            public Task<List<string>> GetIssuesNames(GetIssuesNamesQuery query)
-            {
-                return queryBus.Send(query);
-            }
-        }
+        var applicationService = new IssueApplicationService(new QueryBus(serviceLocator.GetMediator()));
 
-        public interface IAppReadModel
-        {
-            IQueryable<string> Issues { get; }
-        }
+        //Given
+        var query = new GetIssuesNamesQuery("cleaning");
 
-        public class AppReadModel: IAppReadModel
-        {
-            private readonly IList<string> issues;
-            public IQueryable<string> Issues => issues.AsQueryable();
+        //When
+        var result = await applicationService.GetIssuesNames(query);
 
-            public AppReadModel(params string[] issues)
-            {
-                this.issues = issues.ToList();
-            }
-        }
-
-        public class CreateIssueCommandHandler: IQueryHandler<GetIssuesNamesQuery, List<string>>
-        {
-            private readonly IAppReadModel readModel;
-
-            public CreateIssueCommandHandler(IAppReadModel readModel)
-            {
-                this.readModel = readModel;
-            }
-
-            public Task<List<string>> Handle(GetIssuesNamesQuery query, CancellationToken cancellationToken = default(CancellationToken))
-            {
-                return Task.Run(() => readModel.Issues
-                    .Where(taskName => taskName.ToLower().Contains(query.Filter.ToLower()))
-                    .ToList(), cancellationToken);
-            }
-        }
-
-        [Fact]
-        public async void GivenCommandWithData_WhenCommandIsSendToApplicationService_ThenreadModelIsChanged()
-        {
-            var serviceLocator = new ServiceLocator();
-
-            var readModel = new AppReadModel("Cleaning main room", "Writing blog", "cleaning kitchen");
-            var commandHandler = new CreateIssueCommandHandler(readModel);
-            serviceLocator.RegisterQueryHandler(commandHandler);
-
-            var applicationService = new IssueApplicationService(new QueryBus(serviceLocator.GetMediator()));
-
-            //Given
-            var query = new GetIssuesNamesQuery("cleaning");
-
-            //When
-            var result = await applicationService.GetIssuesNames(query);
-
-            //Then
-            result.Should().Have.Count.EqualTo(2);
-            result.Should().Have.SameValuesAs("Cleaning main room", "cleaning kitchen");
-        }
+        //Then
+        result.Should().Have.Count.EqualTo(2);
+        result.Should().Have.SameValuesAs("Cleaning main room", "cleaning kitchen");
     }
 }

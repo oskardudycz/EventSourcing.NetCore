@@ -2,35 +2,34 @@ using System;
 using Core.Aggregates;
 using Carts.Carts;
 
-namespace Carts.Tests.Builders
+namespace Carts.Tests.Builders;
+
+internal class CartBuilder
 {
-    internal class CartBuilder
+    private Func<Cart> build  = () => new Cart();
+
+    public CartBuilder Initialized()
     {
-        private Func<Cart> build  = () => new Cart();
+        var cartId = Guid.NewGuid();
+        var clientId = Guid.NewGuid();
 
-        public CartBuilder Initialized()
-        {
-            var cartId = Guid.NewGuid();
-            var clientId = Guid.NewGuid();
+        // When
+        var cart = Cart.Initialize(
+            cartId,
+            clientId
+        );
 
-            // When
-            var cart = Cart.Initialize(
-                cartId,
-                clientId
-            );
+        build = () => cart;
 
-            build = () => cart;
+        return this;
+    }
 
-            return this;
-        }
+    public static CartBuilder Create() => new();
 
-        public static CartBuilder Create() => new();
-
-        public Cart Build()
-        {
-            var cart = build();
-            ((IAggregate)cart).DequeueUncommittedEvents();
-            return cart;
-        }
+    public Cart Build()
+    {
+        var cart = build();
+        ((IAggregate)cart).DequeueUncommittedEvents();
+        return cart;
     }
 }

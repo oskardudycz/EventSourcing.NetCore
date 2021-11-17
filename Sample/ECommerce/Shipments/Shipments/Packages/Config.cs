@@ -1,12 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Shipments.Packages
+namespace Shipments.Packages;
+
+internal static class Config
 {
-    internal static class Config
+    internal static IServiceCollection AddPackages(this IServiceCollection services)
     {
-        internal static IServiceCollection AddPackages(this IServiceCollection services)
-        {
-            return services.AddScoped<IPackageService, PackageService>();
-        }
+        return services.AddScoped<IPackageService, PackageService>();
     }
 }

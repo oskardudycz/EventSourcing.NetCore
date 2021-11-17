@@ -4,33 +4,30 @@ using Microsoft.AspNetCore.Routing;
 using Warehouse.Core.Commands;
 using Warehouse.Core.Extensions;
 
-namespace Warehouse.Products.RegisteringProduct
+namespace Warehouse.Products.RegisteringProduct;
+
+public record RegisterProductRequest(
+    string? SKU,
+    string? Name,
+    string? Description
+);
+
+internal static class Route
 {
-    public record RegisterProductRequest(
-        string? SKU,
-        string? Name,
-        string? Description
-    );
-
-    internal static class Route
+    internal static IEndpointRouteBuilder UseRegisterProductEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        internal static IEndpointRouteBuilder UseRegisterProductEndpoint(this IEndpointRouteBuilder endpoints)
+        endpoints.MapPost("api/products/", async context =>
         {
-            endpoints.MapPost("api/products/", async context =>
-            {
-                var (sku, name, description) = await context.FromBody<RegisterProductRequest>();
-                var productId = Guid.NewGuid();
+            var (sku, name, description) = await context.FromBody<RegisterProductRequest>();
+            var productId = Guid.NewGuid();
 
-                var command = RegisterProduct.Create(productId, sku, name, description);
+            var command = RegisterProduct.Create(productId, sku, name, description);
 
-                await context.SendCommand(command);
+            await context.SendCommand(command);
 
-                await context.Created(productId);
-            });
+            await context.Created(productId);
+        });
 
-            return endpoints;
-        }
+        return endpoints;
     }
 }
-
-

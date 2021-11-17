@@ -1,24 +1,23 @@
 using System;
 using Core.Commands;
 
-namespace Tickets.Maintenance.Commands
+namespace Tickets.Maintenance.Commands;
+
+public class RebuildProjection : ICommand
 {
-    public class RebuildProjection : ICommand
+    public string ViewName { get; }
+
+    private RebuildProjection(string viewName)
     {
-        public string ViewName { get; }
-
-        private RebuildProjection(string viewName)
-        {
-            ViewName = viewName;
-        }
+        ViewName = viewName;
+    }
 
 
-        public static RebuildProjection Create(string? viewName)
-        {
-            if (viewName == null)
-                throw new ArgumentNullException(nameof(viewName));
+    public static RebuildProjection Create(string? viewName)
+    {
+        if (viewName == null)
+            throw new ArgumentNullException(nameof(viewName));
 
-            return new RebuildProjection(viewName);
-        }
+        return new RebuildProjection(viewName);
     }
 }

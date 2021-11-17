@@ -1,19 +1,18 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Core.Events
+namespace Core.Events;
+
+public static class Config
 {
-    public static class Config
+    public static IServiceCollection AddEventHandler<TEvent, TEventHandler>(
+        this IServiceCollection services
+    )
+        where TEvent : IEvent
+        where TEventHandler : class, IEventHandler<TEvent>
     {
-        public static IServiceCollection AddEventHandler<TEvent, TEventHandler>(
-            this IServiceCollection services
-        )
-            where TEvent : IEvent
-            where TEventHandler : class, IEventHandler<TEvent>
-        {
-            return services.AddTransient<TEventHandler>()
-                .AddTransient<INotificationHandler<TEvent>>(sp => sp.GetRequiredService<TEventHandler>())
-                .AddTransient<IEventHandler<TEvent>>(sp => sp.GetRequiredService<TEventHandler>());
-        }
+        return services.AddTransient<TEventHandler>()
+            .AddTransient<INotificationHandler<TEvent>>(sp => sp.GetRequiredService<TEventHandler>())
+            .AddTransient<IEventHandler<TEvent>>(sp => sp.GetRequiredService<TEventHandler>());
     }
 }

@@ -10,33 +10,32 @@ using SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasuremen
 using SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 using SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
 
-namespace SmartHome.Temperature.TemperatureMeasurements
+namespace SmartHome.Temperature.TemperatureMeasurements;
+
+public static class TemperatureSummaryConfig
 {
-    public static class TemperatureSummaryConfig
+    internal static void AddTemperatureMeasurements(this IServiceCollection services)
     {
-        internal static void AddTemperatureMeasurements(this IServiceCollection services)
-        {
-            services.AddScoped<IRepository<TemperatureMeasurement>, MartenRepository<TemperatureMeasurement>>();
+        services.AddScoped<IRepository<TemperatureMeasurement>, MartenRepository<TemperatureMeasurement>>();
 
-            AddCommandHandlers(services);
-            AddQueryHandlers(services);
-        }
+        AddCommandHandlers(services);
+        AddQueryHandlers(services);
+    }
 
-        private static void AddCommandHandlers(IServiceCollection services)
-        {
-            services.AddCommandHandler<StartTemperatureMeasurement, HandleStartTemperatureMeasurement>()
-                    .AddCommandHandler<RecordTemperature, HandleRecordTemperature>();
-        }
+    private static void AddCommandHandlers(IServiceCollection services)
+    {
+        services.AddCommandHandler<StartTemperatureMeasurement, HandleStartTemperatureMeasurement>()
+            .AddCommandHandler<RecordTemperature, HandleRecordTemperature>();
+    }
 
-        private static void AddQueryHandlers(IServiceCollection services)
-        {
-            services.AddQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>, HandleGetTemperatureMeasurements>();
-        }
+    private static void AddQueryHandlers(IServiceCollection services)
+    {
+        services.AddQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>, HandleGetTemperatureMeasurements>();
+    }
 
-        internal static void ConfigureTemperatureMeasurements(this StoreOptions options)
-        {
-            // Snapshots
-            options.Projections.SelfAggregate<TemperatureMeasurement>(ProjectionLifecycle.Async);
-        }
+    internal static void ConfigureTemperatureMeasurements(this StoreOptions options)
+    {
+        // Snapshots
+        options.Projections.SelfAggregate<TemperatureMeasurement>(ProjectionLifecycle.Async);
     }
 }

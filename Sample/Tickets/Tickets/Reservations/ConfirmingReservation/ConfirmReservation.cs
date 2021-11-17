@@ -6,48 +6,47 @@ using Core.Exceptions;
 using Core.Repositories;
 using MediatR;
 
-namespace Tickets.Reservations.ConfirmingReservation
+namespace Tickets.Reservations.ConfirmingReservation;
+
+public class ConfirmReservation : ICommand
 {
-    public class ConfirmReservation : ICommand
+    public Guid ReservationId { get; }
+
+    private ConfirmReservation(Guid reservationId)
     {
-        public Guid ReservationId { get; }
-
-        private ConfirmReservation(Guid reservationId)
-        {
-            ReservationId = reservationId;
-        }
-
-        public static ConfirmReservation Create(Guid? reservationId)
-        {
-            if (!reservationId.HasValue)
-                throw new ArgumentNullException(nameof(reservationId));
-
-            return new ConfirmReservation(reservationId.Value);
-        }
+        ReservationId = reservationId;
     }
 
-    internal class HandleConfirmReservation:
-        ICommandHandler<ConfirmReservation>
+    public static ConfirmReservation Create(Guid? reservationId)
     {
-        private readonly IRepository<Reservation> repository;
+        if (!reservationId.HasValue)
+            throw new ArgumentNullException(nameof(reservationId));
 
-        public HandleConfirmReservation(
-            IRepository<Reservation> repository
-        )
-        {
-            this.repository = repository;
-        }
+        return new ConfirmReservation(reservationId.Value);
+    }
+}
 
-        public async Task<Unit> Handle(ConfirmReservation command, CancellationToken cancellationToken)
-        {
-            var reservation = await repository.Find(command.ReservationId, cancellationToken)
-                              ?? throw AggregateNotFoundException.For<Reservation>(command.ReservationId);
+internal class HandleConfirmReservation:
+    ICommandHandler<ConfirmReservation>
+{
+    private readonly IRepository<Reservation> repository;
 
-            reservation.Confirm();
+    public HandleConfirmReservation(
+        IRepository<Reservation> repository
+    )
+    {
+        this.repository = repository;
+    }
 
-            await repository.Update(reservation, cancellationToken);
+    public async Task<Unit> Handle(ConfirmReservation command, CancellationToken cancellationToken)
+    {
+        var reservation = await repository.Find(command.ReservationId, cancellationToken)
+                          ?? throw AggregateNotFoundException.For<Reservation>(command.ReservationId);
 
-            return Unit.Value;
-        }
+        reservation.Confirm();
+
+        await repository.Update(reservation, cancellationToken);
+
+        return Unit.Value;
     }
 }

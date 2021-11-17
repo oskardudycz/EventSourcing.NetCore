@@ -5,51 +5,50 @@ using Core.Commands;
 using Core.Repositories;
 using MediatR;
 
-namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor
+namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
+
+public class InstallMotionSensor : ICommand
 {
-    public class InstallMotionSensor : ICommand
+    public Guid MotionSensorId { get; }
+
+    private InstallMotionSensor(
+        Guid motionSensorId
+    )
     {
-        public Guid MotionSensorId { get; }
-
-        private InstallMotionSensor(
-            Guid motionSensorId
-        )
-        {
-            MotionSensorId = motionSensorId;
-        }
-
-        public static InstallMotionSensor Create(
-            Guid motionSensorId
-        )
-        {
-            if (motionSensorId == Guid.Empty)
-                throw new ArgumentOutOfRangeException(nameof(motionSensorId));
-
-            return new InstallMotionSensor(motionSensorId);
-        }
+        MotionSensorId = motionSensorId;
     }
 
-    public class HandleInstallMotionSensor :
-        ICommandHandler<InstallMotionSensor>
+    public static InstallMotionSensor Create(
+        Guid motionSensorId
+    )
     {
-        private readonly IRepository<MotionSensor> repository;
+        if (motionSensorId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(motionSensorId));
 
-        public HandleInstallMotionSensor(
-            IRepository<MotionSensor> repository
-        )
-        {
-            this.repository = repository;
-        }
+        return new InstallMotionSensor(motionSensorId);
+    }
+}
 
-        public async Task<Unit> Handle(InstallMotionSensor command, CancellationToken cancellationToken)
-        {
-            var reservation = MotionSensor.Install(
-                command.MotionSensorId
-            );
+public class HandleInstallMotionSensor :
+    ICommandHandler<InstallMotionSensor>
+{
+    private readonly IRepository<MotionSensor> repository;
 
-            await repository.Add(reservation, cancellationToken);
+    public HandleInstallMotionSensor(
+        IRepository<MotionSensor> repository
+    )
+    {
+        this.repository = repository;
+    }
 
-            return Unit.Value;
-        }
+    public async Task<Unit> Handle(InstallMotionSensor command, CancellationToken cancellationToken)
+    {
+        var reservation = MotionSensor.Install(
+            command.MotionSensorId
+        );
+
+        await repository.Add(reservation, cancellationToken);
+
+        return Unit.Value;
     }
 }

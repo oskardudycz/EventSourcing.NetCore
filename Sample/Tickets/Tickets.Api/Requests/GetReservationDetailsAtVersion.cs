@@ -1,7 +1,6 @@
-namespace Tickets.Api.Requests
+namespace Tickets.Api.Requests;
+
+public class GetReservationDetailsAtVersion
 {
-    public class GetReservationDetailsAtVersion
-    {
-        public int Version { get; set; }
-    }
+    public int Version { get; set; }
 }

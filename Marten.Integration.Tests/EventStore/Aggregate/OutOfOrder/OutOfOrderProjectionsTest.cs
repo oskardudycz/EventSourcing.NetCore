@@ -5,95 +5,94 @@ using SharpTestsEx;
 using Weasel.Postgresql;
 using Xunit;
 
-namespace Marten.Integration.Tests.EventStore.Projections
+namespace Marten.Integration.Tests.EventStore.Projections;
+
+public class OutOfOrderProjectionsTest: MartenTest
 {
-    public class OutOfOrderProjectionsTest: MartenTest
+    public record IssueCreated(
+        Guid IssueId,
+        string Description,
+        int IssueVersion
+    );
+
+    public record IssueUpdated(
+        Guid IssueId,
+        string Description,
+        int IssueVersion
+    );
+
+    public record Issue(
+        Guid IssueId,
+        string Description
+    );
+
+    public class IssuesList
     {
-        public record IssueCreated(
-            Guid IssueId,
-            string Description,
-            int IssueVersion
-        );
+        public Guid Id { get; set; }
+        public Dictionary<Guid, Issue> Issues { get; } = new();
 
-        public record IssueUpdated(
-            Guid IssueId,
-            string Description,
-            int IssueVersion
-        );
-
-        public record Issue(
-            Guid IssueId,
-            string Description
-        );
-
-        public class IssuesList
+        public void Apply(IssueCreated @event)
         {
-            public Guid Id { get; set; }
-            public Dictionary<Guid, Issue> Issues { get; } = new();
-
-            public void Apply(IssueCreated @event)
-            {
-                var (issueId, description, _) = @event;
-                Issues.Add(issueId, new Issue(issueId, description));
-            }
-
-            public void Apply(IssueUpdated @event)
-            {
-                if (!Issues.ContainsKey(@event.IssueId))
-                    return;
-
-                Issues[@event.IssueId] = Issues[@event.IssueId]
-                    with {Description = @event.Description};
-            }
+            var (issueId, description, _) = @event;
+            Issues.Add(issueId, new Issue(issueId, description));
         }
 
-        protected override IDocumentSession CreateSession(Action<StoreOptions>? setStoreOptions = null)
+        public void Apply(IssueUpdated @event)
         {
-            var store = DocumentStore.For(options =>
-            {
-                options.Connection(Settings.ConnectionString);
-                options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.DatabaseSchemaName = SchemaName;
-                options.Events.DatabaseSchemaName = SchemaName;
+            if (!Issues.ContainsKey(@event.IssueId))
+                return;
 
-                //It's needed to manually set that inline aggregation should be applied
-                options.Projections.SelfAggregate<IssuesList>();
-            });
-
-            return store.OpenSession();
+            Issues[@event.IssueId] = Issues[@event.IssueId]
+                with {Description = @event.Description};
         }
+    }
 
-        [Fact]
-        public void GivenOutOfOrderEvents_WhenPublishedWithSetVersion_ThenLiveAggregationWorksFine()
+    protected override IDocumentSession CreateSession(Action<StoreOptions>? setStoreOptions = null)
+    {
+        var store = DocumentStore.For(options =>
         {
-            var firstTaskId = Guid.NewGuid();
-            var secondTaskId = Guid.NewGuid();
+            options.Connection(Settings.ConnectionString);
+            options.AutoCreateSchemaObjects = AutoCreate.All;
+            options.DatabaseSchemaName = SchemaName;
+            options.Events.DatabaseSchemaName = SchemaName;
 
-            var events = new object[]
-            {
-                new IssueUpdated(firstTaskId,  "Final First Issue Description", 4),
-                new IssueCreated(firstTaskId,  "First Issue", 1),
-                new IssueCreated(secondTaskId, "Second Issue 2", 2),
-                new IssueUpdated(firstTaskId,  "Intermediate First Issue Description", 3),
-                new IssueUpdated(secondTaskId, "Final Second Issue Description", 4),
-            };
+            //It's needed to manually set that inline aggregation should be applied
+            options.Projections.SelfAggregate<IssuesList>();
+        });
 
-            //1. Create events
-            var streamId = EventStore.StartStream<IssuesList>(events).Id;
+        return store.OpenSession();
+    }
 
-            Session.SaveChanges();
+    [Fact]
+    public void GivenOutOfOrderEvents_WhenPublishedWithSetVersion_ThenLiveAggregationWorksFine()
+    {
+        var firstTaskId = Guid.NewGuid();
+        var secondTaskId = Guid.NewGuid();
 
-            //2. Get live agregation
-            var issuesListFromLiveAggregation = EventStore.AggregateStream<IssuesList>(streamId);
+        var events = new object[]
+        {
+            new IssueUpdated(firstTaskId,  "Final First Issue Description", 4),
+            new IssueCreated(firstTaskId,  "First Issue", 1),
+            new IssueCreated(secondTaskId, "Second Issue 2", 2),
+            new IssueUpdated(firstTaskId,  "Intermediate First Issue Description", 3),
+            new IssueUpdated(secondTaskId, "Final Second Issue Description", 4),
+        };
 
-            //3. Get inline aggregation
-            var issuesListFromInlineAggregation = Session.Load<IssuesList>(streamId);
+        //1. Create events
+        var streamId = EventStore.StartStream<IssuesList>(events).Id;
 
-            issuesListFromLiveAggregation.Should().Not.Be.Null();
-            issuesListFromInlineAggregation.Should().Not.Be.Null();
+        Session.SaveChanges();
 
-            issuesListFromLiveAggregation!.Issues.Count.Should().Be.EqualTo(2);
-            issuesListFromLiveAggregation!.Issues.Count.Should().Be.EqualTo(issuesListFromInlineAggregation!.Issues.Count);
-        }
+        //2. Get live agregation
+        var issuesListFromLiveAggregation = EventStore.AggregateStream<IssuesList>(streamId);
+
+        //3. Get inline aggregation
+        var issuesListFromInlineAggregation = Session.Load<IssuesList>(streamId);
+
+        issuesListFromLiveAggregation.Should().Not.Be.Null();
+        issuesListFromInlineAggregation.Should().Not.Be.Null();
+
+        issuesListFromLiveAggregation!.Issues.Count.Should().Be.EqualTo(2);
+        issuesListFromLiveAggregation!.Issues.Count.Should().Be.EqualTo(issuesListFromInlineAggregation!.Issues.Count);
     }
 }

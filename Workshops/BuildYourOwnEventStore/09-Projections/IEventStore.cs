@@ -1,18 +1,17 @@
 using System;
 using System.Collections;
 
-namespace EventStoreBasics
+namespace EventStoreBasics;
+
+public interface IEventStore
 {
-    public interface IEventStore
-    {
-        void Init();
-        bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null);
+    void Init();
+    bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null);
 
-        T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
-            where T : notnull;
-        StreamState? GetStreamState(Guid streamId);
-        IEnumerable GetEvents(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null);
+    T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
+        where T : notnull;
+    StreamState? GetStreamState(Guid streamId);
+    IEnumerable GetEvents(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null);
 
-        bool Store<TStream>(TStream aggregate) where TStream : IAggregate;
-    }
+    bool Store<TStream>(TStream aggregate) where TStream : IAggregate;
 }

@@ -16,71 +16,70 @@ using Orders.Products;
 using Orders.Shipments.OutOfStockProduct;
 using Orders.Shipments.SendingPackage;
 
-namespace Orders.Orders
+namespace Orders.Orders;
+
+public class OrderSaga:
+    IEventHandler<CartFinalized>,
+    IEventHandler<OrderInitialized>,
+    IEventHandler<PaymentFinalized>,
+    IEventHandler<PackageWasSent>,
+    IEventHandler<ProductWasOutOfStock>,
+    IEventHandler<OrderCancelled>,
+    IEventHandler<OrderPaymentRecorded>
 {
-    public class OrderSaga:
-        IEventHandler<CartFinalized>,
-        IEventHandler<OrderInitialized>,
-        IEventHandler<PaymentFinalized>,
-        IEventHandler<PackageWasSent>,
-        IEventHandler<ProductWasOutOfStock>,
-        IEventHandler<OrderCancelled>,
-        IEventHandler<OrderPaymentRecorded>
+    private readonly IIdGenerator idGenerator;
+    private readonly ICommandBus commandBus;
+
+    public OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus)
     {
-        private readonly IIdGenerator idGenerator;
-        private readonly ICommandBus commandBus;
+        this.idGenerator = idGenerator;
+        this.commandBus = commandBus;
+    }
 
-        public OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus)
-        {
-            this.idGenerator = idGenerator;
-            this.commandBus = commandBus;
-        }
+    // Happy path
+    public Task Handle(CartFinalized @event, CancellationToken cancellationToken)
+    {
+        var orderId = idGenerator.New();
 
-        // Happy path
-        public Task Handle(CartFinalized @event, CancellationToken cancellationToken)
-        {
-            var orderId = idGenerator.New();
+        return commandBus.Send(InitializeOrder.Create(orderId, @event.ClientId, @event.ProductItems, @event.TotalPrice));
+    }
 
-            return commandBus.Send(InitializeOrder.Create(orderId, @event.ClientId, @event.ProductItems, @event.TotalPrice));
-        }
+    public Task Handle(OrderInitialized @event, CancellationToken cancellationToken)
+    {
+        return commandBus.Send(RequestPayment.Create(@event.OrderId, @event.TotalPrice));
+    }
 
-        public Task Handle(OrderInitialized @event, CancellationToken cancellationToken)
-        {
-            return commandBus.Send(RequestPayment.Create(@event.OrderId, @event.TotalPrice));
-        }
+    public async Task Handle(PaymentFinalized @event, CancellationToken cancellationToken)
+    {
+        await commandBus.Send(RecordOrderPayment.Create(@event.OrderId, @event.PaymentId, @event.FinalizedAt));
+    }
 
-        public async Task Handle(PaymentFinalized @event, CancellationToken cancellationToken)
-        {
-            await commandBus.Send(RecordOrderPayment.Create(@event.OrderId, @event.PaymentId, @event.FinalizedAt));
-        }
+    public Task Handle(OrderPaymentRecorded @event, CancellationToken cancellationToken)
+    {
+        return commandBus.Send(
+            SendPackage.Create(
+                @event.OrderId,
+                @event.ProductItems.Select(pi => new ProductItem(pi.ProductId, pi.Quantity)).ToList()
+            )
+        );
+    }
 
-        public Task Handle(OrderPaymentRecorded @event, CancellationToken cancellationToken)
-        {
-            return commandBus.Send(
-                SendPackage.Create(
-                    @event.OrderId,
-                    @event.ProductItems.Select(pi => new ProductItem(pi.ProductId, pi.Quantity)).ToList()
-                )
-            );
-        }
+    public Task Handle(PackageWasSent @event, CancellationToken cancellationToken)
+    {
+        return commandBus.Send(CompleteOrder.Create(@event.OrderId));
+    }
 
-        public Task Handle(PackageWasSent @event, CancellationToken cancellationToken)
-        {
-            return commandBus.Send(CompleteOrder.Create(@event.OrderId));
-        }
+    // Compensation
+    public Task Handle(ProductWasOutOfStock @event, CancellationToken cancellationToken)
+    {
+        return commandBus.Send(CancelOrder.Create(@event.OrderId, (OrderCancellationReason) OrderCancellationReason.ProductWasOutOfStock));
+    }
 
-        // Compensation
-        public Task Handle(ProductWasOutOfStock @event, CancellationToken cancellationToken)
-        {
-            return commandBus.Send(CancelOrder.Create(@event.OrderId, (OrderCancellationReason) OrderCancellationReason.ProductWasOutOfStock));
-        }
+    public Task Handle(OrderCancelled @event, CancellationToken cancellationToken)
+    {
+        if (!@event.PaymentId.HasValue)
+            return Task.CompletedTask;
 
-        public Task Handle(OrderCancelled @event, CancellationToken cancellationToken)
-        {
-            if (!@event.PaymentId.HasValue)
-                return Task.CompletedTask;
-
-            return commandBus.Send(DiscardPayment.Create(@event.PaymentId.Value));
-        }
+        return commandBus.Send(DiscardPayment.Create(@event.PaymentId.Value));
     }
 }

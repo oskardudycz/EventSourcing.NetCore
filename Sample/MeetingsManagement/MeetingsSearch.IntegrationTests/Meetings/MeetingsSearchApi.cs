@@ -1,7 +1,6 @@
-namespace MeetingsSearch.IntegrationTests.Meetings
+namespace MeetingsSearch.IntegrationTests.Meetings;
+
+public class MeetingsSearchApi
 {
-    public class MeetingsSearchApi
-    {
-        public const string MeetingsUrl = "/api/Meetings";
-    }
+    public const string MeetingsUrl = "/api/Meetings";
 }

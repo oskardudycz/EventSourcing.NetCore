@@ -2,26 +2,25 @@ using System;
 using Core.Events;
 using Newtonsoft.Json;
 
-namespace SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement
+namespace SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
+
+public class TemperatureMeasurementStarted : IEvent
 {
-    public class TemperatureMeasurementStarted : IEvent
+    public Guid MeasurementId { get; }
+    public DateTimeOffset StartedAt { get; }
+
+    [JsonConstructor]
+    private TemperatureMeasurementStarted(Guid measurementId, DateTimeOffset startedAt)
     {
-        public Guid MeasurementId { get; }
-        public DateTimeOffset StartedAt { get; }
+        MeasurementId = measurementId;
+        StartedAt = startedAt;
+    }
 
-        [JsonConstructor]
-        private TemperatureMeasurementStarted(Guid measurementId, DateTimeOffset startedAt)
-        {
-            MeasurementId = measurementId;
-            StartedAt = startedAt;
-        }
+    public static TemperatureMeasurementStarted Create(Guid measurementId)
+    {
+        if (measurementId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(measurementId));
 
-        public static TemperatureMeasurementStarted Create(Guid measurementId)
-        {
-            if (measurementId == Guid.Empty)
-                throw new ArgumentOutOfRangeException(nameof(measurementId));
-
-            return new TemperatureMeasurementStarted(measurementId, DateTimeOffset.UtcNow);
-        }
+        return new TemperatureMeasurementStarted(measurementId, DateTimeOffset.UtcNow);
     }
 }

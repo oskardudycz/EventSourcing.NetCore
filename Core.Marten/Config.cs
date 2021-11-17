@@ -9,82 +9,81 @@ using Microsoft.Extensions.DependencyInjection;
 using Weasel.Core;
 using Weasel.Postgresql;
 
-namespace Core.Marten
+namespace Core.Marten;
+
+public class Config
 {
-    public class Config
+    private const string DefaultSchema = "public";
+
+    public string ConnectionString { get; set; } = default!;
+
+    public string WriteModelSchema { get; set; } = DefaultSchema;
+    public string ReadModelSchema { get; set; } = DefaultSchema;
+
+    public bool ShouldRecreateDatabase { get; set; } = false;
+
+    public DaemonMode DaemonMode { get; set; } = DaemonMode.Disabled;
+}
+
+public static class MartenConfigExtensions
+{
+    private const string DefaultConfigKey = "EventStore";
+
+    public static IServiceCollection AddMarten(this IServiceCollection services, IConfiguration config,
+        Action<StoreOptions>? configureOptions = null, string configKey = DefaultConfigKey)
     {
-        private const string DefaultSchema = "public";
+        var martenConfig = config.GetSection(configKey).Get<Config>();
 
-        public string ConnectionString { get; set; } = default!;
+        services
+            .AddScoped<IIdGenerator, MartenIdGenerator>();
 
-        public string WriteModelSchema { get; set; } = DefaultSchema;
-        public string ReadModelSchema { get; set; } = DefaultSchema;
+        var documentStore = services
+            .AddMarten(options =>
+            {
+                SetStoreOptions(options, martenConfig, configureOptions);
+            })
+            .InitializeStore();
 
-        public bool ShouldRecreateDatabase { get; set; } = false;
+        SetupSchema(documentStore, martenConfig, 1);
 
-        public DaemonMode DaemonMode { get; set; } = DaemonMode.Disabled;
+        return services;
     }
 
-    public static class MartenConfigExtensions
+    private static void SetupSchema(IDocumentStore documentStore, Config martenConfig, int retryLeft = 1)
     {
-        private const string DefaultConfigKey = "EventStore";
-
-        public static IServiceCollection AddMarten(this IServiceCollection services, IConfiguration config,
-            Action<StoreOptions>? configureOptions = null, string configKey = DefaultConfigKey)
+        try
         {
-            var martenConfig = config.GetSection(configKey).Get<Config>();
+            if (martenConfig.ShouldRecreateDatabase)
+                documentStore.Advanced.Clean.CompletelyRemoveAll();
 
-            services
-                .AddScoped<IIdGenerator, MartenIdGenerator>();
-
-            var documentStore = services
-                .AddMarten(options =>
-                {
-                    SetStoreOptions(options, martenConfig, configureOptions);
-                })
-                .InitializeStore();
-
-            SetupSchema(documentStore, martenConfig, 1);
-
-            return services;
-        }
-
-        private static void SetupSchema(IDocumentStore documentStore, Config martenConfig, int retryLeft = 1)
-        {
-            try
+            using (NoSynchronizationContextScope.Enter())
             {
-                if (martenConfig.ShouldRecreateDatabase)
-                    documentStore.Advanced.Clean.CompletelyRemoveAll();
-
-                using (NoSynchronizationContextScope.Enter())
-                {
-                    documentStore.Schema.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
-                }
-            }
-            catch
-            {
-                if (retryLeft == 0) throw;
-
-                Thread.Sleep(1000);
-                SetupSchema(documentStore, martenConfig, --retryLeft);
+                documentStore.Schema.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
             }
         }
-
-        private static void SetStoreOptions(StoreOptions options, Config config,
-            Action<StoreOptions>? configureOptions = null)
+        catch
         {
-            options.Connection(config.ConnectionString);
-            options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
+            if (retryLeft == 0) throw;
 
-            var schemaName = Environment.GetEnvironmentVariable("SchemaName");
-            options.Events.DatabaseSchemaName = schemaName ?? config.WriteModelSchema;
-            options.DatabaseSchemaName = schemaName ?? config.ReadModelSchema;
-
-            options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters,
-                enumStorage: EnumStorage.AsString);
-            options.Projections.AsyncMode = config.DaemonMode;
-
-            configureOptions?.Invoke(options);
+            Thread.Sleep(1000);
+            SetupSchema(documentStore, martenConfig, --retryLeft);
         }
+    }
+
+    private static void SetStoreOptions(StoreOptions options, Config config,
+        Action<StoreOptions>? configureOptions = null)
+    {
+        options.Connection(config.ConnectionString);
+        options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
+
+        var schemaName = Environment.GetEnvironmentVariable("SchemaName");
+        options.Events.DatabaseSchemaName = schemaName ?? config.WriteModelSchema;
+        options.DatabaseSchemaName = schemaName ?? config.ReadModelSchema;
+
+        options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters,
+            enumStorage: EnumStorage.AsString);
+        options.Projections.AsyncMode = config.DaemonMode;
+
+        configureOptions?.Invoke(options);
     }
 }

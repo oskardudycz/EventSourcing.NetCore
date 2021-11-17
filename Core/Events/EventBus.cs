@@ -3,31 +3,30 @@ using System.Threading.Tasks;
 using Core.Events.External;
 using MediatR;
 
-namespace Core.Events
+namespace Core.Events;
+
+public class EventBus: IEventBus
 {
-    public class EventBus: IEventBus
+    private readonly IMediator mediator;
+    private readonly IExternalEventProducer externalEventProducer;
+
+    public EventBus(
+        IMediator mediator,
+        IExternalEventProducer externalEventProducer
+    )
     {
-        private readonly IMediator mediator;
-        private readonly IExternalEventProducer externalEventProducer;
+        this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        this.externalEventProducer = externalEventProducer?? throw new ArgumentNullException(nameof(externalEventProducer));
+    }
 
-        public EventBus(
-            IMediator mediator,
-            IExternalEventProducer externalEventProducer
-        )
+    public async Task Publish(params IEvent[] events)
+    {
+        foreach (var @event in events)
         {
-            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            this.externalEventProducer = externalEventProducer?? throw new ArgumentNullException(nameof(externalEventProducer));
-        }
+            await mediator.Publish(@event);
 
-        public async Task Publish(params IEvent[] events)
-        {
-            foreach (var @event in events)
-            {
-                await mediator.Publish(@event);
-
-                if (@event is IExternalEvent externalEvent)
-                    await externalEventProducer.Publish(externalEvent);
-            }
+            if (@event is IExternalEvent externalEvent)
+                await externalEventProducer.Publish(externalEvent);
         }
     }
 }

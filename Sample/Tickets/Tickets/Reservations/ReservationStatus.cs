@@ -1,9 +1,8 @@
-namespace Tickets.Reservations
+namespace Tickets.Reservations;
+
+public enum ReservationStatus
 {
-    public enum ReservationStatus
-    {
-        Tentative,
-        Confirmed,
-        Cancelled
-    }
+    Tentative,
+    Confirmed,
+    Cancelled
 }

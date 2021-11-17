@@ -5,92 +5,91 @@ using Payments.Payments.DiscardingPayment;
 using Payments.Payments.RequestingPayment;
 using Payments.Payments.TimingOutPayment;
 
-namespace Payments.Payments
+namespace Payments.Payments;
+
+public class Payment: Aggregate
 {
-    public class Payment: Aggregate
+    public Guid OrderId { get; private set; }
+
+    public decimal Amount { get; private set; }
+
+    public PaymentStatus Status { get; private set; }
+
+    public static Payment Initialize(Guid paymentId, Guid orderId, decimal amount)
     {
-        public Guid OrderId { get; private set; }
+        return new Payment(paymentId, orderId, amount);
+    }
 
-        public decimal Amount { get; private set; }
+    public Payment(){}
 
-        public PaymentStatus Status { get; private set; }
+    private Payment(Guid id, Guid orderId, decimal amount)
+    {
+        var @event = PaymentRequested.Create(id, orderId, amount);
 
-        public static Payment Initialize(Guid paymentId, Guid orderId, decimal amount)
-        {
-            return new Payment(paymentId, orderId, amount);
-        }
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-        public Payment(){}
+    public void Apply(PaymentRequested @event)
+    {
+        Version++;
 
-        private Payment(Guid id, Guid orderId, decimal amount)
-        {
-            var @event = PaymentRequested.Create(id, orderId, amount);
+        Id = @event.PaymentId;
+        OrderId = @event.OrderId;
+        Amount = @event.Amount;
+    }
 
-            Enqueue(@event);
-            Apply(@event);
-        }
+    public void Complete()
+    {
+        if(Status != PaymentStatus.Pending)
+            throw new InvalidOperationException($"Completing payment in '{Status}' status is not allowed.");
 
-        public void Apply(PaymentRequested @event)
-        {
-            Version++;
+        var @event = PaymentCompleted.Create(Id, DateTime.UtcNow);
 
-            Id = @event.PaymentId;
-            OrderId = @event.OrderId;
-            Amount = @event.Amount;
-        }
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-        public void Complete()
-        {
-            if(Status != PaymentStatus.Pending)
-                throw new InvalidOperationException($"Completing payment in '{Status}' status is not allowed.");
+    public void Apply(PaymentCompleted @event)
+    {
+        Version++;
 
-            var @event = PaymentCompleted.Create(Id, DateTime.UtcNow);
+        Status = PaymentStatus.Completed;
+    }
 
-            Enqueue(@event);
-            Apply(@event);
-        }
+    public void Discard(DiscardReason discardReason)
+    {
+        if(Status != PaymentStatus.Pending)
+            throw new InvalidOperationException($"Discarding payment in '{Status}' status is not allowed.");
 
-        public void Apply(PaymentCompleted @event)
-        {
-            Version++;
+        var @event = PaymentDiscarded.Create(Id, discardReason, DateTime.UtcNow);
 
-            Status = PaymentStatus.Completed;
-        }
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-        public void Discard(DiscardReason discardReason)
-        {
-            if(Status != PaymentStatus.Pending)
-                throw new InvalidOperationException($"Discarding payment in '{Status}' status is not allowed.");
+    public void Apply(PaymentDiscarded @event)
+    {
+        Version++;
 
-            var @event = PaymentDiscarded.Create(Id, discardReason, DateTime.UtcNow);
+        Status = PaymentStatus.Failed;
+    }
 
-            Enqueue(@event);
-            Apply(@event);
-        }
+    public void TimeOut()
+    {
+        if(Status != PaymentStatus.Pending)
+            throw new InvalidOperationException($"Discarding payment in '{Status}' status is not allowed.");
 
-        public void Apply(PaymentDiscarded @event)
-        {
-            Version++;
+        var @event = PaymentTimedOut.Create(Id, DateTime.UtcNow);
 
-            Status = PaymentStatus.Failed;
-        }
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-        public void TimeOut()
-        {
-            if(Status != PaymentStatus.Pending)
-                throw new InvalidOperationException($"Discarding payment in '{Status}' status is not allowed.");
+    public void Apply(PaymentTimedOut @event)
+    {
+        Version++;
 
-            var @event = PaymentTimedOut.Create(Id, DateTime.UtcNow);
-
-            Enqueue(@event);
-            Apply(@event);
-        }
-
-        public void Apply(PaymentTimedOut @event)
-        {
-            Version++;
-
-            Status = PaymentStatus.Failed;
-        }
+        Status = PaymentStatus.Failed;
     }
 }

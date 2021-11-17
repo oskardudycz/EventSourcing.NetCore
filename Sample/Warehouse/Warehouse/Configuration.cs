@@ -6,29 +6,28 @@ using Microsoft.Extensions.DependencyInjection;
 using Warehouse.Products;
 using Warehouse.Storage;
 
-namespace Warehouse
+namespace Warehouse;
+
+public static class WarehouseConfiguration
 {
-    public static class WarehouseConfiguration
+    public static IServiceCollection AddWarehouseServices(this IServiceCollection services)
+        => services
+            .AddDbContext<WarehouseDBContext>(
+                options => options.UseNpgsql("name=ConnectionStrings:WarehouseDB"))
+            .AddProductServices();
+
+    public static IEndpointRouteBuilder UseWarehouseEndpoints(this IEndpointRouteBuilder endpoints)
+        => endpoints.UseProductsEndpoints();
+
+    public static IApplicationBuilder ConfigureWarehouse(this IApplicationBuilder app)
     {
-        public static IServiceCollection AddWarehouseServices(this IServiceCollection services)
-            => services
-                .AddDbContext<WarehouseDBContext>(
-                    options => options.UseNpgsql("name=ConnectionStrings:WarehouseDB"))
-                .AddProductServices();
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
-        public static IEndpointRouteBuilder UseWarehouseEndpoints(this IEndpointRouteBuilder endpoints)
-            => endpoints.UseProductsEndpoints();
-
-        public static IApplicationBuilder ConfigureWarehouse(this IApplicationBuilder app)
+        if (environment == "Development")
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-
-            if (environment == "Development")
-            {
-                app.ApplicationServices.GetRequiredService<WarehouseDBContext>().Database.Migrate();
-            }
-
-            return app;
+            app.ApplicationServices.GetRequiredService<WarehouseDBContext>().Database.Migrate();
         }
+
+        return app;
     }
 }

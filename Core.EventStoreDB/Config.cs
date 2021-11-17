@@ -5,63 +5,62 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Core.EventStoreDB
+namespace Core.EventStoreDB;
+
+public class EventStoreDBConfig
 {
-    public class EventStoreDBConfig
+    public string ConnectionString { get; set; } = default!;
+}
+
+public record EventStoreDBOptions(
+    bool UseInternalCheckpointing = true
+);
+
+public static class EventStoreDBConfigExtensions
+{
+    private const string DefaultConfigKey = "EventStore";
+
+    public static IServiceCollection AddEventStoreDB(this IServiceCollection services, IConfiguration config, EventStoreDBOptions? options = null)
     {
-        public string ConnectionString { get; set; } = default!;
+        var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
+
+        services.AddSingleton(
+            new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)));
+
+        if (options?.UseInternalCheckpointing != false)
+        {
+            services
+                .AddTransient<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
+        }
+
+        return services;
     }
 
-    public record EventStoreDBOptions(
-        bool UseInternalCheckpointing = true
-    );
-
-    public static class EventStoreDBConfigExtensions
+    public static IServiceCollection AddEventStoreDBSubscriptionToAll(
+        this IServiceCollection services,
+        string subscriptionId,
+        SubscriptionFilterOptions? filterOptions = null,
+        Action<EventStoreClientOperationOptions>? configureOperation = null,
+        UserCredentials? credentials = null,
+        bool checkpointToEventStoreDB = true)
     {
-        private const string DefaultConfigKey = "EventStore";
-
-        public static IServiceCollection AddEventStoreDB(this IServiceCollection services, IConfiguration config, EventStoreDBOptions? options = null)
+        if (checkpointToEventStoreDB)
         {
-            var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
-
-            services.AddSingleton(
-                new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)));
-
-            if (options?.UseInternalCheckpointing != false)
-            {
-                services
-                    .AddTransient<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
-            }
-
-            return services;
+            services
+                .AddTransient<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
         }
 
-        public static IServiceCollection AddEventStoreDBSubscriptionToAll(
-            this IServiceCollection services,
-            string subscriptionId,
-            SubscriptionFilterOptions? filterOptions = null,
-            Action<EventStoreClientOperationOptions>? configureOperation = null,
-            UserCredentials? credentials = null,
-            bool checkpointToEventStoreDB = true)
-        {
-            if (checkpointToEventStoreDB)
-            {
-                services
-                    .AddTransient<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
-            }
-
-            return services.AddHostedService(serviceProvider =>
-                new SubscribeToAllBackgroundWorker(
-                    serviceProvider,
-                    serviceProvider.GetRequiredService<EventStoreClient>(),
-                    serviceProvider.GetRequiredService<ISubscriptionCheckpointRepository>(),
-                    serviceProvider.GetRequiredService<ILogger<SubscribeToAllBackgroundWorker>>(),
-                    subscriptionId,
-                    filterOptions,
-                    configureOperation,
-                    credentials
-                )
-            );
-        }
+        return services.AddHostedService(serviceProvider =>
+            new SubscribeToAllBackgroundWorker(
+                serviceProvider,
+                serviceProvider.GetRequiredService<EventStoreClient>(),
+                serviceProvider.GetRequiredService<ISubscriptionCheckpointRepository>(),
+                serviceProvider.GetRequiredService<ILogger<SubscribeToAllBackgroundWorker>>(),
+                subscriptionId,
+                filterOptions,
+                configureOperation,
+                credentials
+            )
+        );
     }
 }

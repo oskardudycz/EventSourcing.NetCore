@@ -11,64 +11,63 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 
-namespace Payments.Api
+namespace Payments.Api;
+
+public class Startup
 {
-    public class Startup
+    private readonly IConfiguration config;
+
+    public Startup(IConfiguration config)
     {
-        private readonly IConfiguration config;
+        this.config = config;
+    }
 
-        public Startup(IConfiguration config)
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMvc()
+            .AddNewtonsoftJson(opt => opt.SerializerSettings.Converters.Add(new StringEnumConverter()));
+
+        services.AddControllers();
+
+        services.AddSwaggerGen(c =>
         {
-            this.config = config;
+            c.SwaggerDoc("v1", new OpenApiInfo {Title = "Payments", Version = "v1"});
+        });
+
+        services
+            .AddKafkaProducer()
+            .AddCoreServices()
+            .AddPaymentsModule(config);
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        app.UseExceptionHandlingMiddleware(exception => exception switch
         {
-            services.AddMvc()
-                .AddNewtonsoftJson(opt => opt.SerializerSettings.Converters.Add(new StringEnumConverter()));
+            AggregateNotFoundException _ => HttpStatusCode.NotFound,
+            _ => HttpStatusCode.InternalServerError
+        });
 
-            services.AddControllers();
+        app.UseRouting();
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Payments", Version = "v1"});
-            });
+        app.UseAuthorization();
 
-            services
-                .AddKafkaProducer()
-                .AddCoreServices()
-                .AddPaymentsModule(config);
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        app.UseEndpoints(endpoints =>
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            endpoints.MapControllers();
+        });
 
-            app.UseExceptionHandlingMiddleware(exception => exception switch
-            {
-                AggregateNotFoundException _ => HttpStatusCode.NotFound,
-                _ => HttpStatusCode.InternalServerError
-            });
+        app.UseSwagger();
 
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Payments V1");
-                c.RoutePrefix = string.Empty;
-            });
-        }
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Payments V1");
+            c.RoutePrefix = string.Empty;
+        });
     }
 }

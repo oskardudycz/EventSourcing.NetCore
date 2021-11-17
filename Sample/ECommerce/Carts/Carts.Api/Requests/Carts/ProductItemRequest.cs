@@ -1,11 +1,10 @@
 using System;
 
-namespace Carts.Api.Requests.Carts
-{
-    public class ProductItemRequest
-    {
-        public Guid ProductId { get; set; }
+namespace Carts.Api.Requests.Carts;
 
-        public int Quantity { get;  set; }
-    }
+public class ProductItemRequest
+{
+    public Guid ProductId { get; set; }
+
+    public int Quantity { get;  set; }
 }

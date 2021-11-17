@@ -1,18 +1,17 @@
 using System;
 using Core.Aggregates;
 
-namespace Tickets.Tickets
+namespace Tickets.Tickets;
+
+public class Ticket : Aggregate
 {
-    public class Ticket : Aggregate
+    public Guid SeatId { get; private set; }
+
+    public string Number { get; private set; }
+
+    public Ticket(Guid seatId, string number)
     {
-        public Guid SeatId { get; private set; }
-
-        public string Number { get; private set; }
-
-        public Ticket(Guid seatId, string number)
-        {
-            SeatId = seatId;
-            Number = number;
-        }
+        SeatId = seatId;
+        Number = number;
     }
 }

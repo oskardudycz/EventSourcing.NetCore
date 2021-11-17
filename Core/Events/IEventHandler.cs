@@ -1,9 +1,8 @@
 using MediatR;
 
-namespace Core.Events
+namespace Core.Events;
+
+public interface IEventHandler<in TEvent>: INotificationHandler<TEvent>
+    where TEvent : IEvent
 {
-    public interface IEventHandler<in TEvent>: INotificationHandler<TEvent>
-           where TEvent : IEvent
-    {
-    }
 }

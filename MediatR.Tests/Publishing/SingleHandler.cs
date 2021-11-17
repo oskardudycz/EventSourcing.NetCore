@@ -6,86 +6,85 @@ using System.Threading.Tasks;
 using SharpTestsEx;
 using Xunit;
 
-namespace MediatR.Tests.Publishing
+namespace MediatR.Tests.Publishing;
+
+public class SingleHandler
 {
-    public class SingleHandler
+    public class ServiceLocator
     {
-        public class ServiceLocator
+        private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
+
+        public void Register(Type type, params object[] implementations)
+            => services.Add(type, implementations.ToList());
+
+        public List<object> Get(Type type)
         {
-            private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
+            return services[type];
+        }
+    }
 
-            public void Register(Type type, params object[] implementations)
-                => services.Add(type, implementations.ToList());
+    public class IssuesList
+    {
+        public List<string> Issues { get; }
 
-            public List<object> Get(Type type)
-            {
-                return services[type];
-            }
+        public IssuesList()
+        {
+            Issues = new List<string>();
+        }
+    }
+
+    public class IssueCreated: INotification
+    {
+        public string IssueName { get; }
+
+        public IssueCreated(string issueName)
+        {
+            IssueName = issueName;
+        }
+    }
+
+    public class IssueCreatedHandler: INotificationHandler<IssueCreated>
+    {
+        private readonly IssuesList issuesList;
+
+        public IssueCreatedHandler(IssuesList issuesList)
+        {
+            this.issuesList = issuesList;
         }
 
-        public class IssuesList
+        public Task Handle(IssueCreated @event, CancellationToken cancellationToken = default)
         {
-            public List<string> Issues { get; }
-
-            public IssuesList()
-            {
-                Issues = new List<string>();
-            }
+            issuesList.Issues.Add(@event.IssueName);
+            return Task.CompletedTask;
         }
+    }
 
-        public class IssueCreated: INotification
-        {
-            public string IssueName { get; }
+    private readonly IMediator mediator;
+    private readonly IssuesList issuesList = new IssuesList();
 
-            public IssueCreated(string issueName)
-            {
-                IssueName = issueName;
-            }
-        }
+    public SingleHandler()
+    {
+        var notificationHandler = new IssueCreatedHandler(issuesList);
 
-        public class IssueCreatedHandler: INotificationHandler<IssueCreated>
-        {
-            private readonly IssuesList issuesList;
+        var serviceLocator = new ServiceLocator();
 
-            public IssueCreatedHandler(IssuesList issuesList)
-            {
-                this.issuesList = issuesList;
-            }
+        serviceLocator.Register(typeof(IEnumerable<INotificationHandler<IssueCreated>>),
+            new object[] { new List<INotificationHandler<IssueCreated>> { notificationHandler } });
 
-            public Task Handle(IssueCreated @event, CancellationToken cancellationToken = default)
-            {
-                issuesList.Issues.Add(@event.IssueName);
-                return Task.CompletedTask;
-            }
-        }
+        mediator = new Mediator(type => serviceLocator.Get(type).Single());
+    }
 
-        private readonly IMediator mediator;
-        private readonly IssuesList issuesList = new IssuesList();
+    [Fact]
+    public async void GivenRegisteredAsynchronousRequestHandler_WhenPublishMethodIsBeingCalled_ThenReturnsProperResult()
+    {
+        //Given
+        var @event = new IssueCreated("cleaning");
 
-        public SingleHandler()
-        {
-            var notificationHandler = new IssueCreatedHandler(issuesList);
+        //When
+        await mediator.Publish(@event);
 
-            var serviceLocator = new ServiceLocator();
-
-            serviceLocator.Register(typeof(IEnumerable<INotificationHandler<IssueCreated>>),
-                new object[] { new List<INotificationHandler<IssueCreated>> { notificationHandler } });
-
-            mediator = new Mediator(type => serviceLocator.Get(type).Single());
-        }
-
-        [Fact]
-        public async void GivenRegisteredAsynchronousRequestHandler_WhenPublishMethodIsBeingCalled_ThenReturnsProperResult()
-        {
-            //Given
-            var @event = new IssueCreated("cleaning");
-
-            //When
-            await mediator.Publish(@event);
-
-            //Then
-            issuesList.Issues.Should().Have.Count.EqualTo(1);
-            issuesList.Issues.Should().Have.SameValuesAs("cleaning");
-        }
+        //Then
+        issuesList.Issues.Should().Have.Count.EqualTo(1);
+        issuesList.Issues.Should().Have.SameValuesAs("cleaning");
     }
 }

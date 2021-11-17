@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <VSTestLogger>trx%3bLogFileName=$(MSBuildProjectName).trx</VSTestLogger>
@@ -16,25 +16,24 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="6.1.0" />
-        <PackageReference Include="Marten" Version="4.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-        <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
-        <PackageReference Include="NSubstitute" Version="4.2.2" />
-        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="FluentAssertions" Version="6.2.0"/>
+        <PackageReference Include="Marten" Version="4.1.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0"/>
+        <PackageReference Include="NSubstitute" Version="4.2.2"/>
+        <PackageReference Include="xunit" Version="2.4.1"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj" />
-        <ProjectReference Include="..\MeetingsManagement.Api\MeetingsManagement.Api.csproj" />
-        <ProjectReference Include="..\MeetingsManagement\MeetingsManagement.csproj" />
+        <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj"/>
+        <ProjectReference Include="..\MeetingsManagement.Api\MeetingsManagement.Api.csproj"/>
+        <ProjectReference Include="..\MeetingsManagement\MeetingsManagement.csproj"/>
     </ItemGroup>
 </Project>

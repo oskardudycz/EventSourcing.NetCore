@@ -1,7 +1,6 @@
-﻿namespace Core.Projections
+﻿namespace Core.Projections;
+
+public interface IProjection
 {
-    public interface IProjection
-    {
-        void When(object @event);
-    }
+    void When(object @event);
 }

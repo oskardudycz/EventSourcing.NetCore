@@ -1,9 +1,8 @@
 using System;
 
-namespace Tickets.Api.Requests
+namespace Tickets.Api.Requests;
+
+public class ChangeSeatRequest
 {
-    public class ChangeSeatRequest
-    {
-        public Guid SeatId { get; set; }
-    }
+    public Guid SeatId { get; set; }
 }

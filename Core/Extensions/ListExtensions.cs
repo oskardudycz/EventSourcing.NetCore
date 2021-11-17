@@ -1,20 +1,19 @@
 using System;
 using System.Collections.Generic;
 
-namespace Core.Extensions
+namespace Core.Extensions;
+
+public static class ListExtensions
 {
-    public static class ListExtensions
+    public static IList<T> Replace<T>(this IList<T> list, T existingElement, T replacement)
     {
-        public static IList<T> Replace<T>(this IList<T> list, T existingElement, T replacement)
-        {
-            var indexOfExistingItem = list.IndexOf(existingElement);
+        var indexOfExistingItem = list.IndexOf(existingElement);
 
-            if (indexOfExistingItem == -1)
-                throw new ArgumentOutOfRangeException(nameof(existingElement), "Element was not found");
+        if (indexOfExistingItem == -1)
+            throw new ArgumentOutOfRangeException(nameof(existingElement), "Element was not found");
 
-            list[indexOfExistingItem] = replacement;
+        list[indexOfExistingItem] = replacement;
 
-            return list;
-        }
+        return list;
     }
 }

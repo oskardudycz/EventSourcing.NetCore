@@ -7,58 +7,57 @@ using Core.Requests;
 using MediatR;
 using Orders.Products;
 
-namespace Orders.Shipments.SendingPackage
+namespace Orders.Shipments.SendingPackage;
+
+public class SendPackage : ICommand
 {
-    public class SendPackage : ICommand
+    public Guid OrderId { get; }
+
+    public IReadOnlyList<ProductItem> ProductItems { get; }
+
+    private SendPackage(
+        Guid orderId,
+        IReadOnlyList<ProductItem> productItems
+    )
     {
-        public Guid OrderId { get; }
-
-        public IReadOnlyList<ProductItem> ProductItems { get; }
-
-        private SendPackage(
-            Guid orderId,
-            IReadOnlyList<ProductItem> productItems
-        )
-        {
-            OrderId = orderId;
-            ProductItems = productItems;
-        }
-
-        public static SendPackage Create(
-            Guid orderId,
-            IReadOnlyList<ProductItem> productItems
-        )
-        {
-            if (orderId == Guid.Empty)
-                throw new ArgumentOutOfRangeException(nameof(orderId));
-            if (productItems.Count == 0)
-                throw new ArgumentOutOfRangeException(nameof(productItems.Count));
-
-            return new SendPackage(orderId, productItems);
-        }
+        OrderId = orderId;
+        ProductItems = productItems;
     }
 
-    public class HandleSendPackage:
-        ICommandHandler<SendPackage>
+    public static SendPackage Create(
+        Guid orderId,
+        IReadOnlyList<ProductItem> productItems
+    )
     {
-        private readonly ExternalServicesConfig externalServicesConfig;
-        private readonly IExternalCommandBus externalCommandBus;
+        if (orderId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(orderId));
+        if (productItems.Count == 0)
+            throw new ArgumentOutOfRangeException(nameof(productItems.Count));
 
-        public HandleSendPackage(ExternalServicesConfig externalServicesConfig, IExternalCommandBus externalCommandBus)
-        {
-            this.externalServicesConfig = externalServicesConfig;
-            this.externalCommandBus = externalCommandBus;
-        }
+        return new SendPackage(orderId, productItems);
+    }
+}
 
-        public async Task<Unit> Handle(SendPackage command, CancellationToken cancellationToken)
-        {
-            await externalCommandBus.Post(
-                externalServicesConfig.ShipmentsUrl!,
-                "shipments",
-                command,
-                cancellationToken);
+public class HandleSendPackage:
+    ICommandHandler<SendPackage>
+{
+    private readonly ExternalServicesConfig externalServicesConfig;
+    private readonly IExternalCommandBus externalCommandBus;
 
-            return Unit.Value;
-        }
+    public HandleSendPackage(ExternalServicesConfig externalServicesConfig, IExternalCommandBus externalCommandBus)
+    {
+        this.externalServicesConfig = externalServicesConfig;
+        this.externalCommandBus = externalCommandBus;
+    }
+
+    public async Task<Unit> Handle(SendPackage command, CancellationToken cancellationToken)
+    {
+        await externalCommandBus.Post(
+            externalServicesConfig.ShipmentsUrl!,
+            "shipments",
+            command,
+            cancellationToken);
+
+        return Unit.Value;
     }
 }
