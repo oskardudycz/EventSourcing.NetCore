@@ -1,7 +1,6 @@
-namespace Orders.Orders.CancellingOrder
+namespace Orders.Orders.CancellingOrder;
+
+public enum OrderCancellationReason
 {
-    public enum OrderCancellationReason
-    {
-        ProductWasOutOfStock
-    }
+    ProductWasOutOfStock
 }

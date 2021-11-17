@@ -1,10 +1,9 @@
 using System;
 
-namespace EventStoreBasics
+namespace EventStoreBasics;
+
+public interface ISnapshot
 {
-    public interface ISnapshot
-    {
-        Type Handles { get; }
-        void Handle(IAggregate aggregate);
-    }
+    Type Handles { get; }
+    void Handle(IAggregate aggregate);
 }

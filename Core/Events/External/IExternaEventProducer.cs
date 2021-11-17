@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
 
-namespace Core.Events.External
+namespace Core.Events.External;
+
+public interface IExternalEventProducer
 {
-    public interface IExternalEventProducer
-    {
-        Task Publish(IExternalEvent @event);
-    }
+    Task Publish(IExternalEvent @event);
 }

@@ -17,136 +17,135 @@ using Tickets.Reservations.GettingReservationHistory;
 using Tickets.Reservations.GettingReservations;
 using Xunit;
 
-namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation
+namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation;
+
+public class CreateTentativeReservationFixture: ApiWithEventsFixture<Startup>
 {
-    public class CreateTentativeReservationFixture: ApiWithEventsFixture<Startup>
+    protected override string ApiUrl => "/api/Reservations";
+
+    protected override Dictionary<string, string> GetConfiguration(string fixtureName) =>
+        TestConfiguration.Get(fixtureName);
+
+    public readonly Guid SeatId = Guid.NewGuid();
+
+    public HttpResponseMessage CommandResponse = default!;
+
+    public override async Task InitializeAsync()
     {
-        protected override string ApiUrl => "/api/Reservations";
+        // send create command
+        CommandResponse = await Post(new CreateTentativeReservationRequest {SeatId = SeatId});
+    }
+}
 
-        protected override Dictionary<string, string> GetConfiguration(string fixtureName) =>
-            TestConfiguration.Get(fixtureName);
+public class CreateTentativeReservationTests: IClassFixture<CreateTentativeReservationFixture>
+{
+    private readonly CreateTentativeReservationFixture fixture;
 
-        public readonly Guid SeatId = Guid.NewGuid();
-
-        public HttpResponseMessage CommandResponse = default!;
-
-        public override async Task InitializeAsync()
-        {
-            // send create command
-            CommandResponse = await Post(new CreateTentativeReservationRequest {SeatId = SeatId});
-        }
+    public CreateTentativeReservationTests(CreateTentativeReservationFixture fixture)
+    {
+        this.fixture = fixture;
     }
 
-    public class CreateTentativeReservationTests: IClassFixture<CreateTentativeReservationFixture>
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task CreateCommand_ShouldReturn_CreatedStatus_With_ReservationId()
     {
-        private readonly CreateTentativeReservationFixture fixture;
+        var commandResponse = fixture.CommandResponse;
+        commandResponse.EnsureSuccessStatusCode();
+        commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        public CreateTentativeReservationTests(CreateTentativeReservationFixture fixture)
-        {
-            this.fixture = fixture;
-        }
+        // get created record id
+        var createdId = await commandResponse.GetResultFromJson<Guid>();
+        createdId.Should().NotBeEmpty();
+    }
 
-        [Fact]
-        [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldReturn_CreatedStatus_With_ReservationId()
-        {
-            var commandResponse = fixture.CommandResponse;
-            commandResponse.EnsureSuccessStatusCode();
-            commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task CreateCommand_ShouldPublish_TentativeReservationCreated()
+    {
+        var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            // get created record id
-            var createdId = await commandResponse.GetResultFromJson<Guid>();
-            createdId.Should().NotBeEmpty();
-        }
+        fixture.PublishedInternalEventsOfType<TentativeReservationCreated>()
+            .Should()
+            .HaveCount(1)
+            .And.Contain(@event =>
+                @event.ReservationId == createdReservationId
+                && @event.SeatId == fixture.SeatId
+                && !string.IsNullOrEmpty(@event.Number)
+            );
+    }
 
-        [Fact]
-        [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldPublish_TentativeReservationCreated()
-        {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task CreateCommand_ShouldCreate_ReservationDetailsReadModel()
+    {
+        var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            fixture.PublishedInternalEventsOfType<TentativeReservationCreated>()
-                .Should()
-                .HaveCount(1)
-                .And.Contain(@event =>
-                    @event.ReservationId == createdReservationId
-                    && @event.SeatId == fixture.SeatId
-                    && !string.IsNullOrEmpty(@event.Number)
-                );
-        }
+        // prepare query
+        var query = $"{createdReservationId}";
 
-        [Fact]
-        [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldCreate_ReservationDetailsReadModel()
-        {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+        //send query
+        var queryResponse = await fixture.Get(query);
+        queryResponse.EnsureSuccessStatusCode();
 
-            // prepare query
-            var query = $"{createdReservationId}";
+        var reservationDetails =  await queryResponse.GetResultFromJson<ReservationDetails>();
+        reservationDetails.Id.Should().Be(createdReservationId);
+        reservationDetails.Number.Should().NotBeNull().And.NotBeEmpty();
+        reservationDetails.Status.Should().Be(ReservationStatus.Tentative);
+    }
 
-            //send query
-            var queryResponse = await fixture.Get(query);
-            queryResponse.EnsureSuccessStatusCode();
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task CreateCommand_ShouldCreate_ReservationList()
+    {
+        var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            var reservationDetails =  await queryResponse.GetResultFromJson<ReservationDetails>();
-            reservationDetails.Id.Should().Be(createdReservationId);
-            reservationDetails.Number.Should().NotBeNull().And.NotBeEmpty();
-            reservationDetails.Status.Should().Be(ReservationStatus.Tentative);
-        }
+        //send query
+        var queryResponse = await fixture.Get();
+        queryResponse.EnsureSuccessStatusCode();
 
-        [Fact]
-        [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldCreate_ReservationList()
-        {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+        var reservationPagedList = await queryResponse.GetResultFromJson<PagedListResponse<ReservationShortInfo>>();
 
-            //send query
-            var queryResponse = await fixture.Get();
-            queryResponse.EnsureSuccessStatusCode();
+        reservationPagedList.Should().NotBeNull();
+        reservationPagedList.Items.Should().NotBeNull();
 
-            var reservationPagedList = await queryResponse.GetResultFromJson<PagedListResponse<ReservationShortInfo>>();
+        reservationPagedList.Items.Should().HaveCount(1);
+        reservationPagedList.TotalItemCount.Should().Be(1);
+        reservationPagedList.HasNextPage.Should().Be(false);
 
-            reservationPagedList.Should().NotBeNull();
-            reservationPagedList.Items.Should().NotBeNull();
+        var reservationInfo = reservationPagedList.Items.Single();
 
-            reservationPagedList.Items.Should().HaveCount(1);
-            reservationPagedList.TotalItemCount.Should().Be(1);
-            reservationPagedList.HasNextPage.Should().Be(false);
-
-            var reservationInfo = reservationPagedList.Items.Single();
-
-            reservationInfo.Id.Should().Be(createdReservationId);
-            reservationInfo.Number.Should().NotBeNull().And.NotBeEmpty();
-            reservationInfo.Status.Should().Be(ReservationStatus.Tentative);
-        }
+        reservationInfo.Id.Should().Be(createdReservationId);
+        reservationInfo.Number.Should().NotBeNull().And.NotBeEmpty();
+        reservationInfo.Status.Should().Be(ReservationStatus.Tentative);
+    }
 
 
-        [Fact]
-        [Trait("Category", "Acceptance")]
-        public async Task CreateCommand_ShouldCreate_ReservationHistory()
-        {
-            var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task CreateCommand_ShouldCreate_ReservationHistory()
+    {
+        var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            // prepare query
-            var query = $"{createdReservationId}/history";
+        // prepare query
+        var query = $"{createdReservationId}/history";
 
-            //send query
-            var queryResponse = await fixture.Get(query);
-            queryResponse.EnsureSuccessStatusCode();
+        //send query
+        var queryResponse = await fixture.Get(query);
+        queryResponse.EnsureSuccessStatusCode();
 
-            var reservationPagedList = await queryResponse.GetResultFromJson<PagedListResponse<ReservationHistory>>();
+        var reservationPagedList = await queryResponse.GetResultFromJson<PagedListResponse<ReservationHistory>>();
 
-            reservationPagedList.Should().NotBeNull();
-            reservationPagedList.Items.Should().NotBeNull();
+        reservationPagedList.Should().NotBeNull();
+        reservationPagedList.Items.Should().NotBeNull();
 
-            reservationPagedList.Items.Should().HaveCount(1);
-            reservationPagedList.TotalItemCount.Should().Be(1);
-            reservationPagedList.HasNextPage.Should().Be(false);
+        reservationPagedList.Items.Should().HaveCount(1);
+        reservationPagedList.TotalItemCount.Should().Be(1);
+        reservationPagedList.HasNextPage.Should().Be(false);
 
-            var reservationInfo = reservationPagedList.Items.Single();
+        var reservationInfo = reservationPagedList.Items.Single();
 
-            reservationInfo.ReservationId.Should().Be(createdReservationId);
-            reservationInfo.Description.Should().StartWith("Created tentative reservation with number");
-        }
+        reservationInfo.ReservationId.Should().Be(createdReservationId);
+        reservationInfo.Description.Should().StartWith("Created tentative reservation with number");
     }
 }

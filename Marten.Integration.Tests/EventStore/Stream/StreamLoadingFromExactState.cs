@@ -3,98 +3,97 @@ using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
 using Xunit;
 
-namespace Marten.Integration.Tests.EventStore.Stream
+namespace Marten.Integration.Tests.EventStore.Stream;
+
+public class StreamLoadingFromExactState: MartenTest
 {
-    public class StreamLoadingFromExactState: MartenTest
+    public record IssueCreated(
+        Guid IssueId,
+        string Description
+    );
+
+    public record IssueUpdated(
+        Guid IssueId,
+        string Description
+    );
+
+    [Fact(Skip = "Skipping - AppVeyor for some reason doesn't like it -_-")]
+    public void GivenSetOfEvents_WithFetchEventsFromDifferentTimes_ThenProperSetsAreLoaded()
     {
-        public record IssueCreated(
-            Guid IssueId,
-            string Description
-        );
+        //Given
+        var streamId = Guid.NewGuid();
+        var taskId = Guid.NewGuid();
 
-        public record IssueUpdated(
-            Guid IssueId,
-            string Description
-        );
+        //When
+        var beforeCreateTimestamp = DateTime.UtcNow;
 
-        [Fact(Skip = "Skipping - AppVeyor for some reason doesn't like it -_-")]
-        public void GivenSetOfEvents_WithFetchEventsFromDifferentTimes_ThenProperSetsAreLoaded()
-        {
-            //Given
-            var streamId = Guid.NewGuid();
-            var taskId = Guid.NewGuid();
+        EventStore.Append(streamId, new IssueCreated(taskId, "Initial Name"));
+        Session.SaveChanges();
+        var createTimestamp = DateTime.UtcNow;
 
-            //When
-            var beforeCreateTimestamp = DateTime.UtcNow;
+        EventStore.Append(streamId, new IssueUpdated(taskId, "Updated name"));
+        Session.SaveChanges();
+        var firstUpdateTimestamp = DateTime.UtcNow;
 
-            EventStore.Append(streamId, new IssueCreated(taskId, "Initial Name"));
-            Session.SaveChanges();
-            var createTimestamp = DateTime.UtcNow;
+        EventStore.Append(streamId, new IssueUpdated(taskId, "Updated again name"),
+            new IssueUpdated(taskId, "Updated again and again name"));
+        Session.SaveChanges();
+        var secondUpdateTimestamp = DateTime.UtcNow;
 
-            EventStore.Append(streamId, new IssueUpdated(taskId, "Updated name"));
-            Session.SaveChanges();
-            var firstUpdateTimestamp = DateTime.UtcNow;
+        //Then
+        var events = EventStore.FetchStream(streamId, timestamp: beforeCreateTimestamp);
+        events.Count.Should().Be.EqualTo(0);
 
-            EventStore.Append(streamId, new IssueUpdated(taskId, "Updated again name"),
-                new IssueUpdated(taskId, "Updated again and again name"));
-            Session.SaveChanges();
-            var secondUpdateTimestamp = DateTime.UtcNow;
+        events = EventStore.FetchStream(streamId, timestamp: createTimestamp);
+        events.Count.Should().Be.EqualTo(1);
 
-            //Then
-            var events = EventStore.FetchStream(streamId, timestamp: beforeCreateTimestamp);
-            events.Count.Should().Be.EqualTo(0);
+        events = EventStore.FetchStream(streamId, timestamp: firstUpdateTimestamp);
+        events.Count.Should().Be.EqualTo(2);
 
-            events = EventStore.FetchStream(streamId, timestamp: createTimestamp);
-            events.Count.Should().Be.EqualTo(1);
+        events = EventStore.FetchStream(streamId, timestamp: secondUpdateTimestamp);
+        events.Count.Should().Be.EqualTo(4);
+    }
 
-            events = EventStore.FetchStream(streamId, timestamp: firstUpdateTimestamp);
-            events.Count.Should().Be.EqualTo(2);
+    [Fact]
+    public void GivenSetOfEvents_WithFetchEventsFromDifferentVersionNumber_ThenProperSetsAreLoaded()
+    {
+        //Given
+        var streamId = Guid.NewGuid();
+        var taskId = Guid.NewGuid();
 
-            events = EventStore.FetchStream(streamId, timestamp: secondUpdateTimestamp);
-            events.Count.Should().Be.EqualTo(4);
-        }
+        //When
+        EventStore.Append(streamId, new IssueCreated(taskId, "Initial Name"));
+        Session.SaveChanges();
 
-        [Fact]
-        public void GivenSetOfEvents_WithFetchEventsFromDifferentVersionNumber_ThenProperSetsAreLoaded()
-        {
-            //Given
-            var streamId = Guid.NewGuid();
-            var taskId = Guid.NewGuid();
+        EventStore.Append(streamId, new IssueUpdated(taskId, "Updated name"));
+        Session.SaveChanges();
 
-            //When
-            EventStore.Append(streamId, new IssueCreated(taskId, "Initial Name"));
-            Session.SaveChanges();
+        EventStore.Append(streamId, new IssueUpdated(taskId, "Updated again name"),
+            new IssueUpdated(taskId, "Updated again and again name"));
+        Session.SaveChanges();
 
-            EventStore.Append(streamId, new IssueUpdated(taskId, "Updated name"));
-            Session.SaveChanges();
+        //Then
+        //version after create
+        var events = EventStore.FetchStream(streamId, 1);
+        events.Count.Should().Be.EqualTo(1);
 
-            EventStore.Append(streamId, new IssueUpdated(taskId, "Updated again name"),
-                new IssueUpdated(taskId, "Updated again and again name"));
-            Session.SaveChanges();
+        //version after first update
+        events = EventStore.FetchStream(streamId, 2);
+        events.Count.Should().Be.EqualTo(2);
 
-            //Then
-            //version after create
-            var events = EventStore.FetchStream(streamId, 1);
-            events.Count.Should().Be.EqualTo(1);
+        //even though 3 and 4 updates were append at the same time version is incremented for both of them
+        events = EventStore.FetchStream(streamId, 3);
+        events.Count.Should().Be.EqualTo(3);
 
-            //version after first update
-            events = EventStore.FetchStream(streamId, 2);
-            events.Count.Should().Be.EqualTo(2);
+        events = EventStore.FetchStream(streamId, 4);
+        events.Count.Should().Be.EqualTo(4);
 
-            //even though 3 and 4 updates were append at the same time version is incremented for both of them
-            events = EventStore.FetchStream(streamId, 3);
-            events.Count.Should().Be.EqualTo(3);
+        //fetching with version equal to 0 returns the most recent state
+        events = EventStore.FetchStream(streamId, 0);
+        events.Count.Should().Be.EqualTo(4);
 
-            events = EventStore.FetchStream(streamId, 4);
-            events.Count.Should().Be.EqualTo(4);
-
-            //fetching with version equal to 0 returns the most recent state
-            events = EventStore.FetchStream(streamId, 0);
-            events.Count.Should().Be.EqualTo(4);
-
-            //providing bigger version than current doesn't throws exception - returns most recent state
-            events = EventStore.FetchStream(streamId, 100);
-            events.Count.Should().Be.EqualTo(4);
-        }
+        //providing bigger version than current doesn't throws exception - returns most recent state
+        events = EventStore.FetchStream(streamId, 100);
+        events.Count.Should().Be.EqualTo(4);
     }
 }

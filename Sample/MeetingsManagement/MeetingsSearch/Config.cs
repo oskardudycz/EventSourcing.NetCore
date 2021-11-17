@@ -3,21 +3,20 @@ using MeetingsSearch.Meetings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MeetingsSearch
+namespace MeetingsSearch;
+
+public static class Config
 {
-    public static class Config
+    public static void AddMeetingsSearch(this IServiceCollection services, IConfiguration config)
     {
-        public static void AddMeetingsSearch(this IServiceCollection services, IConfiguration config)
+        services.AddElasticsearch(config, settings =>
         {
-            services.AddElasticsearch(config, settings =>
-            {
-                settings
-                    .DefaultMappingFor<Meeting>(m => m
-                        .PropertyName(p => p.Id, "id")
-                        .PropertyName(p => p.Name, "name")
-                    );
-            });
-            services.AddMeeting();
-        }
+            settings
+                .DefaultMappingFor<Meeting>(m => m
+                    .PropertyName(p => p.Id, "id")
+                    .PropertyName(p => p.Name, "name")
+                );
+        });
+        services.AddMeeting();
     }
 }

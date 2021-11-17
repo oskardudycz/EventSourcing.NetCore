@@ -5,44 +5,43 @@ using Core.Commands;
 using Core.Repositories;
 using MediatR;
 
-namespace Carts.Carts.ConfirmingCart
+namespace Carts.Carts.ConfirmingCart;
+
+public class ConfirmCart: ICommand
 {
-    public class ConfirmCart: ICommand
+    public Guid CartId { get; }
+
+    private ConfirmCart(Guid cartId)
     {
-        public Guid CartId { get; }
-
-        private ConfirmCart(Guid cartId)
-        {
-            CartId = cartId;
-        }
-
-        public static ConfirmCart Create(Guid cartId)
-        {
-            if (cartId == Guid.Empty)
-                throw new ArgumentOutOfRangeException(nameof(cartId));
-
-            return new ConfirmCart(cartId);
-        }
+        CartId = cartId;
     }
 
-    internal class HandleConfirmCart:
-        ICommandHandler<ConfirmCart>
+    public static ConfirmCart Create(Guid cartId)
     {
-        private readonly IRepository<Cart> cartRepository;
+        if (cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
 
-        public HandleConfirmCart(
-            IRepository<Cart> cartRepository
-        )
-        {
-            this.cartRepository = cartRepository;
-        }
+        return new ConfirmCart(cartId);
+    }
+}
 
-        public Task<Unit> Handle(ConfirmCart command, CancellationToken cancellationToken)
-        {
-            return cartRepository.GetAndUpdate(
-                command.CartId,
-                cart => cart.Confirm(),
-                cancellationToken);
-        }
+internal class HandleConfirmCart:
+    ICommandHandler<ConfirmCart>
+{
+    private readonly IRepository<Cart> cartRepository;
+
+    public HandleConfirmCart(
+        IRepository<Cart> cartRepository
+    )
+    {
+        this.cartRepository = cartRepository;
+    }
+
+    public Task<Unit> Handle(ConfirmCart command, CancellationToken cancellationToken)
+    {
+        return cartRepository.GetAndUpdate(
+            command.CartId,
+            cart => cart.Confirm(),
+            cancellationToken);
     }
 }

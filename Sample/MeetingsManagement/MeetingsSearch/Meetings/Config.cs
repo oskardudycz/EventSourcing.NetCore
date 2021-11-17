@@ -7,15 +7,14 @@ using MeetingsSearch.Meetings.CreatingMeeting;
 using MeetingsSearch.Meetings.SearchingMeetings;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MeetingsSearch.Meetings
+namespace MeetingsSearch.Meetings;
+
+public static class Config
 {
-    public static class Config
+    public static void AddMeeting(this IServiceCollection services)
     {
-        public static void AddMeeting(this IServiceCollection services)
-        {
-            services.AddScoped<IRepository<Meeting>, ElasticSearchRepository<Meeting>>();
-            services.AddEventHandler<MeetingCreated, HandleMeetingCreated>();
-            services.AddQueryHandler<SearchMeetings, IReadOnlyCollection<Meeting>, HandleSearchMeetings>();
-        }
+        services.AddScoped<IRepository<Meeting>, ElasticSearchRepository<Meeting>>();
+        services.AddEventHandler<MeetingCreated, HandleMeetingCreated>();
+        services.AddQueryHandler<SearchMeetings, IReadOnlyCollection<Meeting>, HandleSearchMeetings>();
     }
 }

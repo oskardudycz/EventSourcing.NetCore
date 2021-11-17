@@ -1,19 +1,18 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Core.Commands
+namespace Core.Commands;
+
+public static class Config
 {
-    public static class Config
+    public static IServiceCollection AddCommandHandler<TCommand, TCommandHandler>(
+        this IServiceCollection services
+    )
+        where TCommand : ICommand
+        where TCommandHandler : class, ICommandHandler<TCommand>
     {
-        public static IServiceCollection AddCommandHandler<TCommand, TCommandHandler>(
-            this IServiceCollection services
-        )
-            where TCommand : ICommand
-            where TCommandHandler : class, ICommandHandler<TCommand>
-        {
-            return services.AddTransient<TCommandHandler>()
-                .AddTransient<IRequestHandler<TCommand, Unit>>(sp => sp.GetRequiredService<TCommandHandler>())
-                .AddTransient<ICommandHandler<TCommand>>(sp => sp.GetRequiredService<TCommandHandler>());
-        }
+        return services.AddTransient<TCommandHandler>()
+            .AddTransient<IRequestHandler<TCommand, Unit>>(sp => sp.GetRequiredService<TCommandHandler>())
+            .AddTransient<ICommandHandler<TCommand>>(sp => sp.GetRequiredService<TCommandHandler>());
     }
 }

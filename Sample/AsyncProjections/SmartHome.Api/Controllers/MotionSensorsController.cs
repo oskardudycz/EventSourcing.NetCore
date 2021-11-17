@@ -9,53 +9,52 @@ using SmartHome.Temperature.MotionSensors.GettingMotionSensor;
 using SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 using SmartHome.Temperature.MotionSensors.RebuildingMotionSensorsViews;
 
-namespace SmartHome.Api
+namespace SmartHome.Api;
+
+[Route("api/motion-sensors")]
+public class MotionSensorsController: Controller
 {
-    [Route("api/motion-sensors")]
-    public class MotionSensorsController: Controller
+    private readonly ICommandBus commandBus;
+    private readonly IQueryBus queryBus;
+    private readonly IIdGenerator idGenerator;
+
+    public MotionSensorsController(
+        ICommandBus commandBus,
+        IQueryBus queryBus,
+        IIdGenerator idGenerator)
     {
-        private readonly ICommandBus commandBus;
-        private readonly IQueryBus queryBus;
-        private readonly IIdGenerator idGenerator;
+        this.commandBus = commandBus;
+        this.queryBus = queryBus;
+        this.idGenerator = idGenerator;
+    }
 
-        public MotionSensorsController(
-            ICommandBus commandBus,
-            IQueryBus queryBus,
-            IIdGenerator idGenerator)
-        {
-            this.commandBus = commandBus;
-            this.queryBus = queryBus;
-            this.idGenerator = idGenerator;
-        }
+    [HttpGet]
+    public Task<IReadOnlyList<MotionSensor>> Get()
+    {
+        return queryBus.Send<GetMotionSensors, IReadOnlyList<MotionSensor>>(GetMotionSensors.Create());
+    }
 
-        [HttpGet]
-        public Task<IReadOnlyList<MotionSensor>> Get()
-        {
-            return queryBus.Send<GetMotionSensors, IReadOnlyList<MotionSensor>>(GetMotionSensors.Create());
-        }
+    [HttpPost]
+    public async Task<IActionResult> Start()
+    {
+        var measurementId = idGenerator.New();
 
-        [HttpPost]
-        public async Task<IActionResult> Start()
-        {
-            var measurementId = idGenerator.New();
+        var command = InstallMotionSensor.Create(
+            measurementId
+        );
 
-            var command = InstallMotionSensor.Create(
-                measurementId
-            );
+        await commandBus.Send(command);
 
-            await commandBus.Send(command);
+        return Created("api/MotionSensors", measurementId);
+    }
 
-            return Created("api/MotionSensors", measurementId);
-        }
+    [HttpPost("rebuild")]
+    public async Task<IActionResult> Rebuild()
+    {
+        var command = RebuildMotionSensorsViews.Create();
 
-        [HttpPost("rebuild")]
-        public async Task<IActionResult> Rebuild()
-        {
-            var command = RebuildMotionSensorsViews.Create();
+        await commandBus.Send(command);
 
-            await commandBus.Send(command);
-
-            return NoContent();
-        }
+        return NoContent();
     }
 }

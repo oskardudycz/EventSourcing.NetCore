@@ -1,9 +1,8 @@
 using ECommerce.ShoppingCarts.ProductItems;
 
-namespace ECommerce.Pricing.ProductPricing
+namespace ECommerce.Pricing.ProductPricing;
+
+public interface IProductPriceCalculator
 {
-    public interface IProductPriceCalculator
-    {
-        PricedProductItem Calculate(ProductItem productItem);
-    }
+    PricedProductItem Calculate(ProductItem productItem);
 }

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using Carts.Carts.Products;
 
-namespace Carts.Pricing
+namespace Carts.Pricing;
+
+public interface IProductPriceCalculator
 {
-    public interface IProductPriceCalculator
-    {
-        IReadOnlyList<PricedProductItem> Calculate(params ProductItem[] productItems);
-    }
+    IReadOnlyList<PricedProductItem> Calculate(params ProductItem[] productItems);
 }

@@ -6,104 +6,104 @@ using Dapper;
 using Newtonsoft.Json;
 using Npgsql;
 
-namespace EventStoreBasics
+namespace EventStoreBasics;
+
+public class EventStore: IDisposable, IEventStore
 {
-    public class EventStore: IDisposable, IEventStore
+    private readonly NpgsqlConnection databaseConnection;
+
+    private const string Apply = "Apply";
+
+    public EventStore(NpgsqlConnection databaseConnection)
     {
-        private readonly NpgsqlConnection databaseConnection;
+        this.databaseConnection = databaseConnection;
+    }
 
-        private const string Apply = "Apply";
+    public void Init()
+    {
+        // See more in Greg Young's "Building an Event Storage" article https://cqrs.wordpress.com/documents/building-event-storage/
+        CreateStreamsTable();
+        CreateEventsTable();
+        CreateAppendEventFunction();
+    }
 
-        public EventStore(NpgsqlConnection databaseConnection)
-        {
-            this.databaseConnection = databaseConnection;
-        }
+    public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null) where TStream: notnull
+    {
+        return databaseConnection.QuerySingle<bool>(
+            "SELECT append_event(@Id, @Data::jsonb, @Type, @StreamId, @StreamType, @ExpectedVersion)",
+            new
+            {
+                Id = Guid.NewGuid(),
+                Data = JsonConvert.SerializeObject(@event),
+                Type = @event.GetType().AssemblyQualifiedName,
+                StreamId = streamId,
+                StreamType = typeof(TStream).AssemblyQualifiedName,
+                ExpectedVersion = expectedVersion
+            },
+            commandType: CommandType.Text
+        );
+    }
 
-        public void Init()
-        {
-            // See more in Greg Young's "Building an Event Storage" article https://cqrs.wordpress.com/documents/building-event-storage/
-            CreateStreamsTable();
-            CreateEventsTable();
-            CreateAppendEventFunction();
-        }
+    public T AggregateStream<T>(Guid streamId) where T: notnull
+    {
+        // 1. Create instance
+        // 2. Get Stream Events
+        // 3. For each event call apply method on aggregate and increment aggregate version
+        // 4. Return Aggregate
+        throw new NotImplementedException("Implement aggregation based on the description above");
+    }
 
-        public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null) where TStream: notnull
-        {
-            return databaseConnection.QuerySingle<bool>(
-                "SELECT append_event(@Id, @Data::jsonb, @Type, @StreamId, @StreamType, @ExpectedVersion)",
-                new
-                {
-                    Id = Guid.NewGuid(),
-                    Data = JsonConvert.SerializeObject(@event),
-                    Type = @event.GetType().AssemblyQualifiedName,
-                    StreamId = streamId,
-                    StreamType = typeof(TStream).AssemblyQualifiedName,
-                    ExpectedVersion = expectedVersion
-                },
-                commandType: CommandType.Text
-            );
-        }
-
-        public T AggregateStream<T>(Guid streamId) where T: notnull
-        {
-            // 1. Create instance
-            // 2. Get Stream Events
-            // 3. For each event call apply method on aggregate and increment aggregate version
-            // 4. Return Aggregate
-            throw new NotImplementedException("Implement aggregation based on the description above");
-        }
-
-        public StreamState? GetStreamState(Guid streamId)
-        {
-            const string getStreamSql =
-                @"SELECT id, type, version
+    public StreamState? GetStreamState(Guid streamId)
+    {
+        const string getStreamSql =
+            @"SELECT id, type, version
                   FROM streams
                   WHERE id = @streamId";
 
-            return databaseConnection
-                .Query<dynamic>(getStreamSql, new { streamId })
-                .Select(streamData =>
-                    new StreamState(
-                        streamData.id,
-                        Type.GetType(streamData.type),
-                        streamData.version
-                    ))
-                .SingleOrDefault();
-        }
+        return databaseConnection
+            .Query<dynamic>(getStreamSql, new { streamId })
+            .Select(streamData =>
+                new StreamState(
+                    streamData.id,
+                    Type.GetType(streamData.type),
+                    streamData.version
+                ))
+            .SingleOrDefault();
+    }
 
-        public IEnumerable GetEvents(Guid streamId)
-        {
-            const string getStreamSql =
-                @"SELECT id, data, stream_id, type, version, created
+    public IEnumerable GetEvents(Guid streamId)
+    {
+        const string getStreamSql =
+            @"SELECT id, data, stream_id, type, version, created
                   FROM events
                   WHERE stream_id = @streamId
                   ORDER BY version";
 
-            return databaseConnection
-                .Query<dynamic>(getStreamSql, new { streamId })
-                .Select(@event =>
-                    JsonConvert.DeserializeObject(
-                        @event.data,
-                        Type.GetType(@event.type)
-                    ))
-                .ToList();
-        }
+        return databaseConnection
+            .Query<dynamic>(getStreamSql, new { streamId })
+            .Select(@event =>
+                JsonConvert.DeserializeObject(
+                    @event.data,
+                    Type.GetType(@event.type)
+                ))
+            .ToList();
+    }
 
-        private void CreateStreamsTable()
-        {
-            const string creatStreamsTableSql =
-                @"CREATE TABLE IF NOT EXISTS streams(
+    private void CreateStreamsTable()
+    {
+        const string creatStreamsTableSql =
+            @"CREATE TABLE IF NOT EXISTS streams(
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       type           TEXT                      NOT NULL,
                       version        BIGINT                    NOT NULL
                   );";
-            databaseConnection.Execute(creatStreamsTableSql);
-        }
+        databaseConnection.Execute(creatStreamsTableSql);
+    }
 
-        private void CreateEventsTable()
-        {
-            const string creatEventsTableSql =
-                @"CREATE TABLE IF NOT EXISTS events(
+    private void CreateEventsTable()
+    {
+        const string creatEventsTableSql =
+            @"CREATE TABLE IF NOT EXISTS events(
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       data           JSONB                     NOT NULL,
                       stream_id      UUID                      NOT NULL,
@@ -113,13 +113,13 @@ namespace EventStoreBasics
                       FOREIGN KEY(stream_id) REFERENCES streams(id),
                       CONSTRAINT events_stream_and_version UNIQUE(stream_id, version)
                 );";
-            databaseConnection.Execute(creatEventsTableSql);
-        }
+        databaseConnection.Execute(creatEventsTableSql);
+    }
 
-        private void CreateAppendEventFunction()
-        {
-            const string appendEventFunctionSql =
-                @"CREATE OR REPLACE FUNCTION append_event(id uuid, data jsonb, type text, stream_id uuid, stream_type text, expected_stream_version bigint default null) RETURNS boolean
+    private void CreateAppendEventFunction()
+    {
+        const string appendEventFunctionSql =
+            @"CREATE OR REPLACE FUNCTION append_event(id uuid, data jsonb, type text, stream_id uuid, stream_type text, expected_stream_version bigint default null) RETURNS boolean
                 LANGUAGE plpgsql
                 AS $$
                 DECLARE
@@ -165,12 +165,11 @@ namespace EventStoreBasics
                     RETURN TRUE;
                 END;
                 $$;";
-            databaseConnection.Execute(appendEventFunctionSql);
-        }
+        databaseConnection.Execute(appendEventFunctionSql);
+    }
 
-        public void Dispose()
-        {
-            databaseConnection.Dispose();
-        }
+    public void Dispose()
+    {
+        databaseConnection.Dispose();
     }
 }

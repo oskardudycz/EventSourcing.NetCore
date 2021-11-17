@@ -3,36 +3,35 @@ using EventStore.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ECommerce.Core.EventStoreDB
+namespace ECommerce.Core.EventStoreDB;
+
+public class EventStoreDBConfig
 {
-    public class EventStoreDBConfig
+    public string ConnectionString { get; set; } = default!;
+}
+
+public record EventStoreDBOptions(
+    bool UseInternalCheckpointing = true
+);
+
+public static class EventStoreDBConfigExtensions
+{
+    private const string DefaultConfigKey = "EventStore";
+
+    public static IServiceCollection AddEventStoreDB(this IServiceCollection services, IConfiguration config, EventStoreDBOptions? options = null)
     {
-        public string ConnectionString { get; set; } = default!;
-    }
+        var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
 
-    public record EventStoreDBOptions(
-        bool UseInternalCheckpointing = true
-    );
+        services.AddSingleton(
+                new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
+            .AddTransient<EventStoreDBSubscriptionToAll, EventStoreDBSubscriptionToAll>();
 
-    public static class EventStoreDBConfigExtensions
-    {
-        private const string DefaultConfigKey = "EventStore";
-
-        public static IServiceCollection AddEventStoreDB(this IServiceCollection services, IConfiguration config, EventStoreDBOptions? options = null)
+        if (options?.UseInternalCheckpointing != false)
         {
-            var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
-
-            services.AddSingleton(
-                    new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
-                .AddTransient<EventStoreDBSubscriptionToAll, EventStoreDBSubscriptionToAll>();
-
-            if (options?.UseInternalCheckpointing != false)
-            {
-                services
-                    .AddTransient<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
-            }
-
-            return services;
+            services
+                .AddTransient<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
         }
+
+        return services;
     }
 }

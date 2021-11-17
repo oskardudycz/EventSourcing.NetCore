@@ -4,38 +4,37 @@ using Tickets.Reservations.CancellingReservation;
 using Tickets.Reservations.ConfirmingReservation;
 using Tickets.Reservations.CreatingTentativeReservation;
 
-namespace Tickets.Reservations.GettingReservations
+namespace Tickets.Reservations.GettingReservations;
+
+public class ReservationShortInfo
 {
-    public class ReservationShortInfo
+    public Guid Id { get; set; }
+
+    public string Number { get; set; } = default!;
+
+    public ReservationStatus Status { get; set; }
+
+    public void Apply(TentativeReservationCreated @event)
     {
-        public Guid Id { get; set; }
-
-        public string Number { get; set; } = default!;
-
-        public ReservationStatus Status { get; set; }
-
-        public void Apply(TentativeReservationCreated @event)
-        {
-            Id = @event.ReservationId;
-            Number = @event.Number;
-            Status = ReservationStatus.Tentative;
-        }
-
-        public void Apply(ReservationConfirmed @event)
-        {
-            Status = ReservationStatus.Confirmed;
-        }
+        Id = @event.ReservationId;
+        Number = @event.Number;
+        Status = ReservationStatus.Tentative;
     }
 
-    public class ReservationShortInfoProjection : AggregateProjection<ReservationShortInfo>
+    public void Apply(ReservationConfirmed @event)
     {
-        public ReservationShortInfoProjection()
-        {
-            ProjectEvent<TentativeReservationCreated>((item, @event) => item.Apply(@event));
+        Status = ReservationStatus.Confirmed;
+    }
+}
 
-            ProjectEvent<ReservationConfirmed>((item, @event) => item.Apply(@event));
+public class ReservationShortInfoProjection : AggregateProjection<ReservationShortInfo>
+{
+    public ReservationShortInfoProjection()
+    {
+        ProjectEvent<TentativeReservationCreated>((item, @event) => item.Apply(@event));
 
-            DeleteEvent<ReservationCancelled>();
-        }
+        ProjectEvent<ReservationConfirmed>((item, @event) => item.Apply(@event));
+
+        DeleteEvent<ReservationCancelled>();
     }
 }

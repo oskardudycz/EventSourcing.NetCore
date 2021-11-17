@@ -6,71 +6,70 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Core.WebApi.Middlewares.ExceptionHandling
+namespace Core.WebApi.Middlewares.ExceptionHandling;
+
+public class ExceptionHandlingMiddleware
 {
-    public class ExceptionHandlingMiddleware
+    private readonly RequestDelegate next;
+
+    private readonly ILogger logger;
+
+    public ExceptionHandlingMiddleware(
+        RequestDelegate next,
+        ILoggerFactory loggerFactory
+    )
     {
-        private readonly RequestDelegate next;
+        this.next = next;
+        logger = loggerFactory.CreateLogger<ExceptionHandlingMiddleware>();
+    }
 
-        private readonly ILogger logger;
-
-        public ExceptionHandlingMiddleware(
-            RequestDelegate next,
-            ILoggerFactory loggerFactory
-        )
+    public async Task Invoke(HttpContext context /* other scoped dependencies */)
+    {
+        try
         {
-            this.next = next;
-            logger = loggerFactory.CreateLogger<ExceptionHandlingMiddleware>();
+            await next(context);
         }
-
-        public async Task Invoke(HttpContext context /* other scoped dependencies */)
+        catch (Exception ex)
         {
-            try
-            {
-                await next(context);
-            }
-            catch (Exception ex)
-            {
-                await HandleExceptionAsync(context, ex);
-            }
-        }
-
-        private Task HandleExceptionAsync(HttpContext context, Exception exception)
-        {
-            logger.LogError(exception, exception.Message);
-            Console.WriteLine(exception.Message);
-
-            var codeInfo = ExceptionToHttpStatusMapper.Map(exception);
-
-            var result = JsonConvert.SerializeObject(new HttpExceptionWrapper((int)codeInfo.Code, codeInfo.Message));
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)codeInfo.Code;
-            return context.Response.WriteAsync(result);
+            await HandleExceptionAsync(context, ex);
         }
     }
 
-    public class HttpExceptionWrapper
+    private Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        public int StatusCode { get; }
+        logger.LogError(exception, exception.Message);
+        Console.WriteLine(exception.Message);
 
-        public string Error { get; }
+        var codeInfo = ExceptionToHttpStatusMapper.Map(exception);
 
-        public HttpExceptionWrapper(int statusCode, string error)
-        {
-            StatusCode = statusCode;
-            Error = error;
-        }
+        var result = JsonConvert.SerializeObject(new HttpExceptionWrapper((int)codeInfo.Code, codeInfo.Message));
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)codeInfo.Code;
+        return context.Response.WriteAsync(result);
     }
+}
 
-    public static class ExceptionHandlingMiddlewareExtensions
+public class HttpExceptionWrapper
+{
+    public int StatusCode { get; }
+
+    public string Error { get; }
+
+    public HttpExceptionWrapper(int statusCode, string error)
     {
-        public static IApplicationBuilder UseExceptionHandlingMiddleware(
-            this IApplicationBuilder app,
-            Func<Exception, HttpStatusCode>? customMap = null
-        )
-        {
-            ExceptionToHttpStatusMapper.CustomMap = customMap;
-            return app.UseMiddleware<ExceptionHandlingMiddleware>();
-        }
+        StatusCode = statusCode;
+        Error = error;
+    }
+}
+
+public static class ExceptionHandlingMiddlewareExtensions
+{
+    public static IApplicationBuilder UseExceptionHandlingMiddleware(
+        this IApplicationBuilder app,
+        Func<Exception, HttpStatusCode>? customMap = null
+    )
+    {
+        ExceptionToHttpStatusMapper.CustomMap = customMap;
+        return app.UseMiddleware<ExceptionHandlingMiddleware>();
     }
 }

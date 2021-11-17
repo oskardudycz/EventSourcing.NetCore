@@ -9,63 +9,62 @@ using ECommerce.ShoppingCarts.GettingCartById;
 using FluentAssertions;
 using Xunit;
 
-namespace ECommerce.Api.Tests.ShoppingCarts.Initializing
+namespace ECommerce.Api.Tests.ShoppingCarts.Initializing;
+
+public class InitializeShoppingCartFixture: ApiFixture<Startup>
 {
-    public class InitializeShoppingCartFixture: ApiFixture<Startup>
+    protected override string ApiUrl => "/api/ShoppingCarts";
+
+    public readonly Guid ClientId = Guid.NewGuid();
+
+    public HttpResponseMessage CommandResponse = default!;
+
+    public override async Task InitializeAsync()
     {
-        protected override string ApiUrl => "/api/ShoppingCarts";
+        CommandResponse = await Post(new InitializeShoppingCartRequest(ClientId));
+    }
+}
 
-        public readonly Guid ClientId = Guid.NewGuid();
+public class InitializeShoppingCartTests: IClassFixture<InitializeShoppingCartFixture>
+{
+    private readonly InitializeShoppingCartFixture fixture;
 
-        public HttpResponseMessage CommandResponse = default!;
-
-        public override async Task InitializeAsync()
-        {
-            CommandResponse = await Post(new InitializeShoppingCartRequest(ClientId));
-        }
+    public InitializeShoppingCartTests(InitializeShoppingCartFixture fixture)
+    {
+        this.fixture = fixture;
     }
 
-    public class InitializeShoppingCartTests: IClassFixture<InitializeShoppingCartFixture>
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task Post_Should_Return_CreatedStatus_With_CartId()
     {
-        private readonly InitializeShoppingCartFixture fixture;
+        var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
+        commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        public InitializeShoppingCartTests(InitializeShoppingCartFixture fixture)
-        {
-            this.fixture = fixture;
-        }
+        // get created record id
+        var createdId = await commandResponse.GetResultFromJson<Guid>();
+        createdId.Should().NotBeEmpty();
+    }
 
-        [Fact]
-        [Trait("Category", "Acceptance")]
-        public async Task Post_Should_Return_CreatedStatus_With_CartId()
-        {
-            var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
-            commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task Post_Should_Create_ShoppingCart()
+    {
+        var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-            // get created record id
-            var createdId = await commandResponse.GetResultFromJson<Guid>();
-            createdId.Should().NotBeEmpty();
-        }
+        // prepare query
+        var query = $"{createdId}";
 
-        [Fact]
-        [Trait("Category", "Acceptance")]
-        public async Task Post_Should_Create_ShoppingCart()
-        {
-            var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
+        //send query
+        var queryResponse = await fixture.Get(query, 30);
 
-            // prepare query
-            var query = $"{createdId}";
+        queryResponse.EnsureSuccessStatusCode();
 
-            //send query
-            var queryResponse = await fixture.Get(query, 30);
-
-            queryResponse.EnsureSuccessStatusCode();
-
-            var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
-            cartDetails.Should().NotBeNull();
-            cartDetails.Id.Should().Be(createdId);
-            cartDetails.Status.Should().Be(ShoppingCartStatus.Pending);
-            cartDetails.ClientId.Should().Be(fixture.ClientId);
-            cartDetails.Version.Should().Be(0);
-        }
+        var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
+        cartDetails.Should().NotBeNull();
+        cartDetails.Id.Should().Be(createdId);
+        cartDetails.Status.Should().Be(ShoppingCartStatus.Pending);
+        cartDetails.ClientId.Should().Be(fixture.ClientId);
+        cartDetails.Version.Should().Be(0);
     }
 }

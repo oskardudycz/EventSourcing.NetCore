@@ -3,41 +3,40 @@ using FluentAssertions;
 using Tickets.Reservations;
 using Tickets.Reservations.CreatingTentativeReservation;
 
-namespace Tickets.Tests.Extensions.Reservations
+namespace Tickets.Tests.Extensions.Reservations;
+
+internal static class ReservationExtensions
 {
-    internal static class ReservationExtensions
+    public static Reservation IsTentativeReservationWith(
+        this Reservation reservation,
+        Guid id,
+        string number,
+        Guid seatId)
     {
-        public static Reservation IsTentativeReservationWith(
-            this Reservation reservation,
-            Guid id,
-            string number,
-            Guid seatId)
-        {
-            reservation.Status.Should().Be(ReservationStatus.Tentative);
+        reservation.Status.Should().Be(ReservationStatus.Tentative);
 
-            reservation.Id.Should().Be(id);
-            reservation.Number.Should().Be(number);
-            reservation.SeatId.Should().Be(seatId);
-            reservation.Version.Should().Be(1);
+        reservation.Id.Should().Be(id);
+        reservation.Number.Should().Be(number);
+        reservation.SeatId.Should().Be(seatId);
+        reservation.Version.Should().Be(1);
 
-            return reservation;
-        }
+        return reservation;
+    }
 
-        public static Reservation HasTentativeReservationCreatedEventWith(
-            this Reservation reservation,
-            Guid id,
-            string number,
-            Guid seatId)
-        {
-            var @event = reservation.PublishedEvent<TentativeReservationCreated>();
+    public static Reservation HasTentativeReservationCreatedEventWith(
+        this Reservation reservation,
+        Guid id,
+        string number,
+        Guid seatId)
+    {
+        var @event = reservation.PublishedEvent<TentativeReservationCreated>();
 
-            @event.Should().NotBeNull();
-            @event.Should().BeOfType<TentativeReservationCreated>();
-            @event!.ReservationId.Should().Be(id);
-            @event.Number.Should().Be(number);
-            @event.SeatId.Should().Be(seatId);
+        @event.Should().NotBeNull();
+        @event.Should().BeOfType<TentativeReservationCreated>();
+        @event!.ReservationId.Should().Be(id);
+        @event.Number.Should().Be(number);
+        @event.SeatId.Should().Be(seatId);
 
-            return reservation;
-        }
+        return reservation;
     }
 }

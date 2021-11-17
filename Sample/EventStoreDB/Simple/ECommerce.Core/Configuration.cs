@@ -3,16 +3,15 @@ using ECommerce.Core.EventStoreDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ECommerce.Core
+namespace ECommerce.Core;
+
+public static class Configuration
 {
-    public static class Configuration
-    {
-        public static IServiceCollection AddCoreServices(
-            this IServiceCollection services,
-            IConfiguration configuration
-        ) =>
-            services
-                .AddEventBus()
-                .AddEventStoreDB(configuration);
-    }
+    public static IServiceCollection AddCoreServices(
+        this IServiceCollection services,
+        IConfiguration configuration
+    ) =>
+        services
+            .AddEventBus()
+            .AddEventStoreDB(configuration);
 }

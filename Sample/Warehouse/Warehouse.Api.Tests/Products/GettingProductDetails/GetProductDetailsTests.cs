@@ -8,85 +8,84 @@ using Warehouse.Products.GettingProductDetails;
 using Warehouse.Products.RegisteringProduct;
 using Xunit;
 
-namespace Warehouse.Api.Tests.Products.GettingProductDetails
+namespace Warehouse.Api.Tests.Products.GettingProductDetails;
+
+public class GetProductDetailsFixture: ApiFixture
 {
-    public class GetProductDetailsFixture: ApiFixture
+    protected override string ApiUrl => "/api/products";
+
+    protected override Func<IWebHostBuilder, IWebHostBuilder> SetupWebHostBuilder =>
+        whb => WarehouseTestWebHostBuilder.Configure(whb, nameof(GetProductDetailsFixture));
+
+    public ProductDetails ExistingProduct = default!;
+
+    public Guid ProductId = default!;
+
+    public override async Task InitializeAsync()
     {
-        protected override string ApiUrl => "/api/products";
+        var registerProduct = new RegisterProductRequest("IN11111", "ValidName", "ValidDescription");
+        var registerResponse = await Post(registerProduct);
 
-        protected override Func<IWebHostBuilder, IWebHostBuilder> SetupWebHostBuilder =>
-            whb => WarehouseTestWebHostBuilder.Configure(whb, nameof(GetProductDetailsFixture));
+        registerResponse.EnsureSuccessStatusCode()
+            .StatusCode.Should().Be(HttpStatusCode.Created);
 
-        public ProductDetails ExistingProduct = default!;
+        ProductId = await registerResponse.GetResultFromJson<Guid>();
 
-        public Guid ProductId = default!;
+        var (sku, name, description) = registerProduct;
+        ExistingProduct = new ProductDetails(ProductId, sku!, name!, description);
+    }
+}
 
-        public override async Task InitializeAsync()
-        {
-            var registerProduct = new RegisterProductRequest("IN11111", "ValidName", "ValidDescription");
-            var registerResponse = await Post(registerProduct);
+public class GetProductDetailsTests: IClassFixture<GetProductDetailsFixture>
+{
+    private readonly GetProductDetailsFixture fixture;
 
-            registerResponse.EnsureSuccessStatusCode()
-                .StatusCode.Should().Be(HttpStatusCode.Created);
-
-            ProductId = await registerResponse.GetResultFromJson<Guid>();
-
-            var (sku, name, description) = registerProduct;
-            ExistingProduct = new ProductDetails(ProductId, sku!, name!, description);
-        }
+    public GetProductDetailsTests(GetProductDetailsFixture fixture)
+    {
+        this.fixture = fixture;
     }
 
-    public class GetProductDetailsTests: IClassFixture<GetProductDetailsFixture>
+    [Fact]
+    public async Task ValidRequest_With_NoParams_ShouldReturn_200()
     {
-        private readonly GetProductDetailsFixture fixture;
+        // Given
 
-        public GetProductDetailsTests(GetProductDetailsFixture fixture)
-        {
-            this.fixture = fixture;
-        }
+        // When
+        var response = await fixture.Get(fixture.ProductId.ToString());
 
-        [Fact]
-        public async Task ValidRequest_With_NoParams_ShouldReturn_200()
-        {
-            // Given
+        // Then
+        response.EnsureSuccessStatusCode()
+            .StatusCode.Should().Be(HttpStatusCode.OK);
 
-            // When
-            var response = await fixture.Get(fixture.ProductId.ToString());
+        var product = await response.GetResultFromJson<ProductDetails>();
+        product.Should().NotBeNull();
+        product.Should().BeEquivalentTo(fixture.ExistingProduct);
+    }
 
-            // Then
-            response.EnsureSuccessStatusCode()
-                .StatusCode.Should().Be(HttpStatusCode.OK);
+    [Theory]
+    [InlineData(12)]
+    [InlineData("not-a-guid")]
+    public async Task InvalidGuidId_ShouldReturn_400(object invalidId)
+    {
+        // Given
 
-            var product = await response.GetResultFromJson<ProductDetails>();
-            product.Should().NotBeNull();
-            product.Should().BeEquivalentTo(fixture.ExistingProduct);
-        }
+        // When
+        var response = await fixture.Get($"{invalidId}");
 
-        [Theory]
-        [InlineData(12)]
-        [InlineData("not-a-guid")]
-        public async Task InvalidGuidId_ShouldReturn_400(object invalidId)
-        {
-            // Given
+        // Then
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
 
-            // When
-            var response = await fixture.Get($"{invalidId}");
+    [Fact]
+    public async Task NotExistingId_ShouldReturn_404()
+    {
+        // Given
+        var notExistingId = Guid.NewGuid();
 
-            // Then
-            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
+        // When
+        var response = await fixture.Get($"{notExistingId}");
 
-        [Fact]
-        public async Task NotExistingId_ShouldReturn_404()
-        {
-            // Given
-            var notExistingId = Guid.NewGuid();
-
-            // When
-            var response = await fixture.Get($"{notExistingId}");
-
-            // Then
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
+        // Then
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

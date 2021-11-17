@@ -1,8 +1,7 @@
-namespace Payments.Payments.FailingPayment
+namespace Payments.Payments.FailingPayment;
+
+public enum PaymentFailReason
 {
-    public enum PaymentFailReason
-    {
-        Discarded,
-        TimedOut
-    }
+    Discarded,
+    TimedOut
 }

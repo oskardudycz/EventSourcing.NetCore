@@ -4,39 +4,38 @@ using System.Threading.Tasks;
 using Core.Queries;
 using Marten;
 
-namespace Carts.Carts.GettingCartById
+namespace Carts.Carts.GettingCartById;
+
+public class GetCartById : IQuery<CartDetails>
 {
-    public class GetCartById : IQuery<CartDetails>
+    public Guid CartId { get; }
+
+    private GetCartById(Guid cartId)
     {
-        public Guid CartId { get; }
-
-        private GetCartById(Guid cartId)
-        {
-            CartId = cartId;
-        }
-
-        public static GetCartById Create(Guid cartId)
-        {
-            if (cartId == Guid.Empty)
-                throw new ArgumentOutOfRangeException(nameof(cartId));
-
-            return new GetCartById(cartId);
-        }
+        CartId = cartId;
     }
 
-    internal class HandleGetCartById :
-        IQueryHandler<GetCartById, CartDetails?>
+    public static GetCartById Create(Guid cartId)
     {
-        private readonly IDocumentSession querySession;
+        if (cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
 
-        public HandleGetCartById(IDocumentSession querySession)
-        {
-            this.querySession = querySession;
-        }
+        return new GetCartById(cartId);
+    }
+}
 
-        public Task<CartDetails?> Handle(GetCartById request, CancellationToken cancellationToken)
-        {
-            return querySession.LoadAsync<CartDetails>(request.CartId, cancellationToken);
-        }
+internal class HandleGetCartById :
+    IQueryHandler<GetCartById, CartDetails?>
+{
+    private readonly IDocumentSession querySession;
+
+    public HandleGetCartById(IDocumentSession querySession)
+    {
+        this.querySession = querySession;
+    }
+
+    public Task<CartDetails?> Handle(GetCartById request, CancellationToken cancellationToken)
+    {
+        return querySession.LoadAsync<CartDetails>(request.CartId, cancellationToken);
     }
 }

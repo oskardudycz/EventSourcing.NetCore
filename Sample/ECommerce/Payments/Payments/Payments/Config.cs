@@ -11,38 +11,37 @@ using Payments.Payments.FinalizingPayment;
 using Payments.Payments.RequestingPayment;
 using Payments.Payments.TimingOutPayment;
 
-namespace Payments.Payments
+namespace Payments.Payments;
+
+internal static class PaymentsConfig
 {
-    internal static class PaymentsConfig
+    internal static void AddPayments(this IServiceCollection services)
     {
-        internal static void AddPayments(this IServiceCollection services)
-        {
-            services.AddScoped<IRepository<Payment>, MartenRepository<Payment>>()
-                .AddCommandHandlers()
-                .AddEventHandlers();
-        }
+        services.AddScoped<IRepository<Payment>, MartenRepository<Payment>>()
+            .AddCommandHandlers()
+            .AddEventHandlers();
+    }
 
-        private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
-        {
-            return services
-                .AddCommandHandler<RequestPayment, HandleRequestPayment>()
-                .AddCommandHandler<CompletePayment, HandleCompletePayment>()
-                .AddCommandHandler<DiscardPayment, HandleDiscardPayment>()
-                .AddCommandHandler<TimeOutPayment, HandleTimeOutPayment>();
-        }
+    private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
+    {
+        return services
+            .AddCommandHandler<RequestPayment, HandleRequestPayment>()
+            .AddCommandHandler<CompletePayment, HandleCompletePayment>()
+            .AddCommandHandler<DiscardPayment, HandleDiscardPayment>()
+            .AddCommandHandler<TimeOutPayment, HandleTimeOutPayment>();
+    }
 
-        private static IServiceCollection AddEventHandlers(this IServiceCollection services)
-        {
-             return services
-                 .AddEventHandler<PaymentCompleted, TransformIntoPaymentFinalized>()
-                 .AddEventHandler<PaymentDiscarded, TransformIntoPaymentFailed>()
-                 .AddEventHandler<PaymentTimedOut, TransformIntoPaymentFailed>();
-        }
+    private static IServiceCollection AddEventHandlers(this IServiceCollection services)
+    {
+        return services
+            .AddEventHandler<PaymentCompleted, TransformIntoPaymentFinalized>()
+            .AddEventHandler<PaymentDiscarded, TransformIntoPaymentFailed>()
+            .AddEventHandler<PaymentTimedOut, TransformIntoPaymentFailed>();
+    }
 
-        internal static void ConfigurePayments(this StoreOptions options)
-        {
-            // Snapshots
-            options.Projections.SelfAggregate<Payment>();
-        }
+    internal static void ConfigurePayments(this StoreOptions options)
+    {
+        // Snapshots
+        options.Projections.SelfAggregate<Payment>();
     }
 }

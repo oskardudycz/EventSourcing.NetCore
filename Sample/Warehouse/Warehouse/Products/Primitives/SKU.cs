@@ -2,26 +2,25 @@
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-namespace Warehouse.Products.Primitives
+namespace Warehouse.Products.Primitives;
+
+public record SKU
 {
-    public record SKU
+    public string Value { get; init; }
+
+    [JsonConstructor]
+    private SKU(string value)
     {
-        public string Value { get; init; }
+        Value = value;
+    }
 
-        [JsonConstructor]
-        private SKU(string value)
-        {
-            Value = value;
-        }
+    public static SKU Create(string? value)
+    {
+        if (value == null)
+            throw new ArgumentNullException(nameof(SKU));
+        if (string.IsNullOrWhiteSpace(value) || !Regex.IsMatch(value, "[A-Z]{2,4}[0-9]{4,18}"))
+            throw new ArgumentOutOfRangeException(nameof(SKU));
 
-        public static SKU Create(string? value)
-        {
-            if (value == null)
-                throw new ArgumentNullException(nameof(SKU));
-            if (string.IsNullOrWhiteSpace(value) || !Regex.IsMatch(value, "[A-Z]{2,4}[0-9]{4,18}"))
-                throw new ArgumentOutOfRangeException(nameof(SKU));
-
-            return new SKU(value);
-        }
+        return new SKU(value);
     }
 }

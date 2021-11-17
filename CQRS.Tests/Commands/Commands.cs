@@ -6,119 +6,118 @@ using MediatR;
 using SharpTestsEx;
 using Xunit;
 
-namespace CQRS.Tests.Commands
+namespace CQRS.Tests.Commands;
+
+public class Commands
 {
-    public class Commands
+    public interface ICommand: IRequest
+    { }
+
+    public interface ICommandHandler<in T>: IRequestHandler<T> where T : ICommand
+    { }
+
+    public interface ICommandBus
     {
-        public interface ICommand: IRequest
-        { }
+        Task Send(ICommand command);
+    }
 
-        public interface ICommandHandler<in T>: IRequestHandler<T> where T : ICommand
-        { }
+    public class CommandBus: ICommandBus
+    {
+        private readonly IMediator mediator;
 
-        public interface ICommandBus
+        public CommandBus(IMediator mediator)
         {
-            Task Send(ICommand command);
+            this.mediator = mediator;
         }
 
-        public class CommandBus: ICommandBus
+        public Task Send(ICommand command)
         {
-            private readonly IMediator mediator;
+            return mediator.Send(command);
+        }
+    }
 
-            public CommandBus(IMediator mediator)
-            {
-                this.mediator = mediator;
-            }
+    public class CreateIssueCommand: ICommand
+    {
+        public string Name { get; }
 
-            public Task Send(ICommand command)
-            {
-                return mediator.Send(command);
-            }
+        public CreateIssueCommand(string name)
+        {
+            Name = name;
+        }
+    }
+
+    public interface IIssueApplicationService
+    {
+        Task CreateIssue(CreateIssueCommand command);
+    }
+
+    public class IssueApplicationService: IIssueApplicationService
+    {
+        private readonly ICommandBus commandBus;
+
+        public IssueApplicationService(ICommandBus commandBus)
+        {
+            this.commandBus = commandBus;
         }
 
-        public class CreateIssueCommand: ICommand
+        public Task CreateIssue(CreateIssueCommand command)
         {
-            public string Name { get; }
+            return commandBus.Send(command);
+        }
+    }
 
-            public CreateIssueCommand(string name)
-            {
-                Name = name;
-            }
+    public interface IAppWrtiteModel
+    {
+        IList<string> Issues { get; }
+    }
+
+    public class AppWriteModel: IAppWrtiteModel
+    {
+        public IList<string> Issues { get; }
+
+        public AppWriteModel(params string[] issues)
+        {
+            Issues = new List<string>();
+        }
+    }
+
+    public class CreateIssueCommandHandler: ICommandHandler<CreateIssueCommand>
+    {
+        private readonly IAppWrtiteModel writeModel;
+
+        public CreateIssueCommandHandler(IAppWrtiteModel writeModel)
+        {
+            this.writeModel = writeModel;
         }
 
-        public interface IIssueApplicationService
+        public Task<Unit> Handle(CreateIssueCommand message, CancellationToken cancellationToken = default)
         {
-            Task CreateIssue(CreateIssueCommand command);
+            writeModel.Issues.Add(message.Name);
+            return Unit.Task;
         }
+    }
 
-        public class IssueApplicationService: IIssueApplicationService
-        {
-            private readonly ICommandBus commandBus;
+    [Fact]
+    public void GivenCommandWithData_WhenCommandIsSendToApplicationService_ThenWriteModelIsChanged()
+    {
+        var serviceLocator = new ServiceLocator();
 
-            public IssueApplicationService(ICommandBus commandBus)
-            {
-                this.commandBus = commandBus;
-            }
+        var writeModel = new AppWriteModel();
+        var commandHandler = new CreateIssueCommandHandler(writeModel);
+        serviceLocator.RegisterCommandHandler<CreateIssueCommand, CreateIssueCommandHandler>(commandHandler);
 
-            public Task CreateIssue(CreateIssueCommand command)
-            {
-                return commandBus.Send(command);
-            }
-        }
+        var applicationService = new IssueApplicationService(new CommandBus(serviceLocator.GetMediator()));
 
-        public interface IAppWrtiteModel
-        {
-            IList<string> Issues { get; }
-        }
+        //Given
+        var createdIssueName = "cleaning";
 
-        public class AppWriteModel: IAppWrtiteModel
-        {
-            public IList<string> Issues { get; }
+        var command = new CreateIssueCommand(createdIssueName);
 
-            public AppWriteModel(params string[] issues)
-            {
-                Issues = new List<string>();
-            }
-        }
+        //When
+        applicationService.CreateIssue(command);
 
-        public class CreateIssueCommandHandler: ICommandHandler<CreateIssueCommand>
-        {
-            private readonly IAppWrtiteModel writeModel;
-
-            public CreateIssueCommandHandler(IAppWrtiteModel writeModel)
-            {
-                this.writeModel = writeModel;
-            }
-
-            public Task<Unit> Handle(CreateIssueCommand message, CancellationToken cancellationToken = default)
-            {
-                writeModel.Issues.Add(message.Name);
-                return Unit.Task;
-            }
-        }
-
-        [Fact]
-        public void GivenCommandWithData_WhenCommandIsSendToApplicationService_ThenWriteModelIsChanged()
-        {
-            var serviceLocator = new ServiceLocator();
-
-            var writeModel = new AppWriteModel();
-            var commandHandler = new CreateIssueCommandHandler(writeModel);
-            serviceLocator.RegisterCommandHandler<CreateIssueCommand, CreateIssueCommandHandler>(commandHandler);
-
-            var applicationService = new IssueApplicationService(new CommandBus(serviceLocator.GetMediator()));
-
-            //Given
-            var createdIssueName = "cleaning";
-
-            var command = new CreateIssueCommand(createdIssueName);
-
-            //When
-            applicationService.CreateIssue(command);
-
-            //Then
-            writeModel.Issues.Should().Have.Count.EqualTo(1);
-            writeModel.Issues.Should().Have.SameValuesAs(createdIssueName);
-        }
+        //Then
+        writeModel.Issues.Should().Have.Count.EqualTo(1);
+        writeModel.Issues.Should().Have.SameValuesAs(createdIssueName);
     }
 }

@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
 
-namespace Core.Commands
+namespace Core.Commands;
+
+public interface ICommandBus
 {
-    public interface ICommandBus
-    {
-        Task Send<TCommand>(TCommand command) where TCommand : ICommand;
-    }
+    Task Send<TCommand>(TCommand command) where TCommand : ICommand;
 }

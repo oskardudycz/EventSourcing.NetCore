@@ -1,6 +1,5 @@
 using MediatR;
 
-namespace Core.Commands
-{
-    public interface ICommand: IRequest { }
-}
+namespace Core.Commands;
+
+public interface ICommand: IRequest { }

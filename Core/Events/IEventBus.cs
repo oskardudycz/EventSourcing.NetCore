@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
 
-namespace Core.Events
+namespace Core.Events;
+
+public interface IEventBus
 {
-    public interface IEventBus
-    {
-        Task Publish(params IEvent[] events);
-    }
+    Task Publish(params IEvent[] events);
 }
