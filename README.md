@@ -394,6 +394,8 @@ Feel free to [create an issue](https://github.com/oskardudycz/EventSourcing.NetC
 
 👉 [Github Sponsors](https://github.com/sponsors/oskardudycz) 
 
+⭐ Star on GitHub or sharing with your friends will also help!
+
 ## 4. Prerequisites
 
 For running the Event Store examples you need to have:
