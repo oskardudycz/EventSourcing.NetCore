@@ -64,13 +64,10 @@ namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings
 
         [Fact]
         [Trait("Category", "Acceptance")]
-        public async Task ScheduleMeeting_ShouldSucceed()
+        public void ScheduleMeeting_ShouldSucceed()
         {
             var commandResponse = fixture.ScheduleMeetingCommandResponse.EnsureSuccessStatusCode();
             commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var createdId = await commandResponse.GetResultFromJson<string>();
-            createdId.Should().BeNull();
         }
 
         [Fact]
