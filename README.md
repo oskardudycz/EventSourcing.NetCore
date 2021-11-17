@@ -398,7 +398,7 @@ Feel free to [create an issue](https://github.com/oskardudycz/EventSourcing.NetC
 
 For running the Event Store examples you need to have:
 
-1. .NET 5 installed - https://dotnet.microsoft.com/download/dotnet/5.0
+1. .NET 6 installed - https://dotnet.microsoft.com/download/dotnet/6.0
 2. [Docker](https://store.docker.com/search?type=edition&offering=community) installed. Then going to the `docker` folder and running:
 
 ```
@@ -445,7 +445,7 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - Read models are stored as Marten documents.
 
 ### 6.5 [Warehouse](./Sample/Warehouse)
-- simplest CQRS flow using .NET 5 Endpoints,
+- simplest CQRS flow using .NET Endpoints,
 - example of how and where to use C# Records, Nullable Reference Types, etc,
 - No Event Sourcing! Using Entity Framework to show that CQRS is not bounded to Event Sourcing or any type of storage,
 - No Aggregates! CQRS do not need DDD. Business logic can be handled in handlers.
