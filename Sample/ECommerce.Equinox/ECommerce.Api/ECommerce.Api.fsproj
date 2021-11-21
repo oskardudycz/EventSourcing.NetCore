@@ -6,11 +6,18 @@
 
     <ItemGroup>
         <Compile Include="Controllers\ShoppingCartsController.fs" />
+        <Compile Include="Startup.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\ECommerce.Domain\ECommerce.Domain.fsproj" />
+      <ProjectReference Include="..\ECommerce.Infrastructure\ECommerce.Infrastructure.fsproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
