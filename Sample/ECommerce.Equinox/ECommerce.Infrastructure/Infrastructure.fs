@@ -49,6 +49,12 @@ module CosmosStoreContext =
         let maxEvents = 256
         Equinox.CosmosStore.CosmosStoreContext(storeClient, tipMaxEvents=maxEvents)
 
+module EventStoreContext =
+
+    let create (storeClient : Equinox.EventStore.EventStoreConnection) =
+        let batchingPolicy = Equinox.EventStore.BatchingPolicy(maxBatchSize = 200)
+        Equinox.EventStore.EventStoreContext(storeClient, batchingPolicy)
+
 /// Equinox and Propulsion provide metrics as properties in log emissions
 /// These helpers wire those to pass through virtual Log Sinks that expose them as Prometheus metrics.
 module Sinks =
