@@ -60,8 +60,8 @@ type ShoppingCartsController(carts : ShoppingCart.Service) =
 
         let (CartId.Parse cartId) = id
         match! carts.Read cartId with
-        | Some (res : ShoppingCartDetails) -> OkResult res
-        | None -> NotFoundResult()
+        | Some (res : ShoppingCart.Details.View) -> return OkObjectResult res
+        | None -> return NotFoundResult()
     }
 
 (* TODO
