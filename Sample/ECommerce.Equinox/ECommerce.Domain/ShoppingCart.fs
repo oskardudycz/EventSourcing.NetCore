@@ -16,7 +16,8 @@ module Events =
 
 module Fold =
 
-    type Status = Pending | Confirmed | Cancelled
+    [<Newtonsoft.Json.JsonConverter(typeof<FsCodec.NewtonsoftJson.TypeSafeEnumConverter>)>]
+    type Status = Pending | Confirmed
     type State =
         {   clientId : ClientId option
             status : Status; items : PricedProductItem array
@@ -43,7 +44,7 @@ module Fold =
         | Events.Initialized e ->   { s with clientId = Some e.clientId }
         | Events.ItemAdded e ->     { s with items = s.items |> ItemList.add (e.productId, e.unitPrice, e.quantity) }
         | Events.ItemRemoved e ->   { s with items = s.items |> ItemList.remove (e.productId, e.unitPrice) }
-        | Events.Confirmed e ->     { s with confirmedAt = Some e.confirmedAt }
+        | Events.Confirmed e ->     { s with status = Confirmed; confirmedAt = Some e.confirmedAt }
     let fold = Seq.fold evolve
 
 let decideInitialize clientId (s : Fold.State) =
@@ -65,6 +66,17 @@ let decideConfirm at = function
     | s when Fold.isClosed s -> []
     | _ -> [ Events.Confirmed {| confirmedAt = at |} ]
 
+module Details =
+
+    type View = { (* id *) clientId : ClientId; status : Fold.Status; items : Item[] }
+     and Item = { productId : ProductId; unitPrice : decimal; quantity : int }
+
+    let render = function
+        | ({ clientId = None } : Fold.State) -> None
+        | { clientId = Some clientId } as s ->
+            let items = [| for { productItem = pi; unitPrice = p } in s.items -> { productId = pi.productId; unitPrice = p; quantity = pi.quantity } |]
+            Some {  clientId = clientId; status = s.status; items = items }
+
 type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calculatePrice : ProductId * int -> decimal) =
 
     member _.Initialize(cartId, clientId) =
@@ -84,6 +96,16 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
     member _.Confirm(cartId, at) =
         let decider = resolve cartId
         decider.Transact(decideConfirm at)
+
+    // NOTE doing this does not meet the principle of CQRS
+    // However, its not unrealistic for this demo in that
+    // a) it means you can read your writes immediately
+    // b) it's not unreasonable in efficiency tems
+    // - on Cosmos, you pay only 1RU to read through the cache with the etag
+    // - on ESDB you are reading forward from a cached stream and typically not getting any events
+    member _.Read(cartId) : Async<Details.View option> =
+        let decider = resolve cartId
+        decider.Query(Details.render)
 
 module Config =
 
