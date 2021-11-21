@@ -8,6 +8,7 @@ and [<Measure>] productId
 module ProductId =
     let toString (x : ProductId) : string = (UMX.untag x).ToString("N")
     let parse (value : Guid) : ProductId = %value
+    let (|Parse|) = parse
 
 type ClientId = Guid<clientId>
 and [<Measure>] clientId
@@ -26,3 +27,4 @@ module CartId =
         if not value.HasValue || value.Value = Guid.Empty then raise <| ArgumentOutOfRangeException(nameof value)
         %value.Value
     let (|Parse|) = parse
+    let generate () : CartId = Guid.NewGuid() |> Nullable |> parse
