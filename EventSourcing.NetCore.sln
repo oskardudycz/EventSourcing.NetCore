@@ -483,6 +483,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ECommerce.Domain", "Sample\
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ECommerce.Reactor", "Sample\ECommerce.Equinox\ECommerce.Reactor\ECommerce.Reactor.fsproj", "{C3D0553F-5786-4417-97FD-B65440620274}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ECommerce.Api", "Sample\ECommerce.Equinox\ECommerce.Api\ECommerce.Api.fsproj", "{1F43CF34-CD69-4EEB-BF64-5AD649CE3AF5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ECommerce.Infrastructure", "Sample\ECommerce.Equinox\ECommerce.Infrastructure\ECommerce.Infrastructure.fsproj", "{1C310D3A-BFC5-4984-BB11-4579067CFFB5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -124,5 +124,8 @@ module Config =
             let cat = Config.Cosmos.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
             cat.Resolve
     let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
-    let create (pricer : IProductPriceCalculator) store =
+    let create_ (pricer : IProductPriceCalculator) store =
         Service(resolveDecider store, calculatePrice pricer)
+    let create store =
+        let defaultCalculator = RandomProductPriceCalculator()
+        create_ defaultCalculator
