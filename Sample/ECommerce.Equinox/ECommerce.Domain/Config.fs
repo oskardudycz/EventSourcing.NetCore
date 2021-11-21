@@ -8,6 +8,12 @@ module Memory =
     let create codec initial fold store =
         Equinox.MemoryStore.MemoryStoreCategory(store, codec, fold, initial)
 
+module Esdb =
+
+    let createUnoptimized codec initial fold (context, cache) =
+        let cacheStrategy = Equinox.EventStore.CachingStrategy.SlidingWindow (cache, System.TimeSpan.FromMinutes 20.)
+        Equinox.EventStore.EventStoreCategory(context, codec, fold, initial, cacheStrategy)
+
 module Cosmos =
 
     let private createCached codec initial fold accessStrategy (context, cache) =
@@ -29,4 +35,5 @@ module Cosmos =
 [<NoComparison; NoEquality; RequireQualifiedAccess>]
 type Store<'t> =
     | Memory of Equinox.MemoryStore.VolatileStore<'t>
+    | Esdb of Equinox.EventStore.EventStoreContext * Equinox.Core.ICache
     | Cosmos of Equinox.CosmosStore.CosmosStoreContext * Equinox.Core.ICache

@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <PackageReference Include="Equinox.CosmosStore" Version="3.0.5" />
+        <PackageReference Include="Equinox.EventStore" Version="3.0.5" />
         <PackageReference Include="Equinox.MemoryStore" Version="3.0.5" />
         <PackageReference Include="FsCodec.NewtonsoftJson" Version="2.2.2" />
         <PackageReference Include="Propulsion" Version="2.11.0" />
