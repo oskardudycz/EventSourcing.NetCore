@@ -477,6 +477,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaggerUi.Aspire.Hosting", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Scheduling", "Core.Scheduling\Core.Scheduling.csproj", "{3B754142-CDA4-430F-8DF7-5DC0D204EE35}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ECommerce.Equinox", "ECommerce.Equinox", "{5CF0173B-EAC6-4100-8F5A-F1966066E87D}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ECommerce.Domain", "Sample\ECommerce.Equinox\ECommerce.Domain\ECommerce.Domain.fsproj", "{7C22079D-C359-40DE-8E5F-1DDD9CDD06DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
