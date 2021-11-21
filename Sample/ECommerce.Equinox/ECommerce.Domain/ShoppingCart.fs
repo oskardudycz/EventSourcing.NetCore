@@ -23,7 +23,7 @@ module Fold =
             status : Status; items : PricedProductItem array
             confirmedAt : System.DateTimeOffset option }
     let initial = { clientId = None; status = Status.Pending; items = Array.empty; confirmedAt = None }
-    let isClosed (s : State) = match s.status with Confirmed | Cancelled -> true | Pending -> false
+    let isClosed (s : State) = match s.status with Confirmed -> true | Pending -> false
     module ItemList =
         let keys (x : PricedProductItem) = x.productItem.productId, x.unitPrice
         let add (productId, price, quantity) (current : PricedProductItem seq) =
@@ -116,6 +116,9 @@ module Config =
     let private resolveStream = function
         | Config.Store.Memory store ->
             let cat = Config.Memory.create Events.codec Fold.initial Fold.fold store
+            cat.Resolve
+        | Config.Store.Esdb (context, cache) ->
+            let cat = Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
             cat.Resolve
         | Config.Store.Cosmos (context, cache) ->
             let cat = Config.Cosmos.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)

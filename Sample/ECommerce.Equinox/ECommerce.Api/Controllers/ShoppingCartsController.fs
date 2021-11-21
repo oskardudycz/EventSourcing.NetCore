@@ -1,9 +1,8 @@
 ﻿namespace ECommerce.Api.Controllers
 
 open ECommerce.Domain
-open System
-open System.Threading.Tasks
 open Microsoft.AspNetCore.Mvc
+open System
 
 type InitializeShoppingCartRequest = { clientId : Guid Nullable }
 type AddProductRequest = { productId : Guid; quantity : int }
@@ -20,7 +19,6 @@ type ShoppingCartsController(carts : ShoppingCart.Service) =
 
         // TODO this should be resolved via an idempotent lookup in the Client's list
         let cartId = CartId.generate();
-
         do! carts.Initialize(cartId, ClientId.parse request.clientId)
         return CreatedResult("api/ShoppingCarts", cartId);
     }
