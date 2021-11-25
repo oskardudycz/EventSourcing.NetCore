@@ -109,9 +109,8 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
 
 module Config =
 
-    let calculatePrice (pricer : IProductPriceCalculator) (productId, quantity) =
-        let priced = pricer.Calculate( { productId = productId; quantity = quantity })
-        priced.unitPrice
+    let calculatePrice (pricer : IProductPriceCalculator) (productId, quantity) : decimal =
+        pricer.Calculate productId
 
     let private resolveStream = function
         | Config.Store.Memory store ->

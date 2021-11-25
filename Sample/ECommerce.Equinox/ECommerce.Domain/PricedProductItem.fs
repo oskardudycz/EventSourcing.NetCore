@@ -1,5 +1,10 @@
 namespace ECommerce.Domain
 
+(* NOT USED in this impl - in general helpers like this end up in two distinct places:
+ - in `module Fold` only for folding purposes
+ - as specific types e.g. in `module Details` you define specific models that a Synchronous Query
+ - as specific types that a Decision function projects out
+
 open System
 
 type ProductItem = { productId : ProductId; quantity : int }
@@ -24,3 +29,4 @@ type PricedProductItem = { productItem : ProductItem; unitPrice : decimal } with
         if x.unitPrice <> productItem.unitPrice then raise <| ArgumentException "Product unit prices do not match."
         // TODO fix bug in source: new ProductItem(ProductId, productItem.Quantity + productItem.Quantity),
         { productItem = { productId = x.ProductId; quantity = x.Quantity + productItem.Quantity }; unitPrice = x.unitPrice }
+*)
