@@ -25,9 +25,10 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
     - [6.2 Simple EventSourcing with EventStoreDB](#62-simple-eventsourcing-with-eventstoredb)
     - [6.3 ECommerce with EventStoreDB](#63-ecommerce-with-eventstoredb)
     - [6.5 Warehouse](#65-warehouse)
-    - [6.6 Meetings Management with Marten](#66-meetings-management-with-marten)
-    - [6.7 Cinema Tickets Reservations with Marten](#67-cinema-tickets-reservations-with-marten)
-    - [6.8 SmartHome IoT with Marten](#68-smarthome-iot-with-marten)
+    - [6.6 Event Pipelines](#66-event-pipelines)
+    - [6.7 Meetings Management with Marten](#67-meetings-management-with-marten)
+    - [6.8 Cinema Tickets Reservations with Marten](#68-cinema-tickets-reservations-with-marten)
+    - [6.9 SmartHome IoT with Marten](#69-smarthome-iot-with-marten)
   - [7. Self-paced training Kit](#7-self-paced-training-kit)
   - [8. Articles](#8-articles)
   - [9. Event Store - Marten](#9-event-store---marten)
@@ -452,7 +453,18 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - No Event Sourcing! Using Entity Framework to show that CQRS is not bounded to Event Sourcing or any type of storage,
 - No Aggregates! CQRS do not need DDD. Business logic can be handled in handlers.
 
-### 6.6 [Meetings Management with Marten](./Sample/MeetingsManagement/)
+### 6.6 [Event Pipelines](./EventPipelines)
+Shows how to compose event handlers in the processing pipelines to:
+- filter events,
+- transform them,
+- NOT requiring marker interfaces for events,
+- NOT requiring marker interfaces for handlers,
+- enables composition through regular functions,
+- allows using interfaces and classes if you want to,
+- can be used with Dependency Injection, but also without through builder,
+- integrates with MediatR if you want to.
+
+### 6.7 [Meetings Management with Marten](./Sample/MeetingsManagement/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - microservices example,
@@ -460,12 +472,12 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - Kafka as a messaging platform to integrate microservices,
 - read models handled in separate microservice and stored to other database (ElasticSearch)
 
-### 6.7 [Cinema Tickets Reservations with Marten](./Sample/Tickets/)
+### 6.8 [Cinema Tickets Reservations with Marten](./Sample/Tickets/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to Marten.
 
-### 6.8 [SmartHome IoT with Marten](./Sample/AsyncProjections/)
+### 6.9 [SmartHome IoT with Marten](./Sample/AsyncProjections/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to Marten,
