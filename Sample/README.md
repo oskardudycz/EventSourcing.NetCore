@@ -32,6 +32,17 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - No Event Sourcing! Using Entity Framework to show that CQRS is not bounded to Event Sourcing or any type of storage,
 - No Aggregates! CQRS do not need DDD. Business logic can be handled in handlers.
 
+## [Event Pipelines](./EventPipelines)
+Shows how to compose event handlers in the processing pipelines to:
+- filter events,
+- transform them,
+- NOT requiring marker interfaces for events,
+- NOT requiring marker interfaces for handlers,
+- enables composition through regular functions,
+- allows using interfaces and classes if you want to,
+- can be used with Dependency Injection, but also without through builder,
+- integrates with MediatR if you want to.
+
 ## [Meetings Management with Marten](./MeetingsManagement/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
