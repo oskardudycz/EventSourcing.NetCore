@@ -1,4 +1,4 @@
-## [Event Pipelines](./EventPipelines)
+# [Event Pipelines](./EventPipelines)
 
 Shows how to compose event handlers in the processing pipelines to:
 - filter events,
@@ -96,3 +96,15 @@ var builder = EventHandlersBuilder
 
 var eventBus = new EventBus(builder);
 ```
+
+## Samples
+
+Check different ways of defining and integrating Event Handlers:
+- [Pure functions with Builder](./EventPipelines.Tests/PureFunctionsWithBuilderTest.cs)
+- [Pure functions with Dependency Injection](./EventPipelines.Tests/PureFunctionsWithIoCTest.cs)
+- [Classes with Builder](./EventPipelines.Tests/PureFunctionsWithBuilderTest.cs)
+- [Classes with Dependency Injection](./EventPipelines.Tests/ClassesWithIoCTest.cs)
+
+And how to integrate with MediatR:
+- [Pure functions](./EventPipelines.Tests/PureFunctionsWithMediatRTest.cs)
+- [Classes](./EventPipelines.Tests/ClassesWithMediatRTest.cs)

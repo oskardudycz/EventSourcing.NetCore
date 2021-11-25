@@ -221,6 +221,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Core", "Sample\EventStoreDB\Simple\ECommerce.Core\ECommerce.Core.csproj", "{D3351193-F63A-43F1-BB70-C9F4D25887CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventPipelines", "EventPipelines", "{D9799DB3-9D11-4909-8133-64CD96F6E1AC}"
+	ProjectSection(SolutionItems) = preProject
+		Sample\EventPipelines\README.md = Sample\EventPipelines\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventPipelines", "Sample\EventPipelines\EventPipelines\EventPipelines.csproj", "{622B15BD-9675-431E-B3F0-336D4E50E30F}"
 EndProject
