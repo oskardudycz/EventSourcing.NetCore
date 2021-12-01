@@ -1,4 +1,4 @@
-# [Event Pipelines](./EventPipelines)
+# Event Pipelines
 
 Shows how to compose event handlers in the processing pipelines to:
 - filter events,
