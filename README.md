@@ -25,10 +25,11 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
     - [6.2 Simple EventSourcing with EventStoreDB](#62-simple-eventsourcing-with-eventstoredb)
     - [6.3 ECommerce with EventStoreDB](#63-ecommerce-with-eventstoredb)
     - [6.5 Warehouse](#65-warehouse)
-    - [6.6 Event Pipelines](#66-event-pipelines)
-    - [6.7 Meetings Management with Marten](#67-meetings-management-with-marten)
-    - [6.8 Cinema Tickets Reservations with Marten](#68-cinema-tickets-reservations-with-marten)
-    - [6.9 SmartHome IoT with Marten](#69-smarthome-iot-with-marten)
+    - [6.6 Event Versioning](#66-event-versioning)
+    - [6.7 Event Pipelines](#67-event-pipelines)
+    - [6.8 Meetings Management with Marten](#68-meetings-management-with-marten)
+    - [6.9 Cinema Tickets Reservations with Marten](#69-cinema-tickets-reservations-with-marten)
+    - [6.10 SmartHome IoT with Marten](#610-smarthome-iot-with-marten)
   - [7. Self-paced training Kit](#7-self-paced-training-kit)
   - [8. Articles](#8-articles)
   - [9. Event Store - Marten](#9-event-store---marten)
@@ -453,7 +454,21 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - No Event Sourcing! Using Entity Framework to show that CQRS is not bounded to Event Sourcing or any type of storage,
 - No Aggregates! CQRS do not need DDD. Business logic can be handled in handlers.
 
-### 6.6 [Event Pipelines](./Sample/EventPipelines)
+### 6.6 [Event Versioning](./Sample/EventVersioning)
+Shows how to handle basic event schema versioning scenarios using event and stream transformations (e.g. upcasting):
+- [Simple mapping](./Sample/EventsVersioning/#simple-mapping)
+  - [New not required property](./Sample/EventsVersioning/#new-not-required-property)
+  - [New required property](./Sample/EventsVersioning/#new-required-property)
+  - [Renamed property](./Sample/EventsVersioning/#renamed-property)
+- [Upcasting](./Sample/EventsVersioning/#upcasting)
+  - [Changed Structure](./Sample/EventsVersioning/#changed-structure)
+  - [New required property](./Sample/EventsVersioning/#new-required-property-1)
+- [Downcasters](./Sample/EventsVersioning/#downcasters)
+- [Events Transformations](./Sample/EventsVersioning/#events-transformations)
+- [Stream Transformation](./Sample/EventsVersioning/#stream-transformation)
+- [Summary](./Sample/EventsVersioning/#summary)
+
+### 6.7 [Event Pipelines](./Sample/EventPipelines)
 Shows how to compose event handlers in the processing pipelines to:
 - filter events,
 - transform them,
@@ -464,7 +479,7 @@ Shows how to compose event handlers in the processing pipelines to:
 - can be used with Dependency Injection, but also without through builder,
 - integrates with MediatR if you want to.
 
-### 6.7 [Meetings Management with Marten](./Sample/MeetingsManagement/)
+### 6.8 [Meetings Management with Marten](./Sample/MeetingsManagement/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - microservices example,
@@ -472,12 +487,12 @@ Shows how to compose event handlers in the processing pipelines to:
 - Kafka as a messaging platform to integrate microservices,
 - read models handled in separate microservice and stored to other database (ElasticSearch)
 
-### 6.8 [Cinema Tickets Reservations with Marten](./Sample/Tickets/)
+### 6.9 [Cinema Tickets Reservations with Marten](./Sample/Tickets/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to Marten.
 
-### 6.9 [SmartHome IoT with Marten](./Sample/AsyncProjections/)
+### 6.10 [SmartHome IoT with Marten](./Sample/AsyncProjections/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to Marten,

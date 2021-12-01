@@ -86,7 +86,8 @@ public class MultipleTransformationsWithDifferentEventTypes
             return this;
         }
 
-        public EventTransformations Register<TOldEvent, TEvent>(string eventTypeName, Func<TOldEvent, TEvent> transformEvent)
+        public EventTransformations Register<TOldEvent, TEvent>(string eventTypeName,
+            Func<TOldEvent, TEvent> transformEvent)
             where TOldEvent : notnull
             where TEvent : notnull
         {
@@ -100,7 +101,7 @@ public class MultipleTransformationsWithDifferentEventTypes
 
     public class EventTypeMapping
     {
-        private readonly Dictionary<string, Type> mappings = new ();
+        private readonly Dictionary<string, Type> mappings = new();
 
         public EventTypeMapping Register<TEvent>(params string[] typeNames)
         {
@@ -130,7 +131,8 @@ public class MultipleTransformationsWithDifferentEventTypes
 
         public object? Deserialize(string eventTypeName, string json) =>
             transformations.TryTransform(eventTypeName, json, out var transformed)
-                ? transformed : JsonSerializer.Deserialize(json, mapping.Map(eventTypeName));
+                ? transformed
+                : JsonSerializer.Deserialize(json, mapping.Map(eventTypeName));
     }
 
     [Fact]
@@ -160,7 +162,7 @@ public class MultipleTransformationsWithDifferentEventTypes
         );
         var eventV2 = new ShoppingCartInitialized(
             Guid.NewGuid(),
-            new Client(Guid.NewGuid(), "Oscar the Grouch" )
+            new Client(Guid.NewGuid(), "Oscar the Grouch")
         );
         var eventV3 = new ShoppingCartInitializedWithStatus(
             Guid.NewGuid(),
@@ -168,7 +170,7 @@ public class MultipleTransformationsWithDifferentEventTypes
             ShoppingCartStatus.Pending
         );
 
-        var events = new []
+        var events = new[]
         {
             new { EventType = eventTypeV1Name, EventData = JsonSerializer.Serialize(eventV1) },
             new { EventType = eventTypeV2Name, EventData = JsonSerializer.Serialize(eventV2) },

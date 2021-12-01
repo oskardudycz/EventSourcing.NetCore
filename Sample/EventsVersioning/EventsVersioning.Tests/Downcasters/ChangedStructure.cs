@@ -18,27 +18,27 @@ public class ChangedStructure
         Client Client
     );
 
-    public static V1.ShoppingCartInitialized Downcast(
-        ShoppingCartInitialized newEvent
-    )
-    {
-        return new V1.ShoppingCartInitialized(
-            newEvent.ShoppingCartId,
-            newEvent.Client.Id
-        );
-    }
+public static V1.ShoppingCartInitialized Downcast(
+    ShoppingCartInitialized newEvent
+)
+{
+    return new V1.ShoppingCartInitialized(
+        newEvent.ShoppingCartId,
+        newEvent.Client.Id
+    );
+}
 
-    public static V1.ShoppingCartInitialized Downcast(
-        string newEventJson
-    )
-    {
-        var newEvent = JsonDocument.Parse(newEventJson).RootElement;
+public static V1.ShoppingCartInitialized Downcast(
+    string newEventJson
+)
+{
+    var newEvent = JsonDocument.Parse(newEventJson).RootElement;
 
-        return new V1.ShoppingCartInitialized(
-            newEvent.GetProperty("ShoppingCartId").GetGuid(),
-            newEvent.GetProperty("Client").GetProperty("Id").GetGuid()
-        );
-    }
+    return new V1.ShoppingCartInitialized(
+        newEvent.GetProperty("ShoppingCartId").GetGuid(),
+        newEvent.GetProperty("Client").GetProperty("Id").GetGuid()
+    );
+}
 
     [Fact]
     public void UpcastObjects_Should_BeForwardCompatible()
