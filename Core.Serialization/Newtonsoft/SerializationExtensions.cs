@@ -1,11 +1,25 @@
-using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-namespace Core.Api.Testing;
+namespace Core.Serialization.Newtonsoft;
 
 public static class SerializationExtensions
 {
+    public static JsonSerializerSettings WithDefaults(this JsonSerializerSettings settings)
+    {
+        settings.WithNonDefaultConstructorContractResolver()
+            .Converters.Add(new StringEnumConverter());
+
+        return settings;
+    }
+
+    public static JsonSerializerSettings WithNonDefaultConstructorContractResolver(this JsonSerializerSettings settings)
+    {
+        settings.ContractResolver = new NonDefaultConstructorContractResolver();
+        return settings;
+    }
+
     /// <summary>
     /// Deserialize object from json with JsonNet
     /// </summary>
@@ -14,7 +28,8 @@ public static class SerializationExtensions
     /// <returns>deserialized object</returns>
     public static T FromJson<T>(this string json)
     {
-        return JsonConvert.DeserializeObject<T>(json)!;
+        return JsonConvert.DeserializeObject<T>(json,
+            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver())!;
     }
 
     /// <summary>

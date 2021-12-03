@@ -16,4 +16,8 @@
     <ItemGroup>
         <Folder Include="Properties\" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Core.Serialization\Core.Serialization.csproj" />
+    </ItemGroup>
 </Project>

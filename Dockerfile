@@ -9,6 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS builder
 WORKDIR /app
 
 COPY ./Core/Core.csproj ./Core/
+COPY ./Core.Serialization/Core.Serialization.csproj ./Core.Serialization/
 COPY ./Core.Marten/Core.Marten.csproj ./Core.Marten/
 COPY ./Core.WebApi/Core.WebApi.csproj ./Core.WebApi/
 COPY ./Sample/Tickets/Tickets/Tickets.csproj ./Sample/Tickets/Tickets/
@@ -19,6 +20,7 @@ RUN dotnet restore ./Sample/Tickets/Tickets.Api/Tickets.Api.csproj
 
 # Copy project files
 COPY ./Core ./Core
+COPY ./Core.Serialization ./Core.Serialization
 COPY ./Core.Marten ./Core.Marten
 COPY ./Core.WebApi ./Core.WebApi
 COPY ./Sample/Tickets/Tickets ./Sample/Tickets/Tickets

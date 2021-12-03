@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Core;
 using Core.Exceptions;
+using Core.Serialization.Newtonsoft;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,7 +28,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddMvc()
-            .AddNewtonsoftJson(opt => opt.SerializerSettings.Converters.Add(new StringEnumConverter()));
+            .AddNewtonsoftJson(opt => opt.SerializerSettings.WithDefaults());
 
         services.AddControllers();
 

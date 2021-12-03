@@ -1,5 +1,5 @@
 ﻿using System;
-using Core.Serialization;
+using Core.Serialization.Newtonsoft;
 using Marten;
 using Marten.Services.Json;
 using Newtonsoft.Json.Serialization;
@@ -8,10 +8,6 @@ namespace Core.Marten.Serialization;
 
 public class NonDefaultConstructorMartenJsonNetContractResolver: JsonNetContractResolver
 {
-    public NonDefaultConstructorMartenJsonNetContractResolver()
-    {
-    }
-
     public NonDefaultConstructorMartenJsonNetContractResolver(
         Casing casing,
         CollectionStorage collectionStorage,
