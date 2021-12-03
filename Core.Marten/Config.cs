@@ -4,6 +4,7 @@ using Core.Ids;
 using Core.Threading;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
+using Marten.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Weasel.Core;
@@ -80,8 +81,19 @@ public static class MartenConfigExtensions
         options.Events.DatabaseSchemaName = schemaName ?? config.WriteModelSchema;
         options.DatabaseSchemaName = schemaName ?? config.ReadModelSchema;
 
-        options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.NonPublicSetters,
-            enumStorage: EnumStorage.AsString);
+
+        var serializer = new JsonNetSerializer { EnumStorage = EnumStorage.AsString };
+        serializer.Customize(s =>
+        {
+            s.ContractResolver = new NonDefaultConstructorMartenJsonNetContractResolver(
+                Casing.Default,
+                CollectionStorage.Default,
+                NonPublicMembersStorage.NonPublicSetters
+            );
+        });
+
+        options.Serializer(serializer);
+
         options.Projections.AsyncMode = config.DaemonMode;
 
         configureOptions?.Invoke(options);
