@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Core.Serialization;
+namespace Core.Serialization.Newtonsoft;
 
 public static class JsonObjectContractProvider
 {
-    private const string ConstructorAttributeName = nameof(JsonConstructorAttribute);
-    private static readonly ConcurrentDictionary<Type, JsonObjectContract> Constructors = new();
+    private static readonly Type ConstructorAttributeType = typeof(JsonConstructorAttribute);
+    private static readonly ConcurrentDictionary<string, JsonObjectContract> Constructors = new();
 
     public static JsonObjectContract UsingNonDefaultConstructor(
         JsonObjectContract contract,
         Type objectType,
         Func<ConstructorInfo, JsonPropertyCollection, IList<JsonProperty>> createConstructorParameters) =>
-        Constructors.GetOrAdd(objectType, (type) =>
+        Constructors.GetOrAdd(objectType.AssemblyQualifiedName!, _ =>
         {
-            var nonDefaultConstructor = GetNonDefaultConstructor(type);
+            var nonDefaultConstructor = GetNonDefaultConstructor(objectType);
 
             if (nonDefaultConstructor == null) return contract;
 
@@ -37,10 +34,14 @@ public static class JsonObjectContractProvider
     private static ObjectConstructor<object> GetObjectConstructor(MethodBase method)
     {
         var c = method as ConstructorInfo;
-        if (c != null)
-            return a => c.Invoke(a);
 
-        return a => method.Invoke(null, a)!;
+        if (c == null)
+            return a => method.Invoke(null, a)!;
+
+        if (!c.GetParameters().Any())
+            return _ => c.Invoke(Array.Empty<object?>());
+
+        return a => c.Invoke(a);
     }
 
     private static ConstructorInfo? GetNonDefaultConstructor(Type objectType)
@@ -61,23 +62,19 @@ public static class JsonObjectContractProvider
 
         var constructors = objectType
             .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-            .Where(c => c.GetCustomAttributes().Any(a => a.GetType().Name == ConstructorAttributeName)).ToList();
+            .Where(c => c.GetCustomAttributes().Any(a => a.GetType() == ConstructorAttributeType)).ToList();
 
         return constructors.Count switch
         {
             1 => constructors[0],
-            > 1 => throw new JsonException($"Multiple constructors with a {ConstructorAttributeName}."),
+            > 1 => throw new JsonException($"Multiple constructors with a {ConstructorAttributeType.Name}."),
             _ => null
         };
     }
 
-    private static ConstructorInfo? GetTheMostSpecificConstructor(Type objectType)
-    {
-        var constructors = objectType
+    private static ConstructorInfo? GetTheMostSpecificConstructor(Type objectType) =>
+        objectType
             .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-            .OrderBy(e => e.GetParameters().Length);
-
-        var mostSpecific = constructors.LastOrDefault();
-        return mostSpecific;
-    }
+            .OrderByDescending(e => e.GetParameters().Length)
+            .FirstOrDefault();
 }

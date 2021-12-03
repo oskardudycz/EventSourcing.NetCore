@@ -16,4 +16,8 @@
         <PackageReference Include="FluentAssertions" Version="6.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.0" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Core.Serialization\Core.Serialization.csproj" />
+    </ItemGroup>
 </Project>

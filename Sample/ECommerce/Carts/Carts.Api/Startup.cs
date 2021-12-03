@@ -2,6 +2,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using Core;
 using Core.Exceptions;
+using Core.Serialization.Newtonsoft;
 using Core.Streaming.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
@@ -27,7 +28,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddMvc()
-            .AddNewtonsoftJson(opt => opt.SerializerSettings.Converters.Add(new StringEnumConverter()));
+            .AddNewtonsoftJson(opt => opt.SerializerSettings.WithDefaults());
 
         services.AddControllers();
 

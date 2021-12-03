@@ -23,7 +23,7 @@ public class InitializeCartFixture: ApiWithEventsFixture<Startup>
 
     public override async Task InitializeAsync()
     {
-        CommandResponse = await Post(new InitCartRequest {ClientId = ClientId });
+        CommandResponse = await Post(new InitCartRequest(ClientId));
     }
 }
 

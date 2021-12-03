@@ -1,11 +1,20 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Core.Reflection;
 
 public static class TypeProvider
 {
+    private static bool IsRecord(this Type objectType)
+    {
+        return objectType.GetMethod("<Clone>$") != null ||
+               ((TypeInfo)objectType)
+               .DeclaredProperties.FirstOrDefault(x => x.Name == "EqualityContract")?
+               .GetMethod?.GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
+    }
+
     public static Type? GetTypeFromAnyReferencingAssembly(string typeName)
     {
         var referencedAssemblies = Assembly.GetEntryAssembly()?

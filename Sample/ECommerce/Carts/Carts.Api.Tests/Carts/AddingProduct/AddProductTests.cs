@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,15 +12,17 @@ using Core.Testing;
 using FluentAssertions;
 using Xunit;
 
-namespace Carts.Api.Tests.Carts.Confirming;
+namespace Carts.Api.Tests.Carts.AddingProduct;
 
-public class ConfirmShoppingCartFixture: ApiWithEventsFixture<Startup>
+public class AddProductFixture: ApiWithEventsFixture<Startup>
 {
     protected override string ApiUrl => "/api/Carts";
 
     public Guid ShoppingCartId { get; private set; }
 
     public readonly Guid ClientId = Guid.NewGuid();
+
+    public readonly ProductItemRequest ProductItem = new(Guid.NewGuid(), 1);
 
     public HttpResponseMessage CommandResponse = default!;
 
@@ -30,15 +33,15 @@ public class ConfirmShoppingCartFixture: ApiWithEventsFixture<Startup>
 
         ShoppingCartId = await initializeResponse.GetResultFromJson<Guid>();
 
-        CommandResponse = await Put($"{ShoppingCartId}/confirmation", new ConfirmCartRequest());
+        CommandResponse = await Post($"{ShoppingCartId}/products", new AddProductRequest(ProductItem));
     }
 }
 
-public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
+public class AddProductTests: IClassFixture<AddProductFixture>
 {
-    private readonly ConfirmShoppingCartFixture fixture;
+    private readonly AddProductFixture fixture;
 
-    public ConfirmShoppingCartTests(ConfirmShoppingCartFixture fixture)
+    public AddProductTests(AddProductFixture fixture)
     {
         this.fixture = fixture;
     }
@@ -69,8 +72,13 @@ public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
         var cartDetails = await queryResponse.GetResultFromJson<CartDetails>();
         cartDetails.Should().NotBeNull();
         cartDetails.Id.Should().Be(fixture.ShoppingCartId);
-        cartDetails.Status.Should().Be(CartStatus.Confirmed);
+        cartDetails.Status.Should().Be(CartStatus.Pending);
         cartDetails.ClientId.Should().Be(fixture.ClientId);
+        cartDetails.ProductItems.Should().HaveCount(1);
+
+        var productItem = cartDetails.ProductItems.Single().ProductItem;
+        productItem.ProductId.Should().Be(fixture.ProductItem.ProductId);
+        productItem.Quantity.Should().Be(fixture.ProductItem.Quantity);
         cartDetails.Version.Should().Be(2);
 
         fixture.PublishedExternalEventsOfType<CartFinalized>();

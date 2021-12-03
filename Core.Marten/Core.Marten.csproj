@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Core.Serialization\Core.Serialization.csproj" />
       <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
