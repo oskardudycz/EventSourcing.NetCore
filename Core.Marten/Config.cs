@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Core.Ids;
+using Core.Marten.Serialization;
 using Core.Threading;
 using Marten;
 using Marten.Events.Daemon.Resiliency;

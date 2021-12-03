@@ -4,7 +4,7 @@ using Marten;
 using Marten.Services.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Core.Marten;
+namespace Core.Marten.Serialization;
 
 public class NonDefaultConstructorMartenJsonNetContractResolver: JsonNetContractResolver
 {
