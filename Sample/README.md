@@ -32,7 +32,7 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - No Event Sourcing! Using Entity Framework to show that CQRS is not bounded to Event Sourcing or any type of storage,
 - No Aggregates! CQRS do not need DDD. Business logic can be handled in handlers.
 
-## [Event Versioning](./EventVersioning)
+## [Event Versioning](./EventsVersioning)
 Shows how to handle basic event schema versioning scenarios using event and stream transformations (e.g. upcasting):
 - [Simple mapping](./EventsVersioning/#simple-mapping)
   - [New not required property](./EventsVersioning/#new-not-required-property)

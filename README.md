@@ -1,10 +1,10 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/oskar_at_net?style=social)](https://twitter.com/oskar_at_net) [![Join the chat at https://gitter.im/EventSourcing-NetCore/community](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/EventSourcing-NetCore/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![Github Actions](https://github.com/oskardudycz/EventSourcing.NetCore/actions/workflows/build.dotnet.yml/badge.svg?branch=main) [![blog](https://img.shields.io/badge/blog-event--driven.io-brightgreen)](https://event-driven.io/?utm_source=event_sourcing_net) [![blog](https://img.shields.io/badge/%F0%9F%9A%80-Architecture%20Weekly-important)](https://www.architecture-weekly.com/?utm_source=event_sourcing_net) 
 
-# EventSourcing.NetCore
+# EventSourcing .NET
 
-Tutorial, practical samples and other resources about Event Sourcing in .NET Core.
+Tutorial, practical samples and other resources about Event Sourcing in .NET.
 
-- [EventSourcing.NetCore](#eventsourcingnetcore)
+- [EventSourcing .NET](#eventsourcing-net)
   - [1. Event Sourcing](#1-event-sourcing)
     - [1.1 What is Event Sourcing?](#11-what-is-event-sourcing)
     - [1.2 What is Event?](#12-what-is-event)
@@ -15,8 +15,9 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET Cor
   - [2. Videos](#2-videos)
     - [2.1. Practical Event Sourcing with Marten](#21-practical-event-sourcing-with-marten)
     - [2.2. Practical Introduction to Event Sourcing with EventStoreDB](#22-practical-introduction-to-event-sourcing-with-eventstoredb)
-    - [2.3 The Light and The Dark Side of the Event-Driven Design](#23-the-light-and-the-dark-side-of-the-event-driven-design)
-    - [2.4 Conversation with Yves Lorphelin about CQRS](#24-conversation-with-yves-lorphelin-about-cqrs)
+    - [2.3. Never Lose Data Again - Event Sourcing to the Rescue!](#23-never-lose-data-again---event-sourcing-to-the-rescue)
+    - [2.4 The Light and The Dark Side of the Event-Driven Design](#24-the-light-and-the-dark-side-of-the-event-driven-design)
+    - [2.5 Conversation with Yves Lorphelin about CQRS](#25-conversation-with-yves-lorphelin-about-cqrs)
   - [3. Support](#3-support)
   - [4. Prerequisites](#4-prerequisites)
   - [5. Tools used](#5-tools-used)
@@ -380,11 +381,15 @@ Read more in my article:
 
 <a href="https://www.youtube.com/watch?v=rqYPVzjoxqI" target="_blank"><img src="https://img.youtube.com/vi/rqYPVzjoxqI/0.jpg" alt="Practical introduction to Event Sourcing with EventStoreDB" width="320" height="240" border="10" /></a>
 
-### 2.3 The Light and The Dark Side of the Event-Driven Design
+### 2.3. Never Lose Data Again - Event Sourcing to the Rescue!
+
+<a href="https://www.youtube.com/watch?v=fDC465jJoDk" target="_blank"><img src="https://img.youtube.com/vi/fDC465jJoDk/0.jpg" alt="Never Lose Data Again - Event Sourcing to the Rescue!" width="320" height="240" border="10" /></a>
+
+### 2.4 The Light and The Dark Side of the Event-Driven Design
 
 <a href="https://www.youtube.com/watch?v=0pYmuk0-N_4" target="_blank"><img src="https://img.youtube.com/vi/0pYmuk0-N_4/0.jpg" alt="The Light and The Dark Side of the Event-Driven Design" width="320" height="240" border="10" /></a>
 
-### 2.4 Conversation with [Yves Lorphelin](https://github.com/ylorph/) about CQRS
+### 2.5 Conversation with [Yves Lorphelin](https://github.com/ylorph/) about CQRS
 
 <a href="https://www.youtube.com/watch?v=D-3N2vQ7ADE" target="_blank"><img src="https://img.youtube.com/vi/D-3N2vQ7ADE/0.jpg" alt="Event Store Conversations: Yves Lorphelin talks to Oskar Dudycz about CQRS (EN)" width="320" height="240" border="10" /></a>
 
@@ -409,7 +414,7 @@ For running the Event Store examples you need to have:
 docker-compose up
 ```
 
-**More information about using .NET Core, WebApi and Docker you can find in my other tutorials:** [WebApi with .NET](https://github.com/oskardudycz/WebApiWith.NETCore)
+**More information about using .NET, WebApi and Docker you can find in my other tutorials:** [WebApi with .NET](https://github.com/oskardudycz/WebApiWith.NETCore)
 
 ## 5. Tools used
 

@@ -27,6 +27,10 @@ The same "issues" happens for event data model. Greg Young wrote a book about it
 
 This sample shows how to do basic Event Schema versioning. Those patterns can be applied to any event store.
 
+You can watch the webinar on YouTube where I'm explaining the details of the implementation:
+
+<a href="https://www.youtube.com/watch?v=fDC465jJoDk" target="_blank"><img src="https://img.youtube.com/vi/fDC465jJoDk/0.jpg" alt="Never Lose Data Again - Event Sourcing to the Rescue!" width="320" height="240" border="10" /></a>
+
 ## Simple mapping
 
 There are some simple mappings that we could handle on the code structure or serialisation level. I'm using `System.Text.Json` in samples, other serialises may be smarter, but the patterns will be similar. 
