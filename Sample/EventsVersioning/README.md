@@ -11,6 +11,7 @@
   - [Downcasters](#downcasters)
   - [Events Transformations](#events-transformations)
   - [Stream Transformation](#stream-transformation)
+  - [Migrations](#migrations)
   - [Summary](#summary)
 
 As time flow, the events' definition may change. Our business is changing, and we need to add more information. Sometimes we have to fix a bug or modify the definition for a better developer experience. 
@@ -23,7 +24,7 @@ Migrations are never easy, even in relational databases. You always have to thin
 
 We should always try to perform the change in a non-breaking manner. I explained that in [Let's take care of ourselves! Thoughts on compatibility](https://event-driven.io/en/lets_take_care_of_ourselves_thoughts_about_comptibility/) article.
 
-The same "issues" happens for event data model. Greg Young wrote a book about it: https://leanpub.com/esversioning/read. I recommend you to read it.
+The same "issues" happens for event data model. Greg Young wrote a book about it. You can read it for free: https://leanpub.com/esversioning/read. I recommend you to read it.
 
 This sample shows how to do basic Event Schema versioning. Those patterns can be applied to any event store.
 
@@ -37,6 +38,8 @@ or read blog article [Simple patterns for events schema versioning](https://even
 
 There are some simple mappings that we could handle on the code structure or serialisation level. I'm using `System.Text.Json` in samples, other serialises may be smarter, but the patterns will be similar. 
 
+### New not required property
+
 Having event defined as such:
 
 ```csharp
@@ -45,8 +48,6 @@ public record ShoppingCartInitialized(
     Guid ClientId
 );
 ```
-
-### New not required property
 
 If we'd like to add a new not required property, e.g. `IntializedAt`, we can add it just as a new nullable property. The essential fact to decide if that's the right strategy is if we're good with not having it defined. It can be handled as:
 
@@ -59,6 +60,8 @@ public record ShoppingCartInitialized(
 );
 ```
 
+Then, most serialisers will put the null value by default and not fail unless we use strict mode. The new events will contain whole information, for the old ones we'll have to live with that.
+
 See full sample: [NewNotRequiredProperty.cs](./EventsVersioning.Tests/SimpleMappings/NewNotRequiredProperty.cs).
 
 
@@ -66,7 +69,7 @@ See full sample: [NewNotRequiredProperty.cs](./EventsVersioning.Tests/SimpleMapp
 
 We must define a default value if we'd like to add a new required property and make it non-breaking. It's the same as you'd add a new column to the relational table. 
 
-For instance, we decide that we'd like to add a validation step when the shopping cart is open (e.g. for fraud or spam detection), and our shopping cart can be opened with a pending state. We could solve that by adding the new property with the status information and setting it to `Initialised`, assuming that all old events were appended using the older logic.
+For instance, we decide that we'd like to add a validation step when the shopping cart is open (e.g. for fraud or spam detection), and our shopping cart can be opened with a pending state. We could solve that by adding the new property with the status information and setting it to `Initialized`, assuming that all old events were appended using the older logic.
 
 ```csharp
 public enum ShoppingCartStatus
@@ -112,6 +115,29 @@ public class ShoppingCartInitialized
     }
 }
 ```
+
+The benefit is that both old and the new structure will be backward and forward compatible. The downside of this solution is that we're still keeping the old JSON structure, so all consumers need to be aware of that and do mapping if they want to use the new structure. Some serialisers like Newtonsoft Json.NET allows to do such magic:
+
+```csharp
+public class ShoppingCartIntialised
+{
+    public Guid CartId { get; init; }
+    public Guid ClientId { get; init; }
+
+    public ShoppingCartIntialised(
+        Guid? cartId,
+        Guid clientId,
+        Guid? shoppingCartId = null
+    )
+    {
+        CartId = cartId ?? shoppingCartId!.Value;
+        ClientId = clientId;
+    }
+}
+```
+
+We'll either use the new property name or, if it's not available, then an old one. The downside is that we had to pollute our code with additional fields and nullable markers. As always, pick your poison.
+
 See full sample: [NewRequiredProperty.cs](./EventsVersioning.Tests/SimpleMappings/NewRequiredProperty.cs).
 
 ## Upcasting
@@ -126,14 +152,14 @@ For instance, we decide to send also other information about the client, instead
 
 ```csharp
 public record Client(
-        Guid Id,
-        string Name = "Unknown"
-    );
+    Guid Id,
+    string Name = "Unknown"
+);
 
-    public record ShoppingCartInitialized(
-        Guid ShoppingCartId,
-        Client Client
-    );
+public record ShoppingCartInitialized(
+    Guid ShoppingCartId,
+    Client Client
+);
 ```
 
 We can define upcaster as a function that'll later plug in the deserialisation process. 
@@ -156,12 +182,16 @@ Or we can map it from JSON
 
 ```csharp
 public static ShoppingCartInitialized Upcast(
-    V1.ShoppingCartInitialized oldEvent
+    string oldEventJson
 )
 {
+    var oldEvent = JsonDocument.Parse(oldEventJson).RootElement;
+
     return new ShoppingCartInitialized(
-        oldEvent.ShoppingCartId,
-        new Client(oldEvent.ClientId)
+        oldEvent.GetProperty("ShoppingCartId").GetGuid(),
+        new Client(
+            oldEvent.GetProperty("ClientId").GetGuid()
+        )
     );
 }
 ```
@@ -555,6 +585,16 @@ private EventData ToShoppingCartInitializedWithProducts(
 ```
 
 See a full sample in [StreamTransformations.cs](./EventsVersioning.Tests/Transformations/StreamTransformations.cs).
+
+## Migrations
+
+You can say that, well, those patterns are not migrations. Events will stay as they were, and you'll have to keep the old structure forever. That's quite true. Still, this is fine, as typically, you should not change the past. Having precise information, even including bugs, is a valid scenario. It allows you to get insights and see the precise history. However, pragmatically you may sometimes want to have a "clean" event log with only a new schema.
+
+It appears that composing the patterns described above can support such a case. For example, if you're running EventStoreDB or Marten, you can read/subscribe to the event stream, store events in the new stream, or even a new EventStoreDB cluster or Postgres schema. Having that, you could even rewrite the whole log and switch databases once the new one caught up.
+
+I hope that those samples will show you that you can support many versioning scenarios with basic composition techniques.
+
+![migrations](./assets/migration.png)
 
 ## Summary
 
