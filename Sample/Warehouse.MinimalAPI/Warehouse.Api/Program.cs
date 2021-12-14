@@ -1,101 +1,91 @@
+using System.Net;
 using Core.WebApi.Middlewares.ExceptionHandling;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Warehouse;
-
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Warehouse.Api.Core.Commands;
+using Warehouse.Api.Core.Queries;
+using Warehouse.Api.Products;
+using Warehouse.Api.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen()
+    .AddDbContext<WarehouseDBContext>(
+        options => options.UseNpgsql("name=ConnectionStrings:WarehouseDB"))
+    .AddProductServices();
+
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.UseExceptionHandlingMiddleware();
 
-app.MapGet("/todoitems", async (TodoDb db) =>
-    await db.Todos.ToListAsync());
-
-app.MapGet("/todoitems/complete", async (TodoDb db) =>
-    await db.Todos.Where(t => t.IsComplete).ToListAsync());
-
-app.MapGet("/todoitems/{id}", async (int id, TodoDb db) =>
-    await db.Todos.FindAsync(id)
-        is Todo todo
-        ? Results.Ok(todo)
-        : Results.NotFound());
-
-app.MapPost("/todoitems", async (Todo todo, TodoDb db) =>
+if (app.Environment.IsDevelopment())
 {
-    db.Todos.Add(todo);
-    await db.SaveChangesAsync();
+    app.UseSwagger()
+        .UseSwaggerUI();
 
-    return Results.Created($"/todoitems/{todo.Id}", todo);
-});
+    using var scope = app.Services.CreateScope();
+    await using var dbContext = scope.ServiceProvider.GetRequiredService<WarehouseDBContext>();
+    await dbContext.Database.MigrateAsync();
+}
 
-app.MapPut("/todoitems/{id}", async (int id, Todo inputTodo, TodoDb db) =>
+// Get Products
+app.MapGet("/api/products", HandleGetProducts)
+    .Produces((int)HttpStatusCode.BadRequest);
+
+ValueTask<IReadOnlyList<ProductListItem>> HandleGetProducts(
+    [FromServices] QueryHandler<GetProducts, IReadOnlyList<ProductListItem>> getProducts,
+    string? filter,
+    int? page,
+    int? pageSize,
+    CancellationToken ct
+) =>
+    getProducts(GetProducts.With(filter, page, pageSize), ct);
+
+
+// Get Product Details by Id
+app.MapGet("/api/products/{id}", HandleGetProductDetails)
+    .Produces(StatusCodes.Status400BadRequest)
+    .Produces(StatusCodes.Status404NotFound);
+
+async Task<IResult> HandleGetProductDetails(
+    [FromServices] QueryHandler<GetProductDetails, ProductDetails?> getProductById,
+    Guid productId,
+    CancellationToken ct
+) =>
+    await getProductById(GetProductDetails.With(productId), ct)
+        is { } product
+        ? Results.Ok(product)
+        : Results.NotFound();
+
+// Register new product
+app.MapPost("api/products/",HandleRegisterProduct)
+    .Produces(StatusCodes.Status400BadRequest)
+    .Produces(StatusCodes.Status404NotFound);
+
+async Task<IResult> HandleRegisterProduct(
+    [FromServices] CommandHandler<RegisterProduct> registerProduct,
+    RegisterProductRequest request,
+    CancellationToken ct
+)
 {
-    var todo = await db.Todos.FindAsync(id);
+    var productId = Guid.NewGuid();
+    var (sku, name, description) = request;
 
-    if (todo is null) return Results.NotFound();
+    await registerProduct(
+        RegisterProduct.With(productId, sku, name, description),
+        ct);
 
-    todo.Name = inputTodo.Name;
-    todo.IsComplete = inputTodo.IsComplete;
-
-    await db.SaveChangesAsync();
-
-    return Results.NoContent();
-});
-
-app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
-{
-    if (await db.Todos.FindAsync(id) is Todo todo)
-    {
-        db.Todos.Remove(todo);
-        await db.SaveChangesAsync();
-        return Results.Ok(todo);
-    }
-
-    return Results.NotFound();
-});
+    return Results.Created($"/api/products/{productId}", productId);
+}
 
 app.Run();
 
-class Todo
-{
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public bool IsComplete { get; set; }
-}
+public record RegisterProductRequest(
+    string? SKU,
+    string? Name,
+    string? Description
+);
 
-class TodoDb : DbContext
-{
-    public TodoDb(DbContextOptions<TodoDb> options)
-        : base(options) { }
-
-    public DbSet<Todo> Todos => Set<Todo>();
-}
-
-
-// var builder = Host.CreateDefaultBuilder(args)
-//     .ConfigureWebHostDefaults(webBuilder =>
-//     {
-//         webBuilder
-//             .ConfigureServices(services =>
-//             {
-//                 services.AddRouting()
-//                     .AddWarehouseServices();
-//             })
-//             .Configure(app =>
-//             {
-//                 app.UseExceptionHandlingMiddleware()
-//                     .UseRouting()
-//                     .UseEndpoints(endpoints =>
-//                     {
-//                         endpoints.UseWarehouseEndpoints();
-//                     })
-//                     .ConfigureWarehouse();
-//             });
-//     })
-//     .Build();
-// builder.Run();
+public partial class Program { }
