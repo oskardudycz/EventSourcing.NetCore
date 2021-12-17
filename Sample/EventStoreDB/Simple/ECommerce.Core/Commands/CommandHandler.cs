@@ -9,13 +9,13 @@ namespace ECommerce.Core.Commands;
 
 public static class CommandHandlerExtensions
 {
-    public static async Task HandleCreateCommand<TCommand, TEntity>(
+    public static async Task HandleCreateCommand<TCommand>(
         EventStoreClient eventStore,
         Func<TCommand, object> handle,
         Func<TCommand, string> getId,
         TCommand command,
         CancellationToken ct
-    ) where TEntity : notnull
+    )
     {
         var entityId = getId(command);
         var @event = handle(command);
@@ -41,25 +41,25 @@ public static class CommandHandlerExtensions
         await eventStore.Append(id, @event, getVersion(command), ct);
     }
 
-    public static IServiceCollection AddCreateCommandHandler<TCommand, TEntity>(
+    public static IServiceCollection AddCreateCommandHandler<TCommand>(
         this IServiceCollection services,
         Func<TCommand, object> handle,
         Func<TCommand, string> getId
-    ) where TEntity : notnull =>
-        services.AddCreateCommandHandler<TCommand, TEntity>(_ => handle, getId);
+    ) =>
+        services.AddCreateCommandHandler(_ => handle, getId);
 
-    public static IServiceCollection AddCreateCommandHandler<TCommand, TEntity>(
+    public static IServiceCollection AddCreateCommandHandler<TCommand>(
         this IServiceCollection services,
         Func<IServiceProvider, Func<TCommand, object>> handle,
         Func<TCommand, string> getId
-    ) where TEntity : notnull =>
+    ) =>
         services
             .AddTransient<Func<TCommand, CancellationToken, ValueTask>>(sp =>
             {
                 var eventStore = sp.GetRequiredService<EventStoreClient>();
 
                 return async (command, ct) =>
-                    await HandleCreateCommand<TCommand, TEntity>(eventStore, handle(sp), getId, command, ct);
+                    await HandleCreateCommand(eventStore, handle(sp), getId, command, ct);
             });
 
     public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
@@ -122,7 +122,7 @@ public static class CommandHandlerExtensions
             Func<TCommand, string> getId
         )
         {
-            services.AddCreateCommandHandler<TCommand, TEntity>(_ => handle, getId);
+            services.AddCreateCommandHandler<TCommand>(_ => handle, getId);
             return this;
         }
 
@@ -131,7 +131,7 @@ public static class CommandHandlerExtensions
             Func<TCommand, string> getId
         )
         {
-            services.AddCreateCommandHandler<TCommand, TEntity>(_ => handle, getId);
+            services.AddCreateCommandHandler<TCommand>(_ => handle, getId);
             return this;
         }
 
