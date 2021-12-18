@@ -99,18 +99,19 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
         let decider = resolve cartId
         decider.Transact(decideConfirm at)
 
-    // NOTE doing this does not meet the principle of CQRS
+    // NOTE doing this does not fulfil the CQRS principle to the letter
     // However, its not unrealistic for this demo in that
     // a) it means you can read your writes immediately
-    // b) it's not unreasonable in efficiency tems
+    // b) it's not unreasonable in efficiency terms
     // - on Cosmos, you pay only 1RU to read through the cache with the etag
-    // - on ESDB you are reading forward from a cached stream and typically not getting any events
+    // - on ESDB you are reading forward from a cached stream and hence are typically doing a roundtrip that does not send any events
     member _.Read(cartId) : Async<Details.View option> =
         let decider = resolve cartId
         decider.Query(Details.render)
 
 module Config =
 
+    // Adapts the external Pricing algorithm interface shape (see IProductPriceCalculator) to what's required by `type Service`
     let calculatePrice (pricer : ProductId -> Async<decimal>) (productId, quantity) : Async<decimal> =
         pricer productId
 
@@ -127,6 +128,6 @@ module Config =
     let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
     let create_ pricer store =
         Service(resolveDecider store, calculatePrice pricer)
-    let create store =
+    let create =
         let defaultCalculator = RandomProductPriceCalculator()
         create_ defaultCalculator.Calculate
