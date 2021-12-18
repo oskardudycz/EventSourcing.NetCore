@@ -170,7 +170,8 @@ let run (args : Args.Arguments) =
 [<EntryPoint>]
 let main argv =
     try let args = Args.parse EnvVar.tryGet argv
-        try Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(Sinks.tags AppName |> Sinks.equinoxMetricsOnly, args.StoreVerbose).CreateLogger()
+        let metrics = Sinks.tags AppName |> Sinks.equinoxMetricsOnly
+        try Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.StoreVerbose).CreateLogger()
             try run args; 0
             with e when not (e :? MissingArg) -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()

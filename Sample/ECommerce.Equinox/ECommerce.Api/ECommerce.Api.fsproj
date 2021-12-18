@@ -1,28 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Controllers\ShoppingCartsController.fs" />
-        <Compile Include="Startup.fs" />
-        <Compile Include="Program.fs" />
+        <Compile Include="Controllers\ShoppingCartsController.fs"/>
+        <Compile Include="Startup.fs"/>
+        <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ECommerce.Domain\ECommerce.Domain.fsproj" />
-      <ProjectReference Include="..\ECommerce.Infrastructure\ECommerce.Infrastructure.fsproj" />
+        <ProjectReference Include="..\ECommerce.Domain\ECommerce.Domain.fsproj"/>
+        <ProjectReference Include="..\ECommerce.Infrastructure\ECommerce.Infrastructure.fsproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="3.2.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Remove="appsettings.json" />
-      <Content Remove="appsettings.Development.json" />
+        <_ContentIncludedByDefault Remove="Properties\launchSettings.json"/>
     </ItemGroup>
 
 </Project>
