@@ -16,29 +16,31 @@ module Events =
 
 module Fold =
 
+    type Item = { productId : ProductId; quantity : int; unitPrice : decimal }
+
     [<Newtonsoft.Json.JsonConverter(typeof<FsCodec.NewtonsoftJson.TypeSafeEnumConverter>)>]
     type Status = Pending | Confirmed
     type State =
         {   clientId : ClientId option
-            status : Status; items : PricedProductItem array
+            status : Status; items : Item array
             confirmedAt : System.DateTimeOffset option }
     let initial = { clientId = None; status = Status.Pending; items = Array.empty; confirmedAt = None }
     let isClosed (s : State) = match s.status with Confirmed -> true | Pending -> false
     module ItemList =
-        let keys (x : PricedProductItem) = x.productItem.productId, x.unitPrice
-        let add (productId, price, quantity) (current : PricedProductItem seq) =
+        let keys (x : Item) = x.productId, x.unitPrice
+        let add (productId, price, quantity) (current : Item seq) =
             let newItemKeys = productId, price
-            let mkItem (productId, price, quantity) = { productItem = { productId = productId; quantity = quantity }; unitPrice = price }
+            let mkItem (productId, price, quantity) = { productId = productId; quantity = quantity; unitPrice = price }
             let mutable merged = false
             [|  for x in current do
                     if newItemKeys = keys x then
-                        mkItem (productId, price, x.productItem.quantity + quantity)
+                        mkItem (productId, price, x.quantity + quantity)
                         merged <- true
                     else
                         x
                 if not merged then
                     mkItem (productId, price, quantity) |]
-        let remove (productId, price) (current : PricedProductItem[]) =
+        let remove (productId, price) (current : Item[]) =
             current |> Array.where (fun x -> keys x <> (productId, price))
     let private evolve s = function
         | Events.Initialized e ->   { s with clientId = Some e.clientId }
@@ -74,7 +76,8 @@ module Details =
     let render = function
         | ({ clientId = None } : Fold.State) -> None
         | { clientId = Some clientId } as s ->
-            let items = [| for { productItem = pi; unitPrice = p } in s.items -> { productId = pi.productId; unitPrice = p; quantity = pi.quantity } |]
+            let items = [| for { productId = productId; quantity = q; unitPrice = p } in s.items ->
+                             { productId = productId; unitPrice = p; quantity = q } |]
             Some {  clientId = clientId; status = s.status; items = items }
 
 type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calculatePrice : ProductId * int -> decimal) =
