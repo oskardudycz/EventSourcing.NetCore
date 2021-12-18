@@ -53,11 +53,12 @@ let decideInitialize clientId (s : Fold.State) =
     if s.clientId <> None then []
     else [ Events.Initialized {| clientId = clientId |}]
 
-let decideAdd calculatePrice productId quantity = function
-    | s when Fold.isClosed s -> invalidOp $"Adding product item for cart in '%A{s.status}' status is not allowed."
+let decideAdd calculatePrice productId quantity state = async {
+    match state with
+    | s when Fold.isClosed s -> return invalidOp $"Adding product item for cart in '%A{s.status}' status is not allowed."
     | _ ->
-        let price = calculatePrice (productId, quantity)
-        [ Events.ItemAdded {| productId = productId; unitPrice = price; quantity = quantity |} ]
+        let! price = calculatePrice (productId, quantity)
+        return (), [ Events.ItemAdded {| productId = productId; unitPrice = price; quantity = quantity |} ] }
 
 let decideRemove (productId, price) = function
     | s when Fold.isClosed s -> invalidOp $"Removing product item for cart in '%A{s.status}' status is not allowed."
@@ -80,7 +81,7 @@ module Details =
                              { productId = productId; unitPrice = p; quantity = q } |]
             Some {  clientId = clientId; status = s.status; items = items }
 
-type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calculatePrice : ProductId * int -> decimal) =
+type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calculatePrice : ProductId * int -> Async<decimal>) =
 
     member _.Initialize(cartId, clientId) =
         let decider = resolve cartId
@@ -88,7 +89,7 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
 
     member _.Add(cartId, productId, quantity) =
         let decider = resolve cartId
-        decider.Transact(decideAdd calculatePrice productId quantity)
+        decider.TransactAsync(decideAdd calculatePrice productId quantity)
 
     member _.Remove(cartId, productId, price) =
         let decider = resolve cartId
@@ -110,8 +111,8 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
 
 module Config =
 
-    let calculatePrice (pricer : IProductPriceCalculator) (productId, quantity) : decimal =
-        pricer.Calculate productId
+    let calculatePrice (pricer : ProductId -> Async<decimal>) (productId, quantity) : Async<decimal> =
+        pricer productId
 
     let private resolveStream = function
         | Config.Store.Memory store ->
@@ -124,8 +125,8 @@ module Config =
             let cat = Config.Cosmos.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
             cat.Resolve
     let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
-    let create_ (pricer : IProductPriceCalculator) store =
+    let create_ pricer store =
         Service(resolveDecider store, calculatePrice pricer)
     let create store =
         let defaultCalculator = RandomProductPriceCalculator()
-        create_ defaultCalculator
+        create_ defaultCalculator.Calculate

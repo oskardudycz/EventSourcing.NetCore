@@ -8,7 +8,7 @@
   <ItemGroup>
     <Compile Include="Config.fs" />
     <Compile Include="Types.fs" />
-    <Compile Include="IProductPriceCalculator.fs" />
+    <Compile Include="RandomProductPriceCalculator.fs" />
     <Compile Include="ShoppingCart.fs" />
   </ItemGroup>
 
