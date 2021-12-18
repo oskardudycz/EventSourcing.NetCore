@@ -90,8 +90,6 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
         let decider = resolve cartId
         decider.Transact(decideAdd calculatePrice productId quantity)
 
-    // TODO fix in Remove: throw new InvalidOperationException($"Adding product item for cart in '{shoppingCart.Status}' status is not allowed.");
-
     member _.Remove(cartId, productId, price) =
         let decider = resolve cartId
         decider.Transact(decideRemove (productId, price))
