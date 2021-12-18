@@ -32,7 +32,6 @@ type ShoppingCartsController(carts : ShoppingCart.Service) =
         return OkResult() :> _
     }
 
-    // TODO remove shoppingCartId from request in C#
     [<HttpDelete("{id}/products")>]
     member _.RemoveProduct([<FromRoute>] id : Guid Nullable, [<FromBody>] request : RemoveProductRequest) : Async<IActionResult> = async {
         if obj.ReferenceEquals(null, request) then nameof request |> nullArg
@@ -42,10 +41,9 @@ type ShoppingCartsController(carts : ShoppingCart.Service) =
         return OkResult() :> _
     }
 
-    // TODO remove shoppingCartId from request in C#
     [<HttpDelete("{id}/confirmation")>]
     member _.ConfirmCart([<FromRoute>] id : Guid Nullable(*, [<FromBody>] request : ConfirmShoppingCartRequest*)) : Async<IActionResult> = async {
-//        if obj.ReferenceEquals(null, request) then nameof request |> nullArg
+//        if obj.ReferenceEquals(null, request) then nameof request |> nullArg // TODO only relevant if we follow version-contingent style
 
         let (CartId.Parse cartId) = id
         do! carts.Confirm(cartId, DateTimeOffset.UtcNow)
@@ -54,14 +52,14 @@ type ShoppingCartsController(carts : ShoppingCart.Service) =
 
     [<HttpGet("{id}")>]
     member _.Get([<FromRoute>] id : Guid Nullable) : Async<IActionResult> = async {
-
         let (CartId.Parse cartId) = id
         match! carts.Read cartId with
         | Some (res : ShoppingCart.Details.View) -> return OkObjectResult res :> _
         | None -> return NotFoundResult() :> _
     }
 
-(* TODO
+    (* TODO we dont produce a list like this atm - not porting for the moment as having an arbitrarily growing list like this does not really make
+        sense; instead, we'll produce a cart summaries API
     [HttpGet]
     public Task<IReadOnlyList<ShoppingCartShortInfo>> Get(
         [FromServices] Func<GetCarts, CancellationToken, Task<IReadOnlyList<ShoppingCartShortInfo>>> query,
