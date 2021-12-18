@@ -17,7 +17,11 @@ type ShoppingCartsController(carts : ShoppingCart.Service) =
     member _.InitializeCart([<FromBody>] request : InitializeShoppingCartRequest) : Async<IActionResult> = async {
         if obj.ReferenceEquals(null, request) then nameof request |> nullArg
 
-        // TODO this should be resolved via an idempotent lookup in the Client's list
+        // TODO in these samples in general, the semantics should be extended to be more representative of the real world
+        // - you don't want to create orphan carts esp if they need to retry this API call
+        // - you may want to allow users to shop before logging in, keeping the clientId in a cookie.
+        //   After some time, you let them log in, but then you need to merge the content into their real cart
+        // For now, the code remains in line with the C# version
         let cartId = CartId.generate();
         do! carts.Initialize(cartId, ClientId.parse request.clientId)
         return CreatedResult("api/ShoppingCarts", cartId) :> _
