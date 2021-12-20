@@ -109,6 +109,9 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
         let decider = resolve cartId
         decider.Query(Details.render)
 
+    member _.ReadFromDenormalized(cartId) : Async<Details.View option> =
+        failwith "TODO implement Reactor maintaining same"
+
 module Config =
 
     // Adapts the external Pricing algorithm interface shape (see IProductPriceCalculator) to what's required by `type Service`
