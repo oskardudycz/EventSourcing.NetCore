@@ -10,9 +10,13 @@ module Memory =
 
 module Esdb =
 
-    let createUnoptimized codec initial fold (context, cache) =
+    let private createCached codec initial fold accessStrategy (context, cache) =
         let cacheStrategy = Equinox.EventStore.CachingStrategy.SlidingWindow (cache, System.TimeSpan.FromMinutes 20.)
-        Equinox.EventStore.EventStoreCategory(context, codec, fold, initial, cacheStrategy)
+        Equinox.EventStore.EventStoreCategory(context, codec, fold, initial, cacheStrategy, ?access = accessStrategy)
+    let createUnoptimized codec initial fold (context, cache) =
+        createCached codec initial fold None (context, cache)
+    let createLatestKnownEvent codec initial fold (context, cache) =
+        createCached codec initial fold (Some Equinox.EventStore.AccessStrategy.LatestKnownEvent) (context, cache)
 
 module Cosmos =
 
@@ -24,10 +28,10 @@ module Cosmos =
         let accessStrategy = Equinox.CosmosStore.AccessStrategy.Unoptimized
         createCached codec initial fold accessStrategy (context, cache)
 
-//    let createSnapshotted codec initial fold (isOrigin, toSnapshot) (context, cache) =
-//        let accessStrategy = Equinox.CosmosStore.AccessStrategy.Snapshot (isOrigin, toSnapshot)
-//        createCached codec initial fold accessStrategy (context, cache)
-//
+    let createSnapshotted codec initial fold (isOrigin, toSnapshot) (context, cache) =
+        let accessStrategy = Equinox.CosmosStore.AccessStrategy.Snapshot (isOrigin, toSnapshot)
+        createCached codec initial fold accessStrategy (context, cache)
+
     let createRollingState codec initial fold toSnapshot (context, cache) =
         let accessStrategy = Equinox.CosmosStore.AccessStrategy.RollingState toSnapshot
         createCached codec initial fold accessStrategy (context, cache)

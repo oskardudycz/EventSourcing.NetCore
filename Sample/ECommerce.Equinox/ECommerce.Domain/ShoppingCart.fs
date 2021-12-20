@@ -104,7 +104,7 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
     // a) it means you can read your writes immediately
     // b) it's not unreasonable in efficiency terms
     // - on Cosmos, you pay only 1RU to read through the cache with the etag
-    // - on ESDB you are reading forward from a cached stream and hence are typically doing a roundtrip that does not send any events
+    // - on EventStoreDB you are reading forward from a cached stream and hence are typically doing a roundtrip that does not send any events
     member _.Read(cartId) : Async<Details.View option> =
         let decider = resolve cartId
         decider.Query(Details.render)
@@ -112,7 +112,7 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
 module Config =
 
     // Adapts the external Pricing algorithm interface shape (see IProductPriceCalculator) to what's required by `type Service`
-    let calculatePrice (pricer : ProductId -> Async<decimal>) (productId, quantity) : Async<decimal> =
+    let calculatePrice (pricer : ProductId -> Async<decimal>) (productId, _quantity) : Async<decimal> =
         pricer productId
 
     let private resolveStream = function

@@ -6,18 +6,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Config.fs"/>
-        <Compile Include="Types.fs"/>
-        <Compile Include="RandomProductPriceCalculator.fs"/>
-        <Compile Include="ShoppingCart.fs"/>
+        <Compile Include="Config.fs" />
+        <Compile Include="Types.fs" />
+        <Compile Include="RandomProductPriceCalculator.fs" />
+        <Compile Include="ShoppingCart.fs" />
+        <Compile Include="ConfirmedEpoch.fs" />
+        <Compile Include="ConfirmedSeries.fs" />
+        <Compile Include="ConfirmedIngester.fs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Equinox.CosmosStore" Version="3.0.5"/>
-        <PackageReference Include="Equinox.EventStore" Version="3.0.5"/>
-        <PackageReference Include="Equinox.MemoryStore" Version="3.0.5"/>
-        <PackageReference Include="FsCodec.NewtonsoftJson" Version="2.2.2"/>
-        <PackageReference Include="Propulsion" Version="2.11.0"/>
+        <PackageReference Include="Equinox.CosmosStore" Version="3.0.5" />
+        <PackageReference Include="Equinox.EventStore" Version="3.0.5" />
+        <PackageReference Include="Equinox.MemoryStore" Version="3.0.5" />
+        <PackageReference Include="FsCodec.NewtonsoftJson" Version="2.2.2" />
+        <PackageReference Include="Propulsion" Version="2.11.0" />
     </ItemGroup>
 
 </Project>
