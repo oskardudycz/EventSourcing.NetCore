@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="ExactlyOnceIngester.fs" />
         <Compile Include="Config.fs" />
         <Compile Include="Types.fs" />
         <Compile Include="RandomProductPriceCalculator.fs" />

@@ -34,8 +34,6 @@ module Fold =
 
     let fold : State -> Events.Event seq -> State = Seq.fold evolve
 
-type Result = { accepted : CartId[]; closed : bool; residual : Events.Cart[] }
-
 let notAlreadyIn (ids : CartId seq) =
     let ids = System.Collections.Generic.HashSet ids
     fun (x : Events.Cart) -> (not << ids.Contains) x.cartId
@@ -43,7 +41,7 @@ let notAlreadyIn (ids : CartId seq) =
 /// Manages ingestion of only items not already in the list
 /// Yields residual net of items already present in this epoch
 // NOTE See feedSource template for more advanced version handling splitting large input requests where epoch limit is strict
-let decide shouldClose candidates (currentIds, closed as state) =
+let decide shouldClose candidates (currentIds, closed as state) : ExactlyOnceIngester.IngestResult<_,_> * Events.Event list =
     match closed, candidates |> Array.filter (notAlreadyIn currentIds) with
     | false, fresh ->
         let added, events =
@@ -67,7 +65,7 @@ type Service internal
 
     /// Ingest the supplied items. Yields relevant elements of the post-state to enable generation of stats
     /// and facilitate deduplication of incoming items in order to avoid null store round-trips where possible
-    member _.Ingest(epochId, items) : Async<Result> =
+    member _.Ingest(epochId, items) =
         let decider = resolveStale epochId
         /// NOTE decider which will initially transact against potentially stale cached state, which will trigger a
         /// resync if another writer has gotten in before us. This is a conscious decision in this instance; the bulk
@@ -93,7 +91,8 @@ module Config =
             let cat = Config.Cosmos.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
             fun sn -> cat.Resolve(sn, ?option = opt)
     let private resolveDecider store opt = streamName >> resolveStream opt store >> Config.createDecider
-    let create shouldClose = resolveDecider >> create_ shouldClose
+    let shouldClose maxItemsPerEpoch candidateItems currentItems = Array.length currentItems + Array.length candidateItems >= maxItemsPerEpoch
+    let create maxItemsPerEpoch = resolveDecider >> create_ (shouldClose maxItemsPerEpoch)
 
 /// Custom Fold and caching logic compared to the IngesterService
 /// - When reading, we want the full Items
