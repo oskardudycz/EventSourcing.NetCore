@@ -11,7 +11,7 @@ let linger, maxItemsPerEpoch = System.TimeSpan.FromMilliseconds 1., 5
 
 let createSut =
     // While we use ~ 200ms when hitting Cosmos, there's no value in doing so in the context of these property based tests
-    ConfirmedIngester.Config.create_ linger maxItemsPerEpoch
+    ConfirmedIngester.Config.create_ maxItemsPerEpoch linger
 
 type GuidStringN<[<Measure>]'m> = GuidStringN of string<'m> with static member op_Explicit(GuidStringN x) = x
 
@@ -34,13 +34,13 @@ let [<Property>] properties shouldUseSameSut (Gap gap) (initialEpochId, NonEmpty
 
     // Initialize with some items
     let initialSut = createSut store
-    let! initialResult = initialSut.IngestMany(initialEpochId, initialItems)
+    let! initialResult = initialSut.IngestItems(initialEpochId, initialItems)
     let initialExpected = initialItems |> Seq.map ConfirmedEpoch.itemId
     test <@ set initialExpected = set initialResult @>
 
     // Add more, can be overlapping, adjacent
     let sut = if shouldUseSameSut then initialSut else createSut store
-    let! result = sut.IngestMany(nextEpochId, items)
+    let! result = sut.IngestItems(nextEpochId, items)
     let expected = items |> Seq.map ConfirmedEpoch.itemId |> Seq.except initialExpected
 
     test <@ set expected = set result @> }
