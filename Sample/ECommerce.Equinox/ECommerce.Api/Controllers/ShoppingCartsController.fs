@@ -10,7 +10,7 @@ type RemoveProductRequest = { productId : Guid; price : decimal }
 
 [<ApiController>]
 [<Route("api/[controller]")>]
-type ShoppingCartsController(carts : ShoppingCart.Service) =
+type ShoppingCartsController(carts : ShoppingCart.Service, cartsDenormalized : ShoppingCartSummary.Service) =
     inherit ControllerBase()
 
     [<HttpPost>]
@@ -54,11 +54,21 @@ type ShoppingCartsController(carts : ShoppingCart.Service) =
         return OkResult() :> _
     }
 
+    /// Reads from write side
     [<HttpGet("{id}")>]
     member _.Get([<FromRoute>] id : Guid Nullable) : Async<IActionResult> = async {
         let (CartId.Parse cartId) = id
         match! carts.Read cartId with
         | Some (res : ShoppingCart.Details.View) -> return OkObjectResult res :> _
+        | None -> return NotFoundResult() :> _
+    }
+
+    /// Reads from denormalized view
+    [<HttpGet("{id}/summary")>]
+    member _.GetSummary([<FromRoute>] id : Guid Nullable) : Async<IActionResult> = async {
+        let (CartId.Parse cartId) = id
+        match! cartsDenormalized.Read cartId with
+        | Some (res : ShoppingCartSummary.Details.View) -> return OkObjectResult res :> _
         | None -> return NotFoundResult() :> _
     }
 

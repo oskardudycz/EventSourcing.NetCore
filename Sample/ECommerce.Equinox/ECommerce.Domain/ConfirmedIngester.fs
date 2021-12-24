@@ -3,9 +3,10 @@ module ECommerce.Domain.ConfirmedIngester
 type Service internal (tip : ExactlyOnceIngester.Service<_, _, _, _>) =
 
     /// Slot the item into the series of epochs.
-    /// Returns items that actually got added (i.e. may be empty if it was an idempotent retry).
-    member _.IngestItems(originEpochId, items) : Async<seq<_>>=
-        tip.IngestMany(originEpochId, items)
+    /// Returns true if it got added this time, i.e. idempotent retries don't count
+    member _.TryIngestCartSummary(originEpochId, cartSummary : ConfirmedEpoch.Events.Cart) : Async<bool> = async {
+        let! ingested = tip.IngestMany(originEpochId, [| cartSummary |])
+        return ingested |> Seq.contains cartSummary.cartId }
 
     /// Efficiently determine a valid ingestion origin epoch
     member _.ActiveIngestionEpochId() =
@@ -19,7 +20,6 @@ module Config =
         let log = Serilog.Log.ForContext<Service>()
         let tip = ExactlyOnceIngester.create log linger (series.ReadIngestionEpochId, series.MarkIngestionEpochId) (epochs.Ingest, Array.toSeq)
         Service(tip)
-    let create store =
-        let defaultLinger = System.TimeSpan.FromMilliseconds 200.
+    let create linger store =
         let maxItemsPerEpoch = 10_000
-        create_ maxItemsPerEpoch defaultLinger store
+        create_ maxItemsPerEpoch linger store
