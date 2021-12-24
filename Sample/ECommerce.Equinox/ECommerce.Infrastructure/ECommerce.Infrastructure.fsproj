@@ -15,9 +15,14 @@
         <PackageReference Include="Equinox.CosmosStore.Prometheus" Version="3.0.5" />
         <PackageReference Include="Equinox.EventStore" Version="3.0.5" />
         <PackageReference Include="prometheus-net.AspNetCore" Version="3.6.0" />
-        <PackageReference Include="Propulsion.CosmosStore" Version="2.12.0-rc.1" />
+        <PackageReference Include="Propulsion.CosmosStore" Version="2.12.0-rc.2" />
+<!--        <PackageReference Include="Propulsion.EventStore" Version="2.12.0-rc.2" />-->
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\..\propulsion\src\Propulsion.EventStore\Propulsion.EventStore.fsproj" />
     </ItemGroup>
 
 </Project>

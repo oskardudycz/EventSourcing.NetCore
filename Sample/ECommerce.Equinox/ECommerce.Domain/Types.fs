@@ -27,10 +27,11 @@ type CartId = Guid<cartId>
 and [<Measure>] cartId
 module CartId =
     let toString (x : CartId) : string = (UMX.untag x).ToString("N")
+    let (|Parse|) : string -> CartId = Guid.Parse >> UMX.tag
     let parse (value : Guid Nullable) : CartId =
         if not value.HasValue || value.Value = Guid.Empty then raise <| ArgumentOutOfRangeException(nameof value)
         %value.Value
-    let (|Parse|) = parse
+    let (|ParseGuid|) = parse
     let generate () : CartId = Guid.NewGuid() |> Nullable |> parse
 
 (* At present, there's only a single series of Confirmed carts; this extension point could be used
@@ -45,8 +46,7 @@ module ConfirmedSeriesId =
 type [<Measure>] confirmedEpochId
 type ConfirmedEpochId = int<confirmedEpochId>
 module ConfirmedEpochId =
-    let unknown = -1<confirmedEpochId>
     let initial = 0<confirmedEpochId>
-    let value (value : ConfirmedEpochId) : int = %value
+//    let value (value : ConfirmedEpochId) : int = %value
     let next (value : ConfirmedEpochId) : ConfirmedEpochId = % (%value + 1)
     let toString (value : ConfirmedEpochId) : string = string %value

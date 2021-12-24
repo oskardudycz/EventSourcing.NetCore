@@ -3,6 +3,7 @@ module ECommerce.Domain.ShoppingCart
 let [<Literal>] Category = "ShoppingCart"
 
 let streamName = CartId.toString >> FsCodec.StreamName.create Category
+let (|StreamName|_|) = function FsCodec.StreamName.CategoryAndId (Category, CartId.Parse cartId) -> Some cartId | _ -> None
 
 module Events =
 
@@ -11,8 +12,24 @@ module Events =
         | ItemAdded of {| productId : ProductId; quantity : int; unitPrice : decimal |}
         | ItemRemoved of {| productId : ProductId; (*; quantity : int;*) unitPrice : decimal |}
         | Confirmed of {| confirmedAt : System.DateTimeOffset |}
+        | Registering of {| originEpoch : ConfirmedEpochId |}
         interface TypeShape.UnionContract.IUnionContract
     let codec = FsCodec.NewtonsoftJson.Codec.Create<Event>()
+
+module Reactions =
+
+    let (|Decode|) (span : Propulsion.Streams.StreamSpan<_>) = span.events |> Seq.choose Events.codec.TryDecode |> Array.ofSeq
+    let (|Parse|_|) = function
+        | StreamName sellerId, Decode events -> Some (sellerId, events)
+        | _ -> None
+    let chooseConfirmed = function
+        | Events.Confirmed e -> Some ()
+        | _ -> None
+    let (|Confirmed|_|) events = Seq.rev events |> Seq.tryPick chooseConfirmed
+    let chooseNotRegistering = function
+        | Events.Registering e -> None
+        | _ -> Some ()
+    let (|StateChanged|_|) events = Seq.rev events |> Seq.tryPick chooseNotRegistering
 
 module Fold =
 
@@ -23,8 +40,9 @@ module Fold =
     type State =
         {   clientId : ClientId option
             status : Status; items : Item array
-            confirmedAt : System.DateTimeOffset option }
-    let initial = { clientId = None; status = Status.Pending; items = Array.empty; confirmedAt = None }
+            confirmedAt : System.DateTimeOffset option
+            confirmedOriginEpoch : ConfirmedEpochId option }
+    let initial = { clientId = None; status = Status.Pending; items = Array.empty; confirmedAt = None; confirmedOriginEpoch = None }
     let isClosed (s : State) = match s.status with Confirmed -> true | Pending -> false
     module ItemList =
         let keys (x : Item) = x.productId, x.unitPrice
@@ -47,6 +65,7 @@ module Fold =
         | Events.ItemAdded e ->     { s with items = s.items |> ItemList.add (e.productId, e.unitPrice, e.quantity) }
         | Events.ItemRemoved e ->   { s with items = s.items |> ItemList.remove (e.productId, e.unitPrice) }
         | Events.Confirmed e ->     { s with status = Confirmed; confirmedAt = Some e.confirmedAt }
+        | Events.Registering e ->   { s with confirmedOriginEpoch = Some e.originEpoch }
     let fold = Seq.fold evolve
 
 let decideInitialize clientId (s : Fold.State) =
@@ -81,6 +100,15 @@ module Details =
                              { productId = productId; unitPrice = p; quantity = q } |]
             Some {  clientId = clientId; status = s.status; items = items }
 
+let summarizeWithOriginEpoch getActiveEpochId state = async {
+    match state with
+    | s when not (Fold.isClosed s) -> return failwith "Unexpected"
+    | { confirmedOriginEpoch = Some originEpoch } as s ->
+        return (Details.render s |> Option.get, originEpoch), []
+    | { confirmedOriginEpoch = None } as s ->
+        let! originEpoch = getActiveEpochId ()
+        return (Details.render s |> Option.get, originEpoch), [ Events.Registering {| originEpoch = originEpoch |} ] }
+
 type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calculatePrice : ProductId * int -> Async<decimal>) =
 
     member _.Initialize(cartId, clientId) =
@@ -109,8 +137,16 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calc
         let decider = resolve cartId
         decider.Query(Details.render)
 
-    member _.ReadFromDenormalized(cartId) : Async<Details.View option> =
-        failwith "TODO implement Reactor maintaining same"
+    /// Summarizes the contents of the cart
+    /// Decides the tranche from where the insertion into the PoolTranches is to commence
+    member _.SummarizeWithOriginEpoch(cartId, getActiveEpochId) : Async<Details.View * ConfirmedEpochId> =
+        let decider = resolve cartId
+        decider.TransactAsync(summarizeWithOriginEpoch getActiveEpochId)
+
+    /// Render view (and emit version on which it was based) for Denormalizer to store
+    member _.SummarizeWithVersion(cartId) : Async<Details.View option * int64> =
+        let decider = resolve cartId
+        decider.QueryEx(fun c -> Details.render c.State, c.Version)
 
 module Config =
 
