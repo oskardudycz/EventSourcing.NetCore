@@ -21,6 +21,9 @@ module Events =
         interface TypeShape.UnionContract.IUnionContract
     let codec = FsCodec.NewtonsoftJson.Codec.Create<Event>()
 
+let ofShoppingCartView cartId (view : ShoppingCart.Details.View) : Events.Cart =
+    { cartId = cartId; items = [| for i in view.items -> { productId = i.productId; unitPrice = i.unitPrice; quantity = i.quantity }|] }
+
 let itemId (x : Events.Cart) : CartId = x.cartId
 let (|ItemIds|) : Events.Cart[] -> CartId[] = Array.map itemId
 
