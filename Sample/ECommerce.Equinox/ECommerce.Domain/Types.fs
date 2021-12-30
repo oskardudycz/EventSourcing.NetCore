@@ -47,6 +47,27 @@ type [<Measure>] confirmedEpochId
 type ConfirmedEpochId = int<confirmedEpochId>
 module ConfirmedEpochId =
     let initial = 0<confirmedEpochId>
-//    let value (value : ConfirmedEpochId) : int = %value
+    let value (value : ConfirmedEpochId) : int = %value
+    let parse (value : int) : ConfirmedEpochId = %value
     let next (value : ConfirmedEpochId) : ConfirmedEpochId = % (%value + 1)
     let toString (value : ConfirmedEpochId) : string = string %value
+
+type [<Measure>] confirmedCheckpoint
+type ConfirmedCheckpoint = int64<confirmedCheckpoint>
+module ConfirmedCheckpoint =
+
+    let initial : ConfirmedCheckpoint = %0L
+    let factor = 1_000_000L
+
+    let ofEpochAndOffset (epoch : ConfirmedEpochId) offset : ConfirmedCheckpoint =
+        int64 (ConfirmedEpochId.value epoch) * factor + int64 offset |> UMX.tag
+
+    let ofEpochContent (epoch : ConfirmedEpochId) isClosed count : ConfirmedCheckpoint =
+        let epoch, offset =
+            if isClosed then ConfirmedEpochId.next epoch, 0
+            else epoch, count
+        ofEpochAndOffset epoch offset
+
+    let toEpochAndOffset (value : ConfirmedCheckpoint) : ConfirmedEpochId * int =
+        let d, r = Math.DivRem(%value, factor)
+        (ConfirmedEpochId.parse (int d)), int r
