@@ -2,10 +2,13 @@ module ECommerce.Domain.ConfirmedIngester
 
 type Service internal (tip : ExactlyOnceIngester.Service<_, _, _, _>) =
 
+    member _.IngestMany(originEpochId, cartSummaries) : Async<CartId seq> =
+        tip.IngestMany(originEpochId, cartSummaries)
+
     /// Slot the item into the series of epochs.
     /// Returns true if it got added this time, i.e. idempotent retries don't count
-    member _.TryIngestCartSummary(originEpochId, cartSummary : ConfirmedEpoch.Events.Cart) : Async<bool> = async {
-        let! ingested = tip.IngestMany(originEpochId, [| cartSummary |])
+    member x.TryIngestCartSummary(originEpochId, cartSummary : ConfirmedEpoch.Events.Cart) : Async<bool> = async {
+        let! ingested = x.IngestMany(originEpochId, [| cartSummary |])
         return ingested |> Seq.contains cartSummary.cartId }
 
     /// Efficiently determine a valid ingestion origin epoch
