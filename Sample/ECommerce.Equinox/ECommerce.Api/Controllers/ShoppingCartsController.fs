@@ -31,7 +31,7 @@ type ShoppingCartsController(carts : ShoppingCart.Service, cartsDenormalized : S
     member _.AddProduct([<FromRoute>] id : Guid Nullable, [<FromBody>] request : AddProductRequest) : Async<IActionResult> = async {
         if obj.ReferenceEquals(null, request) then nameof request |> nullArg
 
-        let CartId.Parse cartId, ProductId.Parse productId = id, request.productId
+        let CartId.ParseGuid cartId, ProductId.Parse productId = id, request.productId
         do! carts.Add(cartId, productId, request.quantity)
         return OkResult() :> _
     }
@@ -40,7 +40,7 @@ type ShoppingCartsController(carts : ShoppingCart.Service, cartsDenormalized : S
     member _.RemoveProduct([<FromRoute>] id : Guid Nullable, [<FromBody>] request : RemoveProductRequest) : Async<IActionResult> = async {
         if obj.ReferenceEquals(null, request) then nameof request |> nullArg
 
-        let CartId.Parse cartId, ProductId.Parse productId = id, request.productId
+        let CartId.ParseGuid cartId, ProductId.Parse productId = id, request.productId
         do! carts.Remove(cartId, productId, request.price)
         return OkResult() :> _
     }
@@ -49,7 +49,7 @@ type ShoppingCartsController(carts : ShoppingCart.Service, cartsDenormalized : S
     member _.ConfirmCart([<FromRoute>] id : Guid Nullable(*, [<FromBody>] request : ConfirmShoppingCartRequest*)) : Async<IActionResult> = async {
 //        if obj.ReferenceEquals(null, request) then nameof request |> nullArg // TODO only relevant if we follow version-contingent style
 
-        let (CartId.Parse cartId) = id
+        let (CartId.ParseGuid cartId) = id
         do! carts.Confirm(cartId, DateTimeOffset.UtcNow)
         return OkResult() :> _
     }
@@ -57,7 +57,7 @@ type ShoppingCartsController(carts : ShoppingCart.Service, cartsDenormalized : S
     /// Reads from write side
     [<HttpGet("{id}")>]
     member _.Get([<FromRoute>] id : Guid Nullable) : Async<IActionResult> = async {
-        let (CartId.Parse cartId) = id
+        let (CartId.ParseGuid cartId) = id
         match! carts.Read cartId with
         | Some (res : ShoppingCart.Details.View) -> return OkObjectResult res :> _
         | None -> return NotFoundResult() :> _
@@ -66,7 +66,7 @@ type ShoppingCartsController(carts : ShoppingCart.Service, cartsDenormalized : S
     /// Reads from denormalized view
     [<HttpGet("{id}/summary")>]
     member _.GetSummary([<FromRoute>] id : Guid Nullable) : Async<IActionResult> = async {
-        let (CartId.Parse cartId) = id
+        let (CartId.ParseGuid cartId) = id
         match! cartsDenormalized.Read cartId with
         | Some (res : ShoppingCartSummary.Details.View) -> return OkObjectResult res :> _
         | None -> return NotFoundResult() :> _
