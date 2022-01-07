@@ -19,7 +19,7 @@ module Events =
         | Ingested of Ingested
         | Closed
         interface TypeShape.UnionContract.IUnionContract
-    let codec = FsCodec.NewtonsoftJson.Codec.Create<Event>()
+    let codec = Config.EventCodec.forUnion<Event>
 
 let ofShoppingCartView cartId (view : ShoppingCart.Details.View) : Events.Cart =
     { cartId = cartId; items = [| for i in view.items -> { productId = i.productId; unitPrice = i.unitPrice; quantity = i.quantity }|] }

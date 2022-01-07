@@ -9,12 +9,11 @@ module Events =
     type Ingested = { version : int64; value : Summary }
      and Summary = { items : Item[]; status : Status; clientId : ClientId }
      and Item = { productId : ProductId; unitPrice : decimal; quantity : int }
-     and [<Newtonsoft.Json.JsonConverter(typeof<FsCodec.NewtonsoftJson.TypeSafeEnumConverter>)>]
-         Status = Pending | Confirmed
+     and Status = Pending | Confirmed
     type Event =
         | Ingested of Ingested
         interface TypeShape.UnionContract.IUnionContract
-    let codec = FsCodec.NewtonsoftJson.Codec.Create<Event>()
+    let codec = Config.EventCodec.forUnion<Event>
 
 module Fold =
 
