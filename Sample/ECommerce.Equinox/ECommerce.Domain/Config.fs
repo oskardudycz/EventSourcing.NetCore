@@ -15,12 +15,6 @@ module EventCodec =
     let private defaultOptions = Options.Create(autoUnion = true)
     let forUnion<'t when 't :> TypeShape.UnionContract.IUnionContract> =
         Codec.Create<'t>(options = defaultOptions).ToByteArrayCodec()
-    let private withUpconverter<'c, 'e when 'c :> TypeShape.UnionContract.IUnionContract> up : FsCodec.IEventCodec<'e, _, _> =
-        let down (_ : 'e) = failwith "Unexpected"
-        Codec.Create<'e, 'c, _>(up, down, options = defaultOptions).ToByteArrayCodec()
-    let withIndex<'c when 'c :> TypeShape.UnionContract.IUnionContract> : FsCodec.IEventCodec<int64 * 'c, _, _> =
-        let up (raw : FsCodec.ITimelineEvent<_>, e) = raw.Index, e
-        withUpconverter<'c, int64 * 'c> up
 
 module Esdb =
 
