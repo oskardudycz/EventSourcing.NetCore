@@ -16,7 +16,7 @@ module Events =
         | Started of            {| epochId : ConfirmedEpochId |}
         | Snapshotted of        {| active : ConfirmedEpochId |}
         interface TypeShape.UnionContract.IUnionContract
-    let codec = FsCodec.NewtonsoftJson.Codec.Create<Event>()
+    let codec = Config.EventCodec.forUnion<Event>
 
 module Fold =
 

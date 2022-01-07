@@ -14,7 +14,7 @@ module Events =
         | Confirmed of {| confirmedAt : System.DateTimeOffset |}
         | Registering of {| originEpoch : ConfirmedEpochId |}
         interface TypeShape.UnionContract.IUnionContract
-    let codec = FsCodec.NewtonsoftJson.Codec.Create<Event>()
+    let codec = Config.EventCodec.forUnion<Event>
 
 module Reactions =
 
@@ -23,11 +23,11 @@ module Reactions =
         | StreamName sellerId, Decode events -> Some (sellerId, events)
         | _ -> None
     let chooseConfirmed = function
-        | Events.Confirmed e -> Some ()
+        | Events.Confirmed _ -> Some ()
         | _ -> None
     let (|Confirmed|_|) events = Seq.rev events |> Seq.tryPick chooseConfirmed
     let chooseNotRegistering = function
-        | Events.Registering e -> None
+        | Events.Registering _ -> None
         | _ -> Some ()
     let (|StateChanged|_|) events = Seq.rev events |> Seq.tryPick chooseNotRegistering
 
@@ -35,7 +35,6 @@ module Fold =
 
     type Item = { productId : ProductId; quantity : int; unitPrice : decimal }
 
-    [<Newtonsoft.Json.JsonConverter(typeof<FsCodec.NewtonsoftJson.TypeSafeEnumConverter>)>]
     type Status = Pending | Confirmed
     type State =
         {   clientId : ClientId option
