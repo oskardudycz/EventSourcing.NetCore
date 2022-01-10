@@ -14,7 +14,7 @@ public abstract class Aggregate<T>: IAggregate<T> where T : notnull
 
     public int Version { get; protected set; }
 
-    [NonSerialized] private readonly Queue<IEvent> uncommittedEvents = new Queue<IEvent>();
+    [NonSerialized] private readonly Queue<IEvent> uncommittedEvents = new();
 
     public virtual void When(object @event) { }
 
