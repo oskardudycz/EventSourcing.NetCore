@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Marten.Integration.Tests.TestsInfrastructure;
+using Marten.Schema;
 using Newtonsoft.Json;
 using Weasel.Postgresql;
 using Xunit;
@@ -54,28 +55,30 @@ public class ReservationId: StronglyTypedValue<Guid>
     public ReservationId(Guid value) : base(value)
     {
     }
-};
+}
 
 public class CustomerId: StronglyTypedValue<Guid>
 {
     public CustomerId(Guid value) : base(value)
     {
     }
-};
+}
 
 public class SeatId: StronglyTypedValue<Guid>
 {
     public SeatId(Guid value) : base(value)
     {
     }
-};
+}
 
 public class ReservationNumber: StronglyTypedValue<string>
 {
     public ReservationNumber(string value) : base(value)
     {
+        if (string.IsNullOrEmpty(value) || value.StartsWith("RES/") || value.Length <= 4)
+            throw new ArgumentOutOfRangeException(nameof(value));
     }
-};
+}
 
 public record TentativeReservationCreated(
     ReservationId ReservationId,
@@ -104,11 +107,12 @@ public abstract class Aggregate<TKey, T>
     where T : IComparable<T>
 {
 
-    public TKey AggregateId { get; set; } = default!;
+    public TKey Id { get; set; } = default!;
 
-    public T Id
+    [Identity]
+    public T AggregateId
     {
-        get => AggregateId.Value;
+        get => Id.Value;
         set {}
     }
 
@@ -138,6 +142,7 @@ public enum ReservationStatus
     Cancelled
 }
 
+
 public class Reservation : Aggregate<ReservationId, Guid>
 {
     public CustomerId CustomerId { get; private set; } = default!;
@@ -164,14 +169,14 @@ public class Reservation : Aggregate<ReservationId, Guid>
     private Reservation(){}
 
     private Reservation(
-        ReservationId aggregateId,
+        ReservationId id,
         SeatId seatId,
         CustomerId customerId,
         ReservationNumber reservationNumber
     )
     {
         var @event = new TentativeReservationCreated(
-            aggregateId,
+            id,
             seatId,
             customerId,
             reservationNumber
@@ -187,7 +192,7 @@ public class Reservation : Aggregate<ReservationId, Guid>
         if(Status != ReservationStatus.Tentative)
             throw new InvalidOperationException($"Changing seat for the reservation in '{Status}' status is not allowed.");
 
-        var @event = new ReservationSeatChanged(AggregateId, newSeatId);
+        var @event = new ReservationSeatChanged(Id, newSeatId);
 
         Enqueue(@event);
         Apply(@event);
@@ -198,7 +203,7 @@ public class Reservation : Aggregate<ReservationId, Guid>
         if(Status != ReservationStatus.Tentative)
             throw new InvalidOperationException($"Only tentative reservation can be confirmed (current status: {Status}.");
 
-        var @event = new ReservationConfirmed(AggregateId);
+        var @event = new ReservationConfirmed(Id);
 
         Enqueue(@event);
         Apply(@event);
@@ -209,7 +214,7 @@ public class Reservation : Aggregate<ReservationId, Guid>
         if(Status != ReservationStatus.Tentative)
             throw new InvalidOperationException($"Only tentative reservation can be cancelled (current status: {Status}).");
 
-        var @event = new ReservationCancelled(AggregateId);
+        var @event = new ReservationCancelled(Id);
 
         Enqueue(@event);
         Apply(@event);
@@ -217,7 +222,7 @@ public class Reservation : Aggregate<ReservationId, Guid>
 
     public void Apply(TentativeReservationCreated @event)
     {
-        AggregateId = @event.ReservationId;
+        Id = @event.ReservationId;
         SeatId = @event.SeatId;
         CustomerId = @event.CustomerId;
         Number = @event.Number;
@@ -276,21 +281,31 @@ public class CompositeIdsTests: MartenTest
         var @event = reservation.DequeueUncommittedEvents().Single();
 
         //1. Create events
-        EventStore.Append(reservation.Id, @event);
+        EventStore.Append(reservation.AggregateId, @event);
 
         Session.SaveChanges();
 
         //2. Get live agregation
-        var issuesListFromLiveAggregation = EventStore.AggregateStream<Reservation>(reservation.Id);
+        var issuesListFromLiveAggregation = EventStore.AggregateStream<Reservation>(reservation.AggregateId);
 
         //3. Get inline aggregation
-        var issuesListFromInlineAggregation = Session.Load<Reservation>(reservation.Id);
+        var issuesListFromInlineAggregation = Session.Load<Reservation>(reservation.AggregateId);
+
+        //4. Get inline aggregregation through linq
+        var reservationId = reservation.Id;
+
+        var issuesListFromInlineAggregationFromLinq = Session.Query<Reservation>().SingleOrDefault(r => r.Id.Value == reservationId.Value);
+        var issuesListFromInlineAggregationFromLinqWithAggregateId = Session.Query<Reservation>().SingleOrDefault(r => r.AggregateId == reservationId.Value);
 
         issuesListFromLiveAggregation.Should().NotBeNull();
         issuesListFromInlineAggregation.Should().NotBeNull();
+        issuesListFromInlineAggregationFromLinq.Should().NotBeNull();
+        issuesListFromInlineAggregationFromLinqWithAggregateId.Should().NotBeNull();
 
-        issuesListFromLiveAggregation!.Id.Should().Be(reservation.Id);
-        issuesListFromInlineAggregation!.Id.Should().Be(reservation.Id);
+        issuesListFromLiveAggregation!.AggregateId.Should().Be(reservationId.Value);
+        issuesListFromLiveAggregation!.AggregateId.Should().Be(reservationId.Value);
+        issuesListFromInlineAggregationFromLinq!.AggregateId.Should().Be(reservationId.Value);
+        issuesListFromInlineAggregationFromLinqWithAggregateId!.AggregateId.Should().Be(reservationId.Value);
     }
 }
 
