@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.Client;
@@ -30,14 +31,28 @@ public static class RetryScope
     ) =>
         RetryPolicy.ExecuteAsync(ct => action(eventStore, ct), cancellationToken);
 
-    public static Task<IWriteResult> AppendWithRetry(
+    public static Task<List<ResolvedEvent>> ReadAllStreamsEventsWithRetry(
         this EventStoreClient eventStore,
         string streamName,
-        StreamRevision expectedRevision,
-        IEnumerable<EventData> eventData,
         CancellationToken cancellationToken
     ) =>
         eventStore.ExecuteAsync(
-            (es, ct) => es.AppendToStreamAsync(streamName, expectedRevision, eventData, cancellationToken: ct),
+            async (es, ct) =>
+            {
+                await using var readResult = es.ReadStreamAsync(
+                    Direction.Forwards,
+                    streamName,
+                    StreamPosition.Start,
+                    cancellationToken: ct
+                );
+
+                if(await readResult.ReadState != ReadState.Ok)
+                    throw new ArgumentOutOfRangeException(
+                        nameof(streamName), $"Stream '{streamName}' was not found"
+                    );
+
+                return await readResult
+                    .ToListAsync(ct);
+            },
             cancellationToken);
 }
