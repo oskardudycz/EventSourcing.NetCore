@@ -1,0 +1,43 @@
+name: Nuget Packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore Core/Bk.Forked.EventSourcing.NetCore.Core.sln
+    - name: Build
+      run: dotnet build --no-restore Core/Bk.Forked.EventSourcing.NetCore.Core.sln
+    - name: Test
+      run: dotnet test --no-build --verbosity normal Core/Bk.Forked.EventSourcing.NetCore.Core.sln
+
+  publish-packages:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Ensure GitHub NuGet Source
+      run: |
+        dotnet nuget add source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+          -n github \
+          -u ${{ github.repository_owner }} \
+          -p ${{ secrets.GITHUB_TOKEN }} \
+          --store-password-in-clear-text
+    - name: Pack & Push Data
+      run: | 
+        dotnet pack Core/Core.csproj --output nuget-packages --configuration Release -p:Version=1.0.0
+        dotnet nuget push nuget-packages/Bk.Forked.EventSourcing.NetCore.Core.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source github
