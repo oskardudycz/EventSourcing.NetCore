@@ -12,6 +12,7 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET.
     - [1.4 Event representation](#14-event-representation)
     - [1.5 Event Storage](#15-event-storage)
     - [1.6 Retrieving the current state from events](#16-retrieving-the-current-state-from-events)
+    - [1.7 Strongly-Typed ids with Marten](#17-strongly-typed-ids-with-marten)
   - [2. Videos](#2-videos)
     - [2.1. Practical Event Sourcing with Marten](#21-practical-event-sourcing-with-marten)
     - [2.2. Practical Introduction to Event Sourcing with EventStoreDB](#22-practical-introduction-to-event-sourcing-with-eventstoredb)
@@ -370,6 +371,182 @@ See samples:
 Read more in my article:
 -   📝 [How to get the current entity state from events?](https://event-driven.io/en/how_to_get_the_current_entity_state_in_event_sourcing/?utm_source=event_sourcing_net)
 
+### 1.7 Strongly-Typed ids with Marten
+
+Strongly typed ids (or, in general, a proper type system) can make your code more predictable. It reduces the chance of trivial mistakes, like accidentally changing parameters order of the same primitive type. 
+
+So for such code:
+
+```csharp
+var reservationId = "RES/01";
+var seatId = "SEAT/22";
+var customerId = "CUS/291";
+
+var reservation = new ReservationId (
+    reservationId,
+    seatId,
+    customerId 
+);
+```
+
+the compiler won't catch if you switch `reservationId` with `seatId`.
+
+If you use strongly typed ids, then compile will catch that issue:
+
+```csharp
+var reservationId = new ReservationId("RES/01");
+var seatId = new SeatId("SEAT/22");
+var customerId = new CustomerId("CUS/291");
+
+var reservation = new ReservationId (
+    reservationId,
+    seatId,
+    customerId 
+);
+```
+
+They're not ideal, as they're usually not playing well with the storage engines. Typical issues are: serialisation, Linq queries, etc. For some cases they may be just overkill. You need to pick your poison.
+
+To reduce tedious, copy/paste code, it's worth defining a strongly-typed id base class, like:
+
+```csharp
+public class StronglyTypedValue<T>: IEquatable<StronglyTypedValue<T>> where T: IComparable<T>
+{
+    public T Value { get; }
+
+    public StronglyTypedValue(T value)
+    {
+        Value = value;
+    }
+
+    public bool Equals(StronglyTypedValue<T>? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return EqualityComparer<T>.Default.Equals(Value, other.Value);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((StronglyTypedValue<T>)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return EqualityComparer<T>.Default.GetHashCode(Value);
+    }
+
+    public static bool operator ==(StronglyTypedValue<T>? left, StronglyTypedValue<T>? right)
+    {
+        return Equals(left, right);
+    }
+
+    public static bool operator !=(StronglyTypedValue<T>? left, StronglyTypedValue<T>? right)
+    {
+        return !Equals(left, right);
+    }
+}
+```
+
+Then you can define specific id class as:
+
+```csharp
+public class ReservationId: StronglyTypedValue<Guid>
+{
+    public ReservationId(Guid value) : base(value)
+    {
+    }
+}
+```
+
+You can even add additional rules:
+
+```csharp
+public class ReservationNumber: StronglyTypedValue<string>
+{
+    public ReservationNumber(string value) : base(value)
+    {
+        if (string.IsNullOrEmpty(value) || value.StartsWith("RES/") || value.Length <= 4)
+            throw new ArgumentOutOfRangeException(nameof(value));
+    }
+}
+```
+
+The base class working with Marten, can be defined as:
+
+```csharp
+public abstract class Aggregate<TKey, T>
+    where TKey: StronglyTypedValue<T>
+    where T : IComparable<T>
+{
+    public TKey Id { get; set; } = default!;
+    
+    [Identity]
+    public T AggregateId    {
+        get => Id.Value;
+        set {} 
+    }
+
+    public int Version { get; protected set; }
+
+    [JsonIgnore] private readonly Queue<object> uncommittedEvents = new(); 
+
+    public object[] DequeueUncommittedEvents()
+    {
+        var dequeuedEvents = uncommittedEvents.ToArray();
+
+        uncommittedEvents.Clear();
+
+        return dequeuedEvents;
+    }
+
+    protected void Enqueue(object @event)
+    {
+        uncommittedEvents.Enqueue(@event);
+    }
+}
+```
+
+Marten requires the id with public setter and getter of `string` or `Guid`. We used the trick and added `AggregateId` with a strongly-typed backing field. We also informed Marten of the [Identity](https://martendb.io/documents/identity.html#document-identity) attribute to use this field in its internals.
+
+Example aggregate can look like:
+
+```csharp
+public class Reservation : Aggregate<ReservationId, Guid>
+{
+    public CustomerId CustomerId { get; private set; } = default!;
+
+    public SeatId SeatId { get; private set; } = default!;
+
+    public ReservationNumber Number { get; private set; } = default!;
+
+    public ReservationStatus Status { get; private set; }
+
+    public static Reservation CreateTentative(
+        SeatId seatId,
+        CustomerId customerId)
+    {
+        return new Reservation(
+            new ReservationId(Guid.NewGuid()),
+            seatId,
+            customerId,
+            new ReservationNumber(Guid.NewGuid().ToString())
+        );
+    }
+
+    // (...)
+}
+```
+
+See the full sample [here](./Marten.Integration.Tests/CompositeIds/CompositeIdsTests.cs).
+
+Read more in the article:
+-   📝 [Using strongly-typed identifiers with Marten](https://event-driven.io/en/using_strongly_typed_ids_with_marten//?utm_source=event_sourcing_net)
+-   📝 [Immutable Value Objects are simpler and more useful than you think!](https://event-driven.io/en/immutable_value_objects/?utm_source=event_sourcing_net)
+
 ## 2. Videos
 
 
@@ -538,11 +715,16 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
 -   📝 [How to use ETag header for optimistic concurrency](https://event-driven.io/en/how_to_use_etag_header_for_optimistic_concurrency/?utm_source=event_sourcing_net)
 -   📝 [Dealing with Eventual Consistency and Idempotency in MongoDB projections](https://event-driven.io/en/dealing_with_eventual_consistency_and_idempotency_in_mongodb_projections/?utm_source=event_sourcing_net)
 -   📝 [Long-polling, how to make our async API synchronous](https://event-driven.io/en/long_polling_and_eventual_consistency/?utm_source=event_sourcing_net)
+-   📝 [A simple trick for idempotency handling in the Elastic Search read model](https://event-driven.io/en/simple_trick_for_idempotency_handling_in_elastic_search_readm_model/?utm_source=event_sourcing_net)
+-   📝 [How to do snapshots in Marten?](https://event-driven.io/en/how_to_do_snapshots_in_Marten/?utm_source=event_sourcing_net)
+-   📝 [Integrating Marten with other systems](https://event-driven.io/en/integrating_Marten/?utm_source=event_sourcing_net)
 -   📝 [How to (not) do the events versioning?](https://event-driven.io/en/how_to_do_event_versioning/?utm_source=event_sourcing_net)
 -   📝 [Simple patterns for events schema versioning](https://event-driven.io/en/simple_events_versioning_patterns/?utm_source=event_sourcing_net)
 -   📝 [How to create projections of events for nested object structures?](https://event-driven.io/en/how_to_create_projections_of_events_for_nested_object_structures/?utm_source=event_sourcing_net)
 -   📝 [How to scale projections in the event-driven systems?](https://event-driven.io/en/how_to_scale_projections_in_the_event_driven_systems/?utm_source=event_sourcing_net)
+-   📝 [Immutable Value Objects are simpler and more useful than you think!](https://event-driven.io/en/immutable_value_objects/?utm_source=event_sourcing_net)
 -   📝 [Notes about C# records and Nullable Reference Types](https://event-driven.io/en/notes_about_csharp_records_and_nullable_reference_types/?utm_source=event_sourcing_net)
+-   📝 [Using strongly-typed identifiers with Marten](https://event-driven.io/en/using_strongly_typed_ids_with_marten/?utm_source=event_sourcing_net)
 -   📝 [How using events helps in a teams' autonomy](https://event-driven.io/en/how_using_events_help_in_teams_autonomy/?utm_source=event_sourcing_net)
 -   📝 [What texting your Ex has to do with Event-Driven Design?](https://event-driven.io/en/what_texting_ex_has_to_do_with_event_driven_design/?utm_source=event_sourcing_net)
 -   📝 [What if I told you that Relational Databases are in fact Event Stores?](https://event-driven.io/en/relational_databases_are_event_stores/?utm_source=event_sourcing_net)
@@ -863,4 +1045,4 @@ It contains a weekly updated list of materials I found valuable and educational.
 
 ---
 
-**EventSourcing.NetCore** is Copyright &copy; 2017-2021 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
+**EventSourcing.NetCore** is Copyright &copy; 2017-2022 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
