@@ -30,7 +30,7 @@ public class StronglyTypedValue<T>: IEquatable<StronglyTypedValue<T>> where T: I
     {
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((StronglyTypedValue<T>)obj);
     }
 
@@ -285,13 +285,13 @@ public class CompositeIdsTests: MartenTest
 
         Session.SaveChanges();
 
-        //2. Get live agregation
+        //2. Get live aggregation
         var issuesListFromLiveAggregation = EventStore.AggregateStream<Reservation>(reservation.AggregateId);
 
         //3. Get inline aggregation
         var issuesListFromInlineAggregation = Session.Load<Reservation>(reservation.AggregateId);
 
-        //4. Get inline aggregregation through linq
+        //4. Get inline aggregation through linq
         var reservationId = reservation.Id;
 
         var issuesListFromInlineAggregationFromLinq = Session.Query<Reservation>().SingleOrDefault(r => r.Id.Value == reservationId.Value);
