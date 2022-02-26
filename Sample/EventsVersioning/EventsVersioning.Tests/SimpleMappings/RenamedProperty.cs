@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using FluentAssertions;
-using Newtonsoft.Json;
 using Xunit;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using V1 = ECommerce.V1;

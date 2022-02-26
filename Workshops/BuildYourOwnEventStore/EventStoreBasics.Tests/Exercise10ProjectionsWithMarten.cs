@@ -3,7 +3,7 @@ using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Marten;
 using Marten.Events.Projections;
-using Weasel.Postgresql;
+using Weasel.Core;
 using Xunit;
 
 namespace EventStoreBasics.Tests;

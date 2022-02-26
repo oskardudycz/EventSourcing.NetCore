@@ -1,6 +1,6 @@
 using Npgsql;
 using SharpTestsEx;
-using Weasel.Postgresql;
+using Weasel.Core;
 using Xunit;
 
 namespace Marten.Integration.Tests.General;
@@ -52,7 +52,7 @@ public class StoreInitializationTests
     }
 
     [Fact]
-    public void GivenSettingWithNpgsqlConnection_WhenDocumentSessionIsInitializedWithDifferentShema_ThenConnectionIsCreated()
+    public void GivenSettingWithNpgsqlConnection_WhenDocumentSessionIsInitializedWithDifferentSchema_ThenConnectionIsCreated()
     {
         var ex = Record.Exception(() =>
         {
@@ -81,15 +81,11 @@ public class StoreInitializationTests
                 options.Events.DatabaseSchemaName = Settings.SchemaName;
             });
 
-            using (var session = store.OpenSession())
-            {
-                using (var transaction = session.Connection.BeginTransaction())
-                {
-                    ConnectionShouldBeEstablished(store);
+            using var session = store.OpenSession();
+            using var transaction = session.Connection!.BeginTransaction();
+            ConnectionShouldBeEstablished(store);
 
-                    transaction.Rollback();
-                }
-            }
+            transaction.Rollback();
         });
 
         ex.Should().Be.Null();
