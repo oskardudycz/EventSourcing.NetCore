@@ -29,7 +29,7 @@ public class Startup
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ECommerce.Api", Version = "v1" });
             })
             .AddCoreServices(Configuration)
-            .AddECommerceModule()
+            .AddECommerceModule(Configuration)
             .AddEventStoreDBSubscriptionToAll();
     }
 
