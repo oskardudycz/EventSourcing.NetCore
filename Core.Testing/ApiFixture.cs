@@ -12,7 +12,7 @@ using Shipments.Api.Tests.Core;
 
 namespace Core.Testing;
 
-public abstract class ApiWithEventsFixture<TStartup>: Api.Testing.ApiFixture<TStartup> where TStartup : class
+public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where TStartup : class
 {
     private readonly EventsLog eventsLog = new();
     private readonly DummyExternalEventProducer externalEventProducer = new();

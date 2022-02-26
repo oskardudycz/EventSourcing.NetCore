@@ -22,7 +22,14 @@ public static class Config
     private static IServiceCollection AddEntityFramework(this IServiceCollection services, IConfiguration config)
     {
         return services.AddDbContext<ShipmentsDbContext>(
-            options => options.UseNpgsql("name=ConnectionStrings:ShipmentsDatabase"));
+            options =>
+            {
+                var schemaName = Environment.GetEnvironmentVariable("SchemaName")!;
+                var connectionString = config.GetConnectionString("ShipmentsDatabase");
+                options.UseNpgsql(
+                    $"{connectionString}; searchpath = {schemaName.ToLower()}",
+                    x => x.MigrationsHistoryTable("__EFMigrationsHistory", schemaName.ToLower()));
+            });
     }
 
     public static void ConfigureShipmentsModule(this IApplicationBuilder app)

@@ -69,7 +69,7 @@ public class StoreInitializationTests
         ex.Should().Be.Null();
     }
 
-    [Fact]
+    [Fact(Skip = "To investigate in Npgsql")]
     public void GivenProperConnectionString_WhenDocumentSessionIsCreatedAndTransactionIsCreated_ThenConnectionIsCreatedAndItsPossibleToMakeRollback()
     {
         var ex = Record.Exception(() =>
