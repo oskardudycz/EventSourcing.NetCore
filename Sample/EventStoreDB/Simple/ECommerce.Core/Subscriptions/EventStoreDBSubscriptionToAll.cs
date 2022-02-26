@@ -56,31 +56,15 @@ public class EventStoreDBSubscriptionToAll
 
         var checkpoint = await checkpointRepository.Load(SubscriptionId, ct);
 
-        if (checkpoint != null)
-        {
-            await eventStoreClient.SubscribeToAllAsync(
-                new Position(checkpoint.Value, checkpoint.Value),
-                HandleEvent,
-                subscriptionOptions.ResolveLinkTos,
-                HandleDrop,
-                subscriptionOptions.FilterOptions,
-                subscriptionOptions.ConfigureOperation,
-                subscriptionOptions.Credentials,
-                ct
-            );
-        }
-        else
-        {
-            await eventStoreClient.SubscribeToAllAsync(
-                HandleEvent,
-                false,
-                HandleDrop,
-                subscriptionOptions.FilterOptions,
-                subscriptionOptions.ConfigureOperation,
-                subscriptionOptions.Credentials,
-                ct
-            );
-        }
+        await eventStoreClient.SubscribeToAllAsync(
+            checkpoint == null? FromAll.Start : FromAll.After(new Position(checkpoint.Value, checkpoint.Value)),
+            HandleEvent,
+            subscriptionOptions.ResolveLinkTos,
+            HandleDrop,
+            subscriptionOptions.FilterOptions,
+            subscriptionOptions.Credentials,
+            ct
+        );
 
         logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
     }

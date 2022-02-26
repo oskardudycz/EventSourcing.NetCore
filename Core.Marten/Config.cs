@@ -9,7 +9,6 @@ using Marten.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Weasel.Core;
-using Weasel.Postgresql;
 
 namespace Core.Marten;
 
@@ -44,6 +43,7 @@ public static class MartenConfigExtensions
             {
                 SetStoreOptions(options, martenConfig, configureOptions);
             })
+            .AddAsyncDaemon(DaemonMode.Solo)
             .InitializeStore();
 
         SetupSchema(documentStore, martenConfig, 1);
@@ -94,8 +94,6 @@ public static class MartenConfigExtensions
         });
 
         options.Serializer(serializer);
-
-        options.Projections.AsyncMode = config.DaemonMode;
 
         configureOptions?.Invoke(options);
     }

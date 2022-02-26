@@ -17,7 +17,7 @@ public static class AggregateStreamExtensions
         ulong? fromVersion = null
     ) where T : class, IProjection
     {
-        await using var readResult = eventStore.ReadStreamAsync(
+        var readResult = eventStore.ReadStreamAsync(
             Direction.Forwards,
             StreamNameMapper.ToStreamId<T>(id),
             fromVersion ?? StreamPosition.Start,

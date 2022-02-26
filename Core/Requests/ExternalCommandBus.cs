@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
 using RestSharp;
+using RestSharp.Serializers;
 
 namespace Core.Requests;
 
@@ -18,8 +19,8 @@ public class ExternalCommandBus: IExternalCommandBus
     {
         var client = new RestClient(url);
 
-        var request = new RestRequest(path, DataFormat.Json);
-        request.AddJsonBody(command);
+        var request = new RestRequest(path, Method.Post);
+        request.AddBody(command, ContentType.Json);
 
         return client.PostAsync<dynamic>(request, cancellationToken);
     }
@@ -28,8 +29,8 @@ public class ExternalCommandBus: IExternalCommandBus
     {
         var client = new RestClient(url);
 
-        var request = new RestRequest(path, DataFormat.Json);
-        request.AddJsonBody(command);
+        var request = new RestRequest(path, Method.Put);
+        request.AddBody(command, ContentType.Json);
 
         return client.PutAsync<dynamic>(request, cancellationToken);
     }
@@ -38,8 +39,8 @@ public class ExternalCommandBus: IExternalCommandBus
     {
         var client = new RestClient(url);
 
-        var request = new RestRequest(path, DataFormat.Json);
-        request.AddJsonBody(command);
+        var request = new RestRequest(path, Method.Delete);
+        request.AddBody(command, ContentType.Json);
 
         return client.DeleteAsync<dynamic>(request, cancellationToken);
     }

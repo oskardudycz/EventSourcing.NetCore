@@ -1,5 +1,5 @@
 ﻿using System;
-using Weasel.Postgresql;
+using Weasel.Core;
 
 namespace Marten.Integration.Tests.TestsInfrastructure;
 

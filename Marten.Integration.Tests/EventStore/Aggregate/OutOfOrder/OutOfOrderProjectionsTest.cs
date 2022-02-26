@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
-using Weasel.Postgresql;
+using Weasel.Core;
 using Xunit;
 
-namespace Marten.Integration.Tests.EventStore.Projections;
+namespace Marten.Integration.Tests.EventStore.Aggregate.OutOfOrder;
 
 public class OutOfOrderProjectionsTest: MartenTest
 {

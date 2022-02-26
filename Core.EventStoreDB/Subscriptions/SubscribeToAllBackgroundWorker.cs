@@ -83,31 +83,15 @@ public class SubscribeToAllBackgroundWorker: IHostedService
 
         var checkpoint = await checkpointRepository.Load(subscriptionId, ct);
 
-        if (checkpoint != null)
-        {
-            await eventStoreClient.SubscribeToAllAsync(
-                new Position(checkpoint.Value, checkpoint.Value),
-                HandleEvent,
-                false,
-                HandleDrop,
-                filterOptions,
-                configureOperation,
-                credentials,
-                ct
-            );
-        }
-        else
-        {
-            await eventStoreClient.SubscribeToAllAsync(
-                HandleEvent,
-                false,
-                HandleDrop,
-                filterOptions,
-                configureOperation,
-                credentials,
-                ct
-            );
-        }
+        await eventStoreClient.SubscribeToAllAsync(
+            checkpoint == null? FromAll.Start : FromAll.After(new Position(checkpoint.Value, checkpoint.Value)),
+            HandleEvent,
+            false,
+            HandleDrop,
+            filterOptions,
+            credentials,
+            ct
+        );
 
         logger.LogInformation("Subscription to all '{SubscriptionId}' started", subscriptionId);
     }

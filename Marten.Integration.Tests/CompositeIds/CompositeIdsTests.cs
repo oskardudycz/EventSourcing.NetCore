@@ -5,7 +5,7 @@ using FluentAssertions;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Marten.Schema;
 using Newtonsoft.Json;
-using Weasel.Postgresql;
+using Weasel.Core;
 using Xunit;
 
 namespace Marten.Integration.Tests.CompositeIds;
