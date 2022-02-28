@@ -28,7 +28,11 @@ public class ConfirmShoppingCartFixture: ApiFixture<Startup>
 
         ShoppingCartId = await initializeResponse.GetResultFromJson<Guid>();
 
-        CommandResponse = await Put($"{ShoppingCartId}/confirmation", new ConfirmShoppingCartRequest(0));
+        CommandResponse = await Put(
+            $"{ShoppingCartId}/confirmation",
+            new ConfirmShoppingCartRequest(0),
+            new RequestOptions { IfMatch = 0.ToString() }
+        );
     }
 }
 
