@@ -65,32 +65,32 @@ public class ShoppingCartsController: Controller
         return Ok();
     }
 
-    [HttpDelete("{id}/products")]
+    [HttpDelete("{id}/products/{productId}")]
     public async Task<IActionResult> RemoveProduct(
         [FromServices] Func<RemoveProductItemFromShoppingCart, CancellationToken, ValueTask> handle,
         Guid id,
-        [FromBody] RemoveProductRequest request,
+        [FromRoute]Guid? productId,
+        [FromQuery]int? quantity,
+        [FromQuery]decimal? unitPrice,
+        [FromQuery]uint? version,
         CancellationToken ct
     )
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
-
         var command = RemoveProductItemFromShoppingCart.From(
             id,
             PricedProductItem.From(
                 ProductItem.From(
-                    request.ProductItem?.ProductId,
-                    request.ProductItem?.Quantity
+                    productId,
+                    quantity
                 ),
-                request.ProductItem?.UnitPrice
+                unitPrice
             ),
-            request.Version
+            version
         );
 
         await handle(command, ct);
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPut("{id}/confirmation")]

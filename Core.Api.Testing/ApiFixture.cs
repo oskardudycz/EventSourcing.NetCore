@@ -94,4 +94,16 @@ public abstract class ApiFixture: IAsyncLifetime
     {
         return Put(string.Empty, request);
     }
+
+    public Task<HttpResponseMessage> Delete(string path, object? request = null)
+    {
+        return Client.DeleteAsync(
+            $"{ApiUrl}/{path}"
+        );
+    }
+
+    public Task<HttpResponseMessage> Delete(object request)
+    {
+        return Delete(string.Empty, request);
+    }
 }
