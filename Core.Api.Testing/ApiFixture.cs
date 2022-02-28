@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Core.Serialization.Newtonsoft;
 using Microsoft.AspNetCore.Hosting;
@@ -46,12 +47,13 @@ public abstract class ApiFixture: IAsyncLifetime
 
     public virtual Task DisposeAsync() => Task.CompletedTask;
 
-    public async Task<HttpResponseMessage> Get(string path = "", int maxNumberOfRetries = 0, int retryIntervalInMs = 1000, Func<HttpResponseMessage, ValueTask<bool>>? check = null)
+    public async Task<HttpResponseMessage> Get(string path = "", int maxNumberOfRetries = 0,
+        int retryIntervalInMs = 1000, Func<HttpResponseMessage, ValueTask<bool>>? check = null)
     {
         HttpResponseMessage queryResponse;
         var retryCount = maxNumberOfRetries;
 
-        var doCheck = check ?? (response => new (response.StatusCode == HttpStatusCode.OK));
+        var doCheck = check ?? (response => new(response.StatusCode == HttpStatusCode.OK));
         do
         {
             queryResponse = await Client.GetAsync(
@@ -64,46 +66,41 @@ public abstract class ApiFixture: IAsyncLifetime
             await Task.Delay(retryIntervalInMs);
             retryCount--;
         } while (true);
+
         return queryResponse;
     }
 
-    public Task<HttpResponseMessage> Post(string path, object request)
-    {
-        return Client.PostAsync(
-            $"{ApiUrl}/{path}",
-            request.ToJsonStringContent()
-        );
-    }
+    public Task<HttpResponseMessage> Post(string path, object body,  RequestOptions? requestOptions = null)
+        => Send(HttpMethod.Post, path, body, requestOptions);
 
-    public Task<HttpResponseMessage> Post(object request)
-    {
-        return Post(string.Empty, request);
-    }
+    public Task<HttpResponseMessage> Post(object body,  RequestOptions? requestOptions = null) =>
+        Post(string.Empty, body, requestOptions);
 
-    public Task<HttpResponseMessage> Put(string path, object? request = null)
-    {
-        return Client.PutAsync(
-            $"{ApiUrl}/{path}",
-            request != null ?
-                request.ToJsonStringContent()
-                : new StringContent(string.Empty)
-        );
-    }
+    public Task<HttpResponseMessage> Put(string path, object? body = null,  RequestOptions? requestOptions = null)
+        => Send(HttpMethod.Put, path, body, requestOptions);
 
-    public Task<HttpResponseMessage> Put(object request)
-    {
-        return Put(string.Empty, request);
-    }
+    public Task<HttpResponseMessage> Delete(string path, object? body,  RequestOptions? requestOptions = null)
+        => Send(HttpMethod.Delete, path, body, requestOptions);
 
-    public Task<HttpResponseMessage> Delete(string path, object? request = null)
-    {
-        return Client.DeleteAsync(
-            $"{ApiUrl}/{path}"
-        );
-    }
+    public Task<HttpResponseMessage> Delete(object? body,  RequestOptions? requestOptions = null) =>
+        Delete(string.Empty, body, requestOptions);
 
-    public Task<HttpResponseMessage> Delete(object request)
+    public async Task<HttpResponseMessage> Send(HttpMethod method, string path, object? body = null, RequestOptions? requestOptions = null)
     {
-        return Delete(string.Empty, request);
+        using var request = new HttpRequestMessage(method, $"{ApiUrl}/{path}");
+
+        if (requestOptions?.IfMatch != null)
+            request.Headers.IfMatch.Add(new EntityTagHeaderValue($"\"{requestOptions.IfMatch}\"", true));
+
+        request.Content = body != null
+            ? body.ToJsonStringContent()
+            : new StringContent(string.Empty);
+
+        return await Client.SendAsync(request);
     }
+}
+
+public class RequestOptions
+{
+    public string? IfMatch { get; set; }
 }

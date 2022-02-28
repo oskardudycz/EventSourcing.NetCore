@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Core.Exceptions;
 using Core.WebApi.Middlewares.ExceptionHandling;
+using Core.WebApi.OptimisticConcurrency;
 using ECommerce.Api.Core;
 using ECommerce.Core;
 using EventStore.Client;
@@ -33,7 +34,8 @@ public class Startup
             })
             .AddCoreServices(Configuration)
             .AddECommerceModule(Configuration)
-            .AddEventStoreDBSubscriptionToAll();
+            .AddEventStoreDBSubscriptionToAll()
+            .AddOptimisticConcurrencyMiddleware();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +54,7 @@ public class Startup
                 WrongExpectedVersionException => HttpStatusCode.PreconditionFailed,
                 _ => HttpStatusCode.InternalServerError
             })
+            .UseOptimisticConcurrencyMiddleware()
             .UseHttpsRedirection()
             .UseRouting()
             .UseAuthorization()
