@@ -6,15 +6,12 @@ public record InitializeShoppingCartRequest(
     Guid? ClientId
 );
 
-public class ProductItemRequest
-{
-    public Guid ProductId { get; set; }
-
-    public int Quantity { get;  set; }
-}
+public record ProductItemRequest(
+    Guid? ProductId,
+    int? Quantity
+);
 
 public record AddProductRequest(
-    Guid? ShoppingCartId,
     ProductItemRequest? ProductItem,
     uint? Version
 );
@@ -26,7 +23,6 @@ public record PricedProductItemRequest(
 );
 
 public record RemoveProductRequest(
-    Guid? ShoppingCartId,
     PricedProductItemRequest? ProductItem,
     uint? Version
 );

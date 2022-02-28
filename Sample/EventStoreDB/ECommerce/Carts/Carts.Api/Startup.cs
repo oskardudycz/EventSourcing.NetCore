@@ -5,6 +5,7 @@ using Core.EventStoreDB;
 using Core.Exceptions;
 using Core.Serialization.Newtonsoft;
 using Core.WebApi.Middlewares.ExceptionHandling;
+using EventStore.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -52,6 +53,7 @@ public class Startup
         app.UseExceptionHandlingMiddleware(exception => exception switch
         {
             AggregateNotFoundException _ => HttpStatusCode.NotFound,
+            WrongExpectedVersionException => HttpStatusCode.PreconditionFailed,
             _ => HttpStatusCode.InternalServerError
         });
 

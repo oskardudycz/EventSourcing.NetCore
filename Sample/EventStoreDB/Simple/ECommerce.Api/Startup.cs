@@ -1,6 +1,9 @@
-﻿using Core.WebApi.Middlewares.ExceptionHandling;
+﻿using System.Net;
+using Core.Exceptions;
+using Core.WebApi.Middlewares.ExceptionHandling;
 using ECommerce.Api.Core;
 using ECommerce.Core;
+using EventStore.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -43,7 +46,12 @@ public class Startup
 
         app.UseSwagger()
             .UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce.Api v1"))
-            .UseMiddleware(typeof(ExceptionHandlingMiddleware))
+            .UseExceptionHandlingMiddleware(exception => exception switch
+            {
+                AggregateNotFoundException _ => HttpStatusCode.NotFound,
+                WrongExpectedVersionException => HttpStatusCode.PreconditionFailed,
+                _ => HttpStatusCode.InternalServerError
+            })
             .UseHttpsRedirection()
             .UseRouting()
             .UseAuthorization()

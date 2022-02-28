@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\..\Core.WebApi\Core.WebApi.csproj" />
+      <ProjectReference Include="..\..\..\..\Core\Core.csproj" />
       <ProjectReference Include="..\ECommerce\ECommerce.csproj" />
     </ItemGroup>
 
