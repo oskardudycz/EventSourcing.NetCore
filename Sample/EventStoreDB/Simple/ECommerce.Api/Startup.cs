@@ -2,8 +2,10 @@
 using Core.Exceptions;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
+using Core.WebApi.Swagger;
 using ECommerce.Api.Core;
 using ECommerce.Core;
+using ECommerce.Core.EventStoreDB;
 using EventStore.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,11 +33,15 @@ public class Startup
             .AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ECommerce.Api", Version = "v1" });
+                c.OperationFilter<MetadataOperationFilter>();
             })
             .AddCoreServices(Configuration)
             .AddECommerceModule(Configuration)
             .AddEventStoreDBSubscriptionToAll()
-            .AddOptimisticConcurrencyMiddleware();
+            .AddOptimisticConcurrencyMiddleware(
+                sp => sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().TrySet,
+                sp => () => sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Value?.ToString()
+            );
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

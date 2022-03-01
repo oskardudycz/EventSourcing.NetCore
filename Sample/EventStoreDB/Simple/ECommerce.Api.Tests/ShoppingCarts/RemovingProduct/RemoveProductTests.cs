@@ -33,7 +33,11 @@ public class RemoveProductFixture: ApiFixture<Startup>
 
         ShoppingCartId = await initializeResponse.GetResultFromJson<Guid>();
 
-        var addResponse = await Post($"{ShoppingCartId}/products", new AddProductRequest(ProductItem, 0));
+        var addResponse  = await Post(
+            $"{ShoppingCartId}/products",
+            new AddProductRequest(ProductItem),
+            new RequestOptions { IfMatch = 0.ToString() }
+        );
         addResponse.EnsureSuccessStatusCode();
 
         var queryResponse = await Get($"{ShoppingCartId}", 30,
@@ -44,8 +48,8 @@ public class RemoveProductFixture: ApiFixture<Startup>
         var unitPrice = cartDetails.ProductItems.Single().UnitPrice;
 
         CommandResponse = await Delete(
-            $"{ShoppingCartId}/products/{ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={unitPrice}&version=1",
-            new AddProductRequest(ProductItem, 0)
+            $"{ShoppingCartId}/products/{ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={unitPrice}",
+            new RequestOptions { IfMatch = 1.ToString() }
         );
     }
 }

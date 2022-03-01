@@ -31,7 +31,11 @@ public class AddProductFixture: ApiFixture<Startup>
 
         ShoppingCartId = await initializeResponse.GetResultFromJson<Guid>();
 
-        CommandResponse = await Post($"{ShoppingCartId}/products", new AddProductRequest(ProductItem, 0));
+        CommandResponse = await Post(
+            $"{ShoppingCartId}/products",
+            new AddProductRequest(ProductItem),
+            new RequestOptions { IfMatch = 0.ToString() }
+        );
     }
 }
 

@@ -24,7 +24,9 @@ public static class EventStoreDBConfigExtensions
 
         services.AddSingleton(
                 new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
-            .AddTransient<EventStoreDBSubscriptionToAll, EventStoreDBSubscriptionToAll>();
+            .AddTransient<EventStoreDBSubscriptionToAll, EventStoreDBSubscriptionToAll>()
+            .AddScoped<EventStoreDBExpectedStreamRevisionProvider, EventStoreDBExpectedStreamRevisionProvider>()
+            .AddScoped<EventStoreDBNextStreamRevisionProvider, EventStoreDBNextStreamRevisionProvider>();
 
         if (options?.UseInternalCheckpointing != false)
         {

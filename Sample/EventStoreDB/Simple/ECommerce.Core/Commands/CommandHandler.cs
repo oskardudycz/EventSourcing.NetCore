@@ -9,28 +9,26 @@ namespace ECommerce.Core.Commands;
 
 public static class CommandHandlerExtensions
 {
-    public static async Task HandleCreateCommand<TCommand>(
-        EventStoreClient eventStore,
+    public static Task<ulong> HandleCreateCommand<TCommand>(EventStoreClient eventStore,
         Func<TCommand, object> handle,
         Func<TCommand, string> getId,
         TCommand command,
-        CancellationToken ct
-    )
+        CancellationToken ct)
     {
         var entityId = getId(command);
         var @event = handle(command);
 
-        await eventStore.Append(entityId, @event, ct);
+        return eventStore.Append(entityId, @event, ct);
     }
 
-    public static async Task HandleUpdateCommand<TCommand, TEntity>(
+    public static async Task<ulong> HandleUpdateCommand<TCommand, TEntity>(
         EventStoreClient eventStore,
         Func<TEntity> getDefault,
         Func<TEntity, object, TEntity> when,
         Func<TCommand, TEntity, object> handle,
         Func<TCommand, string> getId,
-        Func<TCommand, uint> getVersion,
         TCommand command,
+        ulong expectedVersion,
         CancellationToken ct) where TEntity : notnull
     {
         var id = getId(command);
@@ -38,28 +36,32 @@ public static class CommandHandlerExtensions
 
         var @event = handle(command, entity);
 
-        await eventStore.Append(id, @event, getVersion(command), ct);
+        return await eventStore.Append(id, @event, expectedVersion, ct);
     }
 
     public static IServiceCollection AddCreateCommandHandler<TCommand>(
         this IServiceCollection services,
         Func<TCommand, object> handle,
-        Func<TCommand, string> getId
+        Func<TCommand, string> getId,
+        Action<ulong>? setNextExpectedVersion = null
     ) =>
-        services.AddCreateCommandHandler(_ => handle, getId);
+        services.AddCreateCommandHandler(_ => handle, getId, setNextExpectedVersion);
 
     public static IServiceCollection AddCreateCommandHandler<TCommand>(
         this IServiceCollection services,
         Func<IServiceProvider, Func<TCommand, object>> handle,
-        Func<TCommand, string> getId
+        Func<TCommand, string> getId,
+        Action<ulong>? setNextExpectedVersion = null
     ) =>
         services
             .AddTransient<Func<TCommand, CancellationToken, ValueTask>>(sp =>
             {
                 var eventStore = sp.GetRequiredService<EventStoreClient>();
 
+                setNextExpectedVersion ??= sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Set;
+
                 return async (command, ct) =>
-                    await HandleCreateCommand(eventStore, handle(sp), getId, command, ct);
+                    setNextExpectedVersion(await HandleCreateCommand(eventStore, handle(sp), getId, command, ct));
             });
 
     public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
@@ -68,8 +70,11 @@ public static class CommandHandlerExtensions
         Func<TEntity, object, TEntity> when,
         Func<TCommand, TEntity, object> handle,
         Func<TCommand, string> getId,
-        Func<TCommand, uint> getVersion) where TEntity : notnull =>
-        services.AddUpdateCommandHandler(getDefault, when, _ => handle, getId, getVersion);
+        Func<ulong>? getExpectedVersion = null,
+        Action<ulong>? setNextExpectedVersion = null
+    ) where TEntity : notnull =>
+        services.AddUpdateCommandHandler(getDefault, when, _ => handle, getId, getExpectedVersion,
+            setNextExpectedVersion);
 
     public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
         this IServiceCollection services,
@@ -77,14 +82,34 @@ public static class CommandHandlerExtensions
         Func<TEntity, object, TEntity> when,
         Func<IServiceProvider, Func<TCommand, TEntity, object>> handle,
         Func<TCommand, string> getId,
-        Func<TCommand, uint> getVersion) where TEntity : notnull =>
+        Func<ulong>? getExpectedVersion = null,
+        Action<ulong>? setNextExpectedVersion = null
+    ) where TEntity : notnull =>
         services
             .AddTransient<Func<TCommand, CancellationToken, ValueTask>>(sp =>
             {
                 var repository = sp.GetRequiredService<EventStoreClient>();
+
+                getExpectedVersion ??= () =>
+                    sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().Value ??
+                    throw new ArgumentNullException("ETag", "Expected version not set");
+
+                setNextExpectedVersion ??=
+                    sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Set;
+
                 return async (command, ct) =>
-                    await HandleUpdateCommand(repository, getDefault, when, handle(sp), getId, getVersion, command,
-                        ct);
+                    setNextExpectedVersion(
+                        await HandleUpdateCommand(
+                            repository,
+                            getDefault,
+                            when,
+                            handle(sp),
+                            getId,
+                            command,
+                            getExpectedVersion(),
+                            ct
+                        )
+                    );
             });
 
     public static IServiceCollection For<TEntity>(
@@ -138,19 +163,19 @@ public static class CommandHandlerExtensions
         public CommandHandlersBuilder<TEntity> UpdateOn<TCommand>(
             Func<TCommand, TEntity, object> handle,
             Func<TCommand, string> getId,
-            Func<TCommand, uint> getVersion)
+            Func<ulong>? getExpectedVersion = null)
         {
-            services.AddUpdateCommandHandler(getDefault, when, _ => handle, getId, getVersion);
+            services.AddUpdateCommandHandler(getDefault, when, _ => handle, getId, getExpectedVersion);
             return this;
         }
 
         public CommandHandlersBuilder<TEntity> UpdateOn<TCommand>(
             Func<IServiceProvider, Func<TCommand, TEntity, object>> handle,
             Func<TCommand, string> getId,
-            Func<TCommand, uint> getVersion
+            Func<ulong>? getExpectedVersion = null
         )
         {
-            services.AddUpdateCommandHandler(getDefault, when, handle, getId, getVersion);
+            services.AddUpdateCommandHandler(getDefault, when, handle, getId, getExpectedVersion);
             return this;
         }
     }

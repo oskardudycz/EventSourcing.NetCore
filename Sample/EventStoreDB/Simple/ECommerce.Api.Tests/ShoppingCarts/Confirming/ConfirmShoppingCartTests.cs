@@ -30,7 +30,7 @@ public class ConfirmShoppingCartFixture: ApiFixture<Startup>
 
         CommandResponse = await Put(
             $"{ShoppingCartId}/confirmation",
-            new ConfirmShoppingCartRequest(0),
+            new ConfirmShoppingCartRequest(),
             new RequestOptions { IfMatch = 0.ToString() }
         );
     }

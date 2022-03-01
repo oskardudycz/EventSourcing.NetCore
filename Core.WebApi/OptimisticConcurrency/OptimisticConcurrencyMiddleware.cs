@@ -8,12 +8,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 
 namespace Core.WebApi.OptimisticConcurrency;
-
-// Inspired by Tomasz Pęczek article: https://www.tpeczek.com/2017/11/handling-conditional-requests-in-aspnet.html
 
 public class OptimisticConcurrencyMiddleware
 {
@@ -39,9 +36,15 @@ public class OptimisticConcurrencyMiddleware
     {
         TryGetExpectedVersionFromRequestIfMatchHeader(context, expectedResourceVersionProvider);
 
-        await next(context);
+        // It's needed to do it in the event handler,
+        // as headers cannot be modified after the header was
+        context.Response.OnStarting(() =>
+        {
+            TrySetETagResponseHeader(context, nextResourceVersionProvider);
+            return Task.CompletedTask;
+        });
 
-        TrySetETagResponseHeader(context, nextResourceVersionProvider);
+        await next(context);
     }
 
     private void TryGetExpectedVersionFromRequestIfMatchHeader(
@@ -55,7 +58,7 @@ public class OptimisticConcurrencyMiddleware
 
         if (ifMatchHeader == null || Equals(ifMatchHeader, EntityTagHeaderValue.Any)) return;
 
-        if (!expectedResourceVersionProvider.TrySet(ifMatchHeader.Tag.Value))
+        if (!expectedResourceVersionProvider.TrySet(ifMatchHeader.GetSanitizedValue()))
             throw new ArgumentOutOfRangeException(nameof(ifMatchHeader), "Invalid format of If-Match header value");
     }
 
@@ -67,29 +70,26 @@ public class OptimisticConcurrencyMiddleware
         var nextExpectedVersion = nextResourceVersionProvider.Value;
         if (nextExpectedVersion == null) return;
 
-        context.Response.GetTypedHeaders().ETag = new EntityTagHeaderValue(nextExpectedVersion, true);
+        context.TrySetETagResponseHeader(nextExpectedVersion);
     }
 }
 
 public static class ConditionalRequestMiddlewareConfig
 {
-    public static IServiceCollection AddOptimisticConcurrencyMiddleware(this IServiceCollection services)
+    public static IServiceCollection AddOptimisticConcurrencyMiddleware(
+        this IServiceCollection services,
+        Func<IServiceProvider, Func<string, bool>>? trySetExpectedVersion = null,
+        Func<IServiceProvider, Func<string?>>? getNextVersion = null
+    )
     {
-        services.TryAddScoped<DefaultExpectedResourceVersionProvider, DefaultExpectedResourceVersionProvider>();
-        services.TryAddScoped<DefaultNextResourceVersionProvider, DefaultNextResourceVersionProvider>();
+        services.TryAddScoped<IExpectedResourceVersionProvider>(sp =>
+            new ExpectedResourceVersionProvider(trySetExpectedVersion?.Invoke(sp)));
+        services.TryAddScoped<INextResourceVersionProvider>(sp =>
+            new NextResourceVersionProvider(getNextVersion?.Invoke(sp)));
 
         return services;
     }
 
-    public static IApplicationBuilder UseOptimisticConcurrencyMiddleware(this IApplicationBuilder app)
-    {
-        if (app.ApplicationServices.GetService(typeof(DefaultExpectedResourceVersionProvider)) == null ||
-            app.ApplicationServices.GetService(typeof(DefaultNextResourceVersionProvider)) == null)
-        {
-            throw new InvalidOperationException(
-                "Unable to find the required services. You must call the appropriate AddOptimisticConcurrencyMiddleware method in ConfigureServices in the application startup code.");
-        }
-
-        return app.UseMiddleware<OptimisticConcurrencyMiddleware>();
-    }
+    public static IApplicationBuilder UseOptimisticConcurrencyMiddleware(this IApplicationBuilder app) =>
+        app.UseMiddleware<OptimisticConcurrencyMiddleware>();
 }

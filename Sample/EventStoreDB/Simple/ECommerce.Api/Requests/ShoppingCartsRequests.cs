@@ -12,8 +12,7 @@ public record ProductItemRequest(
 );
 
 public record AddProductRequest(
-    ProductItemRequest? ProductItem,
-    uint? Version
+    ProductItemRequest? ProductItem
 );
 
 public record PricedProductItemRequest(
@@ -23,10 +22,7 @@ public record PricedProductItemRequest(
 );
 
 public record RemoveProductRequest(
-    PricedProductItemRequest? ProductItem,
-    uint? Version
+    PricedProductItemRequest? ProductItem
 );
 
-public record ConfirmShoppingCartRequest(
-    uint? Version
-);
+public record ConfirmShoppingCartRequest;
