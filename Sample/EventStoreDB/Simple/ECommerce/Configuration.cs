@@ -17,10 +17,11 @@ public static class Configuration
             .AddDbContext<ECommerceDbContext>(
                 options =>
                 {
-                    var schemaName = Environment.GetEnvironmentVariable("SchemaName")!;
                     var connectionString = config.GetConnectionString("ECommerceDB");
+                    var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "simple_esdb_ecommerce";
+
                     options.UseNpgsql(
-                        $"{connectionString}; searchpath = {schemaName.ToLower()}",
+                        $"{connectionString};searchpath = {schemaName.ToLower()}",
                         x => x.MigrationsHistoryTable("__EFMigrationsHistory", schemaName.ToLower()));
                 })
             .AddSingleton<Func<Guid>>(Guid.NewGuid);

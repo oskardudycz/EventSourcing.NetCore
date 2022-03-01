@@ -33,18 +33,15 @@ public static class Configuration
                                     command,
                                     shoppingCart
                                 ),
-                        command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
-                        command => command.Version
+                        command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                     )
                     .UpdateOn<RemoveProductItemFromShoppingCart>(
                         RemoveProductItemFromShoppingCart.Handle,
-                        command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
-                        command => command.Version
+                        command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                     )
                     .UpdateOn<ConfirmShoppingCart>(
                         ConfirmShoppingCart.Handle,
-                        command => ShoppingCart.MapToStreamId(command.ShoppingCartId),
-                        command => command.Version
+                        command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                     )
             )
             .For<ShoppingCartDetails, ECommerceDbContext>(

@@ -6,20 +6,17 @@ namespace ECommerce.ShoppingCarts.AddingProductItem;
 
 public record AddProductItemToShoppingCart(
     Guid ShoppingCartId,
-    ProductItem ProductItem,
-    uint Version
+    ProductItem ProductItem
 )
 {
-    public static AddProductItemToShoppingCart From(Guid? cartId, ProductItem? productItem, uint? version)
+    public static AddProductItemToShoppingCart From(Guid? cartId, ProductItem? productItem)
     {
         if (cartId == null || cartId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(cartId));
         if (productItem == null)
             throw new ArgumentOutOfRangeException(nameof(productItem));
-        if (version == null)
-            throw new ArgumentOutOfRangeException(nameof(version));
 
-        return new AddProductItemToShoppingCart(cartId.Value, productItem, version.Value);
+        return new AddProductItemToShoppingCart(cartId.Value, productItem);
     }
 
     public static ProductItemAddedToShoppingCart Handle(
@@ -28,7 +25,7 @@ public record AddProductItemToShoppingCart(
         ShoppingCart shoppingCart
     )
     {
-        var (cartId, productItem, _) = command;
+        var (cartId, productItem) = command;
 
         if(shoppingCart.IsClosed)
             throw new InvalidOperationException($"Adding product item for cart in '{shoppingCart.Status}' status is not allowed.");

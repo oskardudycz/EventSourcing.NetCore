@@ -79,11 +79,11 @@ public abstract class ApiFixture: IAsyncLifetime
     public Task<HttpResponseMessage> Put(string path, object? body = null,  RequestOptions? requestOptions = null)
         => Send(HttpMethod.Put, path, body, requestOptions);
 
-    public Task<HttpResponseMessage> Delete(string path, object? body,  RequestOptions? requestOptions = null)
-        => Send(HttpMethod.Delete, path, body, requestOptions);
+    public Task<HttpResponseMessage> Delete(string path, RequestOptions? requestOptions = null)
+        => Send(HttpMethod.Delete, path, null, requestOptions);
 
-    public Task<HttpResponseMessage> Delete(object? body,  RequestOptions? requestOptions = null) =>
-        Delete(string.Empty, body, requestOptions);
+    public Task<HttpResponseMessage> Delete(RequestOptions? requestOptions = null) =>
+        Delete(string.Empty, requestOptions);
 
     public async Task<HttpResponseMessage> Send(HttpMethod method, string path, object? body = null, RequestOptions? requestOptions = null)
     {
@@ -92,9 +92,12 @@ public abstract class ApiFixture: IAsyncLifetime
         if (requestOptions?.IfMatch != null)
             request.Headers.IfMatch.Add(new EntityTagHeaderValue($"\"{requestOptions.IfMatch}\"", true));
 
-        request.Content = body != null
-            ? body.ToJsonStringContent()
-            : new StringContent(string.Empty);
+        if (method == HttpMethod.Post || method == HttpMethod.Put || method == HttpMethod.Patch)
+        {
+            request.Content = body != null
+                ? body.ToJsonStringContent()
+                : new StringContent(string.Empty);
+        }
 
         return await Client.SendAsync(request);
     }

@@ -32,7 +32,7 @@ public static class EventStoreDBExtensions
             ))!;
     }
 
-    public static async Task Append(
+    public static async Task<ulong> Append(
         this EventStoreClient eventStore,
         string id,
         object @event,
@@ -40,28 +40,31 @@ public static class EventStoreDBExtensions
     )
 
     {
-        await eventStore.AppendToStreamAsync(
+        var result = await eventStore.AppendToStreamAsync(
             id,
             StreamState.NoStream,
             new[] { @event.ToJsonEventData() },
             cancellationToken: cancellationToken
         );
+        return result.NextExpectedStreamRevision;
     }
 
 
-    public static async Task Append(
+    public static async Task<ulong> Append(
         this EventStoreClient eventStore,
         string id,
         object @event,
-        uint version,
+        ulong expectedRevision,
         CancellationToken cancellationToken
     )
     {
-        await eventStore.AppendToStreamAsync(
+        var result = await eventStore.AppendToStreamAsync(
             id,
-            StreamRevision.FromInt64(version),
+            expectedRevision,
             new[] { @event.ToJsonEventData() },
             cancellationToken: cancellationToken
         );
+
+        return result.NextExpectedStreamRevision;
     }
 }

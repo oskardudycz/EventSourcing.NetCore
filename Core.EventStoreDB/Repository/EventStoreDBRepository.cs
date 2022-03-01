@@ -17,36 +17,28 @@ public class EventStoreDBRepository<T>: IRepository<T> where T : class, IAggrega
     private readonly IEventBus eventBus;
 
     public EventStoreDBRepository(
-        EventStoreClient eventStoreDBClient,
+        EventStoreClient eventStore,
         IEventBus eventBus
     )
     {
-        this.eventStore = eventStoreDBClient ?? throw new ArgumentNullException(nameof(eventStoreDBClient));
+        this.eventStore = eventStore ?? throw new ArgumentNullException(nameof(eventStore));
         this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
     }
 
-    public Task<T?> Find(Guid id, CancellationToken cancellationToken)
-    {
-        return eventStore.AggregateStream<T>(
+    public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
+        eventStore.AggregateStream<T>(
             id,
             cancellationToken
         );
-    }
 
-    public Task Add(T aggregate, CancellationToken cancellationToken)
-    {
-        return Store(aggregate, cancellationToken);
-    }
+    public Task Add(T aggregate, CancellationToken cancellationToken) =>
+        Store(aggregate, cancellationToken);
 
-    public Task Update(T aggregate, CancellationToken cancellationToken)
-    {
-        return Store(aggregate, cancellationToken);
-    }
+    public Task Update(T aggregate, CancellationToken cancellationToken) =>
+        Store(aggregate, cancellationToken);
 
-    public Task Delete(T aggregate, CancellationToken cancellationToken)
-    {
-        return Store(aggregate, cancellationToken);
-    }
+    public Task Delete(T aggregate, CancellationToken cancellationToken) =>
+        Store(aggregate, cancellationToken);
 
     private async Task Store(T aggregate, CancellationToken cancellationToken)
     {

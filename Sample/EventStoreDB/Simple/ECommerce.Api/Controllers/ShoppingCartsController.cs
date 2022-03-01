@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.WebApi.Headers;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts.AddingProductItem;
@@ -56,8 +57,7 @@ public class ShoppingCartsController: Controller
             ProductItem.From(
                 request.ProductItem?.ProductId,
                 request.ProductItem?.Quantity
-            ),
-            request.Version
+            )
         );
 
         await handle(command, ct);
@@ -72,7 +72,6 @@ public class ShoppingCartsController: Controller
         [FromRoute]Guid? productId,
         [FromQuery]int? quantity,
         [FromQuery]decimal? unitPrice,
-        [FromQuery]uint? version,
         CancellationToken ct
     )
     {
@@ -84,8 +83,7 @@ public class ShoppingCartsController: Controller
                     quantity
                 ),
                 unitPrice
-            ),
-            version
+            )
         );
 
         await handle(command, ct);
@@ -105,7 +103,7 @@ public class ShoppingCartsController: Controller
             throw new ArgumentNullException(nameof(request));
 
         var command =
-            ConfirmShoppingCart.From(id, request.Version);
+            ConfirmShoppingCart.From(id);
 
         await handle(command, ct);
 
@@ -124,6 +122,7 @@ public class ShoppingCartsController: Controller
         if (result == null)
             return NotFound();
 
+        Response.TrySetETagResponseHeader(result.Version.ToString());
         return Ok(result);
     }
 

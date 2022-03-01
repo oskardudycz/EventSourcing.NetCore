@@ -5,20 +5,17 @@ namespace ECommerce.ShoppingCarts.RemovingProductItem;
 
 public record RemoveProductItemFromShoppingCart(
     Guid ShoppingCartId,
-    PricedProductItem ProductItem,
-    uint Version
+    PricedProductItem ProductItem
 )
 {
-    public static RemoveProductItemFromShoppingCart From(Guid? cartId, PricedProductItem? productItem, uint? version)
+    public static RemoveProductItemFromShoppingCart From(Guid? cartId, PricedProductItem? productItem)
     {
         if (cartId == null || cartId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(cartId));
         if (productItem == null)
             throw new ArgumentOutOfRangeException(nameof(productItem));
-        if (version == null)
-            throw new ArgumentOutOfRangeException(nameof(version));
 
-        return new RemoveProductItemFromShoppingCart(cartId.Value, productItem, version.Value);
+        return new RemoveProductItemFromShoppingCart(cartId.Value, productItem);
     }
 
     public static ProductItemRemovedFromShoppingCart Handle(
@@ -26,7 +23,7 @@ public record RemoveProductItemFromShoppingCart(
         ShoppingCart shoppingCart
     )
     {
-        var (cartId, productItem, _) = command;
+        var (cartId, productItem) = command;
 
         if(shoppingCart.IsClosed)
             throw new InvalidOperationException($"Adding product item for cart in '{shoppingCart.Status}' status is not allowed.");

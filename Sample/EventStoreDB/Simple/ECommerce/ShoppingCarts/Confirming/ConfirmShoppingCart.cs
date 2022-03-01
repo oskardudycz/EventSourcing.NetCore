@@ -3,19 +3,15 @@
 namespace ECommerce.ShoppingCarts.Confirming;
 
 public record ConfirmShoppingCart(
-    Guid ShoppingCartId,
-    uint Version
+    Guid ShoppingCartId
 )
 {
-    public static ConfirmShoppingCart From(Guid? cartId, uint? version)
+    public static ConfirmShoppingCart From(Guid? cartId)
     {
         if (cartId == null || cartId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(cartId));
 
-        if (version == null)
-            throw new ArgumentOutOfRangeException(nameof(version));
-
-        return new ConfirmShoppingCart(cartId.Value, version.Value);
+        return new ConfirmShoppingCart(cartId.Value);
     }
 
     public static ShoppingCartConfirmed Handle(ConfirmShoppingCart command, ShoppingCart shoppingCart)
