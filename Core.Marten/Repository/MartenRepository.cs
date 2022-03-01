@@ -3,12 +3,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.Events;
-using Core.Repositories;
 using Marten;
 
 namespace Core.Marten.Repository;
 
-public class MartenRepository<T>: IRepository<T> where T : class, IAggregate
+public interface IMartenRepository<T> where T : class, IAggregate
+{
+    Task<T?> Find(Guid id, CancellationToken cancellationToken);
+    Task Add(T aggregate, CancellationToken cancellationToken);
+    Task Update(T aggregate, CancellationToken cancellationToken);
+    Task Delete(T aggregate, CancellationToken cancellationToken);
+}
+
+public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggregate
 {
     private readonly IDocumentSession documentSession;
     private readonly IEventBus eventBus;
@@ -24,7 +31,7 @@ public class MartenRepository<T>: IRepository<T> where T : class, IAggregate
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken)
     {
-        return documentSession.Events.AggregateStreamAsync<T>(id, token:cancellationToken);
+        return documentSession.Events.AggregateStreamAsync<T>(id, token: cancellationToken);
     }
 
     public Task Add(T aggregate, CancellationToken cancellationToken)

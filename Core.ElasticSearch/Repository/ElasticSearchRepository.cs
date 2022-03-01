@@ -8,7 +8,16 @@ using IAggregate = Core.Aggregates.IAggregate;
 
 namespace Core.ElasticSearch.Repository;
 
-public class ElasticSearchRepository<T>: Repositories.IRepository<T> where T : class, IAggregate, new()
+
+public interface IElasticSearchRepository<T> where T : class, IAggregate, new()
+{
+    Task<T?> Find(Guid id, CancellationToken cancellationToken);
+    Task Add(T aggregate, CancellationToken cancellationToken);
+    Task Update(T aggregate, CancellationToken cancellationToken);
+    Task Delete(T aggregate, CancellationToken cancellationToken);
+}
+
+public class ElasticSearchRepository<T>: IElasticSearchRepository<T> where T : class, IAggregate, new()
 {
     private readonly IElasticClient elasticClient;
     private readonly IEventBus eventBus;

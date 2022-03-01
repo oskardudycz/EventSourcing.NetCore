@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
 using Core.Exceptions;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Tickets.Reservations.ChangingReservationSeat;
@@ -36,10 +36,10 @@ public class ChangeReservationSeat : ICommand
 internal class HandleChangeReservationSeat:
     ICommandHandler<ChangeReservationSeat>
 {
-    private readonly IRepository<Reservation> repository;
+    private readonly IMartenRepository<Reservation> repository;
 
     public HandleChangeReservationSeat(
-        IRepository<Reservation> repository
+        IMartenRepository<Reservation> repository
     )
     {
         this.repository = repository;

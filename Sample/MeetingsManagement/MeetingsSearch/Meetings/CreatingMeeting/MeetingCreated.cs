@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.ElasticSearch.Repository;
 using Core.Events;
-using Core.Repositories;
 
 namespace MeetingsSearch.Meetings.CreatingMeeting;
 
@@ -20,9 +20,9 @@ internal class MeetingCreated: IEvent
 
 internal class HandleMeetingCreated: IEventHandler<MeetingCreated>
 {
-    private readonly IRepository<Meeting> repository;
+    private readonly IElasticSearchRepository<Meeting> repository;
 
-    public HandleMeetingCreated(IRepository<Meeting> repository)
+    public HandleMeetingCreated(IElasticSearchRepository<Meeting> repository)
     {
         this.repository = repository;
     }

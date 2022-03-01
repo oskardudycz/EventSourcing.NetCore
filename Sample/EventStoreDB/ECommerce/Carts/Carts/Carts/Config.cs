@@ -11,7 +11,6 @@ using Core.Commands;
 using Core.EventStoreDB.Repository;
 using Core.Marten.ExternalProjections;
 using Core.Queries;
-using Core.Repositories;
 using Marten.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,7 +21,7 @@ internal static class CartsConfig
     internal static IServiceCollection AddCarts(this IServiceCollection services)
     {
         return services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>()
-            .AddScoped<IRepository<ShoppingCart>, EventStoreDBRepository<ShoppingCart>>()
+            .AddScoped<IEventStoreDBRepository<ShoppingCart>, EventStoreDBRepository<ShoppingCart>>()
             .AddCommandHandlers()
             .AddProjections()
             .AddQueryHandlers();

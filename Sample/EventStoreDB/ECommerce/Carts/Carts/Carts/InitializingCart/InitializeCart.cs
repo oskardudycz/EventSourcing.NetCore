@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.EventStoreDB.Repository;
 using MediatR;
 
 namespace Carts.Carts.InitializingCart;
@@ -33,10 +33,10 @@ public class InitializeCart: ICommand
 internal class HandleInitializeCart:
     ICommandHandler<InitializeCart>
 {
-    private readonly IRepository<ShoppingCart> cartRepository;
+    private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
 
     public HandleInitializeCart(
-        IRepository<ShoppingCart> cartRepository
+        IEventStoreDBRepository<ShoppingCart> cartRepository
     )
     {
         this.cartRepository = cartRepository;

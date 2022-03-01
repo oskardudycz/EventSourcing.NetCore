@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <Folder Include="Properties\" />
+        <Folder Include="Repositories" />
     </ItemGroup>
 
     <ItemGroup>

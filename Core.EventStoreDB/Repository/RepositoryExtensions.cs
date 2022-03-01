@@ -5,15 +5,15 @@ using Core.Aggregates;
 using Core.Exceptions;
 using MediatR;
 
-namespace Core.Repositories;
+namespace Core.EventStoreDB.Repository;
 
 public static class RepositoryExtensions
 {
     public static async Task<T> Get<T>(
-        this IRepository<T> repository,
+        this IEventStoreDBRepository<T> repository,
         Guid id,
         CancellationToken cancellationToken
-    ) where T : IAggregate
+    ) where T : class, IAggregate
     {
         var entity = await repository.Find(id, cancellationToken);
 
@@ -21,11 +21,11 @@ public static class RepositoryExtensions
     }
 
     public static async Task<Unit> GetAndUpdate<T>(
-        this IRepository<T> repository,
+        this IEventStoreDBRepository<T> repository,
         Guid id,
         Action<T> action,
         CancellationToken cancellationToken
-    ) where T : IAggregate
+    ) where T : class, IAggregate
     {
         var entity = await repository.Get(id, cancellationToken);
 

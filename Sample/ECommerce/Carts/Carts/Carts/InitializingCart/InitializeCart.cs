@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Carts.Carts.InitializingCart;
@@ -33,10 +33,10 @@ public class InitializeCart: ICommand
 internal class HandleInitializeCart:
     ICommandHandler<InitializeCart>
 {
-    private readonly IRepository<Cart> cartRepository;
+    private readonly IMartenRepository<Cart> cartRepository;
 
     public HandleInitializeCart(
-        IRepository<Cart> cartRepository
+        IMartenRepository<Cart> cartRepository
     )
     {
         this.cartRepository = cartRepository;

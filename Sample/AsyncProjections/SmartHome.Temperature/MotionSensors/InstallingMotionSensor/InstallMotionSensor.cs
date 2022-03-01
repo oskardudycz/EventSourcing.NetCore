@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
@@ -32,10 +32,10 @@ public class InstallMotionSensor : ICommand
 public class HandleInstallMotionSensor :
     ICommandHandler<InstallMotionSensor>
 {
-    private readonly IRepository<MotionSensor> repository;
+    private readonly IMartenRepository<MotionSensor> repository;
 
     public HandleInstallMotionSensor(
-        IRepository<MotionSensor> repository
+        IMartenRepository<MotionSensor> repository
     )
     {
         this.repository = repository;

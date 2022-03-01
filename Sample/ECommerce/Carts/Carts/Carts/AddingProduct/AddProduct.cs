@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Carts.Carts.Products;
 using Carts.Pricing;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Carts.Carts.AddingProduct;
@@ -33,11 +33,11 @@ public class AddProduct: ICommand
 internal class HandleAddProduct:
     ICommandHandler<AddProduct>
 {
-    private readonly IRepository<Cart> cartRepository;
+    private readonly IMartenRepository<Cart> cartRepository;
     private readonly IProductPriceCalculator productPriceCalculator;
 
     public HandleAddProduct(
-        IRepository<Cart> cartRepository,
+        IMartenRepository<Cart> cartRepository,
         IProductPriceCalculator productPriceCalculator
     )
     {

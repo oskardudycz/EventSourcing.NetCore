@@ -1,7 +1,6 @@
 using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;
-using Core.Repositories;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Orders.Carts.FinalizingCart;
@@ -19,7 +18,7 @@ internal static class OrdersConfig
 {
     internal static IServiceCollection AddOrders(this IServiceCollection services)
     {
-        return services.AddScoped<IRepository<Order>, MartenRepository<Order>>()
+        return services.AddScoped<IMartenRepository<Order>, MartenRepository<Order>>()
             .AddCommandHandlers()
             .AddEventHandlers();
     }

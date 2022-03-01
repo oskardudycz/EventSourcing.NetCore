@@ -13,7 +13,6 @@ using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;
 using Core.Queries;
-using Core.Repositories;
 using Marten;
 using Marten.Pagination;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +25,7 @@ internal static class CartsConfig
     {
         services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>();
 
-        services.AddScoped<IRepository<Cart>, MartenRepository<Cart>>();
+        services.AddScoped<IMartenRepository<Cart>, MartenRepository<Cart>>();
 
         AddCommandHandlers(services);
         AddQueryHandlers(services);

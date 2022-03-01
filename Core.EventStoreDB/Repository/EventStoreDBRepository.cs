@@ -8,12 +8,19 @@ using Core.Events;
 using Core.EventStoreDB.Events;
 using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Serialization;
-using Core.Repositories;
 using EventStore.Client;
 
 namespace Core.EventStoreDB.Repository;
 
-public class EventStoreDBRepository<T>: IRepository<T> where T : class, IAggregate
+public interface IEventStoreDBRepository<T> where T : class, IAggregate
+{
+    Task<T?> Find(Guid id, CancellationToken cancellationToken);
+    Task Add(T aggregate, CancellationToken cancellationToken);
+    Task Update(T aggregate, CancellationToken cancellationToken);
+    Task Delete(T aggregate, CancellationToken cancellationToken);
+}
+
+public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : class, IAggregate
 {
     private readonly EventStoreClient eventStore;
     private readonly EventStoreDBExpectedStreamRevisionProvider expectedStreamRevisionProvider;

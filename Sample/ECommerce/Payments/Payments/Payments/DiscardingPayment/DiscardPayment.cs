@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Payments.Payments.DiscardingPayment;
@@ -33,10 +33,10 @@ public class DiscardPayment: ICommand
 public class HandleDiscardPayment:
     ICommandHandler<DiscardPayment>
 {
-    private readonly IRepository<Payment> paymentRepository;
+    private readonly IMartenRepository<Payment> paymentRepository;
 
     public HandleDiscardPayment(
-        IRepository<Payment> paymentRepository)
+        IMartenRepository<Payment> paymentRepository)
     {
         this.paymentRepository = paymentRepository;
     }

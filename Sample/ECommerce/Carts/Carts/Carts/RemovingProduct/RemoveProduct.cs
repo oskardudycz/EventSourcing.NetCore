@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Carts.Carts.Products;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Carts.Carts.RemovingProduct;
@@ -29,10 +29,10 @@ public class RemoveProduct: ICommand
 internal class HandleRemoveProduct:
     ICommandHandler<RemoveProduct>
 {
-    private readonly IRepository<Cart> cartRepository;
+    private readonly IMartenRepository<Cart> cartRepository;
 
     public HandleRemoveProduct(
-        IRepository<Cart> cartRepository
+        IMartenRepository<Cart> cartRepository
     )
     {
         this.cartRepository = cartRepository;
