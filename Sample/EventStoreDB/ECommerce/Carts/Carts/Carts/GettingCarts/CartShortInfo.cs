@@ -13,7 +13,7 @@ public class CartShortInfo: IProjection
 
     public int TotalItemsCount { get; set; }
 
-    public CartStatus Status { get; set; }
+    public ShoppingCartStatus Status { get; set; }
 
     public void When(object @event)
     {
@@ -38,7 +38,7 @@ public class CartShortInfo: IProjection
     {
         Id = @event.CartId;
         TotalItemsCount = 0;
-        Status = CartStatus.Pending;
+        Status = ShoppingCartStatus.Pending;
     }
 
     public void Apply(ProductAdded @event)
@@ -53,6 +53,6 @@ public class CartShortInfo: IProjection
 
     public void Apply(CartConfirmed @event)
     {
-        Status = CartStatus.Confirmed;
+        Status = ShoppingCartStatus.Confirmed;
     }
 }

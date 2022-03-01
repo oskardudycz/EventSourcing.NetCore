@@ -12,24 +12,24 @@ using Core.Extensions;
 
 namespace Carts.Carts;
 
-public class Cart: Aggregate
+public class ShoppingCart: Aggregate
 {
     public Guid ClientId { get; private set; }
 
-    public CartStatus Status { get; private set; }
+    public ShoppingCartStatus Status { get; private set; }
 
     public IList<PricedProductItem> ProductItems { get; private set; } = default!;
 
     public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 
-    public static Cart Initialize(
+    public static ShoppingCart Initialize(
         Guid cartId,
         Guid clientId)
     {
-        return new Cart(cartId, clientId);
+        return new ShoppingCart(cartId, clientId);
     }
 
-    private Cart(){}
+    private ShoppingCart(){}
 
     public override void When(object @event)
     {
@@ -50,14 +50,14 @@ public class Cart: Aggregate
         }
     }
 
-    private Cart(
+    private ShoppingCart(
         Guid id,
         Guid clientId)
     {
         var @event = CartInitialized.Create(
             id,
             clientId,
-            CartStatus.Pending
+            ShoppingCartStatus.Pending
         );
 
         Enqueue(@event);
@@ -71,14 +71,14 @@ public class Cart: Aggregate
         Id = @event.CartId;
         ClientId = @event.ClientId;
         ProductItems = new List<PricedProductItem>();
-        Status = @event.CartStatus;
+        Status = @event.ShoppingCartStatus;
     }
 
     public void AddProduct(
         IProductPriceCalculator productPriceCalculator,
         ProductItem productItem)
     {
-        if(Status != CartStatus.Pending)
+        if(Status != ShoppingCartStatus.Pending)
             throw new InvalidOperationException($"Adding product for the cart in '{Status}' status is not allowed.");
 
         var pricedProductItem = productPriceCalculator.Calculate(productItem).Single();
@@ -112,7 +112,7 @@ public class Cart: Aggregate
     public void RemoveProduct(
         PricedProductItem productItemToBeRemoved)
     {
-        if(Status != CartStatus.Pending)
+        if(Status != ShoppingCartStatus.Pending)
             throw new InvalidOperationException($"Removing product from the cart in '{Status}' status is not allowed.");
 
         var existingProductItem = FindProductItemMatchingWith(productItemToBeRemoved);
@@ -120,7 +120,7 @@ public class Cart: Aggregate
         if (existingProductItem is null)
             throw new InvalidOperationException($"Product with id `{productItemToBeRemoved.ProductId}` and price '{productItemToBeRemoved.UnitPrice}' was not found in cart.");
 
-        if(existingProductItem.HasEnough(productItemToBeRemoved.Quantity))
+        if(!existingProductItem.HasEnough(productItemToBeRemoved.Quantity))
             throw new InvalidOperationException($"Cannot remove {productItemToBeRemoved.Quantity} items of Product with id `{productItemToBeRemoved.ProductId}` as there are only ${existingProductItem.Quantity} items in card");
 
         var @event = ProductRemoved.Create(Id, productItemToBeRemoved);
@@ -154,7 +154,7 @@ public class Cart: Aggregate
 
     public void Confirm()
     {
-        if(Status != CartStatus.Pending)
+        if(Status != ShoppingCartStatus.Pending)
             throw new InvalidOperationException($"Confirming cart in '{Status}' status is not allowed.");
 
         var @event = CartConfirmed.Create(Id, DateTime.UtcNow);
@@ -167,7 +167,7 @@ public class Cart: Aggregate
     {
         Version++;
 
-        Status = CartStatus.Confirmed;
+        Status = ShoppingCartStatus.Confirmed;
     }
 
     private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)

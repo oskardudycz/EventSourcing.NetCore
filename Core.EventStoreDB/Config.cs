@@ -1,4 +1,5 @@
 using System;
+using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Subscriptions;
 using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +26,9 @@ public static class EventStoreDBConfigExtensions
         var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
 
         services.AddSingleton(
-            new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)));
+            new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
+            .AddScoped<EventStoreDBExpectedStreamRevisionProvider, EventStoreDBExpectedStreamRevisionProvider>()
+            .AddScoped<EventStoreDBNextStreamRevisionProvider, EventStoreDBNextStreamRevisionProvider>();
 
         if (options?.UseInternalCheckpointing != false)
         {

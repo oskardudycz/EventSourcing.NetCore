@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Core.OptimisticConcurrency;
+using Core.WebApi.OptimisticConcurrency;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Core.WebApi.Tracing.Correlation;
@@ -48,4 +53,18 @@ public class CorrelationIdMiddleware
 
         await next(context);
     }
+}
+
+public static class CorrelationIdMiddlewareConfig
+{
+    public static IServiceCollection AddCorrelationIdMiddleware(this IServiceCollection services)
+    {
+        services.TryAddScoped<ICorrelationIdFactory, GuidCorrelationIdFactory>();
+        services.TryAddScoped<Func<CorrelationId>>(sp => sp.GetRequiredService<ICorrelationIdFactory>().New);
+
+        return services;
+    }
+
+    public static IApplicationBuilder UseCorrelationIdMiddleware(this IApplicationBuilder app) =>
+        app.UseMiddleware<OptimisticConcurrencyMiddleware>();
 }

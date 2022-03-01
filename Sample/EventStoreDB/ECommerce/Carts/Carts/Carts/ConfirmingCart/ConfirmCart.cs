@@ -28,10 +28,10 @@ public class ConfirmCart: ICommand
 internal class HandleConfirmCart:
     ICommandHandler<ConfirmCart>
 {
-    private readonly IRepository<Cart> cartRepository;
+    private readonly IRepository<ShoppingCart> cartRepository;
 
     public HandleConfirmCart(
-        IRepository<Cart> cartRepository
+        IRepository<ShoppingCart> cartRepository
     )
     {
         this.cartRepository = cartRepository;

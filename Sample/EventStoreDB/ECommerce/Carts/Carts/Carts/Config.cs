@@ -19,10 +19,10 @@ namespace Carts.Carts;
 
 internal static class CartsConfig
 {
-    internal static void AddCarts(this IServiceCollection services)
+    internal static IServiceCollection AddCarts(this IServiceCollection services)
     {
-        services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>()
-            .AddScoped<IRepository<Cart>, EventStoreDBRepository<Cart>>()
+        return services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>()
+            .AddScoped<IRepository<ShoppingCart>, EventStoreDBRepository<ShoppingCart>>()
             .AddCommandHandlers()
             .AddProjections()
             .AddQueryHandlers();
@@ -40,10 +40,10 @@ internal static class CartsConfig
     private static IServiceCollection AddProjections(this IServiceCollection services)
     {
         services
-            .Project<CartInitialized, CartDetails>(@event => @event.CartId)
-            .Project<ProductAdded, CartDetails>(@event => @event.CartId)
-            .Project<ProductRemoved, CartDetails>(@event => @event.CartId)
-            .Project<CartConfirmed, CartDetails>(@event => @event.CartId);
+            .Project<CartInitialized, ShoppingCartDetails>(@event => @event.CartId)
+            .Project<ProductAdded, ShoppingCartDetails>(@event => @event.CartId)
+            .Project<ProductRemoved, ShoppingCartDetails>(@event => @event.CartId)
+            .Project<CartConfirmed, ShoppingCartDetails>(@event => @event.CartId);
 
         services
             .Project<CartInitialized, CartShortInfo>(@event => @event.CartId)
@@ -63,9 +63,9 @@ internal static class CartsConfig
     private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
     {
         return services
-            .AddQueryHandler<GetCartById, CartDetails, HandleGetCartById>()
+            .AddQueryHandler<GetCartById, ShoppingCartDetails, HandleGetCartById>()
             .AddQueryHandler<GetCarts, IPagedList<CartShortInfo>, HandleGetCarts>()
             .AddQueryHandler<GetCartHistory, IPagedList<CartHistory>, HandleGetCartHistory>()
-            .AddQueryHandler<GetCartAtVersion, CartDetails, HandleGetCartAtVersion>();
+            .AddQueryHandler<GetCartAtVersion, ShoppingCartDetails, HandleGetCartAtVersion>();
     }
 }

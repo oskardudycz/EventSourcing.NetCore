@@ -2,18 +2,18 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Carts.Api.Requests.Carts;
+using Carts.Api.Requests;
 using Carts.Carts;
 using Carts.Carts.GettingCartById;
 using Core.Api.Testing;
 using FluentAssertions;
 using Xunit;
 
-namespace Carts.Api.Tests.Carts.InitializingCart;
+namespace Carts.Api.Tests.ShoppingCarts.Initializing;
 
-public class InitCartFixture: ApiFixture<Startup>
+public class InitializeShoppingCartFixture: ApiFixture<Startup>
 {
-    protected override string ApiUrl => "/api/Carts";
+    protected override string ApiUrl => "/api/ShoppingCarts";
 
     public readonly Guid ClientId = Guid.NewGuid();
 
@@ -21,22 +21,22 @@ public class InitCartFixture: ApiFixture<Startup>
 
     public override async Task InitializeAsync()
     {
-        CommandResponse = await Post(new InitializeCartRequest {ClientId = ClientId });
+        CommandResponse = await Post(new InitializeShoppingCartRequest(ClientId));
     }
 }
 
-public class InitializeCartTests: IClassFixture<InitCartFixture>
+public class InitializeShoppingCartTests: IClassFixture<InitializeShoppingCartFixture>
 {
-    private readonly InitCartFixture fixture;
+    private readonly InitializeShoppingCartFixture fixture;
 
-    public InitializeCartTests(InitCartFixture fixture)
+    public InitializeShoppingCartTests(InitializeShoppingCartFixture fixture)
     {
         this.fixture = fixture;
     }
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task CreateCommand_ShouldReturn_CreatedStatus_With_CartId()
+    public async Task Post_Should_Return_CreatedStatus_With_CartId()
     {
         var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
         commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -48,7 +48,7 @@ public class InitializeCartTests: IClassFixture<InitCartFixture>
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task CreateCommand_ShouldCreate_Cart()
+    public async Task Post_Should_Create_ShoppingCart()
     {
         var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
@@ -56,17 +56,15 @@ public class InitializeCartTests: IClassFixture<InitCartFixture>
         var query = $"{createdId}";
 
         //send query
-        var queryResponse = await fixture.Get(query, 10,
-            check: response => new(response.StatusCode == HttpStatusCode.Created));
+        var queryResponse = await fixture.Get(query, 30);
 
         queryResponse.EnsureSuccessStatusCode();
 
-        var cartDetails = await queryResponse.GetResultFromJson<CartDetails>();
+        var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
+        cartDetails.Should().NotBeNull();
         cartDetails.Id.Should().Be(createdId);
-        cartDetails.Status.Should().Be(CartStatus.Pending);
+        cartDetails.Status.Should().Be(ShoppingCartStatus.Pending);
         cartDetails.ClientId.Should().Be(fixture.ClientId);
-        cartDetails.Version.Should().Be(1);
-        cartDetails.ProductItems.Should().BeEmpty();
-        cartDetails.TotalPrice.Should().Be(0);
+        cartDetails.Version.Should().Be(0);
     }
 }

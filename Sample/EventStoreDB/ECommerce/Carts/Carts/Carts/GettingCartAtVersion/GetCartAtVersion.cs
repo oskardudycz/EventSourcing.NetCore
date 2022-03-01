@@ -9,7 +9,7 @@ using EventStore.Client;
 
 namespace Carts.Carts.GettingCartAtVersion;
 
-public class GetCartAtVersion : IQuery<CartDetails>
+public class GetCartAtVersion : IQuery<ShoppingCartDetails>
 {
     public Guid CartId { get; }
     public ulong Version { get; }
@@ -32,7 +32,7 @@ public class GetCartAtVersion : IQuery<CartDetails>
 }
 
 internal class HandleGetCartAtVersion :
-    IQueryHandler<GetCartAtVersion, CartDetails>
+    IQueryHandler<GetCartAtVersion, ShoppingCartDetails>
 {
     private readonly EventStoreClient eventStore;
 
@@ -41,16 +41,16 @@ internal class HandleGetCartAtVersion :
         this.eventStore = eventStore;
     }
 
-    public async Task<CartDetails> Handle(GetCartAtVersion request, CancellationToken cancellationToken)
+    public async Task<ShoppingCartDetails> Handle(GetCartAtVersion request, CancellationToken cancellationToken)
     {
-        var cart = await eventStore.AggregateStream<CartDetails>(
+        var cart = await eventStore.AggregateStream<ShoppingCartDetails>(
             request.CartId,
             cancellationToken,
             request.Version
         );
 
         if (cart == null)
-            throw AggregateNotFoundException.For<Cart>(request.CartId);
+            throw AggregateNotFoundException.For<ShoppingCart>(request.CartId);
 
         return cart;
     }

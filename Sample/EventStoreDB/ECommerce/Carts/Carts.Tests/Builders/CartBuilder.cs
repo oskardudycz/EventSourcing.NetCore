@@ -15,16 +15,16 @@ internal class CartBuilder
         var cartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
 
-        eventsToApply.Enqueue(new CartInitialized(cartId, clientId, CartStatus.Pending));
+        eventsToApply.Enqueue(new CartInitialized(cartId, clientId, ShoppingCartStatus.Pending));
 
         return this;
     }
 
     public static CartBuilder Create() => new();
 
-    public Cart Build()
+    public ShoppingCart Build()
     {
-        var cart = (Cart) Activator.CreateInstance(typeof(Cart), true)!;
+        var cart = (ShoppingCart) Activator.CreateInstance(typeof(ShoppingCart), true)!;
 
         foreach (var @event in eventsToApply)
         {

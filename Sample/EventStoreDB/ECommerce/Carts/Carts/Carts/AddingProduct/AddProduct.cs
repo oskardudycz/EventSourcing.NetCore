@@ -35,11 +35,11 @@ public class AddProduct: ICommand
 internal class HandleAddProduct:
     ICommandHandler<AddProduct>
 {
-    private readonly IRepository<Cart> cartRepository;
+    private readonly IRepository<ShoppingCart> cartRepository;
     private readonly IProductPriceCalculator productPriceCalculator;
 
     public HandleAddProduct(
-        IRepository<Cart> cartRepository,
+        IRepository<ShoppingCart> cartRepository,
         IProductPriceCalculator productPriceCalculator
     )
     {

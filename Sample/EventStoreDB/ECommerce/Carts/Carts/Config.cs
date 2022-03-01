@@ -8,11 +8,11 @@ namespace Carts;
 
 public static class Config
 {
-    public static void AddCartsModule(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddCartsModule(this IServiceCollection services, IConfiguration config)
     {
         services.AddEventStoreDB(config);
         // Document Part used for projections
         services.AddMarten(config, configKey: "ReadModel_Marten");
-        services.AddCarts();
+        return services.AddCarts();
     }
 }

@@ -11,12 +11,12 @@ using Core.Projections;
 
 namespace Carts.Carts.GettingCartById;
 
-public class CartDetails: IProjection
+public class ShoppingCartDetails: IProjection
 {
     public Guid Id { get; set; }
     public Guid ClientId { get; set; }
 
-    public CartStatus Status { get; set; }
+    public ShoppingCartStatus Status { get; set; }
 
     public IList<PricedProductItem> ProductItems { get; set; } = default!;
 
@@ -46,12 +46,11 @@ public class CartDetails: IProjection
 
     public void Apply(CartInitialized @event)
     {
-        Version++;
-
         Id = @event.CartId;
         ClientId = @event.ClientId;
         ProductItems = new List<PricedProductItem>();
-        Status = @event.CartStatus;
+        Status = @event.ShoppingCartStatus;
+        Version = 0;
     }
 
     public void Apply(ProductAdded @event)
@@ -101,7 +100,7 @@ public class CartDetails: IProjection
     {
         Version++;
 
-        Status = CartStatus.Confirmed;
+        Status = ShoppingCartStatus.Confirmed;
     }
 
     private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)

@@ -74,7 +74,7 @@ public class OptimisticConcurrencyMiddleware
     }
 }
 
-public static class ConditionalRequestMiddlewareConfig
+public static class OptimisticConcurrencyMiddlewareConfig
 {
     public static IServiceCollection AddOptimisticConcurrencyMiddleware(
         this IServiceCollection services,

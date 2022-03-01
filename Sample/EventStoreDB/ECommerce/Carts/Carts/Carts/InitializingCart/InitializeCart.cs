@@ -33,10 +33,10 @@ public class InitializeCart: ICommand
 internal class HandleInitializeCart:
     ICommandHandler<InitializeCart>
 {
-    private readonly IRepository<Cart> cartRepository;
+    private readonly IRepository<ShoppingCart> cartRepository;
 
     public HandleInitializeCart(
-        IRepository<Cart> cartRepository
+        IRepository<ShoppingCart> cartRepository
     )
     {
         this.cartRepository = cartRepository;
@@ -44,7 +44,7 @@ internal class HandleInitializeCart:
 
     public async Task<Unit> Handle(InitializeCart command, CancellationToken cancellationToken)
     {
-        var cart = Cart.Initialize(command.CartId, command.ClientId);
+        var cart = ShoppingCart.Initialize(command.CartId, command.ClientId);
 
         await cartRepository.Add(cart, cancellationToken);
 
