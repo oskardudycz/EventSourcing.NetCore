@@ -10,7 +10,7 @@ public interface ICorrelationIdFactory
 }
 
 
-public class CorrelationIdFactory: ICorrelationIdFactory
+public class GuidCorrelationIdFactory: ICorrelationIdFactory
 {
     public CorrelationId New() => new(Guid.NewGuid().ToString("N"));
 }

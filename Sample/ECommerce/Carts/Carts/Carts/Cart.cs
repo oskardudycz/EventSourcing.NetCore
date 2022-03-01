@@ -101,7 +101,7 @@ public class Cart: Aggregate
         if (existingProductItem is null)
             throw new InvalidOperationException($"Product with id `{productItemToBeRemoved.ProductId}` and price '{productItemToBeRemoved.UnitPrice}' was not found in cart.");
 
-        if(existingProductItem.HasEnough(productItemToBeRemoved.Quantity))
+        if(!existingProductItem.HasEnough(productItemToBeRemoved.Quantity))
             throw new InvalidOperationException($"Cannot remove {productItemToBeRemoved.Quantity} items of Product with id `{productItemToBeRemoved.ProductId}` as there are only ${existingProductItem.Quantity} items in card");
 
         var @event = ProductRemoved.Create(Id, productItemToBeRemoved);

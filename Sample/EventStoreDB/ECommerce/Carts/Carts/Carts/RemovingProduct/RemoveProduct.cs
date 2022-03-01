@@ -34,10 +34,10 @@ public class RemoveProduct: ICommand
 internal class HandleRemoveProduct:
     ICommandHandler<RemoveProduct>
 {
-    private readonly IRepository<Cart> cartRepository;
+    private readonly IRepository<ShoppingCart> cartRepository;
 
     public HandleRemoveProduct(
-        IRepository<Cart> cartRepository
+        IRepository<ShoppingCart> cartRepository
     )
     {
         this.cartRepository = cartRepository;

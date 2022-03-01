@@ -22,7 +22,7 @@ public class ConfirmCartTests
         cart.Confirm();
 
         // Then
-        cart.Status.Should().Be(CartStatus.Confirmed);
+        cart.Status.Should().Be(ShoppingCartStatus.Confirmed);
         cart.Version.Should().Be(2);
 
         var @event = cart.PublishedEvent<CartConfirmed>();

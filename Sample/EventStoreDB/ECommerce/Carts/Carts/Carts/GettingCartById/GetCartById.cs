@@ -7,7 +7,7 @@ using Marten;
 
 namespace Carts.Carts.GettingCartById;
 
-public class GetCartById : IQuery<CartDetails>
+public class GetCartById : IQuery<ShoppingCartDetails>
 {
     public Guid CartId { get; }
 
@@ -26,7 +26,7 @@ public class GetCartById : IQuery<CartDetails>
 }
 
 internal class HandleGetCartById :
-    IQueryHandler<GetCartById, CartDetails>
+    IQueryHandler<GetCartById, ShoppingCartDetails>
 {
     private readonly IDocumentSession querySession;
 
@@ -35,10 +35,10 @@ internal class HandleGetCartById :
         this.querySession = querySession;
     }
 
-    public async Task<CartDetails> Handle(GetCartById request, CancellationToken cancellationToken)
+    public async Task<ShoppingCartDetails> Handle(GetCartById request, CancellationToken cancellationToken)
     {
-        var cart = await querySession.LoadAsync<CartDetails>(request.CartId, cancellationToken);
+        var cart = await querySession.LoadAsync<ShoppingCartDetails>(request.CartId, cancellationToken);
 
-        return cart ?? throw AggregateNotFoundException.For<Cart>(request.CartId);
+        return cart ?? throw AggregateNotFoundException.For<ShoppingCart>(request.CartId);
     }
 }

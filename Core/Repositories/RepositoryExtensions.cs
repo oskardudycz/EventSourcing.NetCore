@@ -9,16 +9,25 @@ namespace Core.Repositories;
 
 public static class RepositoryExtensions
 {
-    public static async Task<T> Get<T>(this IRepository<T> repository, Guid id, CancellationToken cancellationToken = default) where T : IAggregate
+    public static async Task<T> Get<T>(
+        this IRepository<T> repository,
+        Guid id,
+        CancellationToken cancellationToken
+    ) where T : IAggregate
     {
         var entity = await repository.Find(id, cancellationToken);
 
         return entity ?? throw AggregateNotFoundException.For<T>(id);
     }
 
-    public static async Task<Unit> GetAndUpdate<T>(this IRepository<T> repository, Guid id, Action<T> action, CancellationToken cancellationToken = default) where T : IAggregate
+    public static async Task<Unit> GetAndUpdate<T>(
+        this IRepository<T> repository,
+        Guid id,
+        Action<T> action,
+        CancellationToken cancellationToken
+    ) where T : IAggregate
     {
-        var entity = await repository.Get<T>(id, cancellationToken);
+        var entity = await repository.Get(id, cancellationToken);
 
         action(entity);
 

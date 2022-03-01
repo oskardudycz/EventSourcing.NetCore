@@ -17,7 +17,7 @@ public class InitializeCartCommandHandlerTests
     public async Task ForInitCardCommand_ShouldAddNewCart()
     {
         // Given
-        var repository = new FakeRepository<Cart>();
+        var repository = new FakeRepository<ShoppingCart>();
 
         var commandHandler = new HandleInitializeCart(
             repository

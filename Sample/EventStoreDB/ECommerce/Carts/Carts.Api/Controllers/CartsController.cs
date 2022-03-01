@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Carts.Api.Requests.Carts;
+using Carts.Api.Requests;
 using Carts.Carts.GettingCartAtVersion;
 using Carts.Carts.GettingCartById;
 using Carts.Carts.GettingCartHistory;
@@ -12,18 +12,19 @@ using Core.Ids;
 using Core.Marten.Responses;
 using Core.Queries;
 using Core.Responses;
+using Core.WebApi.Headers;
 using Marten.Pagination;
 
 namespace Carts.Api.Controllers;
 
 [Route("api/[controller]")]
-public class CartsController: Controller
+public class ShoppingCartsController: Controller
 {
     private readonly ICommandBus commandBus;
     private readonly IQueryBus queryBus;
     private readonly IIdGenerator idGenerator;
 
-    public CartsController(
+    public ShoppingCartsController(
         ICommandBus commandBus,
         IQueryBus queryBus,
         IIdGenerator idGenerator)
@@ -34,7 +35,7 @@ public class CartsController: Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> InitializeCart([FromBody] InitializeCartRequest? request)
+    public async Task<IActionResult> InitializeCart([FromBody] InitializeShoppingCartRequest? request)
     {
         var cartId = idGenerator.New();
 
@@ -45,11 +46,14 @@ public class CartsController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/Carts", cartId);
+        return Created("api/ShoppingCarts", cartId);
     }
 
     [HttpPost("{id}/products")]
-    public async Task<IActionResult> AddProduct(Guid id, [FromBody] AddProductRequest? request)
+    public async Task<IActionResult> AddProduct(
+        Guid id,
+        [FromBody] AddProductRequest? request
+    )
     {
         var command = Carts.AddingProduct.AddProduct.Create(
             id,
@@ -64,21 +68,26 @@ public class CartsController: Controller
         return Ok();
     }
 
-    [HttpDelete("{id}/products")]
-    public async Task<IActionResult> RemoveProduct(Guid id, [FromBody] RemoveProductRequest request)
+    [HttpDelete("{id}/products/{productId}")]
+    public async Task<IActionResult> RemoveProduct(
+        Guid id,
+        [FromRoute]Guid? productId,
+        [FromQuery]int? quantity,
+        [FromQuery]decimal? unitPrice
+    )
     {
         var command = Carts.RemovingProduct.RemoveProduct.Create(
             id,
             PricedProductItem.Create(
-                request?.ProductItem?.ProductId,
-                request?.ProductItem?.Quantity,
-                request?.ProductItem?.UnitPrice
+                productId,
+                quantity,
+                unitPrice
             )
         );
 
         await commandBus.Send(command);
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPut("{id}/confirmation")]
@@ -94,13 +103,18 @@ public class CartsController: Controller
     }
 
     [HttpGet("{id}")]
-    public Task<CartDetails> Get(Guid id)
+    public async Task<ShoppingCartDetails> Get(Guid id)
     {
-        return queryBus.Send<GetCartById, CartDetails>(GetCartById.Create(id));
+        var result = await queryBus.Send<GetCartById, ShoppingCartDetails>(GetCartById.Create(id));
+
+        Response.TrySetETagResponseHeader(result.Version.ToString());
+
+        return result;
     }
 
     [HttpGet]
-    public async Task<PagedListResponse<CartShortInfo>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+    public async Task<PagedListResponse<CartShortInfo>> Get([FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20)
     {
         var pagedList = await queryBus.Send<GetCarts, IPagedList<CartShortInfo>>(GetCarts.Create(pageNumber, pageSize));
 
@@ -117,8 +131,8 @@ public class CartsController: Controller
     }
 
     [HttpGet("{id}/versions")]
-    public Task<CartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion? query)
+    public Task<ShoppingCartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion? query)
     {
-        return queryBus.Send<GetCartAtVersion, CartDetails>(GetCartAtVersion.Create(id, query?.Version));
+        return queryBus.Send<GetCartAtVersion, ShoppingCartDetails>(GetCartAtVersion.Create(id, query?.Version));
     }
 }

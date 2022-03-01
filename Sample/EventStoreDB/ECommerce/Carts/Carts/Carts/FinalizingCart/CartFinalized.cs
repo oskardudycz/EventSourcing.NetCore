@@ -64,8 +64,8 @@ internal class HandleCartFinalized : IEventHandler<CartConfirmed>
 
     public async Task Handle(CartConfirmed @event, CancellationToken cancellationToken)
     {
-        var cart = await querySession.LoadAsync<Cart>(@event.CartId, cancellationToken)
-                   ?? throw  AggregateNotFoundException.For<Cart>(@event.CartId);
+        var cart = await querySession.LoadAsync<ShoppingCart>(@event.CartId, cancellationToken)
+                   ?? throw  AggregateNotFoundException.For<ShoppingCart>(@event.CartId);
 
         var externalEvent = CartFinalized.Create(
             @event.CartId,

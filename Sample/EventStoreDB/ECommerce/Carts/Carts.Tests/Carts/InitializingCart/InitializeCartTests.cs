@@ -15,7 +15,7 @@ public class InitializeCartTests
         var clientId = Guid.NewGuid();
 
         // When
-        var cart = Cart.Initialize(
+        var cart = ShoppingCart.Initialize(
             cartId,
             clientId
         );
