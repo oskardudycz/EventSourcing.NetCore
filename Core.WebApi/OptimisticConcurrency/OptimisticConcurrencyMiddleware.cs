@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Core.WebApi.Tracing.Correlation;
+using Core.OptimisticConcurrency;
+using Core.WebApi.Headers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,8 +33,8 @@ public class OptimisticConcurrencyMiddleware
 
     public async Task Invoke(
         HttpContext context,
-        ExpectedResourceVersionProvider expectedResourceVersionProvider,
-        NextResourceVersionProvider nextResourceVersionProvider
+        IExpectedResourceVersionProvider expectedResourceVersionProvider,
+        INextResourceVersionProvider nextResourceVersionProvider
     )
     {
         TryGetExpectedVersionFromRequestIfMatchHeader(context, expectedResourceVersionProvider);
@@ -45,56 +46,45 @@ public class OptimisticConcurrencyMiddleware
 
     private void TryGetExpectedVersionFromRequestIfMatchHeader(
         HttpContext context,
-        ExpectedResourceVersionProvider expectedResourceVersionProvider
+        IExpectedResourceVersionProvider expectedResourceVersionProvider
     )
     {
         if (!SupportedMethods.Contains(context.Request.Method)) return;
 
-        var ifMatchHeader = GetIfMatchHeader(context);
+        var ifMatchHeader = context.GetIfMatchRequestHeader();
 
-        if (ifMatchHeader != null && !Equals(ifMatchHeader, EntityTagHeaderValue.Any))
-        {
-            expectedResourceVersionProvider.Set(new ResourceVersion(ifMatchHeader.ToString()));
-        }
+        if (ifMatchHeader == null || Equals(ifMatchHeader, EntityTagHeaderValue.Any)) return;
+
+        if (!expectedResourceVersionProvider.TrySet(ifMatchHeader.Tag.Value))
+            throw new ArgumentOutOfRangeException(nameof(ifMatchHeader), "Invalid format of If-Match header value");
     }
 
-    private static EntityTagHeaderValue? GetIfMatchHeader(HttpContext context)
+    private static void TrySetETagResponseHeader(
+        HttpContext context,
+        INextResourceVersionProvider nextResourceVersionProvider
+    )
     {
-        return context.Request.GetTypedHeaders().IfMatch.FirstOrDefault();
+        var nextExpectedVersion = nextResourceVersionProvider.Value;
+        if (nextExpectedVersion == null) return;
+
+        context.Response.GetTypedHeaders().ETag = new EntityTagHeaderValue(nextExpectedVersion, true);
     }
-
-    private static void TrySetETagResponseHeader(HttpContext context,
-        NextResourceVersionProvider nextResourceVersionProvider)
-    {
-        if (!IsSuccessStatusCode(context.Response.StatusCode))
-            return;
-
-        var nextExpectedVersion = nextResourceVersionProvider.Get();
-        if (nextExpectedVersion == null)
-            return;
-
-        context.Response.GetTypedHeaders().ETag =
-            new EntityTagHeaderValue(new StringSegment(nextExpectedVersion.Value), true);
-    }
-
-    private static bool IsSuccessStatusCode(int statusCode) =>
-        statusCode is >= 200 and <= 299;
 }
 
 public static class ConditionalRequestMiddlewareConfig
 {
     public static IServiceCollection AddOptimisticConcurrencyMiddleware(this IServiceCollection services)
     {
-        services.TryAddScoped<ExpectedResourceVersionProvider, ExpectedResourceVersionProvider>();
-        services.TryAddScoped<NextResourceVersionProvider, NextResourceVersionProvider>();
+        services.TryAddScoped<DefaultExpectedResourceVersionProvider, DefaultExpectedResourceVersionProvider>();
+        services.TryAddScoped<DefaultNextResourceVersionProvider, DefaultNextResourceVersionProvider>();
 
         return services;
     }
 
     public static IApplicationBuilder UseOptimisticConcurrencyMiddleware(this IApplicationBuilder app)
     {
-        if (app.ApplicationServices.GetService(typeof(ExpectedResourceVersionProvider)) == null ||
-            app.ApplicationServices.GetService(typeof(NextResourceVersionProvider)) == null)
+        if (app.ApplicationServices.GetService(typeof(DefaultExpectedResourceVersionProvider)) == null ||
+            app.ApplicationServices.GetService(typeof(DefaultNextResourceVersionProvider)) == null)
         {
             throw new InvalidOperationException(
                 "Unable to find the required services. You must call the appropriate AddOptimisticConcurrencyMiddleware method in ConfigureServices in the application startup code.");
