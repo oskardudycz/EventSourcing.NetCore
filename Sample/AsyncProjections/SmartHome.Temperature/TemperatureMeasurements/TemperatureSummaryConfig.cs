@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Core.Commands;
 using Core.Marten.Repository;
 using Core.Queries;
-using Core.Repositories;
 using Marten;
 using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +15,7 @@ public static class TemperatureSummaryConfig
 {
     internal static void AddTemperatureMeasurements(this IServiceCollection services)
     {
-        services.AddScoped<IRepository<TemperatureMeasurement>, MartenRepository<TemperatureMeasurement>>();
+        services.AddScoped<IMartenRepository<TemperatureMeasurement>, MartenRepository<TemperatureMeasurement>>();
 
         AddCommandHandlers(services);
         AddQueryHandlers(services);

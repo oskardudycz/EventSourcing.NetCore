@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
-using Core.Repositories;
+using Core.Marten.Repository;
 
-namespace Core.Testing;
+namespace Carts.Tests.Stubs.Repositories;
 
-public class FakeRepository<T> : IRepository<T> where T : IAggregate
+public class FakeRepository<T> : IMartenRepository<T> where T : class, IAggregate
 {
     public Dictionary<Guid, T> Aggregates { get; private set; }
 

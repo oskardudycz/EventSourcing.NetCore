@@ -1,7 +1,6 @@
 using Core.Commands;
 using Core.Marten.Repository;
 using Core.Queries;
-using Core.Repositories;
 using Marten;
 using Marten.Pagination;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +22,7 @@ internal static class ReservationsConfig
     {
         services
             .AddScoped<IReservationNumberGenerator, ReservationNumberGenerator>()
-            .AddScoped<IRepository<Reservation>, MartenRepository<Reservation>>()
+            .AddScoped<IMartenRepository<Reservation>, MartenRepository<Reservation>>()
             .AddCommandHandlers()
             .AddQueryHandlers();
     }

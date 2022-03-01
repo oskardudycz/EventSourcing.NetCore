@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Orders.Orders.RecordingOrderPayment;
@@ -36,9 +36,9 @@ public class RecordOrderPayment: ICommand
 public class HandleRecordOrderPayment :
     ICommandHandler<RecordOrderPayment>
 {
-    private readonly IRepository<Order> orderRepository;
+    private readonly IMartenRepository<Order> orderRepository;
 
-    public HandleRecordOrderPayment(IRepository<Order> orderRepository)
+    public HandleRecordOrderPayment(IMartenRepository<Order> orderRepository)
     {
         this.orderRepository = orderRepository;
     }

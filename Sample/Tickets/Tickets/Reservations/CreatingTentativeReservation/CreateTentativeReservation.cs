@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 using Tickets.Reservations.NumberGeneration;
 
@@ -33,11 +33,11 @@ public class CreateTentativeReservation : ICommand
 internal class HandleCreateTentativeReservation:
     ICommandHandler<CreateTentativeReservation>
 {
-    private readonly IRepository<Reservation> repository;
+    private readonly IMartenRepository<Reservation> repository;
     private readonly IReservationNumberGenerator reservationNumberGenerator;
 
     public HandleCreateTentativeReservation(
-        IRepository<Reservation> repository,
+        IMartenRepository<Reservation> repository,
         IReservationNumberGenerator reservationNumberGenerator
     )
     {

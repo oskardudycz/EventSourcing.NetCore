@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 using Orders.Products;
 
@@ -50,9 +50,9 @@ public class InitializeOrder: ICommand
 public class HandleInitializeOrder :
     ICommandHandler<InitializeOrder>
 {
-    private readonly IRepository<Order> orderRepository;
+    private readonly IMartenRepository<Order> orderRepository;
 
-    public HandleInitializeOrder(IRepository<Order> orderRepository)
+    public HandleInitializeOrder(IMartenRepository<Order> orderRepository)
     {
         this.orderRepository = orderRepository;
     }

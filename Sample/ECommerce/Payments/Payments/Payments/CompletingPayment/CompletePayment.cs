@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 using Payments.Payments.DiscardingPayment;
 
@@ -30,10 +30,10 @@ public class CompletePayment: ICommand
 public class HandleCompletePayment:
     ICommandHandler<CompletePayment>
 {
-    private readonly IRepository<Payment> paymentRepository;
+    private readonly IMartenRepository<Payment> paymentRepository;
 
     public HandleCompletePayment(
-        IRepository<Payment> paymentRepository)
+        IMartenRepository<Payment> paymentRepository)
     {
         this.paymentRepository = paymentRepository;
     }

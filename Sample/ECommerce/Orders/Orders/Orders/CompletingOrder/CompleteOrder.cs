@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Orders.Orders.CompletingOrder;
@@ -28,9 +28,9 @@ public class CompleteOrder: ICommand
 public class HandleCompleteOrder :
     ICommandHandler<CompleteOrder>
 {
-    private readonly IRepository<Order> orderRepository;
+    private readonly IMartenRepository<Order> orderRepository;
 
-    public HandleCompleteOrder(IRepository<Order> orderRepository)
+    public HandleCompleteOrder(IMartenRepository<Order> orderRepository)
     {
         this.orderRepository = orderRepository;
     }

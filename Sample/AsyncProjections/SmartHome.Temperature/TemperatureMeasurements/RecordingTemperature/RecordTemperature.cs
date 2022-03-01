@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
@@ -33,10 +33,10 @@ public class RecordTemperature : ICommand
 public class HandleRecordTemperature:
     ICommandHandler<RecordTemperature>
 {
-    private readonly IRepository<TemperatureMeasurement> repository;
+    private readonly IMartenRepository<TemperatureMeasurement> repository;
 
     public HandleRecordTemperature(
-        IRepository<TemperatureMeasurement> repository
+        IMartenRepository<TemperatureMeasurement> repository
     )
     {
         this.repository = repository;

@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.EventStoreDB.Repository;
 using MediatR;
 
 namespace Carts.Carts.ConfirmingCart;
@@ -28,10 +28,10 @@ public class ConfirmCart: ICommand
 internal class HandleConfirmCart:
     ICommandHandler<ConfirmCart>
 {
-    private readonly IRepository<ShoppingCart> cartRepository;
+    private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
 
     public HandleConfirmCart(
-        IRepository<ShoppingCart> cartRepository
+        IEventStoreDBRepository<ShoppingCart> cartRepository
     )
     {
         this.cartRepository = cartRepository;

@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Payments.Payments.RequestingPayment;
@@ -44,10 +44,10 @@ public class RequestPayment: ICommand
 public class HandleRequestPayment:
     ICommandHandler<RequestPayment>
 {
-    private readonly IRepository<Payment> paymentRepository;
+    private readonly IMartenRepository<Payment> paymentRepository;
 
     public HandleRequestPayment(
-        IRepository<Payment> paymentRepository)
+        IMartenRepository<Payment> paymentRepository)
     {
         this.paymentRepository = paymentRepository;
     }

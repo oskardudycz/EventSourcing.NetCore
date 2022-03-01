@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace MeetingsManagement.Meetings.CreatingMeeting
@@ -22,10 +22,10 @@ namespace MeetingsManagement.Meetings.CreatingMeeting
     internal class HandleCreateMeeting:
         ICommandHandler<CreateMeeting>
     {
-        private readonly IRepository<Meeting> repository;
+        private readonly IMartenRepository<Meeting> repository;
 
         public HandleCreateMeeting(
-            IRepository<Meeting> repository
+            IMartenRepository<Meeting> repository
         )
         {
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));

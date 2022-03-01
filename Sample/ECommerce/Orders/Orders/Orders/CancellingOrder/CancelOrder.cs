@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Orders.Orders.CancellingOrder;
@@ -34,9 +34,9 @@ public class CancelOrder: ICommand
 public class HandleCancelOrder :
     ICommandHandler<CancelOrder>
 {
-    private readonly IRepository<Order> orderRepository;
+    private readonly IMartenRepository<Order> orderRepository;
 
-    public HandleCancelOrder(IRepository<Order> orderRepository)
+    public HandleCancelOrder(IMartenRepository<Order> orderRepository)
     {
         this.orderRepository = orderRepository;
     }

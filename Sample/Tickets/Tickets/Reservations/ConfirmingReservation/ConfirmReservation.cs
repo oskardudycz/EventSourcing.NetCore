@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
 using Core.Exceptions;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Tickets.Reservations.ConfirmingReservation;
@@ -29,10 +29,10 @@ public class ConfirmReservation : ICommand
 internal class HandleConfirmReservation:
     ICommandHandler<ConfirmReservation>
 {
-    private readonly IRepository<Reservation> repository;
+    private readonly IMartenRepository<Reservation> repository;
 
     public HandleConfirmReservation(
-        IRepository<Reservation> repository
+        IMartenRepository<Reservation> repository
     )
     {
         this.repository = repository;

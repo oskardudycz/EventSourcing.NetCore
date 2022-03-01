@@ -1,7 +1,6 @@
 using Core.Commands;
 using Core.Marten.Repository;
 using Core.Queries;
-using Core.Repositories;
 using Marten;
 using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.GettingMeeting;
@@ -15,7 +14,7 @@ namespace MeetingsManagement.Meetings
         public static IServiceCollection AddMeeting(this IServiceCollection services)
         {
             return services
-                .AddScoped<IRepository<Meeting>, MartenRepository<Meeting>>()
+                .AddScoped<IMartenRepository<Meeting>, MartenRepository<Meeting>>()
                 .AddCommandHandler<CreateMeeting, HandleCreateMeeting>()
                 .AddCommandHandler<ScheduleMeeting, HandleScheduleMeeting>()
                 .AddQueryHandler<GetMeeting, MeetingView?, HandleGetMeeting>();

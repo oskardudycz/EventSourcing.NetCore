@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 
 namespace Payments.Payments.TimingOutPayment;
@@ -32,10 +32,10 @@ public class TimeOutPayment: ICommand
 public class HandleTimeOutPayment:
     ICommandHandler<TimeOutPayment>
 {
-    private readonly IRepository<Payment> paymentRepository;
+    private readonly IMartenRepository<Payment> paymentRepository;
 
     public HandleTimeOutPayment(
-        IRepository<Payment> paymentRepository)
+        IMartenRepository<Payment> paymentRepository)
     {
         this.paymentRepository = paymentRepository;
     }

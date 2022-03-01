@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
+using Core.EventStoreDB.Repository;
 using Core.Marten.Repository;
 
-namespace Tickets.Tests.Stubs.Storage;
+namespace Carts.Tests.Stubs.Repositories;
 
-public class FakeRepository<T> : IMartenRepository<T> where T : class, IAggregate
+public class FakeRepository<T> : IEventStoreDBRepository<T> where T : class, IAggregate
 {
     public Dictionary<Guid, T> Aggregates { get; private set; }
 

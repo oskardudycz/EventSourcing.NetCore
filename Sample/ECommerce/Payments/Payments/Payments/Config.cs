@@ -1,7 +1,6 @@
 using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;
-using Core.Repositories;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Payments.Payments.CompletingPayment;
@@ -17,7 +16,7 @@ internal static class PaymentsConfig
 {
     internal static void AddPayments(this IServiceCollection services)
     {
-        services.AddScoped<IRepository<Payment>, MartenRepository<Payment>>()
+        services.AddScoped<IMartenRepository<Payment>, MartenRepository<Payment>>()
             .AddCommandHandlers()
             .AddEventHandlers();
     }

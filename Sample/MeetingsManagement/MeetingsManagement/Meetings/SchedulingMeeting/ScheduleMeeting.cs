@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
 using Core.Exceptions;
-using Core.Repositories;
+using Core.Marten.Repository;
 using MediatR;
 using MeetingsManagement.Meetings.ValueObjects;
 
@@ -18,10 +18,10 @@ namespace MeetingsManagement.Meetings.SchedulingMeeting
     internal class HandleScheduleMeeting:
         ICommandHandler<ScheduleMeeting>
     {
-        private readonly IRepository<Meeting> repository;
+        private readonly IMartenRepository<Meeting> repository;
 
         public HandleScheduleMeeting(
-            IRepository<Meeting> repository
+            IMartenRepository<Meeting> repository
         )
         {
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
