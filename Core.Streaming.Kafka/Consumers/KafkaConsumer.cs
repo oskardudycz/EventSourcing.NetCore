@@ -40,26 +40,24 @@ public class KafkaConsumer: IExternalEventConsumer
         logger.LogInformation("Kafka consumer started");
 
         // create consumer
-        using (var consumer = new ConsumerBuilder<string, string>(config.ConsumerConfig).Build())
+        using var consumer = new ConsumerBuilder<string, string>(config.ConsumerConfig).Build();
+        // subscribe to Kafka topics (taken from config)
+        consumer.Subscribe(config.Topics);
+        try
         {
-            // subscribe to Kafka topics (taken from config)
-            consumer.Subscribe(config.Topics);
-            try
+            // keep consumer working until it get signal that it should be shuted down
+            while (!cancellationToken.IsCancellationRequested)
             {
-                // keep consumer working until it get signal that it should be shuted down
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    // consume event from Kafka
-                    await ConsumeNextEvent(consumer, cancellationToken);
-                }
+                // consume event from Kafka
+                await ConsumeNextEvent(consumer, cancellationToken);
             }
-            catch (Exception e)
-            {
-                logger.LogInformation("Error consuming message: " + e.Message + e.StackTrace);
+        }
+        catch (Exception e)
+        {
+            logger.LogInformation("Error consuming message: " + e.Message + e.StackTrace);
 
-                // Ensure the consumer leaves the group cleanly and final offsets are committed.
-                consumer.Close();
-            }
+            // Ensure the consumer leaves the group cleanly and final offsets are committed.
+            consumer.Close();
         }
     }
 
