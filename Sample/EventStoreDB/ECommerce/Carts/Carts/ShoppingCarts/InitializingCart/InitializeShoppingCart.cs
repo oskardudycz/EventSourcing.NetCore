@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
 using MediatR;
 
@@ -27,20 +28,27 @@ internal class HandleInitializeCart:
     ICommandHandler<InitializeShoppingCart>
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
+    private readonly EventStoreDBOptimisticConcurrencyScope scope;
 
     public HandleInitializeCart(
-        IEventStoreDBRepository<ShoppingCart> cartRepository
+        IEventStoreDBRepository<ShoppingCart> cartRepository,
+        EventStoreDBOptimisticConcurrencyScope scope
     )
     {
         this.cartRepository = cartRepository;
+        this.scope = scope;
     }
 
     public async Task<Unit> Handle(InitializeShoppingCart command, CancellationToken cancellationToken)
     {
-        var cart = ShoppingCart.Initialize(command.CartId, command.ClientId);
+        var (cartId, clientId) = command;
 
-        await cartRepository.Add(cart, cancellationToken);
-
+        await scope.Do(_ =>
+            cartRepository.Add(
+                ShoppingCart.Initialize(cartId, clientId),
+                cancellationToken
+            )
+        );
         return Unit.Value;
     }
 }

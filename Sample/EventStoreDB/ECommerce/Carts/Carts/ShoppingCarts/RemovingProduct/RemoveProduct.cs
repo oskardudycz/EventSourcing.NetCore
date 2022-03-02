@@ -1,25 +1,20 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Carts.ShoppingCarts.AddingProduct;
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
+using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
 using MediatR;
 
 namespace Carts.ShoppingCarts.RemovingProduct;
 
-public class RemoveProduct: ICommand
+public record RemoveProduct(
+    Guid CartId,
+    PricedProductItem ProductItem
+): ICommand
 {
-    public Guid CartId { get; }
-
-    public PricedProductItem ProductItem { get; }
-
-    private RemoveProduct(Guid cartId, PricedProductItem productItem)
-    {
-        CartId = cartId;
-        ProductItem = productItem;
-    }
-
     public static RemoveProduct Create(Guid? cartId, PricedProductItem? productItem)
     {
         if (cartId == null || cartId == Guid.Empty)
@@ -35,19 +30,28 @@ internal class HandleRemoveProduct:
     ICommandHandler<RemoveProduct>
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
+    private readonly EventStoreDBOptimisticConcurrencyScope scope;
 
     public HandleRemoveProduct(
-        IEventStoreDBRepository<ShoppingCart> cartRepository
+        IEventStoreDBRepository<ShoppingCart> cartRepository,
+        EventStoreDBOptimisticConcurrencyScope scope
     )
     {
         this.cartRepository = cartRepository;
+        this.scope = scope;
     }
 
-    public Task<Unit> Handle(RemoveProduct command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(RemoveProduct command, CancellationToken cancellationToken)
     {
-        return cartRepository.GetAndUpdate(
-            command.CartId,
-            cart => cart.RemoveProduct(command.ProductItem),
-            cancellationToken);
+        await scope.Do(expectedRevision =>
+            cartRepository.GetAndUpdate(
+                command.CartId,
+                cart => cart.RemoveProduct(command.ProductItem),
+                expectedRevision,
+                cancellationToken
+            )
+        );
+
+        return Unit.Value;
     }
 }

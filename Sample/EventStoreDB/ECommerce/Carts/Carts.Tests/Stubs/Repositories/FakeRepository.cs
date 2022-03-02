@@ -22,21 +22,21 @@ public class FakeRepository<T> : IEventStoreDBRepository<T> where T : class, IAg
         return Task.FromResult(Aggregates.GetValueOrDefault(id));
     }
 
-    public Task Add(T aggregate, CancellationToken cancellationToken)
+    public async Task<ulong> Add(T aggregate, CancellationToken cancellationToken = default)
     {
         Aggregates.Add(aggregate.Id, aggregate);
-        return Task.CompletedTask;
+        return await Task.FromResult((ulong)aggregate.Version);
     }
 
-    public Task Update(T aggregate, CancellationToken cancellationToken)
+    public async Task<ulong> Update(T aggregate, ulong? expectedVersion = null, CancellationToken cancellationToken = default)
     {
         Aggregates[aggregate.Id] = aggregate;
-        return Task.CompletedTask;
+        return await Task.FromResult((ulong)aggregate.Version);
     }
 
-    public Task Delete(T aggregate, CancellationToken cancellationToken)
+    public async Task<ulong> Delete(T aggregate, ulong? expectedVersion = null, CancellationToken cancellationToken = default)
     {
         Aggregates.Remove(aggregate.Id);
-        return Task.CompletedTask;
+        return await Task.FromResult((ulong)aggregate.Version);
     }
 }

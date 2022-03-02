@@ -1,4 +1,31 @@
-﻿namespace Core.EventStoreDB.OptimisticConcurrency;
+﻿using System;
+using System.Threading.Tasks;
+
+namespace Core.EventStoreDB.OptimisticConcurrency;
+
+public class EventStoreDBOptimisticConcurrencyScope
+{
+    private readonly EventStoreDBExpectedStreamRevisionProvider expectedStreamVersionProvider;
+    private readonly EventStoreDBNextStreamRevisionProvider nextStreamVersionProvider;
+
+    public EventStoreDBOptimisticConcurrencyScope(
+        EventStoreDBExpectedStreamRevisionProvider expectedStreamVersionProvider,
+        EventStoreDBNextStreamRevisionProvider nextStreamVersionProvider
+    )
+    {
+        this.expectedStreamVersionProvider = expectedStreamVersionProvider;
+        this.nextStreamVersionProvider = nextStreamVersionProvider;
+    }
+
+    public async Task Do(Func<ulong?, Task<ulong>> handler)
+    {
+        var expectedVersion = expectedStreamVersionProvider.Value;
+
+        var nextVersion = await handler(expectedVersion);
+
+        nextStreamVersionProvider.Set(nextVersion);
+    }
+}
 
 public class EventStoreDBExpectedStreamRevisionProvider
 {

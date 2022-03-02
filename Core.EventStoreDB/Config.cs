@@ -1,4 +1,3 @@
-using System;
 using Core.BackgroundWorkers;
 using Core.Events.NoMediator;
 using Core.EventStoreDB.OptimisticConcurrency;
@@ -32,6 +31,7 @@ public static class EventStoreDBConfigExtensions
             .AddSingleton(new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
             .AddScoped<EventStoreDBExpectedStreamRevisionProvider, EventStoreDBExpectedStreamRevisionProvider>()
             .AddScoped<EventStoreDBNextStreamRevisionProvider, EventStoreDBNextStreamRevisionProvider>()
+            .AddScoped<EventStoreDBOptimisticConcurrencyScope, EventStoreDBOptimisticConcurrencyScope>()
             .AddTransient<EventStoreDBSubscriptionToAll, EventStoreDBSubscriptionToAll>();
 
         if (options?.UseInternalCheckpointing != false)

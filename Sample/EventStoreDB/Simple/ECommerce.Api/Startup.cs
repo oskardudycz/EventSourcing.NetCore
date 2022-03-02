@@ -7,7 +7,6 @@ using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Core.WebApi.Tracing.Correlation;
 using ECommerce.Core;
-using ECommerce.Core.EventStoreDB;
 using EventStore.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

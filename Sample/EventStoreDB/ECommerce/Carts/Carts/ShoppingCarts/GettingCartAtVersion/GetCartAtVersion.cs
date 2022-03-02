@@ -9,17 +9,11 @@ using EventStore.Client;
 
 namespace Carts.ShoppingCarts.GettingCartAtVersion;
 
-public class GetCartAtVersion : IQuery<ShoppingCartDetails>
+public record GetCartAtVersion(
+    Guid CartId,
+    ulong Version
+): IQuery<ShoppingCartDetails>
 {
-    public Guid CartId { get; }
-    public ulong Version { get; }
-
-    private GetCartAtVersion(Guid cartId, ulong version)
-    {
-        CartId = cartId;
-        Version = version;
-    }
-
     public static GetCartAtVersion Create(Guid? cartId, ulong? version)
     {
         if (cartId == null || cartId == Guid.Empty)
@@ -31,7 +25,7 @@ public class GetCartAtVersion : IQuery<ShoppingCartDetails>
     }
 }
 
-internal class HandleGetCartAtVersion :
+internal class HandleGetCartAtVersion:
     IQueryHandler<GetCartAtVersion, ShoppingCartDetails>
 {
     private readonly EventStoreClient eventStore;

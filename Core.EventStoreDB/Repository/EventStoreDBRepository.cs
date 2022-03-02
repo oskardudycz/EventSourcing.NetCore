@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.Events;
 using Core.EventStoreDB.Events;
-using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Serialization;
 using EventStore.Client;
 
@@ -15,26 +14,18 @@ namespace Core.EventStoreDB.Repository;
 public interface IEventStoreDBRepository<T> where T : class, IAggregate
 {
     Task<T?> Find(Guid id, CancellationToken cancellationToken);
-    Task Add(T aggregate, CancellationToken cancellationToken);
-    Task Update(T aggregate, CancellationToken cancellationToken);
-    Task Delete(T aggregate, CancellationToken cancellationToken);
+    Task<ulong> Add(T aggregate, CancellationToken cancellationToken);
+    Task<ulong> Update(T aggregate, ulong? expectedRevision = null, CancellationToken cancellationToken = default);
+    Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, CancellationToken cancellationToken = default);
 }
 
 public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : class, IAggregate
 {
     private readonly EventStoreClient eventStore;
-    private readonly EventStoreDBExpectedStreamRevisionProvider expectedStreamRevisionProvider;
-    private readonly EventStoreDBNextStreamRevisionProvider nextStreamRevisionProvider;
 
-    public EventStoreDBRepository(
-        EventStoreClient eventStore,
-        EventStoreDBExpectedStreamRevisionProvider expectedStreamRevisionProvider,
-        EventStoreDBNextStreamRevisionProvider nextStreamRevisionProvider
-    )
+    public EventStoreDBRepository(EventStoreClient eventStore)
     {
         this.eventStore = eventStore ?? throw new ArgumentNullException(nameof(eventStore));
-        this.expectedStreamRevisionProvider = expectedStreamRevisionProvider;
-        this.nextStreamRevisionProvider = nextStreamRevisionProvider;
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
@@ -43,7 +34,7 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
             cancellationToken
         );
 
-    public async Task Add(T aggregate, CancellationToken cancellationToken)
+    public async Task<ulong> Add(T aggregate, CancellationToken cancellationToken = default)
     {
         var result = await eventStore.AppendToStreamAsync(
             StreamNameMapper.ToStreamId<T>(aggregate.Id),
@@ -51,27 +42,24 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
             GetEventsToStore(aggregate),
             cancellationToken: cancellationToken
         );
-        nextStreamRevisionProvider.Set(result.NextExpectedStreamRevision);
+        return result.NextExpectedStreamRevision;
     }
 
-    public async Task Update(T aggregate, CancellationToken cancellationToken)
+    public async Task<ulong> Update(T aggregate, ulong? expectedRevision = null, CancellationToken cancellationToken = default)
     {
+        var nextVersion = expectedRevision ?? (ulong)aggregate.Version;
+
         var result = await eventStore.AppendToStreamAsync(
             StreamNameMapper.ToStreamId<T>(aggregate.Id),
-            GetExpectedStreamRevision(),
+            nextVersion,
             GetEventsToStore(aggregate),
             cancellationToken: cancellationToken
         );
-        nextStreamRevisionProvider.Set(result.NextExpectedStreamRevision);
+        return result.NextExpectedStreamRevision;
     }
 
-    public Task Delete(T aggregate, CancellationToken cancellationToken) =>
-        Update(aggregate, cancellationToken);
-
-    private StreamRevision GetExpectedStreamRevision() =>
-        expectedStreamRevisionProvider.Value ??
-        throw new ArgumentNullException(nameof(expectedStreamRevisionProvider.Value),
-            "Stream revision was not provided.");
+    public Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, CancellationToken cancellationToken = default) =>
+        Update(aggregate, expectedRevision, cancellationToken);
 
     private static IEnumerable<EventData> GetEventsToStore(T aggregate)
     {
