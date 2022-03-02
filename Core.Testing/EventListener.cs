@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Core.Events;
 using MediatR;
 
-namespace Shipments.Api.Tests.Core;
+namespace Core.Testing;
 
 public class EventsLog
 {

@@ -1,9 +1,14 @@
 using System.Net;
 using Core;
 using Core.Exceptions;
+using Core.Marten.OptimisticConcurrency;
 using Core.Serialization.Newtonsoft;
 using Core.Streaming.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
+using Core.WebApi.OptimisticConcurrency;
+using Core.WebApi.Swagger;
+using Core.WebApi.Tracing.Correlation;
+using Marten.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -30,14 +35,18 @@ public class Startup
         services.AddControllers();
 
         services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo {Title = "Payments", Version = "v1"});
-        });
-
-        services
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Payments", Version = "v1" });
+                c.OperationFilter<MetadataOperationFilter>();
+            })
             .AddKafkaProducer()
             .AddCoreServices()
-            .AddPaymentsModule(config);
+            .AddPaymentsModule(config)
+            .AddCorrelationIdMiddleware()
+            .AddOptimisticConcurrencyMiddleware(
+                sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
+                sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
+            );
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -48,26 +57,24 @@ public class Startup
         }
 
         app.UseExceptionHandlingMiddleware(exception => exception switch
-        {
-            AggregateNotFoundException _ => HttpStatusCode.NotFound,
-            _ => HttpStatusCode.InternalServerError
-        });
-
-        app.UseRouting();
-
-        app.UseAuthorization();
-
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
-
-        app.UseSwagger();
-
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Payments V1");
-            c.RoutePrefix = string.Empty;
-        });
+            {
+                AggregateNotFoundException _ => HttpStatusCode.NotFound,
+                ConcurrencyException => HttpStatusCode.PreconditionFailed,
+                _ => HttpStatusCode.InternalServerError
+            })
+            .UseCorrelationIdMiddleware()
+            .UseOptimisticConcurrencyMiddleware()
+            .UseRouting()
+            .UseAuthorization()
+            .UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            })
+            .UseSwagger()
+            .UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Payments V1");
+                c.RoutePrefix = string.Empty;
+            });
     }
 }

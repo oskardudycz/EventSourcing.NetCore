@@ -1,5 +1,5 @@
 using System;
-using Carts.Carts;
+using Carts.ShoppingCarts;
 using Carts.Tests.Extensions.Reservations;
 using Xunit;
 
@@ -15,7 +15,7 @@ public class InitializeCartTests
         var clientId = Guid.NewGuid();
 
         // When
-        var cart = Cart.Initialize(
+        var cart = ShoppingCart.Initialize(
             cartId,
             clientId
         );

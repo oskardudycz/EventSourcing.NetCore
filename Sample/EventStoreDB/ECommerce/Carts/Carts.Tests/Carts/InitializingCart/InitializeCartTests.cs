@@ -1,5 +1,5 @@
 using System;
-using Carts.Carts;
+using Carts.ShoppingCarts;
 using Carts.Tests.Extensions.Reservations;
 using Xunit;
 

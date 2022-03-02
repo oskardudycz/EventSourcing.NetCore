@@ -9,7 +9,7 @@ using SmartHome.Temperature.MotionSensors.GettingMotionSensor;
 using SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 using SmartHome.Temperature.MotionSensors.RebuildingMotionSensorsViews;
 
-namespace SmartHome.Api;
+namespace SmartHome.Api.Controllers;
 
 [Route("api/motion-sensors")]
 public class MotionSensorsController: Controller

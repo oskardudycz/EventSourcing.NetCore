@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace EventStoreBasics.Tools;
+namespace Tools.Tools;
 
 public static class ReflectionInvoker
 {

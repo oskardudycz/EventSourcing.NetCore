@@ -1,6 +1,6 @@
 using System;
-using Carts.Carts;
-using Carts.Carts.InitializingCart;
+using Carts.ShoppingCarts;
+using Carts.ShoppingCarts.InitializingCart;
 using Core.Testing;
 using FluentAssertions;
 
@@ -29,10 +29,10 @@ internal static class CartExtensions
         Guid id,
         Guid clientId)
     {
-        var @event = shoppingCart.PublishedEvent<CartInitialized>();
+        var @event = shoppingCart.PublishedEvent<ShoppingCartInitialized>();
 
         @event.Should().NotBeNull();
-        @event.Should().BeOfType<CartInitialized>();
+        @event.Should().BeOfType<ShoppingCartInitialized>();
         @event!.CartId.Should().Be(id);
         @event.ClientId.Should().Be(clientId);
         @event.ShoppingCartStatus.Should().Be(ShoppingCartStatus.Pending);

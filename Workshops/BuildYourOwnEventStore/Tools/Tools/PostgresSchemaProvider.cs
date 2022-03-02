@@ -3,7 +3,7 @@ using System.Linq;
 using Dapper;
 using Npgsql;
 
-namespace EventStoreBasics.Tests.Tools;
+namespace Tools.Tools;
 
 /// <summary>
 /// Helper class that returns information about the database schema (Tables and its Columns)

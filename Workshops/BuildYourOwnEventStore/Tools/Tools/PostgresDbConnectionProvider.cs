@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Dapper;
 using Npgsql;
 
-namespace EventStoreBasics.Tests.Tools;
+namespace Tools.Tools;
 
 public static class PostgresDbConnectionProvider
 {

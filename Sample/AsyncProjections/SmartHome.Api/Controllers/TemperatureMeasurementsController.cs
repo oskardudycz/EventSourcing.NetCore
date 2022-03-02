@@ -10,7 +10,7 @@ using SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasuremen
 using SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 using SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
 
-namespace SmartHome.Api;
+namespace SmartHome.Api.Controllers;
 
 [Route("api/temperature-measurements")]
 public class TemperatureMeasurementsController: Controller

@@ -2,8 +2,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Carts.Carts;
-using Carts.Carts.InitializingCart;
+using Carts.ShoppingCarts;
+using Carts.ShoppingCarts.InitializingCart;
 using Carts.Tests.Extensions.Reservations;
 using Carts.Tests.Stubs.Repositories;
 using Core.Testing;
@@ -24,7 +24,7 @@ public class InitializeCartCommandHandlerTests
             repository
         );
 
-        var command = InitializeCart.Create(Guid.NewGuid(), Guid.NewGuid());
+        var command = InitializeShoppingCart.Create(Guid.NewGuid(), Guid.NewGuid());
 
         // When
         await commandHandler.Handle(command, CancellationToken.None);

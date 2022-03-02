@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using Core.Ids;
+using Core.Marten.Ids;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Serialization;
 using Core.Threading;
 using Marten;
@@ -36,7 +38,9 @@ public static class MartenConfigExtensions
         var martenConfig = config.GetSection(configKey).Get<Config>();
 
         services
-            .AddScoped<IIdGenerator, MartenIdGenerator>();
+            .AddScoped<IIdGenerator, MartenIdGenerator>()
+            .AddScoped<MartenExpectedStreamVersionProvider, MartenExpectedStreamVersionProvider>()
+            .AddScoped<MartenNextStreamVersionProvider, MartenNextStreamVersionProvider>();
 
         var documentStore = services
             .AddMarten(options =>
@@ -82,18 +86,10 @@ public static class MartenConfigExtensions
         options.Events.DatabaseSchemaName = schemaName ?? config.WriteModelSchema;
         options.DatabaseSchemaName = schemaName ?? config.ReadModelSchema;
 
-
-        var serializer = new JsonNetSerializer { EnumStorage = EnumStorage.AsString };
-        serializer.Customize(s =>
-        {
-            s.ContractResolver = new NonDefaultConstructorMartenJsonNetContractResolver(
-                Casing.Default,
-                CollectionStorage.Default,
-                NonPublicMembersStorage.NonPublicSetters
-            );
-        });
-
-        options.Serializer(serializer);
+        options.UseDefaultSerialization(
+            EnumStorage.AsString,
+            nonPublicMembersStorage: NonPublicMembersStorage.All
+        );
 
         configureOptions?.Invoke(options);
     }

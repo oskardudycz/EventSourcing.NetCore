@@ -1,4 +1,4 @@
-using Carts.Carts;
+using Carts.ShoppingCarts;
 using Core.EventStoreDB;
 using Core.Marten;
 using Microsoft.Extensions.Configuration;
