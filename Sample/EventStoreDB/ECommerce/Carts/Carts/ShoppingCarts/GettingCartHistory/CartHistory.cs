@@ -7,11 +7,12 @@ using Core.Projections;
 
 namespace Carts.ShoppingCarts.GettingCartHistory;
 
-public class CartHistory: IProjection
+public class CartHistory: IVersionedProjection
 {
     public Guid Id { get; set;}
     public Guid CartId { get; set;}
     public string Description { get; set; } = default!;
+    public ulong LastProcessedPosition { get; set; }
 
     public void When(object @event)
     {

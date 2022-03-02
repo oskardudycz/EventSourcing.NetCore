@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Carts.Pricing;
 using Carts.ShoppingCarts.AddingProduct;
 using Carts.ShoppingCarts.ConfirmingCart;
@@ -8,6 +10,7 @@ using Carts.ShoppingCarts.GettingCarts;
 using Carts.ShoppingCarts.InitializingCart;
 using Carts.ShoppingCarts.RemovingProduct;
 using Core.Commands;
+using Core.Events.NoMediator;
 using Core.EventStoreDB.Repository;
 using Core.Marten.ExternalProjections;
 using Core.Queries;
@@ -34,6 +37,14 @@ internal static class CartsConfig
             .AddCommandHandler<AddProduct, HandleAddProduct>()
             .AddCommandHandler<RemoveProduct, HandleRemoveProduct>()
             .AddCommandHandler<ConfirmShoppingCart, HandleConfirmCart>();
+    }
+
+    public class MyClass: INoMediatorEventHandler<ShoppingCartInitialized>
+    {
+        public Task Handle(ShoppingCartInitialized @event, CancellationToken ct)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private static IServiceCollection AddProjections(this IServiceCollection services)

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ECommerce.Core.Serialisation;
+using Core.EventStoreDB.Serialization;
 using EventStore.Client;
 
 namespace ECommerce.Core.EventStoreDB;
@@ -24,7 +24,7 @@ public static class EventStoreDBExtensions
         );
 
         return (await readResult
-            .Select(@event => @event.Deserialize())
+            .Select(@event => @event.Deserialize()!)
             .AggregateAsync(
                 getDefault(),
                 when,

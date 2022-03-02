@@ -1,5 +1,5 @@
-﻿using ECommerce.Core.Events;
-using ECommerce.Core.EventStoreDB;
+﻿using Core.Events.NoMediator;
+using Core.EventStoreDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

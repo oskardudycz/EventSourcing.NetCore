@@ -42,7 +42,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
         );
 
         await documentSession.SaveChangesAsync(cancellationToken);
-        await eventBus.Publish(events);
+        await eventBus.Publish(events, cancellationToken);
 
         return events.Length;
     }
@@ -62,7 +62,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
         );
 
         await documentSession.SaveChangesAsync(cancellationToken);
-        await eventBus.Publish(events);
+        await eventBus.Publish(events, cancellationToken);
 
         return nextVersion;
     }

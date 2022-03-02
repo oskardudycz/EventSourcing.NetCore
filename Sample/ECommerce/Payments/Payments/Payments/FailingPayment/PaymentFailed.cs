@@ -54,7 +54,7 @@ public class TransformIntoPaymentFailed :
             PaymentFailReason.Discarded
         );
 
-        await eventBus.Publish(externalEvent);
+        await eventBus.Publish(externalEvent, cancellationToken);
     }
 
     public async Task Handle(PaymentTimedOut @event, CancellationToken cancellationToken)
@@ -69,6 +69,6 @@ public class TransformIntoPaymentFailed :
             PaymentFailReason.Discarded
         );
 
-        await eventBus.Publish(externalEvent);
+        await eventBus.Publish(externalEvent, cancellationToken);
     }
 }

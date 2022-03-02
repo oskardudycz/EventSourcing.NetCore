@@ -6,38 +6,36 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
-using Polly.Retry;
 
-namespace ECommerce.Core.Events;
+namespace Core.Events.NoMediator;
 
-public interface IEventBus
+public interface INoMediatorEventBus
 {
-    Task Publish<TEvent>(TEvent @event, CancellationToken ct);
-
     Task Publish(object @event, CancellationToken ct);
 }
 
-public class EventBus: IEventBus
+public class NoMediatorEventBus: INoMediatorEventBus
 {
     private readonly IServiceProvider serviceProvider;
-    private readonly AsyncRetryPolicy retryPolicy;
+    private readonly AsyncPolicy retryPolicy;
     private static readonly ConcurrentDictionary<Type, MethodInfo> PublishMethods = new();
 
-    public EventBus(
+    public NoMediatorEventBus(
         IServiceProvider serviceProvider,
-        AsyncRetryPolicy retryPolicy
+        AsyncPolicy retryPolicy
     )
     {
         this.serviceProvider = serviceProvider;
         this.retryPolicy = retryPolicy;
     }
 
-    public async Task Publish<TEvent>(TEvent @event, CancellationToken ct)
+    private async Task Publish<TEvent>(TEvent @event, CancellationToken ct)
     {
+        // You can consider adding here a retry policy for event handling
         using var scope = serviceProvider.CreateScope();
 
         var eventHandlers =
-            scope.ServiceProvider.GetServices<IEventHandler<TEvent>>();
+            scope.ServiceProvider.GetServices<INoMediatorEventHandler<TEvent>>();
 
         foreach (var eventHandler in eventHandlers)
         {
@@ -57,8 +55,8 @@ public class EventBus: IEventBus
     private static MethodInfo GetGenericPublishFor(object @event)
     {
         return PublishMethods.GetOrAdd(@event.GetType(), eventType =>
-            typeof(EventBus)
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+            typeof(NoMediatorEventBus)
+                .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
                 .Single(m => m.Name == nameof(Publish) && m.GetGenericArguments().Any())
                 .MakeGenericMethod(eventType)
         );
@@ -67,7 +65,8 @@ public class EventBus: IEventBus
 
 public static class EventBusExtensions
 {
-    public static IServiceCollection AddEventBus(this IServiceCollection services) =>
-        services.AddSingleton<IEventBus, EventBus>(sp =>
-            new EventBus(sp, Policy.Handle<Exception>().RetryAsync(3)));
+    public static IServiceCollection AddEventBus(this IServiceCollection services, AsyncPolicy? asyncPolicy = null) =>
+        services.AddSingleton<INoMediatorEventBus, NoMediatorEventBus>(sp =>
+            new NoMediatorEventBus(sp, asyncPolicy ?? Policy.NoOpAsync())
+        );
 }

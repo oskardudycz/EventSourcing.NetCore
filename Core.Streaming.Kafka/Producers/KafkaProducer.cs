@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Core.Events;
@@ -23,20 +24,18 @@ public class KafkaProducer: IExternalEventProducer
         config = configuration.GetKafkaProducerConfig();
     }
 
-    public async Task Publish(IExternalEvent @event)
+    public async Task Publish(IExternalEvent @event, CancellationToken cancellationToken)
     {
-        using (var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build())
-        {
-            await Task.Yield();
-            // publish event to kafka topic taken from config
-            var result = await p.ProduceAsync(config.Topic,
-                new Message<string, string>
-                {
-                    // store event type name in message Key
-                    Key = @event.GetType().Name,
-                    // serialize event to message Value
-                    Value = JsonConvert.SerializeObject(@event)
-                });
-        }
+        using var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build();
+        await Task.Yield();
+        // publish event to kafka topic taken from config
+        var result = await p.ProduceAsync(config.Topic,
+            new Message<string, string>
+            {
+                // store event type name in message Key
+                Key = @event.GetType().Name,
+                // serialize event to message Value
+                Value = JsonConvert.SerializeObject(@event)
+            }, cancellationToken);
     }
 }

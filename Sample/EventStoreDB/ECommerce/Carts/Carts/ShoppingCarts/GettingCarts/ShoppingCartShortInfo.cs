@@ -7,13 +7,15 @@ using Core.Projections;
 
 namespace Carts.ShoppingCarts.GettingCarts;
 
-public class ShoppingCartShortInfo: IProjection
+public class ShoppingCartShortInfo: IVersionedProjection
 {
     public Guid Id { get; set; }
 
     public int TotalItemsCount { get; set; }
 
     public ShoppingCartStatus Status { get; set; }
+
+    public ulong LastProcessedPosition { get; set; }
 
     public void When(object @event)
     {

@@ -57,6 +57,6 @@ internal class HandleCartFinalized: IEventHandler<ShoppingCartConfirmed>
             @event.ConfirmedAt
         );
 
-        await eventBus.Publish(externalEvent);
+        await eventBus.Publish(externalEvent, cancellationToken);
     }
 }
