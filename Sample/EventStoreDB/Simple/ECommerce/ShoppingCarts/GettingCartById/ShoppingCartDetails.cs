@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Events;
 
 namespace ECommerce.ShoppingCarts.GettingCartById;
 
@@ -11,6 +12,7 @@ public class ShoppingCartDetails
     public ShoppingCartStatus Status { get; set; }
     public List<ShoppingCartDetailsProductItem> ProductItems { get; set; } = default!;
     public int Version { get; set; }
+    public ulong LastProcessedPosition { get; set; }
 }
 
 public class ShoppingCartDetailsProductItem
@@ -22,30 +24,38 @@ public class ShoppingCartDetailsProductItem
 
 public static class ShoppingCartDetailsProjection
 {
-    public static ShoppingCartDetails Handle(ShoppingCartInitialized @event)
+    public static ShoppingCartDetails Handle(StreamEvent<ShoppingCartInitialized> @event)
     {
-        var (shoppingCartId, clientId) = @event;
+        var (shoppingCartId, clientId) = @event.Data;
 
         return new ShoppingCartDetails
         {
             Id = shoppingCartId,
             ClientId = clientId,
             Status = ShoppingCartStatus.Pending,
-            Version = 0
+            Version = 0,
+            LastProcessedPosition = @event.Metadata.LogPosition
         };
     }
 
-    public static void Handle(ShoppingCartConfirmed @event, ShoppingCartDetails view)
+    public static void Handle(StreamEvent<ShoppingCartConfirmed> @event, ShoppingCartDetails view)
     {
+        if (view.LastProcessedPosition >= @event.Metadata.LogPosition)
+            return;
+
         view.Status = ShoppingCartStatus.Confirmed;
         view.Version++;
+        view.LastProcessedPosition = @event.Metadata.LogPosition;
     }
 
-    public static void Handle(ProductItemAddedToShoppingCart @event, ShoppingCartDetails view)
+    public static void Handle(StreamEvent<ProductItemAddedToShoppingCart> @event, ShoppingCartDetails view)
     {
-        var productItem = @event.ProductItem;
+        if (view.LastProcessedPosition >= @event.Metadata.LogPosition)
+            return;
+
+        var productItem = @event.Data.ProductItem;
         var existingProductItem = view.ProductItems
-            .FirstOrDefault(x => x.ProductId == @event.ProductItem.ProductId);
+            .FirstOrDefault(x => x.ProductId == productItem.ProductId);
 
         if (existingProductItem == null)
         {
@@ -62,13 +72,17 @@ public static class ShoppingCartDetailsProjection
         }
 
         view.Version++;
+        view.LastProcessedPosition = @event.Metadata.LogPosition;
     }
 
-    public static void Handle(ProductItemRemovedFromShoppingCart @event, ShoppingCartDetails view)
+    public static void Handle(StreamEvent<ProductItemRemovedFromShoppingCart> @event, ShoppingCartDetails view)
     {
-        var productItem = @event.ProductItem;
+        if (view.LastProcessedPosition >= @event.Metadata.LogPosition)
+            return;
+
+        var productItem = @event.Data.ProductItem;
         var existingProductItem = view.ProductItems
-            .Single(x => x.ProductId == @event.ProductItem.ProductId);
+            .Single(x => x.ProductId == productItem.ProductId);
 
         if (existingProductItem.Quantity == productItem.Quantity)
         {
@@ -80,5 +94,6 @@ public static class ShoppingCartDetailsProjection
         }
 
         view.Version++;
+        view.LastProcessedPosition = @event.Metadata.LogPosition;
     }
 }

@@ -34,6 +34,9 @@ namespace ECommerce.Migrations
                     b.Property<int>("Version")
                         .HasColumnType("integer");
 
+                    b.Property<int>("LastProcessedPosition")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.ToTable("ShoppingCartDetails");
@@ -59,6 +62,9 @@ namespace ECommerce.Migrations
 
                     b.Property<int>("Version")
                         .HasColumnType("integer");
+
+                    b.Property<int>("LastProcessedPosition")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
