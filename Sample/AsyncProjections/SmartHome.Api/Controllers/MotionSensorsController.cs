@@ -51,9 +51,7 @@ public class MotionSensorsController: Controller
     [HttpPost("rebuild")]
     public async Task<IActionResult> Rebuild()
     {
-        var command = RebuildMotionSensorsViews.Create();
-
-        await commandBus.Send(command);
+        await commandBus.Send(new RebuildMotionSensorsViews());
 
         return NoContent();
     }

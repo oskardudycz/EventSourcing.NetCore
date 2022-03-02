@@ -2,29 +2,18 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace Payments.Payments.RequestingPayment;
 
-public class RequestPayment: ICommand
+public record RequestPayment(
+    Guid PaymentId,
+    Guid OrderId,
+    decimal Amount
+): ICommand
 {
-    public Guid PaymentId { get; }
-
-    public Guid OrderId { get; }
-
-    public decimal Amount { get; }
-
-    private RequestPayment(
-        Guid paymentId,
-        Guid orderId,
-        decimal amount
-    )
-    {
-        PaymentId = paymentId;
-        OrderId = orderId;
-        Amount = amount;
-    }
     public static RequestPayment Create(
         Guid? paymentId,
         Guid? orderId,
@@ -41,23 +30,32 @@ public class RequestPayment: ICommand
         return new RequestPayment(paymentId.Value, orderId.Value, amount.Value);
     }
 }
+
 public class HandleRequestPayment:
     ICommandHandler<RequestPayment>
 {
     private readonly IMartenRepository<Payment> paymentRepository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
     public HandleRequestPayment(
-        IMartenRepository<Payment> paymentRepository)
+        IMartenRepository<Payment> paymentRepository,
+        MartenOptimisticConcurrencyScope scope
+    )
     {
         this.paymentRepository = paymentRepository;
+        this.scope = scope;
     }
 
     public async Task<Unit> Handle(RequestPayment command, CancellationToken cancellationToken)
     {
-        var payment = Payment.Initialize(command.PaymentId, command.OrderId, command.Amount);
+        var (paymentId, orderId, amount) = command;
 
-        await paymentRepository.Add(payment, cancellationToken);
-
+        await scope.Do(_ =>
+            paymentRepository.Add(
+                Payment.Initialize(paymentId, orderId, amount),
+                cancellationToken
+            )
+        );
         return Unit.Value;
     }
 }

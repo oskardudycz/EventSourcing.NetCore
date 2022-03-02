@@ -6,13 +6,7 @@ using Marten;
 
 namespace SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasurements;
 
-public class GetTemperatureMeasurements: IQuery<IReadOnlyList<TemperatureMeasurement>>
-{
-    public static GetTemperatureMeasurements Create()
-    {
-        return new();
-    }
-}
+public record GetTemperatureMeasurements: IQuery<IReadOnlyList<TemperatureMeasurement>>;
 
 public class HandleGetTemperatureMeasurements: IQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>
 {

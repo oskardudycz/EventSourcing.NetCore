@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Carts.Api.Requests;
 using Carts.Api.Requests.Carts;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.GettingCartAtVersion;
@@ -133,7 +132,7 @@ public class ShoppingCartsController: Controller
     }
 
     [HttpGet("{id}/versions")]
-    public Task<ShoppingCartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion? query)
+    public Task<ShoppingCartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersionRequest? query)
     {
         return queryBus.Send<GetCartAtVersion, ShoppingCartDetails>(GetCartAtVersion.Create(id, query?.Version));
     }

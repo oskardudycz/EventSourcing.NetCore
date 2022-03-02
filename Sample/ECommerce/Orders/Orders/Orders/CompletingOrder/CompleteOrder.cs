@@ -2,20 +2,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace Orders.Orders.CompletingOrder;
 
-public class CompleteOrder: ICommand
+public record CompleteOrder(
+    Guid OrderId
+): ICommand
 {
-    public Guid OrderId { get; }
-
-    private CompleteOrder(Guid orderId)
-    {
-        OrderId = orderId;
-    }
-
     public static CompleteOrder Create(Guid? orderId)
     {
         if (orderId == null || orderId == Guid.Empty)
@@ -25,21 +21,31 @@ public class CompleteOrder: ICommand
     }
 }
 
-public class HandleCompleteOrder :
+public class HandleCompleteOrder:
     ICommandHandler<CompleteOrder>
 {
     private readonly IMartenRepository<Order> orderRepository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
-    public HandleCompleteOrder(IMartenRepository<Order> orderRepository)
+    public HandleCompleteOrder(
+        IMartenRepository<Order> orderRepository,
+        MartenOptimisticConcurrencyScope scope
+    )
     {
         this.orderRepository = orderRepository;
+        this.scope = scope;
     }
 
-    public Task<Unit> Handle(CompleteOrder command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CompleteOrder command, CancellationToken cancellationToken)
     {
-        return orderRepository.GetAndUpdate(
-            command.OrderId,
-            order => order.Complete(),
-            cancellationToken);
+        await scope.Do(expectedVersion =>
+            orderRepository.GetAndUpdate(
+                command.OrderId,
+                order => order.Complete(),
+                expectedVersion,
+                cancellationToken
+            )
+        );
+        return Unit.Value;
     }
 }

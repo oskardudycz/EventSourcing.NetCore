@@ -6,14 +6,9 @@ namespace Tickets.Maintenance;
 
 internal static class Config
 {
+    internal static IServiceCollection AddMaintainance(this IServiceCollection services) =>
+        services.AddCommandHandlers();
 
-    internal static void AddMaintainance(this IServiceCollection services)
-    {
-        AddCommandHandlers(services);
-    }
-
-    private static void AddCommandHandlers(IServiceCollection services)
-    {
+    private static IServiceCollection AddCommandHandlers(this IServiceCollection services) =>
         services.AddCommandHandler<RebuildProjection, MaintenanceCommandHandler>();
-    }
 }

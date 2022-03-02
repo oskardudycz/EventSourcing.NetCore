@@ -1,25 +1,13 @@
 using System;
 using Core.Events;
-using Newtonsoft.Json;
 
 namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 
-public class MotionSensorInstalled : IEvent
+public record MotionSensorInstalled(
+    Guid MotionSensorId,
+    DateTime InstalledAt
+) : IEvent
 {
-    public Guid MotionSensorId { get; }
-
-    public DateTime InstalledAt { get; }
-
-    [JsonConstructor]
-    private MotionSensorInstalled(
-        Guid motionSensorId,
-        DateTime installedAt
-    )
-    {
-        MotionSensorId = motionSensorId;
-        InstalledAt = installedAt;
-    }
-
     public static MotionSensorInstalled Create(
         Guid motionSensorId,
         DateTime installedAt

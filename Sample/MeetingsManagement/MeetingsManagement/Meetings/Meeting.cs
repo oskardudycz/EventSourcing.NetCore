@@ -4,57 +4,56 @@ using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.SchedulingMeeting;
 using MeetingsManagement.Meetings.ValueObjects;
 
-namespace MeetingsManagement.Meetings
+namespace MeetingsManagement.Meetings;
+
+public class Meeting: Aggregate
 {
-    public class Meeting: Aggregate
+    public string Name { get; private set; } = default!;
+
+    public DateTime Created { get; private set; }
+
+    public DateRange? Occurs { get; private set; }
+
+    public Meeting()
     {
-        public string Name { get; private set; } = default!;
+    }
 
-        public DateTime Created { get; private set; }
+    public static Meeting New(Guid id, string name)
+    {
+        return new(id, name, DateTime.UtcNow);
+    }
 
-        public DateRange? Occurs { get; private set; }
+    public Meeting(Guid id, string name, DateTime created)
+    {
+        if (id == Guid.Empty)
+            throw new ArgumentException($"{nameof(id)} cannot be empty.");
 
-        public Meeting()
-        {
-        }
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException($"{nameof(name)} cannot be empty.");
 
-        public static Meeting New(Guid id, string name)
-        {
-            return new(id, name, DateTime.UtcNow);
-        }
+        var @event = MeetingCreated.Create(id, name, created);
 
-        public Meeting(Guid id, string name, DateTime created)
-        {
-            if (id == Guid.Empty)
-                throw new ArgumentException($"{nameof(id)} cannot be empty.");
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException($"{nameof(name)} cannot be empty.");
+    public void Apply(MeetingCreated @event)
+    {
+        Id = @event.MeetingId;
+        Name = @event.Name;
+        Created = @event.Created;
+    }
 
-            var @event = MeetingCreated.Create(id, name, created);
+    internal void Schedule(DateRange occurs)
+    {
+        var @event = MeetingScheduled.Create(Id, occurs);
 
-            Enqueue(@event);
-            Apply(@event);
-        }
+        Enqueue(@event);
+        Apply(@event);
+    }
 
-        public void Apply(MeetingCreated @event)
-        {
-            Id = @event.MeetingId;
-            Name = @event.Name;
-            Created = @event.Created;
-        }
-
-        internal void Schedule(DateRange occurs)
-        {
-            var @event = MeetingScheduled.Create(Id, occurs);
-
-            Enqueue(@event);
-            Apply(@event);
-        }
-
-        public void Apply(MeetingScheduled @event)
-        {
-            Occurs = @event.Occurs;
-        }
+    public void Apply(MeetingScheduled @event)
+    {
+        Occurs = @event.Occurs;
     }
 }

@@ -4,18 +4,11 @@ using Core.Events;
 
 namespace Carts.ShoppingCarts.AddingProduct;
 
-public class ProductAdded: IEvent
+public record ProductAdded(
+    Guid CartId,
+    PricedProductItem ProductItem
+): IEvent
 {
-    public Guid CartId { get; }
-
-    public PricedProductItem ProductItem { get; }
-
-    private ProductAdded(Guid cartId, PricedProductItem productItem)
-    {
-        CartId = cartId;
-        ProductItem = productItem;
-    }
-
     public static ProductAdded Create(Guid cartId, PricedProductItem productItem)
     {
         if (cartId == Guid.Empty)

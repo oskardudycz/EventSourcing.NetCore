@@ -2,25 +2,18 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace Orders.Orders.RecordingOrderPayment;
 
-public class RecordOrderPayment: ICommand
+public record RecordOrderPayment(
+    Guid OrderId,
+    Guid PaymentId,
+    DateTime PaymentRecordedAt
+): ICommand
 {
-    public Guid OrderId { get; }
-
-    public Guid PaymentId { get; }
-
-    public DateTime PaymentRecordedAt { get; }
-
-    private RecordOrderPayment(Guid orderId, Guid paymentId, DateTime paymentRecordedAt)
-    {
-        OrderId = orderId;
-        PaymentId = paymentId;
-        PaymentRecordedAt = paymentRecordedAt;
-    }
     public static RecordOrderPayment Create(Guid? orderId, Guid? paymentId, DateTime? paymentRecordedAt)
     {
         if (orderId == null || orderId == Guid.Empty)
@@ -33,21 +26,33 @@ public class RecordOrderPayment: ICommand
         return new RecordOrderPayment(orderId.Value, paymentId.Value, paymentRecordedAt.Value);
     }
 }
-public class HandleRecordOrderPayment :
+
+public class HandleRecordOrderPayment:
     ICommandHandler<RecordOrderPayment>
 {
     private readonly IMartenRepository<Order> orderRepository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
-    public HandleRecordOrderPayment(IMartenRepository<Order> orderRepository)
+    public HandleRecordOrderPayment(
+        IMartenRepository<Order> orderRepository,
+        MartenOptimisticConcurrencyScope scope
+    )
     {
         this.orderRepository = orderRepository;
+        this.scope = scope;
     }
 
-    public Task<Unit> Handle(RecordOrderPayment command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(RecordOrderPayment command, CancellationToken cancellationToken)
     {
-        return orderRepository.GetAndUpdate(
-            command.OrderId,
-            order => order.RecordPayment(command.PaymentId, command.PaymentRecordedAt),
-            cancellationToken);
+        var (orderId, paymentId, recordedAt) = command;
+        await scope.Do(expectedVersion =>
+            orderRepository.GetAndUpdate(
+                orderId,
+                order => order.RecordPayment(paymentId, recordedAt),
+                expectedVersion,
+                cancellationToken
+            )
+        );
+        return Unit.Value;
     }
 }

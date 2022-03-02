@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core.Streaming.Kafka\Core.Streaming.Kafka.csproj" />
+      <ProjectReference Include="..\..\..\Core.WebApi\Core.WebApi.csproj" />
       <ProjectReference Include="..\MeetingsManagement\MeetingsManagement.csproj" />
     </ItemGroup>
 

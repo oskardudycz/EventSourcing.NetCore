@@ -8,20 +8,13 @@ using Marten.Pagination;
 
 namespace Carts.ShoppingCarts.GettingCartHistory;
 
-public class GetCartHistory : IQuery<IPagedList<ShoppingCartHistory>>
+public record GetCartHistory(
+    Guid CartId,
+    int PageNumber,
+    int PageSize
+): IQuery<IPagedList<ShoppingCartHistory>>
 {
-    public Guid CartId { get; }
-    public int PageNumber { get; }
-    public int PageSize { get; }
-
-    private GetCartHistory(Guid cartId, int pageNumber, int pageSize)
-    {
-        CartId = cartId;
-        PageNumber = pageNumber;
-        PageSize = pageSize;
-    }
-
-    public static GetCartHistory Create(Guid cartId,int pageNumber = 1, int pageSize = 20)
+    public static GetCartHistory Create(Guid cartId, int pageNumber = 1, int pageSize = 20)
     {
         if (pageNumber <= 0)
             throw new ArgumentOutOfRangeException(nameof(pageNumber));
@@ -32,7 +25,7 @@ public class GetCartHistory : IQuery<IPagedList<ShoppingCartHistory>>
     }
 }
 
-internal class HandleGetCartHistory :
+internal class HandleGetCartHistory:
     IQueryHandler<GetCartHistory, IPagedList<ShoppingCartHistory>>
 {
     private readonly IDocumentSession querySession;
@@ -42,10 +35,12 @@ internal class HandleGetCartHistory :
         this.querySession = querySession;
     }
 
-    public Task<IPagedList<ShoppingCartHistory>> Handle(GetCartHistory request, CancellationToken cancellationToken)
+    public Task<IPagedList<ShoppingCartHistory>> Handle(GetCartHistory query, CancellationToken cancellationToken)
     {
+        var (cartId, pageNumber, pageSize) = query;
+
         return querySession.Query<ShoppingCartHistory>()
-            .Where(h => h.CartId == request.CartId)
-            .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
+            .Where(h => h.CartId == cartId)
+            .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 }

@@ -14,7 +14,7 @@ public class ElasticSearchConfig
 public static class ElasticSearchConfigExtensions
 {
     private const string DefaultConfigKey = "ElasticSearch";
-    public static void AddElasticsearch(
+    public static IServiceCollection AddElasticsearch(
         this IServiceCollection services, IConfiguration configuration, Action<ConnectionSettings>? config = null)
     {
         var elasticSearchConfig = configuration.GetSection(DefaultConfigKey).Get<ElasticSearchConfig>();
@@ -26,6 +26,6 @@ public static class ElasticSearchConfigExtensions
 
         var client = new ElasticClient(settings);
 
-        services.AddSingleton<IElasticClient>(client);
+        return services.AddSingleton<IElasticClient>(client);
     }
 }

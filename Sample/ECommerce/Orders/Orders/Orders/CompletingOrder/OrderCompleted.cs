@@ -3,18 +3,11 @@ using Core.Events;
 
 namespace Orders.Orders.CompletingOrder;
 
-public class OrderCompleted : IEvent
+public record OrderCompleted(
+    Guid OrderId,
+    DateTime CompletedAt
+): IEvent
 {
-    public Guid OrderId { get; }
-
-    public DateTime CompletedAt { get; }
-
-    public OrderCompleted(Guid orderId, DateTime completedAt)
-    {
-        OrderId = orderId;
-        CompletedAt = completedAt;
-    }
-
     public static OrderCompleted Create(Guid orderId, DateTime completedAt)
     {
         if (orderId == Guid.Empty)

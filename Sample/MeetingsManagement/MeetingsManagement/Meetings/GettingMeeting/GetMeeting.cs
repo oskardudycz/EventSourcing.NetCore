@@ -4,27 +4,26 @@ using System.Threading.Tasks;
 using Core.Queries;
 using Marten;
 
-namespace MeetingsManagement.Meetings.GettingMeeting
+namespace MeetingsManagement.Meetings.GettingMeeting;
+
+public record GetMeeting(
+    Guid Id
+): IQuery<MeetingView>;
+
+
+internal class HandleGetMeeting: IQueryHandler<GetMeeting, MeetingView?>
 {
-    public record GetMeeting(
-        Guid Id
-    ): IQuery<MeetingView>;
+    private readonly IDocumentSession session;
 
-
-    internal class HandleGetMeeting: IQueryHandler<GetMeeting, MeetingView?>
+    public HandleGetMeeting(
+        IDocumentSession session
+    )
     {
-        private readonly IDocumentSession session;
+        this.session = session ?? throw new ArgumentNullException(nameof(session));
+    }
 
-        public HandleGetMeeting(
-            IDocumentSession session
-        )
-        {
-            this.session = session ?? throw new ArgumentNullException(nameof(session));
-        }
-
-        public Task<MeetingView?> Handle(GetMeeting request, CancellationToken cancellationToken)
-        {
-            return session.LoadAsync<MeetingView>(request.Id, cancellationToken);
-        }
+    public Task<MeetingView?> Handle(GetMeeting request, CancellationToken cancellationToken)
+    {
+        return session.LoadAsync<MeetingView>(request.Id, cancellationToken);
     }
 }

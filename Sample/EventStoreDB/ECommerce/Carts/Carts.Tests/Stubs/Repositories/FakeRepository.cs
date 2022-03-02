@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.EventStoreDB.Repository;
-using Core.Marten.Repository;
 
 namespace Carts.Tests.Stubs.Repositories;
 

@@ -22,21 +22,21 @@ public class FakeRepository<T> : IMartenRepository<T> where T : class, IAggregat
         return Task.FromResult(Aggregates.GetValueOrDefault(id));
     }
 
-    public Task Add(T aggregate, CancellationToken cancellationToken)
+    public async Task<long> Add(T aggregate, CancellationToken cancellationToken = default)
     {
         Aggregates.Add(aggregate.Id, aggregate);
-        return Task.CompletedTask;
+        return await Task.FromResult(aggregate.Version);
     }
 
-    public Task Update(T aggregate, CancellationToken cancellationToken)
+    public async Task<long> Update(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
     {
         Aggregates[aggregate.Id] = aggregate;
-        return Task.CompletedTask;
+        return await Task.FromResult(aggregate.Version);
     }
 
-    public Task Delete(T aggregate, CancellationToken cancellationToken)
+    public async Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
     {
         Aggregates.Remove(aggregate.Id);
-        return Task.CompletedTask;
+        return await Task.FromResult(aggregate.Version);
     }
 }

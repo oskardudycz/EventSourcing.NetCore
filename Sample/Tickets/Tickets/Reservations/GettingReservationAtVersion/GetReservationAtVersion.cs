@@ -8,17 +8,11 @@ using Tickets.Reservations.GettingReservationById;
 
 namespace Tickets.Reservations.GettingReservationAtVersion;
 
-public class GetReservationAtVersion : IQuery<ReservationDetails>
+public record GetReservationAtVersion(
+    Guid ReservationId,
+    int Version
+): IQuery<ReservationDetails>
 {
-    public Guid ReservationId { get; }
-    public int Version { get; }
-
-    private GetReservationAtVersion(Guid reservationId, int version)
-    {
-        ReservationId = reservationId;
-        Version = version;
-    }
-
     public static GetReservationAtVersion Create(Guid reservationId, int version)
     {
         if (reservationId == Guid.Empty)
@@ -30,7 +24,7 @@ public class GetReservationAtVersion : IQuery<ReservationDetails>
     }
 }
 
-internal class HandleGetReservationAtVersion :
+internal class HandleGetReservationAtVersion:
     IQueryHandler<GetReservationAtVersion, ReservationDetails>
 {
     private readonly IDocumentSession querySession;
@@ -40,9 +34,13 @@ internal class HandleGetReservationAtVersion :
         this.querySession = querySession;
     }
 
-    public async Task<ReservationDetails> Handle(GetReservationAtVersion request, CancellationToken cancellationToken)
+    public async Task<ReservationDetails> Handle(GetReservationAtVersion query, CancellationToken cancellationToken)
     {
-        return await querySession.Events.AggregateStreamAsync<ReservationDetails>(request.ReservationId, request.Version, token: cancellationToken)
-               ?? throw AggregateNotFoundException.For<ReservationDetails>(request.ReservationId);
+        var (reservationId, version) = query;
+        return await querySession.Events.AggregateStreamAsync<ReservationDetails>(
+            reservationId,
+            version,
+            token: cancellationToken
+        ) ?? throw AggregateNotFoundException.For<ReservationDetails>(reservationId);
     }
 }

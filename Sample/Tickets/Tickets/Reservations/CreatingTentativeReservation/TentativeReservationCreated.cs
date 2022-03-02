@@ -1,23 +1,14 @@
 using System;
 using Core.Events;
-using Newtonsoft.Json;
 
 namespace Tickets.Reservations.CreatingTentativeReservation;
 
-public class TentativeReservationCreated: IEvent
+public record TentativeReservationCreated(
+    Guid ReservationId,
+    Guid SeatId,
+    string Number
+): IEvent
 {
-    public Guid ReservationId { get; }
-    public Guid SeatId { get; }
-    public string Number { get; }
-
-    [JsonConstructor]
-    private TentativeReservationCreated(Guid reservationId, Guid seatId, string number)
-    {
-        ReservationId = reservationId;
-        SeatId = seatId;
-        Number = number;
-    }
-
     public static TentativeReservationCreated Create(Guid reservationId, Guid seatId, string number)
     {
         if (reservationId == Guid.Empty)

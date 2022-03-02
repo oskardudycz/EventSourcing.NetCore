@@ -3,19 +3,12 @@ using Core.Events;
 
 namespace Payments.Payments.RequestingPayment;
 
-public class PaymentRequested: IEvent
+public record PaymentRequested(
+    Guid PaymentId,
+    Guid OrderId,
+    decimal Amount
+): IEvent
 {
-    public Guid PaymentId { get; }
-    public Guid OrderId { get; }
-    public decimal Amount { get; }
-
-    private PaymentRequested(Guid paymentId, Guid orderId, decimal amount)
-    {
-        PaymentId = paymentId;
-        OrderId = orderId;
-        Amount = amount;
-    }
-
     public static PaymentRequested Create(Guid paymentId, Guid orderId, in decimal amount)
     {
         if (paymentId == Guid.Empty)

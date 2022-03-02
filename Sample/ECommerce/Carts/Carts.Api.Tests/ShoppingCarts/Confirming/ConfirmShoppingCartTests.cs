@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Carts.Api.Requests;
 using Carts.Api.Requests.Carts;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.FinalizingCart;

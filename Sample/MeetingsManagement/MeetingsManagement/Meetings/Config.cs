@@ -7,23 +7,20 @@ using MeetingsManagement.Meetings.GettingMeeting;
 using MeetingsManagement.Meetings.SchedulingMeeting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MeetingsManagement.Meetings
-{
-    public static class Config
-    {
-        public static IServiceCollection AddMeeting(this IServiceCollection services)
-        {
-            return services
-                .AddScoped<IMartenRepository<Meeting>, MartenRepository<Meeting>>()
-                .AddCommandHandler<CreateMeeting, HandleCreateMeeting>()
-                .AddCommandHandler<ScheduleMeeting, HandleScheduleMeeting>()
-                .AddQueryHandler<GetMeeting, MeetingView?, HandleGetMeeting>();
-        }
+namespace MeetingsManagement.Meetings;
 
-        public static void ConfigureMarten(StoreOptions options)
-        {
-            options.Projections.SelfAggregate<Meeting>();
-            options.Projections.Add(new MeetingViewProjection());
-        }
+public static class Config
+{
+    public static IServiceCollection AddMeeting(this IServiceCollection services) =>
+        services
+            .AddScoped<IMartenRepository<Meeting>, MartenRepository<Meeting>>()
+            .AddCommandHandler<CreateMeeting, HandleCreateMeeting>()
+            .AddCommandHandler<ScheduleMeeting, HandleScheduleMeeting>()
+            .AddQueryHandler<GetMeeting, MeetingView?, HandleGetMeeting>();
+
+    public static void ConfigureMarten(StoreOptions options)
+    {
+        options.Projections.SelfAggregate<Meeting>();
+        options.Projections.Add(new MeetingViewProjection());
     }
 }

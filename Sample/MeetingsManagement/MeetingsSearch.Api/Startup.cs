@@ -1,6 +1,12 @@
+using System.Net;
 using Core;
+using Core.Exceptions;
 using Core.Serialization.Newtonsoft;
 using Core.Streaming.Kafka;
+using Core.WebApi.Middlewares.ExceptionHandling;
+using Core.WebApi.OptimisticConcurrency;
+using Core.WebApi.Swagger;
+using Core.WebApi.Tracing.Correlation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,11 +33,13 @@ public class Startup
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "Meeting Search", Version = "v1" });
+            c.OperationFilter<MetadataOperationFilter>();
         });
 
         services.AddCoreServices()
             .AddKafkaConsumer()
-            .AddMeetingsSearch(config);
+            .AddMeetingsSearch(config)
+            .AddCorrelationIdMiddleware();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -41,19 +49,19 @@ public class Startup
             app.UseDeveloperExceptionPage();
         }
 
-        app.UseRouting();
-        app.UseEndpoints(endpoints => {
-            endpoints.MapControllers();
-        });
-
-        // Enable middleware to serve generated Swagger as a JSON endpoint.
-        app.UseSwagger();
-
-        // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meeting Management V1");
-            c.RoutePrefix = string.Empty;
-        });
+        app.UseExceptionHandlingMiddleware()
+            .UseCorrelationIdMiddleware()
+            .UseRouting()
+            .UseAuthorization()
+            .UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            })
+            .UseSwagger()
+            .UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meeting Search V1");
+                c.RoutePrefix = string.Empty;
+            });
     }
 }

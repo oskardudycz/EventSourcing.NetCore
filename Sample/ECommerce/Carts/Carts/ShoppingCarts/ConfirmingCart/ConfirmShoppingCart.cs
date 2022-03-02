@@ -2,20 +2,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace Carts.ShoppingCarts.ConfirmingCart;
 
-public class ConfirmShoppingCart: ICommand
+public record ConfirmShoppingCart(
+    Guid CartId
+): ICommand
 {
-    public Guid CartId { get; }
-
-    private ConfirmShoppingCart(Guid cartId)
-    {
-        CartId = cartId;
-    }
-
     public static ConfirmShoppingCart Create(Guid cartId)
     {
         if (cartId == Guid.Empty)
@@ -29,19 +25,27 @@ internal class HandleConfirmCart:
     ICommandHandler<ConfirmShoppingCart>
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
     public HandleConfirmCart(
-        IMartenRepository<ShoppingCart> cartRepository
+        IMartenRepository<ShoppingCart> cartRepository,
+        MartenOptimisticConcurrencyScope scope
     )
     {
         this.cartRepository = cartRepository;
+        this.scope = scope;
     }
 
-    public Task<Unit> Handle(ConfirmShoppingCart command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(ConfirmShoppingCart command, CancellationToken cancellationToken)
     {
-        return cartRepository.GetAndUpdate(
-            command.CartId,
-            cart => cart.Confirm(),
-            cancellationToken);
+        await scope.Do(expectedVersion =>
+            cartRepository.GetAndUpdate(
+                command.CartId,
+                cart => cart.Confirm(),
+                expectedVersion,
+                cancellationToken
+            )
+        );
+        return Unit.Value;
     }
 }

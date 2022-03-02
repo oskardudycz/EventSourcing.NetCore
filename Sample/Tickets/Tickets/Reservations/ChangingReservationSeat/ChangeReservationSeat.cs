@@ -2,23 +2,17 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Exceptions;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace Tickets.Reservations.ChangingReservationSeat;
 
-public class ChangeReservationSeat : ICommand
+public record ChangeReservationSeat(
+    Guid ReservationId,
+    Guid SeatId
+): ICommand
 {
-    public Guid ReservationId { get; }
-    public Guid SeatId { get; }
-
-    private ChangeReservationSeat(Guid reservationId, Guid seatId)
-    {
-        ReservationId = reservationId;
-        SeatId = seatId;
-    }
-
     public static ChangeReservationSeat Create(Guid? reservationId, Guid? seatId)
     {
         if (!reservationId.HasValue)
@@ -37,23 +31,27 @@ internal class HandleChangeReservationSeat:
     ICommandHandler<ChangeReservationSeat>
 {
     private readonly IMartenRepository<Reservation> repository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
     public HandleChangeReservationSeat(
-        IMartenRepository<Reservation> repository
+        IMartenRepository<Reservation> repository,
+        MartenOptimisticConcurrencyScope scope
     )
     {
         this.repository = repository;
+        this.scope = scope;
     }
 
     public async Task<Unit> Handle(ChangeReservationSeat command, CancellationToken cancellationToken)
     {
-        var reservation = await repository.Find(command.ReservationId, cancellationToken)
-                          ?? throw AggregateNotFoundException.For<Reservation>(command.ReservationId);
-
-        reservation.ChangeSeat(command.SeatId);
-
-        await repository.Update(reservation, cancellationToken);
-
+        await scope.Do(expectedVersion =>
+            repository.GetAndUpdate(
+                command.ReservationId,
+                reservation => reservation.ChangeSeat(command.SeatId),
+                expectedVersion,
+                cancellationToken
+            )
+        );
         return Unit.Value;
     }
 }

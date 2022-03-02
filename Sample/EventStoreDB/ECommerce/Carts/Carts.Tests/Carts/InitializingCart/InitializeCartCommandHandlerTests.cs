@@ -6,7 +6,6 @@ using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.InitializingCart;
 using Carts.Tests.Extensions.Reservations;
 using Carts.Tests.Stubs.Repositories;
-using Core.Testing;
 using FluentAssertions;
 using Xunit;
 

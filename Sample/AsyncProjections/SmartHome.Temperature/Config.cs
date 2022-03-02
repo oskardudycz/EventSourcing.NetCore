@@ -8,14 +8,13 @@ namespace SmartHome.Temperature;
 
 public static class Config
 {
-    public static void AddTemperaturesModule(this IServiceCollection services, IConfiguration config)
-    {
-        services.AddMarten(config, options =>
-        {
-            options.ConfigureTemperatureMeasurements();
-            options.ConfigureMotionSensors();
-        });
-        services.AddTemperatureMeasurements();
-        services.AddMotionSensors();
-    }
+    public static IServiceCollection AddTemperaturesModule(this IServiceCollection services, IConfiguration config) =>
+        services
+            .AddMarten(config, options =>
+            {
+                options.ConfigureTemperatureMeasurements();
+                options.ConfigureMotionSensors();
+            })
+            .AddTemperatureMeasurements()
+            .AddMotionSensors();
 }

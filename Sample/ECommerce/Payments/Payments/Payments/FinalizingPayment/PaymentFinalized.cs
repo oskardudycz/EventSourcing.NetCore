@@ -7,23 +7,13 @@ using Payments.Payments.CompletingPayment;
 
 namespace Payments.Payments.FinalizingPayment;
 
-public class PaymentFinalized: IExternalEvent
+public record PaymentFinalized(
+    Guid OrderId,
+    Guid PaymentId,
+    decimal Amount,
+    DateTime FinalizedAt
+): IExternalEvent
 {
-    public Guid OrderId { get; }
-
-    public Guid PaymentId { get; }
-
-    public decimal Amount { get; }
-
-    public DateTime FinalizedAt { get; }
-
-    private PaymentFinalized(Guid paymentId, Guid orderId, decimal amount, DateTime finalizedAt)
-    {
-        OrderId = orderId;
-        PaymentId = paymentId;
-        Amount = amount;
-        FinalizedAt = finalizedAt;
-    }
     public static PaymentFinalized Create(Guid paymentId, Guid orderId, decimal amount, DateTime finalizedAt)
     {
         if (paymentId == Guid.Empty)
@@ -38,7 +28,8 @@ public class PaymentFinalized: IExternalEvent
         return new PaymentFinalized(paymentId, orderId, amount, finalizedAt);
     }
 }
-public class TransformIntoPaymentFinalized :
+
+public class TransformIntoPaymentFinalized:
     IEventHandler<PaymentCompleted>
 {
     private readonly IEventBus eventBus;
@@ -55,13 +46,15 @@ public class TransformIntoPaymentFinalized :
 
     public async Task Handle(PaymentCompleted @event, CancellationToken cancellationToken)
     {
-        var payment = await querySession.LoadAsync<Payment>(@event.PaymentId, cancellationToken);
+        var (paymentId, completedAt) = @event;
+
+        var payment = await querySession.LoadAsync<Payment>(paymentId, cancellationToken);
 
         var externalEvent = PaymentFinalized.Create(
-            @event.PaymentId,
+            paymentId,
             payment!.OrderId,
             payment.Amount,
-            @event.CompletedAt
+            completedAt
         );
 
         await eventBus.Publish(externalEvent);

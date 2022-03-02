@@ -5,31 +5,14 @@ using Orders.Products;
 
 namespace Orders.Orders.InitializingOrder;
 
-public class OrderInitialized: IEvent
+public record OrderInitialized(
+    Guid OrderId,
+    Guid ClientId,
+    IReadOnlyList<PricedProductItem> ProductItems,
+    decimal TotalPrice,
+    DateTime InitializedAt
+): IEvent
 {
-    public Guid OrderId { get; }
-    public Guid ClientId { get; }
-
-    public IReadOnlyList<PricedProductItem> ProductItems { get; }
-
-    public decimal TotalPrice { get; }
-
-    public DateTime InitializedAt { get; }
-
-    private OrderInitialized(
-        Guid orderId,
-        Guid clientId,
-        IReadOnlyList<PricedProductItem> productItems,
-        decimal totalPrice,
-        DateTime initializedAt)
-    {
-        OrderId = orderId;
-        ClientId = clientId;
-        ProductItems = productItems;
-        TotalPrice = totalPrice;
-        InitializedAt = initializedAt;
-    }
-
     public static OrderInitialized Create(
         Guid orderId,
         Guid clientId,

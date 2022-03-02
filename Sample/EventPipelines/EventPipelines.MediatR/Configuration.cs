@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EventPipelines.MediatR
+namespace EventPipelines.MediatR;
+
+public static class Configuration
 {
-    public static class Configuration
-    {
-        public static IServiceCollection RouteEventsFromMediatR(this IServiceCollection services) =>
-            services.AddSingleton(typeof(INotificationHandler<>), typeof(MediatorEventRouter<>));
-    }
+    public static IServiceCollection RouteEventsFromMediatR(this IServiceCollection services) =>
+        services.AddSingleton(typeof(INotificationHandler<>), typeof(MediatorEventRouter<>));
 }

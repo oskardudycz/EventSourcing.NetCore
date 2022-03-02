@@ -11,32 +11,14 @@ using Marten;
 
 namespace Carts.ShoppingCarts.FinalizingCart;
 
-public class CartFinalized: IExternalEvent
+public record CartFinalized(
+    Guid CartId,
+    Guid ClientId,
+    IReadOnlyList<PricedProductItem> ProductItems,
+    decimal TotalPrice,
+    DateTime FinalizedAt
+): IExternalEvent
 {
-    public Guid CartId { get; }
-
-    public Guid ClientId { get; }
-
-    public IReadOnlyList<PricedProductItem> ProductItems { get; }
-
-    public decimal TotalPrice { get; }
-
-    public DateTime FinalizedAt { get; }
-
-    private CartFinalized(
-        Guid cartId,
-        Guid clientId,
-        IReadOnlyList<PricedProductItem> productItems,
-        decimal totalPrice,
-        DateTime finalizedAt)
-    {
-        CartId = cartId;
-        ClientId = clientId;
-        ProductItems = productItems;
-        TotalPrice = totalPrice;
-        FinalizedAt = finalizedAt;
-    }
-
     public static CartFinalized Create(
         Guid cartId,
         Guid clientId,
@@ -48,7 +30,7 @@ public class CartFinalized: IExternalEvent
     }
 }
 
-internal class HandleCartFinalized : IEventHandler<ShoppingCartConfirmed>
+internal class HandleCartFinalized: IEventHandler<ShoppingCartConfirmed>
 {
     private readonly IQuerySession querySession;
     private readonly IEventBus eventBus;
@@ -65,7 +47,7 @@ internal class HandleCartFinalized : IEventHandler<ShoppingCartConfirmed>
     public async Task Handle(ShoppingCartConfirmed @event, CancellationToken cancellationToken)
     {
         var cart = await querySession.LoadAsync<ShoppingCart>(@event.CartId, cancellationToken)
-                   ?? throw  AggregateNotFoundException.For<ShoppingCart>(@event.CartId);
+                   ?? throw AggregateNotFoundException.For<ShoppingCart>(@event.CartId);
 
         var externalEvent = CartFinalized.Create(
             @event.CartId,

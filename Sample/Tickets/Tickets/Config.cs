@@ -8,13 +8,12 @@ namespace Tickets;
 
 public static class Config
 {
-    public static void AddTicketsModule(this IServiceCollection services, IConfiguration config)
-    {
-        services.AddMarten(config, options =>
-        {
-            options.ConfigureReservations();
-        });
-        services.AddReservations();
-        services.AddMaintainance();
-    }
+    public static IServiceCollection AddTicketsModule(this IServiceCollection services, IConfiguration config) =>
+        services
+            .AddMarten(config, options =>
+            {
+                options.ConfigureReservations();
+            })
+            .AddReservations()
+            .AddMaintainance();
 }

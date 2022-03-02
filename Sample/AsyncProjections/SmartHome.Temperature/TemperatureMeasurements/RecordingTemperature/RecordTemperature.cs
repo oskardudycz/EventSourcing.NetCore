@@ -2,23 +2,17 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 
-public class RecordTemperature : ICommand
+public record RecordTemperature(
+    Guid MeasurementId,
+    decimal Temperature
+): ICommand
 {
-    public Guid MeasurementId { get; }
-
-    public decimal Temperature { get; }
-
-    private RecordTemperature(Guid measurementId, decimal temperature)
-    {
-        MeasurementId = measurementId;
-        Temperature = temperature;
-    }
-
     public static RecordTemperature Create(Guid measurementId, decimal temperature)
     {
         if (measurementId == Guid.Empty)
@@ -34,22 +28,29 @@ public class HandleRecordTemperature:
     ICommandHandler<RecordTemperature>
 {
     private readonly IMartenRepository<TemperatureMeasurement> repository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
     public HandleRecordTemperature(
-        IMartenRepository<TemperatureMeasurement> repository
+        IMartenRepository<TemperatureMeasurement> repository,
+        MartenOptimisticConcurrencyScope scope
     )
     {
         this.repository = repository;
+        this.scope = scope;
     }
 
     public async Task<Unit> Handle(RecordTemperature command, CancellationToken cancellationToken)
     {
-        var reservation = await repository.Find(command.MeasurementId, cancellationToken);
+        var (measurementId, temperature) = command;
 
-        reservation!.Record(command.Temperature);
-
-        await repository.Update(reservation, cancellationToken);
-
+        await scope.Do(expectedVersion =>
+            repository.GetAndUpdate(
+                measurementId,
+                reservation => reservation.Record(temperature),
+                expectedVersion,
+                cancellationToken
+            )
+        );
         return Unit.Value;
     }
 }

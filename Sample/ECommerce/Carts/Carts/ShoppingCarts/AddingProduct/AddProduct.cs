@@ -4,23 +4,17 @@ using System.Threading.Tasks;
 using Carts.Pricing;
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace Carts.ShoppingCarts.AddingProduct;
 
-public class AddProduct: ICommand
+public record AddProduct(
+    Guid CartId,
+    ProductItem ProductItem
+): ICommand
 {
-
-    public Guid CartId { get; }
-
-    public ProductItem ProductItem { get; }
-
-    private AddProduct(Guid cartId, ProductItem productItem)
-    {
-        CartId = cartId;
-        ProductItem = productItem;
-    }
     public static AddProduct Create(Guid cartId, ProductItem productItem)
     {
         if (cartId == Guid.Empty)
@@ -35,21 +29,30 @@ internal class HandleAddProduct:
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
     private readonly IProductPriceCalculator productPriceCalculator;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
     public HandleAddProduct(
         IMartenRepository<ShoppingCart> cartRepository,
-        IProductPriceCalculator productPriceCalculator
+        IProductPriceCalculator productPriceCalculator,
+        MartenOptimisticConcurrencyScope scope
     )
     {
         this.cartRepository = cartRepository;
         this.productPriceCalculator = productPriceCalculator;
+        this.scope = scope;
     }
 
-    public Task<Unit> Handle(AddProduct command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AddProduct command, CancellationToken cancellationToken)
     {
-        return cartRepository.GetAndUpdate(
-            command.CartId,
-            cart => cart.AddProduct(productPriceCalculator, command.ProductItem),
-            cancellationToken);
+        var (cartId, productItem) = command;
+
+        await scope.Do(expectedVersion =>
+            cartRepository.GetAndUpdate(
+                cartId,
+                cart => cart.AddProduct(productPriceCalculator, productItem),
+                expectedVersion,
+                cancellationToken)
+        );
+        return Unit.Value;
     }
 }

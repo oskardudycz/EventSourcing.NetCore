@@ -2,20 +2,19 @@
 using System.Threading.Tasks;
 using MediatR;
 
-namespace EventPipelines.MediatR
+namespace EventPipelines.MediatR;
+
+public class MediatorEventRouter<T> : INotificationHandler<T> where T : INotification
 {
-    public class MediatorEventRouter<T> : INotificationHandler<T> where T : INotification
+    private readonly IEventBus eventBus;
+
+    public MediatorEventRouter(IEventBus eventBus)
     {
-        private readonly IEventBus eventBus;
+        this.eventBus = eventBus;
+    }
 
-        public MediatorEventRouter(IEventBus eventBus)
-        {
-            this.eventBus = eventBus;
-        }
-
-        public async Task Handle(T notification, CancellationToken cancellationToken)
-        {
-            await eventBus.Publish(notification, cancellationToken);
-        }
+    public async Task Handle(T notification, CancellationToken cancellationToken)
+    {
+        await eventBus.Publish(notification, cancellationToken);
     }
 }
