@@ -7,15 +7,10 @@ using Marten;
 
 namespace Carts.ShoppingCarts.GettingCartById;
 
-public class GetCartById : IQuery<ShoppingCartDetails>
+public record GetCartById(
+    Guid CartId
+    ) : IQuery<ShoppingCartDetails>
 {
-    public Guid CartId { get; }
-
-    private GetCartById(Guid cartId)
-    {
-        CartId = cartId;
-    }
-
     public static GetCartById Create(Guid? cartId)
     {
         if (cartId == null || cartId == Guid.Empty)

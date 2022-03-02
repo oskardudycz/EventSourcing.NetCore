@@ -7,17 +7,11 @@ using Marten.Pagination;
 
 namespace Carts.ShoppingCarts.GettingCarts;
 
-public class GetCarts : IQuery<IPagedList<ShoppingCartShortInfo>>
+public record GetCarts(
+    int PageNumber,
+    int PageSize
+): IQuery<IPagedList<ShoppingCartShortInfo>>
 {
-    public int PageNumber { get; }
-    public int PageSize { get; }
-
-    private GetCarts(int pageNumber, int pageSize)
-    {
-        PageNumber = pageNumber;
-        PageSize = pageSize;
-    }
-
     public static GetCarts Create(int? pageNumber = 1, int? pageSize = 20)
     {
         if (pageNumber is null or <= 0)
@@ -29,7 +23,7 @@ public class GetCarts : IQuery<IPagedList<ShoppingCartShortInfo>>
     }
 }
 
-internal class HandleGetCarts :
+internal class HandleGetCarts:
     IQueryHandler<GetCarts, IPagedList<ShoppingCartShortInfo>>
 {
     private readonly IDocumentSession querySession;
@@ -41,7 +35,9 @@ internal class HandleGetCarts :
 
     public Task<IPagedList<ShoppingCartShortInfo>> Handle(GetCarts request, CancellationToken cancellationToken)
     {
+        var (pageNumber, pageSize) = request;
+
         return querySession.Query<ShoppingCartShortInfo>()
-            .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
+            .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 }

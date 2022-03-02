@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 using Core.Events;
 using Core.Events.NoMediator;
 using Core.Projections;
-using Core.Serialization.Newtonsoft;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 namespace Core.Marten.ExternalProjections;
 
@@ -15,7 +13,6 @@ public class MartenExternalProjection<TEvent, TView>: INoMediatorEventHandler<St
     where TView : IVersionedProjection
     where TEvent : notnull
 {
-    private readonly string projectionName = typeof(TView).Name;
     private readonly IDocumentSession session;
     private readonly Func<TEvent, Guid> getId;
 

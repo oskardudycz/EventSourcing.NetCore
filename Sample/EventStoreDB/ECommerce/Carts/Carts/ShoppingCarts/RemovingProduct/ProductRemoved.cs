@@ -4,18 +4,11 @@ using Core.Events;
 
 namespace Carts.ShoppingCarts.RemovingProduct;
 
-public class ProductRemoved: IEvent
+public record ProductRemoved(
+    Guid CartId,
+    PricedProductItem ProductItem
+): IEvent
 {
-    public Guid CartId { get; }
-
-    public PricedProductItem ProductItem { get; }
-
-    public ProductRemoved(Guid cartId, PricedProductItem productItem)
-    {
-        CartId = cartId;
-        ProductItem = productItem;
-    }
-
     public static ProductRemoved Create(Guid cartId, PricedProductItem productItem)
     {
         if (cartId == Guid.Empty)
