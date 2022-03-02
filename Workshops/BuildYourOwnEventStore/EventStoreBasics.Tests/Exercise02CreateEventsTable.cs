@@ -1,7 +1,7 @@
 using System;
-using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Npgsql;
+using Tools.Tools;
 using Xunit;
 
 namespace EventStoreBasics.Tests;

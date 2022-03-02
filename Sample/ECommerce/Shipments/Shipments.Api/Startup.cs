@@ -4,6 +4,9 @@ using Core.Exceptions;
 using Core.Serialization.Newtonsoft;
 using Core.Streaming.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
+using Core.WebApi.OptimisticConcurrency;
+using Core.WebApi.Swagger;
+using Core.WebApi.Tracing.Correlation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -30,14 +33,16 @@ public class Startup
         services.AddControllers();
 
         services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo {Title = "Shipments", Version = "v1"});
-        });
-
-        services
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Shipments", Version = "v1" });
+                c.OperationFilter<MetadataOperationFilter>();
+            })
             .AddKafkaProducer()
             .AddCoreServices()
-            .AddShipmentsModule(config);
+            .AddShipmentsModule(config)
+            .AddCorrelationIdMiddleware();
+        // TODO: Add optimistic concurrency here
+        // .AddOptimisticConcurrencyMiddleware();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -48,28 +53,27 @@ public class Startup
         }
 
         app.UseExceptionHandlingMiddleware(exception => exception switch
-        {
-            AggregateNotFoundException _ => HttpStatusCode.NotFound,
-            _ => HttpStatusCode.InternalServerError
-        });
-
-        app.UseRouting();
-
-        app.UseAuthorization();
-
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
-
-        app.UseSwagger();
-
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Shipments V1");
-            c.RoutePrefix = string.Empty;
-        });
-
-        app.ConfigureShipmentsModule();
+            {
+                AggregateNotFoundException _ => HttpStatusCode.NotFound,
+                // TODO: Add here EF concurrency exception
+                // ConcurrencyException => HttpStatusCode.PreconditionFailed,
+                _ => HttpStatusCode.InternalServerError
+            })
+            .UseCorrelationIdMiddleware()
+            // TODO: Add optimistic concurrency here
+            // .UseOptimisticConcurrencyMiddleware()
+            .UseRouting()
+            .UseAuthorization()
+            .UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            })
+            .UseSwagger()
+            .UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Shipments V1");
+                c.RoutePrefix = string.Empty;
+            })
+            .ConfigureShipmentsModule();
     }
 }

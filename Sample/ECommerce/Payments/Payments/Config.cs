@@ -7,12 +7,12 @@ namespace Payments;
 
 public static class Config
 {
-    public static void AddPaymentsModule(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddPaymentsModule(this IServiceCollection services, IConfiguration config)
     {
         services.AddMarten(config, options =>
         {
             options.ConfigurePayments();
         });
-        services.AddPayments();
+        return services.AddPayments();
     }
 }

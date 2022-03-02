@@ -8,7 +8,6 @@ using Core.Events.External;
 using Core.Requests;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Shipments.Api.Tests.Core;
 
 namespace Core.Testing;
 

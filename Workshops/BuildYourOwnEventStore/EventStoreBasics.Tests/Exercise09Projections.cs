@@ -1,11 +1,11 @@
 using System;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using EventStoreBasics.Tests.Tools;
 using FluentAssertions;
 using Npgsql;
 using SimpleMigrations;
 using SimpleMigrations.DatabaseProvider;
+using Tools.Tools;
 using Xunit;
 
 namespace EventStoreBasics.Tests;

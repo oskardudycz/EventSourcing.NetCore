@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Carts.Carts.Products;
 using Carts.Pricing;
+using Carts.ShoppingCarts.Products;
 
 namespace Carts.Tests.Stubs.Products;
 

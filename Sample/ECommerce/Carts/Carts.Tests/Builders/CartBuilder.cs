@@ -1,12 +1,12 @@
 using System;
+using Carts.ShoppingCarts;
 using Core.Aggregates;
-using Carts.Carts;
 
 namespace Carts.Tests.Builders;
 
 internal class CartBuilder
 {
-    private Func<Cart> build  = () => new Cart();
+    private Func<ShoppingCart> build  = () => new ShoppingCart();
 
     public CartBuilder Initialized()
     {
@@ -14,7 +14,7 @@ internal class CartBuilder
         var clientId = Guid.NewGuid();
 
         // When
-        var cart = Cart.Initialize(
+        var cart = ShoppingCart.Initialize(
             cartId,
             clientId
         );
@@ -26,7 +26,7 @@ internal class CartBuilder
 
     public static CartBuilder Create() => new();
 
-    public Cart Build()
+    public ShoppingCart Build()
     {
         var cart = build();
         ((IAggregate)cart).DequeueUncommittedEvents();

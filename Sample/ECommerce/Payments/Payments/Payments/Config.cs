@@ -14,29 +14,23 @@ namespace Payments.Payments;
 
 internal static class PaymentsConfig
 {
-    internal static void AddPayments(this IServiceCollection services)
-    {
+    internal static IServiceCollection AddPayments(this IServiceCollection services) =>
         services.AddScoped<IMartenRepository<Payment>, MartenRepository<Payment>>()
             .AddCommandHandlers()
             .AddEventHandlers();
-    }
 
-    private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
-    {
-        return services
+    private static IServiceCollection AddCommandHandlers(this IServiceCollection services) =>
+        services
             .AddCommandHandler<RequestPayment, HandleRequestPayment>()
             .AddCommandHandler<CompletePayment, HandleCompletePayment>()
             .AddCommandHandler<DiscardPayment, HandleDiscardPayment>()
             .AddCommandHandler<TimeOutPayment, HandleTimeOutPayment>();
-    }
 
-    private static IServiceCollection AddEventHandlers(this IServiceCollection services)
-    {
-        return services
+    private static IServiceCollection AddEventHandlers(this IServiceCollection services) =>
+        services
             .AddEventHandler<PaymentCompleted, TransformIntoPaymentFinalized>()
             .AddEventHandler<PaymentDiscarded, TransformIntoPaymentFailed>()
             .AddEventHandler<PaymentTimedOut, TransformIntoPaymentFailed>();
-    }
 
     internal static void ConfigurePayments(this StoreOptions options)
     {

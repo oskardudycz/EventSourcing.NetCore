@@ -3,7 +3,6 @@ using Core.Events;
 using Core.Marten.Repository;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
-using Orders.Carts.FinalizingCart;
 using Orders.Orders.CancellingOrder;
 using Orders.Orders.CompletingOrder;
 using Orders.Orders.InitializingOrder;
@@ -11,6 +10,7 @@ using Orders.Orders.RecordingOrderPayment;
 using Orders.Payments.FinalizingPayment;
 using Orders.Shipments.OutOfStockProduct;
 using Orders.Shipments.SendingPackage;
+using Orders.ShoppingCarts.FinalizingCart;
 
 namespace Orders.Orders;
 

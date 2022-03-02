@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Carts.Carts;
-using Carts.Carts.InitializingCart;
+using Carts.ShoppingCarts;
+using Carts.ShoppingCarts.InitializingCart;
 using Core.Events;
 
 namespace Carts.Tests.Builders;
@@ -15,7 +15,7 @@ internal class CartBuilder
         var cartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
 
-        eventsToApply.Enqueue(new CartInitialized(cartId, clientId, ShoppingCartStatus.Pending));
+        eventsToApply.Enqueue(new ShoppingCartInitialized(cartId, clientId, ShoppingCartStatus.Pending));
 
         return this;
     }

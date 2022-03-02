@@ -1,11 +1,11 @@
-using FluentAssertions;
-using Carts.Carts;
-using Carts.Carts.ConfirmingCart;
+using Carts.ShoppingCarts;
+using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.Tests.Builders;
 using Core.Testing;
+using FluentAssertions;
 using Xunit;
 
-namespace Carts.Tests.Carts;
+namespace Carts.Tests.Carts.ConfirmingCart;
 
 public class ConfirmCartTests
 {
@@ -25,10 +25,10 @@ public class ConfirmCartTests
         cart.Status.Should().Be(ShoppingCartStatus.Confirmed);
         cart.Version.Should().Be(2);
 
-        var @event = cart.PublishedEvent<CartConfirmed>();
+        var @event = cart.PublishedEvent<ShoppingCartConfirmed>();
 
         @event.Should().NotBeNull();
-        @event.Should().BeOfType<CartConfirmed>();
+        @event.Should().BeOfType<ShoppingCartConfirmed>();
         @event!.CartId.Should().Be(cart.Id);
     }
 }

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Core.Commands;
 using Core.Events;
 using Core.Ids;
-using Orders.Carts.FinalizingCart;
 using Orders.Orders.CancellingOrder;
 using Orders.Orders.CompletingOrder;
 using Orders.Orders.InitializingOrder;
@@ -15,6 +14,7 @@ using Orders.Payments.RequestingPayment;
 using Orders.Products;
 using Orders.Shipments.OutOfStockProduct;
 using Orders.Shipments.SendingPackage;
+using Orders.ShoppingCarts.FinalizingCart;
 
 namespace Orders.Orders;
 

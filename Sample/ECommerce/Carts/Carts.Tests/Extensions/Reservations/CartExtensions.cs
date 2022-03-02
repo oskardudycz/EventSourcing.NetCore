@@ -1,6 +1,6 @@
 using System;
-using Carts.Carts;
-using Carts.Carts.InitializingCart;
+using Carts.ShoppingCarts;
+using Carts.ShoppingCarts.InitializingCart;
 using Core.Testing;
 using FluentAssertions;
 
@@ -8,35 +8,35 @@ namespace Carts.Tests.Extensions.Reservations;
 
 internal static class CartExtensions
 {
-    public static Cart IsInitializedCartWith(
-        this Cart cart,
+    public static ShoppingCart IsInitializedCartWith(
+        this ShoppingCart shoppingCart,
         Guid id,
         Guid clientId)
     {
 
-        cart.Id.Should().Be(id);
-        cart.ClientId.Should().Be(clientId);
-        cart.Status.Should().Be(CartStatus.Pending);
-        cart.ProductItems.Should().BeEmpty();
-        cart.TotalPrice.Should().Be(0);
-        cart.Version.Should().Be(1);
+        shoppingCart.Id.Should().Be(id);
+        shoppingCart.ClientId.Should().Be(clientId);
+        shoppingCart.Status.Should().Be(ShoppingCartStatus.Pending);
+        shoppingCart.ProductItems.Should().BeEmpty();
+        shoppingCart.TotalPrice.Should().Be(0);
+        shoppingCart.Version.Should().Be(1);
 
-        return cart;
+        return shoppingCart;
     }
 
-    public static Cart HasCartInitializedEventWith(
-        this Cart cart,
+    public static ShoppingCart HasCartInitializedEventWith(
+        this ShoppingCart shoppingCart,
         Guid id,
         Guid clientId)
     {
-        var @event = cart.PublishedEvent<CartInitialized>();
+        var @event = shoppingCart.PublishedEvent<ShoppingCartInitialized>();
 
         @event.Should().NotBeNull();
-        @event.Should().BeOfType<CartInitialized>();
+        @event.Should().BeOfType<ShoppingCartInitialized>();
         @event!.CartId.Should().Be(id);
         @event.ClientId.Should().Be(clientId);
-        @event.CartStatus.Should().Be(CartStatus.Pending);
+        @event.ShoppingCartStatus.Should().Be(ShoppingCartStatus.Pending);
 
-        return cart;
+        return shoppingCart;
     }
 }

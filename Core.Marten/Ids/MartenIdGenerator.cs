@@ -1,8 +1,9 @@
 using System;
+using Core.Ids;
 using Marten;
 using Marten.Schema.Identity;
 
-namespace Core.Ids;
+namespace Core.Marten.Ids;
 
 public class MartenIdGenerator : IIdGenerator
 {

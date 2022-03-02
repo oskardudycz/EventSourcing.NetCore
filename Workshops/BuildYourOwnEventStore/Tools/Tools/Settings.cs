@@ -1,4 +1,4 @@
-namespace EventStoreBasics.Tests.Tools;
+namespace Tools.Tools;
 
 public static class Settings
 {
