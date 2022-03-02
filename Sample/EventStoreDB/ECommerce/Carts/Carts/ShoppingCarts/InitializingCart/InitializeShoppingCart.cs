@@ -7,18 +7,11 @@ using MediatR;
 
 namespace Carts.ShoppingCarts.InitializingCart;
 
-public class InitializeShoppingCart: ICommand
+public record InitializeShoppingCart(
+    Guid CartId,
+    Guid ClientId
+): ICommand
 {
-    public Guid CartId { get; }
-
-    public Guid ClientId { get; }
-
-    private InitializeShoppingCart(Guid cartId, Guid clientId)
-    {
-        CartId = cartId;
-        ClientId = clientId;
-    }
-
     public static InitializeShoppingCart Create(Guid? cartId, Guid? clientId)
     {
         if (cartId == null || cartId == Guid.Empty)
