@@ -7,17 +7,11 @@ using Marten.Pagination;
 
 namespace Tickets.Reservations.GettingReservations;
 
-public class GetReservations: IQuery<IPagedList<ReservationShortInfo>>
+public record GetReservations(
+    int PageNumber,
+    int PageSize
+): IQuery<IPagedList<ReservationShortInfo>>
 {
-    public int PageNumber { get; }
-    public int PageSize { get; }
-
-    private GetReservations(int pageNumber, int pageSize)
-    {
-        PageNumber = pageNumber;
-        PageSize = pageSize;
-    }
-
     public static GetReservations Create(int pageNumber = 1, int pageSize = 20)
     {
         if (pageNumber <= 0)
@@ -39,10 +33,10 @@ internal class HandleGetReservations:
         this.querySession = querySession;
     }
 
-    public Task<IPagedList<ReservationShortInfo>> Handle(GetReservations request,
-        CancellationToken cancellationToken)
-    {
-        return querySession.Query<ReservationShortInfo>()
-            .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
-    }
+    public Task<IPagedList<ReservationShortInfo>> Handle(
+        GetReservations query,
+        CancellationToken cancellationToken
+    ) =>
+        querySession.Query<ReservationShortInfo>()
+            .ToPagedListAsync(query.PageNumber, query.PageSize, cancellationToken);
 }

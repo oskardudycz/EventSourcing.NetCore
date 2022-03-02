@@ -10,10 +10,9 @@ namespace MeetingsSearch.Meetings;
 
 public static class Config
 {
-    public static void AddMeeting(this IServiceCollection services)
-    {
-        services.AddScoped<IElasticSearchRepository<Meeting>, ElasticSearchRepository<Meeting>>();
-        services.AddEventHandler<MeetingCreated, HandleMeetingCreated>();
-        services.AddQueryHandler<SearchMeetings, IReadOnlyCollection<Meeting>, HandleSearchMeetings>();
-    }
+    public static IServiceCollection AddMeeting(this IServiceCollection services) =>
+        services
+            .AddScoped<IElasticSearchRepository<Meeting>, ElasticSearchRepository<Meeting>>()
+            .AddEventHandler<MeetingCreated, HandleMeetingCreated>()
+            .AddQueryHandler<SearchMeetings, IReadOnlyCollection<Meeting>, HandleSearchMeetings>();
 }

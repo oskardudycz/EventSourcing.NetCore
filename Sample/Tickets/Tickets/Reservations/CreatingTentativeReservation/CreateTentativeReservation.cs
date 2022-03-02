@@ -8,17 +8,11 @@ using Tickets.Reservations.NumberGeneration;
 
 namespace Tickets.Reservations.CreatingTentativeReservation;
 
-public class CreateTentativeReservation : ICommand
+public record CreateTentativeReservation(
+    Guid ReservationId,
+    Guid SeatId
+    ) : ICommand
 {
-    public Guid ReservationId { get; }
-    public Guid SeatId { get; }
-
-    private CreateTentativeReservation(Guid reservationId, Guid seatId)
-    {
-        ReservationId = reservationId;
-        SeatId = seatId;
-    }
-
     public static CreateTentativeReservation Create(Guid? reservationId, Guid? seatId)
     {
         if (!reservationId.HasValue)

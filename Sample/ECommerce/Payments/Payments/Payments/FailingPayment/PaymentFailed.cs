@@ -8,44 +8,21 @@ using Payments.Payments.TimingOutPayment;
 
 namespace Payments.Payments.FailingPayment;
 
-public class PaymentFailed: IExternalEvent
+public record PaymentFailed(
+    Guid OrderId,
+    Guid PaymentId,
+    decimal Amount,
+    DateTime FailedAt,
+    PaymentFailReason FailReason
+): IExternalEvent
 {
-    public Guid OrderId { get; }
-
-    public Guid PaymentId { get; }
-
-    public decimal Amount { get; }
-
-    public DateTime FailedAt { get; }
-
-    public PaymentFailReason FailReason { get; }
-
-    private PaymentFailed(
-        Guid paymentId,
-        Guid orderId,
-        decimal amount,
-        DateTime failedAt,
-        PaymentFailReason failReason
-    )
-    {
-        PaymentId = paymentId;
-        OrderId = orderId;
-        Amount = amount;
-        FailedAt = failedAt;
-        FailReason = failReason;
-    }
-
-
     public static PaymentFailed Create(
         Guid paymentId,
         Guid orderId,
         decimal amount,
         DateTime failedAt,
         PaymentFailReason failReason
-    )
-    {
-        return new(paymentId, orderId, amount, failedAt, failReason);
-    }
+    ) => new (paymentId, orderId, amount, failedAt, failReason);
 }
 
 

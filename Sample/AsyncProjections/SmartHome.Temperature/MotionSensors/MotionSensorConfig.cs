@@ -12,24 +12,18 @@ namespace SmartHome.Temperature.MotionSensors;
 
 public static class MotionSensorConfig
 {
-    internal static void AddMotionSensors(this IServiceCollection services)
-    {
-        services.AddScoped<IMartenRepository<MotionSensor>, MartenRepository<MotionSensor>>();
+    internal static IServiceCollection AddMotionSensors(this IServiceCollection services) =>
+        services
+            .AddScoped<IMartenRepository<MotionSensor>, MartenRepository<MotionSensor>>()
+            .AddCommandHandlers()
+            .AddQueryHandlers();
 
-        AddCommandHandlers(services);
-        AddQueryHandlers(services);
-    }
-
-    private static void AddCommandHandlers(IServiceCollection services)
-    {
+    private static IServiceCollection AddCommandHandlers(this IServiceCollection services) =>
         services.AddCommandHandler<InstallMotionSensor, HandleInstallMotionSensor>()
             .AddCommandHandler<RebuildMotionSensorsViews, HandleRebuildMotionSensorsViews>();
-    }
 
-    private static void AddQueryHandlers(IServiceCollection services)
-    {
+    private static IServiceCollection AddQueryHandlers(this IServiceCollection services) =>
         services.AddQueryHandler<GetMotionSensors, IReadOnlyList<MotionSensor>, HandleGetMotionSensors>();
-    }
 
     internal static void ConfigureMotionSensors(this StoreOptions options)
     {

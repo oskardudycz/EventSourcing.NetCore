@@ -7,15 +7,10 @@ using MediatR;
 
 namespace SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
 
-public class StartTemperatureMeasurement: ICommand
+public record StartTemperatureMeasurement(
+    Guid MeasurementId
+): ICommand
 {
-    public Guid MeasurementId { get; }
-
-    private StartTemperatureMeasurement(Guid measurementId)
-    {
-        MeasurementId = measurementId;
-    }
-
     public static StartTemperatureMeasurement Create(Guid measurementId)
     {
         if (measurementId == Guid.Empty)

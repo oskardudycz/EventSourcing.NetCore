@@ -3,31 +3,20 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 using Orders.Products;
 
 namespace Orders.Orders.InitializingOrder;
 
-public class InitializeOrder: ICommand
+public record InitializeOrder(
+    Guid OrderId,
+    Guid ClientId,
+    IReadOnlyList<PricedProductItem> ProductItems,
+    decimal TotalPrice
+): ICommand
 {
-    public Guid OrderId { get; }
-    public Guid ClientId { get; }
-    public IReadOnlyList<PricedProductItem> ProductItems { get; }
-    public decimal TotalPrice { get; }
-
-    private InitializeOrder(
-        Guid orderId,
-        Guid clientId,
-        IReadOnlyList<PricedProductItem> productItems,
-        decimal totalPrice)
-    {
-        OrderId = orderId;
-        ClientId = clientId;
-        ProductItems = productItems;
-        TotalPrice = totalPrice;
-    }
-
     public static InitializeOrder Create(
         Guid? orderId,
         Guid? clientId,
@@ -47,22 +36,32 @@ public class InitializeOrder: ICommand
         return new InitializeOrder(orderId.Value, clientId.Value, productItems, totalPrice.Value);
     }
 }
-public class HandleInitializeOrder :
+
+public class HandleInitializeOrder:
     ICommandHandler<InitializeOrder>
 {
     private readonly IMartenRepository<Order> orderRepository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
-    public HandleInitializeOrder(IMartenRepository<Order> orderRepository)
+    public HandleInitializeOrder(
+        IMartenRepository<Order> orderRepository,
+        MartenOptimisticConcurrencyScope scope
+    )
     {
         this.orderRepository = orderRepository;
+        this.scope = scope;
     }
 
     public async Task<Unit> Handle(InitializeOrder command, CancellationToken cancellationToken)
     {
-        var order = Order.Initialize(command.OrderId, command.ClientId, command.ProductItems, command.TotalPrice);
+        var (orderId, clientId, productItems, totalPrice) = command;
 
-        await orderRepository.Add(order, cancellationToken);
-
+        await scope.Do(_ =>
+            orderRepository.Add(
+                Order.Initialize(orderId, clientId, productItems, totalPrice),
+                cancellationToken
+            )
+        );
         return Unit.Value;
     }
 }

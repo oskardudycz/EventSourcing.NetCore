@@ -7,17 +7,10 @@ using MediatR;
 
 namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 
-public class InstallMotionSensor : ICommand
+public record InstallMotionSensor(
+    Guid MotionSensorId
+) : ICommand
 {
-    public Guid MotionSensorId { get; }
-
-    private InstallMotionSensor(
-        Guid motionSensorId
-    )
-    {
-        MotionSensorId = motionSensorId;
-    }
-
     public static InstallMotionSensor Create(
         Guid motionSensorId
     )

@@ -61,7 +61,7 @@ public class Reservation : Aggregate
         if(Status != ReservationStatus.Tentative)
             throw new InvalidOperationException($"Changing seat for the reservation in '{Status}' status is not allowed.");
 
-        var @event = ReservationSeatChanged.Create(Id, newSeatId);
+        var @event = new ReservationSeatChanged(Id, newSeatId);
 
         Enqueue(@event);
         Apply(@event);
@@ -72,7 +72,7 @@ public class Reservation : Aggregate
         if(Status != ReservationStatus.Tentative)
             throw new InvalidOperationException($"Only tentative reservation can be confirmed (current status: {Status}.");
 
-        var @event = ReservationConfirmed.Create(Id);
+        var @event = new ReservationConfirmed(Id);
 
         Enqueue(@event);
         Apply(@event);
@@ -83,7 +83,7 @@ public class Reservation : Aggregate
         if(Status != ReservationStatus.Tentative)
             throw new InvalidOperationException($"Only tentative reservation can be cancelled (current status: {Status}).");
 
-        var @event = ReservationCancelled.Create(Id);
+        var @event = new ReservationCancelled(Id);
 
         Enqueue(@event);
         Apply(@event);

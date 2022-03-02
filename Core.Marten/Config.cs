@@ -3,11 +3,9 @@ using System.Threading;
 using Core.Ids;
 using Core.Marten.Ids;
 using Core.Marten.OptimisticConcurrency;
-using Core.Marten.Serialization;
 using Core.Threading;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
-using Marten.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Weasel.Core;
@@ -39,6 +37,7 @@ public static class MartenConfigExtensions
 
         services
             .AddScoped<IIdGenerator, MartenIdGenerator>()
+            .AddScoped<MartenOptimisticConcurrencyScope, MartenOptimisticConcurrencyScope>()
             .AddScoped<MartenExpectedStreamVersionProvider, MartenExpectedStreamVersionProvider>()
             .AddScoped<MartenNextStreamVersionProvider, MartenNextStreamVersionProvider>();
 

@@ -2,23 +2,17 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace Orders.Orders.CancellingOrder;
 
-public class CancelOrder: ICommand
+public record CancelOrder(
+    Guid OrderId,
+    OrderCancellationReason CancellationReason
+): ICommand
 {
-    public Guid OrderId { get; }
-
-    public OrderCancellationReason CancellationReason { get; }
-
-    private CancelOrder(Guid orderId, OrderCancellationReason cancellationReason)
-    {
-        OrderId = orderId;
-        CancellationReason = cancellationReason;
-    }
-
     public static CancelOrder Create(Guid? orderId, OrderCancellationReason? cancellationReason)
     {
         if (!orderId.HasValue)
@@ -31,21 +25,31 @@ public class CancelOrder: ICommand
     }
 }
 
-public class HandleCancelOrder :
+public class HandleCancelOrder:
     ICommandHandler<CancelOrder>
 {
     private readonly IMartenRepository<Order> orderRepository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
-    public HandleCancelOrder(IMartenRepository<Order> orderRepository)
+    public HandleCancelOrder(
+        IMartenRepository<Order> orderRepository,
+        MartenOptimisticConcurrencyScope scope
+    )
     {
         this.orderRepository = orderRepository;
+        this.scope = scope;
     }
 
-    public Task<Unit> Handle(CancelOrder command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CancelOrder command, CancellationToken cancellationToken)
     {
-        return orderRepository.GetAndUpdate(
-            command.OrderId,
-            order => order.Cancel(command.CancellationReason),
-            cancellationToken);
+        await scope.Do(expectedVersion =>
+            orderRepository.GetAndUpdate(
+                command.OrderId,
+                order => order.Cancel(command.CancellationReason),
+                expectedVersion,
+                cancellationToken
+            )
+        );
+        return Unit.Value;
     }
 }

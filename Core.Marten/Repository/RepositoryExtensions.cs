@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.Exceptions;
-using MediatR;
 
 namespace Core.Marten.Repository;
 
@@ -20,19 +19,18 @@ public static class RepositoryExtensions
         return entity ?? throw AggregateNotFoundException.For<T>(id);
     }
 
-    public static async Task<Unit> GetAndUpdate<T>(
+    public static async Task<long> GetAndUpdate<T>(
         this IMartenRepository<T> repository,
         Guid id,
         Action<T> action,
-        CancellationToken cancellationToken
+        long? expectedVersion = null,
+        CancellationToken cancellationToken = default
     ) where T : class, IAggregate
     {
         var entity = await repository.Get(id, cancellationToken);
 
         action(entity);
 
-        await repository.Update(entity, cancellationToken);
-
-        return Unit.Value;
+        return await repository.Update(entity, expectedVersion, cancellationToken);
     }
 }

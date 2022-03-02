@@ -1,25 +1,14 @@
 using System;
 using Core.Events;
-using Newtonsoft.Json;
 
 namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 
-public class TemperatureRecorded : IEvent
+public record TemperatureRecorded(
+    Guid MeasurementId,
+    decimal Temperature,
+    DateTimeOffset MeasuredAt
+): IEvent
 {
-    public Guid MeasurementId { get; }
-
-    public decimal Temperature { get; }
-
-    public DateTimeOffset MeasuredAt { get; }
-
-    [JsonConstructor]
-    private TemperatureRecorded(Guid measurementId, decimal temperature, DateTimeOffset measuredAt)
-    {
-        MeasurementId = measurementId;
-        Temperature = temperature;
-        MeasuredAt = measuredAt;
-    }
-
     public static TemperatureRecorded Create(Guid measurementId, decimal temperature)
     {
         if (measurementId == Guid.Empty)

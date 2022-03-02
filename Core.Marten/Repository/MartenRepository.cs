@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.Events;
-using Core.Marten.OptimisticConcurrency;
 using Marten;
 
 namespace Core.Marten.Repository;
@@ -11,35 +10,29 @@ namespace Core.Marten.Repository;
 public interface IMartenRepository<T> where T : class, IAggregate
 {
     Task<T?> Find(Guid id, CancellationToken cancellationToken);
-    Task Add(T aggregate, CancellationToken cancellationToken);
-    Task Update(T aggregate, CancellationToken cancellationToken);
-    Task Delete(T aggregate, CancellationToken cancellationToken);
+    Task<long> Add(T aggregate, CancellationToken cancellationToken);
+    Task<long> Update(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default);
+    Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default);
 }
 
 public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggregate
 {
     private readonly IDocumentSession documentSession;
     private readonly IEventBus eventBus;
-    private readonly MartenExpectedStreamVersionProvider expectedStreamVersionProvider;
-    private readonly MartenNextStreamVersionProvider nextStreamVersionProvider;
 
     public MartenRepository(
         IDocumentSession documentSession,
-        IEventBus eventBus,
-        MartenExpectedStreamVersionProvider expectedStreamVersionProvider,
-        MartenNextStreamVersionProvider nextStreamVersionProvider
+        IEventBus eventBus
     )
     {
         this.documentSession = documentSession;
         this.eventBus = eventBus;
-        this.expectedStreamVersionProvider = expectedStreamVersionProvider;
-        this.nextStreamVersionProvider = nextStreamVersionProvider;
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         documentSession.Events.AggregateStreamAsync<T>(id, token: cancellationToken);
 
-    public async Task Add(T aggregate, CancellationToken cancellationToken)
+    public async Task<long> Add(T aggregate, CancellationToken cancellationToken)
     {
         var events = aggregate.DequeueUncommittedEvents();
 
@@ -48,34 +41,32 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
             events
         );
 
-        nextStreamVersionProvider.Set(events.Length);
         await documentSession.SaveChangesAsync(cancellationToken);
         await eventBus.Publish(events);
+
+        return events.Length;
     }
 
-    public async Task Update(T aggregate, CancellationToken cancellationToken)
+    public async Task<long> Update(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
     {
         var events = aggregate.DequeueUncommittedEvents();
 
-        var nextVersion = GetExpectedStreamVersion() + events.Length;
+        var nextVersion = expectedVersion.HasValue ?
+            expectedVersion.Value + events.Length
+            : aggregate.Version;
 
         documentSession.Events.Append(
             aggregate.Id,
-            nextVersion,
+            aggregate.Version,
             events
         );
 
-        nextStreamVersionProvider.Set(nextVersion);
         await documentSession.SaveChangesAsync(cancellationToken);
         await eventBus.Publish(events);
+
+        return nextVersion;
     }
 
-    public Task Delete(T aggregate, CancellationToken cancellationToken) =>
-        Update(aggregate, cancellationToken);
-
-
-    private long GetExpectedStreamVersion() =>
-        expectedStreamVersionProvider.Value ??
-        throw new ArgumentNullException(nameof(expectedStreamVersionProvider.Value),
-            "Stream revision was not provided.");
+    public Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default) =>
+        Update(aggregate, expectedVersion, cancellationToken);
 }

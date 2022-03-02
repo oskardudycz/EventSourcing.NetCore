@@ -5,32 +5,14 @@ using Orders.Products;
 
 namespace Orders.Orders.RecordingOrderPayment;
 
-public class OrderPaymentRecorded: IEvent
+public record OrderPaymentRecorded(
+    Guid OrderId,
+    Guid PaymentId,
+    IReadOnlyList<PricedProductItem> ProductItems,
+    decimal Amount,
+    DateTime PaymentRecordedAt
+): IEvent
 {
-    public Guid OrderId { get; }
-
-    public Guid PaymentId { get; }
-
-    public IReadOnlyList<PricedProductItem> ProductItems { get; }
-
-    public decimal Amount { get; }
-
-    public DateTime PaymentRecordedAt { get; }
-
-    private OrderPaymentRecorded(
-        Guid orderId,
-        Guid paymentId,
-        IReadOnlyList<PricedProductItem> productItems,
-        decimal amount,
-        DateTime paymentRecordedAt)
-    {
-        OrderId = orderId;
-        PaymentId = paymentId;
-        ProductItems = productItems;
-        Amount = amount;
-        PaymentRecordedAt = paymentRecordedAt;
-    }
-
     public static OrderPaymentRecorded Create(
         Guid orderId,
         Guid paymentId,

@@ -18,32 +18,26 @@ namespace Tickets.Reservations;
 
 internal static class ReservationsConfig
 {
-    internal static void AddReservations(this IServiceCollection services)
-    {
+    internal static IServiceCollection AddReservations(this IServiceCollection services) =>
         services
             .AddScoped<IReservationNumberGenerator, ReservationNumberGenerator>()
             .AddScoped<IMartenRepository<Reservation>, MartenRepository<Reservation>>()
             .AddCommandHandlers()
             .AddQueryHandlers();
-    }
 
-    private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
-    {
-        return services
+    private static IServiceCollection AddCommandHandlers(this IServiceCollection services) =>
+        services
             .AddCommandHandler<CreateTentativeReservation, HandleCreateTentativeReservation>()
             .AddCommandHandler<ChangeReservationSeat,HandleChangeReservationSeat>()
             .AddCommandHandler<ConfirmReservation, HandleConfirmReservation>()
             .AddCommandHandler<CancelReservation, HandleCancelReservation>();
-    }
 
-    private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
-    {
-        return services
+    private static IServiceCollection AddQueryHandlers(this IServiceCollection services) =>
+        services
             .AddQueryHandler<GetReservationById, ReservationDetails, HandleGetReservationById>()
             .AddQueryHandler<GetReservationAtVersion, ReservationDetails, HandleGetReservationAtVersion>()
             .AddQueryHandler<GetReservations, IPagedList<ReservationShortInfo>, HandleGetReservations>()
             .AddQueryHandler<GetReservationHistory, IPagedList<ReservationHistory>, HandleGetReservationHistory>();
-    }
 
     internal static void ConfigureReservations(this StoreOptions options)
     {
@@ -63,7 +57,6 @@ internal static class ReservationsConfig
             // Partial index by supplying a condition
             x.Predicate = "(data ->> 'Status') != 'Cancelled'";
         });
-
 
         // options.Schema.For<Reservation>().UniqueIndex(x => x.SeatId);
 

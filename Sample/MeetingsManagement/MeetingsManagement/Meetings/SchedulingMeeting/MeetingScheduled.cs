@@ -2,28 +2,21 @@ using System;
 using Core.Events;
 using MeetingsManagement.Meetings.ValueObjects;
 
-namespace MeetingsManagement.Meetings.SchedulingMeeting
+namespace MeetingsManagement.Meetings.SchedulingMeeting;
+
+public record MeetingScheduled(
+    Guid MeetingId,
+    DateRange Occurs
+): IEvent
 {
-    public class MeetingScheduled: IEvent
+    public static MeetingScheduled Create(Guid meetingId, DateRange occurs)
     {
-        public Guid MeetingId { get; }
-        public DateRange Occurs { get; }
+        if (meetingId == default)
+            throw new ArgumentException($"{nameof(meetingId)} needs to be defined.");
 
-        public MeetingScheduled(Guid meetingId, DateRange occurs)
-        {
-            MeetingId = meetingId;
-            Occurs = occurs;
-        }
+        if (occurs == default(DateRange))
+            throw new ArgumentException($"{nameof(occurs)} needs to be defined.");
 
-        public static MeetingScheduled Create(Guid meetingId, DateRange occurs)
-        {
-            if (meetingId == default(Guid))
-                throw new ArgumentException($"{nameof(meetingId)} needs to be defined.");
-
-            if (occurs == default(DateRange))
-                throw new ArgumentException($"{nameof(occurs)} needs to be defined.");
-
-            return new MeetingScheduled(meetingId, occurs);
-        }
+        return new MeetingScheduled(meetingId, occurs);
     }
 }

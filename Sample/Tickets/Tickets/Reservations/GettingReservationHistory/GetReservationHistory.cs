@@ -8,20 +8,13 @@ using Marten.Pagination;
 
 namespace Tickets.Reservations.GettingReservationHistory;
 
-public class GetReservationHistory : IQuery<IPagedList<ReservationHistory>>
+public record GetReservationHistory(
+    Guid ReservationId,
+    int PageNumber,
+    int PageSize
+): IQuery<IPagedList<ReservationHistory>>
 {
-    public Guid ReservationId { get; }
-    public int PageNumber { get; }
-    public int PageSize { get; }
-
-    private GetReservationHistory(Guid reservationId, int pageNumber, int pageSize)
-    {
-        ReservationId = reservationId;
-        PageNumber = pageNumber;
-        PageSize = pageSize;
-    }
-
-    public static GetReservationHistory Create(Guid reservationId,int pageNumber = 1, int pageSize = 20)
+    public static GetReservationHistory Create(Guid reservationId, int pageNumber = 1, int pageSize = 20)
     {
         if (pageNumber <= 0)
             throw new ArgumentOutOfRangeException(nameof(pageNumber));
@@ -32,7 +25,7 @@ public class GetReservationHistory : IQuery<IPagedList<ReservationHistory>>
     }
 }
 
-internal class HandleGetReservationHistory :
+internal class HandleGetReservationHistory:
     IQueryHandler<GetReservationHistory, IPagedList<ReservationHistory>>
 {
     private readonly IDocumentSession querySession;
@@ -41,10 +34,16 @@ internal class HandleGetReservationHistory :
     {
         this.querySession = querySession;
     }
-    public Task<IPagedList<ReservationHistory>> Handle(GetReservationHistory request, CancellationToken cancellationToken)
+
+    public Task<IPagedList<ReservationHistory>> Handle(
+        GetReservationHistory query,
+        CancellationToken cancellationToken
+    )
     {
+        var (reservationId, pageNumber, pageSize) = query;
+
         return querySession.Query<ReservationHistory>()
-            .Where(h => h.ReservationId == request.ReservationId)
-            .ToPagedListAsync(request.PageNumber, request.PageSize, cancellationToken);
+            .Where(h => h.ReservationId == reservationId)
+            .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 }

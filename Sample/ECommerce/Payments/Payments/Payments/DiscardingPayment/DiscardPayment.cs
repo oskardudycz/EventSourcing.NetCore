@@ -2,23 +2,17 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace Payments.Payments.DiscardingPayment;
 
-public class DiscardPayment: ICommand
+public record DiscardPayment(
+    Guid PaymentId,
+    DiscardReason DiscardReason
+): ICommand
 {
-    public Guid PaymentId { get; }
-
-    public DiscardReason DiscardReason { get; }
-
-    private DiscardPayment(Guid paymentId, DiscardReason discardReason)
-    {
-        PaymentId = paymentId;
-        DiscardReason = discardReason;
-    }
-
     public static DiscardPayment Create(Guid? paymentId, DiscardReason? discardReason)
     {
         if (paymentId == null || paymentId == Guid.Empty)
@@ -34,18 +28,28 @@ public class HandleDiscardPayment:
     ICommandHandler<DiscardPayment>
 {
     private readonly IMartenRepository<Payment> paymentRepository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
     public HandleDiscardPayment(
-        IMartenRepository<Payment> paymentRepository)
+        IMartenRepository<Payment> paymentRepository,
+        MartenOptimisticConcurrencyScope scope
+    )
     {
         this.paymentRepository = paymentRepository;
+        this.scope = scope;
     }
 
-    public Task<Unit> Handle(DiscardPayment command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(DiscardPayment command, CancellationToken cancellationToken)
     {
-        return paymentRepository.GetAndUpdate(
-            command.PaymentId,
-            payment => payment.Discard(command.DiscardReason),
-            cancellationToken);
+        var (paymentId, _) = command;
+
+        await scope.Do(expectedVersion =>
+            paymentRepository.GetAndUpdate(
+                paymentId,
+                payment => payment.TimeOut(),
+                expectedVersion,
+                cancellationToken)
+        );
+        return Unit.Value;
     }
 }

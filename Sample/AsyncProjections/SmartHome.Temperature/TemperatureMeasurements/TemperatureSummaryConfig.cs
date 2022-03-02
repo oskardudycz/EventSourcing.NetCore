@@ -13,24 +13,20 @@ namespace SmartHome.Temperature.TemperatureMeasurements;
 
 public static class TemperatureSummaryConfig
 {
-    internal static void AddTemperatureMeasurements(this IServiceCollection services)
-    {
-        services.AddScoped<IMartenRepository<TemperatureMeasurement>, MartenRepository<TemperatureMeasurement>>();
+    internal static IServiceCollection AddTemperatureMeasurements(this IServiceCollection services) =>
+        services
+            .AddScoped<IMartenRepository<TemperatureMeasurement>, MartenRepository<TemperatureMeasurement>>()
+            .AddCommandHandlers()
+            .AddQueryHandlers();
 
-        AddCommandHandlers(services);
-        AddQueryHandlers(services);
-    }
-
-    private static void AddCommandHandlers(IServiceCollection services)
-    {
+    private static IServiceCollection AddCommandHandlers(this IServiceCollection services) =>
         services.AddCommandHandler<StartTemperatureMeasurement, HandleStartTemperatureMeasurement>()
             .AddCommandHandler<RecordTemperature, HandleRecordTemperature>();
-    }
 
-    private static void AddQueryHandlers(IServiceCollection services)
-    {
-        services.AddQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>, HandleGetTemperatureMeasurements>();
-    }
+    private static IServiceCollection AddQueryHandlers(this IServiceCollection services) =>
+        services
+            .AddQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>,
+                HandleGetTemperatureMeasurements>();
 
     internal static void ConfigureTemperatureMeasurements(this StoreOptions options)
     {

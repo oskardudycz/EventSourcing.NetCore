@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Text.RegularExpressions;
 using Core.WebApi.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;

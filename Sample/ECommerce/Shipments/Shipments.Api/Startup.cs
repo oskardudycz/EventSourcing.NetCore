@@ -4,7 +4,6 @@ using Core.Exceptions;
 using Core.Serialization.Newtonsoft;
 using Core.Streaming.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
-using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Core.WebApi.Tracing.Correlation;
 using Microsoft.AspNetCore.Builder;

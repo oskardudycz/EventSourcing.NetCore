@@ -3,26 +3,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
 namespace Carts.ShoppingCarts.RemovingProduct;
 
-public class RemoveProduct: ICommand
+public record RemoveProduct(
+    Guid CartId,
+    PricedProductItem ProductItem
+): ICommand
 {
-    public Guid CartId { get; }
-
-    public PricedProductItem ProductItem { get; }
-
-    private RemoveProduct(Guid cardId, PricedProductItem productItem)
+    public static RemoveProduct Create(Guid cartId, PricedProductItem productItem)
     {
-        CartId = cardId;
-        ProductItem = productItem;
-    }
+        if (cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
 
-    public static RemoveProduct Create(Guid cardId, PricedProductItem productItem)
-    {
-        return new(cardId, productItem);
+        return new RemoveProduct(cartId, productItem);
     }
 }
 
@@ -30,19 +27,29 @@ internal class HandleRemoveProduct:
     ICommandHandler<RemoveProduct>
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
     public HandleRemoveProduct(
-        IMartenRepository<ShoppingCart> cartRepository
+        IMartenRepository<ShoppingCart> cartRepository,
+        MartenOptimisticConcurrencyScope scope
     )
     {
         this.cartRepository = cartRepository;
+        this.scope = scope;
     }
 
-    public Task<Unit> Handle(RemoveProduct command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(RemoveProduct command, CancellationToken cancellationToken)
     {
-        return cartRepository.GetAndUpdate(
-            command.CartId,
-            cart => cart.RemoveProduct(command.ProductItem),
-            cancellationToken);
+        var (cartId, productItem) = command;
+
+        await scope.Do(expectedVersion =>
+            cartRepository.GetAndUpdate(
+                cartId,
+                cart => cart.RemoveProduct(productItem),
+                expectedVersion,
+                cancellationToken
+            )
+        );
+        return Unit.Value;
     }
 }

@@ -30,10 +30,10 @@ public class TemperatureMeasurementsController: Controller
     }
 
     [HttpGet]
-    public Task<IReadOnlyList<TemperatureMeasurement>> Get()
-    {
-        return queryBus.Send<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>(GetTemperatureMeasurements.Create());
-    }
+    public Task<IReadOnlyList<TemperatureMeasurement>> Get() =>
+        queryBus.Send<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>(
+            new GetTemperatureMeasurements()
+        );
 
     [HttpPost]
     public async Task<IActionResult> Start()

@@ -3,24 +3,13 @@ using Core.Events;
 
 namespace Orders.Orders.CancellingOrder;
 
-public class OrderCancelled: IEvent
+public record OrderCancelled(
+    Guid OrderId,
+    Guid? PaymentId,
+    OrderCancellationReason OrderCancellationReason,
+    DateTime CancelledAt
+): IEvent
 {
-    public Guid OrderId { get; }
-    public Guid? PaymentId { get; }
-    public OrderCancellationReason OrderCancellationReason { get; }
-    public DateTime CancelledAt { get; }
-
-    public OrderCancelled(Guid orderId,
-        Guid? paymentId,
-        OrderCancellationReason orderCancellationReason,
-        DateTime cancelledAt)
-    {
-        OrderId = orderId;
-        PaymentId = paymentId;
-        OrderCancellationReason = orderCancellationReason;
-        CancelledAt = cancelledAt;
-    }
-
     public static OrderCancelled Create(Guid orderId,
         Guid? paymentId,
         OrderCancellationReason orderCancellationReason,

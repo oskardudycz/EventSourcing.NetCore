@@ -1,33 +1,25 @@
 using System;
 using Core.Events;
 
-namespace MeetingsManagement.Meetings.CreatingMeeting
+namespace MeetingsManagement.Meetings.CreatingMeeting;
+
+public record MeetingCreated(
+    Guid MeetingId,
+    string Name,
+    DateTime Created
+): IExternalEvent
 {
-    public class MeetingCreated: IExternalEvent
+    public static MeetingCreated Create(Guid meetingId, string name, DateTime created)
     {
-        public Guid MeetingId { get; }
-        public string Name { get; }
-        public DateTime Created { get; }
+        if (meetingId == default)
+            throw new ArgumentException($"{nameof(meetingId)} needs to be defined.");
 
-        public MeetingCreated(Guid meetingId, string name, DateTime created)
-        {
-            MeetingId = meetingId;
-            Name = name;
-            Created = created;
-        }
+        if (created == default)
+            throw new ArgumentException($"{nameof(created)} needs to be defined.");
 
-        public static MeetingCreated Create(Guid meetingId, string name, DateTime created)
-        {
-            if (meetingId == default(Guid))
-                throw new ArgumentException($"{nameof(meetingId)} needs to be defined.");
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException($"{nameof(name)} can't be empty.");
 
-            if (created == default(DateTime))
-                throw new ArgumentException($"{nameof(created)} needs to be defined.");
-
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException($"{nameof(name)} can't be empty.");
-
-            return new MeetingCreated(meetingId, name, created);
-        }
+        return new MeetingCreated(meetingId, name, created);
     }
 }

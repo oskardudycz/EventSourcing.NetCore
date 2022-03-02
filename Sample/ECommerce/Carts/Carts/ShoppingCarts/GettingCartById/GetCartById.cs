@@ -6,15 +6,10 @@ using Marten;
 
 namespace Carts.ShoppingCarts.GettingCartById;
 
-public class GetCartById : IQuery<ShoppingCartDetails>
+public record GetCartById(
+    Guid CartId
+): IQuery<ShoppingCartDetails>
 {
-    public Guid CartId { get; }
-
-    private GetCartById(Guid cartId)
-    {
-        CartId = cartId;
-    }
-
     public static GetCartById Create(Guid cartId)
     {
         if (cartId == Guid.Empty)
@@ -24,7 +19,7 @@ public class GetCartById : IQuery<ShoppingCartDetails>
     }
 }
 
-internal class HandleGetCartById :
+internal class HandleGetCartById:
     IQueryHandler<GetCartById, ShoppingCartDetails?>
 {
     private readonly IDocumentSession querySession;
@@ -34,8 +29,8 @@ internal class HandleGetCartById :
         this.querySession = querySession;
     }
 
-    public Task<ShoppingCartDetails?> Handle(GetCartById request, CancellationToken cancellationToken)
+    public Task<ShoppingCartDetails?> Handle(GetCartById query, CancellationToken cancellationToken)
     {
-        return querySession.LoadAsync<ShoppingCartDetails>(request.CartId, cancellationToken);
+        return querySession.LoadAsync<ShoppingCartDetails>(query.CartId, cancellationToken);
     }
 }
