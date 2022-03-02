@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace ECommerce.Api.Core;
+namespace Core.BackgroundWorkers;
 
-public class BackgroundWorker: IHostedService
+public class BackgroundWorker: IHostedService, IDisposable
 {
     private Task? executingTask;
     private CancellationTokenSource? cts;
@@ -27,7 +27,7 @@ public class BackgroundWorker: IHostedService
         // Create a linked token so we can trigger cancellation outside of this token's cancellation
         cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-        executingTask = perform(cts.Token);
+        executingTask = Task.Run(() => perform(cts.Token), cancellationToken);
 
         return executingTask;
     }
@@ -48,5 +48,10 @@ public class BackgroundWorker: IHostedService
         cancellationToken.ThrowIfCancellationRequested();
 
         logger.LogInformation("Background worker stopped");
+    }
+
+    public void Dispose()
+    {
+        cts?.Dispose();
     }
 }

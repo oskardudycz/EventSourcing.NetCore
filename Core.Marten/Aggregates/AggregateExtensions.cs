@@ -18,6 +18,6 @@ public static class AggregateExtensions
         var uncommitedEvents = aggregate.DequeueUncommittedEvents();
         session.Events.Append(aggregate.Id, uncommitedEvents);
         await session.SaveChangesAsync(cancellationToken);
-        await eventBus.Publish(uncommitedEvents);
+        await eventBus.Publish(uncommitedEvents, cancellationToken);
     }
 }

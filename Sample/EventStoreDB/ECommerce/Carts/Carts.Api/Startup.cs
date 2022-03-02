@@ -43,8 +43,8 @@ public class Startup
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Carts", Version = "v1" });
                 c.OperationFilter<MetadataOperationFilter>();
             })
-            .AddEventStoreDBSubscriptionToAll("MainSubscription")
             .AddCoreServices()
+            .AddEventStoreDBSubscriptionToAll()
             .AddCartsModule(config)
             .AddCorrelationIdMiddleware()
             .AddOptimisticConcurrencyMiddleware(

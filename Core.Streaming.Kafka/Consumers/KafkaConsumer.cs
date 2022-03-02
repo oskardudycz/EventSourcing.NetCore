@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using IEventBus = Core.Events.IEventBus;
 
 namespace Core.Streaming.Kafka.Consumers;
 
@@ -71,20 +72,18 @@ public class KafkaConsumer: IExternalEventConsumer
             // wait for the upcoming message, consume it when arrives
             var message = consumer.Consume(cancellationToken);
 
-            // get event type from name storred in message.Key
+            // get event type from name stored in message.Key
             var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Message.Key)!;
 
             // deserialize event
             var @event = JsonConvert.DeserializeObject(message.Message.Value, eventType)!;
 
-            using (var scope = serviceProvider.CreateScope())
-            {
-                var eventBus =
-                    scope.ServiceProvider.GetRequiredService<IEventBus>();
+            using var scope = serviceProvider.CreateScope();
+            var eventBus =
+                scope.ServiceProvider.GetRequiredService<IEventBus>();
 
-                // publish event to internal event bus
-                await eventBus.Publish((IEvent)@event);
-            }
+            // publish event to internal event bus
+            await eventBus.Publish((IEvent)@event, cancellationToken);
         }
         catch (Exception e)
         {

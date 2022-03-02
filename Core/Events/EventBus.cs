@@ -1,9 +1,16 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.Events.External;
 using MediatR;
 
 namespace Core.Events;
+
+public interface IEventBus
+{
+    Task Publish(IEvent @event, CancellationToken ct);
+    Task Publish(IEvent[] events, CancellationToken ct);
+}
 
 public class EventBus: IEventBus
 {
@@ -19,14 +26,19 @@ public class EventBus: IEventBus
         this.externalEventProducer = externalEventProducer?? throw new ArgumentNullException(nameof(externalEventProducer));
     }
 
-    public async Task Publish(params IEvent[] events)
+    public async Task Publish(IEvent[] events, CancellationToken ct)
     {
         foreach (var @event in events)
         {
-            await mediator.Publish(@event);
-
-            if (@event is IExternalEvent externalEvent)
-                await externalEventProducer.Publish(externalEvent);
+            await Publish(@event, ct);
         }
+    }
+
+    public async Task Publish(IEvent @event, CancellationToken ct)
+    {
+        await mediator.Publish(@event, ct);
+
+        if (@event is IExternalEvent externalEvent)
+            await externalEventProducer.Publish(externalEvent, ct);
     }
 }

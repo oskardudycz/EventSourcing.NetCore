@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.Api.Testing;
 using Core.Commands;
@@ -8,6 +9,7 @@ using Core.Events.External;
 using Core.Requests;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using IEventBus = Core.Events.IEventBus;
 
 namespace Core.Testing;
 
@@ -41,11 +43,11 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
         return externalCommandBus.SentCommands.OfType<TCommand>().ToList();
     }
 
-    public async Task PublishInternalEvent(IEvent @event)
+    public async Task PublishInternalEvent(IEvent @event, CancellationToken ct = default)
     {
         using var scope = Server.Host.Services.CreateScope();
         var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
-        await eventBus.Publish(@event);
+        await eventBus.Publish(@event, ct);
     }
 
     public IReadOnlyCollection<TEvent> PublishedInternalEventsOfType<TEvent>()
@@ -54,6 +56,6 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
     }
 }
 
-public abstract class ApiWithEventsFixture: Api.Testing.ApiFixture
+public abstract class ApiWithEventsFixture: ApiFixture
 {
 }

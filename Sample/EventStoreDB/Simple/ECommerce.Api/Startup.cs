@@ -1,10 +1,11 @@
 ﻿using System.Net;
+using Core.EventStoreDB;
+using Core.EventStoreDB.OptimisticConcurrency;
 using Core.Exceptions;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Core.WebApi.Tracing.Correlation;
-using ECommerce.Api.Core;
 using ECommerce.Core;
 using ECommerce.Core.EventStoreDB;
 using EventStore.Client;
@@ -37,8 +38,8 @@ public class Startup
                 c.OperationFilter<MetadataOperationFilter>();
             })
             .AddCoreServices(Configuration)
-            .AddECommerceModule(Configuration)
             .AddEventStoreDBSubscriptionToAll()
+            .AddECommerceModule(Configuration)
             .AddCorrelationIdMiddleware()
             .AddOptimisticConcurrencyMiddleware(
                 sp => sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().TrySet,

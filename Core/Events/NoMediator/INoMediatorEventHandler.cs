@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ECommerce.Core.Events;
+namespace Core.Events.NoMediator;
 
-public interface IEventHandler<in TEvent>
+public interface INoMediatorEventHandler<in TEvent>
 {
     Task Handle(TEvent @event, CancellationToken ct);
 }

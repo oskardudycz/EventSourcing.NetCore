@@ -8,6 +8,7 @@ using Shipments.Packages.Events.External;
 using Shipments.Packages.Requests;
 using Shipments.Products;
 using Shipments.Storage;
+using IEventBus = Core.Events.IEventBus;
 
 namespace Shipments.Packages;
 
@@ -61,7 +62,7 @@ internal class PackageService: IPackageService
 
         if (!productAvailabilityService.IsEnoughOf(request.ProductItems!.ToArray()))
         {
-            await Publish(new ProductWasOutOfStock(request.OrderId, DateTime.UtcNow));
+            await Publish(new ProductWasOutOfStock(request.OrderId, DateTime.UtcNow), cancellationToken);
             throw new ArgumentOutOfRangeException(nameof(request.ProductItems), "Cannot send package - product was out of stock.");
         }
 
@@ -86,7 +87,7 @@ internal class PackageService: IPackageService
         return package;
     }
 
-    public async Task DeliverPackage(DeliverPackage request, CancellationToken cancellationToken = default)
+    public async Task DeliverPackage(DeliverPackage request, CancellationToken cancellationToken)
     {
         var package = await GetById(request.Id, cancellationToken);
 
@@ -95,16 +96,16 @@ internal class PackageService: IPackageService
         await SaveChanges(cancellationToken);
     }
 
-    private async Task SaveChangesAndPublish(IEvent @event, CancellationToken cancellationToken = default)
+    private async Task SaveChangesAndPublish(IEvent @event, CancellationToken cancellationToken)
     {
         await SaveChanges(cancellationToken);
 
-        await Publish(@event);
+        await Publish(@event, cancellationToken);
     }
 
-    private async Task Publish(IEvent @event)
+    private async Task Publish(IEvent @event, CancellationToken cancellationToken)
     {
-        await eventBus.Publish(@event);
+        await eventBus.Publish(@event, cancellationToken);
     }
 
     private Task SaveChanges(CancellationToken cancellationToken = default)

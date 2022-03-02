@@ -11,7 +11,7 @@ using Core.Projections;
 
 namespace Carts.ShoppingCarts.GettingCartById;
 
-public class ShoppingCartDetails: IProjection
+public class ShoppingCartDetails: IVersionedProjection
 {
     public Guid Id { get; set; }
     public Guid ClientId { get; set; }
@@ -22,7 +22,7 @@ public class ShoppingCartDetails: IProjection
 
     public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 
-    public int Version { get; set; }
+    public long Version { get; set; }
 
 
     public void When(object @event)
@@ -108,4 +108,6 @@ public class ShoppingCartDetails: IProjection
         return ProductItems
             .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));
     }
+
+    public ulong LastProcessedPosition { get; set; }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.Events;
 using Core.Events.External;
@@ -9,7 +10,7 @@ public class DummyExternalEventProducer: IExternalEventProducer
 {
     public IList<IExternalEvent> PublishedEvents { get; } = new List<IExternalEvent>();
 
-    public Task Publish(IExternalEvent @event)
+    public Task Publish(IExternalEvent @event, CancellationToken ct)
     {
         PublishedEvents.Add(@event);
 

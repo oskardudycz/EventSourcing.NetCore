@@ -57,6 +57,6 @@ public class TransformIntoPaymentFinalized:
             completedAt
         );
 
-        await eventBus.Publish(externalEvent);
+        await eventBus.Publish(externalEvent, cancellationToken);
     }
 }
