@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
@@ -16,20 +17,27 @@ internal class HandleCreateMeeting:
     ICommandHandler<CreateMeeting>
 {
     private readonly IMartenRepository<Meeting> repository;
+    private readonly MartenOptimisticConcurrencyScope scope;
 
     public HandleCreateMeeting(
-        IMartenRepository<Meeting> repository
+        IMartenRepository<Meeting> repository,
+        MartenOptimisticConcurrencyScope scope
     )
     {
-        this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        this.repository = repository;
+        this.scope = scope;
     }
 
     public async Task<Unit> Handle(CreateMeeting command, CancellationToken cancellationToken)
     {
-        var meeting = Meeting.New(command.Id, command.Name);
+        var (id, name) = command;
 
-        await repository.Add(meeting, cancellationToken);
-
+        await scope.Do(_ =>
+            repository.Add(
+                Meeting.New(id, name),
+                cancellationToken
+            )
+        );
         return Unit.Value;
     }
 }

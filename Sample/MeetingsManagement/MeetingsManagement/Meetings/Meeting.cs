@@ -42,6 +42,8 @@ public class Meeting: Aggregate
         Id = @event.MeetingId;
         Name = @event.Name;
         Created = @event.Created;
+
+        Version++;
     }
 
     internal void Schedule(DateRange occurs)
@@ -55,5 +57,7 @@ public class Meeting: Aggregate
     public void Apply(MeetingScheduled @event)
     {
         Occurs = @event.Occurs;
+
+        Version++;
     }
 }

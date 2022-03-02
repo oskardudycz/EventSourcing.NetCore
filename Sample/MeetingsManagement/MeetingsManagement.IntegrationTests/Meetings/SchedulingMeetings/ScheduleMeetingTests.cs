@@ -33,12 +33,13 @@ public class ScheduleMeetingFixture: ApiFixture<Startup>
         );
 
         // send create command
-        CreateMeetingCommandResponse = await Post( createCommand);
+        CreateMeetingCommandResponse = await Post(createCommand);
 
         var occurs = DateRange.Create(Start, End);
 
         // send schedule meeting request
-        ScheduleMeetingCommandResponse = await Post($"{MeetingId}/schedule", occurs);
+        ScheduleMeetingCommandResponse =
+            await Post($"{MeetingId}/schedule", occurs, new RequestOptions { IfMatch = 1.ToString() });
     }
 }
 

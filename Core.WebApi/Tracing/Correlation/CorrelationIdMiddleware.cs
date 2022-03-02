@@ -65,5 +65,5 @@ public static class CorrelationIdMiddlewareConfig
     }
 
     public static IApplicationBuilder UseCorrelationIdMiddleware(this IApplicationBuilder app) =>
-        app.UseMiddleware<OptimisticConcurrencyMiddleware>();
+        app.UseMiddleware<CorrelationIdMiddleware>();
 }
