@@ -45,7 +45,12 @@ public abstract class ApiFixture: IAsyncLifetime
 
     public virtual Task InitializeAsync() => Task.CompletedTask;
 
-    public virtual Task DisposeAsync() => Task.CompletedTask;
+    public virtual Task DisposeAsync()
+    {
+        Sut.Dispose();
+        Client.Dispose();
+        return Task.CompletedTask;
+    }
 
     public async Task<HttpResponseMessage> Get(string path = "", int maxNumberOfRetries = 0,
         int retryIntervalInMs = 1000, Func<HttpResponseMessage, ValueTask<bool>>? check = null)

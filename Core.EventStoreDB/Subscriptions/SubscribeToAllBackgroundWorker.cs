@@ -6,6 +6,7 @@ using Core.Events.NoMediator;
 using Core.EventStoreDB.Events;
 using Core.Threading;
 using EventStore.Client;
+using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
 namespace Core.EventStoreDB.Subscriptions;
@@ -119,6 +120,9 @@ public class EventStoreDBSubscriptionToAll
             SubscriptionId,
             reason
         );
+
+        if (exception is RpcException { StatusCode: StatusCode.Cancelled })
+            return;
 
         Resubscribe();
     }

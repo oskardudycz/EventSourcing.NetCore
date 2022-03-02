@@ -15,7 +15,8 @@ namespace ECommerce.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ClientId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    Version = table.Column<int>(type: "integer", nullable: false)
+                    Version = table.Column<int>(type: "integer", nullable: false),
+                    LastProcessedPosition = table.Column<ulong>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -31,7 +32,8 @@ namespace ECommerce.Migrations
                     TotalItemsCount = table.Column<int>(type: "integer", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    Version = table.Column<int>(type: "integer", nullable: false)
+                    Version = table.Column<int>(type: "integer", nullable: false),
+                    LastProcessedPosition = table.Column<ulong>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
