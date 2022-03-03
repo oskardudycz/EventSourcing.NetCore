@@ -37,17 +37,16 @@ It uses:
 
 - Most of the write model infrastructure was reused from other samples,
 - Added new project `Core.EventStoreDB` for specific EventStoreDB code,
-- Added [EventStoreDBRepository](./Core/Core.EventStoreDB/Repository/EventStoreDBRepository.cs) repository to load and store aggregate state,
-- Added separate [IProjection](./Core/Core/Projections/IProjection.cs) interface to handle the same way stream aggregation and materialised projections,
+- Added [EventStoreDBRepository](../../../Core/Core.EventStoreDB/Repository/EventStoreDBRepository.cs) repository to load and store aggregate state,
+- Added separate [IProjection](../../../Core/Projections/IProjection.cs) interface to handle the same way stream aggregation and materialised projections,
 - Thanks to that added dedicated [AggregateStream](./Core/Core.EventStoreDB/Events/AggregateStreamExtensions.cs#L12) method for stream aggregation
 - See [sample Aggregate](./Carts/Carts/Carts/Cart.cs)
 
 ## Read Model
 - Read models are rebuilt with eventual consistency using subscribe to all EventStoreDB feature,
-- Added hosted service [SubscribeToAllBackgroundWorker](./Core/Core.EventStoreDB/Subscriptions/SubscribeToAllBackgroundWorker.cs) to handle subscribing to all. It handles checkpointing and simple retries if the connection was dropped.
-- Added [ISubscriptionCheckpointRepository](./Core/Core.EventStoreDB/Subscriptions/ISubscriptionCheckpointRepository.cs) for handling Subscription checkpointing.
-- Added checkpointing to EventStoreDB stream with [EventStoreDBSubscriptionCheckpointRepository](./Core/Core.EventStoreDB/Subscriptions/EventStoreDBSubscriptionCheckpointRepository.cs) and dummy in-memory checkpointer [InMemorySubscriptionCheckpointRepository](./Core/Core.EventStoreDB/Subscriptions/InMemorySubscriptionCheckpointRepository.cs),
-- Added [MartenExternalProjection](./Core/Core.Marten/ExternalProjections/MartenExternalProjection.cs) as a sample how to project with [`left-fold`](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) into external storage. Another (e.g. ElasticSearch, EntityFramework) can be implemented the same way.
+- Uses hosted service [EventStoreDBSubscriptionToAll](../../../Core.EventStoreDB/Subscriptions/EventStoreDBSubscriptionToAll.cs) to handle subscribing to all. It handles checkpointing and simple retries if the connection was dropped.
+- Uses checkpointing to EventStoreDB stream with [EventStoreDBSubscriptionCheckpointRepository](../../../Core/Core.EventStoreDB/Subscriptions/EventStoreDBSubscriptionCheckpointRepository.cs) and dummy in-memory checkpointer [InMemorySubscriptionCheckpointRepository](./Core/Core.EventStoreDB/Subscriptions/InMemorySubscriptionCheckpointRepository.cs),
+- Uses [MartenExternalProjection](../../../Core/Core.Marten/ExternalProjections/MartenExternalProjection.cs) as a sample how to project with [`left-fold`](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) into external storage. Another (e.g. ElasticSearch, EntityFramework) can be implemented the same way.
 
 ## Tests
 - Added sample of unit testing in [`Carts.Tests`](./Carts/Carts.Tests):
@@ -57,9 +56,9 @@ It uses:
     - [API integration tests](./Carts/Carts.Api.Tests/Carts/InitializingCart/InitializeCartTests.cs)
 
 ## Other
-- Added [EventTypeMapper](./Core/Core/Events/EventTypeMapper.cs) class to allow both convention-based mapping (by the .NET type name) and custom to handle event versioning,
-- Added [StreamNameMapper](./Core/Core/Events/StreamNameMapper.cs) class for convention-based id (and optional tenant) mapping based on the stream type and module,
-- IoC [registration helpers for EventStoreDB configuration](./Core/Core.EventStoreDB/Config.cs),
+- Uses [EventTypeMapper](../../../Core/Events/EventTypeMapper.cs) class to allow both convention-based mapping (by the .NET type name) and custom to handle event versioning,
+- Uses [StreamNameMapper](../../../Core/Events/StreamNameMapper.cs) class for convention-based id (and optional tenant) mapping based on the stream type and module,
+- IoC [registration helpers for EventStoreDB configuration](../../../Core/Core.EventStoreDB/Config.cs),
 
 
 ## Trivia

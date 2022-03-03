@@ -51,8 +51,9 @@ public class EventStoreDBSubscriptionToAll
 
     public async Task SubscribeToAll(EventStoreDBSubscriptionToAllOptions subscriptionOptions, CancellationToken ct)
     {
+        // see: https://github.com/dotnet/runtime/issues/36063
         await Task.Yield();
-        
+
         this.subscriptionOptions = subscriptionOptions;
         cancellationToken = ct;
 
