@@ -16,8 +16,8 @@ public class InitializeOrderFixture: ApiWithEventsFixture<Startup>
 
     public readonly List<PricedProductItemRequest> ProductItems = new()
     {
-        new PricedProductItemRequest {ProductId = Guid.NewGuid(), Quantity = 10, UnitPrice = 3},
-        new PricedProductItemRequest {ProductId = Guid.NewGuid(), Quantity = 3, UnitPrice = 7}
+        new PricedProductItemRequest { ProductId = Guid.NewGuid(), Quantity = 10, UnitPrice = 3 },
+        new PricedProductItemRequest { ProductId = Guid.NewGuid(), Quantity = 3, UnitPrice = 7 }
     };
 
     public decimal TotalPrice => ProductItems.Sum(pi => pi.Quantity!.Value * pi.UnitPrice!.Value);
@@ -64,18 +64,17 @@ public class InitializeOrderTests: IClassFixture<InitializeOrderFixture>
     {
         var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-        fixture.PublishedInternalEventsOfType<OrderInitialized>()
-            .Should()
-            .HaveCount(1)
-            .And.Contain(@event =>
+        await fixture.ShouldPublishInternalEventOfType<OrderInitialized>(
+            @event =>
                 @event.OrderId == createdId
                 && @event.ClientId == fixture.ClientId
                 && @event.InitializedAt > fixture.TimeBeforeSending
                 && @event.ProductItems.Count == fixture.ProductItems.Count
                 && @event.ProductItems.All(
                     pi => fixture.ProductItems.Exists(
-                        expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
-            );
+                        expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity)
+                    )
+        );
     }
 
     // [Fact]

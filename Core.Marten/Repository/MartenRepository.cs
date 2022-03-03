@@ -15,15 +15,12 @@ public interface IMartenRepository<T> where T : class, IAggregate
 public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggregate
 {
     private readonly IDocumentSession documentSession;
-    private readonly IEventBus eventBus;
 
     public MartenRepository(
-        IDocumentSession documentSession,
-        IEventBus eventBus
+        IDocumentSession documentSession
     )
     {
         this.documentSession = documentSession;
-        this.eventBus = eventBus;
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
@@ -39,7 +36,6 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
         );
 
         await documentSession.SaveChangesAsync(cancellationToken);
-        await eventBus.Publish(events, cancellationToken);
 
         return events.Length;
     }
@@ -59,7 +55,6 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
         );
 
         await documentSession.SaveChangesAsync(cancellationToken);
-        await eventBus.Publish(events, cancellationToken);
 
         return nextVersion;
     }

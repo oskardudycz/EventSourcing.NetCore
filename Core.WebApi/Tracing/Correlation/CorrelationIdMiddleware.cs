@@ -15,16 +15,14 @@ public class CorrelationIdMiddleware
 
     private readonly RequestDelegate next;
     private readonly ILogger<CorrelationIdMiddleware> logger;
-    private readonly Func<CorrelationId> correlationIdFactory;
 
-    public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger, Func<CorrelationId> correlationIdFactory)
+    public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
     {
         this.next = next ?? throw new ArgumentNullException(nameof(next));
         this.logger = logger;
-        this.correlationIdFactory = correlationIdFactory;
     }
 
-    public async Task Invoke(HttpContext context)
+    public async Task Invoke(HttpContext context, Func<CorrelationId> correlationIdFactory)
     {
         // get correlation id from header or generate a new one
         context.TraceIdentifier =
@@ -54,8 +52,8 @@ public static class CorrelationIdMiddlewareConfig
 {
     public static IServiceCollection AddCorrelationIdMiddleware(this IServiceCollection services)
     {
-        services.TryAddScoped<ICorrelationIdFactory, GuidCorrelationIdFactory>();
         services.TryAddScoped<Func<CorrelationId>>(sp => sp.GetRequiredService<ICorrelationIdFactory>().New);
+        services.TryAddScoped<ICorrelationIdFactory, GuidCorrelationIdFactory>();
 
         return services;
     }

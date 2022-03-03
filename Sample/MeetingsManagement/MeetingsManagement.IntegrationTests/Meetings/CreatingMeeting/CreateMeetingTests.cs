@@ -58,8 +58,8 @@ public class CreateMeetingTests: IClassFixture<CreateMeetingFixture>
     public void CreateCommand_ShouldPublish_MeetingCreateEvent()
     {
         // assert MeetingCreated event was produced to external bus
-        fixture.PublishedExternalEventsOfType<MeetingCreated>()
-            .Should().Contain(@event =>
+        fixture.ShouldPublishInternalEventOfType<MeetingCreated>(
+            @event =>
                 @event.MeetingId == fixture.MeetingId
                 && @event.Name == fixture.MeetingName
             );

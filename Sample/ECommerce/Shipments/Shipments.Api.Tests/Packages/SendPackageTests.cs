@@ -20,16 +20,8 @@ public class SendPackageFixture: ApiWithEventsFixture<Startup>
 
     public readonly List<ProductItem> ProductItems = new()
     {
-        new ProductItem
-        {
-            ProductId = Guid.NewGuid(),
-            Quantity = 10
-        },
-        new ProductItem
-        {
-            ProductId = Guid.NewGuid(),
-            Quantity = 3
-        }
+        new ProductItem { ProductId = Guid.NewGuid(), Quantity = 10 },
+        new ProductItem { ProductId = Guid.NewGuid(), Quantity = 3 }
     };
 
     public HttpResponseMessage CommandResponse = default!;
@@ -67,10 +59,8 @@ public class SendPackageTests: IClassFixture<SendPackageFixture>
     {
         var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-        fixture.PublishedInternalEventsOfType<PackageWasSent>()
-            .Should()
-            .HaveCount(1)
-            .And.Contain(@event =>
+        await fixture.ShouldPublishInternalEventOfType<PackageWasSent>(
+            @event =>
                 @event.PackageId == createdId
                 && @event.OrderId == fixture.OrderId
                 && @event.SentAt > fixture.TimeBeforeSending
@@ -78,7 +68,7 @@ public class SendPackageTests: IClassFixture<SendPackageFixture>
                 && @event.ProductItems.All(
                     pi => fixture.ProductItems.Exists(
                         expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
-            );
+        );
     }
 
     [Fact]

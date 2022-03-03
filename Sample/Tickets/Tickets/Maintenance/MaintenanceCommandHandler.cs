@@ -17,7 +17,7 @@ public class MaintenanceCommandHandler:
 
     public async Task<Unit> Handle(RebuildProjection command, CancellationToken cancellationToken)
     {
-        using var daemon = documentStore.BuildProjectionDaemon();
+        using var daemon = await documentStore.BuildProjectionDaemonAsync();
         await daemon.RebuildProjection(command.ViewName, cancellationToken);
 
         return Unit.Value;

@@ -18,7 +18,7 @@ public class IndexNameMapper
 
     public static string ToIndexPrefix<TStream>() => ToIndexPrefix(typeof(TStream));
 
-    public static string ToIndexPrefix(Type streamType) => Instance.typeNameMap.GetOrAdd(streamType, (_) =>
+    public static string ToIndexPrefix(Type streamType) => Instance.typeNameMap.GetOrAdd(streamType, _ =>
     {
         var modulePrefix = streamType.Namespace!.Split(".").First();
         return $"{modulePrefix}-{streamType.Name}".ToLower();
