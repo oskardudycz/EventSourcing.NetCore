@@ -1,8 +1,10 @@
+using Core.BackgroundWorkers;
 using Core.Events.External;
 using Core.Streaming.Kafka.Consumers;
 using Core.Streaming.Kafka.Producers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Streaming.Kafka;
 
@@ -21,7 +23,20 @@ public static class Config
         //using TryAdd to support mocking, without that it won't be possible to override in tests
         services.TryAddSingleton<IExternalEventConsumer, KafkaConsumer>();
 
-        return services.AddExternalEventConsumerBackgroundWorker();
+        return services.AddHostedService(serviceProvider =>
+            {
+                var logger =
+                    serviceProvider.GetRequiredService<ILogger<BackgroundWorker>>();
+
+                var consumer =
+                    serviceProvider.GetRequiredService<IExternalEventConsumer>();
+
+                return new BackgroundWorker(
+                    logger,
+                    consumer.StartAsync
+                );
+            }
+        );
     }
 
     public static IServiceCollection AddKafkaProducerAndConsumer(this IServiceCollection services)
