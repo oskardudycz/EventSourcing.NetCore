@@ -33,7 +33,6 @@ It uses:
 - Command handlers are defined as static methods in the same file as command definition. Usually, they change together. They are pure functions that take command and/or state and create new events based on the business logic. See sample [Adding Product Item to ShoppingCart](./ECommerce/ShoppingCarts/AddingProductItem/AddProductItemToShoppingCart.cs#L25). This example also shows that you can inject external services to handlers if needed.
 - [Added syntax for self-documenting command handlers registration](./ECommerce/ShoppingCarts/Configuration.cs#L22). See the details of registration in [CommandHandlerExtensions](./ECommerce.Core/Commands/CommandHandler.cs). They differentiate case when [a new entity/stream is created](./ECommerce.Core/Commands/CommandHandler.cs#L12) from the [update case](./ECommerce.CoreECommerce.Core/Commands/CommandHandler.cs#L26). Update has to support optimistic concurrency. Added also [Command Handlers Builder](./ECommerce.CoreECommerce.Core/Commands/CommandHandler.cs#102) for simplifying the registrations.
 - Added simple [EventStoreDB extensions](./ECommerce.Core/EventStoreDB/EventStoreDBExtensions.cs) repository to load entity state and store event created by business logic,
-- [New, simplified Core infrastructure](./ECommerce.Core/)
 
 ## Read Model
 - Read models are rebuilt with eventual consistency using subscribe to $all stream EventStoreDB feature,
@@ -41,10 +40,9 @@ It uses:
 - Added sample projection for [Shopping cart details](./ECommerce/ShoppingCarts/GettingCartById/ShoppingCartDetails.cs) and slimmed [Shopping cart short info](./ECommerce/ShoppingCarts/GettingCarts/ShoppingCartShortInfo.cs) as an example of different interpretations of the same events. Shopping cart details also contain a nested collection of product items to show more advanced use case. All event handling is done by functions. It enables easier unit and integration testing.
 - [Added syntax for self-documenting projection handlers registration](./ECommerce/ShoppingCarts/Configuration.cs#L49). See the details of registration in [EntityFrameworkProjectionBuilder](./ECommerce.Core/Projections/EntityFrameworkProjection.cs#L28). They differentiate case when [a new read model is created](./ECommerce.Core/Projections/EntityFrameworkProjection.cs#L83) from the [update case](./ECommerce.Core/Projections/EntityFrameworkProjection.cs#L108). Update has to support optimistic concurrency.
 - [example query handlers](./ECommerce/ShoppingCarts/GettingCarts/GetCarts.cs#25) for reading data together with [registration helpers](./ECommerce.Core/Queries/QueryHandler.cs) for EntityFramework querying.
-- Added service [EventStoreDBSubscriptionToAll](./ECommerce.Core/Subscriptions/EventStoreDBSubscriptionToAll.cs) to handle subscribing to all. It handles checkpointing and simple retries when the connection is dropped. Added also general [BackgroundWorker](./ECommerce.Api/Core/BackgroundWorker.cs) to wrap the general `IHostedService` handling
-- Added [ISubscriptionCheckpointRepository](./ECommerce.Core/Subscriptions/ISubscriptionCheckpointRepository.cs) for handling Subscription checkpointing.
-- Added checkpointing to EventStoreDB stream with [EventStoreDBSubscriptionCheckpointRepository](./ECommerce.Core/Subscriptions/EventStoreDBSubscriptionCheckpointRepository.cs),
-- Added custom [EventBus](./ECommerce.Core/Events/EventBus.cs) implementation to not take an additional dependency on external frameworks like MediatR. It's not needed as no advanced pipelining is used here.
+- Used service [EventStoreDBSubscriptionToAll](../../../Core.EventStoreDB/Subscriptions/EventStoreDBSubscriptionToAll.cs) to handle subscribing to all. It handles checkpointing and simple retries when the connection is dropped. Added also general [BackgroundWorker](./ECommerce.Api/Core/BackgroundWorker.cs) to wrap the general `IHostedService` handling
+- Used checkpointing to EventStoreDB stream with [EventStoreDBSubscriptionCheckpointRepository](../../../Core.EventStoreDB/Subscriptions/EventStoreDBSubscriptionCheckpointRepository.cs),
+- Used custom [NoMediatorEventBus](../../../Core/Events/NoMediator/EventBus.cs) implementation to not take an additional dependency on external frameworks like MediatR. It's not needed as no advanced pipelining is used here.
 
 ## Tests
 API integration tests for:
