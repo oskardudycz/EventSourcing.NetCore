@@ -1,5 +1,7 @@
 ﻿module ECommerce.FeedConsumer.Program
 
+open ECommerce.Infrastructure // ConnectStore etc
+open ECommerce.Domain // Config etc
 open Serilog
 open System
 
@@ -101,16 +103,17 @@ let build (args : Args.Arguments) =
     let cache = Equinox.Cache (AppName, sizeMb = 10)
     let context = args.Cosmos.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
 
+    let log = Log.forGroup args.SourceId // needs to have a `group` tag for Propulsion.Streams Prometheus metrics
     let sink =
         let handle = Ingester.handle args.TicketsDop
-        let stats = Ingester.Stats(Log.Logger, args.StatsInterval, args.StateInterval)
-        Propulsion.Streams.StreamsProjector.Start(Log.Logger, args.MaxReadAhead, args.FcsDop, handle, stats, args.StatsInterval)
+        let stats = Ingester.Stats(log, args.StatsInterval, args.StateInterval)
+        Propulsion.Streams.StreamsProjector.Start(log, args.MaxReadAhead, args.FcsDop, handle, stats, args.StatsInterval)
     let pumpSource =
         let checkpoints = Propulsion.Feed.ReaderCheckpoint.CosmosStore.create Config.log (context, cache)
         let feed = ApiClient.TicketsFeed args.BaseUri
         let source =
             Propulsion.Feed.FeedSource(
-                Log.Logger, args.StatsInterval, args.SourceId, args.TailSleepInterval,
+                log, args.StatsInterval, args.SourceId, args.TailSleepInterval,
                 checkpoints, args.CheckpointInterval, feed.Poll, sink)
         source.Pump feed.ReadTranches
     sink, pumpSource
@@ -124,7 +127,7 @@ let run args = async {
 [<EntryPoint>]
 let main argv =
     try let args = Args.parse EnvVar.tryGet argv
-        try let metrics = Sinks.equinoxAndPropulsionFeedConsumerMetrics (Sinks.tags AppName) args.SourceId
+        try let metrics = Sinks.equinoxAndPropulsionFeedConsumerMetrics (Sinks.tags AppName)
             Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.Cosmos.Verbose).CreateLogger()
             try run args |> Async.RunSynchronously
             with e when not (e :? MissingArg) -> Log.Fatal(e, "Exiting"); 2
