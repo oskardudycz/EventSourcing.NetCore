@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using CQRS.Tests.TestsInfrasructure;
 using MediatR;
 using SharpTestsEx;

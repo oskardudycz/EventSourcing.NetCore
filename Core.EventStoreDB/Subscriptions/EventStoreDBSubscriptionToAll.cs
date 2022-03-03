@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Core.Events;
 using Core.Events.NoMediator;
 using Core.EventStoreDB.Events;

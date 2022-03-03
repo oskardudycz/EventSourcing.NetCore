@@ -1,5 +1,3 @@
-using System;
-
 namespace EventStoreBasics;
 
 public interface IRepository<T> where T : IAggregate

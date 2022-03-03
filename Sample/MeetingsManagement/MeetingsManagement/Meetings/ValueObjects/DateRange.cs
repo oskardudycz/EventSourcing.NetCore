@@ -1,5 +1,3 @@
-using System;
-
 namespace MeetingsManagement.Meetings.ValueObjects;
 
 public class DateRange

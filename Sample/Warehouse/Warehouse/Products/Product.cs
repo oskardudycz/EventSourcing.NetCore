@@ -1,5 +1,4 @@
-﻿using System;
-using Warehouse.Products.Primitives;
+﻿using Warehouse.Products.Primitives;
 
 namespace Warehouse.Products;
 

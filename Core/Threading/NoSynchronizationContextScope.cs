@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-
-namespace Core.Threading;
+﻿namespace Core.Threading;
 
 public static class NoSynchronizationContextScope
 {

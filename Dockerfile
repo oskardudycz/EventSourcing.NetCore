@@ -8,6 +8,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS builder
 # Setup working directory for project
 WORKDIR /app
 
+COPY ./Directory.Build.props ./
 COPY ./Core/Core.csproj ./Core/
 COPY ./Core.Serialization/Core.Serialization.csproj ./Core.Serialization/
 COPY ./Core.Marten/Core.Marten.csproj ./Core.Marten/

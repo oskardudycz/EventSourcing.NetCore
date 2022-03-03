@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Carts.Api.Requests.Carts;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.GettingCartAtVersion;

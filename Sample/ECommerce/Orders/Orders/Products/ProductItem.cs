@@ -1,5 +1,3 @@
-using System;
-
 namespace Orders.Products;
 
 public class ProductItem

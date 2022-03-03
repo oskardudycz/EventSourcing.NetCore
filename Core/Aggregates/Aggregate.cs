@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Core.Events;
 
 namespace Core.Aggregates;

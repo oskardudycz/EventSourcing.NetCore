@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Core.Commands;
 using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;

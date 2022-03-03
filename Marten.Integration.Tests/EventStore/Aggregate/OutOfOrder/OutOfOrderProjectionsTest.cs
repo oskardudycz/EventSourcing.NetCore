@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
 using Weasel.Core;

@@ -1,5 +1,4 @@
-﻿using System;
-using Core.Events;
+﻿using Core.Events;
 using Core.EventStoreDB.Serialization;
 using EventStore.Client;
 

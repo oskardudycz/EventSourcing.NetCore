@@ -1,4 +1,3 @@
-using System.Linq;
 using Core.Aggregates;
 using Core.Events;
 

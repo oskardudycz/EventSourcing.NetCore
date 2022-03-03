@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		DOCKERFILE = DOCKERFILE
 		README.md = README.md
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{E1B97A7B-97C3-4C14-9BE6-ACE0AF45CE61}"
@@ -73,7 +74,7 @@ EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Marten", "Core.Marten\Core.Marten.csproj", "{6EF458DC-00FA-45B0-A722-1ACCEB686CAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Streaming.Kafka", "Core.Streaming.Kafka\Core.Streaming.Kafka.csproj", "{A1277765-1C96-4307-A09A-A85E211A59F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Kafka", "Core.Kafka\Core.Kafka.csproj", "{A1277765-1C96-4307-A09A-A85E211A59F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{FBA4E3F4-309C-4D79-8999-306D63313DFD}"
 EndProject
@@ -198,7 +199,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{F078A982-331A-
 ProjectSection(SolutionItems) = preProject
 	.github\workflows\build.dotnet.yml = .github\workflows\build.dotnet.yml
 	.github\workflows\publish.docker.yml = .github\workflows\publish.docker.yml
-	.github\workflows\build.dotnet.testreport.yml = .github\workflows\build.dotnet.testreport.yml
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marten.Integration.Tests", "Marten.Integration.Tests\Marten.Integration.Tests.csproj", "{D9D67A6C-FE95-4864-B8F1-BD2689134590}"

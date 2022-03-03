@@ -1,4 +1,3 @@
-using System;
 using ECommerce.Pricing.ProductPricing;
 using ECommerce.ShoppingCarts.ProductItems;
 

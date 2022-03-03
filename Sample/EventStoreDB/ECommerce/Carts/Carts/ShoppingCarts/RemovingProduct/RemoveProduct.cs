@@ -1,7 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Carts.ShoppingCarts.AddingProduct;
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
 using Core.EventStoreDB.OptimisticConcurrency;

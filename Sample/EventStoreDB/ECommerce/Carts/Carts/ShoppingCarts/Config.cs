@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Carts.Pricing;
 using Carts.ShoppingCarts.AddingProduct;
 using Carts.ShoppingCarts.ConfirmingCart;

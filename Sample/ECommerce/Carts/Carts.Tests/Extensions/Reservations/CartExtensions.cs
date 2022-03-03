@@ -1,4 +1,3 @@
-using System;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.InitializingCart;
 using Core.Testing;

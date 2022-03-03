@@ -1,7 +1,4 @@
-using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Core.Api.Testing;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Marten.Events.Aggregation;
 using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;

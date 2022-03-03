@@ -1,5 +1,3 @@
-using System;
-
 namespace Carts.ShoppingCarts.Products;
 
 public class PricedProductItem

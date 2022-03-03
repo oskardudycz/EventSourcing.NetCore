@@ -1,5 +1,3 @@
-using System;
-
 namespace Tickets.Api.Requests;
 
 public class ChangeSeatRequest

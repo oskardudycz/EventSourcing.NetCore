@@ -1,4 +1,3 @@
-using System;
 using Marten.Events.Aggregation;
 using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.SchedulingMeeting;

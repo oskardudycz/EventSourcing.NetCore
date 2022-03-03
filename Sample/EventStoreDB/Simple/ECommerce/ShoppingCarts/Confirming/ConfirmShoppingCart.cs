@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ECommerce.ShoppingCarts.Confirming;
+﻿namespace ECommerce.ShoppingCarts.Confirming;
 
 public record ConfirmShoppingCart(
     Guid ShoppingCartId

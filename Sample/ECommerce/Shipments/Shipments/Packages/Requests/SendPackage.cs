@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Shipments.Products;
 
 namespace Shipments.Packages.Requests;

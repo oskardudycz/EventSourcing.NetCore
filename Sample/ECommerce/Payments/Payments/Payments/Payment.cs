@@ -1,4 +1,3 @@
-using System;
 using Core.Aggregates;
 using Payments.Payments.CompletingPayment;
 using Payments.Payments.DiscardingPayment;

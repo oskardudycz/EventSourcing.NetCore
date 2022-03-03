@@ -1,4 +1,3 @@
-using System;
 using Marten.Events;
 using Marten.Events.Projections;
 using Tickets.Reservations.CancellingReservation;

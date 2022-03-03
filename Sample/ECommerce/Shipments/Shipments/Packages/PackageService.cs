@@ -1,7 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Core.Events;
 using Microsoft.EntityFrameworkCore;
 using Shipments.Packages.Events.External;

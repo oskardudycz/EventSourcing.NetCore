@@ -1,4 +1,3 @@
-using System;
 using Npgsql;
 
 namespace EventStoreBasics;

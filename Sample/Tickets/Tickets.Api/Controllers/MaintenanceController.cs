@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Core.Commands;
 using Microsoft.AspNetCore.Mvc;
 using Tickets.Api.Requests;

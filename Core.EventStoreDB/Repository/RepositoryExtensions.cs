@@ -1,9 +1,5 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Core.Aggregates;
 using Core.Exceptions;
-using MediatR;
 
 namespace Core.EventStoreDB.Repository;
 

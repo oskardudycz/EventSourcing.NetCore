@@ -1,4 +1,3 @@
-using System;
 using Core.Commands;
 
 namespace Tickets.Maintenance.Commands;

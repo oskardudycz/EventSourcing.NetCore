@@ -1,5 +1,3 @@
-using System;
-
 namespace Payments.Api.Requests.Carts;
 
 public class RequestPaymentRequest

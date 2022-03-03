@@ -1,4 +1,3 @@
-using System;
 using Carts.ShoppingCarts;
 using Carts.Tests.Extensions.Reservations;
 using Xunit;

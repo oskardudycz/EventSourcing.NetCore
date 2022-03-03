@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Carts.Api.Requests.Carts;
+﻿namespace Carts.Api.Requests.Carts;
 
 public record InitializeShoppingCartRequest(
     Guid? ClientId

@@ -1,16 +1,15 @@
 using Core.BackgroundWorkers;
 using Core.Events.External;
-using Core.Streaming.Kafka.Consumers;
-using Core.Streaming.Kafka.Producers;
+using Core.Kafka.Consumers;
+using Core.Kafka.Producers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace Core.Streaming.Kafka;
+namespace Core.Kafka;
 
 public static class Config
 {
-
     public static IServiceCollection AddKafkaProducer(this IServiceCollection services)
     {
         //using TryAdd to support mocking, without that it won't be possible to override in tests

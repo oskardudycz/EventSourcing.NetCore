@@ -1,4 +1,3 @@
-using System;
 using ECommerce.ShoppingCarts.ProductItems;
 
 namespace ECommerce.ShoppingCarts.RemovingProductItem;

@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Confluent.Kafka;
 using Core.Events;
 using Core.Events.External;
@@ -11,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using IEventBus = Core.Events.IEventBus;
 
-namespace Core.Streaming.Kafka.Consumers;
+namespace Core.Kafka.Consumers;
 
 public class KafkaConsumer: IExternalEventConsumer
 {

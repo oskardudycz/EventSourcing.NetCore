@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Marten.Schema;

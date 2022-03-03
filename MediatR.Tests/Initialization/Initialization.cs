@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SharpTestsEx;
+﻿using SharpTestsEx;
 using Xunit;
 
 namespace MediatR.Tests.Initialization;

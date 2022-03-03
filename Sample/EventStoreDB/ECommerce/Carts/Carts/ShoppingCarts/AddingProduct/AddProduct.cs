@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Carts.Pricing;
 using Carts.ShoppingCarts.Products;
 using Core.Commands;

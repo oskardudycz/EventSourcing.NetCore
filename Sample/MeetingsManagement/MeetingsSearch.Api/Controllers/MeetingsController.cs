@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Core.Queries;
 using MeetingsSearch.Meetings;
 using MeetingsSearch.Meetings.SearchingMeetings;

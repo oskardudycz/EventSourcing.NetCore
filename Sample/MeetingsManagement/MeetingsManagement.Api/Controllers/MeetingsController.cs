@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Core.Commands;
 using Core.Queries;
 using MeetingsManagement.Meetings.CreatingMeeting;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ECommerce.ShoppingCarts.Initializing;
+﻿namespace ECommerce.ShoppingCarts.Initializing;
 
 public record InitializeShoppingCart(
     Guid ShoppingCartId,

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Core.Api.Testing;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;

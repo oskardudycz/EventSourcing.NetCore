@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Core.Api.Testing;
 using Core.Testing;
 using FluentAssertions;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using FluentAssertions;
 using Xunit;
 using JsonSerializer = System.Text.Json.JsonSerializer;

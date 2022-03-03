@@ -1,4 +1,3 @@
-using System;
 using Core.Aggregates;
 using Tickets.Reservations.CancellingReservation;
 using Tickets.Reservations.ChangingReservationSeat;

@@ -1,4 +1,3 @@
-using System;
 using Carts.ShoppingCarts.AddingProduct;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.InitializingCart;
