@@ -489,6 +489,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ECommerce.Infrastructure", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ECommerce.Tests", "Sample\ECommerce.Equinox\ECommerce.Tests\ECommerce.Tests.fsproj", "{16B7A55B-E2E6-4CE2-896A-EF0F02259482}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ECommerce.FeedConsumer", "Sample\ECommerce.Equinox\ECommerce.FeedConsumer\ECommerce.FeedConsumer.fsproj", "{F2D522B1-BDF0-4345-919D-42DD79D4BB24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
