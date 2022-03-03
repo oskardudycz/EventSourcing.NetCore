@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <WarningLevel>5</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Infrastructure.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="Ingester.fs" />
+    <Compile Include="ApiClient.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Argu" Version="6.1.1" />
+    <PackageReference Include="Destructurama.FSharp" Version="1.2.0" />
+    <PackageReference Include="Equinox.CosmosStore" Version="3.0.5" />
+    <PackageReference Include="Equinox.CosmosStore.Prometheus" Version="3.0.5" />
+    <PackageReference Include="Propulsion.CosmosStore" Version="2.12.0-rc.3" />
+    <PackageReference Include="Propulsion.Feed" Version="2.12.0-rc.3" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>
