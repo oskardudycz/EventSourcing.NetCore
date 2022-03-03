@@ -7,6 +7,7 @@ open System
 module Log =
 
     let isStoreMetrics x = Serilog.Filters.Matching.WithProperty("isMetric").Invoke x
+    let forGroup group = Log.ForContext("group", group)
 
 module EnvVar =
 
@@ -65,13 +66,17 @@ module Sinks =
         l.WriteTo.Sink(Equinox.CosmosStore.Core.Log.InternalMetrics.Stats.LogSink())
          .WriteTo.Sink(Equinox.CosmosStore.Prometheus.LogSink(tags))
 
-    let equinoxAndPropulsionConsumerMetrics tags group (l : LoggerConfiguration) =
+    let equinoxAndPropulsionConsumerMetrics tags (l : LoggerConfiguration) =
         l |> equinoxMetricsOnly tags
-          |> fun l -> l.WriteTo.Sink(Propulsion.Prometheus.LogSink(tags, group))
+          |> fun l -> l.WriteTo.Sink(Propulsion.Prometheus.LogSink(tags))
 
-    let equinoxAndPropulsionCosmosConsumerMetrics tags group (l : LoggerConfiguration) =
-        l |> equinoxAndPropulsionConsumerMetrics tags group
+    let equinoxAndPropulsionCosmosConsumerMetrics tags (l : LoggerConfiguration) =
+        l |> equinoxAndPropulsionConsumerMetrics tags
           |> fun l -> l.WriteTo.Sink(Propulsion.CosmosStore.Prometheus.LogSink(tags))
+
+    let equinoxAndPropulsionFeedConsumerMetrics tags (l : LoggerConfiguration) =
+        l |> equinoxAndPropulsionConsumerMetrics tags
+          |> fun l -> l.WriteTo.Sink(Propulsion.Feed.Prometheus.LogSink(tags))
 
     let console (configuration : LoggerConfiguration) =
         let t = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {NewLine}{Exception}"

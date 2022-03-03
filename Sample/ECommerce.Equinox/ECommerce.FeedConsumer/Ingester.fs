@@ -1,7 +1,7 @@
 module ECommerce.FeedConsumer.Ingester
 
+open ECommerce.FeedConsumer.Domain
 open System
-open FeedConsumerTemplate.Domain
 
 type Outcome = { added : int; notReady : int; dups : int }
 
