@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Carts.ShoppingCarts.AddingProduct;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.InitializingCart;

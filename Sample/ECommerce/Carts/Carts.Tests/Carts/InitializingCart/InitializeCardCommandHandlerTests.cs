@@ -1,7 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.InitializingCart;
 using Carts.Tests.Extensions.Reservations;

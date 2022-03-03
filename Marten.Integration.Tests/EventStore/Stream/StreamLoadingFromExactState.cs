@@ -1,4 +1,3 @@
-using System;
 using Marten.Integration.Tests.TestsInfrastructure;
 using SharpTestsEx;
 using Xunit;

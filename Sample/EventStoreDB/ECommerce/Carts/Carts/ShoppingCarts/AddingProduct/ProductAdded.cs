@@ -1,4 +1,3 @@
-using System;
 using Carts.ShoppingCarts.Products;
 using Core.Events;
 

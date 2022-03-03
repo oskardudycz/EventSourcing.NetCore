@@ -1,4 +1,3 @@
-using System;
 using Core.Events;
 
 namespace Shipments.Packages.Events.External;

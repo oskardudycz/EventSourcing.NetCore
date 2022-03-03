@@ -2,8 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\Core.Streaming.Kafka\Core.Streaming.Kafka.csproj" />
+      <ProjectReference Include="..\..\..\..\Core.Kafka\Core.Kafka.csproj" />
       <ProjectReference Include="..\..\..\..\Core.WebApi\Core.WebApi.csproj" />
       <ProjectReference Include="..\Orders\Orders.csproj" />
     </ItemGroup>

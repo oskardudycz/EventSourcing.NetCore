@@ -1,5 +1,4 @@
-﻿using System;
-using Weasel.Core;
+﻿using Weasel.Core;
 
 namespace Marten.Integration.Tests.TestsInfrastructure;
 

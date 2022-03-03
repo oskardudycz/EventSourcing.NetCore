@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Core.Ids;
+﻿namespace Core.Ids;
 
 public class NulloIdGenerator : IIdGenerator
 {

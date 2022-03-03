@@ -1,4 +1,3 @@
-using System;
 using Core.Aggregates;
 using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.SchedulingMeeting;

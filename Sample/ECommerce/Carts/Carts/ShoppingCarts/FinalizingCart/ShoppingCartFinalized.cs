@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.Products;
 using Core.Events;

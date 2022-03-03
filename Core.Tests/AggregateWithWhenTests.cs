@@ -1,5 +1,4 @@
-﻿using System;
-using Core.Aggregates;
+﻿using Core.Aggregates;
 using FluentAssertions;
 using Xunit;
 

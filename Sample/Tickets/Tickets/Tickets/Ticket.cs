@@ -1,4 +1,3 @@
-using System;
 using Core.Aggregates;
 
 namespace Tickets.Tickets;

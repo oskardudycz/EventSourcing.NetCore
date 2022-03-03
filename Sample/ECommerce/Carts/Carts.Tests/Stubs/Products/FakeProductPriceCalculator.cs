@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Carts.Pricing;
 using Carts.ShoppingCarts.Products;
 

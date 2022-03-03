@@ -1,5 +1,4 @@
-﻿using System;
-using Core.Serialization.Newtonsoft;
+﻿using Core.Serialization.Newtonsoft;
 using Marten;
 using Marten.Services.Json;
 using Newtonsoft.Json.Serialization;

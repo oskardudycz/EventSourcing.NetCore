@@ -1,4 +1,3 @@
-using System;
 using Core.Ids;
 
 namespace Carts.Tests.Stubs.Ids;

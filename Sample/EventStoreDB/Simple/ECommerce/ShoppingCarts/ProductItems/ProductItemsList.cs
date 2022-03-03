@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace ECommerce.ShoppingCarts.ProductItems;
+﻿namespace ECommerce.ShoppingCarts.ProductItems;
 
 public class ProductItemsList
 {

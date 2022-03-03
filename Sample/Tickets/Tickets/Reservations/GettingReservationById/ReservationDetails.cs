@@ -1,4 +1,3 @@
-using System;
 using Marten.Events.Aggregation;
 using Tickets.Reservations.CancellingReservation;
 using Tickets.Reservations.ChangingReservationSeat;

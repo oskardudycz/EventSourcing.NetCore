@@ -1,4 +1,3 @@
-using System;
 using Core.Aggregates;
 using SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 

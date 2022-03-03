@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.InitializingCart;
 using Core.Events;

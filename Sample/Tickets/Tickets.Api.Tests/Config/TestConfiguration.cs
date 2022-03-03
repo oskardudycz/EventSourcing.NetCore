@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Tickets.Api.Tests.Config;
 
 public static class TestConfiguration

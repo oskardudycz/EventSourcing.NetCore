@@ -1,5 +1,3 @@
-using System;
-
 namespace Marten.Integration.Tests.TestsInfrastructure;
 
 public static class DocumentSessionProvider

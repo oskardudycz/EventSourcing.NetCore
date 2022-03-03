@@ -1,5 +1,3 @@
-using System;
-
 namespace ECommerce.ShoppingCarts.ProductItems;
 
 public record ProductItem(

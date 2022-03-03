@@ -1,4 +1,3 @@
-using System;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using Newtonsoft.Json;

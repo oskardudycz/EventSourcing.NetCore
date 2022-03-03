@@ -1,5 +1,3 @@
-using System;
-
 namespace Orders.Api.Requests.Carts;
 
 public class RecordOrderPaymentRequest

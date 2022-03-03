@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Core.Aggregates;
 using SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 using SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;

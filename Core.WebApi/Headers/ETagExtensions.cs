@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Core.WebApi.Responses;
+﻿using Core.WebApi.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 

@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Carts.ShoppingCarts.GettingCartById;
 using Core.EventStoreDB.Events;
 using Core.Exceptions;

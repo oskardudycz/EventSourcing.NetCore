@@ -1,5 +1,3 @@
-using System;
-
 namespace Tickets.Reservations.NumberGeneration;
 
 public interface IReservationNumberGenerator

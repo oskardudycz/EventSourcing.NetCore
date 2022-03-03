@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using V1 = ECommerce.V1;
+﻿using V1 = ECommerce.V1;
 using Xunit;
 using System.Text.Json;
 using FluentAssertions;

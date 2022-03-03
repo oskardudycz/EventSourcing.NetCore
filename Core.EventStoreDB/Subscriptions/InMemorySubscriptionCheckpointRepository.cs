@@ -1,6 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Core.EventStoreDB.Subscriptions;
 

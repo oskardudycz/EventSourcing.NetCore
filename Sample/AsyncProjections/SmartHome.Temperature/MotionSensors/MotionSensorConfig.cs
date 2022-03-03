@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Core.Commands;
 using Core.Marten.Repository;
 using Core.Queries;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace Core.EventStoreDB.OptimisticConcurrency;
+﻿namespace Core.EventStoreDB.OptimisticConcurrency;
 
 public class EventStoreDBOptimisticConcurrencyScope
 {

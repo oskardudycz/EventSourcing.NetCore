@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ECommerce.V1;
+﻿namespace ECommerce.V1;
 
 public record ProductItem(
     Guid ProductId,

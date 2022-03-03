@@ -1,5 +1,4 @@
 using System.Net;
-using System.Runtime.CompilerServices;
 using Core;
 using Core.EventStoreDB;
 using Core.EventStoreDB.OptimisticConcurrency;
@@ -10,14 +9,7 @@ using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Core.WebApi.Tracing.Correlation;
 using EventStore.Client;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-
-[assembly: InternalsVisibleTo("Marten.Generated")]
 
 namespace Carts.Api;
 

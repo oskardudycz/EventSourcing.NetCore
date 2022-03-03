@@ -1,4 +1,3 @@
-using System;
 using Dapper;
 using FluentAssertions;
 using Npgsql;

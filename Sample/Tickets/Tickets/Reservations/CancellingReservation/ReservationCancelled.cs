@@ -1,4 +1,3 @@
-using System;
 using Core.Events;
 
 namespace Tickets.Reservations.CancellingReservation;

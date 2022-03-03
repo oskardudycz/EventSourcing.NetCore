@@ -8,11 +8,6 @@ using Core.WebApi.Swagger;
 using Core.WebApi.Tracing.Correlation;
 using ECommerce.Core;
 using EventStore.Client;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
 namespace ECommerce.Api;

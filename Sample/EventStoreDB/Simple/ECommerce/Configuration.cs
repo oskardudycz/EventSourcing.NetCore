@@ -1,5 +1,4 @@
-﻿using System;
-using ECommerce.Pricing;
+﻿using ECommerce.Pricing;
 using ECommerce.ShoppingCarts;
 using ECommerce.Storage;
 using Microsoft.EntityFrameworkCore;

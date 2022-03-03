@@ -1,5 +1,3 @@
-using System;
-
 namespace EventStoreBasics;
 
 public class StreamState

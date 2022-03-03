@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using MediatR;
 
 namespace Core.Queries;

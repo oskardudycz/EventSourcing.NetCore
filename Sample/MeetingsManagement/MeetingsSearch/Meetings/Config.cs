@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Core.ElasticSearch.Repository;
 using Core.Events;
 using Core.Queries;

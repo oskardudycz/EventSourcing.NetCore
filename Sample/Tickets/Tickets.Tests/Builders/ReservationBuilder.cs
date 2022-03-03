@@ -1,4 +1,3 @@
-using System;
 using Core.Aggregates;
 using Tickets.Reservations;
 using Tickets.Tests.Stubs.Reservations;

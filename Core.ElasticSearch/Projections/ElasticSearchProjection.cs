@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Core.ElasticSearch.Indices;
+﻿using Core.ElasticSearch.Indices;
 using Core.Events;
 using Core.Events.NoMediator;
 using Core.Projections;

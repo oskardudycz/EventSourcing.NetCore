@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Core.WebApi.Tracing.Correlation;
+﻿namespace Core.WebApi.Tracing.Correlation;
 
 public record CorrelationId(string Value);
 

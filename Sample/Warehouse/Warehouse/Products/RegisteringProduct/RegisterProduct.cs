@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Warehouse.Core.Commands;
+﻿using Warehouse.Core.Commands;
 using Warehouse.Products.Primitives;
 
 namespace Warehouse.Products.RegisteringProduct;

@@ -1,4 +1,3 @@
-using System;
 using FluentAssertions;
 using Tickets.Reservations.ChangingReservationSeat;
 using Tickets.Tests.Builders;

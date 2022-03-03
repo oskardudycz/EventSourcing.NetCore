@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Core.Events;
+﻿using Core.Events;
 using Core.Events.NoMediator;
 using ECommerce.Core.Queries;
 using Microsoft.EntityFrameworkCore;

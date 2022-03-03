@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Core.OptimisticConcurrency;
+﻿namespace Core.OptimisticConcurrency;
 
 public interface IExpectedResourceVersionProvider
 {

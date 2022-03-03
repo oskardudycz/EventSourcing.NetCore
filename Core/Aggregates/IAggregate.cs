@@ -1,4 +1,3 @@
-using System;
 using Core.Events;
 using Core.Projections;
 

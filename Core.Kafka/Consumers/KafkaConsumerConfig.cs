@@ -1,7 +1,7 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 
-namespace Core.Streaming.Kafka.Consumers;
+namespace Core.Kafka.Consumers;
 
 public class KafkaConsumerConfig
 {

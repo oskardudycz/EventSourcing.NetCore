@@ -1,4 +1,3 @@
-using System;
 using Core.Ids;
 
 namespace Tickets.Tests.Stubs.Ids;
