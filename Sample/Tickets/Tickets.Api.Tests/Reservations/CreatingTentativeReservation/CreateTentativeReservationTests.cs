@@ -28,7 +28,7 @@ public class CreateTentativeReservationFixture: ApiWithEventsFixture<Startup>
     public override async Task InitializeAsync()
     {
         // send create command
-        CommandResponse = await Post(new CreateTentativeReservationRequest {SeatId = SeatId});
+        CommandResponse = await Post(new CreateTentativeReservationRequest { SeatId = SeatId });
     }
 }
 
@@ -60,14 +60,12 @@ public class CreateTentativeReservationTests: IClassFixture<CreateTentativeReser
     {
         var createdReservationId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-        fixture.PublishedInternalEventsOfType<TentativeReservationCreated>()
-            .Should()
-            .HaveCount(1)
-            .And.Contain(@event =>
+        await fixture.ShouldPublishInternalEventOfType<TentativeReservationCreated>(
+            @event =>
                 @event.ReservationId == createdReservationId
                 && @event.SeatId == fixture.SeatId
                 && !string.IsNullOrEmpty(@event.Number)
-            );
+        );
     }
 
     [Fact]
@@ -83,7 +81,7 @@ public class CreateTentativeReservationTests: IClassFixture<CreateTentativeReser
         var queryResponse = await fixture.Get(query);
         queryResponse.EnsureSuccessStatusCode();
 
-        var reservationDetails =  await queryResponse.GetResultFromJson<ReservationDetails>();
+        var reservationDetails = await queryResponse.GetResultFromJson<ReservationDetails>();
         reservationDetails.Id.Should().Be(createdReservationId);
         reservationDetails.Number.Should().NotBeNull().And.NotBeEmpty();
         reservationDetails.Status.Should().Be(ReservationStatus.Tentative);

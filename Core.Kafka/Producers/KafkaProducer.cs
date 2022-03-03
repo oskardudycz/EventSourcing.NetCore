@@ -26,7 +26,7 @@ public class KafkaProducer: IExternalEventProducer
         using var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build();
         await Task.Yield();
         // publish event to kafka topic taken from config
-        var result = await p.ProduceAsync(config.Topic,
+        await p.ProduceAsync(config.Topic,
             new Message<string, string>
             {
                 // store event type name in message Key

@@ -7,7 +7,7 @@
     <ItemGroup>
       <PackageReference Include="Dapper" Version="2.0.123" />
       <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-      <PackageReference Include="Marten" Version="5.0.0-alpha.5" />
+      <PackageReference Include="Marten" Version="5.0.0-alpha.6" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="Simple.Migrations" Version="0.9.21" />
     </ItemGroup>

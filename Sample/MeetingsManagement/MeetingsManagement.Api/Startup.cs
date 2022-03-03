@@ -35,8 +35,8 @@ public class Startup
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Meeting Management", Version = "v1" });
                 c.OperationFilter<MetadataOperationFilter>();
             })
-            .AddCoreServices()
             .AddKafkaProducerAndConsumer()
+            .AddCoreServices()
             .AddMeetingsManagement(config)
             .AddCorrelationIdMiddleware()
             .AddOptimisticConcurrencyMiddleware(

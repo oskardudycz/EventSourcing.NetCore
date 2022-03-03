@@ -54,10 +54,8 @@ public class RequestPaymentsTestsTests: IClassFixture<RequestPaymentsTestsFixtur
     {
         var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
 
-        fixture.PublishedInternalEventsOfType<PaymentRequested>()
-            .Should()
-            .HaveCount(1)
-            .And.Contain(@event =>
+        await fixture.ShouldPublishInternalEventOfType<PaymentRequested>(
+            @event =>
                 @event.PaymentId == createdId
                 && @event.OrderId == fixture.OrderId
                 && @event.Amount == fixture.Amount

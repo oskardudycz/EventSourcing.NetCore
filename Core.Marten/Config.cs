@@ -1,9 +1,13 @@
+using Baseline.ImTools;
+using Core.Events;
 using Core.Ids;
 using Core.Marten.Ids;
 using Core.Marten.OptimisticConcurrency;
+using Core.Marten.Subscriptions;
 using Core.Threading;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
+using Marten.Events.Projections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Weasel.Core;
@@ -37,45 +41,21 @@ public static class MartenConfigExtensions
             .AddScoped<IIdGenerator, MartenIdGenerator>()
             .AddScoped<MartenOptimisticConcurrencyScope, MartenOptimisticConcurrencyScope>()
             .AddScoped<MartenExpectedStreamVersionProvider, MartenExpectedStreamVersionProvider>()
-            .AddScoped<MartenNextStreamVersionProvider, MartenNextStreamVersionProvider>();
-
-        var documentStore = services
-            .AddMarten(options =>
-            {
-                SetStoreOptions(options, martenConfig, configureOptions);
-            })
-            .AddAsyncDaemon(DaemonMode.Solo)
-            .InitializeStore();
-
-        SetupSchema(documentStore, martenConfig, 1);
+            .AddScoped<MartenNextStreamVersionProvider, MartenNextStreamVersionProvider>()
+            .AddMarten(sp => SetStoreOptions(sp, martenConfig, configureOptions))
+            .ApplyAllDatabaseChangesOnStartup()
+            .AddAsyncDaemon(DaemonMode.Solo);
 
         return services;
     }
 
-    private static void SetupSchema(IDocumentStore documentStore, Config martenConfig, int retryLeft = 1)
+    private static StoreOptions SetStoreOptions(
+        IServiceProvider serviceProvider,
+        Config config,
+        Action<StoreOptions>? configureOptions = null
+    )
     {
-        try
-        {
-            if (martenConfig.ShouldRecreateDatabase)
-                documentStore.Advanced.Clean.CompletelyRemoveAll();
-
-            using (NoSynchronizationContextScope.Enter())
-            {
-                documentStore.Schema.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
-            }
-        }
-        catch
-        {
-            if (retryLeft == 0) throw;
-
-            Thread.Sleep(1000);
-            SetupSchema(documentStore, martenConfig, --retryLeft);
-        }
-    }
-
-    private static void SetStoreOptions(StoreOptions options, Config config,
-        Action<StoreOptions>? configureOptions = null)
-    {
+        var options = new StoreOptions();
         options.Connection(config.ConnectionString);
         options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
 
@@ -88,6 +68,14 @@ public static class MartenConfigExtensions
             nonPublicMembersStorage: NonPublicMembersStorage.All
         );
 
+        options.Projections.Add(
+            new MartenSubscription(new[] { new MartenEventPublisher(serviceProvider) }),
+            ProjectionLifecycle.Async,
+            "MartenSubscription"
+        );
+
         configureOptions?.Invoke(options);
+
+        return options;
     }
 }

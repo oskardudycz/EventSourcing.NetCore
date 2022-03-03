@@ -28,8 +28,9 @@ public class Startup
             c.OperationFilter<MetadataOperationFilter>();
         });
 
-        services.AddCoreServices()
+        services
             .AddKafkaConsumer()
+            .AddCoreServices()
             .AddMeetingsSearch(config)
             .AddCorrelationIdMiddleware();
     }
