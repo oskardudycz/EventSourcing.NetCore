@@ -1,3 +1,4 @@
+using Core.Events;
 using Core.EventStoreDB.Serialization;
 using EventStore.Client;
 
@@ -32,6 +33,7 @@ public static class EventStoreDBExtensions
         this EventStoreClient eventStore,
         string id,
         object @event,
+        EventMetadata eventMetadata,
         CancellationToken cancellationToken
     )
 
@@ -39,7 +41,7 @@ public static class EventStoreDBExtensions
         var result = await eventStore.AppendToStreamAsync(
             id,
             StreamState.NoStream,
-            new[] { @event.ToJsonEventData() },
+            new[] { @event.ToJsonEventData(eventMetadata) },
             cancellationToken: cancellationToken
         );
         return result.NextExpectedStreamRevision;
@@ -51,13 +53,14 @@ public static class EventStoreDBExtensions
         string id,
         object @event,
         ulong expectedRevision,
+        EventMetadata eventMetadata,
         CancellationToken cancellationToken
     )
     {
         var result = await eventStore.AppendToStreamAsync(
             id,
             expectedRevision,
-            new[] { @event.ToJsonEventData() },
+            new[] { @event.ToJsonEventData(eventMetadata) },
             cancellationToken: cancellationToken
         );
 

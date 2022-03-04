@@ -5,7 +5,7 @@ using Core.Serialization.Newtonsoft;
 using Core.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.Swagger;
-using Core.WebApi.Tracing.Correlation;
+using Core.WebApi.Tracing;
 using Microsoft.OpenApi.Models;
 
 namespace Shipments.Api;

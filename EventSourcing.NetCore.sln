@@ -240,6 +240,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.V1", "Sample\Even
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsVersioning.Tests", "Sample\EventsVersioning\EventsVersioning.Tests\EventsVersioning.Tests.csproj", "{B8C099AE-3585-4228-9C79-81BB340A5215}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.EventStoreDB.Tests", "Core.EventStoreDB.Tests\Core.EventStoreDB.Tests.csproj", "{1738AF23-FD36-4457-B9F9-2593207CDEB5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -534,6 +536,10 @@ Global
 		{B8C099AE-3585-4228-9C79-81BB340A5215}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8C099AE-3585-4228-9C79-81BB340A5215}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8C099AE-3585-4228-9C79-81BB340A5215}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1738AF23-FD36-4457-B9F9-2593207CDEB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1738AF23-FD36-4457-B9F9-2593207CDEB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1738AF23-FD36-4457-B9F9-2593207CDEB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1738AF23-FD36-4457-B9F9-2593207CDEB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -630,6 +636,7 @@ Global
 		{0C3B70E2-26A6-4707-A537-74D649EDC2B8} = {A7186B6B-D56D-4AEF-B6B7-FAA827764C34}
 		{7B7E8DF0-8D21-4BC0-8A61-966A34E77DD8} = {0C3B70E2-26A6-4707-A537-74D649EDC2B8}
 		{B8C099AE-3585-4228-9C79-81BB340A5215} = {0C3B70E2-26A6-4707-A537-74D649EDC2B8}
+		{1738AF23-FD36-4457-B9F9-2593207CDEB5} = {107B18E3-65C8-4A6C-976D-7EEED6A6D318}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A5F55604-2FF3-43B7-B657-4F18E6E95D3B}

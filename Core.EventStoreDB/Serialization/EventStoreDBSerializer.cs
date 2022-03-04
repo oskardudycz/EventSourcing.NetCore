@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Core.Events;
+using Core.EventStoreDB.Events;
 using Core.Serialization.Newtonsoft;
 using EventStore.Client;
 using Newtonsoft.Json;
@@ -8,8 +9,15 @@ namespace Core.EventStoreDB.Serialization;
 
 public static class EventStoreDBSerializer
 {
-    private static readonly JsonSerializerSettings SerializerSettings =
-        new JsonSerializerSettings().WithNonDefaultConstructorContractResolver();
+    private static readonly JsonSerializerSettings SerializerSettings;
+
+    static EventStoreDBSerializer()
+    {
+        SerializerSettings =
+            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver();
+
+        SerializerSettings.Converters.Add(new EventStoreDBEventMetadataJsonConverter());
+    }
 
     public static T? Deserialize<T>(this ResolvedEvent resolvedEvent) where T : class =>
         Deserialize(resolvedEvent) as T;
@@ -34,7 +42,7 @@ public static class EventStoreDBSerializer
         new(
             Uuid.NewUuid(),
             EventTypeMapper.ToName(@event.GetType()),
-            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@event)),
-            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(metadata ?? new { }))
+            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@event, SerializerSettings)),
+            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(metadata ?? new { }, SerializerSettings))
         );
 }
