@@ -1,3 +1,4 @@
+using Core.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.ShoppingCarts.GettingCartById;
@@ -23,6 +24,6 @@ public record GetCartById(
         return await shoppingCarts
             .SingleOrDefaultAsync(
                 x => x.Id == query.ShoppingCartId, ct
-            ) ?? throw new InvalidOperationException();
+            ) ?? throw AggregateNotFoundException.For<ShoppingCartDetails>(query.ShoppingCartId);
     }
 }

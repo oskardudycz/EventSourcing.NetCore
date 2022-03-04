@@ -7,7 +7,7 @@ using Core.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
-using Core.WebApi.Tracing.Correlation;
+using Core.WebApi.Tracing;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
 

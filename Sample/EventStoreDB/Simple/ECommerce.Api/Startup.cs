@@ -5,7 +5,7 @@ using Core.Exceptions;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
-using Core.WebApi.Tracing.Correlation;
+using Core.WebApi.Tracing;
 using ECommerce.Core;
 using EventStore.Client;
 using Microsoft.OpenApi.Models;
