@@ -28,6 +28,9 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
 
     public async Task<long> Add(T aggregate, EventMetadata? eventMetadata = null, CancellationToken cancellationToken = default)
     {
+        documentSession.CorrelationId = eventMetadata?.CorrelationId?.Value;
+        documentSession.CausationId = eventMetadata?.CausationId?.Value;
+
         var events = aggregate.DequeueUncommittedEvents();
 
         documentSession.Events.StartStream<Aggregate>(
@@ -42,6 +45,9 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
 
     public async Task<long> Update(T aggregate, long? expectedVersion = null, EventMetadata? eventMetadata = null, CancellationToken cancellationToken = default)
     {
+        documentSession.CorrelationId = eventMetadata?.CorrelationId?.Value;
+        documentSession.CausationId = eventMetadata?.CausationId?.Value;
+
         var events = aggregate.DequeueUncommittedEvents();
 
         var nextVersion = expectedVersion.HasValue ?
