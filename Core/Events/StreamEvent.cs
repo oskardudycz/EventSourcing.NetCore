@@ -1,6 +1,6 @@
 ﻿namespace Core.Events;
 
-public record EventMetadata(
+public record StreamEventMetadata(
     ulong StreamRevision,
     ulong LogPosition
 );
@@ -8,9 +8,9 @@ public record EventMetadata(
 public class StreamEvent: IEvent
 {
     public object Data { get; }
-    public EventMetadata Metadata { get; }
+    public StreamEventMetadata Metadata { get; }
 
-    public StreamEvent(object data, EventMetadata metadata)
+    public StreamEvent(object data, StreamEventMetadata metadata)
     {
         Data = data;
         Metadata = metadata;
@@ -21,7 +21,7 @@ public class StreamEvent<T>: StreamEvent where T: notnull
 {
     public new T Data => (T)base.Data;
 
-    public StreamEvent(T data, EventMetadata metadata) : base(data, metadata)
+    public StreamEvent(T data, StreamEventMetadata metadata) : base(data, metadata)
     {
     }
 }

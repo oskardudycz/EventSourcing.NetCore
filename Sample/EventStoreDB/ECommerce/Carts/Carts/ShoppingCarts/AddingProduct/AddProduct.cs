@@ -48,7 +48,7 @@ internal class HandleAddProduct:
                 command.CartId,
                 cart => cart.AddProduct(productPriceCalculator, command.ProductItem),
                 expectedRevision,
-                cancellationToken
+                ct: cancellationToken
             )
         );
 

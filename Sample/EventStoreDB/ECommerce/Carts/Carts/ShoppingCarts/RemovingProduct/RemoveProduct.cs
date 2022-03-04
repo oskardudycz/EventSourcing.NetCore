@@ -39,12 +39,14 @@ internal class HandleRemoveProduct:
 
     public async Task<Unit> Handle(RemoveProduct command, CancellationToken cancellationToken)
     {
+        var (cartId, pricedProductItem) = command;
+
         await scope.Do(expectedRevision =>
             cartRepository.GetAndUpdate(
-                command.CartId,
-                cart => cart.RemoveProduct(command.ProductItem),
+                cartId,
+                cart => cart.RemoveProduct(pricedProductItem),
                 expectedRevision,
-                cancellationToken
+                ct: cancellationToken
             )
         );
 

@@ -30,11 +30,11 @@ public static class EventStoreDBSerializer
         )!;
     }
 
-    public static EventData ToJsonEventData(this object @event) =>
+    public static EventData ToJsonEventData(this object @event, object? metadata = null) =>
         new(
             Uuid.NewUuid(),
             EventTypeMapper.ToName(@event.GetType()),
             Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@event)),
-            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { }))
+            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(metadata ?? new { }))
         );
 }
