@@ -26,15 +26,21 @@ public class Config
 
     public bool ShouldRecreateDatabase { get; set; } = false;
 
-    public DaemonMode DaemonMode { get; set; } = DaemonMode.Disabled;
+    public DaemonMode DaemonMode { get; set; } = DaemonMode.Solo;
+
+    public bool UseMetadata = true;
 }
 
 public static class MartenConfigExtensions
 {
     private const string DefaultConfigKey = "EventStore";
 
-    public static IServiceCollection AddMarten(this IServiceCollection services, IConfiguration config,
-        Action<StoreOptions>? configureOptions = null, string configKey = DefaultConfigKey)
+    public static IServiceCollection AddMarten(
+        this IServiceCollection services,
+        IConfiguration config,
+        Action<StoreOptions>? configureOptions = null,
+        string configKey = DefaultConfigKey
+    )
     {
         var martenConfig = config.GetSection(configKey).Get<Config>();
 
@@ -75,6 +81,12 @@ public static class MartenConfigExtensions
         );
 
         configureOptions?.Invoke(options);
+
+        if (config.UseMetadata)
+        {
+            options.Events.MetadataConfig.CausationIdEnabled = true;
+            options.Events.MetadataConfig.CorrelationIdEnabled = true;
+        }
 
         return options;
     }
