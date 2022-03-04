@@ -43,7 +43,7 @@ internal class HandleInitializeCart:
         await scope.Do(_ =>
             cartRepository.Add(
                 ShoppingCart.Initialize(cartId, clientId),
-                cancellationToken
+                ct:cancellationToken
             )
         );
         return Unit.Value;

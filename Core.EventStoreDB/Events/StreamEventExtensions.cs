@@ -12,7 +12,7 @@ public static class StreamEventExtensions
         if (eventData == null)
             return null;
 
-        var metaData = new EventMetadata(resolvedEvent.Event.EventNumber.ToUInt64(), resolvedEvent.Event.Position.CommitPosition);
+        var metaData = new StreamEventMetadata(resolvedEvent.Event.EventNumber.ToUInt64(), resolvedEvent.Event.Position.CommitPosition);
         var type = typeof(StreamEvent<>).MakeGenericType(eventData.GetType());
         return (StreamEvent)Activator.CreateInstance(type, eventData, metaData)!;
     }

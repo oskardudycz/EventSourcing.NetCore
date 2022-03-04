@@ -40,7 +40,7 @@ internal class HandleConfirmCart:
                 command.CartId,
                 cart => cart.Confirm(),
                 expectedRevision,
-                cancellationToken
+                ct: cancellationToken
             )
         );
 

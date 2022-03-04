@@ -1,4 +1,5 @@
 using Core.Aggregates;
+using Core.Events;
 using Core.Exceptions;
 
 namespace Core.EventStoreDB.Repository;
@@ -8,10 +9,10 @@ public static class RepositoryExtensions
     public static async Task<T> Get<T>(
         this IEventStoreDBRepository<T> repository,
         Guid id,
-        CancellationToken cancellationToken
+        CancellationToken ct
     ) where T : class, IAggregate
     {
-        var entity = await repository.Find(id, cancellationToken);
+        var entity = await repository.Find(id, ct);
 
         return entity ?? throw AggregateNotFoundException.For<T>(id);
     }
@@ -21,13 +22,14 @@ public static class RepositoryExtensions
         Guid id,
         Action<T> action,
         ulong? expectedVersion = null,
-        CancellationToken cancellationToken = default
+        EventMetadata? eventMetadata = null,
+        CancellationToken ct = default
     ) where T : class, IAggregate
     {
-        var entity = await repository.Get(id, cancellationToken);
+        var entity = await repository.Get(id, ct);
 
         action(entity);
 
-        return await repository.Update(entity, expectedVersion, cancellationToken);
+        return await repository.Update(entity, expectedVersion, eventMetadata, ct);
     }
 }
