@@ -1,4 +1,5 @@
 using Core.Commands;
+using Core.Marten.Events;
 using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
@@ -15,11 +16,11 @@ internal class HandleScheduleMeeting:
     ICommandHandler<ScheduleMeeting>
 {
     private readonly IMartenRepository<Meeting> repository;
-    private readonly MartenOptimisticConcurrencyScope scope;
+    private readonly IMartenAppendScope scope;
 
     public HandleScheduleMeeting(
         IMartenRepository<Meeting> repository,
-        MartenOptimisticConcurrencyScope scope
+        IMartenAppendScope scope
     )
     {
         this.repository = repository;
@@ -30,11 +31,12 @@ internal class HandleScheduleMeeting:
     {
         var (meetingId, dateRange) = command;
 
-        await scope.Do(expectedVersion =>
+        await scope.Do((expectedVersion, eventMetadata) =>
             repository.GetAndUpdate(
                 meetingId,
                 meeting => meeting.Schedule(dateRange),
                 expectedVersion,
+                eventMetadata,
                 cancellationToken
             )
         );

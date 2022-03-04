@@ -1,4 +1,5 @@
 using Core.Commands;
+using Core.Marten.Events;
 using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
@@ -23,11 +24,11 @@ public class HandleCompletePayment:
     ICommandHandler<CompletePayment>
 {
     private readonly IMartenRepository<Payment> paymentRepository;
-    private readonly MartenOptimisticConcurrencyScope scope;
+    private readonly IMartenAppendScope scope;
 
     public HandleCompletePayment(
         IMartenRepository<Payment> paymentRepository,
-        MartenOptimisticConcurrencyScope scope
+        IMartenAppendScope scope
     )
     {
         this.paymentRepository = paymentRepository;
@@ -38,7 +39,7 @@ public class HandleCompletePayment:
     {
         var paymentId = command.PaymentId;
 
-        await scope.Do(async expectedVersion =>
+        await scope.Do(async (expectedVersion, eventMetadata) =>
             {
                 try
                 {
@@ -46,7 +47,9 @@ public class HandleCompletePayment:
                         paymentId,
                         payment => payment.Complete(),
                         expectedVersion,
-                        cancellationToken);
+                        eventMetadata,
+                        cancellationToken
+                    );
                 }
                 catch
                 {
@@ -54,7 +57,9 @@ public class HandleCompletePayment:
                         paymentId,
                         payment => payment.Discard(DiscardReason.UnexpectedError),
                         expectedVersion,
-                        cancellationToken);
+                        eventMetadata,
+                        cancellationToken
+                    );
                 }
             }
         );

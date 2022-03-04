@@ -1,4 +1,5 @@
 using Core.Commands;
+using Core.Marten.Events;
 using Core.Marten.Repository;
 using MediatR;
 using Tickets.Reservations.NumberGeneration;
@@ -26,26 +27,34 @@ internal class HandleCreateTentativeReservation:
 {
     private readonly IMartenRepository<Reservation> repository;
     private readonly IReservationNumberGenerator reservationNumberGenerator;
+    private readonly IMartenAppendScope scope;
 
     public HandleCreateTentativeReservation(
         IMartenRepository<Reservation> repository,
-        IReservationNumberGenerator reservationNumberGenerator
+        IReservationNumberGenerator reservationNumberGenerator,
+        IMartenAppendScope scope
     )
     {
         this.repository = repository;
         this.reservationNumberGenerator = reservationNumberGenerator;
+        this.scope = scope;
     }
 
     public async Task<Unit> Handle(CreateTentativeReservation command, CancellationToken cancellationToken)
     {
-        var reservation = Reservation.CreateTentative(
-            command.ReservationId,
-            reservationNumberGenerator,
-            command.SeatId
+        var (reservationId, seatId) = command;
+
+        await scope.Do((_, eventMetadata) =>
+            repository.Add(
+                Reservation.CreateTentative(
+                    reservationId,
+                    reservationNumberGenerator,
+                    seatId
+                ),
+                eventMetadata,
+                cancellationToken
+            )
         );
-
-        await repository.Add(reservation, cancellationToken);
-
         return Unit.Value;
     }
 }

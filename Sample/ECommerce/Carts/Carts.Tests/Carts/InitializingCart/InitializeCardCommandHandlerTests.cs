@@ -1,6 +1,7 @@
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.InitializingCart;
 using Carts.Tests.Extensions.Reservations;
+using Carts.Tests.Stubs.Events;
 using Carts.Tests.Stubs.Repositories;
 using Core.Marten.OptimisticConcurrency;
 using FluentAssertions;
@@ -15,10 +16,7 @@ public class InitializeCardCommandHandlerTests
     {
         // Given
         var repository = new FakeRepository<ShoppingCart>();
-        var scope = new MartenOptimisticConcurrencyScope(
-            new MartenExpectedStreamVersionProvider(),
-            new MartenNextStreamVersionProvider()
-        );
+        var scope = new DummyMartenAppendScope();
 
         var commandHandler = new HandleInitializeCart(
             repository,

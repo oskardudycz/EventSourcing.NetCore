@@ -1,4 +1,5 @@
 using Core.Commands;
+using Core.Marten.Events;
 using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
@@ -22,11 +23,11 @@ internal class HandleConfirmReservation:
     ICommandHandler<ConfirmReservation>
 {
     private readonly IMartenRepository<Reservation> repository;
-    private readonly MartenOptimisticConcurrencyScope scope;
+    private readonly IMartenAppendScope scope;
 
     public HandleConfirmReservation(
         IMartenRepository<Reservation> repository,
-        MartenOptimisticConcurrencyScope scope
+        IMartenAppendScope scope
     )
     {
         this.repository = repository;
@@ -35,12 +36,14 @@ internal class HandleConfirmReservation:
 
     public async Task<Unit> Handle(ConfirmReservation command, CancellationToken cancellationToken)
     {
-        await scope.Do(expectedVersion =>
+        await scope.Do((expectedVersion, eventMetadata) =>
             repository.GetAndUpdate(
                 command.ReservationId,
                 payment => payment.Confirm(),
                 expectedVersion,
-                cancellationToken)
+                eventMetadata,
+                cancellationToken
+            )
         );
 
         return Unit.Value;

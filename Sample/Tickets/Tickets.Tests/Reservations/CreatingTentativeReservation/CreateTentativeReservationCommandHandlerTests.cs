@@ -1,3 +1,4 @@
+using Carts.Tests.Stubs.Events;
 using FluentAssertions;
 using Tickets.Reservations;
 using Tickets.Reservations.CreatingTentativeReservation;
@@ -19,7 +20,8 @@ public class CreateTentativeReservationCommandHandlerTests
 
         var commandHandler = new HandleCreateTentativeReservation(
             repository,
-            numberGenerator
+            numberGenerator,
+            new DummyMartenAppendScope()
         );
 
         var command = CreateTentativeReservation.Create(Guid.NewGuid(), Guid.NewGuid());

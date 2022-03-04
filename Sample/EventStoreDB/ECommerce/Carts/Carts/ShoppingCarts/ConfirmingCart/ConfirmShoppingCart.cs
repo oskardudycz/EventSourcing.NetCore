@@ -22,11 +22,11 @@ internal class HandleConfirmCart:
     ICommandHandler<ConfirmShoppingCart>
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
-    private readonly EventStoreDBOptimisticConcurrencyScope scope;
+    private readonly IEventStoreDBAppendScope scope;
 
     public HandleConfirmCart(
         IEventStoreDBRepository<ShoppingCart> cartRepository,
-        EventStoreDBOptimisticConcurrencyScope scope
+        IEventStoreDBAppendScope scope
     )
     {
         this.cartRepository = cartRepository;
@@ -35,12 +35,13 @@ internal class HandleConfirmCart:
 
     public async Task<Unit> Handle(ConfirmShoppingCart command, CancellationToken cancellationToken)
     {
-        await scope.Do(expectedRevision =>
+        await scope.Do((expectedRevision, eventMetadata) =>
             cartRepository.GetAndUpdate(
                 command.CartId,
                 cart => cart.Confirm(),
                 expectedRevision,
-                ct: cancellationToken
+                eventMetadata,
+                cancellationToken
             )
         );
 

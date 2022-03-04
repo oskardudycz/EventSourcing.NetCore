@@ -1,4 +1,5 @@
 using Core.Commands;
+using Core.Marten.Events;
 using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
@@ -32,11 +33,11 @@ public class HandleRequestPayment:
     ICommandHandler<RequestPayment>
 {
     private readonly IMartenRepository<Payment> paymentRepository;
-    private readonly MartenOptimisticConcurrencyScope scope;
+    private readonly IMartenAppendScope scope;
 
     public HandleRequestPayment(
         IMartenRepository<Payment> paymentRepository,
-        MartenOptimisticConcurrencyScope scope
+        IMartenAppendScope scope
     )
     {
         this.paymentRepository = paymentRepository;
@@ -47,9 +48,10 @@ public class HandleRequestPayment:
     {
         var (paymentId, orderId, amount) = command;
 
-        await scope.Do(_ =>
+        await scope.Do((_, eventMetadata) =>
             paymentRepository.Add(
                 Payment.Initialize(paymentId, orderId, amount),
+                eventMetadata,
                 cancellationToken
             )
         );
