@@ -1,4 +1,5 @@
 using Core.Commands;
+using Core.Marten.Events;
 using Core.Marten.Repository;
 using MediatR;
 
@@ -22,22 +23,28 @@ public class HandleStartTemperatureMeasurement:
     ICommandHandler<StartTemperatureMeasurement>
 {
     private readonly IMartenRepository<TemperatureMeasurement> repository;
+    private readonly IMartenAppendScope scope;
 
     public HandleStartTemperatureMeasurement(
-        IMartenRepository<TemperatureMeasurement> repository
+        IMartenRepository<TemperatureMeasurement> repository,
+        IMartenAppendScope scope
     )
     {
         this.repository = repository;
+        this.scope = scope;
     }
 
     public async Task<Unit> Handle(StartTemperatureMeasurement command, CancellationToken cancellationToken)
     {
-        var reservation = TemperatureMeasurement.Start(
-            command.MeasurementId
+        await scope.Do((_, eventMetadata) =>
+            repository.Add(
+                TemperatureMeasurement.Start(
+                    command.MeasurementId
+                ),
+                eventMetadata,
+                cancellationToken
+            )
         );
-
-        await repository.Add(reservation, cancellationToken);
-
         return Unit.Value;
     }
 }

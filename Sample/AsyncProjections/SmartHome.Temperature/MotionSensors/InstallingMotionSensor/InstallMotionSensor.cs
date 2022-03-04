@@ -1,4 +1,5 @@
 using Core.Commands;
+using Core.Marten.Events;
 using Core.Marten.Repository;
 using MediatR;
 
@@ -23,22 +24,28 @@ public class HandleInstallMotionSensor :
     ICommandHandler<InstallMotionSensor>
 {
     private readonly IMartenRepository<MotionSensor> repository;
+    private readonly IMartenAppendScope scope;
 
     public HandleInstallMotionSensor(
-        IMartenRepository<MotionSensor> repository
+        IMartenRepository<MotionSensor> repository,
+        IMartenAppendScope scope
     )
     {
         this.repository = repository;
+        this.scope = scope;
     }
 
     public async Task<Unit> Handle(InstallMotionSensor command, CancellationToken cancellationToken)
     {
-        var reservation = MotionSensor.Install(
-            command.MotionSensorId
+        await scope.Do((_, eventMetadata) =>
+            repository.Add(
+                MotionSensor.Install(
+                    command.MotionSensorId
+                ),
+                eventMetadata,
+                cancellationToken
+            )
         );
-
-        await repository.Add(reservation, cancellationToken);
-
         return Unit.Value;
     }
 }

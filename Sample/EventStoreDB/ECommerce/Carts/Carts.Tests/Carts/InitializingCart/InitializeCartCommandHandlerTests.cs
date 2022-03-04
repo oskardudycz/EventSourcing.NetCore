@@ -1,8 +1,8 @@
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.InitializingCart;
 using Carts.Tests.Extensions.Reservations;
+using Carts.Tests.Stubs.Events;
 using Carts.Tests.Stubs.Repositories;
-using Core.EventStoreDB.OptimisticConcurrency;
 using FluentAssertions;
 using Xunit;
 
@@ -15,10 +15,7 @@ public class InitializeCartCommandHandlerTests
     {
         // Given
         var repository = new FakeRepository<ShoppingCart>();
-        var scope = new EventStoreDBOptimisticConcurrencyScope(
-            new EventStoreDBExpectedStreamRevisionProvider(),
-            new EventStoreDBNextStreamRevisionProvider()
-        );
+        var scope = new DummyEventStoreDBAppendScope();
 
         var commandHandler = new HandleInitializeCart(
             repository,

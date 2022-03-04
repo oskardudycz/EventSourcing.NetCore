@@ -1,6 +1,7 @@
 using Baseline.ImTools;
 using Core.Events;
 using Core.Ids;
+using Core.Marten.Events;
 using Core.Marten.Ids;
 using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Subscriptions;
@@ -39,9 +40,8 @@ public static class MartenConfigExtensions
 
         services
             .AddScoped<IIdGenerator, MartenIdGenerator>()
-            .AddScoped<MartenOptimisticConcurrencyScope, MartenOptimisticConcurrencyScope>()
-            .AddScoped<MartenExpectedStreamVersionProvider, MartenExpectedStreamVersionProvider>()
-            .AddScoped<MartenNextStreamVersionProvider, MartenNextStreamVersionProvider>()
+            .AddScoped<IMartenAppendScope, MartenAppendScope>()
+            .AddMartenAppendScope()
             .AddMarten(sp => SetStoreOptions(sp, martenConfig, configureOptions))
             .ApplyAllDatabaseChangesOnStartup()
             .AddAsyncDaemon(DaemonMode.Solo);

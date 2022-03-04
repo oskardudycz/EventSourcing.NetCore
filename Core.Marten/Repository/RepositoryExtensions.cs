@@ -1,4 +1,5 @@
 using Core.Aggregates;
+using Core.Events;
 using Core.Exceptions;
 
 namespace Core.Marten.Repository;
@@ -8,7 +9,7 @@ public static class RepositoryExtensions
     public static async Task<T> Get<T>(
         this IMartenRepository<T> repository,
         Guid id,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     ) where T : class, IAggregate
     {
         var entity = await repository.Find(id, cancellationToken);
@@ -21,6 +22,7 @@ public static class RepositoryExtensions
         Guid id,
         Action<T> action,
         long? expectedVersion = null,
+        EventMetadata? eventMetadata = null,
         CancellationToken cancellationToken = default
     ) where T : class, IAggregate
     {
@@ -28,6 +30,6 @@ public static class RepositoryExtensions
 
         action(entity);
 
-        return await repository.Update(entity, expectedVersion, cancellationToken);
+        return await repository.Update(entity, expectedVersion, eventMetadata, cancellationToken);
     }
 }

@@ -7,9 +7,9 @@ namespace Core.Marten.Repository;
 public interface IMartenRepository<T> where T : class, IAggregate
 {
     Task<T?> Find(Guid id, CancellationToken cancellationToken);
-    Task<long> Add(T aggregate, CancellationToken cancellationToken);
-    Task<long> Update(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default);
-    Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default);
+    Task<long> Add(T aggregate, EventMetadata? eventMetadata = null, CancellationToken cancellationToken = default);
+    Task<long> Update(T aggregate, long? expectedVersion = null, EventMetadata? eventMetadata = null, CancellationToken cancellationToken = default);
+    Task<long> Delete(T aggregate, long? expectedVersion = null, EventMetadata? eventMetadata = null, CancellationToken cancellationToken = default);
 }
 
 public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggregate
@@ -26,7 +26,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         documentSession.Events.AggregateStreamAsync<T>(id, token: cancellationToken);
 
-    public async Task<long> Add(T aggregate, CancellationToken cancellationToken)
+    public async Task<long> Add(T aggregate, EventMetadata? eventMetadata = null, CancellationToken cancellationToken = default)
     {
         var events = aggregate.DequeueUncommittedEvents();
 
@@ -40,7 +40,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
         return events.Length;
     }
 
-    public async Task<long> Update(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
+    public async Task<long> Update(T aggregate, long? expectedVersion = null, EventMetadata? eventMetadata = null, CancellationToken cancellationToken = default)
     {
         var events = aggregate.DequeueUncommittedEvents();
 
@@ -59,6 +59,6 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
         return nextVersion;
     }
 
-    public Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default) =>
-        Update(aggregate, expectedVersion, cancellationToken);
+    public Task<long> Delete(T aggregate, long? expectedVersion = null, EventMetadata? eventMetadata = null, CancellationToken cancellationToken = default) =>
+        Update(aggregate, expectedVersion, eventMetadata, cancellationToken);
 }

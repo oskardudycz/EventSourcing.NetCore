@@ -1,6 +1,7 @@
 using Carts.Pricing;
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
+using Core.Marten.Events;
 using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
@@ -26,12 +27,12 @@ internal class HandleAddProduct:
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
     private readonly IProductPriceCalculator productPriceCalculator;
-    private readonly MartenOptimisticConcurrencyScope scope;
+    private readonly IMartenAppendScope scope;
 
     public HandleAddProduct(
         IMartenRepository<ShoppingCart> cartRepository,
         IProductPriceCalculator productPriceCalculator,
-        MartenOptimisticConcurrencyScope scope
+        IMartenAppendScope scope
     )
     {
         this.cartRepository = cartRepository;
@@ -43,12 +44,14 @@ internal class HandleAddProduct:
     {
         var (cartId, productItem) = command;
 
-        await scope.Do(expectedVersion =>
+        await scope.Do((expectedVersion, eventMetadata) =>
             cartRepository.GetAndUpdate(
                 cartId,
                 cart => cart.AddProduct(productPriceCalculator, productItem),
                 expectedVersion,
-                cancellationToken)
+                eventMetadata,
+                cancellationToken
+            )
         );
         return Unit.Value;
     }

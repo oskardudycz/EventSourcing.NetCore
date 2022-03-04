@@ -25,11 +25,11 @@ internal class HandleInitializeCart:
     ICommandHandler<InitializeShoppingCart>
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
-    private readonly EventStoreDBOptimisticConcurrencyScope scope;
+    private readonly IEventStoreDBAppendScope scope;
 
     public HandleInitializeCart(
         IEventStoreDBRepository<ShoppingCart> cartRepository,
-        EventStoreDBOptimisticConcurrencyScope scope
+        IEventStoreDBAppendScope scope
     )
     {
         this.cartRepository = cartRepository;
@@ -40,10 +40,11 @@ internal class HandleInitializeCart:
     {
         var (cartId, clientId) = command;
 
-        await scope.Do(_ =>
+        await scope.Do((_, eventMetadata) =>
             cartRepository.Add(
                 ShoppingCart.Initialize(cartId, clientId),
-                ct:cancellationToken
+                eventMetadata,
+                cancellationToken
             )
         );
         return Unit.Value;

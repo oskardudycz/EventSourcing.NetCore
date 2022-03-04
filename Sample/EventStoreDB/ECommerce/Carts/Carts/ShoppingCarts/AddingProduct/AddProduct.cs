@@ -28,12 +28,12 @@ internal class HandleAddProduct:
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
     private readonly IProductPriceCalculator productPriceCalculator;
-    private readonly EventStoreDBOptimisticConcurrencyScope scope;
+    private readonly IEventStoreDBAppendScope scope;
 
     public HandleAddProduct(
         IEventStoreDBRepository<ShoppingCart> cartRepository,
         IProductPriceCalculator productPriceCalculator,
-        EventStoreDBOptimisticConcurrencyScope scope
+        IEventStoreDBAppendScope scope
     )
     {
         this.cartRepository = cartRepository;
@@ -43,12 +43,15 @@ internal class HandleAddProduct:
 
     public async Task<Unit> Handle(AddProduct command, CancellationToken cancellationToken)
     {
-        await scope.Do(expectedRevision =>
+        var (cartId, productItem) = command;
+
+        await scope.Do((expectedRevision, eventMetadata) =>
             cartRepository.GetAndUpdate(
-                command.CartId,
-                cart => cart.AddProduct(productPriceCalculator, command.ProductItem),
+                cartId,
+                cart => cart.AddProduct(productPriceCalculator, productItem),
                 expectedRevision,
-                ct: cancellationToken
+                eventMetadata,
+                cancellationToken
             )
         );
 

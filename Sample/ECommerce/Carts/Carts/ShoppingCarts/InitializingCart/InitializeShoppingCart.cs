@@ -1,4 +1,5 @@
 using Core.Commands;
+using Core.Marten.Events;
 using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
@@ -25,11 +26,11 @@ internal class HandleInitializeCart:
     ICommandHandler<InitializeShoppingCart>
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
-    private readonly MartenOptimisticConcurrencyScope scope;
+    private readonly IMartenAppendScope scope;
 
     public HandleInitializeCart(
         IMartenRepository<ShoppingCart> cartRepository,
-        MartenOptimisticConcurrencyScope scope
+        IMartenAppendScope scope
     )
     {
         this.cartRepository = cartRepository;
@@ -40,9 +41,10 @@ internal class HandleInitializeCart:
     {
         var (cartId, clientId) = command;
 
-        await scope.Do(_ =>
+        await scope.Do((_, eventMetadata) =>
             cartRepository.Add(
                 ShoppingCart.Initialize(cartId, clientId),
+                eventMetadata,
                 cancellationToken
             )
         );
