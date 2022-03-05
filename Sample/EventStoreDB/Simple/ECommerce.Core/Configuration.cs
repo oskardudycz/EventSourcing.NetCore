@@ -1,4 +1,4 @@
-﻿using Core.Events.NoMediator;
+﻿using Core.Events;
 using Core.EventStoreDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

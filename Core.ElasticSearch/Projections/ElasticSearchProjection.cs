@@ -1,6 +1,5 @@
 ﻿using Core.ElasticSearch.Indices;
 using Core.Events;
-using Core.Events.NoMediator;
 using Core.Projections;
 using Elasticsearch.Net;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +7,7 @@ using Nest;
 
 namespace Core.ElasticSearch.Projections;
 
-public class ElasticSearchProjection<TEvent, TView> : INoMediatorEventHandler<EventEnvelope<TEvent>>
+public class ElasticSearchProjection<TEvent, TView> : IEventHandler<EventEnvelope<TEvent>>
     where TView : class, IProjection
     where TEvent : IEvent
 {
@@ -49,7 +48,7 @@ public static class ElasticSearchProjectionConfig
         where TView : class, IProjection
         where TEvent : IEvent
     {
-        services.AddTransient<INoMediatorEventHandler<EventEnvelope<TEvent>>>(sp =>
+        services.AddTransient<IEventHandler<EventEnvelope<TEvent>>>(sp =>
         {
             var session = sp.GetRequiredService<IElasticClient>();
 

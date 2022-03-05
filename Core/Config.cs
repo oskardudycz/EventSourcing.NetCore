@@ -20,9 +20,9 @@ public static class Config
         services.AddMediatR()
             .AddScoped<ICommandBus, CommandBus>()
             .AddScoped<IQueryBus, QueryBus>()
-            .AddTracing();
+            .AddTracing()
+            .AddEventBus();
 
-        services.TryAddScoped<IEventBus, EventBus>();
         services.TryAddScoped<IExternalEventProducer, NulloExternalEventProducer>();
         services.TryAddScoped<IExternalCommandBus, ExternalCommandBus>();
 
