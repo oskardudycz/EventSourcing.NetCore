@@ -69,7 +69,8 @@ public class TracingScopeFactory: ITracingScopeFactory
 
 public static class TraceScopeFactoryExtensions
 {
-    public static TracingScope CreateTraceScope(this ITracingScopeFactory tracingScopeFactory,
+    public static TracingScope CreateTraceScope(
+        this ITracingScopeFactory tracingScopeFactory,
         IServiceProvider serviceProvider, EventEnvelope? eventEnvelope)
     {
         if (eventEnvelope == null)

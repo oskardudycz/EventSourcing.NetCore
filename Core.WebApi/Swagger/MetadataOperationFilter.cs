@@ -27,7 +27,7 @@ public class MetadataOperationFilter: IOperationFilter
 
         operation.Parameters.Add(new OpenApiParameter
         {
-            Name = "X-CorrelationId",
+            Name = "X-Correlation-ID",
             In = ParameterLocation.Header,
             Description = "Correlation Id",
             Required = false
@@ -35,7 +35,7 @@ public class MetadataOperationFilter: IOperationFilter
 
         operation.Parameters.Add(new OpenApiParameter
         {
-            Name = "X-CausationId",
+            Name = "X-Causation-ID",
             In = ParameterLocation.Header,
             Description = "Causation Id",
             Required = false
