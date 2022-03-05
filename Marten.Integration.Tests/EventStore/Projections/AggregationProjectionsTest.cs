@@ -1,6 +1,6 @@
+using FluentAssertions;
 using Marten.Events.Aggregation;
 using Marten.Integration.Tests.TestsInfrastructure;
-using SharpTestsEx;
 using Weasel.Core;
 using Xunit;
 
@@ -115,13 +115,13 @@ public class AggregationProjectionsTest: MartenTest
 
         var projection = Session.Query<IssueDescriptions>().FirstOrDefault();
 
-        issuesListFromLiveAggregation.Should().Not.Be.Null();
-        issuesListFromInlineAggregation.Should().Not.Be.Null();
-        projection.Should().Not.Be.Null();
+        issuesListFromLiveAggregation.Should().NotBeNull();
+        issuesListFromInlineAggregation.Should().NotBeNull();
+        projection.Should().NotBeNull();
 
-        issuesListFromLiveAggregation!.Issues.Count.Should().Be.EqualTo(2);
-        issuesListFromInlineAggregation!.Issues.Count.Should().Be.EqualTo(2);
-        projection!.Descriptions.Count.Should().Be.EqualTo(2);
+        issuesListFromLiveAggregation!.Issues.Count.Should().Be(2);
+        issuesListFromInlineAggregation!.Issues.Count.Should().Be(2);
+        projection!.Descriptions.Count.Should().Be(2);
 
     }
 }

@@ -1,5 +1,5 @@
+using FluentAssertions;
 using Marten.Integration.Tests.TestsInfrastructure;
-using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate;
@@ -63,9 +63,9 @@ public class EventsAggregation: MartenTest
 
         var issuesList = EventStore.AggregateStream<IssuesList>(streamId)!;
 
-        issuesList.Issues.Should().Have.Count.EqualTo(1);
-        issuesList.Issues.Values.Single().IssueId.Should().Be.EqualTo(issue1Id);
-        issuesList.Issues.Values.Single().Description.Should().Be.EqualTo("Description");
+        issuesList.Issues.Should().HaveCount(1);
+        issuesList.Issues.Values.Single().IssueId.Should().Be(issue1Id);
+        issuesList.Issues.Values.Single().Description.Should().Be("Description");
 
         //2. First Issue Description Was Changed
         EventStore.Append(streamId, new IssueUpdated(issue1Id, "New Description"));
@@ -73,9 +73,9 @@ public class EventsAggregation: MartenTest
 
         issuesList = EventStore.AggregateStream<IssuesList>(streamId)!;
 
-        issuesList.Issues.Should().Have.Count.EqualTo(1);
-        issuesList.Issues.Values.Single().IssueId.Should().Be.EqualTo(issue1Id);
-        issuesList.Issues.Values.Single().Description.Should().Be.EqualTo("New Description");
+        issuesList.Issues.Should().HaveCount(1);
+        issuesList.Issues.Values.Single().IssueId.Should().Be(issue1Id);
+        issuesList.Issues.Values.Single().Description.Should().Be("New Description");
 
         //3. Two Other tasks were added
         EventStore.Append(streamId, new IssueCreated(Guid.NewGuid(), "Description2"),
@@ -84,10 +84,10 @@ public class EventsAggregation: MartenTest
 
         issuesList = EventStore.AggregateStream<IssuesList>(streamId)!;
 
-        issuesList.Issues.Should().Have.Count.EqualTo(3);
+        issuesList.Issues.Should().HaveCount(3);
         issuesList.Issues.Values.Select(t => t.Description)
             .Should()
-            .Have.SameSequenceAs("New Description", "Description2", "Description3");
+            .BeEquivalentTo("New Description", "Description2", "Description3");
 
         //4. First issue was removed
         EventStore.Append(streamId, new IssueRemoved(issue1Id));
@@ -95,9 +95,9 @@ public class EventsAggregation: MartenTest
 
         issuesList = EventStore.AggregateStream<IssuesList>(streamId)!;
 
-        issuesList.Issues.Should().Have.Count.EqualTo(2);
+        issuesList.Issues.Should().HaveCount(2);
         issuesList.Issues.Values.Select(t => t.Description)
             .Should()
-            .Have.SameSequenceAs("Description2", "Description3");
+            .BeEquivalentTo("Description2", "Description3");
     }
 }

@@ -1,4 +1,4 @@
-﻿using SharpTestsEx;
+﻿using FluentAssertions;
 using Xunit;
 
 namespace MediatR.Tests.Initialization;
@@ -27,10 +27,10 @@ public class Initialization
             //When
             var mediator = new Mediator(type => ServiceLocator.Get(type).Single());
 
-            mediator.Should().Not.Be.Null();
+            mediator.Should().NotBeNull();
         });
 
         //Then
-        ex.Should().Be.Null();
+        ex.Should().BeNull();
     }
 }

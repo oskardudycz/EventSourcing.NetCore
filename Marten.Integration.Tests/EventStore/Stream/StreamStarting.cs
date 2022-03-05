@@ -1,6 +1,6 @@
+using FluentAssertions;
 using Marten.Exceptions;
 using Marten.Integration.Tests.TestsInfrastructure;
-using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Stream;
@@ -31,7 +31,7 @@ public class StreamStarting: MartenTest
 
         Session.SaveChanges();
 
-        streamId.Should().Not.Be.Null();
+        streamId.Should().NotBeNull();
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class StreamStarting: MartenTest
 
         var streamId = EventStore.StartStream(@event.IssueId, @event);
 
-        streamId.Should().Not.Be.Null();
+        streamId.Should().NotBeNull();
 
         Session.SaveChanges();
     }
@@ -74,8 +74,8 @@ public class StreamStarting: MartenTest
 
         var streamState = EventStore.FetchStreamState(streamId);
 
-        streamState.Should().Not.Be.Null();
-        streamState.Version.Should().Be.EqualTo(1);
+        streamState.Should().NotBeNull();
+        streamState.Version.Should().Be(1);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class StreamStarting: MartenTest
 
         var streamId = EventStore.StartStream(events);
 
-        streamId.Should().Not.Be.Null();
+        streamId.Should().NotBeNull();
 
         Session.SaveChanges();
     }

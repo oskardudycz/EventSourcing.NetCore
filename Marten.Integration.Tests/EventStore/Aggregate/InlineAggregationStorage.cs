@@ -1,5 +1,5 @@
+using FluentAssertions;
 using Marten.Integration.Tests.TestsInfrastructure;
-using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate;
@@ -74,10 +74,10 @@ public class InlineAggregationStorage: MartenTest
         //3. Get inline aggregation
         var issuesListFromInlineAggregation = Session.Load<IssuesList>(streamId)!;
 
-        issuesListFromLiveAggregation.Should().Not.Be.Null();
-        issuesListFromInlineAggregation.Should().Not.Be.Null();
+        issuesListFromLiveAggregation.Should().NotBeNull();
+        issuesListFromInlineAggregation.Should().NotBeNull();
 
-        issuesListFromLiveAggregation.Issues.Count.Should().Be.EqualTo(2);
-        issuesListFromLiveAggregation.Issues.Count.Should().Be.EqualTo(issuesListFromInlineAggregation.Issues.Count);
+        issuesListFromLiveAggregation.Issues.Count.Should().Be(2);
+        issuesListFromLiveAggregation.Issues.Count.Should().Be(issuesListFromInlineAggregation.Issues.Count);
     }
 }

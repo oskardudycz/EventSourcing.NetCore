@@ -1,5 +1,5 @@
+using FluentAssertions;
 using Marten.Integration.Tests.TestsInfrastructure;
-using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Stream;
@@ -37,8 +37,8 @@ public class StreamLoading: MartenTest
         var events = EventStore.FetchStream(streamId);
 
         //Then
-        events.Count.Should().Be.EqualTo(1);
-        events.First().Version.Should().Be.EqualTo(1);
+        events.Count.Should().Be(1);
+        events.First().Version.Should().Be(1);
     }
 
     [Fact]
@@ -54,8 +54,8 @@ public class StreamLoading: MartenTest
         //Then
         var events = EventStore.FetchStream(streamId);
 
-        events.Count.Should().Be.EqualTo(2);
-        events.Last().Version.Should().Be.EqualTo(2);
+        events.Count.Should().Be(2);
+        events.Last().Version.Should().Be(2);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class StreamLoading: MartenTest
         var @event = EventStore.Load<IssueCreated>(eventId);
 
         //Then
-        @event.Should().Not.Be.Null();
-        @event.Id.Should().Be.EqualTo(eventId);
+        @event.Should().NotBeNull();
+        @event.Id.Should().Be(eventId);
     }
 }

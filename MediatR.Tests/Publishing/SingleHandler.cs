@@ -1,4 +1,4 @@
-using SharpTestsEx;
+using FluentAssertions;
 using Xunit;
 
 namespace MediatR.Tests.Publishing;
@@ -79,7 +79,7 @@ public class SingleHandler
         await mediator.Publish(@event);
 
         //Then
-        issuesList.Issues.Should().Have.Count.EqualTo(1);
-        issuesList.Issues.Should().Have.SameValuesAs("cleaning");
+        issuesList.Issues.Should().HaveCount(1);
+        issuesList.Issues.Should().BeEquivalentTo("cleaning");
     }
 }

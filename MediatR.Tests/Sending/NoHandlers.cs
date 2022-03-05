@@ -1,4 +1,4 @@
-using SharpTestsEx;
+using FluentAssertions;
 using Xunit;
 
 namespace MediatR.Tests.Sending;
@@ -7,7 +7,7 @@ public class NoHandlers
 {
     public class ServiceLocator
     {
-        private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
+        private readonly Dictionary<Type, List<object>> services = new();
 
         public void Register(Type type, params object[] implementations)
             => services.Add(type, implementations.ToList());
@@ -54,6 +54,6 @@ public class NoHandlers
         });
 
         //Then
-        ex.Should().Not.Be.Null();
+        ex.Should().NotBeNull();
     }
 }
