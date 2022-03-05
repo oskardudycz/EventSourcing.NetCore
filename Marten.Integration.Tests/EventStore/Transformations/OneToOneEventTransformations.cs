@@ -107,22 +107,22 @@
 //             //2. Get transformed events
 //             var changeLogs = Session.Query<IssueChangesLog>().ToList();
 //
-//             changeLogs.Should().Have.Count.EqualTo(events.Length);
+//             changeLogs.Should().HaveCount(events.Length);
 //
 //             changeLogs.Select(ev => ev.IssueId)
 //                 .Should().Have.SameValuesAs(events.Select(ev => ev.IssueId));
 //
 //             changeLogs.Count(ev => ev.ChangeType == ChangeType.Creation)
-//                 .Should().Be.EqualTo(events.OfType<IssueCreated>().Count());
+//                 .Should().Be(events.OfType<IssueCreated>().Count());
 //
 //             changeLogs.Count(ev => ev.ChangeType == ChangeType.Modification)
-//                 .Should().Be.EqualTo(events.OfType<IssueUpdated>().Count());
+//                 .Should().Be(events.OfType<IssueUpdated>().Count());
 //
 //             changeLogs.Count(ev => ev.IssueId == issue1Id)
-//                 .Should().Be.EqualTo(events.Count(ev => ev.IssueId == issue1Id));
+//                 .Should().Be(events.Count(ev => ev.IssueId == issue1Id));
 //
 //             changeLogs.Count(ev => ev.IssueId == issue2Id)
-//                 .Should().Be.EqualTo(events.Count(ev => ev.IssueId == issue2Id));
+//                 .Should().Be(events.Count(ev => ev.IssueId == issue2Id));
 //         }
 //     }
 // }

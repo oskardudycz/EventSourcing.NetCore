@@ -1,5 +1,5 @@
+using FluentAssertions;
 using Marten.Integration.Tests.TestsInfrastructure;
-using SharpTestsEx;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate
@@ -98,8 +98,8 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             }
 
             //2. Both inline and online aggregation for the same type should be the same
-            issueFromV1InlineAggregation.Description.Should().Be.EqualTo("Issue 1 Updated");
-            issueFromV1InlineAggregation.Description.Should().Be.EqualTo(issueFromV1OnlineAggregation.Description);
+            issueFromV1InlineAggregation.Description.Should().Be("Issue 1 Updated");
+            issueFromV1InlineAggregation.Description.Should().Be(issueFromV1OnlineAggregation.Description);
 
             //3. Simulate change to aggregation logic
             NewVersion.Issue issueFromV2InlineAggregation;
@@ -112,12 +112,12 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             }
 
             //4. Inline aggregated snapshot won't change automatically
-            issueFromV2InlineAggregation.Description.Should().Be.EqualTo(issueFromV1InlineAggregation.Description);
-            issueFromV2InlineAggregation.Description.Should().Not.Be.EqualTo("New Logic: Issue 1 Updated");
+            issueFromV2InlineAggregation.Description.Should().Be(issueFromV1InlineAggregation.Description);
+            issueFromV2InlineAggregation.Description.Should().NotBe("New Logic: Issue 1 Updated");
 
             //5. But online aggregation is being applied automatically
-            issueFromV2OnlineAggregation.Description.Should().Not.Be.EqualTo(issueFromV1OnlineAggregation.Description);
-            issueFromV2OnlineAggregation.Description.Should().Be.EqualTo("New Logic: Issue 1 Updated");
+            issueFromV2OnlineAggregation.Description.Should().NotBe(issueFromV1OnlineAggregation.Description);
+            issueFromV2OnlineAggregation.Description.Should().Be("New Logic: Issue 1 Updated");
 
             //6. Reagregation
             using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
@@ -129,9 +129,9 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
                 var taskFromV2AfterReaggregation = session.Load<NewVersion.Issue>(taskId)!;
 
-                taskFromV2AfterReaggregation.Description.Should().Not.Be.EqualTo(issueFromV1OnlineAggregation.Description);
-                taskFromV2AfterReaggregation.Description.Should().Be.EqualTo(issueFromV2OnlineAggregation.Description);
-                taskFromV2AfterReaggregation.Description.Should().Be.EqualTo("New Logic: Issue 1 Updated");
+                taskFromV2AfterReaggregation.Description.Should().NotBe(issueFromV1OnlineAggregation.Description);
+                taskFromV2AfterReaggregation.Description.Should().Be(issueFromV2OnlineAggregation.Description);
+                taskFromV2AfterReaggregation.Description.Should().Be("New Logic: Issue 1 Updated");
 
                 //9. Check if next event would be properly applied to inline aggregation
                 session.Events.Append(taskId, new IssueUpdated(taskId, "Completely New text"));
@@ -141,7 +141,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
             {
                 var taskFromV2NewInlineAggregation = session.Load<NewVersion.Issue>(taskId)!;
-                taskFromV2NewInlineAggregation.Description.Should().Be.EqualTo("New Logic: Completely New text");
+                taskFromV2NewInlineAggregation.Description.Should().Be("New Logic: Completely New text");
             }
         }
     }

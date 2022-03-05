@@ -1,4 +1,4 @@
-using SharpTestsEx;
+using FluentAssertions;
 using Xunit;
 
 namespace MediatR.Tests.Sending;
@@ -79,7 +79,7 @@ public class MoreThanOneHandler
         await mediator.Send(query);
 
         //Then
-        issuesList.Issues.Count.Should().Be.EqualTo(1);
-        issuesList.Issues.Should().Have.SameValuesAs("cleaning");
+        issuesList.Issues.Count.Should().Be(1);
+        issuesList.Issues.Should().BeEquivalentTo("cleaning");
     }
 }

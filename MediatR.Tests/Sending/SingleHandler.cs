@@ -1,4 +1,4 @@
-using SharpTestsEx;
+using FluentAssertions;
 using Xunit;
 
 namespace MediatR.Tests.Sending;
@@ -7,7 +7,7 @@ public class SingleHandler
 {
     public class ServiceLocator
     {
-        private readonly Dictionary<Type, List<object>> services = new Dictionary<Type, List<object>>();
+        private readonly Dictionary<Type, List<object>> services = new();
 
         public void Register(Type type, params object[] implementations)
             => services.Add(type, implementations.ToList());
@@ -80,7 +80,7 @@ public class SingleHandler
         var result = await mediator.Send(query);
 
         //Then
-        result.Should().Have.Count.EqualTo(2);
-        result.Should().Have.SameValuesAs("Cleaning main room", "cleaning kitchen");
+        result.Should().HaveCount(2);
+        result.Should().BeEquivalentTo("Cleaning main room", "cleaning kitchen");
     }
 }

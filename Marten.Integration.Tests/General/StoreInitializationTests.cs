@@ -1,5 +1,5 @@
+using FluentAssertions;
 using Npgsql;
-using SharpTestsEx;
 using Weasel.Core;
 using Xunit;
 
@@ -17,7 +17,7 @@ public class StoreInitializationTests
             ConnectionShouldBeEstablished(store);
         });
 
-        ex.Should().Not.Be.Null();
+        ex.Should().NotBeNull();
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class StoreInitializationTests
             ConnectionShouldBeEstablished(store);
         });
 
-        ex.Should().Be.Null();
+        ex.Should().BeNull();
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class StoreInitializationTests
             ConnectionShouldBeEstablished(store);
         });
 
-        ex.Should().Be.Null();
+        ex.Should().BeNull();
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class StoreInitializationTests
             ConnectionShouldBeEstablished(store);
         });
 
-        ex.Should().Be.Null();
+        ex.Should().BeNull();
     }
 
     [Fact(Skip = "To investigate in Npgsql")]
@@ -88,7 +88,7 @@ public class StoreInitializationTests
             transaction.Rollback();
         });
 
-        ex.Should().Be.Null();
+        ex.Should().BeNull();
     }
 
     private static void ConnectionShouldBeEstablished(IDocumentStore store)
@@ -97,7 +97,7 @@ public class StoreInitializationTests
         {
             var result = session.Query<int>("SELECT 1");
 
-            result.Should().Not.Be.Null();
+            result.Should().NotBeNull();
         }
     }
 }

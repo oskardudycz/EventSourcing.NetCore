@@ -1,4 +1,4 @@
-using SharpTestsEx;
+using FluentAssertions;
 using Xunit;
 
 namespace MediatR.Tests.Publishing;
@@ -54,6 +54,6 @@ public class NoHandlers
         });
 
         //Then
-        ex.Should().Not.Be.Null();
+        ex.Should().NotBeNull();
     }
 }
