@@ -13,7 +13,7 @@ public class EventStoreDBEventMetadataJsonConverter : JsonConverter
 
     public override bool CanConvert(Type objectType)
     {
-        return objectType == typeof(EventMetadata);
+        return objectType == typeof(TraceMetadata);
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)

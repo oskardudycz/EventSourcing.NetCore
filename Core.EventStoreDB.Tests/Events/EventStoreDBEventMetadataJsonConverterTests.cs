@@ -39,7 +39,7 @@ public class EventStoreDBEventMetadataJsonConverterTests
         var json = $"{{\"$correlationId\":\"{correlationId.Value}\",\"$causationId\":\"{causationId.Value}\"}}";
 
         // When
-        var eventMetadata = JsonConvert.DeserializeObject<EventMetadata>(json, jsonConverter);
+        var eventMetadata = JsonConvert.DeserializeObject<TraceMetadata>(json, jsonConverter);
 
 
         eventMetadata.Should().Be(expectedEventMetadata);

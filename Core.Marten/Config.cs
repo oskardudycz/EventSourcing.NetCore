@@ -7,6 +7,7 @@ using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Weasel.Core;
 
 namespace Core.Marten;
@@ -71,7 +72,10 @@ public static class MartenConfigExtensions
         );
 
         options.Projections.Add(
-            new MartenSubscription(new[] { new MartenEventPublisher(serviceProvider) }),
+            new MartenSubscription(
+                new[] { new MartenEventPublisher(serviceProvider) },
+                serviceProvider.GetRequiredService<ILogger<MartenSubscription>>()
+            ),
             ProjectionLifecycle.Async,
             "MartenSubscription"
         );

@@ -1,5 +1,4 @@
 using Core.BackgroundWorkers;
-using Core.Events.NoMediator;
 using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Subscriptions;
 using EventStore.Client;
@@ -27,7 +26,6 @@ public static class EventStoreDBConfigExtensions
         var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
 
         services
-            .AddEventBus()
             .AddSingleton(new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
             .AddEventStoreDBAppendScope()
             .AddTransient<EventStoreDBSubscriptionToAll, EventStoreDBSubscriptionToAll>();

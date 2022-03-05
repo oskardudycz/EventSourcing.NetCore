@@ -1,14 +1,13 @@
 using Core.Events;
-using MediatR;
 
 namespace Core.Testing;
 
 public class EventsLog
 {
-    public List<IEvent> PublishedEvents { get; } = new List<IEvent>();
+    public List<IEvent> PublishedEvents { get; } = new();
 }
 
-public class EventListener<TEvent>: INotificationHandler<TEvent>
+public class EventListener<TEvent>: IEventHandler<TEvent>
     where TEvent : IEvent
 {
     private readonly EventsLog eventsLog;

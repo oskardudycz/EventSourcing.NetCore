@@ -1,5 +1,4 @@
 ﻿using Core.Events;
-using Core.Events.NoMediator;
 using ECommerce.Core.Queries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -35,7 +34,7 @@ public class EntityFrameworkProjectionBuilder<TView, TDbContext>
     public EntityFrameworkProjectionBuilder<TView, TDbContext> AddOn<TEvent>(Func<EventEnvelope<TEvent>, TView> handler) where TEvent : notnull
     {
         services.AddSingleton(handler);
-        services.AddTransient<INoMediatorEventHandler<EventEnvelope<TEvent>>, AddProjection<TView, TEvent, TDbContext>>();
+        services.AddTransient<IEventHandler<EventEnvelope<TEvent>>, AddProjection<TView, TEvent, TDbContext>>();
 
         return this;
     }
@@ -48,7 +47,7 @@ public class EntityFrameworkProjectionBuilder<TView, TDbContext>
     {
         services.AddSingleton(getViewId);
         services.AddSingleton(handler);
-        services.AddTransient<INoMediatorEventHandler<EventEnvelope<TEvent>>, UpdateProjection<TView, TEvent, TDbContext>>();
+        services.AddTransient<IEventHandler<EventEnvelope<TEvent>>, UpdateProjection<TView, TEvent, TDbContext>>();
 
         if (prepare != null)
         {
@@ -77,7 +76,7 @@ public class EntityFrameworkProjectionBuilder<TView, TDbContext>
     }
 }
 
-public class AddProjection<TView, TEvent, TDbContext>: INoMediatorEventHandler<EventEnvelope<TEvent>>
+public class AddProjection<TView, TEvent, TDbContext>: IEventHandler<EventEnvelope<TEvent>>
     where TView: class
     where TDbContext: DbContext
     where TEvent : notnull
@@ -103,7 +102,7 @@ public class AddProjection<TView, TEvent, TDbContext>: INoMediatorEventHandler<E
     }
 }
 
-public class UpdateProjection<TView, TEvent, TDbContext>: INoMediatorEventHandler<EventEnvelope<TEvent>>
+public class UpdateProjection<TView, TEvent, TDbContext>: IEventHandler<EventEnvelope<TEvent>>
     where TView: class
     where TDbContext: DbContext
     where TEvent : notnull

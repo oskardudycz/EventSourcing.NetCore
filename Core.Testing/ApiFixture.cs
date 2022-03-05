@@ -5,9 +5,7 @@ using Core.Events;
 using Core.Events.External;
 using Core.Requests;
 using FluentAssertions;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using IEventBus = Core.Events.IEventBus;
 
 namespace Core.Testing;
 
@@ -22,7 +20,7 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
         {
             SetupServices?.Invoke(services);
             services.AddSingleton(eventsLog);
-            services.AddSingleton(typeof(INotificationHandler<>), typeof(EventListener<>));
+            services.AddSingleton(typeof(IEventHandler<>), typeof(EventListener<>));
             services.AddSingleton<IExternalEventProducer>(externalEventProducer);
             services.AddSingleton<IExternalCommandBus>(externalCommandBus);
             services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();

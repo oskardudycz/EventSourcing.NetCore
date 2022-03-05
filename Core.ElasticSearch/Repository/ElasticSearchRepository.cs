@@ -17,15 +17,12 @@ public interface IElasticSearchRepository<T> where T : class, IAggregate, new()
 public class ElasticSearchRepository<T>: IElasticSearchRepository<T> where T : class, IAggregate, new()
 {
     private readonly IElasticClient elasticClient;
-    private readonly IEventBus eventBus;
 
     public ElasticSearchRepository(
-        IElasticClient elasticClient,
-        IEventBus eventBus
+        IElasticClient elasticClient
     )
     {
         this.elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-        this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
     }
 
     public async Task<T?> Find(Guid id, CancellationToken cancellationToken)

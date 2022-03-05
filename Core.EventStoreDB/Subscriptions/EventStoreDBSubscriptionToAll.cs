@@ -1,5 +1,4 @@
 using Core.Events;
-using Core.Events.NoMediator;
 using Core.EventStoreDB.Events;
 using Core.Threading;
 using EventStore.Client;
@@ -23,7 +22,7 @@ public class EventStoreDBSubscriptionToAllOptions
 
 public class EventStoreDBSubscriptionToAll
 {
-    private readonly INoMediatorEventBus eventBus;
+    private readonly IEventBus eventBus;
     private readonly EventStoreClient eventStoreClient;
     private readonly ISubscriptionCheckpointRepository checkpointRepository;
     private readonly ILogger<EventStoreDBSubscriptionToAll> logger;
@@ -34,7 +33,7 @@ public class EventStoreDBSubscriptionToAll
 
     public EventStoreDBSubscriptionToAll(
         EventStoreClient eventStoreClient,
-        INoMediatorEventBus eventBus,
+        IEventBus eventBus,
         ISubscriptionCheckpointRepository checkpointRepository,
         ILogger<EventStoreDBSubscriptionToAll> logger
     )
