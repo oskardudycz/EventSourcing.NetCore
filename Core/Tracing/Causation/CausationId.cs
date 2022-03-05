@@ -1,8 +1,9 @@
-﻿using Core.Tracing.Correlation;
+﻿namespace Core.Tracing.Causation;
 
-namespace Core.Tracing.Causation;
-
-public record CausationId(string Value);
+public record CausationId(string Value)
+{
+    public const string LoggerScopeKey = "Causation-ID";
+}
 
 public interface ICausationIdFactory
 {

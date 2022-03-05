@@ -1,6 +1,5 @@
 using Core.Commands;
 using Core.Marten.Events;
-using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
@@ -36,12 +35,12 @@ internal class HandleConfirmReservation:
 
     public async Task<Unit> Handle(ConfirmReservation command, CancellationToken cancellationToken)
     {
-        await scope.Do((expectedVersion, eventMetadata) =>
+        await scope.Do((expectedVersion, traceMetadata) =>
             repository.GetAndUpdate(
                 command.ReservationId,
                 payment => payment.Confirm(),
                 expectedVersion,
-                eventMetadata,
+                traceMetadata,
                 cancellationToken
             )
         );

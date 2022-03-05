@@ -1,5 +1,6 @@
 ﻿using Core.Events;
 using Core.Marten.OptimisticConcurrency;
+using Core.Tracing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Marten.Events;
@@ -13,7 +14,7 @@ public class MartenAppendScope: AppendScope<long>, IMartenAppendScope
     public MartenAppendScope(
         Func<long?> getExpectedVersion,
         Action<long> setNextExpectedVersion,
-        Func<EventMetadata?> getEventMetadata
+        Func<TraceMetadata?> getEventMetadata
     ): base(getExpectedVersion, setNextExpectedVersion, getEventMetadata)
     {
     }
@@ -30,12 +31,12 @@ public static class MartenAppendScopeExtensions
                 {
                     var expectedStreamVersionProvider = sp.GetRequiredService<MartenExpectedStreamVersionProvider>();
                     var nextStreamVersionProvider = sp.GetRequiredService<MartenNextStreamVersionProvider>();
-                    var eventMetadataProvider = sp.GetRequiredService<IEventMetadataProvider>();
+                    var traceMetadataProvider = sp.GetRequiredService<ITraceMetadataProvider>();
 
                     return new MartenAppendScope(
                         () => expectedStreamVersionProvider.Value,
                         nextStreamVersionProvider.Set,
-                        eventMetadataProvider.Get
+                        traceMetadataProvider.Get
                     );
                 });
 }

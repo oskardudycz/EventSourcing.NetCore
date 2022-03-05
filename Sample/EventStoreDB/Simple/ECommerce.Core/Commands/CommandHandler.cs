@@ -1,5 +1,5 @@
-﻿using Core.Events;
-using Core.EventStoreDB.OptimisticConcurrency;
+﻿using Core.EventStoreDB.OptimisticConcurrency;
+using Core.Tracing;
 using Core.Tracing.Causation;
 using Core.Tracing.Correlation;
 using ECommerce.Core.EventStoreDB;
@@ -14,13 +14,13 @@ public static class CommandHandlerExtensions
         Func<TCommand, object> handle,
         Func<TCommand, string> getId,
         TCommand command,
-        EventMetadata eventMetadata,
+        TraceMetadata traceMetadata,
         CancellationToken ct)
     {
         var entityId = getId(command);
         var @event = handle(command);
 
-        return eventStore.Append(entityId, @event, eventMetadata, ct);
+        return eventStore.Append(entityId, @event, traceMetadata, ct);
     }
 
     public static async Task<ulong> HandleUpdateCommand<TCommand, TEntity>(
@@ -31,7 +31,7 @@ public static class CommandHandlerExtensions
         Func<TCommand, string> getId,
         TCommand command,
         ulong expectedVersion,
-        EventMetadata eventMetadata,
+        TraceMetadata traceMetadata,
         CancellationToken ct) where TEntity : notnull
     {
         var id = getId(command);
@@ -39,7 +39,7 @@ public static class CommandHandlerExtensions
 
         var @event = handle(command, entity);
 
-        return await eventStore.Append(id, @event, expectedVersion, eventMetadata, ct);
+        return await eventStore.Append(id, @event, expectedVersion, traceMetadata, ct);
     }
 
     public static IServiceCollection AddCreateCommandHandler<TCommand>(
@@ -63,13 +63,13 @@ public static class CommandHandlerExtensions
 
                 setNextExpectedVersion ??= sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Set;
 
-                var eventMetadata = new EventMetadata(
+                var traceMetadata = new TraceMetadata(
                     sp.GetRequiredService<ICorrelationIdProvider>().Get(),
                     sp.GetRequiredService<ICausationIdProvider>().Get()
                 );
 
                 return async (command, ct) =>
-                    setNextExpectedVersion(await HandleCreateCommand(eventStore, handle(sp), getId, command, eventMetadata, ct));
+                    setNextExpectedVersion(await HandleCreateCommand(eventStore, handle(sp), getId, command, traceMetadata, ct));
             });
 
     public static IServiceCollection AddUpdateCommandHandler<TCommand, TEntity>(
@@ -105,7 +105,7 @@ public static class CommandHandlerExtensions
                 setNextExpectedVersion ??=
                     sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Set;
 
-                var eventMetadata = new EventMetadata(
+                var traceMetadata = new TraceMetadata(
                     sp.GetRequiredService<ICorrelationIdProvider>().Get(),
                     sp.GetRequiredService<ICausationIdProvider>().Get()
                 );
@@ -119,7 +119,7 @@ public static class CommandHandlerExtensions
                             getId,
                             command,
                             getExpectedVersion(),
-                            eventMetadata,
+                            traceMetadata,
                             ct
                         )
                     );

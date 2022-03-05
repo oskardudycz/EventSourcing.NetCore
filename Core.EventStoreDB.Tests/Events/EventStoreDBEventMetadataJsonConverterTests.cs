@@ -1,5 +1,6 @@
 ﻿using Core.Events;
 using Core.EventStoreDB.Events;
+using Core.Tracing;
 using Core.Tracing.Causation;
 using Core.Tracing.Correlation;
 using FluentAssertions;
@@ -19,7 +20,7 @@ public class EventStoreDBEventMetadataJsonConverterTests
         var correlationId = new GuidCorrelationIdFactory().New();
         var causationId = new GuidCausationIdFactory().New();
 
-        var eventMetadata = new EventMetadata(correlationId, causationId);
+        var eventMetadata = new TraceMetadata(correlationId, causationId);
 
         // When
         var json = JsonConvert.SerializeObject(eventMetadata, jsonConverter);
@@ -34,7 +35,7 @@ public class EventStoreDBEventMetadataJsonConverterTests
         // Given
         var correlationId = new GuidCorrelationIdFactory().New();
         var causationId = new GuidCausationIdFactory().New();
-        var expectedEventMetadata = new EventMetadata(correlationId, causationId);
+        var expectedEventMetadata = new TraceMetadata(correlationId, causationId);
         var json = $"{{\"$correlationId\":\"{correlationId.Value}\",\"$causationId\":\"{causationId.Value}\"}}";
 
         // When

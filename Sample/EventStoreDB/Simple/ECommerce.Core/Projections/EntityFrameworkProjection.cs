@@ -32,23 +32,23 @@ public class EntityFrameworkProjectionBuilder<TView, TDbContext>
         this.services = services;
     }
 
-    public EntityFrameworkProjectionBuilder<TView, TDbContext> AddOn<TEvent>(Func<StreamEvent<TEvent>, TView> handler) where TEvent : notnull
+    public EntityFrameworkProjectionBuilder<TView, TDbContext> AddOn<TEvent>(Func<EventEnvelope<TEvent>, TView> handler) where TEvent : notnull
     {
         services.AddSingleton(handler);
-        services.AddTransient<INoMediatorEventHandler<StreamEvent<TEvent>>, AddProjection<TView, TEvent, TDbContext>>();
+        services.AddTransient<INoMediatorEventHandler<EventEnvelope<TEvent>>, AddProjection<TView, TEvent, TDbContext>>();
 
         return this;
     }
 
     public EntityFrameworkProjectionBuilder<TView, TDbContext> UpdateOn<TEvent>(
         Func<TEvent, object> getViewId,
-        Action<StreamEvent<TEvent>, TView> handler,
+        Action<EventEnvelope<TEvent>, TView> handler,
         Func<EntityEntry<TView>, CancellationToken, Task>? prepare = null
     ) where TEvent : notnull
     {
         services.AddSingleton(getViewId);
         services.AddSingleton(handler);
-        services.AddTransient<INoMediatorEventHandler<StreamEvent<TEvent>>, UpdateProjection<TView, TEvent, TDbContext>>();
+        services.AddTransient<INoMediatorEventHandler<EventEnvelope<TEvent>>, UpdateProjection<TView, TEvent, TDbContext>>();
 
         if (prepare != null)
         {
@@ -77,46 +77,46 @@ public class EntityFrameworkProjectionBuilder<TView, TDbContext>
     }
 }
 
-public class AddProjection<TView, TEvent, TDbContext>: INoMediatorEventHandler<StreamEvent<TEvent>>
+public class AddProjection<TView, TEvent, TDbContext>: INoMediatorEventHandler<EventEnvelope<TEvent>>
     where TView: class
     where TDbContext: DbContext
     where TEvent : notnull
 {
     private readonly TDbContext dbContext;
-    private readonly Func<StreamEvent<TEvent>, TView> create;
+    private readonly Func<EventEnvelope<TEvent>, TView> create;
 
     public AddProjection(
         TDbContext dbContext,
-        Func<StreamEvent<TEvent>, TView> create
+        Func<EventEnvelope<TEvent>, TView> create
     )
     {
         this.dbContext = dbContext;
         this.create = create;
     }
 
-    public async Task Handle(StreamEvent<TEvent> @event, CancellationToken ct)
+    public async Task Handle(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct)
     {
-        var view = create(@event);
+        var view = create(eventEnvelope);
 
         await dbContext.AddAsync(view, ct);
         await dbContext.SaveChangesAsync(ct);
     }
 }
 
-public class UpdateProjection<TView, TEvent, TDbContext>: INoMediatorEventHandler<StreamEvent<TEvent>>
+public class UpdateProjection<TView, TEvent, TDbContext>: INoMediatorEventHandler<EventEnvelope<TEvent>>
     where TView: class
     where TDbContext: DbContext
     where TEvent : notnull
 {
     private readonly TDbContext dbContext;
     private readonly Func<TEvent, object> getViewId;
-    private readonly Action<StreamEvent<TEvent>, TView> update;
+    private readonly Action<EventEnvelope<TEvent>, TView> update;
     private readonly Func<EntityEntry<TView>, CancellationToken, Task>? prepare;
 
     public UpdateProjection(
         TDbContext dbContext,
         Func<TEvent, object> getViewId,
-        Action<StreamEvent<TEvent>, TView> update,
+        Action<EventEnvelope<TEvent>, TView> update,
         Func<EntityEntry<TView>, CancellationToken, Task>? prepare = null)
     {
         this.dbContext = dbContext;
@@ -125,9 +125,9 @@ public class UpdateProjection<TView, TEvent, TDbContext>: INoMediatorEventHandle
         this.prepare = prepare;
     }
 
-    public async Task Handle(StreamEvent<TEvent> @event, CancellationToken ct)
+    public async Task Handle(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct)
     {
-        var viewId = getViewId(@event.Data);
+        var viewId = getViewId(eventEnvelope.Data);
         var view = await dbContext.FindAsync<TView>(new [] {viewId}, ct);
 
         if (view == null)
@@ -135,7 +135,7 @@ public class UpdateProjection<TView, TEvent, TDbContext>: INoMediatorEventHandle
 
         prepare?.Invoke(dbContext.Entry(view), ct);
 
-        update(@event, view);
+        update(eventEnvelope, view);
 
         await dbContext.SaveChangesAsync(ct);
     }

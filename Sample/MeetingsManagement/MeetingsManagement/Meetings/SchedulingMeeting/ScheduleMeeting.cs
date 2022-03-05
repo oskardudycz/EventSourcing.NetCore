@@ -1,6 +1,5 @@
 using Core.Commands;
 using Core.Marten.Events;
-using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 using MeetingsManagement.Meetings.ValueObjects;
@@ -31,12 +30,12 @@ internal class HandleScheduleMeeting:
     {
         var (meetingId, dateRange) = command;
 
-        await scope.Do((expectedVersion, eventMetadata) =>
+        await scope.Do((expectedVersion, traceMetadata) =>
             repository.GetAndUpdate(
                 meetingId,
                 meeting => meeting.Schedule(dateRange),
                 expectedVersion,
-                eventMetadata,
+                traceMetadata,
                 cancellationToken
             )
         );

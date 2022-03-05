@@ -1,24 +1,24 @@
 ﻿using Core.Tracing.Causation;
 using Core.Tracing.Correlation;
 
-namespace Core.Events;
+namespace Core.Tracing;
 
-public record EventMetadata(
+public record TraceMetadata(
     CorrelationId? CorrelationId,
     CausationId? CausationId
 );
 
-public interface IEventMetadataProvider
+public interface ITraceMetadataProvider
 {
-    EventMetadata? Get();
+    TraceMetadata? Get();
 }
 
-public class EventMetadataProvider: IEventMetadataProvider
+public class TraceMetadataProvider: ITraceMetadataProvider
 {
     private readonly ICorrelationIdProvider correlationIdProvider;
     private readonly ICausationIdProvider causationIdProvider;
 
-    public EventMetadataProvider(
+    public TraceMetadataProvider(
         ICorrelationIdProvider correlationIdProvider,
         ICausationIdProvider causationIdProvider
     )
@@ -27,7 +27,7 @@ public class EventMetadataProvider: IEventMetadataProvider
         this.causationIdProvider = causationIdProvider;
     }
 
-    public EventMetadata? Get()
+    public TraceMetadata? Get()
     {
         var correlationId = correlationIdProvider.Get();
         var causationId = causationIdProvider.Get();
@@ -35,6 +35,6 @@ public class EventMetadataProvider: IEventMetadataProvider
         if (correlationId == null && causationId == null)
             return null;
 
-        return new EventMetadata(correlationId, causationId);
+        return new TraceMetadata(correlationId, causationId);
     }
 }

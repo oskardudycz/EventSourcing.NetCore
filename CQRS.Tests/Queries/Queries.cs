@@ -1,6 +1,6 @@
 using CQRS.Tests.TestsInfrasructure;
+using FluentAssertions;
 using MediatR;
-using SharpTestsEx;
 using Xunit;
 
 namespace CQRS.Tests.Queries;
@@ -115,7 +115,7 @@ public class Queries
         var result = await applicationService.GetIssuesNames(query);
 
         //Then
-        result.Should().Have.Count.EqualTo(2);
-        result.Should().Have.SameValuesAs("Cleaning main room", "cleaning kitchen");
+        result.Should().HaveCount(2);
+        result.Should().BeEquivalentTo("Cleaning main room", "cleaning kitchen");
     }
 }

@@ -1,5 +1,5 @@
-using Core.Events;
 using Core.EventStoreDB.Serialization;
+using Core.Tracing;
 using EventStore.Client;
 
 namespace ECommerce.Core.EventStoreDB;
@@ -33,7 +33,7 @@ public static class EventStoreDBExtensions
         this EventStoreClient eventStore,
         string id,
         object @event,
-        EventMetadata eventMetadata,
+        TraceMetadata traceMetadata,
         CancellationToken cancellationToken
     )
 
@@ -41,7 +41,7 @@ public static class EventStoreDBExtensions
         var result = await eventStore.AppendToStreamAsync(
             id,
             StreamState.NoStream,
-            new[] { @event.ToJsonEventData(eventMetadata) },
+            new[] { @event.ToJsonEventData(traceMetadata) },
             cancellationToken: cancellationToken
         );
         return result.NextExpectedStreamRevision;
@@ -53,14 +53,14 @@ public static class EventStoreDBExtensions
         string id,
         object @event,
         ulong expectedRevision,
-        EventMetadata eventMetadata,
+        TraceMetadata traceMetadata,
         CancellationToken cancellationToken
     )
     {
         var result = await eventStore.AppendToStreamAsync(
             id,
             expectedRevision,
-            new[] { @event.ToJsonEventData(eventMetadata) },
+            new[] { @event.ToJsonEventData(traceMetadata) },
             cancellationToken: cancellationToken
         );
 

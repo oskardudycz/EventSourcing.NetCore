@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Reflection;
+using Core.Tracing;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 
@@ -13,22 +14,27 @@ public interface INoMediatorEventBus
 public class NoMediatorEventBus: INoMediatorEventBus
 {
     private readonly IServiceProvider serviceProvider;
+    private readonly Func<IServiceProvider, EventEnvelope?, TracingScope> createTracingScope;
     private readonly AsyncPolicy retryPolicy;
     private static readonly ConcurrentDictionary<Type, MethodInfo> PublishMethods = new();
 
     public NoMediatorEventBus(
         IServiceProvider serviceProvider,
+        Func<IServiceProvider, EventEnvelope?, TracingScope> createTracingScope,
         AsyncPolicy retryPolicy
     )
     {
         this.serviceProvider = serviceProvider;
+        this.createTracingScope = createTracingScope;
         this.retryPolicy = retryPolicy;
     }
 
     private async Task Publish<TEvent>(TEvent @event, CancellationToken ct)
     {
+        var eventEnvelope = @event as EventEnvelope;
         // You can consider adding here a retry policy for event handling
         using var scope = serviceProvider.CreateScope();
+        using var tracingScope = createTracingScope(serviceProvider, eventEnvelope);
 
         var eventHandlers =
             scope.ServiceProvider.GetServices<INoMediatorEventHandler<TEvent>>();
@@ -63,6 +69,10 @@ public static class EventBusExtensions
 {
     public static IServiceCollection AddEventBus(this IServiceCollection services, AsyncPolicy? asyncPolicy = null) =>
         services.AddSingleton<INoMediatorEventBus, NoMediatorEventBus>(sp =>
-            new NoMediatorEventBus(sp, asyncPolicy ?? Policy.NoOpAsync())
+            new NoMediatorEventBus(
+                sp,
+                sp.GetRequiredService<ITracingScopeFactory>().CreateTraceScope,
+                asyncPolicy ?? Policy.NoOpAsync()
+            )
         );
 }

@@ -1,21 +1,21 @@
-﻿using Core.Events;
-using Core.Marten.Events;
+﻿using Core.Marten.Events;
+using Core.Tracing;
 
-namespace Carts.Tests.Stubs.Events;
+namespace Tickets.Tests.Stubs.Events;
 
 public class DummyMartenAppendScope: IMartenAppendScope
 {
     private readonly long? expectedVersion;
-    private readonly EventMetadata? eventMetadata;
+    private readonly TraceMetadata? traceMetadata;
 
-    public DummyMartenAppendScope(long? expectedVersion = null, EventMetadata? eventMetadata = null)
+    public DummyMartenAppendScope(long? expectedVersion = null, TraceMetadata? traceMetadata = null)
     {
         this.expectedVersion = expectedVersion;
-        this.eventMetadata = eventMetadata;
+        this.traceMetadata = traceMetadata;
     }
 
-    public async Task Do(Func<long?, EventMetadata?, Task<long>> handler)
+    public async Task Do(Func<long?, TraceMetadata?, Task<long>> handler)
     {
-        await handler(expectedVersion, eventMetadata);
+        await handler(expectedVersion, traceMetadata);
     }
 }

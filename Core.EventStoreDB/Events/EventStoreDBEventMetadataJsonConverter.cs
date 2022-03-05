@@ -1,4 +1,5 @@
 ﻿using Core.Events;
+using Core.Tracing;
 using Core.Tracing.Causation;
 using Core.Tracing.Correlation;
 using Newtonsoft.Json;
@@ -17,7 +18,7 @@ public class EventStoreDBEventMetadataJsonConverter : JsonConverter
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        if (value is not EventMetadata(var correlationId, var causationId) || (correlationId == null && causationId == null))
+        if (value is not TraceMetadata(var correlationId, var causationId) || (correlationId == null && causationId == null))
         {
             writer.WriteNull();
             return;
@@ -65,6 +66,6 @@ public class EventStoreDBEventMetadataJsonConverter : JsonConverter
         } while (true);
 
 
-        return new EventMetadata(correlationId, causationId);
+        return new TraceMetadata(correlationId, causationId);
     }
 }

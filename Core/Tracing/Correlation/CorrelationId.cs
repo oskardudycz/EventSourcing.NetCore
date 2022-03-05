@@ -1,6 +1,9 @@
 ﻿namespace Core.Tracing.Correlation;
 
-public record CorrelationId(string Value);
+public record CorrelationId(string Value)
+{
+    public const string LoggerScopeKey = "Correlation-ID";
+}
 
 public interface ICorrelationIdFactory
 {
