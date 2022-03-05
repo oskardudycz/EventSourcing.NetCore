@@ -1,6 +1,5 @@
 using Core.Commands;
 using Core.Marten.Events;
-using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
@@ -42,12 +41,12 @@ internal class HandleChangeReservationSeat:
 
     public async Task<Unit> Handle(ChangeReservationSeat command, CancellationToken cancellationToken)
     {
-        await scope.Do((expectedVersion, eventMetadata) =>
+        await scope.Do((expectedVersion, traceMetadata) =>
             repository.GetAndUpdate(
                 command.ReservationId,
                 reservation => reservation.ChangeSeat(command.SeatId),
                 expectedVersion,
-                eventMetadata,
+                traceMetadata,
                 cancellationToken
             )
         );

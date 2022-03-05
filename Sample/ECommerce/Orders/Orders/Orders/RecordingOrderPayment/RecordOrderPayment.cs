@@ -1,6 +1,5 @@
 using Core.Commands;
 using Core.Marten.Events;
-using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
@@ -44,12 +43,12 @@ public class HandleRecordOrderPayment:
     {
         var (orderId, paymentId, recordedAt) = command;
 
-        await scope.Do((expectedVersion, eventMetadata) =>
+        await scope.Do((expectedVersion, traceMetadata) =>
             orderRepository.GetAndUpdate(
                 orderId,
                 order => order.RecordPayment(paymentId, recordedAt),
                 expectedVersion,
-                eventMetadata,
+                traceMetadata,
                 cancellationToken
             )
         );

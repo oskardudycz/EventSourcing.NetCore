@@ -2,7 +2,6 @@ using Carts.Pricing;
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
 using Core.Marten.Events;
-using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
@@ -44,12 +43,12 @@ internal class HandleAddProduct:
     {
         var (cartId, productItem) = command;
 
-        await scope.Do((expectedVersion, eventMetadata) =>
+        await scope.Do((expectedVersion, traceMetadata) =>
             cartRepository.GetAndUpdate(
                 cartId,
                 cart => cart.AddProduct(productPriceCalculator, productItem),
                 expectedVersion,
-                eventMetadata,
+                traceMetadata,
                 cancellationToken
             )
         );

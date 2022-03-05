@@ -1,6 +1,5 @@
 using Core.Commands;
 using Core.Marten.Events;
-using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
@@ -41,12 +40,12 @@ public class HandleDiscardPayment:
     {
         var (paymentId, _) = command;
 
-        await scope.Do((expectedVersion, eventMetadata) =>
+        await scope.Do((expectedVersion, traceMetadata) =>
             paymentRepository.GetAndUpdate(
                 paymentId,
                 payment => payment.TimeOut(),
                 expectedVersion,
-                eventMetadata,
+                traceMetadata,
                 cancellationToken
             )
         );

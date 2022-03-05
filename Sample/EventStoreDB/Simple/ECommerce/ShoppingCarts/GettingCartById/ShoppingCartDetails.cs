@@ -21,9 +21,9 @@ public class ShoppingCartDetailsProductItem
 
 public static class ShoppingCartDetailsProjection
 {
-    public static ShoppingCartDetails Handle(StreamEvent<ShoppingCartInitialized> @event)
+    public static ShoppingCartDetails Handle(EventEnvelope<ShoppingCartInitialized> eventEnvelope)
     {
-        var (shoppingCartId, clientId) = @event.Data;
+        var (shoppingCartId, clientId) = eventEnvelope.Data;
 
         return new ShoppingCartDetails
         {
@@ -31,26 +31,26 @@ public static class ShoppingCartDetailsProjection
             ClientId = clientId,
             Status = ShoppingCartStatus.Pending,
             Version = 0,
-            LastProcessedPosition = @event.Metadata.LogPosition
+            LastProcessedPosition = eventEnvelope.Metadata.LogPosition
         };
     }
 
-    public static void Handle(StreamEvent<ShoppingCartConfirmed> @event, ShoppingCartDetails view)
+    public static void Handle(EventEnvelope<ShoppingCartConfirmed> eventEnvelope, ShoppingCartDetails view)
     {
-        if (view.LastProcessedPosition >= @event.Metadata.LogPosition)
+        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
             return;
 
         view.Status = ShoppingCartStatus.Confirmed;
         view.Version++;
-        view.LastProcessedPosition = @event.Metadata.LogPosition;
+        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }
 
-    public static void Handle(StreamEvent<ProductItemAddedToShoppingCart> @event, ShoppingCartDetails view)
+    public static void Handle(EventEnvelope<ProductItemAddedToShoppingCart> eventEnvelope, ShoppingCartDetails view)
     {
-        if (view.LastProcessedPosition >= @event.Metadata.LogPosition)
+        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
             return;
 
-        var productItem = @event.Data.ProductItem;
+        var productItem = eventEnvelope.Data.ProductItem;
         var existingProductItem = view.ProductItems
             .FirstOrDefault(x => x.ProductId == productItem.ProductId);
 
@@ -69,15 +69,15 @@ public static class ShoppingCartDetailsProjection
         }
 
         view.Version++;
-        view.LastProcessedPosition = @event.Metadata.LogPosition;
+        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }
 
-    public static void Handle(StreamEvent<ProductItemRemovedFromShoppingCart> @event, ShoppingCartDetails view)
+    public static void Handle(EventEnvelope<ProductItemRemovedFromShoppingCart> eventEnvelope, ShoppingCartDetails view)
     {
-        if (view.LastProcessedPosition >= @event.Metadata.LogPosition)
+        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
             return;
 
-        var productItem = @event.Data.ProductItem;
+        var productItem = eventEnvelope.Data.ProductItem;
         var existingProductItem = view.ProductItems
             .Single(x => x.ProductId == productItem.ProductId);
 
@@ -91,6 +91,6 @@ public static class ShoppingCartDetailsProjection
         }
 
         view.Version++;
-        view.LastProcessedPosition = @event.Metadata.LogPosition;
+        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }
 }

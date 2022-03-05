@@ -3,7 +3,6 @@ using Carts.ShoppingCarts.InitializingCart;
 using Carts.Tests.Extensions.Reservations;
 using Carts.Tests.Stubs.Events;
 using Carts.Tests.Stubs.Repositories;
-using Core.Marten.OptimisticConcurrency;
 using FluentAssertions;
 using Xunit;
 

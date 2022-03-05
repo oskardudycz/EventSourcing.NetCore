@@ -2,6 +2,7 @@
 using Core.Events;
 using Core.EventStoreDB.Events;
 using Core.Serialization.Newtonsoft;
+using Core.Tracing;
 using EventStore.Client;
 using Newtonsoft.Json;
 
@@ -34,6 +35,21 @@ public static class EventStoreDBSerializer
         return JsonConvert.DeserializeObject(
             Encoding.UTF8.GetString(resolvedEvent.Event.Data.Span),
             eventType,
+            SerializerSettings
+        )!;
+    }
+
+    public static TraceMetadata? DeserializeMetadata(this ResolvedEvent resolvedEvent)
+    {
+        // get type
+        var eventType = EventTypeMapper.ToType(resolvedEvent.Event.EventType);
+
+        if (eventType == null)
+            return null;
+
+        // deserialize event
+        return JsonConvert.DeserializeObject<TraceMetadata>(
+            Encoding.UTF8.GetString(resolvedEvent.Event.Metadata.Span),
             SerializerSettings
         )!;
     }

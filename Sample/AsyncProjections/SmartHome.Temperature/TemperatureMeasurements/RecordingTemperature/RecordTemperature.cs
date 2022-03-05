@@ -1,6 +1,5 @@
 using Core.Commands;
 using Core.Marten.Events;
-using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Repository;
 using MediatR;
 
@@ -41,12 +40,12 @@ public class HandleRecordTemperature:
     {
         var (measurementId, temperature) = command;
 
-        await scope.Do((expectedVersion, eventMetadata) =>
+        await scope.Do((expectedVersion, traceMetadata) =>
             repository.GetAndUpdate(
                 measurementId,
                 reservation => reservation.Record(temperature),
                 expectedVersion,
-                eventMetadata,
+                traceMetadata,
                 cancellationToken
             )
         );

@@ -1,6 +1,6 @@
 using CQRS.Tests.TestsInfrasructure;
+using FluentAssertions;
 using MediatR;
-using SharpTestsEx;
 using Xunit;
 
 namespace CQRS.Tests.Commands;
@@ -114,7 +114,7 @@ public class Commands
         applicationService.CreateIssue(command);
 
         //Then
-        writeModel.Issues.Should().Have.Count.EqualTo(1);
-        writeModel.Issues.Should().Have.SameValuesAs(createdIssueName);
+        writeModel.Issues.Should().HaveCount(1);
+        writeModel.Issues.Should().BeEquivalentTo(createdIssueName);
     }
 }

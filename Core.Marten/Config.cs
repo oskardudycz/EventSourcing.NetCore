@@ -1,11 +1,7 @@
-using Baseline.ImTools;
-using Core.Events;
 using Core.Ids;
 using Core.Marten.Events;
 using Core.Marten.Ids;
-using Core.Marten.OptimisticConcurrency;
 using Core.Marten.Subscriptions;
-using Core.Threading;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;

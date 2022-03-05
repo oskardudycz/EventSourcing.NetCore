@@ -4,6 +4,8 @@ using Core.Events.External;
 using Core.Ids;
 using Core.Queries;
 using Core.Requests;
+using Core.Tracing;
+using Core.Tracing.Causation;
 using Core.Tracing.Correlation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,14 +20,36 @@ public static class Config
         services.AddMediatR()
             .AddScoped<ICommandBus, CommandBus>()
             .AddScoped<IQueryBus, QueryBus>()
-            .AddScoped<IEventMetadataProvider, EventMetadataProvider>()
-            .AddScoped<ICorrelationIdProvider, CorrelationIdProvider>();
+            .AddTracing();
 
         services.TryAddScoped<IEventBus, EventBus>();
         services.TryAddScoped<IExternalEventProducer, NulloExternalEventProducer>();
         services.TryAddScoped<IExternalCommandBus, ExternalCommandBus>();
 
         services.TryAddScoped<IIdGenerator, NulloIdGenerator>();
+
+        return services;
+    }
+
+
+    public static IServiceCollection AddTracing(this IServiceCollection services)
+    {
+        services.TryAddScoped<ICorrelationIdFactory, GuidCorrelationIdFactory>();
+        services.TryAddScoped<ICausationIdFactory, GuidCausationIdFactory>();
+        services.TryAddScoped<ICorrelationIdProvider, CorrelationIdProvider>();
+        services.TryAddScoped<ICausationIdProvider, CausationIdProvider>();
+        services.TryAddScoped<ITraceMetadataProvider, TraceMetadataProvider>();
+        services.TryAddScoped<ITracingScopeFactory, TracingScopeFactory>();
+
+        services.TryAddScoped<Func<IServiceProvider, TracingScope>>(sp =>
+            scopedServiceProvider =>
+                sp.GetRequiredService<ITracingScopeFactory>().CreateTraceScope(scopedServiceProvider)
+        );
+
+        services.TryAddScoped<Func<IServiceProvider, EventEnvelope?, TracingScope>>(sp =>
+            (scopedServiceProvider, eventEnvelope) => sp.GetRequiredService<ITracingScopeFactory>()
+                .CreateTraceScope(scopedServiceProvider, eventEnvelope)
+        );
 
         return services;
     }
