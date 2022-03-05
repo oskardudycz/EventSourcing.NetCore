@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Reflection;
+using Core.Events.External;
 using Core.Tracing;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -48,21 +49,25 @@ public class NoMediatorEventBus: INoMediatorEventBus
         }
     }
 
-    public Task Publish(object @event, CancellationToken ct)
+    public async Task Publish(object @event, CancellationToken ct)
     {
-        return (Task)GetGenericPublishFor(@event)
+        // if it's an event envelope, publish also just event data
+        // thanks to that both handlers with envelope and without will be called
+        if (@event is EventEnvelope(var data, _))
+            await (Task)GetGenericPublishFor(data)
+                .Invoke(this, new[] { data, ct })!;
+
+        await (Task)GetGenericPublishFor(@event)
             .Invoke(this, new[] { @event, ct })!;
     }
 
-    private static MethodInfo GetGenericPublishFor(object @event)
-    {
-        return PublishMethods.GetOrAdd(@event.GetType(), eventType =>
+    private static MethodInfo GetGenericPublishFor(object @event) =>
+        PublishMethods.GetOrAdd(@event.GetType(), eventType =>
             typeof(NoMediatorEventBus)
                 .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
                 .Single(m => m.Name == nameof(Publish) && m.GetGenericArguments().Any())
                 .MakeGenericMethod(eventType)
         );
-    }
 }
 
 public static class EventBusExtensions
