@@ -73,7 +73,7 @@ public static class EventBusExtensions
 {
     public static IServiceCollection AddEventBus(this IServiceCollection services, AsyncPolicy? asyncPolicy = null)
     {
-        services.AddScoped<IEventBus, EventBus>(sp =>
+        services.AddSingleton<IEventBus, EventBus>(sp =>
             new EventBus(
                 sp,
                 sp.GetRequiredService<ITracingScopeFactory>().CreateTraceScope,
