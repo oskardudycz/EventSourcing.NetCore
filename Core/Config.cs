@@ -34,12 +34,12 @@ public static class Config
 
     public static IServiceCollection AddTracing(this IServiceCollection services)
     {
-        services.TryAddScoped<ICorrelationIdFactory, GuidCorrelationIdFactory>();
-        services.TryAddScoped<ICausationIdFactory, GuidCausationIdFactory>();
+        services.TryAddSingleton<ICorrelationIdFactory, GuidCorrelationIdFactory>();
+        services.TryAddSingleton<ICausationIdFactory, GuidCausationIdFactory>();
         services.TryAddScoped<ICorrelationIdProvider, CorrelationIdProvider>();
         services.TryAddScoped<ICausationIdProvider, CausationIdProvider>();
         services.TryAddScoped<ITraceMetadataProvider, TraceMetadataProvider>();
-        services.TryAddScoped<ITracingScopeFactory, TracingScopeFactory>();
+        services.TryAddSingleton<ITracingScopeFactory, TracingScopeFactory>();
 
         services.TryAddScoped<Func<IServiceProvider, TraceMetadata?, TracingScope>>(sp =>
             (scopedServiceProvider, traceMetadata) =>
