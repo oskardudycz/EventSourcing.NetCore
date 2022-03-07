@@ -57,7 +57,6 @@ public class TracingScopeFactory: ITracingScopeFactory
         var causationIdProvider = serviceProvider.GetRequiredService<ICausationIdProvider>();
         causationIdProvider.Set(causationId);
 
-        // TODO: Add logger
         var loggerScope = logger.BeginScope(new Dictionary<string, object>
         {
             [CorrelationId.LoggerScopeKey] = correlationId.Value, [CausationId.LoggerScopeKey] = causationId.Value
