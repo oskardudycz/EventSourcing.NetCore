@@ -43,7 +43,6 @@ public static class MartenConfigExtensions
 
         services
             .AddScoped<IIdGenerator, MartenIdGenerator>()
-            .AddScoped<IMartenAppendScope, MartenAppendScope>()
             .AddMartenAppendScope()
             .AddMarten(sp => SetStoreOptions(sp, martenConfig, configureOptions))
             .ApplyAllDatabaseChangesOnStartup()
