@@ -1,11 +1,9 @@
-using Core.Events;
-
 namespace Payments.Payments.DiscardingPayment;
 
 public record PaymentDiscarded(
     Guid PaymentId,
     DiscardReason DiscardReason,
-    DateTime DiscardedAt): IEvent
+    DateTime DiscardedAt)
 {
     public static PaymentDiscarded Create(Guid paymentId, DiscardReason discardReason, DateTime discardedAt)
     {

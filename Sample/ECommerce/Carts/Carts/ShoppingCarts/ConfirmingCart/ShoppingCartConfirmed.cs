@@ -1,11 +1,9 @@
-using Core.Events;
-
 namespace Carts.ShoppingCarts.ConfirmingCart;
 
 public record ShoppingCartConfirmed(
     Guid CartId,
     DateTime ConfirmedAt
-): IEvent
+)
 {
     public static ShoppingCartConfirmed Create(Guid cartId, DateTime confirmedAt)
     {

@@ -9,7 +9,7 @@ namespace Core.ElasticSearch.Projections;
 
 public class ElasticSearchProjection<TEvent, TView> : IEventHandler<EventEnvelope<TEvent>>
     where TView : class, IProjection
-    where TEvent : IEvent
+    where TEvent : notnull
 {
     private readonly IElasticClient elasticClient;
     private readonly Func<TEvent, string> getId;
@@ -46,7 +46,7 @@ public static class ElasticSearchProjectionConfig
     public static IServiceCollection Project<TEvent, TView>(this IServiceCollection services,
         Func<TEvent, string> getId)
         where TView : class, IProjection
-        where TEvent : IEvent
+        where TEvent : notnull
     {
         services.AddTransient<IEventHandler<EventEnvelope<TEvent>>>(sp =>
         {

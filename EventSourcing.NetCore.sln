@@ -40,6 +40,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workshops", "Workshops", "{CEEE5F74-121E-437F-B3B4-4E7C65482644}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MeetingsManagement", "MeetingsManagement", "{A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}"
+	ProjectSection(SolutionItems) = preProject
+		Sample\MeetingsManagement\Readme.md = Sample\MeetingsManagement\Readme.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{E15B4D4B-1527-446F-8613-A09B230D6643}"
 ProjectSection(SolutionItems) = preProject

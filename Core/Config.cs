@@ -1,6 +1,5 @@
 using Core.Commands;
 using Core.Events;
-using Core.Events.External;
 using Core.Ids;
 using Core.Queries;
 using Core.Requests;
@@ -23,14 +22,12 @@ public static class Config
             .AddTracing()
             .AddEventBus();
 
-        services.TryAddScoped<IExternalEventProducer, NulloExternalEventProducer>();
         services.TryAddScoped<IExternalCommandBus, ExternalCommandBus>();
 
         services.TryAddScoped<IIdGenerator, NulloIdGenerator>();
 
         return services;
     }
-
 
     public static IServiceCollection AddTracing(this IServiceCollection services)
     {

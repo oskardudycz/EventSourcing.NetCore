@@ -1,12 +1,11 @@
 using Carts.ShoppingCarts.Products;
-using Core.Events;
 
 namespace Carts.ShoppingCarts.RemovingProduct;
 
 public record ProductRemoved(
     Guid CartId,
     PricedProductItem ProductItem
-): IEvent
+)
 {
     public static ProductRemoved Create(Guid cartId, PricedProductItem productItem)
     {

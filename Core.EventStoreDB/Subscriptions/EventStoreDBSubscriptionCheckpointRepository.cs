@@ -1,10 +1,9 @@
-﻿using Core.Events;
-using Core.EventStoreDB.Serialization;
+﻿using Core.EventStoreDB.Serialization;
 using EventStore.Client;
 
 namespace Core.EventStoreDB.Subscriptions;
 
-public record CheckpointStored(string SubscriptionId, ulong? Position, DateTime CheckpointedAt): IEvent;
+public record CheckpointStored(string SubscriptionId, ulong? Position, DateTime CheckpointedAt);
 
 public class EventStoreDBSubscriptionCheckpointRepository: ISubscriptionCheckpointRepository
 {

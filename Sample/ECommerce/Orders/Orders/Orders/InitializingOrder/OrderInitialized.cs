@@ -1,4 +1,3 @@
-using Core.Events;
 using Orders.Products;
 
 namespace Orders.Orders.InitializingOrder;
@@ -9,7 +8,7 @@ public record OrderInitialized(
     IReadOnlyList<PricedProductItem> ProductItems,
     decimal TotalPrice,
     DateTime InitializedAt
-): IEvent
+)
 {
     public static OrderInitialized Create(
         Guid orderId,

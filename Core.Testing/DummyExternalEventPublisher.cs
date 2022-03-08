@@ -5,11 +5,11 @@ namespace Core.Testing;
 
 public class DummyExternalEventProducer: IExternalEventProducer
 {
-    public IList<IExternalEvent> PublishedEvents { get; } = new List<IExternalEvent>();
+    public IList<object> PublishedEvents { get; } = new List<object>();
 
-    public Task Publish(IExternalEvent @event, CancellationToken ct)
+    public Task Publish(EventEnvelope @event, CancellationToken ct)
     {
-        PublishedEvents.Add(@event);
+        PublishedEvents.Add(@event.Data);
 
         return Task.CompletedTask;
     }

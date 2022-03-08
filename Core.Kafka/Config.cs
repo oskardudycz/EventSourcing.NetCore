@@ -1,4 +1,5 @@
 using Core.BackgroundWorkers;
+using Core.Events;
 using Core.Events.External;
 using Core.Kafka.Consumers;
 using Core.Kafka.Producers;
@@ -13,7 +14,10 @@ public static class Config
     public static IServiceCollection AddKafkaProducer(this IServiceCollection services)
     {
         //using TryAdd to support mocking, without that it won't be possible to override in tests
-        services.TryAddScoped<IExternalEventProducer, KafkaProducer>();
+        services.TryAddSingleton<IExternalEventProducer, KafkaProducer>();
+        services.AddSingleton<IEventBus>(sp =>
+            new EventBusDecoratorWithExternalProducer(sp.GetRequiredService<EventBus>(),
+                sp.GetRequiredService<IExternalEventProducer>()));
         return services;
     }
 

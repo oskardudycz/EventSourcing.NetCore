@@ -1,9 +1,7 @@
 using Confluent.Kafka;
-using Core.Events;
 using Core.Events.External;
 using Core.Reflection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using IEventBus = Core.Events.IEventBus;
@@ -12,18 +10,18 @@ namespace Core.Kafka.Consumers;
 
 public class KafkaConsumer: IExternalEventConsumer
 {
-    private readonly IServiceProvider serviceProvider;
     private readonly ILogger<KafkaConsumer> logger;
+    private readonly IEventBus eventBus;
     private readonly KafkaConsumerConfig config;
 
     public KafkaConsumer(
-        IServiceProvider serviceProvider,
         ILogger<KafkaConsumer> logger,
-        IConfiguration configuration
+        IConfiguration configuration,
+        IEventBus eventBus
     )
     {
-        this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        this.eventBus = eventBus;
 
         if (configuration == null)
             throw new ArgumentNullException(nameof(configuration));
@@ -73,12 +71,8 @@ public class KafkaConsumer: IExternalEventConsumer
             // deserialize event
             var @event = JsonConvert.DeserializeObject(message.Message.Value, eventType)!;
 
-            using var scope = serviceProvider.CreateScope();
-            var eventBus =
-                scope.ServiceProvider.GetRequiredService<IEventBus>();
-
             // publish event to internal event bus
-            await eventBus.Publish((IEvent)@event, cancellationToken);
+            await eventBus.Publish(@event, cancellationToken);
         }
         catch (Exception e)
         {

@@ -1,11 +1,9 @@
-using Core.Events;
-
 namespace Orders.Orders.CompletingOrder;
 
 public record OrderCompleted(
     Guid OrderId,
     DateTime CompletedAt
-): IEvent
+)
 {
     public static OrderCompleted Create(Guid orderId, DateTime completedAt)
     {

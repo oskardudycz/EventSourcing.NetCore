@@ -53,7 +53,8 @@ public static class SerializationExtensions
     /// <returns>json string</returns>
     public static string ToJson(this object obj)
     {
-        return JsonConvert.SerializeObject(obj);
+        return JsonConvert.SerializeObject(obj,
+            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver());
     }
 
     /// <summary>

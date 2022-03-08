@@ -12,6 +12,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Polly" Version="7.2.3" />
         <PackageReference Include="RestSharp" Version="107.3.0" />
+        <PackageReference Include="Scrutor" Version="3.3.0" />
     </ItemGroup>
 
     <ItemGroup>

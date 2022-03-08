@@ -1,4 +1,3 @@
-using Core.Events;
 using Microsoft.EntityFrameworkCore;
 using Shipments.Packages.Events.External;
 using Shipments.Packages.Requests;
@@ -92,14 +91,14 @@ internal class PackageService: IPackageService
         await SaveChanges(cancellationToken);
     }
 
-    private async Task SaveChangesAndPublish(IEvent @event, CancellationToken cancellationToken)
+    private async Task SaveChangesAndPublish(object @event, CancellationToken cancellationToken)
     {
         await SaveChanges(cancellationToken);
 
         await Publish(@event, cancellationToken);
     }
 
-    private async Task Publish(IEvent @event, CancellationToken cancellationToken)
+    private async Task Publish(object @event, CancellationToken cancellationToken)
     {
         await eventBus.Publish(@event, cancellationToken);
     }

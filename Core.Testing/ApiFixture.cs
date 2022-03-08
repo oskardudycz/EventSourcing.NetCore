@@ -22,11 +22,12 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
             services.AddSingleton(eventsLog);
             services.AddSingleton(typeof(IEventHandler<>), typeof(EventListener<>));
             services.AddSingleton<IExternalEventProducer>(externalEventProducer);
+            services.AddSingleton<IEventBus>(sp =>
+                new EventBusDecoratorWithExternalProducer(sp.GetRequiredService<EventBus>(),
+                    sp.GetRequiredService<IExternalEventProducer>()));
             services.AddSingleton<IExternalCommandBus>(externalCommandBus);
             services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
-
         }, SetupWebHostBuilder);
-
 
 
     public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent
@@ -39,7 +40,7 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
         return externalCommandBus.SentCommands.OfType<TCommand>().ToList();
     }
 
-    public async Task PublishInternalEvent(IEvent @event, CancellationToken ct = default)
+    public async Task PublishInternalEvent(object @event, CancellationToken ct = default)
     {
         using var scope = Server.Host.Services.CreateScope();
         var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
@@ -78,8 +79,6 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
             retryCount--;
         } while (!finished);
     }
-
-
 }
 
 public abstract class ApiWithEventsFixture: ApiFixture

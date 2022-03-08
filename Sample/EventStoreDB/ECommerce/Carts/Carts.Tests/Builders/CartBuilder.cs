@@ -1,12 +1,11 @@
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.InitializingCart;
-using Core.Events;
 
 namespace Carts.Tests.Builders;
 
 internal class CartBuilder
 {
-    private readonly Queue<IEvent> eventsToApply = new();
+    private readonly Queue<object> eventsToApply = new();
 
     public CartBuilder Initialized()
     {
