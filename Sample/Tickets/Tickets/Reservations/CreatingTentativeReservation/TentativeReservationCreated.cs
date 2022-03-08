@@ -1,12 +1,10 @@
-using Core.Events;
-
 namespace Tickets.Reservations.CreatingTentativeReservation;
 
 public record TentativeReservationCreated(
     Guid ReservationId,
     Guid SeatId,
     string Number
-): IEvent
+)
 {
     public static TentativeReservationCreated Create(Guid reservationId, Guid seatId, string number)
     {

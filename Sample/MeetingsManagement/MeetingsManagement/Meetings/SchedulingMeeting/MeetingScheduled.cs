@@ -1,4 +1,3 @@
-using Core.Events;
 using MeetingsManagement.Meetings.ValueObjects;
 
 namespace MeetingsManagement.Meetings.SchedulingMeeting;
@@ -6,7 +5,7 @@ namespace MeetingsManagement.Meetings.SchedulingMeeting;
 public record MeetingScheduled(
     Guid MeetingId,
     DateRange Occurs
-): IEvent
+)
 {
     public static MeetingScheduled Create(Guid meetingId, DateRange occurs)
     {

@@ -1,5 +1,5 @@
 namespace Core.Events;
 
-public interface IExternalEvent: IEvent
+public interface IExternalEvent
 {
 }

@@ -1,5 +1,3 @@
-using Core.Events;
-
 namespace Orders.Orders.CancellingOrder;
 
 public record OrderCancelled(
@@ -7,7 +5,7 @@ public record OrderCancelled(
     Guid? PaymentId,
     OrderCancellationReason OrderCancellationReason,
     DateTime CancelledAt
-): IEvent
+)
 {
     public static OrderCancelled Create(Guid orderId,
         Guid? paymentId,

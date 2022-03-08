@@ -1,12 +1,10 @@
-using Core.Events;
-
 namespace Carts.ShoppingCarts.InitializingCart;
 
 public record ShoppingCartInitialized(
     Guid CartId,
     Guid ClientId,
     ShoppingCartStatus ShoppingCartStatus
-): IEvent
+)
 {
     public static ShoppingCartInitialized Create(Guid cartId, Guid clientId, ShoppingCartStatus shoppingCartStatus)
     {

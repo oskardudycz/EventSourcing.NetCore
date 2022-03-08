@@ -4,11 +4,11 @@ namespace Core.Testing;
 
 public class EventsLog
 {
-    public List<IEvent> PublishedEvents { get; } = new();
+    public List<object> PublishedEvents { get; } = new();
 }
 
 public class EventListener<TEvent>: IEventHandler<TEvent>
-    where TEvent : IEvent
+    where TEvent : notnull
 {
     private readonly EventsLog eventsLog;
 

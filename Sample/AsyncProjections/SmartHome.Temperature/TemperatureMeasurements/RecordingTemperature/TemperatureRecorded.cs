@@ -1,12 +1,10 @@
-using Core.Events;
-
 namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 
 public record TemperatureRecorded(
     Guid MeasurementId,
     decimal Temperature,
     DateTimeOffset MeasuredAt
-): IEvent
+)
 {
     public static TemperatureRecorded Create(Guid measurementId, decimal temperature)
     {

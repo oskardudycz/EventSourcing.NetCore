@@ -1,11 +1,9 @@
-using Core.Events;
-
 namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 
 public record MotionSensorInstalled(
     Guid MotionSensorId,
     DateTime InstalledAt
-) : IEvent
+)
 {
     public static MotionSensorInstalled Create(
         Guid motionSensorId,

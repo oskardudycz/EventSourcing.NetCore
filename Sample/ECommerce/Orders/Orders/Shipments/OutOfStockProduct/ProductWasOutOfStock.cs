@@ -1,9 +1,8 @@
-using Core.Events;
 using Orders.Products;
 
 namespace Orders.Shipments.OutOfStockProduct;
 
-public class ProductWasOutOfStock: IEvent
+public class ProductWasOutOfStock
 {
     public Guid OrderId { get; }
 

@@ -1,5 +1,4 @@
 using Core.ElasticSearch.Indices;
-using Core.Events;
 using Nest;
 using IAggregate = Core.Aggregates.IAggregate;
 

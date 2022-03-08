@@ -1,4 +1,3 @@
-using Core.Events;
 using Orders.Products;
 
 namespace Orders.Orders.RecordingOrderPayment;
@@ -9,7 +8,7 @@ public record OrderPaymentRecorded(
     IReadOnlyList<PricedProductItem> ProductItems,
     decimal Amount,
     DateTime PaymentRecordedAt
-): IEvent
+)
 {
     public static OrderPaymentRecorded Create(
         Guid orderId,

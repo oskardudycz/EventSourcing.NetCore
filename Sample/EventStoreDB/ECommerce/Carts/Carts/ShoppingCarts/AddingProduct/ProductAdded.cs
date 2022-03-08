@@ -1,12 +1,11 @@
 using Carts.ShoppingCarts.Products;
-using Core.Events;
 
 namespace Carts.ShoppingCarts.AddingProduct;
 
 public record ProductAdded(
     Guid CartId,
     PricedProductItem ProductItem
-): IEvent
+)
 {
     public static ProductAdded Create(Guid cartId, PricedProductItem productItem)
     {

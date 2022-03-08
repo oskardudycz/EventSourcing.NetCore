@@ -12,7 +12,7 @@ public record EventMetadata(
 public record EventEnvelope(
     object Data,
     EventMetadata Metadata
-): IEvent;
+);
 
 public record EventEnvelope<T>(
     T Data,

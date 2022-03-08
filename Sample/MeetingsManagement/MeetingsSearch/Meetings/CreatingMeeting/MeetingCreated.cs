@@ -3,7 +3,7 @@ using Core.Events;
 
 namespace MeetingsSearch.Meetings.CreatingMeeting;
 
-internal class MeetingCreated: IEvent
+internal class MeetingCreated
 {
     public Guid MeetingId { get; }
     public string Name { get; }

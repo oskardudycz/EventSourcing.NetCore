@@ -1,8 +1,9 @@
 using Confluent.Kafka;
 using Core.Events;
 using Core.Events.External;
+using Core.Serialization.Newtonsoft;
+using Core.Threading;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 
 namespace Core.Kafka.Producers;
 
@@ -21,18 +22,46 @@ public class KafkaProducer: IExternalEventProducer
         config = configuration.GetKafkaProducerConfig();
     }
 
-    public async Task Publish(IExternalEvent @event, CancellationToken cancellationToken)
+    public async Task Publish(EventEnvelope @event, CancellationToken ct)
     {
-        using var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build();
-        await Task.Yield();
-        // publish event to kafka topic taken from config
-        await p.ProduceAsync(config.Topic,
-            new Message<string, string>
-            {
-                // store event type name in message Key
-                Key = @event.GetType().Name,
-                // serialize event to message Value
-                Value = JsonConvert.SerializeObject(@event)
-            }, cancellationToken);
+        try
+        {
+            using var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build();
+            await Task.Yield();
+            // publish event to kafka topic taken from config
+
+            // var result = p.ProduceAsync(config.Topic,
+            //     new Message<string, string>
+            //     {
+            //         // store event type name in message Key
+            //         Key = @event.GetType().Name,
+            //         // serialize event to message Value
+            //         Value = @event.ToJson()
+            //     }, ct).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            p.Produce(config.Topic,
+                new Message<string, string>
+                {
+                    // store event type name in message Key
+                    Key = @event.GetType().Name,
+                    // serialize event to message Value
+                    Value = @event.ToJson()
+                });
+            p.Flush(ct);
+            // Console.WriteLine(result);
+            // var result = p.ProduceAsync(config.Topic,
+            //     new Message<string, string>
+            //     {
+            //         // store event type name in message Key
+            //         Key = @event.GetType().Name,
+            //         // serialize event to message Value
+            //         Value = @event.ToJson()
+            //     }, ct).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

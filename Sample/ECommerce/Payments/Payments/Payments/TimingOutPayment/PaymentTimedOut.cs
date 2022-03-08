@@ -1,11 +1,9 @@
-using Core.Events;
-
 namespace Payments.Payments.TimingOutPayment;
 
 public record PaymentTimedOut(
     Guid PaymentId,
     DateTime TimedOutAt
-): IEvent
+)
 {
     public static PaymentTimedOut Create(Guid paymentId, in DateTime timedOutAt)
     {

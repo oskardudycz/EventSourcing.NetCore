@@ -1,8 +1,10 @@
 ﻿using Core.Events;
+using Core.Tracing;
+using Core.Tracing.Causation;
+using Core.Tracing.Correlation;
 using Marten;
 using Marten.Events;
 using Microsoft.Extensions.DependencyInjection;
-using IEvent = Core.Events.IEvent;
 
 namespace Core.Marten.Subscriptions;
 
@@ -34,9 +36,17 @@ public class MartenEventPublisher: IMartenEventsConsumer
             using var scope = serviceProvider.CreateScope();
             var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
 
-            if (@event.Data is not IEvent mappedEvent) continue;
+            var eventMetadata = new EventMetadata(
+                @event.Id.ToString(),
+                (ulong)@event.Version,
+                (ulong)@event.Sequence,
+                new TraceMetadata(
+                    @event.CorrelationId != null ? new CorrelationId(@event.CorrelationId) : null,
+                    @event.CausationId != null ? new CausationId(@event.CausationId) : null
+                )
+            );
 
-            await eventBus.Publish(mappedEvent, ct);
+            await eventBus.Publish(new EventEnvelope(@event.Data, eventMetadata), ct);
         }
     }
 }

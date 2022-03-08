@@ -1,9 +1,8 @@
-using Core.Events;
 using Newtonsoft.Json;
 
 namespace SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasurement;
 
-public class TemperatureMeasurementStarted : IEvent
+public class TemperatureMeasurementStarted
 {
     public Guid MeasurementId { get; }
     public DateTimeOffset StartedAt { get; }

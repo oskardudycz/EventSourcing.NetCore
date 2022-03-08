@@ -1,4 +1,5 @@
 using Core.Api.Testing;
+using Core.Events;
 using Core.Testing;
 using FluentAssertions;
 using MeetingsSearch.Api;
@@ -18,9 +19,12 @@ public class CreateMeetingFixture: ApiWithEventsFixture<Startup>
     public override async Task InitializeAsync()
     {
         // prepare event
-        var @event = new MeetingCreated(
-            MeetingId,
-            MeetingName
+        var @event = new EventEnvelope<MeetingCreated>(
+            new MeetingCreated(
+                MeetingId,
+                MeetingName
+            ),
+            new EventMetadata("event-id", 1, 2, null)
         );
 
         // send meeting created event to internal event bus

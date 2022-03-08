@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using Core.Tracing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Polly;
 
 namespace Core.Events;
@@ -32,9 +33,8 @@ public class EventBus: IEventBus
     private async Task Publish<TEvent>(TEvent @event, CancellationToken ct)
     {
         var eventEnvelope = @event as EventEnvelope;
-        // You can consider adding here a retry policy for event handling
         using var scope = serviceProvider.CreateScope();
-        using var tracingScope = createTracingScope(serviceProvider, eventEnvelope);
+        using var tracingScope = createTracingScope(scope.ServiceProvider, eventEnvelope);
 
         var eventHandlers =
             scope.ServiceProvider.GetServices<IEventHandler<TEvent>>();
@@ -73,13 +73,13 @@ public static class EventBusExtensions
 {
     public static IServiceCollection AddEventBus(this IServiceCollection services, AsyncPolicy? asyncPolicy = null)
     {
-        services.AddSingleton<IEventBus, EventBus>(sp =>
-            new EventBus(
-                sp,
-                sp.GetRequiredService<ITracingScopeFactory>().CreateTraceScope,
-                asyncPolicy ?? Policy.NoOpAsync()
-            )
-        );
+        services.AddSingleton(sp => new EventBus(
+            sp,
+            sp.GetRequiredService<ITracingScopeFactory>().CreateTraceScope,
+            asyncPolicy ?? Policy.NoOpAsync()
+        ));
+        services
+            .TryAddSingleton<IEventBus>(sp => sp.GetRequiredService<EventBus>());
 
         return services;
     }
