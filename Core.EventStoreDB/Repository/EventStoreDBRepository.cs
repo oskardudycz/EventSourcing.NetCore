@@ -62,12 +62,13 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
     public async Task<ulong> Update(T aggregate, ulong? expectedRevision = null, TraceMetadata? traceMetadata = null,
         CancellationToken ct = default)
     {
-        var nextVersion = expectedRevision ?? (ulong)aggregate.Version;
+        var eventsToAppend = GetEventsToStore(aggregate, traceMetadata);
+        var nextVersion = expectedRevision ?? (ulong)(aggregate.Version - eventsToAppend.Count);
 
         var result = await eventStore.AppendToStreamAsync(
             StreamNameMapper.ToStreamId<T>(aggregate.Id),
             nextVersion,
-            GetEventsToStore(aggregate, traceMetadata),
+            eventsToAppend,
             cancellationToken: ct
         );
         return result.NextExpectedStreamRevision;
@@ -77,11 +78,12 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
         CancellationToken ct = default) =>
         Update(aggregate, expectedRevision, traceMetadata, ct);
 
-    private static IEnumerable<EventData> GetEventsToStore(T aggregate, TraceMetadata? traceMetadata)
+    private static List<EventData> GetEventsToStore(T aggregate, TraceMetadata? traceMetadata)
     {
         var events = aggregate.DequeueUncommittedEvents();
 
         return events
-            .Select(@event => @event.ToJsonEventData(traceMetadata));
+            .Select(@event => @event.ToJsonEventData(traceMetadata))
+            .ToList();
     }
 }

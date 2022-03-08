@@ -18,7 +18,7 @@ internal static class CartExtensions
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Pending);
         shoppingCart.ProductItems.Should().BeEmpty();
         shoppingCart.TotalPrice.Should().Be(0);
-        shoppingCart.Version.Should().Be(1);
+        shoppingCart.Version.Should().Be(0);
 
         return shoppingCart;
     }
