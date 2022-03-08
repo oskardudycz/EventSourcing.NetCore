@@ -57,11 +57,13 @@ public static class CommandHandlerExtensions
         Action<ulong>? setNextExpectedVersion = null
     ) =>
         services
-            .AddTransient<Func<TCommand, CancellationToken, ValueTask>>(sp =>
+            .AddScoped<Func<TCommand, CancellationToken, ValueTask>>(sp =>
             {
                 var eventStore = sp.GetRequiredService<EventStoreClient>();
+                var nextStreamRevisionProvider =
+                    sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>();
 
-                setNextExpectedVersion ??= sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Set;
+                setNextExpectedVersion ??= nextStreamRevisionProvider.Set;
 
                 var traceMetadata = new TraceMetadata(
                     sp.GetRequiredService<ICorrelationIdProvider>().Get(),
@@ -94,22 +96,29 @@ public static class CommandHandlerExtensions
         Action<ulong>? setNextExpectedVersion = null
     ) where TEntity : notnull =>
         services
-            .AddTransient<Func<TCommand, CancellationToken, ValueTask>>(sp =>
+            .AddScoped<Func<TCommand, CancellationToken, ValueTask>>(sp =>
             {
                 var repository = sp.GetRequiredService<EventStoreClient>();
 
+                var expectedStreamRevisionProvider =
+                    sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>();
+                var nextStreamRevisionProvider =
+                    sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>();
+
                 getExpectedVersion ??= () =>
-                    sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().Value ??
+                    expectedStreamRevisionProvider.Value ??
                     throw new ArgumentNullException("ETag", "Expected version not set");
 
                 setNextExpectedVersion ??=
-                    sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Set;
+                    nextStreamRevisionProvider.Set;
 
                 var traceMetadata = new TraceMetadata(
                     sp.GetRequiredService<ICorrelationIdProvider>().Get(),
                     sp.GetRequiredService<ICausationIdProvider>().Get()
                 );
+
                 return async (command, ct) =>
+                {
                     setNextExpectedVersion(
                         await HandleUpdateCommand(
                             repository,
@@ -123,6 +132,7 @@ public static class CommandHandlerExtensions
                             ct
                         )
                     );
+                };
             });
 
     public static IServiceCollection For<TEntity>(

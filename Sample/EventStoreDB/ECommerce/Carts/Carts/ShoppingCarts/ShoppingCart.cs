@@ -63,7 +63,7 @@ public class ShoppingCart: Aggregate
 
     private void Apply(ShoppingCartInitialized @event)
     {
-        Version++;
+        Version = 0;
 
         Id = @event.CartId;
         ClientId = @event.ClientId;
