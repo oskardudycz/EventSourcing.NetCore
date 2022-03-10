@@ -31,6 +31,8 @@ public record AddProductItemToShoppingCart(
 
         var pricedProductItem = productPriceCalculator.Calculate(productItem);
 
+        shoppingCart.ProductItems.Add(pricedProductItem);
+
         return new ProductItemAddedToShoppingCart(
             cartId,
             pricedProductItem
