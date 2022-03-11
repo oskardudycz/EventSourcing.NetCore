@@ -27,11 +27,22 @@ public class StreamNameMapper
     public static string ToStreamId<TStream>(object aggregateId, object? tenantId = null) =>
         ToStreamId(typeof(TStream), aggregateId);
 
+    /// <summary>
+    /// Generates a stream id in the canonical `{category}-{aggregateId}` format.
+    /// It can be expanded to the `{module}_{streamType}-{tenantId}_{aggregateId}` format
+    /// </summary>
+    /// <param name="streamType"></param>
+    /// <param name="aggregateId"></param>
+    /// <param name="tenantId"></param>
+    /// <returns></returns>
     public static string ToStreamId(Type streamType, object aggregateId, object? tenantId = null)
     {
         var tenantPrefix = tenantId != null ? $"{tenantId}_"  : "";
+        var streamCategory = ToStreamPrefix(streamType);
 
-        return $"{tenantPrefix}{ToStreamPrefix(streamType)}-{aggregateId}";
+        // (Out-of-the box, the category projection treats anything before a `-` separator as the category name)
+        // For this reason, we place the "{tenantId}_" bit (if present) on the right hand side of the '-'
+        return $"{streamCategory}-{tenantPrefix}{aggregateId}";
     }
 
 }
