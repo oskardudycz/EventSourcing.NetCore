@@ -21,7 +21,7 @@
         <PackageReference Include="Equinox.CosmosStore" Version="3.0.6" />
         <PackageReference Include="Equinox.EventStore" Version="3.0.6" />
         <PackageReference Include="Equinox.MemoryStore" Version="3.0.6" />
-        <PackageReference Include="FsCodec.SystemTextJson" Version="2.3.1" />
+        <PackageReference Include="FsCodec.SystemTextJson" Version="2.3.2" />
         <PackageReference Include="Propulsion" Version="2.12.1" />
     </ItemGroup>
 
