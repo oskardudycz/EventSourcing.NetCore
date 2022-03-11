@@ -15,7 +15,7 @@ public class ConfirmCartTests
         // Given
         var cart = CartBuilder
             .Create()
-            .Initialized()
+            .Opened()
             .Build();
 
         // When

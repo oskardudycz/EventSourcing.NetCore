@@ -16,7 +16,7 @@ public record ShoppingCartShortInfo
 
 public class ShoppingCartShortInfoProjection
 {
-    public static ShoppingCartShortInfo Handle(EventEnvelope<ShoppingCartInitialized> eventEnvelope)
+    public static ShoppingCartShortInfo Handle(EventEnvelope<ShoppingCartOpened> eventEnvelope)
     {
         var (shoppingCartId, clientId) = eventEnvelope.Data;
 
@@ -29,16 +29,6 @@ public class ShoppingCartShortInfoProjection
             Version = 0,
             LastProcessedPosition = eventEnvelope.Metadata.LogPosition
         };
-    }
-
-    public static void Handle(EventEnvelope<ShoppingCartConfirmed> eventEnvelope, ShoppingCartShortInfo view)
-    {
-        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
-            return;
-
-        view.Status = ShoppingCartStatus.Confirmed;
-        view.Version++;
-        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }
 
     public static void Handle(EventEnvelope<ProductItemAddedToShoppingCart> eventEnvelope, ShoppingCartShortInfo view)
@@ -63,6 +53,26 @@ public class ShoppingCartShortInfoProjection
 
         view.TotalItemsCount -= productItem.Quantity;
         view.TotalPrice -= productItem.TotalPrice;
+        view.Version++;
+        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
+    }
+
+    public static void Handle(EventEnvelope<ShoppingCartConfirmed> eventEnvelope, ShoppingCartShortInfo view)
+    {
+        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
+            return;
+
+        view.Status = ShoppingCartStatus.Confirmed;
+        view.Version++;
+        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
+    }
+
+    public static void Handle(EventEnvelope<ShoppingCartCanceled> eventEnvelope, ShoppingCartShortInfo view)
+    {
+        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
+            return;
+
+        view.Status = ShoppingCartStatus.Canceled;
         view.Version++;
         view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }

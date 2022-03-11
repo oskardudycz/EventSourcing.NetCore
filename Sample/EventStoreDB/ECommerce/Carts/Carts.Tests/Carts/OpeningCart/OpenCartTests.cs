@@ -2,9 +2,9 @@ using Carts.ShoppingCarts;
 using Carts.Tests.Extensions.Reservations;
 using Xunit;
 
-namespace Carts.Tests.Carts.InitializingCart;
+namespace Carts.Tests.Carts.OpeningCart;
 
-public class InitializeCartTests
+public class OpenCartTests
 {
     [Fact]
     public void ForValidParams_ShouldCreateCartWithPendingStatus()
@@ -14,7 +14,7 @@ public class InitializeCartTests
         var clientId = Guid.NewGuid();
 
         // When
-        var cart = ShoppingCart.Initialize(
+        var cart = ShoppingCart.Open(
             cartId,
             clientId
         );
@@ -22,11 +22,11 @@ public class InitializeCartTests
         // Then
 
         cart
-            .IsInitializedCartWith(
+            .IsOpenedCartWith(
                 cartId,
                 clientId
             )
-            .HasCartInitializedEventWith(
+            .HasCartOpenedEventWith(
                 cartId,
                 clientId
             );

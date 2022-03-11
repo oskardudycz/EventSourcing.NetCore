@@ -27,9 +27,9 @@ public class MergeEvents
         List<EventData> events
     )
     {
-        var cartInitialized = events.First();
+        var cartOpened = events.First();
         var cartInitializedCorrelationId =
-            JsonSerializer.Deserialize<EventMetadata>(cartInitialized.MetaData)!
+            JsonSerializer.Deserialize<EventMetadata>(cartOpened.MetaData)!
                 .CorrelationId;
 
         var i = 1;
@@ -54,7 +54,7 @@ public class MergeEvents
         }
 
         var mergedEvent = ToShoppingCartInitializedWithProducts(
-            cartInitialized,
+            cartOpened,
             productItemsAdded
         );
 
@@ -231,7 +231,7 @@ public class MergeEvents
         {
             (
                 "shopping_cart_initialized_v1",
-                new V1.ShoppingCartInitialized(shoppingCardId, clientId),
+                new V1.ShoppingCartOpened(shoppingCardId, clientId),
                 new EventMetadata(theSameCorrelationId)
             ),
             (

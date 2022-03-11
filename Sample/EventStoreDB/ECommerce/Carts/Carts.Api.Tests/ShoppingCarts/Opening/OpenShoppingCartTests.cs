@@ -1,14 +1,14 @@
 using System.Net;
+using Carts.Api.Requests;
+using Carts.ShoppingCarts;
+using Carts.ShoppingCarts.GettingCartById;
 using Core.Api.Testing;
-using ECommerce.Api.Requests;
-using ECommerce.ShoppingCarts;
-using ECommerce.ShoppingCarts.GettingCartById;
 using FluentAssertions;
 using Xunit;
 
-namespace ECommerce.Api.Tests.ShoppingCarts.Initializing;
+namespace Carts.Api.Tests.ShoppingCarts.Opening;
 
-public class InitializeShoppingCartFixture: ApiFixture<Startup>
+public class OpenShoppingCartFixture: ApiFixture<Startup>
 {
     protected override string ApiUrl => "/api/ShoppingCarts";
 
@@ -18,15 +18,15 @@ public class InitializeShoppingCartFixture: ApiFixture<Startup>
 
     public override async Task InitializeAsync()
     {
-        CommandResponse = await Post(new InitializeShoppingCartRequest(ClientId));
+        CommandResponse = await Post(new OpenShoppingCartRequest(ClientId));
     }
 }
 
-public class InitializeShoppingCartTests: IClassFixture<InitializeShoppingCartFixture>
+public class OpenShoppingCartTests: IClassFixture<OpenShoppingCartFixture>
 {
-    private readonly InitializeShoppingCartFixture fixture;
+    private readonly OpenShoppingCartFixture fixture;
 
-    public InitializeShoppingCartTests(InitializeShoppingCartFixture fixture)
+    public OpenShoppingCartTests(OpenShoppingCartFixture fixture)
     {
         this.fixture = fixture;
     }

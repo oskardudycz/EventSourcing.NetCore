@@ -12,28 +12,28 @@ public class ChangedStructure
         string Name = "Unknown"
     );
 
-    public record ShoppingCartInitialized(
+    public record ShoppingCartOpened(
         Guid ShoppingCartId,
         Client Client
     );
 
-public static V1.ShoppingCartInitialized Downcast(
-    ShoppingCartInitialized newEvent
+public static V1.ShoppingCartOpened Downcast(
+    ShoppingCartOpened newEvent
 )
 {
-    return new V1.ShoppingCartInitialized(
+    return new V1.ShoppingCartOpened(
         newEvent.ShoppingCartId,
         newEvent.Client.Id
     );
 }
 
-public static V1.ShoppingCartInitialized Downcast(
+public static V1.ShoppingCartOpened Downcast(
     string newEventJson
 )
 {
     var newEvent = JsonDocument.Parse(newEventJson).RootElement;
 
-    return new V1.ShoppingCartInitialized(
+    return new V1.ShoppingCartOpened(
         newEvent.GetProperty("ShoppingCartId").GetGuid(),
         newEvent.GetProperty("Client").GetProperty("Id").GetGuid()
     );
@@ -43,7 +43,7 @@ public static V1.ShoppingCartInitialized Downcast(
     public void UpcastObjects_Should_BeForwardCompatible()
     {
         // Given
-        var newEvent = new ShoppingCartInitialized(
+        var newEvent = new ShoppingCartOpened(
             Guid.NewGuid(),
             new Client( Guid.NewGuid(), "Oskar the Grouch")
         );
@@ -60,7 +60,7 @@ public static V1.ShoppingCartInitialized Downcast(
     public void UpcastJson_Should_BeForwardCompatible()
     {
         // Given
-        var newEvent = new ShoppingCartInitialized(
+        var newEvent = new ShoppingCartOpened(
             Guid.NewGuid(),
             new Client( Guid.NewGuid(), "Oskar the Grouch")
         );

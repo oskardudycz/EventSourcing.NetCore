@@ -1,6 +1,7 @@
 using Carts.ShoppingCarts.AddingProduct;
+using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Carts.ShoppingCarts.RemovingProduct;
 using Core.Projections;
 
@@ -20,22 +21,25 @@ public class ShoppingCartShortInfo: IVersionedProjection
     {
         switch (@event)
         {
-            case ShoppingCartInitialized cartInitialized:
-                Apply(cartInitialized);
+            case ShoppingCartOpened cartOpened:
+                Apply(cartOpened);
                 return;
-            case ProductAdded cartInitialized:
-                Apply(cartInitialized);
+            case ProductAdded cartOpened:
+                Apply(cartOpened);
                 return;
-            case ProductRemoved cartInitialized:
-                Apply(cartInitialized);
+            case ProductRemoved cartOpened:
+                Apply(cartOpened);
                 return;
-            case ShoppingCartConfirmed cartInitialized:
-                Apply(cartInitialized);
+            case ShoppingCartConfirmed cartOpened:
+                Apply(cartOpened);
+                return;
+            case ShoppingCartCanceled cartCanceled:
+                Apply(cartCanceled);
                 return;
         }
     }
 
-    public void Apply(ShoppingCartInitialized @event)
+    public void Apply(ShoppingCartOpened @event)
     {
         Id = @event.CartId;
         TotalItemsCount = 0;
@@ -55,5 +59,10 @@ public class ShoppingCartShortInfo: IVersionedProjection
     public void Apply(ShoppingCartConfirmed @event)
     {
         Status = ShoppingCartStatus.Confirmed;
+    }
+
+    public void Apply(ShoppingCartCanceled @event)
+    {
+        Status = ShoppingCartStatus.Canceled;
     }
 }

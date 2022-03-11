@@ -2,7 +2,7 @@
 
 namespace ECommerce.ShoppingCarts;
 
-public record ShoppingCartInitialized(
+public record ShoppingCartOpened(
     Guid ShoppingCartId,
     Guid ClientId
 );
@@ -22,13 +22,18 @@ public record ShoppingCartConfirmed(
     DateTime ConfirmedAt
 );
 
+public record ShoppingCartCanceled(
+    Guid ShoppingCartId,
+    DateTime CanceledAt
+);
+
 public enum ShoppingCartStatus
 {
     Pending = 1,
     Confirmed = 2,
-    Cancelled = 4,
+    Canceled = 4,
 
-    Closed = Confirmed | Cancelled
+    Closed = Confirmed | Canceled
 }
 
 public record ShoppingCart(
@@ -36,7 +41,8 @@ public record ShoppingCart(
     Guid ClientId,
     ShoppingCartStatus Status,
     ProductItemsList ProductItems,
-    DateTime? ConfirmedAt = null
+    DateTime? ConfirmedAt = null,
+    DateTime? CanceledAt = null
 )
 {
     public bool IsClosed { get; } = Status.HasFlag(ShoppingCartStatus.Closed);
@@ -45,7 +51,7 @@ public record ShoppingCart(
     {
         return @event switch
         {
-            ShoppingCartInitialized (var cartId, var clientId) =>
+            ShoppingCartOpened (var cartId, var clientId) =>
                 entity with
                 {
                     Id = cartId,
@@ -72,12 +78,19 @@ public record ShoppingCart(
                     Status = ShoppingCartStatus.Confirmed,
                     ConfirmedAt = confirmedAt
                 },
+
+            ShoppingCartCanceled (_, var canceledAt) =>
+                entity with
+                {
+                    Status = ShoppingCartStatus.Canceled,
+                    CanceledAt = canceledAt
+                },
             _ => entity
         };
     }
 
     public static ShoppingCart Default() =>
-        new (default, default, default, ProductItemsList.Empty(), default);
+        new (default, default, default, ProductItemsList.Empty(), default, default);
 
     public static string MapToStreamId(Guid shoppingCartId) =>
         $"ShoppingCart-{shoppingCartId}";

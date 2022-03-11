@@ -11,25 +11,25 @@ public class NewRequiredPropertyFromMetadata
         Guid UserId
     );
 
-    public record ShoppingCartInitialized(
+    public record ShoppingCartOpened(
         Guid ShoppingCartId,
         Guid ClientId,
         Guid InitializedBy
     );
 
-    public static ShoppingCartInitialized Upcast(
-        V1.ShoppingCartInitialized oldEvent,
+    public static ShoppingCartOpened Upcast(
+        V1.ShoppingCartOpened oldEvent,
         EventMetadata eventMetadata
     )
     {
-        return new ShoppingCartInitialized(
+        return new ShoppingCartOpened(
             oldEvent.ShoppingCartId,
             oldEvent.ClientId,
             eventMetadata.UserId
         );
     }
 
-    public static ShoppingCartInitialized Upcast(
+    public static ShoppingCartOpened Upcast(
         string oldEventJson,
         string eventMetadataJson
     )
@@ -37,7 +37,7 @@ public class NewRequiredPropertyFromMetadata
         var oldEvent = JsonDocument.Parse(oldEventJson);
         var eventMetadata = JsonDocument.Parse(eventMetadataJson);
 
-        return new ShoppingCartInitialized(
+        return new ShoppingCartOpened(
             oldEvent.RootElement.GetProperty("ShoppingCartId").GetGuid(),
             oldEvent.RootElement.GetProperty("ClientId").GetGuid(),
             eventMetadata.RootElement.GetProperty("UserId").GetGuid()
@@ -48,7 +48,7 @@ public class NewRequiredPropertyFromMetadata
     public void UpcastObjects_Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartInitialized(Guid.NewGuid(), Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
         var eventMetadata = new EventMetadata(Guid.NewGuid());
 
         // When
@@ -64,7 +64,7 @@ public class NewRequiredPropertyFromMetadata
     public void UpcastJson_Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartInitialized(Guid.NewGuid(), Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
         var eventMetadata = new EventMetadata(Guid.NewGuid());
 
         // When

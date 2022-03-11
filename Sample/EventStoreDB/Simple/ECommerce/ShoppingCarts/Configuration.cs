@@ -2,10 +2,11 @@
 using ECommerce.Core.Projections;
 using ECommerce.Pricing.ProductPricing;
 using ECommerce.ShoppingCarts.AddingProductItem;
+using ECommerce.ShoppingCarts.Canceling;
 using ECommerce.ShoppingCarts.Confirming;
 using ECommerce.ShoppingCarts.GettingCartById;
 using ECommerce.ShoppingCarts.GettingCarts;
-using ECommerce.ShoppingCarts.Initializing;
+using ECommerce.ShoppingCarts.Opening;
 using ECommerce.ShoppingCarts.RemovingProductItem;
 using ECommerce.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +22,8 @@ public static class Configuration
                 ShoppingCart.Default,
                 ShoppingCart.When,
                 builder => builder
-                    .AddOn<InitializeShoppingCart>(
-                        InitializeShoppingCart.Handle,
+                    .AddOn<OpenShoppingCart>(
+                        OpenShoppingCart.Handle,
                         command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                     )
                     .UpdateOn<AddProductItemToShoppingCart>(
@@ -43,10 +44,14 @@ public static class Configuration
                         ConfirmShoppingCart.Handle,
                         command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                     )
+                    .UpdateOn<CancelShoppingCart>(
+                        CancelShoppingCart.Handle,
+                        command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
+                    )
             )
             .For<ShoppingCartDetails, ECommerceDbContext>(
                 builder => builder
-                    .AddOn<ShoppingCartInitialized>(ShoppingCartDetailsProjection.Handle)
+                    .AddOn<ShoppingCartOpened>(ShoppingCartDetailsProjection.Handle)
                     .UpdateOn<ProductItemAddedToShoppingCart>(
                         e => e.ShoppingCartId,
                         ShoppingCartDetailsProjection.Handle,
@@ -61,11 +66,15 @@ public static class Configuration
                         e => e.ShoppingCartId,
                         ShoppingCartDetailsProjection.Handle
                     )
+                    .UpdateOn<ShoppingCartCanceled>(
+                        e => e.ShoppingCartId,
+                        ShoppingCartDetailsProjection.Handle
+                    )
                     .QueryWith<GetCartById>(GetCartById.Handle)
             )
             .For<ShoppingCartShortInfo, ECommerceDbContext>(
                 builder => builder
-                    .AddOn<ShoppingCartInitialized>(ShoppingCartShortInfoProjection.Handle)
+                    .AddOn<ShoppingCartOpened>(ShoppingCartShortInfoProjection.Handle)
                     .UpdateOn<ProductItemAddedToShoppingCart>(
                         e => e.ShoppingCartId,
                         ShoppingCartShortInfoProjection.Handle
@@ -75,6 +84,10 @@ public static class Configuration
                         ShoppingCartShortInfoProjection.Handle
                     )
                     .UpdateOn<ShoppingCartConfirmed>(
+                        e => e.ShoppingCartId,
+                        ShoppingCartShortInfoProjection.Handle
+                    )
+                    .UpdateOn<ShoppingCartCanceled>(
                         e => e.ShoppingCartId,
                         ShoppingCartShortInfoProjection.Handle
                     )

@@ -18,13 +18,13 @@ public record ConfirmShoppingCart(
     }
 }
 
-internal class HandleConfirmCart:
+internal class HandleConfirmShoppingCart:
     ICommandHandler<ConfirmShoppingCart>
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
     private readonly IMartenAppendScope scope;
 
-    public HandleConfirmCart(
+    public HandleConfirmShoppingCart(
         IMartenRepository<ShoppingCart> cartRepository,
         IMartenAppendScope scope
     )

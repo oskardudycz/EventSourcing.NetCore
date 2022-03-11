@@ -1,7 +1,8 @@
 using Carts.Pricing;
 using Carts.ShoppingCarts.AddingProduct;
+using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Carts.ShoppingCarts.Products;
 using Carts.ShoppingCarts.RemovingProduct;
 using Core.Aggregates;
@@ -19,7 +20,7 @@ public class ShoppingCart: Aggregate
 
     public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 
-    public static ShoppingCart Initialize(
+    public static ShoppingCart Open(
         Guid cartId,
         Guid clientId)
     {
@@ -32,24 +33,22 @@ public class ShoppingCart: Aggregate
         Guid id,
         Guid clientId)
     {
-        var @event = ShoppingCartInitialized.Create(
+        var @event = ShoppingCartOpened.Create(
             id,
-            clientId,
-            ShoppingCartStatus.Pending
+            clientId
         );
 
         Enqueue(@event);
         Apply(@event);
     }
 
-    public void Apply(ShoppingCartInitialized @event)
+    public void Apply(ShoppingCartOpened @event)
     {
         Version++;
 
         Id = @event.CartId;
         ClientId = @event.ClientId;
         ProductItems = new List<PricedProductItem>();
-        Status = @event.ShoppingCartStatus;
     }
 
     public void AddProduct(
@@ -146,6 +145,24 @@ public class ShoppingCart: Aggregate
         Version++;
 
         Status = ShoppingCartStatus.Confirmed;
+    }
+
+    public void Cancel()
+    {
+        if(Status != ShoppingCartStatus.Pending)
+            throw new InvalidOperationException($"Canceling cart in '{Status}' status is not allowed.");
+
+        var @event = ShoppingCartCanceled.Create(Id, DateTime.UtcNow);
+
+        Enqueue(@event);
+        Apply(@event);
+    }
+
+    public void Apply(ShoppingCartCanceled @event)
+    {
+        Version++;
+
+        Status = ShoppingCartStatus.Canceled;
     }
 
     private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)

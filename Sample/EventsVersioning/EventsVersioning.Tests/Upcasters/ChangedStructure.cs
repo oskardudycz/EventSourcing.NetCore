@@ -12,28 +12,28 @@ public class ChangedStructure
         string Name = "Unknown"
     );
 
-    public record ShoppingCartInitialized(
+    public record ShoppingCartOpened(
         Guid ShoppingCartId,
         Client Client
     );
 
-    public static ShoppingCartInitialized Upcast(
-        V1.ShoppingCartInitialized oldEvent
+    public static ShoppingCartOpened Upcast(
+        V1.ShoppingCartOpened oldEvent
     )
     {
-        return new ShoppingCartInitialized(
+        return new ShoppingCartOpened(
             oldEvent.ShoppingCartId,
             new Client(oldEvent.ClientId)
         );
     }
 
-    public static ShoppingCartInitialized Upcast(
+    public static ShoppingCartOpened Upcast(
         string oldEventJson
     )
     {
         var oldEvent = JsonDocument.Parse(oldEventJson).RootElement;
 
-        return new ShoppingCartInitialized(
+        return new ShoppingCartOpened(
             oldEvent.GetProperty("ShoppingCartId").GetGuid(),
             new Client(
                 oldEvent.GetProperty("ClientId").GetGuid()
@@ -45,7 +45,7 @@ public class ChangedStructure
     public void UpcastObjects_Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartInitialized(Guid.NewGuid(), Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
 
         // When
         var @event = Upcast(oldEvent);
@@ -60,7 +60,7 @@ public class ChangedStructure
     public void UpcastJson_Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartInitialized(Guid.NewGuid(), Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
 
         // When
         var @event = Upcast(

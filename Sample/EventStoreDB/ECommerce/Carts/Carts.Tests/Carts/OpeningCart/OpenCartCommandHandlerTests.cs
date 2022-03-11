@@ -1,28 +1,28 @@
 using Carts.ShoppingCarts;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Carts.Tests.Extensions.Reservations;
 using Carts.Tests.Stubs.Events;
 using Carts.Tests.Stubs.Repositories;
 using FluentAssertions;
 using Xunit;
 
-namespace Carts.Tests.Carts.InitializingCart;
+namespace Carts.Tests.Carts.OpeningCart;
 
-public class InitializeCardCommandHandlerTests
+public class OpenCartCommandHandlerTests
 {
     [Fact]
     public async Task ForInitCardCommand_ShouldAddNewCart()
     {
         // Given
         var repository = new FakeRepository<ShoppingCart>();
-        var scope = new DummyMartenAppendScope();
+        var scope = new DummyEventStoreDBAppendScope();
 
-        var commandHandler = new HandleInitializeCart(
+        var commandHandler = new HandleOpenCart(
             repository,
             scope
         );
 
-        var command = InitializeShoppingCart.Create(Guid.NewGuid(), Guid.NewGuid());
+        var command = OpenShoppingCart.Create(Guid.NewGuid(), Guid.NewGuid());
 
         // When
         await commandHandler.Handle(command, CancellationToken.None);
@@ -33,11 +33,11 @@ public class InitializeCardCommandHandlerTests
         var cart = repository.Aggregates.Values.Single();
 
         cart
-            .IsInitializedCartWith(
+            .IsOpenedCartWith(
                 command.CartId,
                 command.ClientId
             )
-            .HasCartInitializedEventWith(
+            .HasCartOpenedEventWith(
                 command.CartId,
                 command.ClientId
             );

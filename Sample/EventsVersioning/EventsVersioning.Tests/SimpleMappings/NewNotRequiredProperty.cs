@@ -7,7 +7,7 @@ namespace EventsVersioning.Tests.SimpleMappings;
 
 public class NewNotRequiredProperty
 {
-    public record ShoppingCartInitialized(
+    public record ShoppingCartOpened(
         Guid ShoppingCartId,
         Guid ClientId,
         // Adding new not required property as nullable
@@ -18,11 +18,11 @@ public class NewNotRequiredProperty
     public void Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartInitialized(Guid.NewGuid(), Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
         var json = JsonSerializer.Serialize(oldEvent);
 
         // When
-        var @event = JsonSerializer.Deserialize<ShoppingCartInitialized>(json);
+        var @event = JsonSerializer.Deserialize<ShoppingCartOpened>(json);
 
         @event.Should().NotBeNull();
         @event!.ShoppingCartId.Should().Be(oldEvent.ShoppingCartId);
@@ -34,11 +34,11 @@ public class NewNotRequiredProperty
     public void Should_BeBackwardCompatible()
     {
         // Given
-        var @event = new ShoppingCartInitialized(Guid.NewGuid(), Guid.NewGuid(), DateTime.UtcNow);
+        var @event = new ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid(), DateTime.UtcNow);
         var json = JsonSerializer.Serialize(@event);
 
         // When
-        var oldEvent = JsonSerializer.Deserialize<V1.ShoppingCartInitialized>(json);
+        var oldEvent = JsonSerializer.Deserialize<V1.ShoppingCartOpened>(json);
 
         oldEvent.Should().NotBeNull();
         oldEvent!.ShoppingCartId.Should().Be(@event.ShoppingCartId);

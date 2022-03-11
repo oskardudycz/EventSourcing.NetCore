@@ -1,6 +1,6 @@
 ﻿namespace ECommerce.Api.Requests;
 
-public record InitializeShoppingCartRequest(
+public record OpenShoppingCartRequest(
     Guid? ClientId
 );
 

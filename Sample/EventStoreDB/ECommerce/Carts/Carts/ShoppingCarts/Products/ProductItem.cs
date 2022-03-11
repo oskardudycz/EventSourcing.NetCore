@@ -1,18 +1,11 @@
 namespace Carts.ShoppingCarts.Products;
 
-public class ProductItem
+public record ProductItem(
+    Guid ProductId,
+    int Quantity
+)
 {
-    public Guid ProductId { get; }
-
-    public int Quantity { get; }
-
-    private ProductItem(Guid productId, int quantity)
-    {
-        ProductId = productId;
-        Quantity = quantity;
-    }
-
-    public static ProductItem Create(Guid? productId, int? quantity)
+    public static ProductItem From(Guid? productId, int? quantity)
     {
         if (!productId.HasValue)
             throw new ArgumentNullException(nameof(productId));
@@ -30,7 +23,7 @@ public class ProductItem
         if (!MatchesProduct(productItem))
             throw new ArgumentException("Product does not match.");
 
-        return Create(ProductId, Quantity + productItem.Quantity);
+        return From(ProductId, Quantity + productItem.Quantity);
     }
 
     public ProductItem Substract(ProductItem productItem)
@@ -38,7 +31,7 @@ public class ProductItem
         if (!MatchesProduct(productItem))
             throw new ArgumentException("Product does not match.");
 
-        return Create(ProductId, Quantity - productItem.Quantity);
+        return From(ProductId, Quantity - productItem.Quantity);
     }
 
     public bool MatchesProduct(ProductItem productItem)
