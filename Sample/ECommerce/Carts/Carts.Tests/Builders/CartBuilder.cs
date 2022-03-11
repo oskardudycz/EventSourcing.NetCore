@@ -7,13 +7,13 @@ internal class CartBuilder
 {
     private Func<ShoppingCart> build  = () => new ShoppingCart();
 
-    public CartBuilder Initialized()
+    public CartBuilder Opened()
     {
         var cartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
 
         // When
-        var cart = ShoppingCart.Initialize(
+        var cart = ShoppingCart.Open(
             cartId,
             clientId
         );

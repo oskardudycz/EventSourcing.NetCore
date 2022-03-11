@@ -21,7 +21,7 @@ public class ShoppingCartDetailsProductItem
 
 public static class ShoppingCartDetailsProjection
 {
-    public static ShoppingCartDetails Handle(EventEnvelope<ShoppingCartInitialized> eventEnvelope)
+    public static ShoppingCartDetails Handle(EventEnvelope<ShoppingCartOpened> eventEnvelope)
     {
         var (shoppingCartId, clientId) = eventEnvelope.Data;
 
@@ -41,6 +41,16 @@ public static class ShoppingCartDetailsProjection
             return;
 
         view.Status = ShoppingCartStatus.Confirmed;
+        view.Version++;
+        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
+    }
+
+    public static void Handle(EventEnvelope<ShoppingCartCanceled> eventEnvelope, ShoppingCartDetails view)
+    {
+        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
+            return;
+
+        view.Status = ShoppingCartStatus.Canceled;
         view.Version++;
         view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }

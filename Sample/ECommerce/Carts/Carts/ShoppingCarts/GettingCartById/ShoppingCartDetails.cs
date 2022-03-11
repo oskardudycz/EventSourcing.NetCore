@@ -1,6 +1,7 @@
 using Carts.ShoppingCarts.AddingProduct;
+using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Carts.ShoppingCarts.Products;
 using Carts.ShoppingCarts.RemovingProduct;
 using Core.Extensions;
@@ -21,14 +22,14 @@ public class ShoppingCartDetails
 
     public int Version { get; set; }
 
-    public void Apply(ShoppingCartInitialized @event)
+    public void Apply(ShoppingCartOpened @event)
     {
         Version++;
 
         Id = @event.CartId;
         ClientId = @event.ClientId;
         ProductItems = new List<PricedProductItem>();
-        Status = @event.ShoppingCartStatus;
+        Status = ShoppingCartStatus.Pending;
     }
 
     public void Apply(ProductAdded @event)
@@ -81,6 +82,13 @@ public class ShoppingCartDetails
         Status = ShoppingCartStatus.Confirmed;
     }
 
+    public void Apply(ShoppingCartCanceled @event)
+    {
+        Version++;
+
+        Status = ShoppingCartStatus.Canceled;
+    }
+
     private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)
     {
         return ProductItems
@@ -92,12 +100,14 @@ public class CartDetailsProjection : AggregateProjection<ShoppingCartDetails>
 {
     public CartDetailsProjection()
     {
-        ProjectEvent<ShoppingCartInitialized>((item, @event) => item.Apply(@event));
+        ProjectEvent<ShoppingCartOpened>((item, @event) => item.Apply(@event));
 
         ProjectEvent<ProductAdded>((item, @event) => item.Apply(@event));
 
         ProjectEvent<ProductRemoved>((item, @event) => item.Apply(@event));
 
         ProjectEvent<ShoppingCartConfirmed>((item, @event) => item.Apply(@event));
+
+        ProjectEvent<ShoppingCartCanceled>((item, @event) => item.Apply(@event));
     }
 }

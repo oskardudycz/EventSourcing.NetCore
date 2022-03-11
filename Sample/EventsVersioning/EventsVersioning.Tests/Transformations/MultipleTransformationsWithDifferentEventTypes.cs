@@ -12,7 +12,7 @@ public class MultipleTransformationsWithDifferentEventTypes
         string Name = "Unknown"
     );
 
-    public record ShoppingCartInitialized(
+    public record ShoppingCartOpened(
         Guid ShoppingCartId,
         Client Client
     );
@@ -20,7 +20,7 @@ public class MultipleTransformationsWithDifferentEventTypes
     public enum ShoppingCartStatus
     {
         Pending = 1,
-        Initialized = 2,
+        Opened = 2,
         Confirmed = 3,
         Cancelled = 4
     }
@@ -42,18 +42,18 @@ public class MultipleTransformationsWithDifferentEventTypes
             new Client(
                 oldEvent.GetProperty("ClientId").GetGuid()
             ),
-            ShoppingCartStatus.Initialized
+            ShoppingCartStatus.Opened
         );
     }
 
     public static ShoppingCartInitializedWithStatus UpcastV2(
-        ShoppingCartInitialized oldEvent
+        ShoppingCartOpened oldEvent
     )
     {
         return new ShoppingCartInitializedWithStatus(
             oldEvent.ShoppingCartId,
             oldEvent.Client,
-            ShoppingCartStatus.Initialized
+            ShoppingCartStatus.Opened
         );
     }
 
@@ -149,15 +149,15 @@ public class MultipleTransformationsWithDifferentEventTypes
 
         var transformations = new EventTransformations()
             .Register(eventTypeV1Name, UpcastV1)
-            .Register<ShoppingCartInitialized, ShoppingCartInitializedWithStatus>(eventTypeV2Name, UpcastV2);
+            .Register<ShoppingCartOpened, ShoppingCartInitializedWithStatus>(eventTypeV2Name, UpcastV2);
 
         var serializer = new EventSerializer(mapping, transformations);
 
-        var eventV1 = new V1.ShoppingCartInitialized(
+        var eventV1 = new V1.ShoppingCartOpened(
             Guid.NewGuid(),
             Guid.NewGuid()
         );
-        var eventV2 = new ShoppingCartInitialized(
+        var eventV2 = new ShoppingCartOpened(
             Guid.NewGuid(),
             new Client(Guid.NewGuid(), "Oscar the Grouch")
         );
@@ -187,11 +187,11 @@ public class MultipleTransformationsWithDifferentEventTypes
         deserializedEvents[0].Client.Should().NotBeNull();
         deserializedEvents[0].Client.Id.Should().Be(eventV1.ClientId);
         deserializedEvents[0].Client.Name.Should().Be("Unknown");
-        deserializedEvents[0].Status.Should().Be(ShoppingCartStatus.Initialized);
+        deserializedEvents[0].Status.Should().Be(ShoppingCartStatus.Opened);
 
         deserializedEvents[1].ShoppingCartId.Should().Be(eventV2.ShoppingCartId);
         deserializedEvents[1].Client.Should().Be(eventV2.Client);
-        deserializedEvents[1].Status.Should().Be(ShoppingCartStatus.Initialized);
+        deserializedEvents[1].Status.Should().Be(ShoppingCartStatus.Opened);
 
         deserializedEvents[2].ShoppingCartId.Should().Be(eventV3.ShoppingCartId);
         deserializedEvents[2].Client.Should().Be(eventV3.Client);

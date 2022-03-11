@@ -1,25 +1,25 @@
-﻿namespace ECommerce.ShoppingCarts.Initializing;
+﻿namespace ECommerce.ShoppingCarts.Opening;
 
-public record InitializeShoppingCart(
+public record OpenShoppingCart(
     Guid ShoppingCartId,
     Guid ClientId
 )
 {
-    public static InitializeShoppingCart From(Guid? cartId, Guid? clientId)
+    public static OpenShoppingCart From(Guid? cartId, Guid? clientId)
     {
         if (cartId == null || cartId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(cartId));
         if (clientId == null || clientId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(clientId));
 
-        return new InitializeShoppingCart(cartId.Value, clientId.Value);
+        return new OpenShoppingCart(cartId.Value, clientId.Value);
     }
 
-    public static ShoppingCartInitialized Handle(InitializeShoppingCart command)
+    public static ShoppingCartOpened Handle(OpenShoppingCart command)
     {
         var (shoppingCartId, clientId) = command;
 
-        return new ShoppingCartInitialized(
+        return new ShoppingCartOpened(
             shoppingCartId,
             clientId
         );

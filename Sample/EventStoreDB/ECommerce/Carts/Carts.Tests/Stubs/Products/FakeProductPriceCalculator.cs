@@ -10,7 +10,7 @@ internal class FakeProductPriceCalculator: IProductPriceCalculator
     {
         return productItems
             .Select(pi =>
-                PricedProductItem.Create(pi, FakePrice))
+                PricedProductItem.From(pi, FakePrice))
             .ToList();
     }
 }

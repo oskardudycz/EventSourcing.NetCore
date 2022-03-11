@@ -1,7 +1,8 @@
 using Carts.Pricing;
 using Carts.ShoppingCarts.AddingProduct;
+using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Carts.ShoppingCarts.Products;
 using Carts.ShoppingCarts.RemovingProduct;
 using Core.Aggregates;
@@ -19,7 +20,7 @@ public class ShoppingCart: Aggregate
 
     public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 
-    public static ShoppingCart Initialize(
+    public static ShoppingCart Open(
         Guid cartId,
         Guid clientId)
     {
@@ -32,17 +33,20 @@ public class ShoppingCart: Aggregate
     {
         switch (@event)
         {
-            case ShoppingCartInitialized cartInitialized:
-                Apply(cartInitialized);
+            case ShoppingCartOpened cartOpened:
+                Apply(cartOpened);
                 return;
-            case ProductAdded cartInitialized:
-                Apply(cartInitialized);
+            case ProductAdded cartOpened:
+                Apply(cartOpened);
                 return;
-            case ProductRemoved cartInitialized:
-                Apply(cartInitialized);
+            case ProductRemoved cartOpened:
+                Apply(cartOpened);
                 return;
-            case ShoppingCartConfirmed cartInitialized:
-                Apply(cartInitialized);
+            case ShoppingCartConfirmed cartOpened:
+                Apply(cartOpened);
+                return;
+            case ShoppingCartCanceled cartCanceled:
+                Apply(cartCanceled);
                 return;
         }
     }
@@ -51,7 +55,7 @@ public class ShoppingCart: Aggregate
         Guid id,
         Guid clientId)
     {
-        var @event = ShoppingCartInitialized.Create(
+        var @event = ShoppingCartOpened.Create(
             id,
             clientId,
             ShoppingCartStatus.Pending
@@ -61,7 +65,7 @@ public class ShoppingCart: Aggregate
         Apply(@event);
     }
 
-    private void Apply(ShoppingCartInitialized @event)
+    private void Apply(ShoppingCartOpened @event)
     {
         Version = 0;
 
@@ -165,6 +169,24 @@ public class ShoppingCart: Aggregate
         Version++;
 
         Status = ShoppingCartStatus.Confirmed;
+    }
+
+    public void Cancel()
+    {
+        if(Status != ShoppingCartStatus.Pending)
+            throw new InvalidOperationException($"Confirming cart in '{Status}' status is not allowed.");
+
+        var @event = ShoppingCartCanceled.Create(Id, DateTime.UtcNow);
+
+        Enqueue(@event);
+        Apply(@event);
+    }
+
+    private void Apply(ShoppingCartCanceled @event)
+    {
+        Version++;
+
+        Status = ShoppingCartStatus.Canceled;
     }
 
     private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)

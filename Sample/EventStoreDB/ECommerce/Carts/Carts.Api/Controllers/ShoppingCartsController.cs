@@ -1,10 +1,11 @@
 using Carts.Api.Requests;
+using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.GettingCartAtVersion;
 using Carts.ShoppingCarts.GettingCartById;
 using Carts.ShoppingCarts.GettingCartHistory;
 using Carts.ShoppingCarts.GettingCarts;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Carts.ShoppingCarts.Products;
 using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
@@ -35,11 +36,11 @@ public class ShoppingCartsController: Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> InitializeCart([FromBody] InitializeShoppingCartRequest? request)
+    public async Task<IActionResult> OpenCart([FromBody] OpenShoppingCartRequest? request)
     {
         var cartId = idGenerator.New();
 
-        var command = InitializeShoppingCart.Create(
+        var command = OpenShoppingCart.Create(
             cartId,
             request?.ClientId
         );
@@ -57,7 +58,7 @@ public class ShoppingCartsController: Controller
     {
         var command = ShoppingCarts.AddingProduct.AddProduct.Create(
             id,
-            ProductItem.Create(
+            ProductItem.From(
                 request?.ProductItem?.ProductId,
                 request?.ProductItem?.Quantity
             )
@@ -78,9 +79,11 @@ public class ShoppingCartsController: Controller
     {
         var command = ShoppingCarts.RemovingProduct.RemoveProduct.Create(
             id,
-            PricedProductItem.Create(
-                productId,
-                quantity,
+            PricedProductItem.From(
+                ProductItem.From(
+                    productId,
+                    quantity
+                ),
                 unitPrice
             )
         );
@@ -94,6 +97,18 @@ public class ShoppingCartsController: Controller
     public async Task<IActionResult> ConfirmCart(Guid id)
     {
         var command = ConfirmShoppingCart.Create(
+            id
+        );
+
+        await commandBus.Send(command);
+
+        return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> CancelCart(Guid id)
+    {
+        var command = CancelShoppingCart.Create(
             id
         );
 

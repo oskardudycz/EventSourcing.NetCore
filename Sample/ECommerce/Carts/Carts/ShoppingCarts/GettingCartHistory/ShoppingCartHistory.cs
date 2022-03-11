@@ -1,6 +1,7 @@
 using Carts.ShoppingCarts.AddingProduct;
+using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Carts.ShoppingCarts.RemovingProduct;
 using Marten.Events;
 using Marten.Events.Projections;
@@ -15,7 +16,7 @@ public record ShoppingCartHistory (
 
 public class CartHistoryTransformation : EventProjection
 {
-    public ShoppingCartHistory Transform(IEvent<ShoppingCartInitialized> input)
+    public ShoppingCartHistory Transform(IEvent<ShoppingCartOpened> input)
     {
         return new (
             Guid.NewGuid(),
@@ -48,6 +49,15 @@ public class CartHistoryTransformation : EventProjection
             Guid.NewGuid(),
             input.Data.CartId,
             $"Confirmed Cart with id `{input.Data.CartId}`"
+        );
+    }
+
+    public ShoppingCartHistory Transform(IEvent<ShoppingCartCanceled> input)
+    {
+        return new (
+            Guid.NewGuid(),
+            input.Data.CartId,
+            $"Canceled Cart with id `{input.Data.CartId}`"
         );
     }
 }

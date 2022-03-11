@@ -43,7 +43,7 @@ There are some simple mappings that we could handle on the code structure or ser
 Having event defined as such:
 
 ```csharp
-public record ShoppingCartInitialized(
+public record ShoppingCartOpened(
     Guid ShoppingCartId,
     Guid ClientId
 );
@@ -52,7 +52,7 @@ public record ShoppingCartInitialized(
 If we'd like to add a new not required property, e.g. `IntializedAt`, we can add it just as a new nullable property. The essential fact to decide if that's the right strategy is if we're good with not having it defined. It can be handled as:
 
 ```csharp
-public record ShoppingCartInitialized(
+public record ShoppingCartOpened(
     Guid ShoppingCartId,
     Guid ClientId,
     // Adding new not required property as nullable
@@ -69,22 +69,22 @@ See full sample: [NewNotRequiredProperty.cs](./EventsVersioning.Tests/SimpleMapp
 
 We must define a default value if we'd like to add a new required property and make it non-breaking. It's the same as you'd add a new column to the relational table. 
 
-For instance, we decide that we'd like to add a validation step when the shopping cart is open (e.g. for fraud or spam detection), and our shopping cart can be opened with a pending state. We could solve that by adding the new property with the status information and setting it to `Initialized`, assuming that all old events were appended using the older logic.
+For instance, we decide that we'd like to add a validation step when the shopping cart is open (e.g. for fraud or spam detection), and our shopping cart can be opened with a pending state. We could solve that by adding the new property with the status information and setting it to `Opened`, assuming that all old events were appended using the older logic.
 
 ```csharp
 public enum ShoppingCartStatus
 {
     Pending = 1,
-    Initialized = 2,
+    Opened = 2,
     Confirmed = 3,
     Cancelled = 4
 }
 
-public record ShoppingCartInitialized(
+public record ShoppingCartOpened(
     Guid ShoppingCartId,
     Guid ClientId,
     // Adding new not required property as nullable
-    ShoppingCartStatus Status = ShoppingCartStatus.Initialized
+    ShoppingCartStatus Status = ShoppingCartStatus.Opened
 );
 ```
 
@@ -99,13 +99,13 @@ Let's assume that we concluded that keeping `ShoppingCart` prefix in the `Shoppi
 We could do it as:
 
 ```csharp
-public class ShoppingCartInitialized
+public class ShoppingCartOpened
 {
     [JsonPropertyName("ShoppingCartId")]
     public Guid CartId { get; init; }
     public Guid ClientId { get; init; }
 
-    public ShoppingCartInitialized(
+    public ShoppingCartOpened(
         Guid cartId,
         Guid clientId
     )
@@ -156,7 +156,7 @@ public record Client(
     string Name = "Unknown"
 );
 
-public record ShoppingCartInitialized(
+public record ShoppingCartOpened(
     Guid ShoppingCartId,
     Client Client
 );
@@ -167,11 +167,11 @@ We can define upcaster as a function that'll later plug in the deserialisation p
 We can define the transformation of the object of the old structure as:
 
 ```csharp
-public static ShoppingCartInitialized Upcast(
-    V1.ShoppingCartInitialized oldEvent
+public static ShoppingCartOpened Upcast(
+    V1.ShoppingCartOpened oldEvent
 )
 {
-    return new ShoppingCartInitialized(
+    return new ShoppingCartOpened(
         oldEvent.ShoppingCartId,
         new Client(oldEvent.ClientId)
     );
@@ -181,13 +181,13 @@ public static ShoppingCartInitialized Upcast(
 Or we can map it from JSON
 
 ```csharp
-public static ShoppingCartInitialized Upcast(
+public static ShoppingCartOpened Upcast(
     string oldEventJson
 )
 {
     var oldEvent = JsonDocument.Parse(oldEventJson).RootElement;
 
-    return new ShoppingCartInitialized(
+    return new ShoppingCartOpened(
         oldEvent.GetProperty("ShoppingCartId").GetGuid(),
         new Client(
             oldEvent.GetProperty("ClientId").GetGuid()
@@ -209,7 +209,7 @@ public record EventMetadata(
     Guid UserId
 );
 
-public record ShoppingCartInitialized(
+public record ShoppingCartOpened(
     Guid ShoppingCartId,
     Guid ClientId,
     Guid InitializedBy
@@ -219,12 +219,12 @@ public record ShoppingCartInitialized(
 Upcaster from old object to the new one can look like:
 
 ```csharp
-public static ShoppingCartInitialized Upcast(
-    V1.ShoppingCartInitialized oldEvent,
+public static ShoppingCartOpened Upcast(
+    V1.ShoppingCartOpened oldEvent,
     EventMetadata eventMetadata
 )
 {
-    return new ShoppingCartInitialized(
+    return new ShoppingCartOpened(
         oldEvent.ShoppingCartId,
         oldEvent.ClientId,
         eventMetadata.UserId
@@ -235,7 +235,7 @@ public static ShoppingCartInitialized Upcast(
 From JSON to the object:
 
 ```csharp
-public static ShoppingCartInitialized Upcast(
+public static ShoppingCartOpened Upcast(
     string oldEventJson,
     string eventMetadataJson
 )
@@ -243,7 +243,7 @@ public static ShoppingCartInitialized Upcast(
     var oldEvent = JsonDocument.Parse(oldEventJson);
     var eventMetadata = JsonDocument.Parse(eventMetadataJson);
 
-    return new ShoppingCartInitialized(
+    return new ShoppingCartOpened(
         oldEvent.RootElement.GetProperty("ShoppingCartId").GetGuid(),
         oldEvent.RootElement.GetProperty("ClientId").GetGuid(),
         eventMetadata.RootElement.GetProperty("UserId").GetGuid()
@@ -260,11 +260,11 @@ In the same way, as described above, we can downcast the events from the new str
 From the new object to the old one:
 
 ```csharp
-public static V1.ShoppingCartInitialized Downcast(
-    ShoppingCartInitialized newEvent
+public static V1.ShoppingCartOpened Downcast(
+    ShoppingCartOpened newEvent
 )
 {
-    return new V1.ShoppingCartInitialized(
+    return new V1.ShoppingCartOpened(
         newEvent.ShoppingCartId,
         newEvent.Client.Id
     );
@@ -274,13 +274,13 @@ public static V1.ShoppingCartInitialized Downcast(
 From new JSON format to the old object:
 
 ```csharp
-public static V1.ShoppingCartInitialized Downcast(
+public static V1.ShoppingCartOpened Downcast(
     string newEventJson
 )
 {
     var newEvent = JsonDocument.Parse(newEventJson).RootElement;
 
-    return new V1.ShoppingCartInitialized(
+    return new V1.ShoppingCartOpened(
         newEvent.GetProperty("ShoppingCartId").GetGuid(),
         newEvent.GetProperty("Client").GetProperty("Id").GetGuid()
     );
@@ -340,7 +340,7 @@ We have two `Register` methods. Both of them has JSON and handler function as pa
 ```csharp
 var transformations = new EventTransformations()
     .Register(eventTypeV1Name, UpcastV1)
-    .Register<ShoppingCartInitialized, ShoppingCartInitializedWithStatus>(
+    .Register<ShoppingCartOpened, ShoppingCartInitializedWithStatus>(
         eventTypeV2Name, UpcastV2);
 ```
 
@@ -416,7 +416,7 @@ See a full sample in [MultipleTransformationsWithDifferentEventTypes.cs](./Event
 
 You might want not only to transform a single event into another (1:1) but also a set of events into another one (N:M).
 
-Let's take as an example scenario where we can initialise not only empty shopping cart but also filled with products. For some time, we were doing that by publishing multiple events: `ShoppingCartInitialized` and `ProductItemAddedToShoppingCart` for each added product item. We decided that we'd like to replace this with event containing list of product items:
+Let's take as an example scenario where we can initialise not only empty shopping cart but also filled with products. For some time, we were doing that by publishing multiple events: `ShoppingCartOpened` and `ProductItemAddedToShoppingCart` for each added product item. We decided that we'd like to replace this with event containing list of product items:
 
 ```csharp
 public record ProductItem(
@@ -429,7 +429,7 @@ public record PricedProductItem(
     decimal UnitPrice
 );
 
-public record ShoppingCartInitialized(
+public record ShoppingCartOpened(
     Guid ShoppingCartId,
     Guid ClientId
 );
@@ -520,9 +520,9 @@ public List<EventData> FlattenInitializedEventsWithProductItemsAdded(
     List<EventData> events
 )
 {
-    var cartInitialized = events.First();
+    var cartOpened = events.First();
     var cartInitializedCorrelationId =
-        JsonSerializer.Deserialize<EventMetadata>(cartInitialized.MetaData)!
+        JsonSerializer.Deserialize<EventMetadata>(cartOpened.MetaData)!
             .CorrelationId;
 
     var i = 1;
@@ -547,7 +547,7 @@ public List<EventData> FlattenInitializedEventsWithProductItemsAdded(
     }
 
     var mergedEvent = ToShoppingCartInitializedWithProducts(
-        cartInitialized,
+        cartOpened,
         productItemsAdded
     );
 

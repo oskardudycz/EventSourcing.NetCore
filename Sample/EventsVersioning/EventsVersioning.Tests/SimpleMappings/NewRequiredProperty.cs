@@ -10,43 +10,43 @@ public class NewRequiredProperty
     public enum ShoppingCartStatus
     {
         Pending = 1,
-        Initialized = 2,
+        Opened = 2,
         Confirmed = 3,
         Cancelled = 4
     }
 
-    public record ShoppingCartInitialized(
+    public record ShoppingCartOpened(
         Guid ShoppingCartId,
         Guid ClientId,
         // Adding new not required property as nullable
-        ShoppingCartStatus Status = ShoppingCartStatus.Initialized
+        ShoppingCartStatus Status = ShoppingCartStatus.Opened
     );
 
     [Fact]
     public void Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartInitialized(Guid.NewGuid(), Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
         var json = JsonSerializer.Serialize(oldEvent);
 
         // When
-        var @event = JsonSerializer.Deserialize<ShoppingCartInitialized>(json);
+        var @event = JsonSerializer.Deserialize<ShoppingCartOpened>(json);
 
         @event.Should().NotBeNull();
         @event!.ShoppingCartId.Should().Be(oldEvent.ShoppingCartId);
         @event.ClientId.Should().Be(oldEvent.ClientId);
-        @event.Status.Should().Be(ShoppingCartStatus.Initialized);
+        @event.Status.Should().Be(ShoppingCartStatus.Opened);
     }
 
     [Fact]
     public void Should_BeBackwardCompatible()
     {
         // Given
-        var @event = new ShoppingCartInitialized(Guid.NewGuid(), Guid.NewGuid(), ShoppingCartStatus.Pending);
+        var @event = new ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid(), ShoppingCartStatus.Pending);
         var json = JsonSerializer.Serialize(@event);
 
         // When
-        var oldEvent = JsonSerializer.Deserialize<V1.ShoppingCartInitialized>(json);
+        var oldEvent = JsonSerializer.Deserialize<V1.ShoppingCartOpened>(json);
 
         oldEvent.Should().NotBeNull();
         oldEvent!.ShoppingCartId.Should().Be(@event.ShoppingCartId);

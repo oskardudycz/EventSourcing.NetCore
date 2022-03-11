@@ -1,31 +1,16 @@
 namespace Carts.ShoppingCarts.Products;
 
-public class PricedProductItem
+public record PricedProductItem(
+    ProductItem ProductItem,
+    decimal UnitPrice
+)
 {
     public Guid ProductId => ProductItem.ProductId;
-
     public int Quantity => ProductItem.Quantity;
 
-    public decimal UnitPrice { get; }
-
     public decimal TotalPrice => Quantity * UnitPrice;
-    public ProductItem ProductItem { get; }
 
-    private PricedProductItem(ProductItem productItem, decimal unitPrice)
-    {
-        ProductItem = productItem;
-        UnitPrice = unitPrice;
-    }
-
-    public static PricedProductItem Create(Guid? productId, int? quantity, decimal? unitPrice)
-    {
-        return Create(
-            ProductItem.Create(productId, quantity),
-            unitPrice
-        );
-    }
-
-    public static PricedProductItem Create(ProductItem productItem, decimal? unitPrice)
+    public static PricedProductItem From(ProductItem productItem, decimal? unitPrice)
     {
         return unitPrice switch
         {

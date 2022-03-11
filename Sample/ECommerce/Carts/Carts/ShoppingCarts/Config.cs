@@ -1,12 +1,13 @@
 using Carts.Pricing;
 using Carts.ShoppingCarts.AddingProduct;
+using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.FinalizingCart;
 using Carts.ShoppingCarts.GettingCartAtVersion;
 using Carts.ShoppingCarts.GettingCartById;
 using Carts.ShoppingCarts.GettingCartHistory;
 using Carts.ShoppingCarts.GettingCarts;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Carts.ShoppingCarts.RemovingProduct;
 using Core.Commands;
 using Core.Events;
@@ -28,10 +29,11 @@ internal static class CartsConfig
             .AddEventHandlers();
 
     private static IServiceCollection AddCommandHandlers(this IServiceCollection services) =>
-        services.AddCommandHandler<InitializeShoppingCart, HandleInitializeCart>()
+        services.AddCommandHandler<OpenShoppingCart, HandleOpenShoppingCart>()
             .AddCommandHandler<AddProduct, HandleAddProduct>()
             .AddCommandHandler<RemoveProduct, HandleRemoveProduct>()
-            .AddCommandHandler<ConfirmShoppingCart, HandleConfirmCart>();
+            .AddCommandHandler<ConfirmShoppingCart, HandleConfirmShoppingCart>()
+            .AddCommandHandler<CancelShoppingCart, HandleCancelShoppingCart>();
 
     private static IServiceCollection AddQueryHandlers(this IServiceCollection services) =>
         services.AddQueryHandler<GetCartById, ShoppingCartDetails?, HandleGetCartById>()

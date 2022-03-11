@@ -1,6 +1,7 @@
 using Carts.ShoppingCarts.AddingProduct;
+using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Carts.ShoppingCarts.RemovingProduct;
 using Marten.Events.Aggregation;
 
@@ -14,7 +15,7 @@ public class ShoppingCartShortInfo
 
     public ShoppingCartStatus Status { get; set; }
 
-    public void Apply(ShoppingCartInitialized @event)
+    public void Apply(ShoppingCartOpened @event)
     {
         Id = @event.CartId;
         TotalItemsCount = 0;
@@ -35,18 +36,25 @@ public class ShoppingCartShortInfo
     {
         Status = ShoppingCartStatus.Confirmed;
     }
+
+    public void Apply(ShoppingCartCanceled @event)
+    {
+        Status = ShoppingCartStatus.Canceled;
+    }
 }
 
 public class CartShortInfoProjection : AggregateProjection<ShoppingCartShortInfo>
 {
     public CartShortInfoProjection()
     {
-        ProjectEvent<ShoppingCartInitialized>((item, @event) => item.Apply(@event));
+        ProjectEvent<ShoppingCartOpened>((item, @event) => item.Apply(@event));
 
         ProjectEvent<ProductAdded>((item, @event) => item.Apply(@event));
 
         ProjectEvent<ProductRemoved>((item, @event) => item.Apply(@event));
 
         ProjectEvent<ShoppingCartConfirmed>((item, @event) => item.Apply(@event));
+
+        ProjectEvent<ShoppingCartCanceled>((item, @event) => item.Apply(@event));
     }
 }

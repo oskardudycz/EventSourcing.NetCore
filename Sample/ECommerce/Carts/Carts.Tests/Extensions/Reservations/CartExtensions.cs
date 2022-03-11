@@ -1,5 +1,5 @@
 using Carts.ShoppingCarts;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 using Core.Testing;
 using FluentAssertions;
 
@@ -7,7 +7,7 @@ namespace Carts.Tests.Extensions.Reservations;
 
 internal static class CartExtensions
 {
-    public static ShoppingCart IsInitializedCartWith(
+    public static ShoppingCart IsOpenedCartWith(
         this ShoppingCart shoppingCart,
         Guid id,
         Guid clientId)
@@ -23,18 +23,17 @@ internal static class CartExtensions
         return shoppingCart;
     }
 
-    public static ShoppingCart HasCartInitializedEventWith(
+    public static ShoppingCart HasCartOpenedEventWith(
         this ShoppingCart shoppingCart,
         Guid id,
         Guid clientId)
     {
-        var @event = shoppingCart.PublishedEvent<ShoppingCartInitialized>();
+        var @event = shoppingCart.PublishedEvent<ShoppingCartOpened>();
 
         @event.Should().NotBeNull();
-        @event.Should().BeOfType<ShoppingCartInitialized>();
+        @event.Should().BeOfType<ShoppingCartOpened>();
         @event!.CartId.Should().Be(id);
         @event.ClientId.Should().Be(clientId);
-        @event.ShoppingCartStatus.Should().Be(ShoppingCartStatus.Pending);
 
         return shoppingCart;
     }

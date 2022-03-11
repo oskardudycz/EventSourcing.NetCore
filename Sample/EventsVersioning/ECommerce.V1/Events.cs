@@ -10,7 +10,7 @@ public record PricedProductItem(
     decimal UnitPrice
 );
 
-public record ShoppingCartInitialized(
+public record ShoppingCartOpened(
     Guid ShoppingCartId,
     Guid ClientId
 );

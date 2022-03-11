@@ -2,10 +2,11 @@ using Core.WebApi.Headers;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts.AddingProductItem;
+using ECommerce.ShoppingCarts.Canceling;
 using ECommerce.ShoppingCarts.Confirming;
 using ECommerce.ShoppingCarts.GettingCartById;
 using ECommerce.ShoppingCarts.GettingCarts;
-using ECommerce.ShoppingCarts.Initializing;
+using ECommerce.ShoppingCarts.Opening;
 using ECommerce.ShoppingCarts.ProductItems;
 using ECommerce.ShoppingCarts.RemovingProductItem;
 
@@ -15,10 +16,10 @@ namespace ECommerce.Api.Controllers;
 public class ShoppingCartsController: Controller
 {
     [HttpPost]
-    public async Task<IActionResult> InitializeCart(
+    public async Task<IActionResult> OpenCart(
         [FromServices] Func<Guid> generateId,
-        [FromServices] Func<InitializeShoppingCart, CancellationToken, ValueTask> handle,
-        [FromBody] InitializeShoppingCartRequest? request,
+        [FromServices] Func<OpenShoppingCart, CancellationToken, ValueTask> handle,
+        [FromBody] OpenShoppingCartRequest? request,
         CancellationToken ct
     )
     {
@@ -27,7 +28,7 @@ public class ShoppingCartsController: Controller
 
         var cartId = generateId();
 
-        var command = InitializeShoppingCart.From(
+        var command = OpenShoppingCart.From(
             cartId,
             request.ClientId
         );
@@ -91,15 +92,24 @@ public class ShoppingCartsController: Controller
     public async Task<IActionResult> ConfirmCart(
         [FromServices] Func<ConfirmShoppingCart, CancellationToken, ValueTask> handle,
         Guid id,
-        [FromBody] ConfirmShoppingCartRequest request,
         CancellationToken ct
     )
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        var command = ConfirmShoppingCart.From(id);
 
-        var command =
-            ConfirmShoppingCart.From(id);
+        await handle(command, ct);
+
+        return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> CancelCart(
+        [FromServices] Func<CancelShoppingCart, CancellationToken, ValueTask> handle,
+        Guid id,
+        CancellationToken ct
+    )
+    {
+        var command = CancelShoppingCart.From(id);
 
         await handle(command, ct);
 

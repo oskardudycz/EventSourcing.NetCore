@@ -22,10 +22,10 @@ public class ConfirmShoppingCartFixture: ApiWithEventsFixture<Startup>
 
     public override async Task InitializeAsync()
     {
-        var initializeResponse = await Post(new InitializeShoppingCartRequest(ClientId));
-        initializeResponse.EnsureSuccessStatusCode();
+        var openResponse = await Post(new OpenShoppingCartRequest(ClientId));
+        openResponse.EnsureSuccessStatusCode();
 
-        ShoppingCartId = await initializeResponse.GetResultFromJson<Guid>();
+        ShoppingCartId = await openResponse.GetResultFromJson<Guid>();
 
         CommandResponse = await Put(
             $"{ShoppingCartId}/confirmation",

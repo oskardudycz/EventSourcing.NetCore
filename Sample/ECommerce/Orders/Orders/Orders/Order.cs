@@ -56,7 +56,7 @@ public class Order: Aggregate
         Id = @event.OrderId;
         ClientId = @event.ClientId;
         ProductItems = @event.ProductItems;
-        Status = OrderStatus.Initialized;
+        Status = OrderStatus.Opened;
     }
 
     public void RecordPayment(Guid paymentId, DateTime recordedAt)

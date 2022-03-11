@@ -1,5 +1,5 @@
 using Carts.ShoppingCarts;
-using Carts.ShoppingCarts.InitializingCart;
+using Carts.ShoppingCarts.OpeningCart;
 
 namespace Carts.Tests.Builders;
 
@@ -7,12 +7,12 @@ internal class CartBuilder
 {
     private readonly Queue<object> eventsToApply = new();
 
-    public CartBuilder Initialized()
+    public CartBuilder Opened()
     {
         var cartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
 
-        eventsToApply.Enqueue(new ShoppingCartInitialized(cartId, clientId, ShoppingCartStatus.Pending));
+        eventsToApply.Enqueue(new ShoppingCartOpened(cartId, clientId, ShoppingCartStatus.Pending));
 
         return this;
     }

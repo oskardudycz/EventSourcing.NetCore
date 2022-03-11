@@ -1,12 +1,12 @@
-namespace Carts.ShoppingCarts.InitializingCart;
+namespace Carts.ShoppingCarts.OpeningCart;
 
-public record ShoppingCartInitialized(
+public record ShoppingCartOpened(
     Guid CartId,
     Guid ClientId,
     ShoppingCartStatus ShoppingCartStatus
 )
 {
-    public static ShoppingCartInitialized Create(Guid cartId, Guid clientId, ShoppingCartStatus shoppingCartStatus)
+    public static ShoppingCartOpened Create(Guid cartId, Guid clientId, ShoppingCartStatus shoppingCartStatus)
     {
         if (cartId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(cartId));
@@ -15,6 +15,6 @@ public record ShoppingCartInitialized(
         if (shoppingCartStatus == default)
             throw new ArgumentOutOfRangeException(nameof(shoppingCartStatus));
 
-        return new ShoppingCartInitialized(cartId, clientId, shoppingCartStatus);
+        return new ShoppingCartOpened(cartId, clientId, shoppingCartStatus);
     }
 }
