@@ -60,7 +60,7 @@ public class GettingStateFromEventsTests
             events.Select(@event =>
                 new EventData(
                     Uuid.NewUuid(),
-                    @event.GetType().Name,
+                    @event.GetType().FullName!,
                     JsonSerializer.SerializeToUtf8Bytes(@event)
                 )
             ), cancellationToken: ct);

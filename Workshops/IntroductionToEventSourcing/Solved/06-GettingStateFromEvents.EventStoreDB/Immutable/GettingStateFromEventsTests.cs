@@ -1,7 +1,10 @@
+using System.Text.Json;
+using EventStore.Client;
 using FluentAssertions;
+using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 using Xunit;
 
-namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable.Solution2;
+namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable;
 
 // EVENTS
 public record ShoppingCartOpened(
@@ -115,19 +118,41 @@ public enum ShoppingCartStatus
     Canceled = 3
 }
 
-public class GettingStateFromEventsTests
+public class GettingStateFromEventsTests: EventStoreDBTest
 {
     /// <summary>
-    /// Solution 1 - Fully immutable and functional with linq Aggregate method
+    /// Solution - Mutable entity with When method
     /// </summary>
-    /// <param name="events"></param>
     /// <returns></returns>
-    private static ShoppingCart GetShoppingCart(IEnumerable<object> events) =>
-        events.Aggregate(ShoppingCart.Default(), ShoppingCart.When);
+    private static async Task<ShoppingCart> GetShoppingCart(EventStoreClient eventStore, string streamName, CancellationToken ct)
+    {
+        var result = eventStore.ReadStreamAsync(
+            Direction.Forwards,
+            streamName,
+            StreamPosition.Start,
+            cancellationToken: ct
+        );
+
+        if (await result.ReadState == ReadState.StreamNotFound)
+            throw new InvalidOperationException("Shopping Cart was not found!");
+
+        return await result
+            .Select(@event =>
+                JsonSerializer.Deserialize(
+                    @event.Event.Data.Span,
+                    Type.GetType(@event.Event.EventType)!
+                )!
+            )
+            .AggregateAsync(
+                ShoppingCart.Default(),
+                ShoppingCart.When,
+                ct
+            );
+    }
 
     [Fact]
     [Trait("Category", "SkipCI")]
-    public void GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
@@ -147,13 +172,22 @@ public class GettingStateFromEventsTests
             new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        var shoppingCart = GetShoppingCart(events);
+        var streamName = $"shopping_cart-{shoppingCartId}";
+
+        await AppendEvents(streamName, events, CancellationToken.None);
+
+        var shoppingCart = await GetShoppingCart(EventStore, streamName, CancellationToken.None);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
         shoppingCart.ProductItems.Should().HaveCount(2);
 
-        shoppingCart.ProductItems[0].Should().Be(pairOfShoes);
-        shoppingCart.ProductItems[1].Should().Be(tShirt);
+        shoppingCart.ProductItems[0].ProductId.Should().Be(shoesId);
+        shoppingCart.ProductItems[0].Quantity.Should().Be(pairOfShoes.Quantity);
+        shoppingCart.ProductItems[0].UnitPrice.Should().Be(pairOfShoes.UnitPrice);
+
+        shoppingCart.ProductItems[1].ProductId.Should().Be(tShirtId);
+        shoppingCart.ProductItems[1].Quantity.Should().Be(tShirt.Quantity);
+        shoppingCart.ProductItems[1].UnitPrice.Should().Be(tShirt.UnitPrice);
     }
 }

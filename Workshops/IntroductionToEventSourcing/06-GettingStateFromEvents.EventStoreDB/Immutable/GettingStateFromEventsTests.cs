@@ -1,6 +1,7 @@
+using System.Text.Json;
+using EventStore.Client;
 using FluentAssertions;
 using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
-using Marten;
 using Xunit;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable;
@@ -46,63 +47,7 @@ public record ShoppingCart(
     PricedProductItem[] ProductItems,
     DateTime? ConfirmedAt = null,
     DateTime? CanceledAt = null
-){
-
-    public static ShoppingCart Create(ShoppingCartOpened opened) =>
-        new ShoppingCart(
-            opened.ShoppingCartId,
-            opened.ClientId,
-            ShoppingCartStatus.Pending,
-            Array.Empty<PricedProductItem>()
-        );
-
-    public ShoppingCart Apply(ProductItemAddedToShoppingCart productItemAdded) =>
-        this with
-        {
-            ProductItems = ProductItems
-                .Union(new[] { productItemAdded.ProductItem })
-                .GroupBy(pi => pi.ProductId)
-                .Select(group => group.Count() == 1
-                    ? group.First()
-                    : new PricedProductItem(
-                        group.Key,
-                        group.Sum(pi => pi.Quantity),
-                        group.First().UnitPrice
-                    )
-                )
-                .ToArray()
-        };
-
-    public ShoppingCart Apply(ProductItemRemovedFromShoppingCart productItemRemoved) =>
-        this with
-        {
-            ProductItems = ProductItems
-                .Select(pi => pi.ProductId == productItemRemoved.ProductItem.ProductId
-                    ? new PricedProductItem(
-                        pi.ProductId,
-                        pi.Quantity - productItemRemoved.ProductItem.Quantity,
-                        pi.UnitPrice
-                    )
-                    : pi
-                )
-                .Where(pi => pi.Quantity > 0)
-                .ToArray()
-        };
-
-    public ShoppingCart Apply(ShoppingCartConfirmed confirmed) =>
-        this with
-        {
-            Status = ShoppingCartStatus.Confirmed,
-            ConfirmedAt = confirmed.ConfirmedAt
-        };
-
-    public ShoppingCart Apply(ShoppingCartCanceled canceled) =>
-        this with
-        {
-            Status = ShoppingCartStatus.Canceled,
-            CanceledAt = canceled.CanceledAt
-        };
-}
+);
 
 public enum ShoppingCartStatus
 {
@@ -111,21 +56,16 @@ public enum ShoppingCartStatus
     Canceled = 3
 }
 
-public class GettingStateFromEventsTests: MartenTest
+public class GettingStateFromEventsTests: EventStoreDBTest
 {
     /// <summary>
-    /// Solution - Immutable entity
+    /// Solution - Mutable entity with When method
     /// </summary>
-    /// <param name="documentSession"></param>
-    /// <param name="shoppingCartId"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private static async Task<ShoppingCart> GetShoppingCart(IDocumentSession documentSession, Guid shoppingCartId,
-        CancellationToken cancellationToken)
+    private static Task<ShoppingCart> GetShoppingCart(EventStoreClient eventStore, string streamName, CancellationToken ct)
     {
-        var shoppingCart = await documentSession.Events.AggregateStreamAsync<ShoppingCart>(shoppingCartId, token: cancellationToken);
-
-        return shoppingCart ?? throw new InvalidOperationException("Shopping Cart was not found!");
+        // 1. Add logic here
+        throw new NotImplementedException();
     }
 
     [Fact]
@@ -150,9 +90,11 @@ public class GettingStateFromEventsTests: MartenTest
             new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        await AppendEvents(shoppingCartId, events, CancellationToken.None);
+        var streamName = $"shopping_cart-{shoppingCartId}";
 
-        var shoppingCart = await GetShoppingCart(DocumentSession, shoppingCartId, CancellationToken.None);
+        await AppendEvents(streamName, events, CancellationToken.None);
+
+        var shoppingCart = await GetShoppingCart(EventStore, streamName, CancellationToken.None);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);

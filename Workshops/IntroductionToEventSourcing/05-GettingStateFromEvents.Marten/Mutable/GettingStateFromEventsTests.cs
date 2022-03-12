@@ -63,12 +63,14 @@ public enum ShoppingCartStatus
 public class GettingStateFromEventsTests: MartenTest
 {
     /// <summary>
-    /// Solution - Mutable entity with When method
+    /// Solution - Mutable entity
     /// </summary>
     /// <param name="documentSession"></param>
     /// <param name="shoppingCartId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private static Task<ShoppingCart> GetShoppingCart(IDocumentSession documentSession, Guid shoppingCartId)
+    private static Task<ShoppingCart> GetShoppingCart(IDocumentSession documentSession, Guid shoppingCartId,
+        CancellationToken cancellationToken)
     {
         // 1. Add logic here
         throw new NotImplementedException();
@@ -110,7 +112,7 @@ public class GettingStateFromEventsTests: MartenTest
 
         await AppendEvents(shoppingCartId, events, CancellationToken.None);
 
-        var shoppingCart = await GetShoppingCart(DocumentSession, shoppingCartId);
+        var shoppingCart = await GetShoppingCart(DocumentSession, shoppingCartId, CancellationToken.None);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
