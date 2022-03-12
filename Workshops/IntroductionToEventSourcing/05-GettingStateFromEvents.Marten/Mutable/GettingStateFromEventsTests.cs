@@ -1,4 +1,6 @@
 using FluentAssertions;
+using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
+using Marten;
 using Xunit;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Mutable;
@@ -49,79 +51,6 @@ public class ShoppingCart
     public IList<PricedProductItem> ProductItems { get; } = new List<PricedProductItem>();
     public DateTime? ConfirmedAt { get; private set; }
     public DateTime? CanceledAt { get; private set; }
-
-    public void When(object @event)
-    {
-        switch (@event)
-        {
-            case ShoppingCartOpened opened:
-                Apply(opened);
-                break;
-            case ProductItemAddedToShoppingCart productItemAdded:
-                Apply(productItemAdded);
-                break;
-            case ProductItemRemovedFromShoppingCart productItemRemoved:
-                Apply(productItemRemoved);
-                break;
-            case ShoppingCartConfirmed confirmed:
-                Apply(confirmed);
-                break;
-            case ShoppingCartCanceled canceled:
-                Apply(canceled);
-                break;
-        }
-    }
-
-    private void Apply(ShoppingCartOpened opened)
-    {
-        Id = opened.ShoppingCartId;
-        ClientId = opened.ClientId;
-        Status = ShoppingCartStatus.Pending;
-    }
-
-    private void Apply(ProductItemAddedToShoppingCart productItemAdded)
-    {
-        var (_, pricedProductItem) = productItemAdded;
-        var productId = pricedProductItem.ProductId;
-        var quantityToAdd = pricedProductItem.Quantity;
-
-        var current = ProductItems.SingleOrDefault(
-            pi => pi.ProductId == productId
-        );
-
-        if (current == null)
-            ProductItems.Add(pricedProductItem);
-        else
-            current.Quantity += quantityToAdd;
-    }
-
-    private void Apply(ProductItemRemovedFromShoppingCart productItemRemoved)
-    {
-        var (_, pricedProductItem) = productItemRemoved;
-        var productId = pricedProductItem.ProductId;
-        var quantityToRemove = pricedProductItem.Quantity;
-
-        var current = ProductItems.Single(
-            pi => pi.ProductId == productId
-        );
-
-        if (current.Quantity == quantityToRemove)
-            ProductItems.Remove(current);
-        else
-            current.Quantity -= quantityToRemove;
-    }
-
-    private void Apply(ShoppingCartConfirmed confirmed)
-    {
-        Status = ShoppingCartStatus.Confirmed;
-        ConfirmedAt = confirmed.ConfirmedAt;
-    }
-
-    private void Apply(ShoppingCartCanceled canceled)
-    {
-        Status = ShoppingCartStatus.Canceled;
-        CanceledAt = canceled.CanceledAt;
-    }
 }
 
 public enum ShoppingCartStatus
@@ -131,28 +60,23 @@ public enum ShoppingCartStatus
     Canceled = 3
 }
 
-public class GettingStateFromEventsTests
+public class GettingStateFromEventsTests: MartenTest
 {
     /// <summary>
     /// Solution - Mutable entity with When method
     /// </summary>
-    /// <param name="events"></param>
+    /// <param name="documentSession"></param>
+    /// <param name="shoppingCartId"></param>
     /// <returns></returns>
-    private static ShoppingCart GetShoppingCart(IEnumerable<object> events)
+    private static Task<ShoppingCart> GetShoppingCart(IDocumentSession documentSession, Guid shoppingCartId)
     {
-        var shoppingCart = new ShoppingCart();
-
-        foreach (var @event in events)
-        {
-            shoppingCart.When(@event);
-        }
-
-        return shoppingCart;
+        // 1. Add logic here
+        throw new NotImplementedException();
     }
 
     [Fact]
     [Trait("Category", "SkipCI")]
-    public void GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
@@ -184,7 +108,9 @@ public class GettingStateFromEventsTests
             new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        var shoppingCart = GetShoppingCart(events);
+        await AppendEvents(shoppingCartId, events, CancellationToken.None);
+
+        var shoppingCart = await GetShoppingCart(DocumentSession, shoppingCartId);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);

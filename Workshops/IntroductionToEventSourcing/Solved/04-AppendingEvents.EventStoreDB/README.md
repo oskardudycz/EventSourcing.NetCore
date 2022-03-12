@@ -10,3 +10,7 @@ docker-compose up
 ```
 
 After that you can use EventStoreDB UI to see how streams and events look like. It's available at: http://localhost:2113/.
+
+## Solution
+
+Use [Append events EventStoreDB API](https://developers.eventstore.com/clients/grpc/appending-events.html).
