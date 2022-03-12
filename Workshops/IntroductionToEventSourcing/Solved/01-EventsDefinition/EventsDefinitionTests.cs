@@ -26,55 +26,75 @@ public record ShoppingCartConfirmed(
     DateTime ConfirmedAt
 );
 
-public record ShoppingCartCancelled(
+public record ShoppingCartCanceled(
     Guid ShoppingCartId,
-    DateTime CancelledAt
+    DateTime CanceledAt
 );
 
 // VALUE OBJECTS
-public record PricedProductItem(
-    ProductItem ProductItem,
-    decimal UnitPrice
-)
+
+public class PricedProductItem
 {
-    public Guid ProductId => ProductItem.ProductId;
-    public int Quantity => ProductItem.Quantity;
+    public Guid ProductId { get; set; }
+    public decimal UnitPrice { get; set; }
+
+    public int Quantity { get; set; }
 
     public decimal TotalPrice => Quantity * UnitPrice;
 }
 
-public record ProductItem(
+public record ImmutablePricedProductItem(
     Guid ProductId,
-    int Quantity
-);
+    int Quantity,
+    decimal UnitPrice
+)
+{
+    public decimal TotalPrice => Quantity * UnitPrice;
+}
 
 // ENTITY
 
-public record ShoppingCart(
+// regular one
+public class ShoppingCart
+{
+    public Guid Id { get; set; }
+    public Guid ClientId { get; set; }
+    public ShoppingCartStatus Status { get; set; }
+    public IList<PricedProductItem> ProductItems { get; set; } = new List<PricedProductItem>();
+    public DateTime? ConfirmedAt { get; set; }
+    public DateTime? CanceledAt { get; set; }
+}
+
+// immutable one
+public record ImmutableShoppingCart(
     Guid Id,
     Guid ClientId,
     ShoppingCartStatus Status,
-    PricedProductItem ProductItems,
-    DateTime? ConfirmedAt = null
+    PricedProductItem[] ProductItems,
+    DateTime? ConfirmedAt = null,
+    DateTime? CanceledAt = null
 );
 
 public enum ShoppingCartStatus
 {
     Pending = 1,
     Confirmed = 2,
-    Cancelled = 3
+    Canceled = 3
 }
 
 public class EventsDefinitionTests
 {
-
     [Fact]
-    [Trait("Category", "SkipCI")]
     public void AllEventTypes_ShouldBeDefined()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
-        var pairOfShoes = new PricedProductItem(new ProductItem(Guid.NewGuid(), 1), 100);
+        var pairOfShoes = new PricedProductItem
+        {
+            ProductId = Guid.NewGuid(),
+            Quantity = 1,
+            UnitPrice = 100
+        };
 
         var events = new object[]
         {
@@ -83,7 +103,7 @@ public class EventsDefinitionTests
             new ProductItemAddedToShoppingCart(shoppingCartId, pairOfShoes),
             new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes),
             new ShoppingCartConfirmed(shoppingCartId, DateTime.UtcNow),
-            new ShoppingCartCancelled(shoppingCartId, DateTime.UtcNow)
+            new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
         const int expectedEventTypesCount = 5;

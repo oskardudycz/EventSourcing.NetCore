@@ -1,4 +1,4 @@
-# Events Modelling
+# Exercise 01 - Events Modelling
 
 Having the following shopping cart process:
 1. The customer may add a product to the shopping cart only after opening it.
