@@ -26,7 +26,7 @@ public record ShoppingCartConfirmed(
     DateTime ConfirmedAt
 );
 
-public record ShoppingCartCancelled(
+public record ShoppingCartCanceled(
     Guid ShoppingCartId,
     DateTime CanceledAt
 );
@@ -79,7 +79,7 @@ public class GettingStateFromEventsTests
             new ProductItemAddedToShoppingCart(shoppingCartId, tShirt),
             new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes),
             new ShoppingCartConfirmed(shoppingCartId, DateTime.UtcNow),
-            new ShoppingCartCancelled(shoppingCartId, DateTime.UtcNow)
+            new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
         var options = new StoreOptions();

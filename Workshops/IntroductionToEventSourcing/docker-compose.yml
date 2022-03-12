@@ -93,8 +93,6 @@ networks:
         driver: bridge
     esdb_network:
         driver: bridge
-    kafka_network:
-        driver: bridge
 
 volumes:
     postgres:

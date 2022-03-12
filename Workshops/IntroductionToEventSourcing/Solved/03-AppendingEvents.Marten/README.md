@@ -15,4 +15,4 @@ After that you can use PG admin (IDE for Postgres) to see how tables and data lo
 
 ## Solution
 
-Call [Marten append events API](https://martendb.io/events/appending.html#appending-events-1) and save changes using `DocumentSession.SaveChangesAsync` method.
+Use [Marten append events API](https://martendb.io/events/appending.html#appending-events-1) and save changes using `DocumentSession.SaveChangesAsync` method.
