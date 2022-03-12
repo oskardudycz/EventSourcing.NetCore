@@ -5,7 +5,7 @@
 1. Install git - https://git-scm.com/downloads.
 2. Install .NET 5 - https://dotnet.microsoft.com/download/dotnet/5.0.
 3. Install Visual Studio 2019, Rider or VSCode.
-4. Install docker - https://docs.docker.com/docker-for-windows/install/.
+4. Install docker - https://docs.docker.com/engine/install/.
 5. Make sure that you have ~10GB disk space.
 6. Create Github Account
 7. Clone Project https://github.com/oskardudycz/EventSourcing.NetCore, make sure that's compiling
