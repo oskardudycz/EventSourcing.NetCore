@@ -1,6 +1,6 @@
 # Build Your Own Event Store Self-Paced Kit
 
-## Prerequisities
+## Prerequisites
 
 1. Install git - https://git-scm.com/downloads.
 2. Install .NET 6 - https://dotnet.microsoft.com/download/dotnet/6.0.

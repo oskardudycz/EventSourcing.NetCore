@@ -17,6 +17,6 @@ Run [docker-compose](../docker-compose.yml) script from the main workshop reposi
 docker-compose up
 ```
 
-After that you can use PG admin (IDE for Postgres) to see how tables and data look like. It's available at: http://localhost:5050.
+After that you can use PG Admin (IDE for Postgres) to see how tables and data look like. It's available at: http://localhost:5050.
 - Login: `admin@pgadmin.org`, Password: `admin`
 - To connect to server click right mouse on Servers, then Register Server and use host: `postgres`, user: `postgres`, password: `Password12!`
