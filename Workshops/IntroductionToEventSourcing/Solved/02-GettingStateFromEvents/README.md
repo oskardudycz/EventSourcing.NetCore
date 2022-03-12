@@ -12,6 +12,8 @@ Select your preferred approach (or both) to solve this use case.
 
 ## Solution
 
+Read also my article [How to get the current entity state from events?](https://event-driven.io/en/how_to_get_the_current_entity_state_in_event_sourcing/?utm_source=event_sourcing_net_workshop).
+
 1. Mutable: [Mutable/GettingStateFromEventsTests.cs](./Mutable/GettingStateFromEventsTests.cs).
 2. Immutable
   * Immutable entity using foreach with switch pattern matching [Immutable/Solution1/GettingStateFromEventsTests.cs](./Immutable/Solution1/GettingStateFromEventsTests.cs).

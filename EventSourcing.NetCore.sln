@@ -272,6 +272,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "02-GettingStateFromEvents",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "02-GettingStateFromEvents", "Workshops\IntroductionToEventSourcing\Solved\02-GettingStateFromEvents\02-GettingStateFromEvents.csproj", "{5C269B31-34B0-4914-BCBE-D624CAF2F946}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "03-AppendingEvents.Marten", "Workshops\IntroductionToEventSourcing\Solved\03-AppendingEvents.Marten\03-AppendingEvents.Marten.csproj", "{6DB98AE3-5EDB-4AD7-A5F0-1BD5FFE47304}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "03-AppendingEvents.Marten", "Workshops\IntroductionToEventSourcing\03-AppendingEvents.Marten\03-AppendingEvents.Marten.csproj", "{CA18779A-8070-4E8D-BB3A-0BA5A228666E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "04-AppendingEvents.EventStoreDB", "Workshops\IntroductionToEventSourcing\04-AppendingEvents.EventStoreDB\04-AppendingEvents.EventStoreDB.csproj", "{D107F07C-02DD-4DEB-BD9C-2368124E3C95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "04-AppendingEvents.EventStoreDB", "Workshops\IntroductionToEventSourcing\Solved\04-AppendingEvents.EventStoreDB\04-AppendingEvents.EventStoreDB.csproj", "{00EEBD09-6194-44EA-9040-CA06D95F41C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -590,6 +598,22 @@ Global
 		{5C269B31-34B0-4914-BCBE-D624CAF2F946}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C269B31-34B0-4914-BCBE-D624CAF2F946}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C269B31-34B0-4914-BCBE-D624CAF2F946}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DB98AE3-5EDB-4AD7-A5F0-1BD5FFE47304}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DB98AE3-5EDB-4AD7-A5F0-1BD5FFE47304}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DB98AE3-5EDB-4AD7-A5F0-1BD5FFE47304}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DB98AE3-5EDB-4AD7-A5F0-1BD5FFE47304}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA18779A-8070-4E8D-BB3A-0BA5A228666E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA18779A-8070-4E8D-BB3A-0BA5A228666E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA18779A-8070-4E8D-BB3A-0BA5A228666E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA18779A-8070-4E8D-BB3A-0BA5A228666E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D107F07C-02DD-4DEB-BD9C-2368124E3C95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D107F07C-02DD-4DEB-BD9C-2368124E3C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D107F07C-02DD-4DEB-BD9C-2368124E3C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D107F07C-02DD-4DEB-BD9C-2368124E3C95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00EEBD09-6194-44EA-9040-CA06D95F41C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00EEBD09-6194-44EA-9040-CA06D95F41C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00EEBD09-6194-44EA-9040-CA06D95F41C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00EEBD09-6194-44EA-9040-CA06D95F41C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -696,6 +720,10 @@ Global
 		{E89E1405-33F0-4A12-BE7D-6982F23A8EA2} = {65F6E2BE-B2D4-4E56-B0CB-3062C4882B9E}
 		{6793146A-E944-4519-8742-255DDFD2033F} = {14C7B928-9D6C-441A-8A1F-0C49173E73EB}
 		{5C269B31-34B0-4914-BCBE-D624CAF2F946} = {65F6E2BE-B2D4-4E56-B0CB-3062C4882B9E}
+		{6DB98AE3-5EDB-4AD7-A5F0-1BD5FFE47304} = {65F6E2BE-B2D4-4E56-B0CB-3062C4882B9E}
+		{CA18779A-8070-4E8D-BB3A-0BA5A228666E} = {14C7B928-9D6C-441A-8A1F-0C49173E73EB}
+		{D107F07C-02DD-4DEB-BD9C-2368124E3C95} = {14C7B928-9D6C-441A-8A1F-0C49173E73EB}
+		{00EEBD09-6194-44EA-9040-CA06D95F41C8} = {65F6E2BE-B2D4-4E56-B0CB-3062C4882B9E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A5F55604-2FF3-43B7-B657-4F18E6E95D3B}

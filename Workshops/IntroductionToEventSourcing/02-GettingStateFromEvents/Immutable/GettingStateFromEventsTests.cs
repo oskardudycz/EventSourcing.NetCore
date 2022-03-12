@@ -31,19 +31,9 @@ public record ShoppingCartCanceled(
 
 // VALUE OBJECTS
 public record PricedProductItem(
-    ProductItem ProductItem,
-    decimal UnitPrice
-)
-{
-    public Guid ProductId => ProductItem.ProductId;
-    public int Quantity => ProductItem.Quantity;
-
-    public decimal TotalPrice => Quantity * UnitPrice;
-}
-
-public record ProductItem(
     Guid ProductId,
-    int Quantity
+    int Quantity,
+    decimal UnitPrice
 );
 
 // ENTITY
@@ -79,13 +69,12 @@ public class GettingStateFromEventsTests
         var clientId = Guid.NewGuid();
         var shoesId = Guid.NewGuid();
         var tShirtId = Guid.NewGuid();
-        var twoPairsOfShoes = new PricedProductItem(new ProductItem(shoesId, 2), 100);
-        var pairOfShoes = new PricedProductItem(new ProductItem(shoesId, 1), 100);
-        var tShirt = new PricedProductItem(new ProductItem(tShirtId, 1), 50);
+        var twoPairsOfShoes = new PricedProductItem(shoesId, 2, 100);
+        var pairOfShoes = new PricedProductItem(shoesId, 1, 100);
+        var tShirt = new PricedProductItem(tShirtId, 1, 50);
 
         var events = new object[]
         {
-            // 2. Put your sample events here
             new ShoppingCartOpened(shoppingCartId, clientId),
             new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
             new ProductItemAddedToShoppingCart(shoppingCartId, tShirt),
