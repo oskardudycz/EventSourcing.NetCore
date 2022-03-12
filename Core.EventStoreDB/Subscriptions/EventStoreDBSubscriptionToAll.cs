@@ -77,7 +77,7 @@ public class EventStoreDBSubscriptionToAll
         {
             if (IsEventWithEmptyData(resolvedEvent) || IsCheckpointEvent(resolvedEvent)) return;
 
-            var streamEvent = resolvedEvent.ToStreamEvent();
+            var streamEvent = resolvedEvent.ToEventEnvelope();
 
             if (streamEvent == null)
             {
