@@ -98,7 +98,6 @@ public class EventsDefinitionTests
 
         var events = new object[]
         {
-            // 2. Put your sample events here
             new ShoppingCartOpened(shoppingCartId, clientId),
             new ProductItemAddedToShoppingCart(shoppingCartId, pairOfShoes),
             new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes),

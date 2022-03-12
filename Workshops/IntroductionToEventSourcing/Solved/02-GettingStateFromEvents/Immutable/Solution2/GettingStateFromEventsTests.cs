@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace IntroductionToEventSourcing.GettingStateFromEvents.Solution3;
+namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable.Solution2;
 
 // EVENTS
 public record ShoppingCartOpened(
@@ -31,19 +31,9 @@ public record ShoppingCartCancelled(
 
 // VALUE OBJECTS
 public record PricedProductItem(
-    ProductItem ProductItem,
-    decimal UnitPrice
-)
-{
-    public Guid ProductId => ProductItem.ProductId;
-    public int Quantity => ProductItem.Quantity;
-
-    public decimal TotalPrice => Quantity * UnitPrice;
-}
-
-public record ProductItem(
     Guid ProductId,
-    int Quantity
+    int Quantity,
+    decimal UnitPrice
 );
 
 // ENTITY
@@ -88,7 +78,7 @@ public class GettingStateFromEventsTests
                     ClientId = clientId,
                     Status = ShoppingCartStatus.Pending
                 },
-            ProductItemAddedToShoppingCart(_, (var (productId, _), var unitPrice) pricedProductItem) =>
+            ProductItemAddedToShoppingCart(_, var pricedProductItem) =>
                 shoppingCart with
                 {
                     ProductItems = shoppingCart.ProductItems
@@ -97,8 +87,9 @@ public class GettingStateFromEventsTests
                         .Select(group => group.Count() == 1?
                             group.First()
                             : new PricedProductItem(
-                                new ProductItem(productId, group.Sum(pi => pi.Quantity)),
-                                unitPrice
+                                group.Key,
+                                group.Sum(pi => pi.Quantity),
+                                group.First().UnitPrice
                             )
                         )
                         .ToArray()
@@ -109,7 +100,8 @@ public class GettingStateFromEventsTests
                     ProductItems = shoppingCart.ProductItems
                         .Select(pi => pi.ProductId == pricedProductItem.ProductId?
                             new PricedProductItem(
-                                new ProductItem(pi.ProductId, pi.Quantity - pricedProductItem.Quantity),
+                                pi.ProductId,
+                                pi.Quantity - pricedProductItem.Quantity,
                                 pi.UnitPrice
                             )
                             :pi
@@ -141,13 +133,12 @@ public class GettingStateFromEventsTests
         var clientId = Guid.NewGuid();
         var shoesId = Guid.NewGuid();
         var tShirtId = Guid.NewGuid();
-        var twoPairsOfShoes = new PricedProductItem(new ProductItem(shoesId, 2), 100);
-        var pairOfShoes = new PricedProductItem(new ProductItem(shoesId, 1), 100);
-        var tShirt = new PricedProductItem(new ProductItem(tShirtId, 1), 50);
+        var twoPairsOfShoes = new PricedProductItem(shoesId, 2, 100);
+        var pairOfShoes = new PricedProductItem(shoesId, 1, 100);
+        var tShirt = new PricedProductItem(tShirtId, 1, 50);
 
         var events = new object[]
         {
-            // 2. Put your sample events here
             new ShoppingCartOpened(shoppingCartId, clientId),
             new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
             new ProductItemAddedToShoppingCart(shoppingCartId, tShirt),
