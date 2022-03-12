@@ -50,7 +50,7 @@ API integration tests for:
 - [Confirming shopping cart](./ECommerce.Api.Tests/ShoppingCarts/Confirming/ConfirmShoppingCartTests.cs) as an example of updating an existing entity,
 
 
-## Prerequisities
+## Prerequisites
 
 1. Install git - https://git-scm.com/downloads.
 2. Install .NET Core 6.0 - https://dotnet.microsoft.com/download/dotnet/6.0.

@@ -2,7 +2,7 @@
 
 Sample is showing the typical flow of the Event Sourcing app with [EventStoreDB](https://developers.eventstore.com).
 
-## Prerequisities
+## Prerequisites
 
 1. Install git - https://git-scm.com/downloads.
 2. Install .NET Core 6.0 - https://dotnet.microsoft.com/download/dotnet/6.0.
