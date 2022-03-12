@@ -36,7 +36,10 @@ public class ExceptionHandlingMiddleware
     private Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         logger.LogError(exception, exception.Message);
-        Console.WriteLine(exception.Message);
+        Console.WriteLine("ERROR:" + exception.Message + exception.StackTrace);
+
+        if(exception.InnerException != null)
+            Console.WriteLine("INNER DETAILS:" + exception.InnerException.Message + exception.InnerException.StackTrace);
 
         var codeInfo = ExceptionToHttpStatusMapper.Map(exception);
 
