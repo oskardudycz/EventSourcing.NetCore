@@ -79,13 +79,13 @@ public static class MartenConfigExtensions
             "MartenSubscription"
         );
 
-        configureOptions?.Invoke(options);
-
         if (config.UseMetadata)
         {
             options.Events.MetadataConfig.CausationIdEnabled = true;
             options.Events.MetadataConfig.CorrelationIdEnabled = true;
         }
+
+        configureOptions?.Invoke(options);
 
         return options;
     }

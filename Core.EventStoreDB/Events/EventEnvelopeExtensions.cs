@@ -4,9 +4,9 @@ using EventStore.Client;
 
 namespace Core.EventStoreDB.Events;
 
-public static class StreamEventExtensions
+public static class EventEnvelopeExtensions
 {
-    public static EventEnvelope? ToStreamEvent(this ResolvedEvent resolvedEvent)
+    public static EventEnvelope? ToEventEnvelope(this ResolvedEvent resolvedEvent)
     {
         var eventData = resolvedEvent.Deserialize();
         var eventMetadata = resolvedEvent.DeserializeMetadata();

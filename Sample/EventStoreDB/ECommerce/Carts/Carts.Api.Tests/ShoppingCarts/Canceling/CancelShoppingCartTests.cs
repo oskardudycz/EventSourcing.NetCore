@@ -67,7 +67,7 @@ public class CancelShoppingCartTests: IClassFixture<CancelShoppingCartFixture>
         var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
         cartDetails.Should().NotBeNull();
         cartDetails.Id.Should().Be(fixture.ShoppingCartId);
-        cartDetails.Status.Should().Be(ShoppingCartStatus.Confirmed);
+        cartDetails.Status.Should().Be(ShoppingCartStatus.Canceled);
         cartDetails.ClientId.Should().Be(fixture.ClientId);
         cartDetails.Version.Should().Be(1);
     }
