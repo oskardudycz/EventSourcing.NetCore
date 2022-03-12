@@ -1,6 +1,7 @@
+using System.Text.Json;
+using EventStore.Client;
 using FluentAssertions;
 using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
-using Marten;
 using Xunit;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Mutable;
@@ -51,6 +52,28 @@ public class ShoppingCart
     public IList<PricedProductItem> ProductItems { get; } = new List<PricedProductItem>();
     public DateTime? ConfirmedAt { get; private set; }
     public DateTime? CanceledAt { get; private set; }
+
+    public void When(object @event)
+    {
+        switch (@event)
+        {
+            case ShoppingCartOpened opened:
+                Apply(opened);
+                break;
+            case ProductItemAddedToShoppingCart productItemAdded:
+                Apply(productItemAdded);
+                break;
+            case ProductItemRemovedFromShoppingCart productItemRemoved:
+                Apply(productItemRemoved);
+                break;
+            case ShoppingCartConfirmed confirmed:
+                Apply(confirmed);
+                break;
+            case ShoppingCartCanceled canceled:
+                Apply(canceled);
+                break;
+        }
+    }
 
     public void Apply(ShoppingCartOpened opened)
     {
@@ -111,19 +134,19 @@ public enum ShoppingCartStatus
     Canceled = 3
 }
 
-public class GettingStateFromEventsTests: MartenTest
+public class GettingStateFromEventsTests: EventStoreDBTest
 {
     /// <summary>
-    /// Solution - Mutable entity
+    /// Solution - Mutable entity with When method
     /// </summary>
-    /// <param name="documentSession"></param>
-    /// <param name="shoppingCartId"></param>
+    /// <param name="eventStore"></param>
+    /// <param name="streamName"></param>
+    /// <param name="ct"></param>
     /// <returns></returns>
-    private static async Task<ShoppingCart> GetShoppingCart(IDocumentSession documentSession, Guid shoppingCartId, CancellationToken ct)
+    private static Task<ShoppingCart> GetShoppingCart(EventStoreClient eventStore, string streamName, CancellationToken ct)
     {
-        var shoppingCart = await documentSession.Events.AggregateStreamAsync<ShoppingCart>(shoppingCartId, token: ct);
-
-        return shoppingCart ?? throw new InvalidOperationException("Shopping Cart was not found!");
+        // 1. Add logic here
+        throw new NotImplementedException();
     }
 
     [Fact]
@@ -135,20 +158,11 @@ public class GettingStateFromEventsTests: MartenTest
         var shoesId = Guid.NewGuid();
         var tShirtId = Guid.NewGuid();
         var twoPairsOfShoes =
-            new PricedProductItem
-            {
-                ProductId = shoesId, Quantity = 2, UnitPrice = 100
-            };
+            new PricedProductItem { ProductId = shoesId, Quantity = 2, UnitPrice = 100 };
         var pairOfShoes =
-            new PricedProductItem
-            {
-                ProductId = shoesId, Quantity = 1, UnitPrice = 100
-            };
+            new PricedProductItem { ProductId = shoesId, Quantity = 1, UnitPrice = 100 };
         var tShirt =
-            new PricedProductItem
-            {
-                ProductId = tShirtId, Quantity = 1, UnitPrice = 50
-            };
+            new PricedProductItem { ProductId = tShirtId, Quantity = 1, UnitPrice = 50 };
 
         var events = new object[]
         {
@@ -160,9 +174,11 @@ public class GettingStateFromEventsTests: MartenTest
             new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        await AppendEvents(shoppingCartId, events, CancellationToken.None);
+        var streamName = $"shopping_cart-{shoppingCartId}";
 
-        var shoppingCart = await GetShoppingCart(DocumentSession, shoppingCartId, CancellationToken.None);
+        await AppendEvents(streamName, events, CancellationToken.None);
+
+        var shoppingCart = await GetShoppingCart(EventStore, streamName, CancellationToken.None);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);

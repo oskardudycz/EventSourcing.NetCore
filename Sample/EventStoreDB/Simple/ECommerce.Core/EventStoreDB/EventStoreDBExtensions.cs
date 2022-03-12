@@ -1,4 +1,5 @@
 using Core.EventStoreDB.Serialization;
+using Core.Exceptions;
 using Core.Tracing;
 using EventStore.Client;
 
@@ -20,13 +21,16 @@ public static class EventStoreDBExtensions
             cancellationToken: cancellationToken
         );
 
-        return (await readResult
+        if (await readResult.ReadState == ReadState.StreamNotFound)
+            throw AggregateNotFoundException.For<TEntity>(id);
+
+        return await readResult
             .Select(@event => @event.Deserialize()!)
             .AggregateAsync(
                 getDefault(),
                 when,
                 cancellationToken
-            ))!;
+            );
     }
 
     public static async Task<ulong> Append(
