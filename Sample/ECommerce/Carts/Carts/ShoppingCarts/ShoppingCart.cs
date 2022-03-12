@@ -49,6 +49,7 @@ public class ShoppingCart: Aggregate
         Id = @event.CartId;
         ClientId = @event.ClientId;
         ProductItems = new List<PricedProductItem>();
+        Status = ShoppingCartStatus.Pending;
     }
 
     public void AddProduct(

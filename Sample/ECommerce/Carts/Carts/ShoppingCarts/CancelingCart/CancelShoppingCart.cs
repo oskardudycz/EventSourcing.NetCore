@@ -38,7 +38,7 @@ internal class HandleCancelShoppingCart:
         await scope.Do((expectedVersion, traceMetadata) =>
             cartRepository.GetAndUpdate(
                 command.CartId,
-                cart => cart.Confirm(),
+                cart => cart.Cancel(),
                 expectedVersion,
                 traceMetadata,
                 cancellationToken
