@@ -19,6 +19,8 @@
    * [EventStoreDB](./11-OptimisticConcurrency.EventStoreDB)
 7. Projections:
    * [General](./12-Projections)
+   * [Idempotency](./13-Projections.Idempotency)
+   * [Eventual Consistency](./14-Projections.EventualConsistency)
 
 ## Prerequisites
 
