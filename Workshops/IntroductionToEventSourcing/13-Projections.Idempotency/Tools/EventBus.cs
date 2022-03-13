@@ -4,6 +4,8 @@ public class EventBus
 {
     private readonly Dictionary<Type, List<Action<EventEnvelope>>> handlers = new();
 
+    private readonly Random random = new();
+
     public void Register<TEvent>(Action<EventEnvelope<TEvent>> handler) where TEvent : notnull
     {
         var eventType = typeof(TEvent);
@@ -22,7 +24,12 @@ public class EventBus
 
         foreach (var handle in eventHandlers)
         {
-            handle(eventEnvelope);
+            var numberOfRepeatedPublish = random.Next(1, 5);
+
+            do
+            {
+                handle(eventEnvelope);
+            } while (--numberOfRepeatedPublish > 0);
         }
     }
 

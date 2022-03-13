@@ -2,7 +2,7 @@ namespace IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 
 public class Database
 {
-    private Dictionary<Guid, object> storage = new();
+    private readonly Dictionary<Guid, object> storage = new();
 
     public void Store<T>(Guid id, T obj) where T: class
     {

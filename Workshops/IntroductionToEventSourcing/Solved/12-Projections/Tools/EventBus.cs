@@ -2,7 +2,7 @@ namespace IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 
 public class EventBus
 {
-    private Dictionary<Type, List<Action<EventEnvelope>>> handlers = new();
+    private readonly Dictionary<Type, List<Action<EventEnvelope>>> handlers = new();
 
     public void Register<TEvent>(Action<EventEnvelope<TEvent>> handler) where TEvent : notnull
     {
