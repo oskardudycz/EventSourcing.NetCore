@@ -27,7 +27,7 @@
         - Login: `admin@pgadmin.org`, Password: `admin`
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
     - Kafka
-    - Kafka ide for browsing topics. Available at: http://localhost:8000
+    - Kafka ide for browsing topics. Available at: http://localhost:8080/ui/clusters/local/topics
     - ElasticSearch
     - Kibana for browsing ElasticSearch - http://localhost:5601
 

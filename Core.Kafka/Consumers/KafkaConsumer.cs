@@ -1,4 +1,5 @@
 using Confluent.Kafka;
+using Core.Events;
 using Core.Events.External;
 using Core.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -49,7 +50,7 @@ public class KafkaConsumer: IExternalEventConsumer
         }
         catch (Exception e)
         {
-            logger.LogInformation("Error consuming message: " + e.Message + e.StackTrace);
+            logger.LogError("Error consuming Kafka message: {Message} {StackTrace}",e.Message, e.StackTrace);
 
             // Ensure the consumer leaves the group cleanly and final offsets are committed.
             consumer.Close();
@@ -68,15 +69,17 @@ public class KafkaConsumer: IExternalEventConsumer
             // get event type from name stored in message.Key
             var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Message.Key)!;
 
+            var eventEnvelopeType = typeof(EventEnvelope<>).MakeGenericType(eventType);
+
             // deserialize event
-            var @event = JsonConvert.DeserializeObject(message.Message.Value, eventType)!;
+            var @event = JsonConvert.DeserializeObject(message.Message.Value, eventEnvelopeType)!;
 
             // publish event to internal event bus
             await eventBus.Publish(@event, cancellationToken);
         }
         catch (Exception e)
         {
-            logger.LogInformation("Error consuming message: " + e.Message + e.StackTrace);
+            logger.LogError("Error producing Kafka message: {Message} {StackTrace}",e.Message, e.StackTrace);
         }
     }
 }

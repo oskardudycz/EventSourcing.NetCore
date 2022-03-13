@@ -24,15 +24,6 @@ public class MartenEventPublisher: IMartenEventsConsumer
     {
         foreach (var @event in streamActions.SelectMany(streamAction => streamAction.Events))
         {
-            // TODO: align all handlers to use StreamEvent
-            // var streamEvent = new StreamEvent(
-            //     @event.Data,
-            //     new EventMetadata(
-            //         (ulong)@event.Version,
-            //         (ulong)@event.Sequence
-            //     )
-            // );
-
             using var scope = serviceProvider.CreateScope();
             var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
 
