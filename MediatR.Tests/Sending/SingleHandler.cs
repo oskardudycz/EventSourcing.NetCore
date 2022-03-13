@@ -71,7 +71,7 @@ public class SingleHandler
     }
 
     [Fact]
-    public async void GivenRegisteredAsynchronousRequestHandler_WhenSendMethodIsBeingCalled_ThenReturnsProperResult()
+    public async Task GivenRegisteredAsynchronousRequestHandler_WhenSendMethodIsBeingCalled_ThenReturnsProperResult()
     {
         //Given
         var query = new GetIssuesNamesQuery("cleaning");

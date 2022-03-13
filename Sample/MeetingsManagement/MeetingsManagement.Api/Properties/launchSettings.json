@@ -1,20 +1,5 @@
 {
-    "iisSettings": {
-        "windowsAuthentication": false,
-        "anonymousAuthentication": true,
-        "iisExpress": {
-            "applicationUrl": "http://localhost:38481",
-            "sslPort": 44357
-        }
-    },
     "profiles": {
-        "IIS Express": {
-            "commandName": "IISExpress",
-            "launchBrowser": true,
-            "environmentVariables": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            }
-        },
         "MeetingsManagement.Api": {
             "commandName": "Project",
             "launchBrowser": true,

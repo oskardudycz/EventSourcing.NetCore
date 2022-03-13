@@ -44,12 +44,10 @@ public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public Task Put_Should_Return_OK()
+    public void Put_Should_Return_OK()
     {
         var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
         commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        return Task.CompletedTask;
     }
 
     [Fact]

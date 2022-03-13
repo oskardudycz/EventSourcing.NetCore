@@ -39,7 +39,7 @@ public class NoHandlers
     }
 
     [Fact]
-    public async void GivenNonRegisteredQueryHandler_WhenPublishMethodIsBeingCalled_ThenThrowsAnError()
+    public async Task GivenNonRegisteredQueryHandler_WhenPublishMethodIsBeingCalled_ThenThrowsAnError()
     {
         var ex = await Record.ExceptionAsync(async () =>
         {

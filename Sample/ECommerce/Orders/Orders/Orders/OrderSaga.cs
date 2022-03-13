@@ -74,9 +74,6 @@ public class OrderSaga:
 
     public Task Handle(OrderCancelled @event, CancellationToken cancellationToken)
     {
-        if (!@event.PaymentId.HasValue)
-            return Task.CompletedTask;
-
-        return commandBus.Send(DiscardPayment.Create(@event.PaymentId.Value));
+        return @event.PaymentId.HasValue ? commandBus.Send(DiscardPayment.Create(@event.PaymentId.Value)) : Task.CompletedTask;
     }
 }
