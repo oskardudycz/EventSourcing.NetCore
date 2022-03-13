@@ -2,22 +2,22 @@ using Confluent.Kafka;
 using Core.Events;
 using Core.Events.External;
 using Core.Serialization.Newtonsoft;
-using Core.Threading;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Kafka.Producers;
 
 public class KafkaProducer: IExternalEventProducer
 {
+    private readonly ILogger<KafkaProducer> logger;
     private readonly KafkaProducerConfig config;
 
     public KafkaProducer(
-        IConfiguration configuration
+        IConfiguration configuration,
+        ILogger<KafkaProducer> logger
     )
     {
-        if (configuration == null)
-            throw new ArgumentNullException(nameof(configuration));
-
+        this.logger = logger;
         // get configuration from appsettings.json
         config = configuration.GetKafkaProducerConfig();
     }
@@ -27,40 +27,20 @@ public class KafkaProducer: IExternalEventProducer
         try
         {
             using var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build();
-            await Task.Yield();
             // publish event to kafka topic taken from config
 
-            // var result = p.ProduceAsync(config.Topic,
-            //     new Message<string, string>
-            //     {
-            //         // store event type name in message Key
-            //         Key = @event.GetType().Name,
-            //         // serialize event to message Value
-            //         Value = @event.ToJson()
-            //     }, ct).ConfigureAwait(false).GetAwaiter().GetResult();
-
-            p.Produce(config.Topic,
+            await p.ProduceAsync(config.Topic,
                 new Message<string, string>
                 {
                     // store event type name in message Key
-                    Key = @event.GetType().Name,
+                    Key = @event.Data.GetType().Name,
                     // serialize event to message Value
                     Value = @event.ToJson()
-                });
-            p.Flush(ct);
-            // Console.WriteLine(result);
-            // var result = p.ProduceAsync(config.Topic,
-            //     new Message<string, string>
-            //     {
-            //         // store event type name in message Key
-            //         Key = @event.GetType().Name,
-            //         // serialize event to message Value
-            //         Value = @event.ToJson()
-            //     }, ct).ConfigureAwait(false).GetAwaiter().GetResult();
+                }, ct).ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.LogError("Error producing Kafka message: {Message} {StackTrace}",e.Message, e.StackTrace);
             throw;
         }
     }
