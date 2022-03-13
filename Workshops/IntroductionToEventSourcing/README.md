@@ -14,6 +14,9 @@
    * [General](./07-BusinessLogic)
    * [Marten](./08-BusinessLogic.Marten)
    * [EventStoreDB](./09-BusinessLogic.EventStoreDB)
+6. Optimistic Concurrency:
+   * [Marten](./10-OptimisticConcurrency.Marten)
+   * [EventStoreDB](./11-OptimisticConcurrency.EventStoreDB)
 
 ## Prerequisites
 
