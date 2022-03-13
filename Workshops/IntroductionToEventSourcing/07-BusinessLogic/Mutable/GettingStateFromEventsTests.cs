@@ -128,7 +128,7 @@ public enum ShoppingCartStatus
 {
     Pending = 1,
     Confirmed = 2,
-    Canceled = 3
+    Canceled = 4
 }
 
 public static class ShoppingCartExtensions
@@ -173,11 +173,11 @@ public class GettingStateFromEventsTests
                 ProductId = tShirtId, Quantity = 1, UnitPrice = 50
             };
 
-        var events = new object[]
-        {
-            // TODO: Fill the events object with results of your business logic
-            // to be the same as events below
 
+        // TODO: Fill the events object with results of your business logic
+        // to be the same as events below
+        var events = new List<object>
+        {
             // new ShoppingCartOpened(shoppingCartId, clientId),
             // new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
             // new ProductItemAddedToShoppingCart(shoppingCartId, tShirt),
@@ -195,6 +195,7 @@ public class GettingStateFromEventsTests
         shoppingCart.ProductItems[0].ProductId.Should().Be(shoesId);
         shoppingCart.ProductItems[0].Quantity.Should().Be(pairOfShoes.Quantity);
         shoppingCart.ProductItems[0].UnitPrice.Should().Be(pairOfShoes.UnitPrice);
+        shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
 
         shoppingCart.ProductItems[1].ProductId.Should().Be(tShirtId);
         shoppingCart.ProductItems[1].Quantity.Should().Be(tShirt.Quantity);

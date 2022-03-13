@@ -45,7 +45,7 @@ public record ShoppingCart(
     DateTime? CanceledAt = null
 )
 {
-    public bool IsClosed { get; } = Status.HasFlag(ShoppingCartStatus.Closed);
+    public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
     public static ShoppingCart When(ShoppingCart entity, object @event)
     {

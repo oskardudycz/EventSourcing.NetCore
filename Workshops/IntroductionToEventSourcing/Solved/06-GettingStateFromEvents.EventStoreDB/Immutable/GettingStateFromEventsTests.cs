@@ -115,7 +115,7 @@ public enum ShoppingCartStatus
 {
     Pending = 1,
     Confirmed = 2,
-    Canceled = 3
+    Canceled = 4
 }
 
 public class GettingStateFromEventsTests: EventStoreDBTest
