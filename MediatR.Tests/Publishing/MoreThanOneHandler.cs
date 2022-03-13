@@ -69,7 +69,7 @@ public class MoreThanOneHandler
     }
 
     [Fact]
-    public async void GivenTwoHandlersForOneEvent_WhenPublishMethodIsBeingCalled_ThenTwoHandlersAreBeingCalled()
+    public async Task GivenTwoHandlersForOneEvent_WhenPublishMethodIsBeingCalled_ThenTwoHandlersAreBeingCalled()
     {
         //Given
         var @event = new IssueCreated("cleaning");

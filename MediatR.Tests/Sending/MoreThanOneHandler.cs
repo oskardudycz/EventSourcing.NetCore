@@ -70,7 +70,7 @@ public class MoreThanOneHandler
     }
 
     [Fact]
-    public async void GivenTwoHandlersForOneCommand_WhenSendMethodIsBeingCalled_ThenOnlyFIrstHandlersIsBeingCalled()
+    public async Task GivenTwoHandlersForOneCommand_WhenSendMethodIsBeingCalled_ThenOnlyFIrstHandlersIsBeingCalled()
     {
         //Given
         var query = new CreateIssueCommand("cleaning");

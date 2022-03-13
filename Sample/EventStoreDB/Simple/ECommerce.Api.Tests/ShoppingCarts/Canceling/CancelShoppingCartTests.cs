@@ -43,17 +43,15 @@ public class CancelShoppingCartTests: IClassFixture<CancelShoppingCartFixture>
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public Task Put_Should_Return_OK()
+    public void Put_Should_Return_OK()
     {
         var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
         commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        return Task.CompletedTask;
     }
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task Put_Should_Confirm_ShoppingCart()
+    public async Task Delete_Should_Cancel_ShoppingCart()
     {
         // prepare query
         var query = $"{fixture.ShoppingCartId}";

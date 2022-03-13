@@ -98,7 +98,7 @@ public class Queries
     }
 
     [Fact]
-    public async void GivenCommandWithData_WhenCommandIsSendToApplicationService_ThenreadModelIsChanged()
+    public async Task GivenCommandWithData_WhenCommandIsSendToApplicationService_ThenreadModelIsChanged()
     {
         var serviceLocator = new ServiceLocator();
 

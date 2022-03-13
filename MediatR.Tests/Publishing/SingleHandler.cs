@@ -70,7 +70,7 @@ public class SingleHandler
     }
 
     [Fact]
-    public async void GivenRegisteredAsynchronousRequestHandler_WhenPublishMethodIsBeingCalled_ThenReturnsProperResult()
+    public async Task GivenRegisteredAsynchronousRequestHandler_WhenPublishMethodIsBeingCalled_ThenReturnsProperResult()
     {
         //Given
         var @event = new IssueCreated("cleaning");

@@ -61,12 +61,10 @@ public class RemoveProductTests: IClassFixture<RemoveProductFixture>
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public Task Delete_Should_Return_OK()
+    public void Delete_Should_Return_OK()
     {
         var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
         commandResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-        return Task.CompletedTask;
     }
 
     [Fact]
