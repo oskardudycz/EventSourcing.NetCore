@@ -17,6 +17,8 @@
 6. Optimistic Concurrency:
    * [Marten](./10-OptimisticConcurrency.Marten)
    * [EventStoreDB](./11-OptimisticConcurrency.EventStoreDB)
+7. Projections:
+   * [General](./12-Projections)
 
 ## Prerequisites
 
