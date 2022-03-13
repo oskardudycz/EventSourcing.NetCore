@@ -17,7 +17,7 @@ There are two variations:
 2. Classical, mutable aggregates (rich domain model): [Mutable/BusinessLogicTests.cs](./Mutable/BusinessLogicTests.cs).
 3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/BusinessLogicTests.cs](./Mixed/BusinessLogicTests.cs).
 
-Select your preferred approach (or all) to solve this use case. Fill appropriate `DocumentSessionExtensions`
+Select your preferred approach (or all) to solve this use case using Marten. Fill appropriate `DocumentSessionExtensions`
 
 _**Note**: If needed update entities, events or test setup structure_
 
