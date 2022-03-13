@@ -13,11 +13,16 @@ Write the code that fulfils this logic. Remember that in Event Sourcing each bus
 ![events](./assets/events.jpg)
 
 There are two variations:
-- using mutable entities: [Mutable/GettingStateFromEventsTests.cs](./Mutable/GettingStateFromEventsTests.cs),
-- using fully immutable structures: [Immutable/GettingStateFromEventsTests.cs](./Immutable/GettingStateFromEventsTests.cs).
+- using mutable entities: [Mutable/BusinessLogicTests.cs](./Mutable/Solution1/BusinessLogicTests.cs),
+- using fully immutable structures: [Immutable/BusinessLogicTests.cs](./Immutable/BusinessLogicTests.cs).
 
 Select your preferred approach (or both) to solve this use case.
 
 _**Note**: If needed update entities, events or test setup structure_
 
+## Solution
+
+1. Immutable, with functional command handlers composition and entities as anemic data model: [Immutable/BusinessLogic.cs](./Immutable/BusinessLogic.cs).
+2. Classical, mutable aggregates (rich domain model): [Mutable/Solution1/BusinessLogic.cs](./Mutable/Solution1/BusinessLogic.cs).
+3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mutable/Solution2/BusinessLogic.cs](./Mutable/Solution1/BusinessLogic.cs).
 

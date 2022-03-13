@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace IntroductionToEventSourcing.GettingStateFromEvents.Mutable;
+namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
 
 // EVENTS
 public record ShoppingCartOpened(
@@ -146,7 +146,7 @@ public static class ShoppingCartExtensions
     }
 }
 
-public class GettingStateFromEventsTests
+public class BusinessLogicTests
 {
 
     [Fact]

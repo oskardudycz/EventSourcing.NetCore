@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable;
+namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
 
 // EVENTS
 public record ShoppingCartOpened(
@@ -121,7 +121,7 @@ public static class ShoppingCartExtensions
         events.Aggregate(ShoppingCart.Default(), ShoppingCart.When);
 }
 
-public class GettingStateFromEventsTests
+public class BusinessLogicTests
 {
     [Fact]
     [Trait("Category", "SkipCI")]
