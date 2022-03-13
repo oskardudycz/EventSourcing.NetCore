@@ -1,4 +1,4 @@
-# Exercise 08 - Business Logic with Marten
+# Exercise 09 - Business Logic with EventStoreDB
 
 Having the following shopping cart process:
 1. The customer may add a product to the shopping cart only after opening it.
@@ -17,13 +17,8 @@ There are two variations:
 2. Classical, mutable aggregates (rich domain model): [Mutable/BusinessLogicTests.cs](./Mutable/BusinessLogicTests.cs).
 3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/BusinessLogicTests.cs](./Mixed/BusinessLogicTests.cs).
 
-Select your preferred approach (or all) to solve this use case. Fill appropriate `DocumentSessionExtensions`
+Select your preferred approach (or all) to solve this use case using EventStoreDB. Fill appropriate `EventStoreClient`
 
 _**Note**: If needed update entities, events or test setup structure_
 
-## Solutions
-
-Read more in my articles:
-- [CQRS is simpler than you think with .NET 6 and C# 10](https://event-driven.io/en/cqrs_is_simpler_than_you_think_with_net6/?utm_source=event_sourcing_net_workshop)
-- [How to register all CQRS handlers by convention](https://event-driven.io/en/how_to_register_all_mediatr_handlers_by_convention?utm_source=event_sourcing_net_workshop)
 
