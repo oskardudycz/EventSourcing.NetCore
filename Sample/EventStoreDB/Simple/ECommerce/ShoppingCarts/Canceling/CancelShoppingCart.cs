@@ -15,7 +15,7 @@ public record CancelShoppingCart(
     public static ShoppingCartCanceled Handle(CancelShoppingCart command, ShoppingCart shoppingCart)
     {
         if(shoppingCart.IsClosed)
-            throw new InvalidOperationException($"Confirming cart in '{shoppingCart.Status}' status is not allowed.");
+            throw new InvalidOperationException($"Canceling cart in '{shoppingCart.Status}' status is not allowed.");
 
         return new ShoppingCartCanceled(
             shoppingCart.Id,

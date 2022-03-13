@@ -1,7 +1,4 @@
-using System.Text.Json;
-using EventStore.Client;
 using FluentAssertions;
-using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 using Xunit;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Mutable;
@@ -75,14 +72,14 @@ public class ShoppingCart
         }
     }
 
-    public void Apply(ShoppingCartOpened opened)
+    private void Apply(ShoppingCartOpened opened)
     {
         Id = opened.ShoppingCartId;
         ClientId = opened.ClientId;
         Status = ShoppingCartStatus.Pending;
     }
 
-    public void Apply(ProductItemAddedToShoppingCart productItemAdded)
+    private void Apply(ProductItemAddedToShoppingCart productItemAdded)
     {
         var (_, pricedProductItem) = productItemAdded;
         var productId = pricedProductItem.ProductId;
@@ -98,7 +95,7 @@ public class ShoppingCart
             current.Quantity += quantityToAdd;
     }
 
-    public void Apply(ProductItemRemovedFromShoppingCart productItemRemoved)
+    private void Apply(ProductItemRemovedFromShoppingCart productItemRemoved)
     {
         var (_, pricedProductItem) = productItemRemoved;
         var productId = pricedProductItem.ProductId;
@@ -114,13 +111,13 @@ public class ShoppingCart
             current.Quantity -= quantityToRemove;
     }
 
-    public void Apply(ShoppingCartConfirmed confirmed)
+    private void Apply(ShoppingCartConfirmed confirmed)
     {
         Status = ShoppingCartStatus.Confirmed;
         ConfirmedAt = confirmed.ConfirmedAt;
     }
 
-    public void Apply(ShoppingCartCanceled canceled)
+    private void Apply(ShoppingCartCanceled canceled)
     {
         Status = ShoppingCartStatus.Canceled;
         CanceledAt = canceled.CanceledAt;
@@ -134,72 +131,62 @@ public enum ShoppingCartStatus
     Canceled = 4
 }
 
-public class GettingStateFromEventsTests: EventStoreDBTest
+public static class ShoppingCartExtensions
 {
-    /// <summary>
-    /// Solution - Mutable entity with When method
-    /// </summary>
-    /// <param name="eventStore"></param>
-    /// <param name="streamName"></param>
-    /// <param name="ct"></param>
-    /// <returns></returns>
-    private static async Task<ShoppingCart> GetShoppingCart(EventStoreClient eventStore, string streamName, CancellationToken ct)
+    public static ShoppingCart GetShoppingCart(this IEnumerable<object> events)
     {
-        var result = eventStore.ReadStreamAsync(
-            Direction.Forwards,
-            streamName,
-            StreamPosition.Start,
-            cancellationToken: ct
-        );
-
-        if (await result.ReadState == ReadState.StreamNotFound)
-            throw new InvalidOperationException("Shopping Cart was not found!");
-
         var shoppingCart = new ShoppingCart();
 
-        await foreach (var @event in result)
+        foreach (var @event in events)
         {
-            var eventData = JsonSerializer.Deserialize(
-                @event.Event.Data.Span,
-                Type.GetType(@event.Event.EventType)!
-            );
-
-            shoppingCart.When(eventData!);
+            shoppingCart.When(@event);
         }
 
         return shoppingCart;
     }
+}
+
+public class GettingStateFromEventsTests
+{
 
     [Fact]
     [Trait("Category", "SkipCI")]
-    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public void GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
         var shoesId = Guid.NewGuid();
         var tShirtId = Guid.NewGuid();
         var twoPairsOfShoes =
-            new PricedProductItem { ProductId = shoesId, Quantity = 2, UnitPrice = 100 };
+            new PricedProductItem
+            {
+                ProductId = shoesId, Quantity = 2, UnitPrice = 100
+            };
         var pairOfShoes =
-            new PricedProductItem { ProductId = shoesId, Quantity = 1, UnitPrice = 100 };
+            new PricedProductItem
+            {
+                ProductId = shoesId, Quantity = 1, UnitPrice = 100
+            };
         var tShirt =
-            new PricedProductItem { ProductId = tShirtId, Quantity = 1, UnitPrice = 50 };
+            new PricedProductItem
+            {
+                ProductId = tShirtId, Quantity = 1, UnitPrice = 50
+            };
 
-        var events = new object[]
+        var events = new List<object>
         {
-            new ShoppingCartOpened(shoppingCartId, clientId),
-            new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
-            new ProductItemAddedToShoppingCart(shoppingCartId, tShirt),
-            new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes),
-            new ShoppingCartConfirmed(shoppingCartId, DateTime.UtcNow),
-            new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
+            // TODO: Fill the events object with results of your business logic
+            // to be the same as events below
+
+            // new ShoppingCartOpened(shoppingCartId, clientId),
+            // new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
+            // new ProductItemAddedToShoppingCart(shoppingCartId, tShirt),
+            // new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes),
+            // new ShoppingCartConfirmed(shoppingCartId, DateTime.UtcNow),
+            // new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        var streamName = $"shopping_cart-{shoppingCartId}";
-
-        await AppendEvents(streamName, events, CancellationToken.None);
-
-        var shoppingCart = await GetShoppingCart(EventStore, streamName, CancellationToken.None);
+        var shoppingCart = events.GetShoppingCart();
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
