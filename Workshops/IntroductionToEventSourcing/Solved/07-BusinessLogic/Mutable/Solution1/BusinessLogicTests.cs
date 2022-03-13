@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace IntroductionToEventSourcing.GettingStateFromEvents.Mutable.Solution1;
+namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution1;
 
 // EVENTS
 public record ShoppingCartOpened(
@@ -59,7 +59,7 @@ public static class ShoppingCartExtensions
     }
 }
 
-public class GettingStateFromEventsTests
+public class BusinessLogicTests
 {
     [Fact]
     [Trait("Category", "SkipCI")]
@@ -80,19 +80,7 @@ public class GettingStateFromEventsTests
         var pricedPairOfShoes = new PricedProductItem { ProductId = shoesId, Quantity = 1, UnitPrice = shoesPrice };
         var pricedTShirt = new PricedProductItem{ ProductId = tShirtId, Quantity = 1, UnitPrice = tShirtPrice };
 
-        var events = new List<object>
-        {
-            // TODO: Fill the events object with results of your business logic
-            // to be the same as events below
-
-            // new ShoppingCartOpened(shoppingCartId, clientId),
-            // new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
-            // new ProductItemAddedToShoppingCart(shoppingCartId, tShirt),
-            // new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes),
-            // new ShoppingCartConfirmed(shoppingCartId, DateTime.UtcNow),
-            // new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
-        };
-
+        var events = new List<object>();
 
         // Open
         var shoppingCart = ShoppingCart.Open(shoppingCartId, clientId);

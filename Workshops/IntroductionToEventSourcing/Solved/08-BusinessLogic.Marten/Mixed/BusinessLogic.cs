@@ -1,10 +1,86 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution2;
+namespace IntroductionToEventSourcing.BusinessLogic.Mixed;
 
 public interface IAggregate
 {
     public Guid Id { get; }
 
     public virtual void When(object @event) { }
+}
+
+
+// COMMANDS
+public record OpenShoppingCart(
+    Guid ShoppingCartId,
+    Guid ClientId
+)
+{
+    public static OpenShoppingCart From(Guid? cartId, Guid? clientId)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+        if (clientId == null || clientId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(clientId));
+
+        return new OpenShoppingCart(cartId.Value, clientId.Value);
+    }
+}
+
+public record AddProductItemToShoppingCart(
+    Guid ShoppingCartId,
+    ProductItem ProductItem
+)
+{
+    public static AddProductItemToShoppingCart From(Guid? cartId, ProductItem? productItem)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+        if (productItem == null)
+            throw new ArgumentOutOfRangeException(nameof(productItem));
+
+        return new AddProductItemToShoppingCart(cartId.Value, productItem);
+    }
+}
+
+public record RemoveProductItemFromShoppingCart(
+    Guid ShoppingCartId,
+    PricedProductItem ProductItem
+)
+{
+    public static RemoveProductItemFromShoppingCart From(Guid? cartId, PricedProductItem? productItem)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+        if (productItem == null)
+            throw new ArgumentOutOfRangeException(nameof(productItem));
+
+        return new RemoveProductItemFromShoppingCart(cartId.Value, productItem);
+    }
+}
+
+public record ConfirmShoppingCart(
+    Guid ShoppingCartId
+)
+{
+    public static ConfirmShoppingCart From(Guid? cartId)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+
+        return new ConfirmShoppingCart(cartId.Value);
+    }
+}
+
+public record CancelShoppingCart(
+    Guid ShoppingCartId
+)
+{
+    public static CancelShoppingCart From(Guid? cartId)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+
+        return new CancelShoppingCart(cartId.Value);
+    }
 }
 
 public class ShoppingCart: IAggregate
@@ -40,7 +116,7 @@ public class ShoppingCart: IAggregate
         }
     }
 
-    public static (ShoppingCartOpened, ShoppingCart) Open(
+    public static (ShoppingCartOpened Event, ShoppingCart Aggregate) Open(
         Guid cartId,
         Guid clientId)
     {

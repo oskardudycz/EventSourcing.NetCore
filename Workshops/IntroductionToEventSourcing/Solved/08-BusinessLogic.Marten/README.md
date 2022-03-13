@@ -1,4 +1,4 @@
-# Exercise 07 - Business Logic
+# Exercise 08 - Business Logic with Marten
 
 Having the following shopping cart process:
 1. The customer may add a product to the shopping cart only after opening it.
@@ -13,10 +13,11 @@ Write the code that fulfils this logic. Remember that in Event Sourcing each bus
 ![events](./assets/events.jpg)
 
 There are two variations:
-- using mutable entities: [Mutable/BusinessLogicTests.cs](./Mutable/BusinessLogicTests.cs),
-- using fully immutable structures: [Immutable/BusinessLogicTests.cs](./Immutable/BusinessLogicTests.cs).
+1. Immutable, with functional command handlers composition and entities as anemic data model: [Immutable/BusinessLogicTests.cs](./Immutable/BusinessLogicTests.cs).
+2. Classical, mutable aggregates (rich domain model): [Mutable/BusinessLogicTests.cs](./Mutable/BusinessLogicTests.cs).
+3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/BusinessLogicTests.cs](./Mixed/BusinessLogicTests.cs).
 
-Select your preferred approach (or both) to solve this use case.
+Select your preferred approach (or all) to solve this use case. Fill appropriate `DocumentSessionExtensions`
 
 _**Note**: If needed update entities, events or test setup structure_
 

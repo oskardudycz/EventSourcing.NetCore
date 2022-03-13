@@ -1,15 +1,105 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution2;
+namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
 
-public interface IAggregate
+public abstract class Aggregate
 {
-    public Guid Id { get; }
+    public Guid Id { get; protected set; } = default!;
+
+    private readonly Queue<object> uncommittedEvents = new();
 
     public virtual void When(object @event) { }
+
+    public object[] DequeueUncommittedEvents()
+    {
+        var dequeuedEvents = uncommittedEvents.ToArray();
+
+        uncommittedEvents.Clear();
+
+        return dequeuedEvents;
+    }
+
+    protected void Enqueue(object @event)
+    {
+        uncommittedEvents.Enqueue(@event);
+    }
 }
 
-public class ShoppingCart: IAggregate
+// COMMANDS
+public record OpenShoppingCart(
+    Guid ShoppingCartId,
+    Guid ClientId
+)
 {
-    public Guid Id { get; private set;  }
+    public static OpenShoppingCart From(Guid? cartId, Guid? clientId)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+        if (clientId == null || clientId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(clientId));
+
+        return new OpenShoppingCart(cartId.Value, clientId.Value);
+    }
+}
+
+public record AddProductItemToShoppingCart(
+    Guid ShoppingCartId,
+    ProductItem ProductItem
+)
+{
+    public static AddProductItemToShoppingCart From(Guid? cartId, ProductItem? productItem)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+        if (productItem == null)
+            throw new ArgumentOutOfRangeException(nameof(productItem));
+
+        return new AddProductItemToShoppingCart(cartId.Value, productItem);
+    }
+}
+
+public record RemoveProductItemFromShoppingCart(
+    Guid ShoppingCartId,
+    PricedProductItem ProductItem
+)
+{
+    public static RemoveProductItemFromShoppingCart From(Guid? cartId, PricedProductItem? productItem)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+        if (productItem == null)
+            throw new ArgumentOutOfRangeException(nameof(productItem));
+
+        return new RemoveProductItemFromShoppingCart(cartId.Value, productItem);
+    }
+}
+
+public record ConfirmShoppingCart(
+    Guid ShoppingCartId
+)
+{
+    public static ConfirmShoppingCart From(Guid? cartId)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+
+        return new ConfirmShoppingCart(cartId.Value);
+    }
+}
+
+public record CancelShoppingCart(
+    Guid ShoppingCartId
+)
+{
+    public static CancelShoppingCart From(Guid? cartId)
+    {
+        if (cartId == null || cartId == Guid.Empty)
+            throw new ArgumentOutOfRangeException(nameof(cartId));
+
+        return new CancelShoppingCart(cartId.Value);
+    }
+}
+
+public class ShoppingCart: Aggregate
+{
     public Guid ClientId { get; private set; }
     public ShoppingCartStatus Status { get; private set; }
     public IList<PricedProductItem> ProductItems { get; } = new List<PricedProductItem>();
@@ -18,7 +108,7 @@ public class ShoppingCart: IAggregate
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    public void When(object @event)
+    public override void When(object @event)
     {
         switch (@event)
         {
@@ -40,22 +130,25 @@ public class ShoppingCart: IAggregate
         }
     }
 
-    public static (ShoppingCartOpened, ShoppingCart) Open(
+    public static ShoppingCart Open(
         Guid cartId,
         Guid clientId)
     {
+        return new ShoppingCart(cartId, clientId);
+    }
+
+    private ShoppingCart(
+        Guid id,
+        Guid clientId)
+    {
         var @event = new ShoppingCartOpened(
-            cartId,
+            id,
             clientId
         );
 
-
-
-        return (@event, new ShoppingCart(@event));
-    }
-
-    private ShoppingCart(ShoppingCartOpened @event) =>
+        Enqueue(@event);
         Apply(@event);
+    }
 
     //just for default creation of empty object
     private ShoppingCart() { }
@@ -67,7 +160,7 @@ public class ShoppingCart: IAggregate
         Status = ShoppingCartStatus.Pending;
     }
 
-    public ProductItemAddedToShoppingCart AddProduct(
+    public void AddProduct(
         IProductPriceCalculator productPriceCalculator,
         ProductItem productItem)
     {
@@ -79,9 +172,8 @@ public class ShoppingCart: IAggregate
 
         var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem);
 
+        Enqueue(@event);
         Apply(@event);
-
-        return @event;
     }
 
     private void Apply(ProductItemAddedToShoppingCart productItemAdded)
@@ -97,11 +189,10 @@ public class ShoppingCart: IAggregate
         if (current == null)
             ProductItems.Add(pricedProductItem);
         else
-            ProductItems[ProductItems.IndexOf(current)] =
-                new PricedProductItem(current.ProductId, current.Quantity + quantityToAdd, current.UnitPrice);
+            current.Quantity += quantityToAdd;
     }
 
-    public ProductItemRemovedFromShoppingCart RemoveProduct(PricedProductItem productItemToBeRemoved)
+    public void RemoveProduct(PricedProductItem productItemToBeRemoved)
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -112,9 +203,8 @@ public class ShoppingCart: IAggregate
 
         var @event = new ProductItemRemovedFromShoppingCart(Id, productItemToBeRemoved);
 
+        Enqueue(@event);
         Apply(@event);
-
-        return @event;
     }
 
     private bool HasEnough(PricedProductItem productItem)
@@ -139,11 +229,10 @@ public class ShoppingCart: IAggregate
         if (current.Quantity == quantityToRemove)
             ProductItems.Remove(current);
         else
-            ProductItems[ProductItems.IndexOf(current)] =
-                new PricedProductItem(current.ProductId, current.Quantity - quantityToRemove, current.UnitPrice);
+            current.Quantity -= quantityToRemove;
     }
 
-    public ShoppingCartConfirmed Confirm()
+    public void Confirm()
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -151,9 +240,8 @@ public class ShoppingCart: IAggregate
 
         var @event = new ShoppingCartConfirmed(Id, DateTime.UtcNow);
 
+        Enqueue(@event);
         Apply(@event);
-
-        return @event;
     }
 
     private void Apply(ShoppingCartConfirmed confirmed)
@@ -162,7 +250,7 @@ public class ShoppingCart: IAggregate
         ConfirmedAt = confirmed.ConfirmedAt;
     }
 
-    public ShoppingCartCanceled Cancel()
+    public void Cancel()
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -170,9 +258,8 @@ public class ShoppingCart: IAggregate
 
         var @event = new ShoppingCartCanceled(Id, DateTime.UtcNow);
 
+        Enqueue(@event);
         Apply(@event);
-
-        return @event;
     }
 
     private void Apply(ShoppingCartCanceled canceled)
@@ -209,7 +296,11 @@ public class FakeProductPriceCalculator: IProductPriceCalculator
 
     public PricedProductItem Calculate(ProductItem productItem)
     {
-        var (productId, quantity) = productItem;
-        return new PricedProductItem(productId, quantity, value);
+        return new PricedProductItem
+            {
+                ProductId = productItem.ProductId,
+                Quantity = productItem.Quantity,
+                UnitPrice = value
+            };
     }
 }

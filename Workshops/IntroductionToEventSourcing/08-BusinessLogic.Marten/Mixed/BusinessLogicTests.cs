@@ -1,7 +1,8 @@
 using FluentAssertions;
+using IntroductionToEventSourcing.BusinessLogic.Tools;
 using Xunit;
 
-namespace IntroductionToEventSourcing.GettingStateFromEvents.Mutable.Solution2;
+namespace IntroductionToEventSourcing.BusinessLogic.Mixed;
 
 // EVENTS
 public record ShoppingCartOpened(
@@ -56,11 +57,11 @@ public static class ShoppingCartExtensions
     }
 }
 
-public class GettingStateFromEventsTests
+public class BusinessLogicTests: MartenTest
 {
     [Fact]
     [Trait("Category", "SkipCI")]
-    public void GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
@@ -77,50 +78,66 @@ public class GettingStateFromEventsTests
         var pricedPairOfShoes = new PricedProductItem(shoesId, 1, shoesPrice);
         var pricedTShirt = new PricedProductItem(tShirtId, 1, tShirtPrice);
 
-        var events = new List<object>
-        {
-            // TODO: Fill the events object with results of your business logic
-            // to be the same as events below
-
-            // new ShoppingCartOpened(shoppingCartId, clientId),
-            // new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
-            // new ProductItemAddedToShoppingCart(shoppingCartId, tShirt),
-            // new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes),
-            // new ShoppingCartConfirmed(shoppingCartId, DateTime.UtcNow),
-            // new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
-        };
-
-
         // Open
-        var (opened, shoppingCart) = ShoppingCart.Open(shoppingCartId, clientId);
-        events.Add(opened);
+        await DocumentSession.Add<ShoppingCart, OpenShoppingCart>(
+            command => command.ShoppingCartId,
+            command =>
+                ShoppingCart.Open(command.ShoppingCartId, command.ClientId).Event,
+            OpenShoppingCart.From(shoppingCartId, clientId),
+            CancellationToken.None
+        );
 
         // Add two pairs of shoes
-        shoppingCart = events.GetShoppingCart();
-        events.Add(shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(shoesPrice), twoPairsOfShoes));
+        await DocumentSession.GetAndUpdate<ShoppingCart, AddProductItemToShoppingCart>(
+            command => command.ShoppingCartId,
+            (command, shoppingCart) =>
+                shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(shoesPrice), command.ProductItem),
+            AddProductItemToShoppingCart.From(shoppingCartId, twoPairsOfShoes),
+            CancellationToken.None
+        );
 
         // Add T-Shirt
-        shoppingCart = events.GetShoppingCart();
-        events.Add(shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(tShirtPrice), tShirt));
+        await DocumentSession.GetAndUpdate<ShoppingCart, AddProductItemToShoppingCart>(
+            command => command.ShoppingCartId,
+            (command, shoppingCart) =>
+                shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(tShirtPrice), command.ProductItem),
+            AddProductItemToShoppingCart.From(shoppingCartId, tShirt),
+            CancellationToken.None
+        );
 
         // Remove pair of shoes
-        events.Add(shoppingCart.RemoveProduct(pricedPairOfShoes));
+        await DocumentSession.GetAndUpdate<ShoppingCart, RemoveProductItemFromShoppingCart>(
+            command => command.ShoppingCartId,
+            (command, shoppingCart) =>
+                shoppingCart.RemoveProduct(command.ProductItem),
+            RemoveProductItemFromShoppingCart.From(shoppingCartId, pricedPairOfShoes),
+            CancellationToken.None
+        );
 
         // Confirm
-        // Uncomment line below and debug to find bug.
-        // shoppingCart = events.GetShoppingCart();
-        events.Add(shoppingCart.Confirm());
+        await DocumentSession.GetAndUpdate<ShoppingCart, ConfirmShoppingCart>(
+            command => command.ShoppingCartId,
+            (_, shoppingCart) =>
+                shoppingCart.Confirm(),
+            ConfirmShoppingCart.From(shoppingCartId),
+            CancellationToken.None
+        );
 
         // Cancel
-        var exception = Record.Exception(() =>
+        var exception = Record.ExceptionAsync(async () =>
             {
-                events.Add(shoppingCart.Cancel());
+                await DocumentSession.GetAndUpdate<ShoppingCart, CancelShoppingCart>(
+                    command => command.ShoppingCartId,
+                    (_, shoppingCart) =>
+                        shoppingCart.Cancel(),
+                    CancelShoppingCart.From(shoppingCartId),
+                    CancellationToken.None
+                );
             }
         );
         exception.Should().BeOfType<InvalidOperationException>();
 
-        // Uncomment line below and debug to find bug.
-        // shoppingCart = events.GetShoppingCart();
+        var shoppingCart = await DocumentSession.Get<ShoppingCart>(shoppingCartId, CancellationToken.None);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);

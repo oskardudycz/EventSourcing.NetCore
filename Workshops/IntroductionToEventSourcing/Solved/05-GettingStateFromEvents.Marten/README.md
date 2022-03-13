@@ -10,15 +10,6 @@ There are two variations:
 
 Select your preferred approach (or both) to solve this use case. If needed you can modify entities or events.
 
-## Solution
-
-Read also:
-- my article [How to get the current entity state from events?](https://event-driven.io/en/how_to_get_the_current_entity_state_in_event_sourcing/?utm_source=event_sourcing_net_workshop).
-- and [Marten documentation on live aggregation](https://martendb.io/events/projections/live-aggregates.html)
-
-1. Mutable: [Mutable/GettingStateFromEventsTests.cs](./Mutable/GettingStateFromEventsTests.cs).
-2. Immutable: [Immutable/GettingStateFromEventsTests.cs](./Immutable/GettingStateFromEventsTests.cs).
-
 ## Prerequisites
 Run [docker-compose](../../docker-compose.yml) script from the main workshop repository to start Postgres instance.
 
@@ -29,3 +20,12 @@ docker-compose up
 After that you can use PG Admin (IDE for Postgres) to see how tables and data look like. It's available at: http://localhost:5050.
 - Login: `admin@pgadmin.org`, Password: `admin`
 - To connect to server click right mouse on Servers, then Register Server and use host: `postgres`, user: `postgres`, password: `Password12!`
+
+## Solution
+
+Read also:
+- my article [How to get the current entity state from events?](https://event-driven.io/en/how_to_get_the_current_entity_state_in_event_sourcing/?utm_source=event_sourcing_net_workshop).
+- and [Marten documentation on live aggregation](https://martendb.io/events/projections/live-aggregates.html)
+
+1. Mutable: [Mutable/GettingStateFromEventsTests.cs](./Mutable/GettingStateFromEventsTests.cs).
+2. Immutable: [Immutable/GettingStateFromEventsTests.cs](./Immutable/GettingStateFromEventsTests.cs).

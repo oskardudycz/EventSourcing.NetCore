@@ -1,6 +1,4 @@
-using IntroductionToEventSourcing.GettingStateFromEvents.Immutable;
-
-namespace IntroductionToEventSourcing.GettingStateFromEvents.Mutable.Solution1;
+namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution1;
 
 public abstract class Aggregate
 {
