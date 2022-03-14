@@ -60,7 +60,7 @@ public record ShoppingCart(
         this with
         {
             ProductItems = ProductItems
-                .Union(new[] { productItemAdded.ProductItem })
+                .Concat(new[] { productItemAdded.ProductItem })
                 .GroupBy(pi => pi.ProductId)
                 .Select(group => group.Count() == 1
                     ? group.First()

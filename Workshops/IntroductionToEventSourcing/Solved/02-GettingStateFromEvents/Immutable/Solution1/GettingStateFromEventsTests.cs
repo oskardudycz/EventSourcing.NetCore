@@ -80,7 +80,7 @@ public class GettingStateFromEventsTests
                     shoppingCart = shoppingCart with
                     {
                         ProductItems = shoppingCart.ProductItems
-                            .Union(new []{ productItemAdded.ProductItem })
+                            .Concat(new []{ productItemAdded.ProductItem })
                             .GroupBy(pi => pi.ProductId)
                             .Select(group => group.Count() == 1?
                                 group.First()
