@@ -64,7 +64,7 @@ public record ShoppingCart(
                 shoppingCart with
                 {
                     ProductItems = shoppingCart.ProductItems
-                        .Union(new [] { pricedProductItem })
+                        .Concat(new [] { pricedProductItem })
                         .GroupBy(pi => pi.ProductId)
                         .Select(group => group.Count() == 1?
                             group.First()
