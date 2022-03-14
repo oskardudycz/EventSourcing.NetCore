@@ -43,19 +43,11 @@ public record PricedProductItem(
     decimal UnitPrice
 );
 
-
-public static class ShoppingCartExtensions
-{
-    public static ShoppingCart GetShoppingCart(this IEnumerable<object> events) =>
-        events.Aggregate(ShoppingCart.Default(), ShoppingCart.When);
-}
-
 // Business logic
 
 public class BusinessLogicTests: MartenTest
 {
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
@@ -114,7 +106,7 @@ public class BusinessLogicTests: MartenTest
         );
 
         // Cancel
-        var exception = Record.ExceptionAsync(async () =>
+        var exception = await Record.ExceptionAsync(async () =>
             {
                 await DocumentSession.GetAndUpdate<ShoppingCart, CancelShoppingCart>(
                     command => command.ShoppingCartId,

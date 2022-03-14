@@ -1,7 +1,7 @@
 using System.Text.Json;
 using EventStore.Client;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Tools;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Tools;
 
 public abstract class EventStoreDBTest: IDisposable
 {

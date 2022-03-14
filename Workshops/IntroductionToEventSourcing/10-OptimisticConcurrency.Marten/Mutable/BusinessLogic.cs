@@ -1,4 +1,4 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Mutable;
 
 public abstract class Aggregate
 {

@@ -8,31 +8,31 @@ public static class DocumentSessionExtensions
         this IDocumentSession session,
         Guid id,
         CancellationToken cancellationToken = default
-    ) where TAggregate : IAggregate
+    ) where TAggregate : class, IAggregate
     {
         // Fill logic here.
         throw new NotImplementedException();
     }
 
-    public static Task<long> Add<TAggregate, TCommand>(
+    public static Task Add<TAggregate, TCommand>(
         this IDocumentSession session,
         Func<TCommand, Guid> getId,
         Func<TCommand, object> action,
         TCommand command,
         CancellationToken cancellationToken = default
-    ) where TAggregate : IAggregate
+    ) where TAggregate : class, IAggregate
     {
         // Fill logic here.
         throw new NotImplementedException();
     }
 
-    public static Task<long> GetAndUpdate<TAggregate, TCommand>(
+    public static Task GetAndUpdate<TAggregate, TCommand>(
         this IDocumentSession session,
         Func<TCommand, Guid> getId,
         Func<TCommand, TAggregate, object> action,
         TCommand command,
         CancellationToken cancellationToken = default
-    ) where TAggregate : IAggregate
+    ) where TAggregate : class, IAggregate
     {
         // Fill logic here.
         throw new NotImplementedException();

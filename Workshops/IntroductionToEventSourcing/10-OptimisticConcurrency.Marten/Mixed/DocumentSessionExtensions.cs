@@ -1,6 +1,6 @@
 using Marten;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Mixed;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Mixed;
 
 public static class DocumentSessionExtensions
 {
@@ -8,7 +8,7 @@ public static class DocumentSessionExtensions
         this IDocumentSession session,
         Guid id,
         CancellationToken cancellationToken = default
-    ) where TAggregate : IAggregate
+    ) where TAggregate : class, IAggregate
     {
         // Fill logic here.
         throw new NotImplementedException();
@@ -20,7 +20,7 @@ public static class DocumentSessionExtensions
         Func<TCommand, object> action,
         TCommand command,
         CancellationToken cancellationToken = default
-    ) where TAggregate : IAggregate
+    ) where TAggregate : class, IAggregate
     {
         // Fill logic here.
         throw new NotImplementedException();
@@ -31,9 +31,9 @@ public static class DocumentSessionExtensions
         Func<TCommand, Guid> getId,
         Func<TCommand, TAggregate, object> action,
         TCommand command,
-        long expectedVersion,
+        long version,
         CancellationToken cancellationToken = default
-    ) where TAggregate : IAggregate
+    ) where TAggregate : class, IAggregate
     {
         // Fill logic here.
         throw new NotImplementedException();

@@ -1,11 +1,11 @@
 using Marten;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Tools;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Tools;
 
 public abstract class MartenTest: IDisposable
 {
     private readonly DocumentStore documentStore;
-    protected readonly IDocumentSession DocumentSession;
+    protected IDocumentSession DocumentSession = default!;
 
     protected MartenTest()
     {
@@ -15,6 +15,11 @@ public abstract class MartenTest: IDisposable
         options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.All);
 
         documentStore = new DocumentStore(options);
+        ReOpenSession();
+    }
+
+    protected void ReOpenSession()
+    {
         DocumentSession = documentStore.LightweightSession();
     }
 

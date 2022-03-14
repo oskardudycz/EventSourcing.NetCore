@@ -1,8 +1,9 @@
 using FluentAssertions;
-using IntroductionToEventSourcing.BusinessLogic.Tools;
+using IntroductionToEventSourcing.OptimisticConcurrency.Tools;
+using Marten.Exceptions;
 using Xunit;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Immutable;
 
 // EVENTS
 public record ShoppingCartOpened(
@@ -43,19 +44,11 @@ public record PricedProductItem(
     decimal UnitPrice
 );
 
-
-public static class ShoppingCartExtensions
-{
-    public static ShoppingCart GetShoppingCart(this IEnumerable<object> events) =>
-        events.Aggregate(ShoppingCart.Default(), ShoppingCart.When);
-}
-
 // Business logic
 
 public class OptimisticConcurrencyTests: MartenTest
 {
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
@@ -78,7 +71,7 @@ public class OptimisticConcurrencyTests: MartenTest
 
         // Try to open again
         // Should fail as stream was already created
-        var exception = Record.ExceptionAsync(async () =>
+        var exception = await Record.ExceptionAsync(async () =>
             {
                 await DocumentSession.Add<ShoppingCart, OpenShoppingCart>(
                     command => command.ShoppingCartId,
@@ -88,7 +81,8 @@ public class OptimisticConcurrencyTests: MartenTest
                 );
             }
         );
-        exception.Should().BeOfType<InvalidOperationException>();
+        exception.Should().BeOfType<ExistingStreamIdCollisionException>();
+        ReOpenSession();
 
         // Add two pairs of shoes
         await DocumentSession.GetAndUpdate<ShoppingCart, AddProductItemToShoppingCart>(
@@ -96,25 +90,25 @@ public class OptimisticConcurrencyTests: MartenTest
             (command, shoppingCart) =>
                 AddProductItemToShoppingCart.Handle(FakeProductPriceCalculator.Returning(shoesPrice), command, shoppingCart),
             AddProductItemToShoppingCart.From(shoppingCartId, twoPairsOfShoes),
-            2,
+            1,
             CancellationToken.None
         );
 
         // Add T-Shirt
         // Should fail because of sending the same expected version as previous call
-        exception = Record.ExceptionAsync(async () =>
+        exception = await Record.ExceptionAsync(async () =>
             {
                 await DocumentSession.GetAndUpdate<ShoppingCart, AddProductItemToShoppingCart>(
                     command => command.ShoppingCartId,
                     (command, shoppingCart) =>
                         AddProductItemToShoppingCart.Handle(FakeProductPriceCalculator.Returning(tShirtPrice), command, shoppingCart),
                     AddProductItemToShoppingCart.From(shoppingCartId, tShirt),
-                    2,
+                    1,
                     CancellationToken.None
                 );
             }
         );
-        exception.Should().BeOfType<InvalidOperationException>();
+        exception.Should().BeOfType<EventStreamUnexpectedMaxEventIdException>();
 
         var shoppingCart = await DocumentSession.Get<ShoppingCart>(shoppingCartId, CancellationToken.None);
 
