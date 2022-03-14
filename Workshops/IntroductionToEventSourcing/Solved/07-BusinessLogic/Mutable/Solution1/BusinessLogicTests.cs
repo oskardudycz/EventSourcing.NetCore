@@ -62,7 +62,6 @@ public static class ShoppingCartExtensions
 public class BusinessLogicTests
 {
     [Fact]
-    [Trait("Category", "SkipCI")]
     public void GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();

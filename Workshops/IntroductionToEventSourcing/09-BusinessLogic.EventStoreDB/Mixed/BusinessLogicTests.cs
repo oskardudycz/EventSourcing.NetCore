@@ -80,7 +80,7 @@ public class BusinessLogicTests: EventStoreDBTest
 
         // Open
         await EventStore.Add<ShoppingCart, OpenShoppingCart>(
-            command => command.ShoppingCartId,
+            command => ShoppingCart.StreamName(command.ShoppingCartId),
             command =>
                 ShoppingCart.Open(command.ShoppingCartId, command.ClientId).Event,
             OpenShoppingCart.From(shoppingCartId, clientId),
@@ -89,7 +89,7 @@ public class BusinessLogicTests: EventStoreDBTest
 
         // Add two pairs of shoes
         await EventStore.GetAndUpdate<ShoppingCart, AddProductItemToShoppingCart>(
-            command => command.ShoppingCartId,
+            command => ShoppingCart.StreamName(command.ShoppingCartId),
             (command, shoppingCart) =>
                 shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(shoesPrice), command.ProductItem),
             AddProductItemToShoppingCart.From(shoppingCartId, twoPairsOfShoes),
@@ -98,7 +98,7 @@ public class BusinessLogicTests: EventStoreDBTest
 
         // Add T-Shirt
         await EventStore.GetAndUpdate<ShoppingCart, AddProductItemToShoppingCart>(
-            command => command.ShoppingCartId,
+            command => ShoppingCart.StreamName(command.ShoppingCartId),
             (command, shoppingCart) =>
                 shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(tShirtPrice), command.ProductItem),
             AddProductItemToShoppingCart.From(shoppingCartId, tShirt),
@@ -107,7 +107,7 @@ public class BusinessLogicTests: EventStoreDBTest
 
         // Remove pair of shoes
         await EventStore.GetAndUpdate<ShoppingCart, RemoveProductItemFromShoppingCart>(
-            command => command.ShoppingCartId,
+            command => ShoppingCart.StreamName(command.ShoppingCartId),
             (command, shoppingCart) =>
                 shoppingCart.RemoveProduct(command.ProductItem),
             RemoveProductItemFromShoppingCart.From(shoppingCartId, pricedPairOfShoes),
@@ -116,7 +116,7 @@ public class BusinessLogicTests: EventStoreDBTest
 
         // Confirm
         await EventStore.GetAndUpdate<ShoppingCart, ConfirmShoppingCart>(
-            command => command.ShoppingCartId,
+            command => ShoppingCart.StreamName(command.ShoppingCartId),
             (_, shoppingCart) =>
                 shoppingCart.Confirm(),
             ConfirmShoppingCart.From(shoppingCartId),
@@ -124,10 +124,10 @@ public class BusinessLogicTests: EventStoreDBTest
         );
 
         // Cancel
-        var exception = Record.ExceptionAsync(async () =>
+        var exception = await Record.ExceptionAsync(async () =>
             {
                 await EventStore.GetAndUpdate<ShoppingCart, CancelShoppingCart>(
-                    command => command.ShoppingCartId,
+                    command => ShoppingCart.StreamName(command.ShoppingCartId),
                     (_, shoppingCart) =>
                         shoppingCart.Cancel(),
                     CancelShoppingCart.From(shoppingCartId),
@@ -137,7 +137,7 @@ public class BusinessLogicTests: EventStoreDBTest
         );
         exception.Should().BeOfType<InvalidOperationException>();
 
-        var shoppingCart = await EventStore.Get<ShoppingCart>(shoppingCartId, CancellationToken.None);
+        var shoppingCart = await EventStore.Get<ShoppingCart>(ShoppingCart.StreamName(shoppingCartId), CancellationToken.None);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);

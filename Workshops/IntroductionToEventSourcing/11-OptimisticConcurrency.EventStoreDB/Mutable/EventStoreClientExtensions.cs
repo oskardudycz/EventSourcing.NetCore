@@ -1,12 +1,12 @@
 using EventStore.Client;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Mutable;
 
 public static class EventStoreClientExtensions
 {
     public static Task<TAggregate> Get<TAggregate>(
         this EventStoreClient eventStore,
-        Guid id,
+        string streamName,
         CancellationToken cancellationToken = default
     ) where TAggregate : Aggregate
     {
@@ -14,9 +14,9 @@ public static class EventStoreClientExtensions
         throw new NotImplementedException();
     }
 
-    public static Task<long> Add<TAggregate, TCommand>(
+    public static Task<ulong> Add<TAggregate, TCommand>(
         this EventStoreClient eventStore,
-        Func<TCommand, Guid> getId,
+        Func<TCommand, string> getStreamName,
         Func<TCommand, TAggregate> action,
         TCommand command,
         CancellationToken cancellationToken = default
@@ -26,9 +26,9 @@ public static class EventStoreClientExtensions
         throw new NotImplementedException();
     }
 
-    public static Task<long> GetAndUpdate<TAggregate, TCommand>(
+    public static Task<ulong> GetAndUpdate<TAggregate, TCommand>(
         this EventStoreClient eventStore,
-        Func<TCommand, Guid> getId,
+        Func<TCommand, string> getStreamName,
         Action<TCommand, TAggregate> action,
         TCommand command,
         ulong expectedRevision,

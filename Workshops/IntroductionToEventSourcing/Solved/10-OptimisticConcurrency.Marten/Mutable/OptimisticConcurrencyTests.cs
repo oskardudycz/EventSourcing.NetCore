@@ -1,8 +1,9 @@
 using FluentAssertions;
-using IntroductionToEventSourcing.BusinessLogic.Tools;
+using IntroductionToEventSourcing.OptimisticConcurrency.Tools;
+using Marten.Exceptions;
 using Xunit;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Mutable;
 
 // EVENTS
 public record ShoppingCartOpened(
@@ -48,7 +49,6 @@ public class ProductItem
 public class OptimisticConcurrencyTests: MartenTest
 {
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
@@ -73,7 +73,7 @@ public class OptimisticConcurrencyTests: MartenTest
 
         // Try to open again
         // Should fail as stream was already created
-        var exception = Record.ExceptionAsync(async () =>
+        var exception = await Record.ExceptionAsync(async () =>
             {
                 await DocumentSession.Add(
                     command => command.ShoppingCartId,
@@ -84,7 +84,8 @@ public class OptimisticConcurrencyTests: MartenTest
                 );
             }
         );
-        exception.Should().BeOfType<InvalidOperationException>();
+        exception.Should().BeOfType<ExistingStreamIdCollisionException>();
+        ReOpenSession();
 
         // Add two pairs of shoes
         await DocumentSession.GetAndUpdate<ShoppingCart, AddProductItemToShoppingCart>(
@@ -92,25 +93,25 @@ public class OptimisticConcurrencyTests: MartenTest
             (command, shoppingCart) =>
                 shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(shoesPrice), command.ProductItem),
             AddProductItemToShoppingCart.From(shoppingCartId, twoPairsOfShoes),
-            2,
+            1,
             CancellationToken.None
         );
 
         // Add T-Shirt
         // Should fail because of sending the same expected version as previous call
-        exception = Record.ExceptionAsync(async () =>
+        exception = await Record.ExceptionAsync(async () =>
             {
                 await DocumentSession.GetAndUpdate<ShoppingCart, AddProductItemToShoppingCart>(
                     command => command.ShoppingCartId,
                     (command, shoppingCart) =>
                         shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(tShirtPrice), command.ProductItem),
                     AddProductItemToShoppingCart.From(shoppingCartId, tShirt),
-                    2,
+                    1,
                     CancellationToken.None
                 );
             }
         );
-        exception.Should().BeOfType<InvalidOperationException>();
+        exception.Should().BeOfType<EventStreamUnexpectedMaxEventIdException>();
 
         var shoppingCart = await DocumentSession.Get<ShoppingCart>(shoppingCartId, CancellationToken.None);
 

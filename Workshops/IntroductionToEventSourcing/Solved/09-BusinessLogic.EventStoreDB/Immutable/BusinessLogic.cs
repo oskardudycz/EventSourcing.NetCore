@@ -11,8 +11,11 @@ public record ShoppingCart(
 )
 {
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
+
     public static ShoppingCart Default() =>
         new (default, default, default, Array.Empty<PricedProductItem>());
+
+    public static string StreamName(Guid id) => $"shopping_cart-{id}";
 
     public static ShoppingCart When(ShoppingCart shoppingCart, object @event)
     {

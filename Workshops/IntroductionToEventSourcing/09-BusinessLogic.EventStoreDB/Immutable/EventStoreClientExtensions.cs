@@ -1,3 +1,4 @@
+using System.Text.Json;
 using EventStore.Client;
 
 namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
@@ -6,7 +7,9 @@ public static class EventStoreClientExtensions
 {
     public static Task<TEntity> Get<TEntity>(
         this EventStoreClient eventStore,
-        Guid id,
+        Func<TEntity, object, TEntity> when,
+        TEntity empty,
+        string streamName,
         CancellationToken cancellationToken = default
     )
     {
@@ -14,9 +17,9 @@ public static class EventStoreClientExtensions
         throw new NotImplementedException();
     }
 
-    public static Task<long> Add<TEntity, TCommand>(
+    public static Task Add<TCommand>(
         this EventStoreClient eventStore,
-        Func<TCommand, Guid> getId,
+        Func<TCommand, string> getStreamName,
         Func<TCommand, object> action,
         TCommand command,
         CancellationToken cancellationToken = default
@@ -26,9 +29,11 @@ public static class EventStoreClientExtensions
         throw new NotImplementedException();
     }
 
-    public static Task<long> GetAndUpdate<TEntity, TCommand>(
+    public static Task GetAndUpdate<TEntity, TCommand>(
         this EventStoreClient eventStore,
-        Func<TCommand, Guid> getId,
+        Func<TEntity, object, TEntity> when,
+        TEntity empty,
+        Func<TCommand, string> getStreamName,
         Func<TCommand, TEntity, object> action,
         TCommand command,
         CancellationToken cancellationToken = default

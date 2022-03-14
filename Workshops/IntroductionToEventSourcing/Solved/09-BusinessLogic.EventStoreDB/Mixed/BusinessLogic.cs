@@ -94,6 +94,8 @@ public class ShoppingCart: IAggregate
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
+    public static string StreamName(Guid id) => $"shopping_cart-{id}";
+
     public void When(object @event)
     {
         switch (@event)

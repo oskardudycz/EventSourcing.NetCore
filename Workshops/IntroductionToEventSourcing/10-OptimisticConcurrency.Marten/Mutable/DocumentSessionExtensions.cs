@@ -1,6 +1,6 @@
 using Marten;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Mutable;
 
 public static class DocumentSessionExtensions
 {
@@ -31,7 +31,7 @@ public static class DocumentSessionExtensions
         Func<TCommand, Guid> getId,
         Action<TCommand, TAggregate> action,
         TCommand command,
-        long expectedVersion,
+        long version,
         CancellationToken cancellationToken = default
     ) where TAggregate : Aggregate
     {

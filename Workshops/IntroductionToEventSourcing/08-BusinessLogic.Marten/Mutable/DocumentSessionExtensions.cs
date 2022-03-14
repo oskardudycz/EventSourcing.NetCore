@@ -14,7 +14,7 @@ public static class DocumentSessionExtensions
         throw new NotImplementedException();
     }
 
-    public static Task<long> Add<TAggregate, TCommand>(
+    public static Task Add<TAggregate, TCommand>(
         this IDocumentSession session,
         Func<TCommand, Guid> getId,
         Func<TCommand, TAggregate> action,
@@ -26,7 +26,7 @@ public static class DocumentSessionExtensions
         throw new NotImplementedException();
     }
 
-    public static Task<long> GetAndUpdate<TAggregate, TCommand>(
+    public static Task GetAndUpdate<TAggregate, TCommand>(
         this IDocumentSession session,
         Func<TCommand, Guid> getId,
         Action<TCommand, TAggregate> action,

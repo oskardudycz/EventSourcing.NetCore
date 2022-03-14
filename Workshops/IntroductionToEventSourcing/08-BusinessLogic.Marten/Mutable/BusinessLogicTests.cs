@@ -112,7 +112,7 @@ public class BusinessLogicTests: MartenTest
         );
 
         // Cancel
-        var exception = Record.ExceptionAsync(async () =>
+        var exception = await Record.ExceptionAsync(async () =>
             {
                 await DocumentSession.GetAndUpdate<ShoppingCart, CancelShoppingCart>(
                     command => command.ShoppingCartId,

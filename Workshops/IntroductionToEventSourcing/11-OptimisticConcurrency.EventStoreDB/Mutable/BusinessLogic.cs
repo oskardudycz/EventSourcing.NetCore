@@ -1,4 +1,4 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Mutable;
 
 public abstract class Aggregate
 {
@@ -107,6 +107,8 @@ public class ShoppingCart: Aggregate
     public DateTime? CanceledAt { get; private set; }
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
+
+    public static string StreamName(Guid id) => $"shopping_cart-{id}";
 
     public override void When(object @event)
     {

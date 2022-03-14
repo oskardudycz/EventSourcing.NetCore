@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <RootNamespace>IntroductionToEventSourcing.BusinessLogic</RootNamespace>
+        <RootNamespace>IntroductionToEventSourcing.OptimisticConcurrency</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

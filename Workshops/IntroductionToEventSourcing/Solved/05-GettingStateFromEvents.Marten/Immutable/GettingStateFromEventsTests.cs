@@ -129,7 +129,6 @@ public class GettingStateFromEventsTests: MartenTest
     }
 
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();

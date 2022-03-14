@@ -8,69 +8,63 @@ public record ShoppingCart(
     PricedProductItem[] ProductItems,
     DateTime? ConfirmedAt = null,
     DateTime? CanceledAt = null
-)
-{
+){
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
-    public static ShoppingCart Default() =>
-        new (default, default, default, Array.Empty<PricedProductItem>());
 
-    public static ShoppingCart When(ShoppingCart shoppingCart, object @event)
-    {
-        return @event switch
+    public static ShoppingCart Create(ShoppingCartOpened opened) =>
+        new ShoppingCart(
+            opened.ShoppingCartId,
+            opened.ClientId,
+            ShoppingCartStatus.Pending,
+            Array.Empty<PricedProductItem>()
+        );
+
+    public ShoppingCart Apply(ProductItemAddedToShoppingCart productItemAdded) =>
+        this with
         {
-            ShoppingCartOpened(var shoppingCartId, var clientId) =>
-                shoppingCart with
-                {
-                    Id = shoppingCartId,
-                    ClientId = clientId,
-                    Status = ShoppingCartStatus.Pending
-                },
-            ProductItemAddedToShoppingCart(_, var pricedProductItem) =>
-                shoppingCart with
-                {
-                    ProductItems = shoppingCart.ProductItems
-                        .Concat(new [] { pricedProductItem })
-                        .GroupBy(pi => pi.ProductId)
-                        .Select(group => group.Count() == 1?
-                            group.First()
-                            : new PricedProductItem(
-                                group.Key,
-                                group.Sum(pi => pi.Quantity),
-                                group.First().UnitPrice
-                            )
-                        )
-                        .ToArray()
-                },
-            ProductItemRemovedFromShoppingCart(_, var pricedProductItem) =>
-                shoppingCart with
-                {
-                    ProductItems = shoppingCart.ProductItems
-                        .Select(pi => pi.ProductId == pricedProductItem.ProductId?
-                            new PricedProductItem(
-                                pi.ProductId,
-                                pi.Quantity - pricedProductItem.Quantity,
-                                pi.UnitPrice
-                            )
-                            :pi
-                        )
-                        .Where(pi => pi.Quantity > 0)
-                        .ToArray()
-                },
-            ShoppingCartConfirmed(_, var confirmedAt) =>
-                shoppingCart with
-                {
-                    Status = ShoppingCartStatus.Confirmed,
-                    ConfirmedAt = confirmedAt
-                },
-            ShoppingCartCanceled(_, var canceledAt) =>
-                shoppingCart with
-                {
-                    Status = ShoppingCartStatus.Canceled,
-                    CanceledAt = canceledAt
-                },
-            _ => shoppingCart
+            ProductItems = ProductItems
+                .Concat(new[] { productItemAdded.ProductItem })
+                .GroupBy(pi => pi.ProductId)
+                .Select(group => group.Count() == 1
+                    ? group.First()
+                    : new PricedProductItem(
+                        group.Key,
+                        group.Sum(pi => pi.Quantity),
+                        group.First().UnitPrice
+                    )
+                )
+                .ToArray()
         };
-    }
+
+    public ShoppingCart Apply(ProductItemRemovedFromShoppingCart productItemRemoved) =>
+        this with
+        {
+            ProductItems = ProductItems
+                .Select(pi => pi.ProductId == productItemRemoved.ProductItem.ProductId
+                    ? new PricedProductItem(
+                        pi.ProductId,
+                        pi.Quantity - productItemRemoved.ProductItem.Quantity,
+                        pi.UnitPrice
+                    )
+                    : pi
+                )
+                .Where(pi => pi.Quantity > 0)
+                .ToArray()
+        };
+
+    public ShoppingCart Apply(ShoppingCartConfirmed confirmed) =>
+        this with
+        {
+            Status = ShoppingCartStatus.Confirmed,
+            ConfirmedAt = confirmed.ConfirmedAt
+        };
+
+    public ShoppingCart Apply(ShoppingCartCanceled canceled) =>
+        this with
+        {
+            Status = ShoppingCartStatus.Canceled,
+            CanceledAt = canceled.CanceledAt
+        };
 
     public bool HasEnough(PricedProductItem productItem)
     {

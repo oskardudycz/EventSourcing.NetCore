@@ -1,4 +1,4 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Mixed;
+namespace IntroductionToEventSourcing.OptimisticConcurrency.Mixed;
 
 public interface IAggregate
 {

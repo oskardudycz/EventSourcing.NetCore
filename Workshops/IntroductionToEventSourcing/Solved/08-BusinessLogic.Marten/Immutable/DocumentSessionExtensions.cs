@@ -4,37 +4,46 @@ namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
 
 public static class DocumentSessionExtensions
 {
-    public static Task<TEntity> Get<TEntity>(
+    public static async Task<TEntity> Get<TEntity>(
         this IDocumentSession session,
         Guid id,
         CancellationToken cancellationToken = default
-    )
+    ) where TEntity : class
     {
-        // Fill logic here.
-        throw new NotImplementedException();
+        var entity = await session.Events.AggregateStreamAsync<TEntity>(id, token: cancellationToken);
+
+        return entity ?? throw new InvalidOperationException($"Entity with id {id} was not found");
     }
 
-    public static Task<long> Add<TEntity, TCommand>(
+    public static Task Add<TEntity, TCommand>(
         this IDocumentSession session,
         Func<TCommand, Guid> getId,
         Func<TCommand, object> action,
         TCommand command,
         CancellationToken cancellationToken = default
-    )
+    ) where TEntity : class
     {
-        // Fill logic here.
-        throw new NotImplementedException();
+        session.Events.StartStream<TEntity>(
+            getId(command),
+            action(command)
+        );
+
+        return session.SaveChangesAsync(cancellationToken);
     }
 
-    public static Task<long> GetAndUpdate<TEntity, TCommand>(
+    public static async Task GetAndUpdate<TEntity, TCommand>(
         this IDocumentSession session,
         Func<TCommand, Guid> getId,
         Func<TCommand, TEntity, object> action,
         TCommand command,
         CancellationToken cancellationToken = default
-    )
+    ) where TEntity : class
     {
-        // Fill logic here.
-        throw new NotImplementedException();
+        var id = getId(command);
+        var current = await session.Get<TEntity>(id, cancellationToken);
+
+        session.Events.Append(id, action(command, current));
+
+        await session.SaveChangesAsync(cancellationToken);
     }
 }
