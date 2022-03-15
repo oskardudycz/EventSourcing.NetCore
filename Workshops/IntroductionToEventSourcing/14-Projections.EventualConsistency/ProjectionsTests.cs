@@ -148,8 +148,11 @@ public class ProjectionsTests
         var database = new Database();
 
         // TODO:
-        // 1. Register here your event handlers using `eventBus.Register`.
-        // 2. Store results in database.
+        // 1. Register here your event handlers using `eventBus.Register`, e.g.
+        eventBus.Register((EventEnvelope<ShoppingCartOpened> @event) =>
+        {
+            // 2. Store results in database.
+        });
 
         eventBus.Publish(events);
 
@@ -180,7 +183,7 @@ public class ProjectionsTests
         shoppingCart = database.Get<ShoppingCartDetails>(otherClientShoppingCartId)!;
 
         shoppingCart.Should().NotBeNull();
-        shoppingCart.Id.Should().Be(cancelledShoppingCartId);
+        shoppingCart.Id.Should().Be(otherClientShoppingCartId);
         shoppingCart.ClientId.Should().Be(otherClientId);
         shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
@@ -199,16 +202,16 @@ public class ProjectionsTests
         shoppingCart.ProductItems[0].Should().Be(trousers);
 
         // first pending
-        shoppingCart = database.Get<ShoppingCartDetails>(otherConfirmedShoppingCartId)!;
+        shoppingCart = database.Get<ShoppingCartDetails>(otherPendingShoppingCartId)!;
 
         shoppingCart.Should().NotBeNull();
-        shoppingCart.Id.Should().Be(otherConfirmedShoppingCartId);
+        shoppingCart.Id.Should().Be(otherPendingShoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
         shoppingCart.ProductItems.Should().BeEmpty();
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Pending);
 
         // summary
-        var summary = database.Get<ShoppingCartsClientSummary>(cancelledShoppingCartId)!;
+        var summary = database.Get<ShoppingCartsClientSummary>(clientId)!;
         summary.Id.Should().Be(clientId);
         summary.TotalItemsCount.Should().Be(3);
         summary.TotalAmount.Should().Be(pairOfShoes.TotalAmount + tShirt.TotalAmount + trousers.TotalAmount);
