@@ -6,7 +6,10 @@ public class Database
 
     public void Store<T>(Guid id, T obj) where T: class
     {
-        storage.Add(id, obj);
+        if (!storage.ContainsKey(id))
+            storage.Add(id, obj);
+        else
+            storage[id] = obj;
     }
 
     public T? Get<T>(Guid id) where T: class
