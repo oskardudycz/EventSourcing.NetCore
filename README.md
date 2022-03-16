@@ -32,7 +32,9 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET.
     - [6.8 Meetings Management with Marten](#68-meetings-management-with-marten)
     - [6.9 Cinema Tickets Reservations with Marten](#69-cinema-tickets-reservations-with-marten)
     - [6.10 SmartHome IoT with Marten](#610-smarthome-iot-with-marten)
-  - [7. Self-paced training Kit](#7-self-paced-training-kit)
+  - [7. Self-paced training Kits](#7-self-paced-training-kits)
+    - [7.1 Introduction to Event Sourcing](#71-introduction-to-event-sourcing)
+    - [7.2 Build your own Event Store](#72-build-your-own-event-store)
   - [8. Articles](#8-articles)
   - [9. Event Store - Marten](#9-event-store---marten)
   - [10. Message Bus (for processing Commands, Queries, Events) - MediatR](#10-message-bus-for-processing-commands-queries-events---mediatr)
@@ -680,11 +682,43 @@ Shows how to compose event handlers in the processing pipelines to:
 - stores events to Marten,
 - asynchronous projections rebuild using AsynDaemon feature.
 
-## 7. Self-paced training Kit
+## 7. Self-paced training Kits
 
-I prepared the self-paced training Kit for the Event Sourcing. See more in the [Workshop description](./Workshops/BuildYourOwnEventStore/Readme.md).
+I prepared the self-paced training Kits for the Event Sourcing. See more in the [Workshop description](./Workshops/BuildYourOwnEventStore/Readme.md).
 
-**Event Sourcing basics** - it teaches the event store basics by showing how to build your Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projections, snapshots, and finishes with the `Marten` basics. See more in [here](./Workshops/BuildYourOwnEventStore/).
+### 7.1 [Introduction to Event Sourcing](./Workshops/IntroductionToEventSourcing)
+
+Event Sourcing is perceived as a complex pattern. Some believe that it's like Nessie, everyone's heard about it, but rarely seen it. In fact, Event Sourcing is a pretty practical and straightforward concept. It helps build predictable applications closer to business. Nowadays, storage is cheap, and information is priceless. In Event Sourcing, no data is lost. 
+
+The workshop aims to build the knowledge of the general concept and its related patterns for the participants. The acquired knowledge will allow for the conscious design of architectural solutions and the analysis of associated risks. 
+
+The emphasis will be on a pragmatic understanding of architectures and applying it in practice using Marten and EventStoreDB.
+
+You can do the workshop as a self-paced kit. That should give you a good foundation for starting your journey with Event Sourcing and learning tools like Marten and EventStoreDB. If you'd like to get full coverage with all nuances of the private workshop, feel free to contact me via [email](mailto:oskar.dudycz@gmail.com).
+
+1. [Events definition](./Workshops/IntroductionToEventSourcing/01-EventsDefinition).
+2. [Getting State from events](./Workshops/IntroductionToEventSourcing/02-GettingStateFromEvents).
+3. Appending Events:
+   * [Marten](./Workshops/IntroductionToEventSourcing/03-AppendingEvents.Marten)
+   * [EventStoreDB](./Workshops/IntroductionToEventSourcing/04-AppendingEvents.EventStoreDB)
+4. Getting State from events
+   * [Marten](./Workshops/IntroductionToEventSourcing/05-GettingStateFromEvents.Marten)
+   * [EventStoreDB](./Workshops/IntroductionToEventSourcing/06-GettingStateFromEvents.EventStoreDB)
+5. Business logic:
+   * [General](./Workshops/IntroductionToEventSourcing/07-BusinessLogic)
+   * [Marten](./Workshops/IntroductionToEventSourcing/08-BusinessLogic.Marten)
+   * [EventStoreDB](./Workshops/IntroductionToEventSourcing/09-BusinessLogic.EventStoreDB)
+6. Optimistic Concurrency:
+   * [Marten](./Workshops/IntroductionToEventSourcing/10-OptimisticConcurrency.Marten)
+   * [EventStoreDB](./Workshops/IntroductionToEventSourcing/11-OptimisticConcurrency.EventStoreDB)
+7. Projections:
+   * [General](./Workshops/IntroductionToEventSourcing/12-Projections)
+   * [Idempotency](./Workshops/IntroductionToEventSourcing/13-Projections.Idempotency)
+   * [Eventual Consistency](./Workshops/IntroductionToEventSourcing/14-Projections.EventualConsistency)
+
+### 7.2 [Build your own Event Store](./Workshops/BuildYourOwnEventStore)
+
+It teaches the event store basics by showing how to build your Event Store on top of Relational Database. It starts with the tables setup, goes through appending events, aggregations, projections, snapshots, and finishes with the `Marten` basics.
 
 1. [Streams Table](./Workshops/BuildYourOwnEventStore/01-CreateStreamsTable)
 2. [Events Table](./Workshops/BuildYourOwnEventStore/02-CreateEventsTable)
