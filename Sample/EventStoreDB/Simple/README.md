@@ -1,6 +1,6 @@
 # Simple, practical EventSourcing with EventStoreDB and EntityFramework
 
-The is the simple Event Sourcing setup with EventStoreDB. For the Read Model, Postgres and Entity Framework are used.
+This is the simple Event Sourcing setup with EventStoreDB. For the Read Model, Postgres and Entity Framework are used.
 
 You can watch the webinar on YouTube where I'm explaining the details of the implementation:
 
