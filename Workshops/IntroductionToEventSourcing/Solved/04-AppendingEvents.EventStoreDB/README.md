@@ -1,4 +1,4 @@
-# Exercise 04 - Appending events to Marten
+# Exercise 04 - Appending events to EventStoreDB
 
 Using a defined structure of events from the [previous exercise](../01-EventsDefinition), fill a `AppendEvents` function to store events in [EventStoreDB](https://developers.eventstore.com/clients/grpc/).
 

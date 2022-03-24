@@ -19,9 +19,9 @@ Extend your implementation to include these rules.
 ![events](./assets/events.jpg)
 
 There are two variations:
-1. Immutable, with functional command handlers composition and entities as anemic data model: [Immutable/OptimisticConcurrencyTests.cs](./Immutable/BusinessLogicTests.cs).
-2. Classical, mutable aggregates (rich domain model): [Mutable/BusinessLogicTests.cs](./Mutable/BusinessLogicTests.cs).
-3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/BusinessLogicTests.cs](./Mixed/BusinessLogicTests.cs).
+1. Immutable, with functional command handlers composition and entities as anemic data model: [Immutable/OptimisticConcurrencyTests.cs](./Immutable/OptimisticConcurrencyTests.cs).
+2. Classical, mutable aggregates (rich domain model): [Mutable/OptimisticConcurrencyTests.cs](./Mutable/OptimisticConcurrencyTests.cs).
+3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/OptimisticConcurrencyTests.cs](./Mixed/OptimisticConcurrencyTests.cs).
 
 Select your preferred approach (or all) to solve this use case using Marten. Fill appropriate `DocumentSessionExtensions`
 
