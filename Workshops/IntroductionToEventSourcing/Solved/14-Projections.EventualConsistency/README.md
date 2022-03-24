@@ -1,4 +1,4 @@
-# Exercise 13 - Projections Idempotency
+# Exercise 14 - Projections Eventual Consistency
 
 With the [Database](./Tools/Database.cs) interface representing the sample database, implement the following projections:
 

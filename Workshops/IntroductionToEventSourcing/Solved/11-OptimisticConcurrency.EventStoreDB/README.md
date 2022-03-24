@@ -1,4 +1,4 @@
-# Exercise 10 - Optimistic Concurrency with EventStoreDB
+# Exercise 11 - Optimistic Concurrency with EventStoreDB
 
 Having the following shopping cart process and implementation from previous exercises:
 1. The customer may add a product to the shopping cart only after opening it.
@@ -15,9 +15,9 @@ How will the solution change when we add requirements:
 ![events](./assets/events.jpg)
 
 There are two variations:
-1. Immutable, with functional command handlers composition and entities as anemic data model: [Immutable/OptimisticConcurrencyTests](./Immutable/BusinessLogicTests.cs).
-2. Classical, mutable aggregates (rich domain model): [Mutable/OptimisticConcurrencyTests](./Mutable/BusinessLogicTests.cs).
-3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/OptimisticConcurrencyTests](./Mixed/BusinessLogicTests.cs).
+1. Immutable, with functional command handlers composition and entities as anemic data model: [Immutable/OptimisticConcurrencyTests](./Immutable/OptimisticConcurrencyTests.cs).
+2. Classical, mutable aggregates (rich domain model): [Mutable/OptimisticConcurrencyTests](./Mutable/OptimisticConcurrencyTests.cs).
+3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/OptimisticConcurrencyTests](./Mixed/OptimisticConcurrencyTests.cs).
 
 Select your preferred approach (or all) to solve this use case using EventStoreDB. Fill appropriate `EventStoreClientExtensions`
 
