@@ -35,26 +35,6 @@ public static class ShoppingCartDetailsProjection
         };
     }
 
-    public static void Handle(EventEnvelope<ShoppingCartConfirmed> eventEnvelope, ShoppingCartDetails view)
-    {
-        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
-            return;
-
-        view.Status = ShoppingCartStatus.Confirmed;
-        view.Version++;
-        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
-    }
-
-    public static void Handle(EventEnvelope<ShoppingCartCanceled> eventEnvelope, ShoppingCartDetails view)
-    {
-        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
-            return;
-
-        view.Status = ShoppingCartStatus.Canceled;
-        view.Version++;
-        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
-    }
-
     public static void Handle(EventEnvelope<ProductItemAddedToShoppingCart> eventEnvelope, ShoppingCartDetails view)
     {
         if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
@@ -100,6 +80,26 @@ public static class ShoppingCartDetailsProjection
             existingProductItem.Quantity -= productItem.Quantity;
         }
 
+        view.Version++;
+        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
+    }
+
+    public static void Handle(EventEnvelope<ShoppingCartConfirmed> eventEnvelope, ShoppingCartDetails view)
+    {
+        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
+            return;
+
+        view.Status = ShoppingCartStatus.Confirmed;
+        view.Version++;
+        view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
+    }
+
+    public static void Handle(EventEnvelope<ShoppingCartCanceled> eventEnvelope, ShoppingCartDetails view)
+    {
+        if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
+            return;
+
+        view.Status = ShoppingCartStatus.Canceled;
         view.Version++;
         view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }

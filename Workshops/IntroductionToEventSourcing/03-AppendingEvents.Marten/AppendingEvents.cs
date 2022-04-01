@@ -79,10 +79,10 @@ public class GettingStateFromEventsTests
             new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        var options = new StoreOptions();
-        options.Connection("PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'");
+        const string connectionString =
+            "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'";
 
-        using var documentStore = new DocumentStore(options);
+        using var documentStore = DocumentStore.For(connectionString);
         await using var documentSession = documentStore.LightweightSession();
 
         documentSession.Listeners.Add(MartenEventsChangesListener.Instance);

@@ -1079,4 +1079,4 @@ It contains a weekly updated list of materials I found valuable and educational.
 
 ---
 
-**EventSourcing.NetCore** is Copyright &copy; 2017-2022 [Oskar Dudycz](http://oskar-dudycz.pl) and other contributors under the [MIT license](LICENSE).
+**EventSourcing.NetCore** is Copyright &copy; 2017-2022 [Oskar Dudycz](http://event-driven.io) and other contributors under the [MIT license](LICENSE).
