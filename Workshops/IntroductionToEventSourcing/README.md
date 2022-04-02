@@ -19,6 +19,8 @@ The emphasis will be on a pragmatic understanding of architectures and applying 
 
 You can do the workshop as a self-paced kit. That should give you a good foundation for starting your journey with Event Sourcing and learning tools like Marten and EventStoreDB. If you'd like to get full coverage with all nuances of the private workshop, feel free to contact me via [email](mailto:oskar.dudycz@gmail.com).
 
+Read also more in my article [Introduction to Event Sourcing - Self Paced Kit](https://event-driven.io/en/introduction_to_event_sourcing/?utm_source=event_sourcing_net).
+
 ## Exercises
 
 1. [Events definition](./01-EventsDefinition).
