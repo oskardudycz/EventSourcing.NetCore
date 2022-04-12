@@ -7,7 +7,6 @@
 
     <ItemGroup>
         <PackageReference Include="EventStore.Client.Grpc.Streams" Version="22.0.0" />
-        <PackageReference Include="Grpc.Net.Client" Version="2.43.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />

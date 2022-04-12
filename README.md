@@ -20,6 +20,7 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
     - [2.4 The Light and The Dark Side of the Event-Driven Design](#24-the-light-and-the-dark-side-of-the-event-driven-design)
     - [2.5 Conversation with Yves Lorphelin about CQRS](#25-conversation-with-yves-lorphelin-about-cqrs)
     - [2.6. Never Lose Data Again - Event Sourcing to the Rescue!](#26-never-lose-data-again---event-sourcing-to-the-rescue)
+    - [2.7. How to deal with privacy and GDPR in Event-Sourced systems](#27-how-to-deal-with-privacy-and-gdpr-in-event-sourced-systems)
   - [3. Support](#3-support)
   - [4. Prerequisites](#4-prerequisites)
   - [5. Tools used](#5-tools-used)
@@ -575,6 +576,10 @@ Read more in the article:
 ### 2.6. Never Lose Data Again - Event Sourcing to the Rescue!
 
 <a href="https://www.youtube.com/watch?v=fDC465jJoDk" target="_blank"><img src="https://img.youtube.com/vi/fDC465jJoDk/0.jpg" alt="Never Lose Data Again - Event Sourcing to the Rescue!" width="320" height="240" border="10" /></a>
+
+### 2.7. How to deal with privacy and GDPR in Event-Sourced systems
+
+<a href="https://www.youtube.com/watch?v=CI7JPFLlpBw" target="_blank"><img src="https://img.youtube.com/vi/CI7JPFLlpBw/0.jpg" alt="How to deal with privacy and GDPR in Event-Sourced systems" width="320" height="240" border="10" /></a>
 
 ## 3. Support
 
