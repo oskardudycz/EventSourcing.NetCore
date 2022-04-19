@@ -6,7 +6,7 @@ namespace Core.Api.Testing;
 
 public static class TestWebHostBuilder
 {
-    public static IWebHostBuilder Create(Dictionary<string, string> configuration, Action<IServiceCollection>? configureServices = null)
+    public static IWebHostBuilder Create(Action<IServiceCollection>? configureServices = null)
     {
         var projectDir = Directory.GetCurrentDirectory();
         configureServices ??= _ => { };
@@ -17,7 +17,6 @@ public static class TestWebHostBuilder
             .UseConfiguration(new ConfigurationBuilder()
                 .SetBasePath(projectDir)
                 .AddJsonFile("appsettings.json", true)
-                .AddInMemoryCollection(configuration)
                 .Build()
             )
             .ConfigureServices(configureServices);

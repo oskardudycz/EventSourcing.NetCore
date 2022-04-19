@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using Core.Api.Testing;
-using Core.Commands;
 using Core.Events;
 using Core.Events.External;
 using Core.Requests;
@@ -16,7 +15,7 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
     private readonly DummyExternalCommandBus externalCommandBus = new();
 
     public override TestContext CreateTestContext() =>
-        new TestContext<TStartup>(GetConfiguration, services =>
+        new TestContext<TStartup>(services =>
         {
             SetupServices?.Invoke(services);
             services.AddSingleton(eventsLog);
@@ -30,14 +29,9 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
         }, SetupWebHostBuilder);
 
 
-    public IReadOnlyCollection<TEvent> PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent
+    public void PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent
     {
-        return externalEventProducer.PublishedEvents.OfType<TEvent>().ToList();
-    }
-
-    public IReadOnlyCollection<TCommand> PublishedExternalCommandOfType<TCommand>() where TCommand : ICommand
-    {
-        return externalCommandBus.SentCommands.OfType<TCommand>().ToList();
+        externalEventProducer.PublishedEvents.OfType<TEvent>().ToList().Should().NotBeEmpty();
     }
 
     public Task PublishInternalEvent<TEvent>(TEvent @event, CancellationToken ct = default) where TEvent : notnull =>

@@ -11,7 +11,7 @@ namespace Core.Api.Testing;
 public abstract class ApiFixture<TStartup>: ApiFixture where TStartup : class
 {
     public override TestContext CreateTestContext() =>
-        new TestContext<TStartup>(GetConfiguration, SetupServices, SetupWebHostBuilder);
+        new TestContext<TStartup>(SetupServices, SetupWebHostBuilder);
 }
 
 public abstract class ApiFixture: IAsyncLifetime
@@ -37,7 +37,7 @@ public abstract class ApiFixture: IAsyncLifetime
         Sut = CreateTestContext();
     }
 
-    public virtual TestContext CreateTestContext() => new(GetConfiguration, SetupServices, SetupWebHostBuilder);
+    public virtual TestContext CreateTestContext() => new(SetupServices, SetupWebHostBuilder);
 
     public virtual Task InitializeAsync() => Task.CompletedTask;
 
