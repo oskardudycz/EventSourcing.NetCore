@@ -1,89 +1,57 @@
-﻿using System.Net;
-using Core.Api.Testing;
-using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
+﻿using Ogooreck.API;
+using static Ogooreck.API.ApiSpecification;
 using Warehouse.Products.GettingProductDetails;
 using Warehouse.Products.RegisteringProduct;
 using Xunit;
 
 namespace Warehouse.Api.Tests.Products.GettingProductDetails;
 
-public class GetProductDetailsFixture: ApiFixture
-{
-    protected override string ApiUrl => "/api/products";
-
-    protected override Func<IWebHostBuilder, IWebHostBuilder> SetupWebHostBuilder =>
-        whb => WarehouseTestWebHostBuilder.Configure(whb, nameof(GetProductDetailsFixture));
-
-    public ProductDetails ExistingProduct = default!;
-
-    public Guid ProductId = default!;
-
-    public override async Task InitializeAsync()
-    {
-        var registerProduct = new RegisterProductRequest("IN11111", "ValidName", "ValidDescription");
-        var registerResponse = await Post(registerProduct);
-
-        registerResponse.EnsureSuccessStatusCode()
-            .StatusCode.Should().Be(HttpStatusCode.Created);
-
-        ProductId = await registerResponse.GetResultFromJson<Guid>();
-
-        var (sku, name, description) = registerProduct;
-        ExistingProduct = new ProductDetails(ProductId, sku!, name!, description);
-    }
-}
-
 public class GetProductDetailsTests: IClassFixture<GetProductDetailsFixture>
 {
-    private readonly GetProductDetailsFixture fixture;
+    private readonly GetProductDetailsFixture API;
 
-    public GetProductDetailsTests(GetProductDetailsFixture fixture)
-    {
-        this.fixture = fixture;
-    }
+    public GetProductDetailsTests(GetProductDetailsFixture api) => API = api;
 
     [Fact]
-    public async Task ValidRequest_With_NoParams_ShouldReturn_200()
-    {
-        // Given
-
-        // When
-        var response = await fixture.Get(fixture.ProductId.ToString());
-
-        // Then
-        response.EnsureSuccessStatusCode()
-            .StatusCode.Should().Be(HttpStatusCode.OK);
-
-        var product = await response.GetResultFromJson<ProductDetails>();
-        product.Should().NotBeNull();
-        product.Should().BeEquivalentTo(fixture.ExistingProduct);
-    }
+    public Task ValidRequest_With_NoParams_ShouldReturn_200() =>
+        API.Given(URI($"/api/products/{API.ExistingProduct.Id}"))
+            .When(GET)
+            .Then(OK, RESPONSE_BODY(API.ExistingProduct));
 
     [Theory]
     [InlineData(12)]
     [InlineData("not-a-guid")]
-    public async Task InvalidGuidId_ShouldReturn_404(object invalidId)
-    {
-        // Given
-
-        // When
-        var response = await fixture.Get($"{invalidId}");
-
-        // Then
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
+    public Task InvalidGuidId_ShouldReturn_400(object invalidId) =>
+        API.Given(URI($"/api/products/{invalidId}"))
+            .When(GET)
+            .Then(BAD_REQUEST);
 
     [Fact]
-    public async Task NotExistingId_ShouldReturn_404()
+    public Task NotExistingId_ShouldReturn_404() =>
+        API.Given(URI($"/api/products/{Guid.NewGuid()}"))
+            .When(GET)
+            .Then(NOT_FOUND);
+}
+
+
+public class GetProductDetailsFixture: ApiSpecification<Program>, IAsyncLifetime
+{
+    public ProductDetails ExistingProduct = default!;
+
+    public GetProductDetailsFixture(): base(new WarehouseTestWebApplicationFactory()) { }
+
+    public async Task InitializeAsync()
     {
-        // Given
-        var notExistingId = Guid.NewGuid();
+        var registerProduct = new RegisterProductRequest("IN11111", "ValidName", "ValidDescription");
+        var registerResponse = await Send(
+            new ApiRequest(POST, URI("/api/products"), BODY(registerProduct))
+        );
 
-        // When
-        var response = await fixture.Get($"{notExistingId}");
+        await CREATED(registerResponse);
 
-        // Then
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        var (sku, name, description) = registerProduct;
+        ExistingProduct = new ProductDetails(registerResponse.GetCreatedId<Guid>(), sku!, name!, description);
     }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }

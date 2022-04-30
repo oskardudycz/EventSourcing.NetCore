@@ -8,14 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Testing;
 
-public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where TStartup : class
+public abstract class ApiWithEventsFixture<TProject>: ApiFixture<TProject> where TProject : class
 {
     private readonly EventsLog eventsLog = new();
     private readonly DummyExternalEventProducer externalEventProducer = new();
     private readonly DummyExternalCommandBus externalCommandBus = new();
 
-    public override TestContext CreateTestContext() =>
-        new TestContext<TStartup>(services =>
+    public override TestContext<TProject> CreateTestContext() =>
+        new(services =>
         {
             SetupServices?.Invoke(services);
             services.AddSingleton(eventsLog);
@@ -26,7 +26,7 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
                     sp.GetRequiredService<IExternalEventProducer>()));
             services.AddSingleton<IExternalCommandBus>(externalCommandBus);
             services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
-        }, SetupWebHostBuilder);
+        });
 
 
     public void PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent
@@ -41,7 +41,7 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
     public async Task PublishInternalEvent<TEvent>(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct = default)
         where TEvent : notnull
     {
-        using var scope = Server.Host.Services.CreateScope();
+        using var scope = Sut.Services.CreateScope();
         var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
 
         await eventBus.Publish(eventEnvelope, ct);
@@ -79,8 +79,4 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
             retryCount--;
         } while (!finished);
     }
-}
-
-public abstract class ApiWithEventsFixture: ApiFixture
-{
 }
