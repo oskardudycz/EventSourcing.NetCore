@@ -1,48 +1,43 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Api.Testing;
 
-public class TestContext<TStartup>: TestContext
-    where TStartup : class
-{
-    public TestContext(
-        Action<IServiceCollection>? setupServices = null,
-        Func<IWebHostBuilder, IWebHostBuilder>? setupWebHostBuilder = null
-    ): base(setupServices, (webHostBuilder =>
-    {
-        SetupWebHostBuilder(webHostBuilder);
-        setupWebHostBuilder?.Invoke(webHostBuilder);
-        return webHostBuilder;
-    }))
-    {
-    }
-
-    private static IWebHostBuilder SetupWebHostBuilder(IWebHostBuilder webHostBuilder) =>
-        webHostBuilder.UseStartup<TStartup>();
-}
-
-public class TestContext: IDisposable
+public class TestContext<TProgram>: IDisposable where TProgram : class
 {
     public HttpClient Client { get; }
+    public IServiceProvider Services => applicationFactory.Services;
 
-    public readonly TestServer Server;
-    public TestContext(
-        Action<IServiceCollection>? setupServices = null,
-        Func<IWebHostBuilder, IWebHostBuilder>? setupWebHostBuilder = null
-    )
+    private readonly WebApplicationFactory<TProgram> applicationFactory;
+
+    public TestContext(Action<IServiceCollection>? setupServices = null)
     {
-        setupWebHostBuilder ??= webHostBuilder => webHostBuilder;
-        Server = new TestServer(setupWebHostBuilder(TestWebHostBuilder.Create(services =>
-        {
-            ConfigureTestServices(services);
-            setupServices?.Invoke(services);
-        })));
+        applicationFactory = new WebApplicationFactory<TProgram>()
+            .WithWebHostBuilder(
+                builder =>
+                {
+                    var projectDir = Directory.GetCurrentDirectory();
+
+                    builder
+                        .UseEnvironment("Development")
+                        .UseContentRoot(projectDir)
+                        .UseConfiguration(new ConfigurationBuilder()
+                            .SetBasePath(projectDir)
+                            .AddJsonFile("appsettings.json", true)
+                            .Build()
+                        )
+                        .ConfigureServices(services =>
+                        {
+                            ConfigureTestServices(services);
+                            setupServices?.Invoke(services);
+                        });
+                }
+            );
 
 
-        Client = Server.CreateClient();
+        Client = applicationFactory.CreateClient();
     }
 
     protected virtual void ConfigureTestServices(IServiceCollection services)
@@ -51,7 +46,7 @@ public class TestContext: IDisposable
 
     public void Dispose()
     {
-        Server.Dispose();
+        applicationFactory.Dispose();
         Client.Dispose();
     }
 }

@@ -1,19 +1,17 @@
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Warehouse;
 
-var builder = Host.CreateDefaultBuilder(args)
+Host.CreateDefaultBuilder(args)
     .ConfigureWebHostDefaults(webBuilder =>
     {
         webBuilder
             .ConfigureServices(services =>
-            {
                 services.AddRouting()
                     .AddWarehouseServices()
                     .AddEndpointsApiExplorer()
-                    .AddSwaggerGen();
-            })
+                    .AddSwaggerGen()
+            )
             .Configure(app =>
-            {
                 app.UseExceptionHandlingMiddleware()
                     .UseRouting()
                     .UseEndpoints(endpoints =>
@@ -22,8 +20,12 @@ var builder = Host.CreateDefaultBuilder(args)
                     })
                     .ConfigureWarehouse()
                     .UseSwagger()
-                    .UseSwaggerUI();
-            });
+                    .UseSwaggerUI()
+            );
     })
-    .Build();
-builder.Run();
+    .Build()
+    .Run();
+
+public partial class Program
+{
+}
