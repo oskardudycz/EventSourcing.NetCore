@@ -12,7 +12,7 @@ public class TestContext<TProgram>: IDisposable where TProgram : class
 
     private readonly WebApplicationFactory<TProgram> applicationFactory;
 
-    public TestContext(Action<IServiceCollection>? setupServices = null)
+    public TestContext()
     {
         applicationFactory = new WebApplicationFactory<TProgram>()
             .WithWebHostBuilder(
@@ -27,21 +27,12 @@ public class TestContext<TProgram>: IDisposable where TProgram : class
                             .SetBasePath(projectDir)
                             .AddJsonFile("appsettings.json", true)
                             .Build()
-                        )
-                        .ConfigureServices(services =>
-                        {
-                            ConfigureTestServices(services);
-                            setupServices?.Invoke(services);
-                        });
+                        );
                 }
             );
 
 
         Client = applicationFactory.CreateClient();
-    }
-
-    protected virtual void ConfigureTestServices(IServiceCollection services)
-    {
     }
 
     public void Dispose()

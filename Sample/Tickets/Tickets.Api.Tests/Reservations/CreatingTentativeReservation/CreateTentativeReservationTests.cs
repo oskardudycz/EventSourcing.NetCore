@@ -18,7 +18,7 @@ public class CreateTentativeReservationFixture: ApiWithEventsFixture<Startup>
 {
     protected override string ApiUrl => "/api/Reservations";
 
-    protected override Dictionary<string, string> GetConfiguration(string fixtureName) =>
+    protected virtual Dictionary<string, string> GetConfiguration(string fixtureName) =>
         TestConfiguration.Get(fixtureName);
 
     public readonly Guid SeatId = Guid.NewGuid();
