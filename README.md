@@ -609,7 +609,7 @@ docker-compose up
 1. [Marten](https://martendb.io/) - Event Store and Read Models
 2. [EventStoreDB](https://eventstore.com) - Event Store 
 3. [MediatR](https://github.com/jbogard/MediatR) - Internal In-Memory Message Bus (for processing Commands, Queries, Events)
-4. [Kafka](https://github.com/jbogard/MediatR) - External Durable Message Bus to integrate services
+4. [Kafka](https://kafka.apache.org/) - External Durable Message Bus to integrate services
 5. [ElasticSearch](https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/nest-getting-started.html) - Read Models
 
 ## 6. Samples
