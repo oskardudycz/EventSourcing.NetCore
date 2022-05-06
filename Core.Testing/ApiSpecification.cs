@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Core.Api.Testing;
 using FluentAssertions;
@@ -30,10 +31,27 @@ public static class ApiSpecification
             return request;
         };
 
+    public static Func<HttpRequestMessage, HttpRequestMessage> HEADERS(params Action<HttpRequestHeaders>[] headers) =>
+        request =>
+        {
+            foreach (var header in headers)
+            {
+                header(request.Headers);
+            }
+
+            return request;
+        };
+
+
+    public static Action<HttpRequestHeaders> IF_MATCH(string ifMatch, bool isWeak = true) =>
+        headers => headers.IfMatch.Add(new EntityTagHeaderValue($"\"{ifMatch}\"", isWeak));
+
     ///////////////////
     ////   WHEN    ////
     ///////////////////
     public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> GET = SEND(HttpMethod.Get);
+
+    public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> GET_UNTIL(int sth) => SEND_UNTIL(HttpMethod.Get);
 
     public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> POST = SEND(HttpMethod.Post);
 
@@ -42,6 +60,13 @@ public static class ApiSpecification
     public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> DELETE = SEND(HttpMethod.Delete);
 
     public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> SEND(HttpMethod httpMethod) =>
+        (api, request) =>
+        {
+            request.Method = httpMethod;
+            return api.SendAsync(request);
+        };
+
+    public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> SEND_UNTIL(HttpMethod httpMethod) =>
         (api, request) =>
         {
             request.Method = httpMethod;
@@ -170,10 +195,10 @@ public class ApiSpecification<TProgram>: IDisposable where TProgram : class
             this.when = when;
         }
 
-        public Task<ThenApiSpecificationBuilder> Then(Func<HttpResponseMessage, ValueTask> then) =>
+        public Task<HttpResponseMessage> Then(Func<HttpResponseMessage, ValueTask> then) =>
             Then(new[] { then });
 
-        public async Task<ThenApiSpecificationBuilder> Then(params Func<HttpResponseMessage, ValueTask>[] thens)
+        public async Task<HttpResponseMessage> Then(params Func<HttpResponseMessage, ValueTask>[] thens)
         {
             var request = new ApiRequest(when, given);
 
@@ -184,24 +209,7 @@ public class ApiSpecification<TProgram>: IDisposable where TProgram : class
                 await then(response);
             }
 
-            return new ThenApiSpecificationBuilder(response);
-        }
-    }
-
-    public class ThenApiSpecificationBuilder
-    {
-        private readonly HttpResponseMessage response;
-
-        internal ThenApiSpecificationBuilder(HttpResponseMessage response)
-        {
-            this.response = response;
-        }
-
-        public ThenApiSpecificationBuilder And(Action<HttpResponseMessage> then)
-        {
-            then(response);
-
-            return this;
+            return response;
         }
     }
 

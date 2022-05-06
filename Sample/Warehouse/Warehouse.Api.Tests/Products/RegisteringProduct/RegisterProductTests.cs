@@ -7,7 +7,7 @@ namespace Warehouse.Api.Tests.Products.RegisteringProduct;
 
 public class RegisterProductTests: IClassFixture<WarehouseTestWebApplicationFactory>
 {
-    private ApiSpecification<Program> API;
+    private readonly ApiSpecification<Program> API;
 
     public RegisterProductTests(WarehouseTestWebApplicationFactory webApplicationFactory) =>
         API = ApiSpecification<Program>.Setup(webApplicationFactory);
