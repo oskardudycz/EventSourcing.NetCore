@@ -14,6 +14,8 @@ Add event handlers registrations in [ProjectionsTests](ProjectionsTests.cs) call
 
 Track and implement proper idempotency handling in projection event handlers.
 
+If needed expand existing classes definition.
+
 ## Solutions
 
 Read more in my articles:

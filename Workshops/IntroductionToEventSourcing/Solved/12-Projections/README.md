@@ -12,6 +12,7 @@ With the [Database](./Tools/Database.cs) interface representing the sample datab
 
 Add event handlers registrations in [ProjectionsTests](ProjectionsTests.cs) calling [EventBus.Register](./Tools/EventBus.cs) method.
 
+If needed expand existing classes definition.
 
 ## Solutions
 
