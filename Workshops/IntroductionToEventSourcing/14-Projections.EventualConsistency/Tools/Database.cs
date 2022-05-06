@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 
 public record DataWrapper(object Data, DateTime ValidFrom);
@@ -22,6 +24,9 @@ public class Database
 
     public T? Get<T>(Guid id) where T : class
     {
-        return storage.TryGetValue(id, out var result) && result.ValidFrom <= DateTime.UtcNow ? (T)result.Data : null;
+        return storage.TryGetValue(id, out var result) && result.ValidFrom <= DateTime.UtcNow ?
+            // Clone to simulate getting new instance on loading
+            JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(result.Data))!
+            : null;
     }
 }

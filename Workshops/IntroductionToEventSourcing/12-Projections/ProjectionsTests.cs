@@ -148,12 +148,8 @@ public class ProjectionsTests
         var database = new Database();
 
         // TODO:
-        // 1. Register here your event handlers using `eventBus.Register`, e.g.
-        eventBus.Register((EventEnvelope<ShoppingCartOpened> @event) =>
-        {
-            // 2. Store results in database.
-        });
-
+        // 1. Register here your event handlers using `eventBus.Register`.
+        // 2. Store results in database.
         eventBus.Publish(events);
 
         // first confirmed
@@ -165,8 +161,8 @@ public class ProjectionsTests
         shoppingCart.ProductItems.Should().HaveCount(2);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
 
-        shoppingCart.ProductItems[0].Should().Be(pairOfShoes);
-        shoppingCart.ProductItems[1].Should().Be(tShirt);
+        shoppingCart.ProductItems.Should().Contain(pairOfShoes);
+        shoppingCart.ProductItems.Should().Contain(tShirt);
 
         // cancelled
         shoppingCart = database.Get<ShoppingCartDetails>(cancelledShoppingCartId)!;
@@ -177,7 +173,7 @@ public class ProjectionsTests
         shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Canceled);
 
-        shoppingCart.ProductItems[0].Should().Be(dress);
+        shoppingCart.ProductItems.Should().Contain(dress);
 
         // confirmed but other client
         shoppingCart = database.Get<ShoppingCartDetails>(otherClientShoppingCartId)!;
@@ -188,7 +184,7 @@ public class ProjectionsTests
         shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
 
-        shoppingCart.ProductItems[0].Should().Be(dress);
+        shoppingCart.ProductItems.Should().Contain(dress);
 
         // second confirmed
         shoppingCart = database.Get<ShoppingCartDetails>(otherConfirmedShoppingCartId)!;
@@ -199,7 +195,7 @@ public class ProjectionsTests
         shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
 
-        shoppingCart.ProductItems[0].Should().Be(trousers);
+        shoppingCart.ProductItems.Should().Contain(trousers);
 
         // first pending
         shoppingCart = database.Get<ShoppingCartDetails>(otherPendingShoppingCartId)!;
