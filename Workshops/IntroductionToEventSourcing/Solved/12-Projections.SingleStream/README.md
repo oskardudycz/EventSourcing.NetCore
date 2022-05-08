@@ -6,9 +6,10 @@ With the [Database](./Tools/Database.cs) interface representing the sample datab
     - total amount of products in the basket,
     - total number of products
     - list of products (e.g. if someone added the same product twice, then we should have one element with the sum).
-2. View of the summary of the customer's purchases, where we have information about:
-    - the number of all products in the confirmed shopping carts
-    - the total amount of confirmed product items.
+2. View with short information about pending shopping carts. It's intended to be used as list view for administration:
+    - total amount of products in the basket,
+    - total number of products
+    - confirmed and canceled shopping carts should not be visible.
 
 Add event handlers registrations in [ProjectionsTests](ProjectionsTests.cs) calling [EventBus.Register](./Tools/EventBus.cs) method.
 
