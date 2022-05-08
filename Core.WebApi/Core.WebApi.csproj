@@ -6,7 +6,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
     </ItemGroup>
 
     <ItemGroup>
