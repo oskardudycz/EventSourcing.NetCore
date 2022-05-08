@@ -6,21 +6,35 @@ public record DataWrapper(object Data, DateTime ValidFrom);
 
 public class Database
 {
-    private readonly Dictionary<Guid, DataWrapper> storage = new();
+    private readonly Dictionary<string, List<DataWrapper>> storage = new();
     private readonly Random random = new();
 
     public void Store<T>(Guid id, T obj) where T : class
     {
-        var validFrom = DateTime.UtcNow.AddMilliseconds(random.Next(250, 1000));
+        if(!storage.ContainsKey(GetId<T>(id)))
+            storage[GetId<T>(id)] =  new List<DataWrapper>();
 
-        storage[id] = new DataWrapper(obj, validFrom);
+        var validFrom = DateTime.UtcNow.AddMilliseconds(random.Next(50, 100));
+
+        storage[GetId<T>(id)].Add(new DataWrapper(obj, validFrom));
+    }
+
+    public void Delete<T>(Guid id)
+    {
+        storage.Remove(GetId<T>(id));
     }
 
     public T? Get<T>(Guid id) where T : class
     {
-        return storage.TryGetValue(id, out var result) && result.ValidFrom <= DateTime.UtcNow ?
-            // Clone to simulate getting new instance on loading
-            JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(result.Data))!
+        if (!storage.TryGetValue(GetId<T>(id), out var result))
+            return null;
+
+        var item = result.LastOrDefault(item => item.ValidFrom <= DateTime.UtcNow);
+
+        return item != null ?
+            JsonSerializer.Deserialize<T>(JsonSerializer.Serialize((T)item.Data))
             : null;
     }
+
+    private static string GetId<T>(Guid id) => $"{typeof(T).Name}-{id}";
 }

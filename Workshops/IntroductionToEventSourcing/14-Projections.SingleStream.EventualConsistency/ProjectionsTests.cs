@@ -59,11 +59,165 @@ public class ShoppingCartDetails
     public decimal TotalItemsCount { get; set; }
 }
 
-public class ShoppingCartsClientSummary
+public class ShoppingCartShortInfo
 {
     public Guid Id { get; set; }
-    public decimal TotalAmount { get; set; }
+    public Guid ClientId { get; set; }
+    public decimal TotalPrice { get; set; }
     public decimal TotalItemsCount { get; set; }
+}
+
+public static class DatabaseExtensions
+{
+    public static void GetAndStore<T>(this Database database, Guid id, Func<T, T> update) where T : class, new ()
+    {
+        var item = database.Get<T>(id) ?? new T();
+
+        database.Store(id, update(item));
+    }
+}
+
+public class ShoppingCartDetailsProjection
+{
+    private readonly Database database;
+    public ShoppingCartDetailsProjection(Database database) => this.database = database;
+
+    public void Handle(EventEnvelope<ShoppingCartOpened> @event) =>
+        database.Store(@event.Data.ShoppingCartId,
+            new ShoppingCartDetails
+            {
+                Id = @event.Data.ShoppingCartId,
+                Status = ShoppingCartStatus.Pending,
+                ClientId = @event.Data.ClientId,
+                ProductItems = new List<PricedProductItem>(),
+                TotalPrice = 0,
+                TotalItemsCount = 0
+            });
+
+    public void Handle(EventEnvelope<ProductItemAddedToShoppingCart> @event) =>
+        database.GetAndStore<ShoppingCartDetails>(@event.Data.ShoppingCartId, item =>
+        {
+            var productItem = @event.Data.ProductItem;
+            var existingProductItem = item.ProductItems.SingleOrDefault(p => p.ProductId == productItem.ProductId);
+
+            if (existingProductItem == null)
+            {
+                item.ProductItems.Add(productItem);
+            }
+            else
+            {
+                item.ProductItems.Remove(existingProductItem);
+                item.ProductItems.Add(
+                    new PricedProductItem(
+                        existingProductItem.ProductId,
+                        existingProductItem.Quantity + productItem.Quantity,
+                        existingProductItem.UnitPrice
+                    )
+                );
+            }
+
+            item.TotalPrice += productItem.TotalAmount;
+            item.TotalItemsCount += productItem.Quantity;
+
+            return item;
+        });
+
+    public void Handle(EventEnvelope<ProductItemRemovedFromShoppingCart> @event) =>
+        database.GetAndStore<ShoppingCartDetails>(@event.Data.ShoppingCartId, item =>
+        {
+            var productItem = @event.Data.ProductItem;
+            var existingProductItem = item.ProductItems.SingleOrDefault(p => p.ProductId == productItem.ProductId);
+
+            if (existingProductItem == null || existingProductItem.Quantity - productItem.Quantity < 0)
+                // You may consider throwing exception here, depending on your strategy
+                return item;
+
+            if (existingProductItem.Quantity - productItem.Quantity == 0)
+            {
+                item.ProductItems.Remove(productItem);
+            }
+            else
+            {
+                item.ProductItems.Remove(existingProductItem);
+                item.ProductItems.Add(
+                    new PricedProductItem(
+                        existingProductItem.ProductId,
+                        existingProductItem.Quantity - productItem.Quantity,
+                        existingProductItem.UnitPrice
+                    )
+                );
+            }
+
+            item.TotalPrice -= productItem.TotalAmount;
+            item.TotalItemsCount -= productItem.Quantity;
+
+            return item;
+        });
+
+    public void Handle(EventEnvelope<ShoppingCartConfirmed> @event) =>
+        database.GetAndStore<ShoppingCartDetails>(@event.Data.ShoppingCartId, item =>
+        {
+            item.Status = ShoppingCartStatus.Confirmed;
+            item.ConfirmedAt = DateTime.UtcNow;
+
+            return item;
+        });
+
+
+    public void Handle(EventEnvelope<ShoppingCartCanceled> @event) =>
+        database.GetAndStore<ShoppingCartDetails>(@event.Data.ShoppingCartId, item =>
+        {
+            item.Status = ShoppingCartStatus.Canceled;
+            item.CanceledAt = DateTime.UtcNow;
+
+            return item;
+        });
+}
+
+public class ShoppingCartShortInfoProjection
+{
+    private readonly Database database;
+
+    public ShoppingCartShortInfoProjection(Database database) => this.database = database;
+
+    public void Handle(EventEnvelope<ShoppingCartOpened> @event) =>
+        database.Store(@event.Data.ShoppingCartId,
+            new ShoppingCartShortInfo
+            {
+                Id = @event.Data.ShoppingCartId,
+                ClientId = @event.Data.ClientId,
+                TotalPrice = 0,
+                TotalItemsCount = 0
+            });
+
+    public void Handle(EventEnvelope<ProductItemAddedToShoppingCart> @event) =>
+        database.GetAndStore<ShoppingCartShortInfo>(@event.Data.ShoppingCartId, item =>
+        {
+            var productItem = @event.Data.ProductItem;
+
+            item.TotalPrice += productItem.TotalAmount;
+            item.TotalItemsCount += productItem.Quantity;
+
+            return item;
+        });
+
+    public void Handle(EventEnvelope<ProductItemRemovedFromShoppingCart> @event) =>
+        database.GetAndStore<ShoppingCartShortInfo>(@event.Data.ShoppingCartId, item =>
+        {
+            var productItem = @event.Data.ProductItem;
+
+            item.TotalPrice -= productItem.TotalAmount;
+            item.TotalItemsCount -= productItem.Quantity;
+
+            return item;
+        });
+
+    public void Handle(EventEnvelope<ShoppingCartConfirmed> @event) =>
+        database.Delete<ShoppingCartShortInfo>(@event.Data.ShoppingCartId);
+
+
+    public void Handle(EventEnvelope<ShoppingCartCanceled> @event) =>
+        database.Delete<ShoppingCartShortInfo>(@event.Data.ShoppingCartId);
 }
 
 public class ProjectionsTests
@@ -148,72 +302,86 @@ public class ProjectionsTests
         var database = new Database();
 
         // TODO:
-        // 1. Register here your event handlers using `eventBus.Register`, e.g.
-        eventBus.Register((EventEnvelope<ShoppingCartOpened> @event) =>
-        {
-            // 2. Store results in database.
-        });
+        // 1. Register here your event handlers using `eventBus.Register`.
+        // 2. Store results in database.
+        var shoppingCartDetailsProjection = new ShoppingCartDetailsProjection(database);
+
+        eventBus.Register<ShoppingCartOpened>(shoppingCartDetailsProjection.Handle);
+        eventBus.Register<ProductItemAddedToShoppingCart>(shoppingCartDetailsProjection.Handle);
+        eventBus.Register<ProductItemRemovedFromShoppingCart>(shoppingCartDetailsProjection.Handle);
+        eventBus.Register<ShoppingCartConfirmed>(shoppingCartDetailsProjection.Handle);
+        eventBus.Register<ShoppingCartCanceled>(shoppingCartDetailsProjection.Handle);
+
+        var shoppingCartShortInfoProjection = new ShoppingCartShortInfoProjection(database);
+
+        eventBus.Register<ShoppingCartOpened>(shoppingCartShortInfoProjection.Handle);
+        eventBus.Register<ProductItemAddedToShoppingCart>(shoppingCartShortInfoProjection.Handle);
+        eventBus.Register<ProductItemRemovedFromShoppingCart>(shoppingCartShortInfoProjection.Handle);
+        eventBus.Register<ShoppingCartConfirmed>(shoppingCartShortInfoProjection.Handle);
+        eventBus.Register<ShoppingCartCanceled>(shoppingCartShortInfoProjection.Handle);
 
         eventBus.Publish(events);
 
         // first confirmed
         var shoppingCart = database.Get<ShoppingCartDetails>(shoppingCartId)!;
-
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(2);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
+        shoppingCart.ProductItems.Should().HaveCount(2);
+        shoppingCart.ProductItems.Should().Contain(pairOfShoes);
+        shoppingCart.ProductItems.Should().Contain(tShirt);
 
-        shoppingCart.ProductItems[0].Should().Be(pairOfShoes);
-        shoppingCart.ProductItems[1].Should().Be(tShirt);
+        var shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(shoppingCartId);
+        shoppingCartShortInfo.Should().BeNull();
 
         // cancelled
         shoppingCart = database.Get<ShoppingCartDetails>(cancelledShoppingCartId)!;
-
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(cancelledShoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Canceled);
+        shoppingCart.ProductItems.Should().HaveCount(1);
+        shoppingCart.ProductItems.Should().Contain(dress);
 
-        shoppingCart.ProductItems[0].Should().Be(dress);
+        shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(cancelledShoppingCartId)!;
+        shoppingCartShortInfo.Should().BeNull();
 
         // confirmed but other client
         shoppingCart = database.Get<ShoppingCartDetails>(otherClientShoppingCartId)!;
-
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(otherClientShoppingCartId);
         shoppingCart.ClientId.Should().Be(otherClientId);
-        shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
+        shoppingCart.ProductItems.Should().HaveCount(1);
+        shoppingCart.ProductItems.Should().Contain(dress);
 
-        shoppingCart.ProductItems[0].Should().Be(dress);
+        shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(otherClientShoppingCartId);
+        shoppingCartShortInfo.Should().BeNull();
 
         // second confirmed
         shoppingCart = database.Get<ShoppingCartDetails>(otherConfirmedShoppingCartId)!;
-
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(otherConfirmedShoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
+        shoppingCart.ProductItems.Should().HaveCount(1);
+        shoppingCart.ProductItems.Should().Contain(trousers);
 
-        shoppingCart.ProductItems[0].Should().Be(trousers);
+        shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(otherConfirmedShoppingCartId);
+        shoppingCartShortInfo.Should().BeNull();
 
         // first pending
         shoppingCart = database.Get<ShoppingCartDetails>(otherPendingShoppingCartId)!;
-
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(otherPendingShoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().BeEmpty();
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Pending);
+        shoppingCart.ProductItems.Should().BeEmpty();
 
-        // summary
-        var summary = database.Get<ShoppingCartsClientSummary>(clientId)!;
-        summary.Id.Should().Be(clientId);
-        summary.TotalItemsCount.Should().Be(3);
-        summary.TotalAmount.Should().Be(pairOfShoes.TotalAmount + tShirt.TotalAmount + trousers.TotalAmount);
+        shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(otherPendingShoppingCartId)!;
+        shoppingCartShortInfo.Should().NotBeNull();
+        shoppingCartShortInfo.Id.Should().Be(otherPendingShoppingCartId);
+        shoppingCartShortInfo.ClientId.Should().Be(clientId);
     }
 }

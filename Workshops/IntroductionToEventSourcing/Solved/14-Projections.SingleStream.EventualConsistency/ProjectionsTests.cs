@@ -66,26 +66,35 @@ public class ShoppingCartDetails: IVersioned
     public ulong Version { get; set; }
 }
 
-public class ShoppingCartsClientSummary: IVersioned
+public class ShoppingCartShortInfo: IVersioned
 {
     public Guid Id { get; set; }
-    public decimal TotalAmount { get; set; }
+    public Guid ClientId { get; set; }
+    public decimal TotalPrice { get; set; }
     public decimal TotalItemsCount { get; set; }
-
     public ulong Version { get; set; }
 }
 
 public static class DatabaseExtensions
 {
-    public static T GetWithRetries<T>(this Database database, Guid id, ulong expectedVersion)
+    public static T? GetExpectingGreaterOrEqualVersionWithRetries<T>(this Database database, Guid id, ulong expectedVersion)
         where T : class, IVersioned, new()
     {
         T? item;
+        var triesLeft = 4;
 
         do
         {
-            item = database.Get<T>(id, expectedVersion);
-        } while (item == null);
+            item = database.Get<T>(id);
+
+            if (item != null && item.Version < expectedVersion)
+                item = null;
+
+            triesLeft--;
+
+            if(triesLeft > 0) Thread.Sleep(50);
+
+        } while (item == null && triesLeft > 0);
 
         return item;
     }
@@ -95,11 +104,17 @@ public static class DatabaseExtensions
     {
         var expectedVersion = currentVersion - 1;
 
-        var item = database.GetWithRetries<T>(id, expectedVersion);
+        var item = database.GetExpectingGreaterOrEqualVersionWithRetries<T>(id, expectedVersion);
+
+        if (item == null)
+            throw new Exception($"Item with id: '{id}' and expected version: {expectedVersion} not found!");
+
+        if (item.Version > expectedVersion)
+            return;
 
         item.Version = currentVersion;
 
-        database.Store(id, expectedVersion, update(item));
+        database.Store(id, update(item));
     }
 }
 
@@ -111,7 +126,6 @@ public class ShoppingCartDetailsProjection
     public void Handle(EventEnvelope<ShoppingCartOpened> @event) =>
         database.Store(
             @event.Data.ShoppingCartId,
-            @event.Metadata.StreamPosition - 1,
             new ShoppingCartDetails
             {
                 Id = @event.Data.ShoppingCartId,
@@ -215,30 +229,58 @@ public class ShoppingCartDetailsProjection
             });
 }
 
-public class ShoppingCartsClientSummaryProjection
+public class ShoppingCartShortInfoProjection
 {
     private readonly Database database;
 
-    public ShoppingCartsClientSummaryProjection(Database database) => this.database = database;
+    public ShoppingCartShortInfoProjection(Database database) => this.database = database;
 
-    public void Handle(EventEnvelope<ShoppingCartConfirmed> @event)
-    {
-        // QUESTION: What are the potential issues with that?
-        // What are the other options to solve that?
-        var details = database.Get<ShoppingCartDetails>(@event.Data.ShoppingCartId, @event.Metadata.StreamPosition - 1)!;
+    public void Handle(EventEnvelope<ShoppingCartOpened> @event) =>
+        database.Store(
+            @event.Data.ShoppingCartId,
+            new ShoppingCartShortInfo
+            {
+                Id = @event.Data.ShoppingCartId,
+                ClientId = @event.Data.ClientId,
+                TotalPrice = 0,
+                TotalItemsCount = 0,
+                Version = @event.Metadata.StreamPosition
+            });
 
-        database.GetAndStore<ShoppingCartsClientSummary>(
-            details.ClientId,
+    public void Handle(EventEnvelope<ProductItemAddedToShoppingCart> @event) =>
+        database.GetAndStore<ShoppingCartShortInfo>(
+            @event.Data.ShoppingCartId,
             @event.Metadata.StreamPosition,
             item =>
             {
-                item.Id = details.ClientId;
-                item.TotalAmount += details.TotalPrice;
-                item.TotalItemsCount += details.TotalItemsCount;
+                var productItem = @event.Data.ProductItem;
+
+                item.TotalPrice += productItem.TotalAmount;
+                item.TotalItemsCount += productItem.Quantity;
 
                 return item;
             });
-    }
+
+    public void Handle(EventEnvelope<ProductItemRemovedFromShoppingCart> @event) =>
+        database.GetAndStore<ShoppingCartShortInfo>(
+            @event.Data.ShoppingCartId,
+            @event.Metadata.StreamPosition,
+            item =>
+            {
+                var productItem = @event.Data.ProductItem;
+
+                item.TotalPrice -= productItem.TotalAmount;
+                item.TotalItemsCount -= productItem.Quantity;
+
+                return item;
+            });
+
+    public void Handle(EventEnvelope<ShoppingCartConfirmed> @event) =>
+        database.Delete<ShoppingCartShortInfo>(@event.Data.ShoppingCartId);
+
+
+    public void Handle(EventEnvelope<ShoppingCartCanceled> @event) =>
+        database.Delete<ShoppingCartShortInfo>(@event.Data.ShoppingCartId);
 }
 
 public class ProjectionsTests
@@ -332,70 +374,76 @@ public class ProjectionsTests
         eventBus.Register<ShoppingCartConfirmed>(shoppingCartDetailsProjection.Handle);
         eventBus.Register<ShoppingCartCanceled>(shoppingCartDetailsProjection.Handle);
 
-        //var shoppingCartsClientSummaryProjection = new ShoppingCartsClientSummaryProjection(database);
+        var shoppingCartShortInfoProjection = new ShoppingCartShortInfoProjection(database);
 
-        //eventBus.Register<ShoppingCartConfirmed>(shoppingCartsClientSummaryProjection.Handle);
+        eventBus.Register<ShoppingCartOpened>(shoppingCartShortInfoProjection.Handle);
+        eventBus.Register<ProductItemAddedToShoppingCart>(shoppingCartShortInfoProjection.Handle);
+        eventBus.Register<ProductItemRemovedFromShoppingCart>(shoppingCartShortInfoProjection.Handle);
+        eventBus.Register<ShoppingCartConfirmed>(shoppingCartShortInfoProjection.Handle);
+        eventBus.Register<ShoppingCartCanceled>(shoppingCartShortInfoProjection.Handle);
 
         eventBus.Publish(events);
 
         // first confirmed
-        var shoppingCart = database.GetWithRetries<ShoppingCartDetails>(shoppingCartId, 5);
-
+        var shoppingCart = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartDetails>(shoppingCartId, 5)!;
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(2);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
-
+        shoppingCart.ProductItems.Should().HaveCount(2);
         shoppingCart.ProductItems.Should().Contain(pairOfShoes);
         shoppingCart.ProductItems.Should().Contain(tShirt);
 
-        // cancelled
-        shoppingCart = database.GetWithRetries<ShoppingCartDetails>(cancelledShoppingCartId, 3);
+        var shoppingCartShortInfo = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartShortInfo>(shoppingCartId, 5);
+        shoppingCartShortInfo.Should().BeNull();
 
+        // cancelled
+        shoppingCart = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartDetails>(cancelledShoppingCartId, 3)!;
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(cancelledShoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Canceled);
-
+        shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.ProductItems.Should().Contain(dress);
 
-        // confirmed but other client
-        shoppingCart = database.GetWithRetries<ShoppingCartDetails>(otherClientShoppingCartId, 3);
+        shoppingCartShortInfo = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartShortInfo>(cancelledShoppingCartId, 3)!;
+        shoppingCartShortInfo.Should().BeNull();
 
+        // confirmed but other client
+        shoppingCart = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartDetails>(otherClientShoppingCartId, 3)!;
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(otherClientShoppingCartId);
         shoppingCart.ClientId.Should().Be(otherClientId);
-        shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
-
+        shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.ProductItems.Should().Contain(dress);
 
-        // second confirmed
-        shoppingCart = database.GetWithRetries<ShoppingCartDetails>(otherConfirmedShoppingCartId, 3);
+        shoppingCartShortInfo = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartShortInfo>(otherClientShoppingCartId, 3);
+        shoppingCartShortInfo.Should().BeNull();
 
+        // second confirmed
+        shoppingCart = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartDetails>(otherConfirmedShoppingCartId, 3)!;
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(otherConfirmedShoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
-
+        shoppingCart.ProductItems.Should().HaveCount(1);
         shoppingCart.ProductItems.Should().Contain(trousers);
 
-        // first pending
-        shoppingCart = database.GetWithRetries<ShoppingCartDetails>(otherPendingShoppingCartId, 1);
+        shoppingCartShortInfo = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartShortInfo>(otherConfirmedShoppingCartId, 3);
+        shoppingCartShortInfo.Should().BeNull();
 
+        // first pending
+        shoppingCart = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartDetails>(otherPendingShoppingCartId, 1)!;
         shoppingCart.Should().NotBeNull();
         shoppingCart.Id.Should().Be(otherPendingShoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().BeEmpty();
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Pending);
+        shoppingCart.ProductItems.Should().BeEmpty();
 
-        // summary
-        // var summary = database.GetWithRetries<ShoppingCartsClientSummary>(clientId, 2);
-        // summary.Id.Should().Be(clientId);
-        // summary.TotalItemsCount.Should().Be(3);
-        // summary.TotalAmount.Should().Be(pairOfShoes.TotalAmount + tShirt.TotalAmount + trousers.TotalAmount);
+        shoppingCartShortInfo = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartShortInfo>(otherPendingShoppingCartId, 1)!;
+        shoppingCartShortInfo.Should().NotBeNull();
+        shoppingCartShortInfo.Id.Should().Be(otherPendingShoppingCartId);
+        shoppingCartShortInfo.ClientId.Should().Be(clientId);
     }
 }
