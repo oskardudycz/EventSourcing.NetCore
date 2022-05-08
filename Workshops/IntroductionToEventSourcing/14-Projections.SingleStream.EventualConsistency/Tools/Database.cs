@@ -13,13 +13,7 @@ public class Database
     {
         var validFrom = DateTime.UtcNow.AddMilliseconds(random.Next(250, 1000));
 
-        storage.Add(id, new DataWrapper(obj, validFrom));
-
-
-        if (!storage.ContainsKey(id))
-            storage.Add(id, new DataWrapper(obj, validFrom));
-        else
-            storage[id] = new DataWrapper(obj, validFrom);
+        storage[id] = new DataWrapper(obj, validFrom);
     }
 
     public T? Get<T>(Guid id) where T : class

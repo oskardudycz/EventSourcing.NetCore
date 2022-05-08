@@ -1,6 +1,6 @@
 # Exercise 14 - Projections Eventual Consistency
 
-With the [Database](./Tools/Database.cs) interface representing the sample database, implement the following projections:
+With the [Database](./Tools/Database.cs) interface representing the sample database, implement the following projections
 
 1. Detailed view of the shopping cart:
     - total amount of products in the basket,

@@ -18,7 +18,7 @@ public class Database
     {
         return storage.TryGetValue(id, out var result) ?
             // Clone to simulate getting new instance on loading
-            JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(result))!
+            JsonSerializer.Deserialize<T>(JsonSerializer.Serialize((T)result))
             : null;
     }
 }
