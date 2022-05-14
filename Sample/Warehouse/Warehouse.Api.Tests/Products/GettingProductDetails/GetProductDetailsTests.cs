@@ -63,7 +63,7 @@ public class GetProductDetailsTests: IClassFixture<GetProductDetailsFixture>
     [Theory]
     [InlineData(12)]
     [InlineData("not-a-guid")]
-    public async Task InvalidGuidId_ShouldReturn_400(object invalidId)
+    public async Task InvalidGuidId_ShouldReturn_404(object invalidId)
     {
         // Given
 
@@ -71,7 +71,7 @@ public class GetProductDetailsTests: IClassFixture<GetProductDetailsFixture>
         var response = await fixture.Get($"{invalidId}");
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
