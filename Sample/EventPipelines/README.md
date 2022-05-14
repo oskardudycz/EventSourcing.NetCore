@@ -9,6 +9,7 @@ Shows how to compose event handlers in the processing pipelines to:
 - allows using interfaces and classes if you want to,
 - can be used with Dependency Injection, but also without through builder,
 - integrates with MediatR if you want to.
+- 📝 Read more [How to build a simple event pipeline](https://event-driven.io/en/how_to_build_simple_event_pipeline/?utm_source=event_sourcing_net) 
 
 ## Overview
 

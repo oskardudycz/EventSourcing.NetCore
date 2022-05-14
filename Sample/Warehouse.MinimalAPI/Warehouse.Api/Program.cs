@@ -31,54 +31,58 @@ if (app.Environment.IsDevelopment())
 }
 
 // Get Products
-app.MapGet("/api/products", HandleGetProducts)
+app.MapGet(
+        "/api/products",
+        (
+                [FromServices] QueryHandler<GetProducts, IReadOnlyList<ProductListItem>> getProducts,
+                string? filter,
+                int? page,
+                int? pageSize,
+                CancellationToken ct
+            ) =>
+            getProducts(GetProducts.With(filter, page, pageSize), ct)
+    )
     .Produces((int)HttpStatusCode.BadRequest);
-
-ValueTask<IReadOnlyList<ProductListItem>> HandleGetProducts(
-    [FromServices] QueryHandler<GetProducts, IReadOnlyList<ProductListItem>> getProducts,
-    string? filter,
-    int? page,
-    int? pageSize,
-    CancellationToken ct
-) =>
-    getProducts(GetProducts.With(filter, page, pageSize), ct);
 
 
 // Get Product Details by Id
-app.MapGet("/api/products/{id}", HandleGetProductDetails)
+app.MapGet(
+        "/api/products/{id:guid}",
+        async (
+                [FromServices] QueryHandler<GetProductDetails, ProductDetails?> getProductById,
+                Guid id,
+                CancellationToken ct
+            ) =>
+            await getProductById(GetProductDetails.With(id), ct)
+                is { } product
+                ? Results.Ok(product)
+                : Results.NotFound()
+    )
     .Produces(StatusCodes.Status400BadRequest)
     .Produces(StatusCodes.Status404NotFound);
 
-async Task<IResult> HandleGetProductDetails(
-    [FromServices] QueryHandler<GetProductDetails, ProductDetails?> getProductById,
-    Guid productId,
-    CancellationToken ct
-) =>
-    await getProductById(GetProductDetails.With(productId), ct)
-        is { } product
-        ? Results.Ok(product)
-        : Results.NotFound();
 
 // Register new product
-app.MapPost("api/products/",HandleRegisterProduct)
+app.MapPost(
+        "api/products/",
+        async (
+            [FromServices] CommandHandler<RegisterProduct> registerProduct,
+            RegisterProductRequest request,
+            CancellationToken ct
+        ) =>
+        {
+            var productId = Guid.NewGuid();
+            var (sku, name, description) = request;
+
+            await registerProduct(
+                RegisterProduct.With(productId, sku, name, description),
+                ct);
+
+            return Results.Created($"/api/products/{productId}", productId);
+        }
+    )
     .Produces(StatusCodes.Status400BadRequest)
     .Produces(StatusCodes.Status404NotFound);
-
-async Task<IResult> HandleRegisterProduct(
-    [FromServices] CommandHandler<RegisterProduct> registerProduct,
-    RegisterProductRequest request,
-    CancellationToken ct
-)
-{
-    var productId = Guid.NewGuid();
-    var (sku, name, description) = request;
-
-    await registerProduct(
-        RegisterProduct.With(productId, sku, name, description),
-        ct);
-
-    return Results.Created($"/api/products/{productId}", productId);
-}
 
 app.Run();
 
@@ -87,5 +91,3 @@ public record RegisterProductRequest(
     string? Name,
     string? Description
 );
-
-public partial class Program { }
