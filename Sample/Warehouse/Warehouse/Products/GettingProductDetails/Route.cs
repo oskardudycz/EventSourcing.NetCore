@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Warehouse.Core.Extensions;
 using Warehouse.Core.Queries;
+using static Microsoft.AspNetCore.Http.Results;
 
 namespace Warehouse.Products.GettingProductDetails;
 
@@ -9,24 +10,14 @@ public static class Route
 {
     internal static IEndpointRouteBuilder UseGetProductDetailsEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/products/{id}", async context =>
+        endpoints.MapGet("/api/products/{id:guid}", async (HttpContext context, Guid id) =>
         {
-            // var dbContext = WarehouseDBContextFactory.Create();
-            // var handler = new HandleGetProductDetails(dbContext.Set<Product>().AsQueryable());
-
-            var productId = context.FromRoute<Guid>("id");
-            var query = GetProductDetails.Create(productId);
+            var query = GetProductDetails.Create(id);
 
             var result = await context
                 .SendQuery<GetProductDetails, ProductDetails?>(query);
 
-            if (result == null)
-            {
-                context.NotFound();
-                return;
-            }
-
-            await context.OK(result);
+            return result != null ? Ok(result) : NotFound();
         });
         return endpoints;
     }

@@ -8,7 +8,9 @@ var builder = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services =>
             {
                 services.AddRouting()
-                    .AddWarehouseServices();
+                    .AddWarehouseServices()
+                    .AddEndpointsApiExplorer()
+                    .AddSwaggerGen();
             })
             .Configure(app =>
             {
@@ -18,7 +20,9 @@ var builder = Host.CreateDefaultBuilder(args)
                     {
                         endpoints.UseWarehouseEndpoints();
                     })
-                    .ConfigureWarehouse();
+                    .ConfigureWarehouse()
+                    .UseSwagger()
+                    .UseSwaggerUI();
             });
     })
     .Build();

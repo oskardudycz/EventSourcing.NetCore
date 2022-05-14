@@ -24,7 +24,7 @@ public static class WarehouseConfiguration
 
         if (environment == "Development")
         {
-            app.ApplicationServices.GetRequiredService<WarehouseDBContext>().Database.Migrate();
+            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<WarehouseDBContext>().Database.Migrate();
         }
 
         return app;
