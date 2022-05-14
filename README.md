@@ -30,11 +30,12 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
     - [6.2 Simple EventSourcing with EventStoreDB](#62-simple-eventsourcing-with-eventstoredb)
     - [6.3 ECommerce with EventStoreDB](#63-ecommerce-with-eventstoredb)
     - [6.5 Warehouse](#65-warehouse)
-    - [6.6 Event Versioning](#66-event-versioning)
-    - [6.7 Event Pipelines](#67-event-pipelines)
-    - [6.8 Meetings Management with Marten](#68-meetings-management-with-marten)
-    - [6.9 Cinema Tickets Reservations with Marten](#69-cinema-tickets-reservations-with-marten)
-    - [6.10 SmartHome IoT with Marten](#610-smarthome-iot-with-marten)
+    - [6.6 Warehouse Minimal API](#66-warehouse-minimal-api)
+    - [6.7 Event Versioning](#67-event-versioning)
+    - [6.8 Event Pipelines](#68-event-pipelines)
+    - [6.9 Meetings Management with Marten](#69-meetings-management-with-marten)
+    - [6.10 Cinema Tickets Reservations with Marten](#610-cinema-tickets-reservations-with-marten)
+    - [6.11 SmartHome IoT with Marten](#611-smarthome-iot-with-marten)
   - [7. Self-paced training Kits](#7-self-paced-training-kits)
     - [7.1 Introduction to Event Sourcing](#71-introduction-to-event-sourcing)
     - [7.2 Build your own Event Store](#72-build-your-own-event-store)
@@ -652,7 +653,13 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - No Event Sourcing! Using Entity Framework to show that CQRS is not bounded to Event Sourcing or any type of storage,
 - No Aggregates! CQRS do not need DDD. Business logic can be handled in handlers.
 
-### 6.6 [Event Versioning](./Sample/EventsVersioning)
+### 6.6 [Warehouse Minimal API](./Sample/Warehouse.MinimalAPI/)
+Variation of the previous example, but:
+- using Minimal API,
+- example how to inject handlers in MediatR like style to decouple API from handlers.
+- 📝 Read more [CQRS is simpler than you think with .NET 6 and C# 10](https://event-driven.io/en/cqrs_is_simpler_than_you_think_with_net6/?utm_source=event_sourcing_net) 
+
+### 6.7 [Event Versioning](./Sample/EventsVersioning)
 Shows how to handle basic event schema versioning scenarios using event and stream transformations (e.g. upcasting):
 - [Simple mapping](./Sample/EventsVersioning/#simple-mapping)
   - [New not required property](./Sample/EventsVersioning/#new-not-required-property)
@@ -665,8 +672,9 @@ Shows how to handle basic event schema versioning scenarios using event and stre
 - [Events Transformations](./Sample/EventsVersioning/#events-transformations)
 - [Stream Transformation](./Sample/EventsVersioning/#stream-transformation)
 - [Summary](./Sample/EventsVersioning/#summary)
+- 📝 [Simple patterns for events schema versioning](https://event-driven.io/en/simple_events_versioning_patterns/?utm_source=event_sourcing_net) 
 
-### 6.7 [Event Pipelines](./Sample/EventPipelines)
+### 6.8 [Event Pipelines](./Sample/EventPipelines)
 Shows how to compose event handlers in the processing pipelines to:
 - filter events,
 - transform them,
@@ -676,8 +684,9 @@ Shows how to compose event handlers in the processing pipelines to:
 - allows using interfaces and classes if you want to,
 - can be used with Dependency Injection, but also without through builder,
 - integrates with MediatR if you want to.
+- 📝 Read more [How to build a simple event pipeline](https://event-driven.io/en/how_to_build_simple_event_pipeline/?utm_source=event_sourcing_net) 
 
-### 6.8 [Meetings Management with Marten](./Sample/MeetingsManagement/)
+### 6.9 [Meetings Management with Marten](./Sample/MeetingsManagement/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - microservices example,
@@ -685,12 +694,12 @@ Shows how to compose event handlers in the processing pipelines to:
 - Kafka as a messaging platform to integrate microservices,
 - read models handled in separate microservice and stored to other database (ElasticSearch)
 
-### 6.9 [Cinema Tickets Reservations with Marten](./Sample/Tickets/)
+### 6.10 [Cinema Tickets Reservations with Marten](./Sample/Tickets/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to Marten.
 
-### 6.10 [SmartHome IoT with Marten](./Sample/AsyncProjections/)
+### 6.11 [SmartHome IoT with Marten](./Sample/AsyncProjections/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to Marten,
@@ -762,6 +771,7 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
 -   📝 [How to slice the codebase effectively?](https://event-driven.io/en/how_to_slice_the_codebase_effectively/?utm_source=event_sourcing_net)
 -   📝 [Generic does not mean Simple?](https://event-driven.io/en/generic_does_not_mean_simple/?utm_source=event_sourcing_net)
 -   📝 [Can command return a value?](https://event-driven.io/en/can_command_return_a_value/?utm_source=event_sourcing_net)
+-   📝 [CQRS is simpler than you think with .NET 6 and C# 10](https://event-driven.io/en/cqrs_is_simpler_than_you_think_with_net6/?utm_source=event_sourcing_net)   
 -   📝 [How to register all CQRS handlers by convention](https://event-driven.io/en/how_to_register_all_mediatr_handlers_by_convention/?utm_source=event_sourcing_net)
 -   📝 [How to use ETag header for optimistic concurrency](https://event-driven.io/en/how_to_use_etag_header_for_optimistic_concurrency/?utm_source=event_sourcing_net)
 -   📝 [Dealing with Eventual Consistency and Idempotency in MongoDB projections](https://event-driven.io/en/dealing_with_eventual_consistency_and_idempotency_in_mongodb_projections/?utm_source=event_sourcing_net)
@@ -770,7 +780,8 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
 -   📝 [How to do snapshots in Marten?](https://event-driven.io/en/how_to_do_snapshots_in_Marten/?utm_source=event_sourcing_net)
 -   📝 [Integrating Marten with other systems](https://event-driven.io/en/integrating_Marten/?utm_source=event_sourcing_net)
 -   📝 [How to (not) do the events versioning?](https://event-driven.io/en/how_to_do_event_versioning/?utm_source=event_sourcing_net)
--   📝 [Simple patterns for events schema versioning](https://event-driven.io/en/simple_events_versioning_patterns/?utm_source=event_sourcing_net)
+-   📝 [Simple patterns for events schema versioning](https://event-driven.io/en/simple_events_versioning_patterns/?utm_source=event_sourcing_net) 
+-   📝 [How to build a simple event pipeline](https://event-driven.io/en/how_to_build_simple_event_pipeline/?utm_source=event_sourcing_net) 
 -   📝 [How to create projections of events for nested object structures?](https://event-driven.io/en/how_to_create_projections_of_events_for_nested_object_structures/?utm_source=event_sourcing_net)
 -   📝 [How to scale projections in the event-driven systems?](https://event-driven.io/en/how_to_scale_projections_in_the_event_driven_systems/?utm_source=event_sourcing_net)
 -   📝 [Immutable Value Objects are simpler and more useful than you think!](https://event-driven.io/en/immutable_value_objects/?utm_source=event_sourcing_net)
