@@ -252,3 +252,6 @@ paket-files/
 *.sln.iml
 
 **/out
+
+# MACOS
+.DS_STORE
