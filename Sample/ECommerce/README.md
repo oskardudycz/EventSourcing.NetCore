@@ -9,7 +9,7 @@
 5. Make sure that you have ~10GB disk space.
 6. Create Github Account
 7. Clone Project https://github.com/oskardudycz/EventSourcing.NetCore, make sure that's compiling
-8. Go to gitter channel https://gitter.im/oskardudycz/szkola-event-sourcing.
+8. Go to gitter channel (ENG) https://gitter.im/EventSourcing-NetCore/community (POL) https://gitter.im/oskardudycz/szkola-event-sourcing.
 9. Check https://github.com/StackExchange/Dapper/, https://github.com/jbogard/MediatR, http://jasperfx.github.io/marten/documentation/
 10. Open `PracticalEventSourcing.sln` solution.
 11. Docker useful commands
