@@ -24,6 +24,9 @@ public class EventBusDecoratorWithExternalProducer: IEventBus
     {
         await eventBus.Publish(eventEnvelope, ct);
 
-        await externalEventProducer.Publish(eventEnvelope, ct);
+        if (eventEnvelope.Data is IExternalEvent)
+        {
+            await externalEventProducer.Publish(eventEnvelope, ct);
+        }
     }
 }
