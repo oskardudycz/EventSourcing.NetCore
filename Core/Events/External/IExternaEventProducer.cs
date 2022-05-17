@@ -20,13 +20,10 @@ public class EventBusDecoratorWithExternalProducer: IEventBus
         this.externalEventProducer = externalEventProducer;
     }
 
-    public async Task Publish(object @event, CancellationToken ct)
+    public async Task Publish(IEventEnvelope eventEnvelope, CancellationToken ct)
     {
-        await eventBus.Publish(@event, ct);
+        await eventBus.Publish(eventEnvelope, ct);
 
-        if (@event is IEventEnvelope { Data: IExternalEvent } eventEnvelope)
-        {
-            await externalEventProducer.Publish(eventEnvelope, ct);
-        }
+        await externalEventProducer.Publish(eventEnvelope, ct);
     }
 }

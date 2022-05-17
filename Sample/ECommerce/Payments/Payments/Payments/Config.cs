@@ -28,9 +28,9 @@ internal static class PaymentsConfig
 
     private static IServiceCollection AddEventHandlers(this IServiceCollection services) =>
         services
-            .AddEventHandler<PaymentCompleted, TransformIntoPaymentFinalized>()
-            .AddEventHandler<PaymentDiscarded, TransformIntoPaymentFailed>()
-            .AddEventHandler<PaymentTimedOut, TransformIntoPaymentFailed>();
+            .AddEventHandler<EventEnvelope<PaymentCompleted>, TransformIntoPaymentFinalized>()
+            .AddEventHandler<EventEnvelope<PaymentDiscarded>, TransformIntoPaymentFailed>()
+            .AddEventHandler<EventEnvelope<PaymentTimedOut>, TransformIntoPaymentFailed>();
 
     internal static void ConfigurePayments(this StoreOptions options)
     {

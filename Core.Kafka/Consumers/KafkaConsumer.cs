@@ -73,7 +73,7 @@ public class KafkaConsumer: IExternalEventConsumer
             var eventEnvelopeType = typeof(EventEnvelope<>).MakeGenericType(eventType);
 
             // deserialize event
-            var @event = message.Message.Value.FromJson(eventEnvelopeType);
+            var @event = (IEventEnvelope)message.Message.Value.FromJson(eventEnvelopeType);
 
             // publish event to internal event bus
             await eventBus.Publish(@event, cancellationToken);

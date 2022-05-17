@@ -24,8 +24,8 @@ public record PaymentFailed(
 
 
 public class TransformIntoPaymentFailed :
-    IEventHandler<PaymentDiscarded>,
-    IEventHandler<PaymentTimedOut>
+    IEventHandler<EventEnvelope<PaymentDiscarded>>,
+    IEventHandler<EventEnvelope<PaymentTimedOut>>
 {
     private readonly IEventBus eventBus;
     private readonly IQuerySession querySession;
@@ -39,31 +39,39 @@ public class TransformIntoPaymentFailed :
         this.querySession = querySession;
     }
 
-    public async Task Handle(PaymentDiscarded @event, CancellationToken cancellationToken)
+    public async Task Handle(EventEnvelope<PaymentDiscarded> @event, CancellationToken cancellationToken)
     {
-        var payment = await querySession.LoadAsync<Payment>(@event.PaymentId, cancellationToken);
+        var payment = await querySession.LoadAsync<Payment>(@event.Data.PaymentId, cancellationToken);
 
-        var externalEvent = PaymentFailed.Create(
-            @event.PaymentId,
-            payment!.OrderId,
-            payment.Amount,
-            @event.DiscardedAt,
-            PaymentFailReason.Discarded
+        // TODO: This should be handled internally by event bus, or this event should be stored in the outbox stream
+        var externalEvent = new EventEnvelope<PaymentFailed>(
+            PaymentFailed.Create(
+                @event.Data.PaymentId,
+                payment!.OrderId,
+                payment.Amount,
+                @event.Data.DiscardedAt,
+                PaymentFailReason.Discarded
+            ),
+            @event.Metadata
         );
 
         await eventBus.Publish(externalEvent, cancellationToken);
     }
 
-    public async Task Handle(PaymentTimedOut @event, CancellationToken cancellationToken)
+    public async Task Handle(EventEnvelope<PaymentTimedOut> @event, CancellationToken cancellationToken)
     {
-        var payment = await querySession.LoadAsync<Payment>(@event.PaymentId, cancellationToken);
+        var payment = await querySession.LoadAsync<Payment>(@event.Data.PaymentId, cancellationToken);
 
-        var externalEvent = PaymentFailed.Create(
-            @event.PaymentId,
-            payment!.OrderId,
-            payment.Amount,
-            @event.TimedOutAt,
-            PaymentFailReason.Discarded
+        // TODO: This should be handled internally by event bus, or this event should be stored in the outbox stream
+        var externalEvent = new EventEnvelope<PaymentFailed>(
+            PaymentFailed.Create(
+                @event.Data.PaymentId,
+                payment!.OrderId,
+                payment.Amount,
+                @event.Data.TimedOutAt,
+                PaymentFailReason.Discarded
+            ),
+            @event.Metadata
         );
 
         await eventBus.Publish(externalEvent, cancellationToken);
