@@ -2,6 +2,7 @@ using Confluent.Kafka;
 using Core.Events;
 using Core.Events.External;
 using Core.Reflection;
+using Core.Serialization.Newtonsoft;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -72,10 +73,12 @@ public class KafkaConsumer: IExternalEventConsumer
             var eventEnvelopeType = typeof(EventEnvelope<>).MakeGenericType(eventType);
 
             // deserialize event
-            var @event = JsonConvert.DeserializeObject(message.Message.Value, eventEnvelopeType)!;
+            var @event = message.Message.Value.FromJson(eventEnvelopeType);
 
             // publish event to internal event bus
             await eventBus.Publish(@event, cancellationToken);
+
+            consumer.Commit();
         }
         catch (Exception e)
         {

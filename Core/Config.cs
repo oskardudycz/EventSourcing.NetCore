@@ -43,7 +43,7 @@ public static class Config
                 sp.GetRequiredService<ITracingScopeFactory>().CreateTraceScope(scopedServiceProvider, traceMetadata)
         );
 
-        services.TryAddScoped<Func<IServiceProvider, EventEnvelope?, TracingScope>>(sp =>
+        services.TryAddScoped<Func<IServiceProvider, IEventEnvelope?, TracingScope>>(sp =>
             (scopedServiceProvider, eventEnvelope) => sp.GetRequiredService<ITracingScopeFactory>()
                 .CreateTraceScope(scopedServiceProvider, eventEnvelope)
         );

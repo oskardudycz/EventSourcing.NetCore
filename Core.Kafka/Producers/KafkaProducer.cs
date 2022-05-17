@@ -22,7 +22,7 @@ public class KafkaProducer: IExternalEventProducer
         config = configuration.GetKafkaProducerConfig();
     }
 
-    public async Task Publish(EventEnvelope @event, CancellationToken ct)
+    public async Task Publish(IEventEnvelope @event, CancellationToken ct)
     {
         try
         {

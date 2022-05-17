@@ -2,7 +2,7 @@ namespace Core.Events.External;
 
 public interface IExternalEventProducer
 {
-    Task Publish(EventEnvelope @event, CancellationToken ct);
+    Task Publish(IEventEnvelope @event, CancellationToken ct);
 }
 
 
@@ -24,7 +24,7 @@ public class EventBusDecoratorWithExternalProducer: IEventBus
     {
         await eventBus.Publish(@event, ct);
 
-        if (@event is EventEnvelope { Data: IExternalEvent } eventEnvelope)
+        if (@event is IEventEnvelope { Data: IExternalEvent } eventEnvelope)
         {
             await externalEventProducer.Publish(eventEnvelope, ct);
         }

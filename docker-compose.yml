@@ -123,6 +123,28 @@ services:
             ADVERTISED_HOST_NAME: kafka
             KAFKA_ADVERTISED_HOSTNAME: 127.0.0.1
 
+    init-kafka:
+        image: confluentinc/cp-kafka:7.0.1
+        depends_on:
+            - kafka
+        entrypoint: [ '/bin/sh', '-c' ]
+        networks:
+            - kafka_network
+        command: |
+            "
+            # blocks until kafka is reachable
+            kafka-topics --bootstrap-server kafka:29092 --list
+
+            echo -e 'Creating kafka topics'
+            kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic Carts --replication-factor 1 --partitions 1
+            kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic Orders --replication-factor 1 --partitions 1
+            kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic Payments --replication-factor 1 --partitions 1
+            kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic Shipments --replication-factor 1 --partitions 1
+
+            echo -e 'Successfully created the following topics:'
+            kafka-topics --bootstrap-server kafka:29092 --list
+            "
+
     #######################################################
     #  Avro Schema Registry
     #######################################################
@@ -155,7 +177,7 @@ services:
         networks:
             - kafka_network
         environment:
-            KAFKA_REST_BOOTSTRAP_SERVERS: kafka:9092
+            KAFKA_REST_BOOTSTRAP_SERVERS: kafka:29092
             KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
             KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registry:8081
             KAFKA_REST_HOST_NAME: kafka_rest
