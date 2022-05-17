@@ -42,7 +42,7 @@ internal static class CartsConfig
             .AddQueryHandler<GetCartHistory, IPagedList<ShoppingCartHistory>, HandleGetCartHistory>();
 
     private static IServiceCollection AddEventHandlers(this IServiceCollection services) =>
-        services.AddEventHandler<ShoppingCartConfirmed, HandleCartFinalized>();
+        services.AddEventHandler<EventEnvelope<ShoppingCartConfirmed>, HandleCartFinalized>();
 
     internal static void ConfigureCarts(this StoreOptions options)
     {

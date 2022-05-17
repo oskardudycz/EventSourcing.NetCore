@@ -15,13 +15,13 @@ public interface IEventBus
 public class EventBus: IEventBus
 {
     private readonly IServiceProvider serviceProvider;
-    private readonly Func<IServiceProvider, EventEnvelope?, TracingScope> createTracingScope;
+    private readonly Func<IServiceProvider, IEventEnvelope?, TracingScope> createTracingScope;
     private readonly AsyncPolicy retryPolicy;
     private static readonly ConcurrentDictionary<Type, MethodInfo> PublishMethods = new();
 
     public EventBus(
         IServiceProvider serviceProvider,
-        Func<IServiceProvider, EventEnvelope?, TracingScope> createTracingScope,
+        Func<IServiceProvider, IEventEnvelope?, TracingScope> createTracingScope,
         AsyncPolicy retryPolicy
     )
     {
@@ -32,7 +32,7 @@ public class EventBus: IEventBus
 
     private async Task Publish<TEvent>(TEvent @event, CancellationToken ct)
     {
-        var eventEnvelope = @event as EventEnvelope;
+        var eventEnvelope = @event as IEventEnvelope;
         using var scope = serviceProvider.CreateScope();
         using var tracingScope = createTracingScope(scope.ServiceProvider, eventEnvelope);
 
@@ -52,9 +52,9 @@ public class EventBus: IEventBus
     {
         // if it's an event envelope, publish also just event data
         // thanks to that both handlers with envelope and without will be called
-        if (@event is EventEnvelope(var data, _))
-            await (Task)GetGenericPublishFor(data)
-                .Invoke(this, new[] { data, ct })!;
+        if (@event is IEventEnvelope eventEnvelope)
+            await (Task)GetGenericPublishFor(eventEnvelope.Data)
+                .Invoke(this, new[] { eventEnvelope.Data, ct })!;
 
         await (Task)GetGenericPublishFor(@event)
             .Invoke(this, new[] { @event, ct })!;

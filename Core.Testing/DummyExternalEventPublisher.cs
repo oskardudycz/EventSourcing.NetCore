@@ -7,7 +7,7 @@ public class DummyExternalEventProducer: IExternalEventProducer
 {
     public IList<object> PublishedEvents { get; } = new List<object>();
 
-    public Task Publish(EventEnvelope @event, CancellationToken ct)
+    public Task Publish(IEventEnvelope @event, CancellationToken ct)
     {
         PublishedEvents.Add(@event.Data);
 

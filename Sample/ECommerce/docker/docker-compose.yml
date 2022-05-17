@@ -34,12 +34,10 @@ services:
         networks:
             - kafka_network
         ports:
-          - "2181:2181"
-          - "2888:2888"
-          - "3888:3888"
+            - "2181:2181"
         environment:
-          ZOOKEEPER_CLIENT_PORT: 2181
-          ZOOKEEPER_TICK_TIME: 2000
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
 
     #######################################################
     #  Kafka
@@ -63,6 +61,28 @@ services:
             ADVERTISED_HOST_NAME: kafka
             KAFKA_ADVERTISED_HOSTNAME: 127.0.0.1
 
+    init-kafka:
+        image: confluentinc/cp-kafka:7.0.1
+        depends_on:
+            - kafka
+        entrypoint: [ '/bin/sh', '-c' ]
+        networks:
+            - kafka_network
+        command: |
+            "
+            # blocks until kafka is reachable
+            kafka-topics --bootstrap-server kafka:29092 --list
+
+            echo -e 'Creating kafka topics'
+            kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic Carts --replication-factor 1 --partitions 1
+            kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic Orders --replication-factor 1 --partitions 1
+            kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic Payments --replication-factor 1 --partitions 1
+            kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic Shipments --replication-factor 1 --partitions 1
+
+            echo -e 'Successfully created the following topics:'
+            kafka-topics --bootstrap-server kafka:29092 --list
+            "
+
     #######################################################
     #  Avro Schema Registry
     #######################################################
@@ -78,12 +98,12 @@ services:
         networks:
             - kafka_network
         environment:
-          SCHEMA_REGISTRY_HOST_NAME: schema_registry
-          SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
-          SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
-          SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
-          SCHEMA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
-          SCHEMA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
+            SCHEMA_REGISTRY_HOST_NAME: schema_registry
+            SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+            SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
+            SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
+            SCHEMA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+            SCHEMA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
 
     kafka_rest:
         image: confluentinc/cp-kafka-rest:7.0.1
@@ -95,7 +115,7 @@ services:
         networks:
             - kafka_network
         environment:
-            KAFKA_REST_BOOTSTRAP_SERVERS: kafka:9092
+            KAFKA_REST_BOOTSTRAP_SERVERS: kafka:29092
             KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
             KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registry:8081
             KAFKA_REST_HOST_NAME: kafka_rest
@@ -108,7 +128,7 @@ services:
             - "8080:8080"
         environment:
             KAFKA_CLUSTERS_0_NAME: local
-            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
         networks:
             - kafka_network
         depends_on:

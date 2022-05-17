@@ -6,7 +6,7 @@ namespace Core.EventStoreDB.Events;
 
 public static class EventEnvelopeExtensions
 {
-    public static EventEnvelope? ToEventEnvelope(this ResolvedEvent resolvedEvent)
+    public static IEventEnvelope? ToEventEnvelope(this ResolvedEvent resolvedEvent)
     {
         var eventData = resolvedEvent.Deserialize();
         var eventMetadata = resolvedEvent.DeserializeMetadata();
@@ -20,7 +20,7 @@ public static class EventEnvelopeExtensions
             resolvedEvent.Event.Position.CommitPosition,
             eventMetadata
         );
-        var type = typeof(EventEnvelope<>).MakeGenericType(eventData.GetType());
-        return (EventEnvelope)Activator.CreateInstance(type, eventData, metaData)!;
+
+        return EventEnvelopeFactory.From(eventData, metaData);
     }
 }

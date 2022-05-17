@@ -70,12 +70,12 @@ public static class TraceScopeFactoryExtensions
 {
     public static TracingScope CreateTraceScope(
         this ITracingScopeFactory tracingScopeFactory,
-        IServiceProvider serviceProvider, EventEnvelope? eventEnvelope)
+        IServiceProvider serviceProvider, IEventEnvelope? eventEnvelope)
     {
         if (eventEnvelope == null)
             return tracingScopeFactory.CreateTraceScope(serviceProvider);
 
-        var (_, eventMetadata) = eventEnvelope;
+        var eventMetadata = eventEnvelope.Metadata;
 
         var newCausationId = new CausationId(eventMetadata.EventId);
 

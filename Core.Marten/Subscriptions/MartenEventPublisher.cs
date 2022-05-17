@@ -37,7 +37,7 @@ public class MartenEventPublisher: IMartenEventsConsumer
                 )
             );
 
-            await eventBus.Publish(new EventEnvelope(@event.Data, eventMetadata), ct);
+            await eventBus.Publish(EventEnvelopeFactory.From(@event.Data, eventMetadata), ct);
         }
     }
 }

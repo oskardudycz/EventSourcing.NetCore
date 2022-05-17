@@ -21,7 +21,7 @@ public class KafkaProducerTests
         )
         .Build();
 
-    private readonly EventEnvelope eventEnvelope =
+    private readonly IEventEnvelope eventEnvelope =
         new EventEnvelope<TestEvent>(new TestEvent("test", 123), new EventMetadata("123", 1, 1, null));
 
     [Fact]
