@@ -25,7 +25,7 @@ public record ShoppingCartFinalized(
     }
 }
 
-internal class HandleCartFinalized: IEventHandler<ShoppingCartConfirmed>
+internal class HandleCartFinalized: IEventHandler<EventEnvelope<ShoppingCartConfirmed>>
 {
     private readonly IQuerySession querySession;
     private readonly IEventBus eventBus;
@@ -39,17 +39,21 @@ internal class HandleCartFinalized: IEventHandler<ShoppingCartConfirmed>
         this.eventBus = eventBus;
     }
 
-    public async Task Handle(ShoppingCartConfirmed @event, CancellationToken cancellationToken)
+    public async Task Handle(EventEnvelope<ShoppingCartConfirmed> @event, CancellationToken cancellationToken)
     {
-        var cart = await querySession.LoadAsync<ShoppingCart>(@event.CartId, cancellationToken)
-                   ?? throw AggregateNotFoundException.For<ShoppingCart>(@event.CartId);
+        var cart = await querySession.LoadAsync<ShoppingCart>(@event.Data.CartId, cancellationToken)
+                   ?? throw AggregateNotFoundException.For<ShoppingCart>(@event.Data.CartId);
 
-        var externalEvent = ShoppingCartFinalized.Create(
-            @event.CartId,
-            cart.ClientId,
-            cart.ProductItems.ToList(),
-            cart.TotalPrice,
-            @event.ConfirmedAt
+        // TODO: This should be handled internally by event bus, or this event should be stored in the outbox stream
+        var externalEvent = new EventEnvelope<ShoppingCartFinalized>(
+            ShoppingCartFinalized.Create(
+                @event.Data.CartId,
+                cart.ClientId,
+                cart.ProductItems.ToList(),
+                cart.TotalPrice,
+                @event.Data.ConfirmedAt
+            ),
+            @event.Metadata
         );
 
         await eventBus.Publish(externalEvent, cancellationToken);

@@ -40,11 +40,14 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
         return externalCommandBus.SentCommands.OfType<TCommand>().ToList();
     }
 
-    public async Task PublishInternalEvent(object @event, CancellationToken ct = default)
+    public async Task PublishInternalEvent<TEvent>(TEvent @event, CancellationToken ct = default) where TEvent : notnull
     {
         using var scope = Server.Host.Services.CreateScope();
         var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
-        await eventBus.Publish(@event, ct);
+
+        //TODO: metadata should be taken by event bus internally
+        var eventEnvelope = new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.NewGuid().ToString(), 0, 0, null));
+        await eventBus.Publish(eventEnvelope, ct);
     }
 
     public IReadOnlyCollection<TEvent> PublishedInternalEventsOfType<TEvent>() =>

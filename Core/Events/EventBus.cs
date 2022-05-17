@@ -9,7 +9,7 @@ namespace Core.Events;
 
 public interface IEventBus
 {
-    Task Publish(object @event, CancellationToken ct);
+    Task Publish(IEventEnvelope @event, CancellationToken ct);
 }
 
 public class EventBus: IEventBus
@@ -48,16 +48,15 @@ public class EventBus: IEventBus
         }
     }
 
-    public async Task Publish(object @event, CancellationToken ct)
+    public async Task Publish(IEventEnvelope eventEnvelope, CancellationToken ct)
     {
-        // if it's an event envelope, publish also just event data
+        // publish also just event data
         // thanks to that both handlers with envelope and without will be called
-        if (@event is IEventEnvelope eventEnvelope)
-            await (Task)GetGenericPublishFor(eventEnvelope.Data)
-                .Invoke(this, new[] { eventEnvelope.Data, ct })!;
+        await (Task)GetGenericPublishFor(eventEnvelope.Data)
+            .Invoke(this, new[] { eventEnvelope.Data, ct })!;
 
-        await (Task)GetGenericPublishFor(@event)
-            .Invoke(this, new[] { @event, ct })!;
+        await (Task)GetGenericPublishFor(eventEnvelope)
+            .Invoke(this, new object[] { eventEnvelope, ct })!;
     }
 
     private static MethodInfo GetGenericPublishFor(object @event) =>

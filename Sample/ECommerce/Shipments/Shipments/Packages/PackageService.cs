@@ -1,9 +1,9 @@
+using Core.Events;
 using Microsoft.EntityFrameworkCore;
 using Shipments.Packages.Events.External;
 using Shipments.Packages.Requests;
 using Shipments.Products;
 using Shipments.Storage;
-using IEventBus = Core.Events.IEventBus;
 
 namespace Shipments.Packages;
 
@@ -91,16 +91,19 @@ internal class PackageService: IPackageService
         await SaveChanges(cancellationToken);
     }
 
-    private async Task SaveChangesAndPublish(object @event, CancellationToken cancellationToken)
+    private async Task SaveChangesAndPublish<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : notnull
     {
         await SaveChanges(cancellationToken);
 
         await Publish(@event, cancellationToken);
     }
 
-    private async Task Publish(object @event, CancellationToken cancellationToken)
+    private async Task Publish<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : notnull
     {
-        await eventBus.Publish(@event, cancellationToken);
+        //TODO: metadata should be taken by event bus internally
+        var eventEnvelope = new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.NewGuid().ToString(), 0, 0, null));
+
+        await eventBus.Publish(eventEnvelope, cancellationToken);
     }
 
     private Task SaveChanges(CancellationToken cancellationToken = default)

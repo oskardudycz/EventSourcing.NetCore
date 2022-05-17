@@ -27,7 +27,7 @@ public record PaymentFinalized(
 }
 
 public class TransformIntoPaymentFinalized:
-    IEventHandler<PaymentCompleted>
+    IEventHandler<EventEnvelope<PaymentCompleted>>
 {
     private readonly IEventBus eventBus;
     private readonly IQuerySession querySession;
@@ -41,17 +41,21 @@ public class TransformIntoPaymentFinalized:
         this.querySession = querySession;
     }
 
-    public async Task Handle(PaymentCompleted @event, CancellationToken cancellationToken)
+    public async Task Handle(EventEnvelope<PaymentCompleted> @event, CancellationToken cancellationToken)
     {
-        var (paymentId, completedAt) = @event;
+        var (paymentId, completedAt) = @event.Data;
 
         var payment = await querySession.LoadAsync<Payment>(paymentId, cancellationToken);
 
-        var externalEvent = PaymentFinalized.Create(
-            paymentId,
-            payment!.OrderId,
-            payment.Amount,
-            completedAt
+        // TODO: This should be handled internally by event bus, or this event should be stored in the outbox stream
+        var externalEvent = new EventEnvelope<PaymentFinalized>(
+            PaymentFinalized.Create(
+                paymentId,
+                payment!.OrderId,
+                payment.Amount,
+                completedAt
+            ),
+            @event.Metadata
         );
 
         await eventBus.Publish(externalEvent, cancellationToken);
