@@ -1,12 +1,9 @@
 using Confluent.Kafka;
 using Core.Events;
 using Core.Events.External;
-using Core.Reflection;
-using Core.Serialization.Newtonsoft;
+using Core.Kafka.Events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using IEventBus = Core.Events.IEventBus;
 
 namespace Core.Kafka.Consumers;
 
@@ -68,15 +65,27 @@ public class KafkaConsumer: IExternalEventConsumer
             var message = consumer.Consume(cancellationToken);
 
             // get event type from name stored in message.Key
-            var eventType = TypeProvider.GetTypeFromAnyReferencingAssembly(message.Message.Key)!;
+            var eventEnvelope = message.ToEventEnvelope();
 
-            var eventEnvelopeType = typeof(EventEnvelope<>).MakeGenericType(eventType);
+            if (eventEnvelope == null)
+            {
+                // That can happen if we're sharing database between modules.
+                // If we're subscribing to all and not filtering out events from other modules,
+                // then we might get events that are from other module and we might not be able to deserialize them.
+                // In that case it's safe to ignore deserialization error.
+                // You may add more sophisticated logic checking if it should be ignored or not.
+                logger.LogWarning("Couldn't deserialize event of type: {EventType}", message.Message.Key);
 
-            // deserialize event
-            var @event = (IEventEnvelope)message.Message.Value.FromJson(eventEnvelopeType);
+                if (!config.IgnoreDeserializationErrors)
+                    throw new InvalidOperationException(
+                        $"Unable to deserialize event {message.Message.Key}"
+                    );
+
+                return;
+            }
 
             // publish event to internal event bus
-            await eventBus.Publish(@event, cancellationToken);
+            await eventBus.Publish(eventEnvelope, cancellationToken);
 
             consumer.Commit();
         }

@@ -7,6 +7,8 @@ public class KafkaConsumerConfig
 {
     public ConsumerConfig? ConsumerConfig { get; set; }
     public string[]? Topics { get; set; }
+
+    public bool IgnoreDeserializationErrors { get; set; } =  true;
 }
 
 public static class KafkaConsumerConfigExtensions

@@ -77,9 +77,9 @@ public class EventStoreDBSubscriptionToAll
         {
             if (IsEventWithEmptyData(resolvedEvent) || IsCheckpointEvent(resolvedEvent)) return;
 
-            var streamEvent = resolvedEvent.ToEventEnvelope();
+            var eventEnvelope = resolvedEvent.ToEventEnvelope();
 
-            if (streamEvent == null)
+            if (eventEnvelope == null)
             {
                 // That can happen if we're sharing database between modules.
                 // If we're subscribing to all and not filtering out events from other modules,
@@ -97,7 +97,7 @@ public class EventStoreDBSubscriptionToAll
             }
 
             // publish event to internal event bus
-            await eventBus.Publish(streamEvent, ct);
+            await eventBus.Publish(eventEnvelope, ct);
 
             await checkpointRepository.Store(SubscriptionId, resolvedEvent.Event.Position.CommitPosition, ct);
         }
