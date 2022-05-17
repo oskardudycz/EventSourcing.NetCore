@@ -13,7 +13,7 @@ public class RandomProductPriceCalculator: IProductPriceCalculator
 
         return productItems
             .Select(pi =>
-                PricedProductItem.Create(pi, (decimal)random.NextDouble() * 100))
+                PricedProductItem.Create(pi, Math.Round(new decimal(random.NextDouble() * 100),2)))
             .ToList();
     }
 }
