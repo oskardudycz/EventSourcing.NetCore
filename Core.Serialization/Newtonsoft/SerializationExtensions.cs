@@ -40,10 +40,10 @@ public static class SerializationExtensions
     /// <param name="json">json string</param>
     /// <param name="type">object type</param>
     /// <returns>deserialized object</returns>
-    public static object FromJson(this string json, Type type)
+    public static object? FromJson(this string json, Type type)
     {
         return JsonConvert.DeserializeObject(json, type,
-            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver())!;
+            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver());
     }
 
     /// <summary>
