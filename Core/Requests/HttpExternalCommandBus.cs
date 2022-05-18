@@ -4,14 +4,14 @@ using RestSharp.Serializers;
 
 namespace Core.Requests;
 
-public interface IExternalCommandBus
+public interface IHttpExternalCommandBus
 {
     Task Post<T>(string url, string path, T command, CancellationToken cancellationToken = default) where T: ICommand;
     Task Put<T>(string url, string path, T command, CancellationToken cancellationToken = default) where T: ICommand;
     Task Delete<T>(string url, string path, T command, CancellationToken cancellationToken = default) where T: ICommand;
 }
 
-public class ExternalCommandBus: IExternalCommandBus
+public class HttpHttpExternalCommandBus: IHttpExternalCommandBus
 {
     public Task Post<T>(string url, string path, T command, CancellationToken cancellationToken = default) where T: ICommand
     {

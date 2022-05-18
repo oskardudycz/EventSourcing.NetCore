@@ -30,18 +30,18 @@ public class HandleDiscardPayment:
     ICommandHandler<DiscardPayment>
 {
     private readonly ExternalServicesConfig externalServicesConfig;
-    private readonly IExternalCommandBus externalCommandBus;
+    private readonly IHttpExternalCommandBus httpExternalCommandBus;
 
     public HandleDiscardPayment(ExternalServicesConfig externalServicesConfig,
-        IExternalCommandBus externalCommandBus)
+        IHttpExternalCommandBus httpExternalCommandBus)
     {
         this.externalServicesConfig = externalServicesConfig;
-        this.externalCommandBus = externalCommandBus;
+        this.httpExternalCommandBus = httpExternalCommandBus;
     }
 
     public async Task<Unit> Handle(DiscardPayment command, CancellationToken cancellationToken)
     {
-        await externalCommandBus.Delete(
+        await httpExternalCommandBus.Delete(
             externalServicesConfig.PaymentsUrl!,
             "payments",
             command,

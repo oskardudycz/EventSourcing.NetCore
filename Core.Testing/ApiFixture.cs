@@ -13,7 +13,7 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
 {
     private readonly EventsLog eventsLog = new();
     private readonly DummyExternalEventProducer externalEventProducer = new();
-    private readonly DummyExternalCommandBus externalCommandBus = new();
+    private readonly DummyHttpExternalCommandBus httpExternalCommandBus = new();
 
     public override TestContext CreateTestContext() =>
         new TestContext<TStartup>(GetConfiguration, services =>
@@ -25,7 +25,7 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
             services.AddSingleton<IEventBus>(sp =>
                 new EventBusDecoratorWithExternalProducer(sp.GetRequiredService<EventBus>(),
                     sp.GetRequiredService<IExternalEventProducer>()));
-            services.AddSingleton<IExternalCommandBus>(externalCommandBus);
+            services.AddSingleton<IHttpExternalCommandBus>(httpExternalCommandBus);
             services.AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
         }, SetupWebHostBuilder);
 
@@ -37,7 +37,7 @@ public abstract class ApiWithEventsFixture<TStartup>: ApiFixture<TStartup> where
 
     public IReadOnlyCollection<TCommand> PublishedExternalCommandOfType<TCommand>() where TCommand : ICommand
     {
-        return externalCommandBus.SentCommands.OfType<TCommand>().ToList();
+        return httpExternalCommandBus.SentCommands.OfType<TCommand>().ToList();
     }
 
     public Task PublishInternalEvent<TEvent>(TEvent @event, CancellationToken ct = default) where TEvent : notnull =>

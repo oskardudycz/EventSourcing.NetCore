@@ -38,17 +38,17 @@ public class HandleSendPackage:
     ICommandHandler<SendPackage>
 {
     private readonly ExternalServicesConfig externalServicesConfig;
-    private readonly IExternalCommandBus externalCommandBus;
+    private readonly IHttpExternalCommandBus httpExternalCommandBus;
 
-    public HandleSendPackage(ExternalServicesConfig externalServicesConfig, IExternalCommandBus externalCommandBus)
+    public HandleSendPackage(ExternalServicesConfig externalServicesConfig, IHttpExternalCommandBus httpExternalCommandBus)
     {
         this.externalServicesConfig = externalServicesConfig;
-        this.externalCommandBus = externalCommandBus;
+        this.httpExternalCommandBus = httpExternalCommandBus;
     }
 
     public async Task<Unit> Handle(SendPackage command, CancellationToken cancellationToken)
     {
-        await externalCommandBus.Post(
+        await httpExternalCommandBus.Post(
             externalServicesConfig.ShipmentsUrl!,
             "shipments",
             command,

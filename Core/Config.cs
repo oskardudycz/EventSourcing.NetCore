@@ -22,7 +22,7 @@ public static class Config
             .AddTracing()
             .AddEventBus();
 
-        services.TryAddScoped<IExternalCommandBus, ExternalCommandBus>();
+        services.TryAddScoped<IHttpExternalCommandBus, HttpHttpExternalCommandBus>();
 
         services.TryAddScoped<IIdGenerator, NulloIdGenerator>();
 

@@ -31,18 +31,18 @@ public class HandleRequestPayment:
     ICommandHandler<RequestPayment>
 {
     private readonly ExternalServicesConfig externalServicesConfig;
-    private readonly IExternalCommandBus externalCommandBus;
+    private readonly IHttpExternalCommandBus httpExternalCommandBus;
 
     public HandleRequestPayment(ExternalServicesConfig externalServicesConfig,
-        IExternalCommandBus externalCommandBus)
+        IHttpExternalCommandBus httpExternalCommandBus)
     {
         this.externalServicesConfig = externalServicesConfig;
-        this.externalCommandBus = externalCommandBus;
+        this.httpExternalCommandBus = httpExternalCommandBus;
     }
 
     public async Task<Unit> Handle(RequestPayment command, CancellationToken cancellationToken)
     {
-        await externalCommandBus.Post(
+        await httpExternalCommandBus.Post(
             externalServicesConfig.PaymentsUrl!,
             "payments",
             command,

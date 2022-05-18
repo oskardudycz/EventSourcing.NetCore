@@ -3,7 +3,7 @@ using Core.Requests;
 
 namespace Core.Testing;
 
-public class DummyExternalCommandBus : IExternalCommandBus
+public class DummyHttpExternalCommandBus : IHttpExternalCommandBus
 {
     public IList<ICommand> SentCommands { get; } = new List<ICommand>();
 
