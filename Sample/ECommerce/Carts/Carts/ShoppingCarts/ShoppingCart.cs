@@ -126,7 +126,7 @@ public class ShoppingCart: Aggregate
 
         ProductItems.Replace(
             existingProductItem,
-            existingProductItem.Substract(productItemToBeRemoved)
+            existingProductItem.Subtract(productItemToBeRemoved)
         );
     }
 

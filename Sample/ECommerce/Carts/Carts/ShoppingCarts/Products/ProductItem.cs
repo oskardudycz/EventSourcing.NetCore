@@ -33,7 +33,7 @@ public class ProductItem
         return Create(ProductId, Quantity + productItem.Quantity);
     }
 
-    public ProductItem Substract(ProductItem productItem)
+    public ProductItem Subtract(ProductItem productItem)
     {
         if (!MatchesProduct(productItem))
             throw new ArgumentException("Product does not match.");
