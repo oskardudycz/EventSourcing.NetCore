@@ -71,7 +71,7 @@ public class ShoppingCartDetails
 
         ProductItems.Replace(
             existingProductItem,
-            existingProductItem.Substract(productItemToBeRemoved)
+            existingProductItem.Subtract(productItemToBeRemoved)
         );
     }
 

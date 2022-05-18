@@ -49,12 +49,12 @@ public class PricedProductItem
         return new PricedProductItem(ProductItem.MergeWith(pricedProductItem.ProductItem), UnitPrice);
     }
 
-    public PricedProductItem Substract(PricedProductItem pricedProductItem)
+    public PricedProductItem Subtract(PricedProductItem pricedProductItem)
     {
         if (!MatchesProductAndPrice(pricedProductItem))
             throw new ArgumentException("Product or price does not match.");
 
-        return new PricedProductItem(ProductItem.Substract(pricedProductItem.ProductItem), UnitPrice);
+        return new PricedProductItem(ProductItem.Subtract(pricedProductItem.ProductItem), UnitPrice);
     }
 
     public bool HasEnough(int quantity)
