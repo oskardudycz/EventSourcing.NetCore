@@ -14,7 +14,7 @@ public class ShoppingCart
 
     public IList<PricedProductItem> ProductItems { get; private set; } = default!;
 
-    public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
+    public Money TotalPrice => new Money( ProductItems.Sum(pi => pi.TotalPrice));
 
     public static ShoppingCart Open(
         Guid cartId,

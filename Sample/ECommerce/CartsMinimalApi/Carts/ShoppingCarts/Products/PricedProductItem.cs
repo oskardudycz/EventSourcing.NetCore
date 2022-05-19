@@ -6,12 +6,12 @@ public class PricedProductItem
 
     public int Quantity => ProductItem.Quantity;
 
-    public decimal UnitPrice { get; }
+    public Money UnitPrice { get; }
 
-    public decimal TotalPrice => Quantity * UnitPrice;
+    public Money TotalPrice => UnitPrice * Quantity;
     public ProductItem ProductItem { get; }
 
-    private PricedProductItem(ProductItem productItem, decimal unitPrice)
+    private PricedProductItem(ProductItem productItem, Money unitPrice)
     {
         ProductItem = productItem;
         UnitPrice = unitPrice;
@@ -32,7 +32,7 @@ public class PricedProductItem
             null => throw new ArgumentNullException(nameof(unitPrice)),
             <= 0 => throw new ArgumentOutOfRangeException(nameof(unitPrice),
                 "Unit price has to be positive number"),
-            _ => new PricedProductItem(productItem, unitPrice.Value)
+            _ => new PricedProductItem(productItem, new Money(unitPrice.Value))
         };
     }
 
