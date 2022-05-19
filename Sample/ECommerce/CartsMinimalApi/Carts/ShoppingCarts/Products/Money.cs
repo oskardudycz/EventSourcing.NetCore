@@ -46,8 +46,8 @@ public struct Money: IEquatable<Money>
         return new Money(a.Value * quantity);
     }
 
-    public static implicit operator decimal (Money m)
+    public static Money operator +(Money a, Money b)
     {
-        return m.Value;
+        return new Money(a.Value + b.Value);
     }
 }
