@@ -5,8 +5,8 @@ public record OpenShoppingCartRequest(
 );
 
 public record AddProductRequest(
-    Guid? ProductId,
-    int? Quantity
+    Guid ProductId,
+    int Quantity
 );
 
 public record PricedProductItemRequest(

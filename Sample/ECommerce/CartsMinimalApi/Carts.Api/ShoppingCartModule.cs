@@ -41,14 +41,13 @@ public class ShoppingCartModule: ICarterModule
     private IResult AddProduct(HttpContext context, Guid cartId, AddProductRequest model,
         IAddProductService addProductService)
     {
-        addProductService.AddProduct(cartId, model);
+        addProductService.AddProduct(cartId, model.ProductId, model.Quantity);
         return Results.StatusCode(204);
     }
 
     private IResult OpenCart(HttpContext context, OpenShoppingCartRequest model, IOpenCartService openCartService)
     {
-        var cartId = openCartService.OpenCart(model);
-
+        var cartId = openCartService.OpenCart(model.ClientId);
         return Results.Created($"/shoppingcart/{cartId}", null);
     }
 }

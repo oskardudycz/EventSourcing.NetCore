@@ -11,9 +11,9 @@ public class OpenCartService: IOpenCartService
         this.shoppingCartRepository = shoppingCartRepository;
     }
 
-    public Guid OpenCart(OpenShoppingCartRequest openShoppingCartRequest)
+    public Guid OpenCart(Guid clientId)
     {
-        var cart = ShoppingCart.Open(Guid.NewGuid(), openShoppingCartRequest.ClientId);
+        var cart = ShoppingCart.Open(Guid.NewGuid(), clientId);
         this.shoppingCartRepository.Save(cart);
         return cart.Id;
     }
