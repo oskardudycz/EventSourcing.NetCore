@@ -15,6 +15,7 @@ module Events =
         | Registering of {| originEpoch : ConfirmedEpochId |}
         interface TypeShape.UnionContract.IUnionContract
     let codec = Config.EventCodec.forUnion<Event>
+    let codecJsonElement = Config.EventCodec.forUnionJsonElement<Event>
 
 module Reactions =
 
@@ -161,7 +162,7 @@ module Config =
             let cat = Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
             cat.Resolve
         | Config.Store.Cosmos (context, cache) ->
-            let cat = Config.Cosmos.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
+            let cat = Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
             cat.Resolve
     let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
     let create_ pricer store =

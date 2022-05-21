@@ -5,21 +5,13 @@ open ECommerce.Domain // Config etc
 open Serilog
 open System
 
-exception MissingArg of message : string with override this.Message = this.message
-
 type Configuration(tryGet) =
+    inherit App.Configuration(tryGet)
 
-    let get key =
-        match tryGet key with
-        | Some value -> value
-        | None -> raise (MissingArg (sprintf "Missing Argument/Environment Variable %s" key))
+    member _.BaseUri =                      base.get "API_BASE_URI"
+    member _.Group =                        base.get "API_CONSUMER_GROUP"
 
-    member _.CosmosConnection =             get "EQUINOX_COSMOS_CONNECTION"
-    member _.CosmosDatabase =               get "EQUINOX_COSMOS_DATABASE"
-    member _.CosmosContainer =              get "EQUINOX_COSMOS_CONTAINER"
-
-    member _.BaseUri =                      get "API_BASE_URI"
-    member _.Group =                        get "API_CONSUMER_GROUP"
+let [<Literal>] AppName = "FeedConsumer"
 
 module Args =
 
@@ -35,7 +27,9 @@ module Args =
         | [<AltCommandLine "-w"; Unique>]   FcsDop of int
         | [<AltCommandLine "-t"; Unique>]   TicketsDop of int
 
-        | [<CliPrefix(CliPrefix.None); Unique; Last>] Cosmos of ParseResults<CosmosParameters>
+        | [<CliPrefix(CliPrefix.None); Unique; Last>] Cosmos of ParseResults<App.CosmosParameters>
+        | [<CliPrefix(CliPrefix.None); Unique; Last>] Dynamo of ParseResults<App.DynamoParameters>
+        | [<CliPrefix(CliPrefix.None); Last>] Esdb of ParseResults<App.EsdbParameters>
         interface IArgParserTemplate with
             member a.Usage = a |> function
                 | Verbose _ ->              "request verbose logging."
@@ -44,8 +38,13 @@ module Args =
                 | MaxReadAhead _ ->         "maximum number of batches to let processing get ahead of completion. Default: 8."
                 | FcsDop _ ->               "maximum number of FCs to process in parallel. Default: 4"
                 | TicketsDop _ ->           "maximum number of Tickets to process in parallel (per FC). Default: 4"
-                | Cosmos _ ->               "Cosmos Store parameters."
-    and Arguments(c : Configuration, a : ParseResults<Parameters>) =
+                | Cosmos _ ->               "specify CosmosDB input parameters"
+                | Dynamo _ ->               "specify DynamoDB input parameters"
+                | Esdb _ ->                 "specify EventStore input parameters"
+
+    [<NoComparison; NoEquality>]
+    type StoreArguments = Cosmos of App.CosmosArguments | Dynamo of App.DynamoArguments | Esdb of App.EsdbArguments
+    type Arguments(c : Configuration, a : ParseResults<Parameters>) =
         member val Verbose =                a.Contains Parameters.Verbose
         member val SourceId =               a.TryGetResult Group        |> Option.defaultWith (fun () -> c.Group) |> Propulsion.Feed.SourceId.parse
         member val BaseUri =                a.TryGetResult BaseUri      |> Option.defaultWith (fun () -> c.BaseUri) |> Uri
@@ -56,40 +55,43 @@ module Args =
         member val StateInterval =          TimeSpan.FromMinutes 5.
         member val CheckpointInterval =     TimeSpan.FromHours 1.
         member val TailSleepInterval =      TimeSpan.FromSeconds 1.
-        member val Cosmos : CosmosArguments =
+        member val ConsumerGroupName =      "default"
+        member val CacheSizeMb =            10
+        member val Store : StoreArguments =
             match a.TryGetSubCommand() with
-            | Some (Cosmos cosmos) -> CosmosArguments(c, cosmos)
-            | _ -> raise (MissingArg "Must specify cosmos")
-    and [<NoEquality; NoComparison>] CosmosParameters =
-        | [<AltCommandLine "-V"; Unique>]   Verbose
-        | [<AltCommandLine "-cm">]          ConnectionMode of Microsoft.Azure.Cosmos.ConnectionMode
-        | [<AltCommandLine "-s">]           Connection of string
-        | [<AltCommandLine "-d">]           Database of string
-        | [<AltCommandLine "-c">]           Container of string
-        | [<AltCommandLine "-o">]           Timeout of float
-        | [<AltCommandLine "-r">]           Retries of int
-        | [<AltCommandLine "-rt">]          RetriesWaitTime of float
-        interface IArgParserTemplate with
-            member a.Usage = a |> function
-                | Verbose _ ->              "request verbose logging."
-                | ConnectionMode _ ->       "override the connection mode. Default: Direct."
-                | Connection _ ->           "specify a connection string for a Cosmos account. (optional if environment variable EQUINOX_COSMOS_CONNECTION specified)"
-                | Database _ ->             "specify a database name for Cosmos store. (optional if environment variable EQUINOX_COSMOS_DATABASE specified)"
-                | Container _ ->            "specify a container name for Cosmos store. (optional if environment variable EQUINOX_COSMOS_CONTAINER specified)"
-                | Timeout _ ->              "specify operation timeout in seconds (default: 30)."
-                | Retries _ ->              "specify operation retries (default: 9)."
-                | RetriesWaitTime _ ->      "specify max wait-time for retry when being throttled by Cosmos in seconds (default: 30)"
-    and CosmosArguments(c : Configuration, a : ParseResults<CosmosParameters>) =
-        let discovery =                     a.TryGetResult Connection   |> Option.defaultWith (fun () -> c.CosmosConnection) |> Equinox.CosmosStore.Discovery.ConnectionString
-        let mode =                          a.TryGetResult ConnectionMode
-        let timeout =                       a.GetResult(Timeout, 30.)   |> TimeSpan.FromSeconds
-        let retries =                       a.GetResult(Retries, 9)
-        let maxRetryWaitTime =              a.GetResult(RetriesWaitTime, 30.) |> TimeSpan.FromSeconds
-        let connector =                     Equinox.CosmosStore.CosmosStoreConnector(discovery, timeout, retries, maxRetryWaitTime, ?mode=mode)
-        let database =                      a.TryGetResult Database     |> Option.defaultWith (fun () -> c.CosmosDatabase)
-        let container =                     a.TryGetResult Container    |> Option.defaultWith (fun () -> c.CosmosContainer)
-        member val Verbose =                a.Contains Verbose
-        member _.Connect() =                connector.ConnectStore("Main", database, container)
+            | Some (Parameters.Cosmos cosmos) -> StoreArguments.Cosmos (App.CosmosArguments (c, cosmos))
+            | Some (Parameters.Dynamo dynamo) -> StoreArguments.Dynamo (App.DynamoArguments (c, dynamo))
+            | Some (Parameters.Esdb es) -> StoreArguments.Esdb (App.EsdbArguments (c, es))
+            | _ -> App.missingArg "Must specify one of cosmos, dynamo or esdb for store"
+        member x.Connect() =
+            let cache = Equinox.Cache (AppName, sizeMb = x.CacheSizeMb)
+            match x.Store with
+            | StoreArguments.Cosmos ca ->
+                let context = ca.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
+                Config.Store.Cosmos (context, cache)
+            | StoreArguments.Dynamo da ->
+                let context = da.Connect() |> DynamoStoreContext.create
+                Config.Store.Dynamo (context, cache)
+            | StoreArguments.Esdb ea ->
+                let context = ea.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
+                Config.Store.Esdb (context, cache)
+        member x.CheckpointerIn(store) : Propulsion.Feed.IFeedCheckpointStore =
+            match store with
+            | Config.Store.Cosmos (context, cache) ->
+                Propulsion.Feed.ReaderCheckpoint.CosmosStore.create Config.log (x.ConsumerGroupName, x.CheckpointInterval) (context, cache)
+            | Config.Store.Dynamo (context, cache) ->
+                Propulsion.Feed.ReaderCheckpoint.DynamoStore.create Config.log (x.ConsumerGroupName, x.CheckpointInterval) (context, cache)
+            | Config.Store.Esdb _ ->
+                failwith "Propulsion.EventStoreDb does not implement a checkpointer, perhaps port https://github.com/absolutejam/Propulsion.EventStoreDB ?"
+                // or fork/finish https://github.com/jet/dotnet-templates/pull/81
+                // alternately one could use a SQL Server DB via Propulsion.SqlStreamStore
+            | Config.Store.Memory _ ->
+                failwith "It's possible to set up an in-memory projection, but that's in the context of a single process integration test as illustrated in https://github.com/jet/dotnet-templates/blob/master/equinox-shipping/Watchdog.Integration/ReactorFixture.fs"
+        member x.StoreVerbose =
+            match x.Store with
+            | StoreArguments.Cosmos a -> a.Verbose
+            | StoreArguments.Dynamo a -> a.Verbose
+            | StoreArguments.Esdb a -> a.Verbose
 
     /// Parse the commandline; can throw exceptions in response to missing arguments and/or `-h`/`--help` args
     let parse tryGetConfigValue argv =
@@ -97,11 +99,8 @@ module Args =
         let parser = ArgumentParser.Create<Parameters>(programName = programName)
         Arguments(Configuration tryGetConfigValue, parser.ParseCommandLine argv)
 
-let [<Literal>] AppName = "FeedConsumerTemplate"
-
 let build (args : Args.Arguments) =
-    let cache = Equinox.Cache (AppName, sizeMb = 10)
-    let context = args.Cosmos.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
+    let store = args.Connect()
 
     let log = Log.forGroup args.SourceId // needs to have a `group` tag for Propulsion.Streams Prometheus metrics
     let sink =
@@ -109,12 +108,12 @@ let build (args : Args.Arguments) =
         let stats = Ingester.Stats(log, args.StatsInterval, args.StateInterval)
         Propulsion.Streams.StreamsProjector.Start(log, args.MaxReadAhead, args.FcsDop, handle, stats, args.StatsInterval)
     let pumpSource =
-        let checkpoints = Propulsion.Feed.ReaderCheckpoint.CosmosStore.create Config.log (context, cache)
+        let checkpoints = args.CheckpointerIn(store)
         let feed = ApiClient.TicketsFeed args.BaseUri
         let source =
             Propulsion.Feed.FeedSource(
                 log, args.StatsInterval, args.SourceId, args.TailSleepInterval,
-                checkpoints, args.CheckpointInterval, feed.Poll, sink)
+                checkpoints, feed.Poll, sink)
         source.Pump feed.ReadTranches
     sink, pumpSource
 
@@ -128,10 +127,10 @@ let run args = async {
 let main argv =
     try let args = Args.parse EnvVar.tryGet argv
         try let metrics = Sinks.equinoxAndPropulsionFeedConsumerMetrics (Sinks.tags AppName)
-            Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.Cosmos.Verbose).CreateLogger()
+            Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.StoreVerbose).CreateLogger()
             try run args |> Async.RunSynchronously
-            with e when not (e :? MissingArg) -> Log.Fatal(e, "Exiting"); 2
+            with e when not (e :? App.MissingArg) -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()
-    with MissingArg msg -> eprintfn "%s" msg; 1
+    with App.MissingArg msg -> eprintfn "%s" msg; 1
         | :? Argu.ArguParseException as e -> eprintfn "%s" e.Message; 1
         | e -> eprintf "Exception %s" e.Message; 1

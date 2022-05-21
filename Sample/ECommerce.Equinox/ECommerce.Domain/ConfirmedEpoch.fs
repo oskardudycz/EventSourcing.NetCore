@@ -20,6 +20,7 @@ module Events =
         | Closed
         interface TypeShape.UnionContract.IUnionContract
     let codec = Config.EventCodec.forUnion<Event>
+    let codecJsonElement = Config.EventCodec.forUnionJsonElement<Event>
 
 let ofShoppingCartView cartId (view : ShoppingCart.Details.View) : Events.Cart =
     { cartId = cartId; items = [| for i in view.items -> { productId = i.productId; unitPrice = i.unitPrice; quantity = i.quantity }|] }
@@ -62,18 +63,16 @@ let decide shouldClose candidates (currentIds, closed as state) : ExactlyOnceIng
 // NOTE see feedSource for example of separating Service logic into Ingestion and Read Services in order to vary the folding and/or state held
 type Service internal
     (   shouldClose : CartId[] -> CartId[] -> bool, // let outer layers decide whether ingestion should trigger closing of the batch
-        resolve_ : Equinox.ResolveOption option -> ConfirmedEpochId -> Equinox.Decider<Events.Event, Fold.State>) =
-    let resolve = resolve_ None
-    let resolveStale = resolve_ (Some Equinox.AllowStale)
+        resolve : ConfirmedEpochId -> Equinox.Decider<Events.Event, Fold.State>) =
 
     /// Ingest the supplied items. Yields relevant elements of the post-state to enable generation of stats
     /// and facilitate deduplication of incoming items in order to avoid null store round-trips where possible
     member _.Ingest(epochId, carts) =
-        let decider = resolveStale epochId
-        /// NOTE decider which will initially transact against potentially stale cached state, which will trigger a
-        /// resync if another writer has gotten in before us. This is a conscious decision in this instance; the bulk
-        /// of writes are presumed to be coming from within this same process
-        decider.Transact(decide shouldClose carts)
+        let decider = resolve epochId
+        // NOTE decider which will initially transact against potentially stale cached state, which will trigger a
+        // resync if another writer has gotten in before us. This is a conscious decision in this instance; the bulk
+        // of writes are presumed to be coming from within this same process
+        decider.Transact(decide shouldClose carts, option = Equinox.AllowStale)
 
     /// Returns all the items currently held in the stream (Not using AllowStale on the assumption this needs to see updates from other apps)
     member _.Read epochId : Async<Fold.State> =
@@ -83,17 +82,17 @@ type Service internal
 module Config =
 
     let private create_ shouldClose resolve = Service(shouldClose, resolve)
-    let private resolveStream opt = function
+    let private resolveStream = function
         | Config.Store.Memory store ->
             let cat = Config.Memory.create Events.codec Fold.initial Fold.fold store
-            fun sn -> cat.Resolve(sn, ?option = opt)
+            cat.Resolve
         | Config.Store.Esdb (context, cache) ->
             let cat = Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-            fun sn -> cat.Resolve(sn, ?option = opt)
+            cat.Resolve
         | Config.Store.Cosmos (context, cache) ->
-            let cat = Config.Cosmos.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-            fun sn -> cat.Resolve(sn, ?option = opt)
-    let private resolveDecider store opt = streamName >> resolveStream opt store >> Config.createDecider
+            let cat = Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
+            cat.Resolve
+    let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
     let shouldClose maxItemsPerEpoch candidateItems currentItems = Array.length currentItems + Array.length candidateItems >= maxItemsPerEpoch
     let create maxItemsPerEpoch = resolveDecider >> create_ (shouldClose maxItemsPerEpoch)
 
@@ -129,7 +128,10 @@ module Reader =
                 let cat = Config.Esdb.createUnoptimized Events.codec initial fold (context, cache)
                 cat.Resolve
             | Config.Store.Cosmos (context, cache) ->
-                let cat = Config.Cosmos.createUnoptimized Events.codec initial fold (context, cache)
+                let cat = Config.Cosmos.createUnoptimized Events.codecJsonElement initial fold (context, cache)
+                cat.Resolve
+            | Config.Store.Dynamo (context, cache) ->
+                let cat = Config.Dynamo.createUnoptimized Events.codec initial fold (context, cache)
                 cat.Resolve
         let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
         let create = resolveDecider >> Service
