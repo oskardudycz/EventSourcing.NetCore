@@ -9,7 +9,9 @@
     <ItemGroup>
         <Compile Include="ConfirmedHandler.fs" />
         <Compile Include="ShoppingCartSummaryHandler.fs" />
+        <Compile Include="ReactorMetrics.fs" />
         <Compile Include="Reactor.fs" />
+        <Compile Include="Args.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
