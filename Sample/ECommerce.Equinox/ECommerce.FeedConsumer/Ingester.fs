@@ -6,7 +6,7 @@ open System
 type Outcome = { added : int; notReady : int; dups : int }
 
 /// Gathers stats based on the outcome of each Span processed for periodic emission
-type Stats(log, statsInterval, stateInterval) =
+type Stats(log, statsInterval, stateInterval, logExternalStats) =
     inherit Propulsion.Streams.Stats<Outcome>(log, statsInterval, stateInterval)
 
     let mutable added, notReady, dups = 0, 0, 0
@@ -20,10 +20,11 @@ type Stats(log, statsInterval, stateInterval) =
         log.Information(exn, "Unhandled")
 
     override _.DumpStats() =
-        base.DumpStats()
         if added <> 0 || notReady <> 0 || dups <> 0 then
-            log.Information(" Added {added} Not Yet Shipped {notReady} Duplicates {dups}", added, notReady, dups)
+            log.Information("👉Added {added} Not Yet Shipped {notReady} Duplicates {dups}", added, notReady, dups)
             added <- 0; notReady <- 0; dups <- 0
+        base.DumpStats()
+        logExternalStats log
 
 module PipelineEvent =
 
