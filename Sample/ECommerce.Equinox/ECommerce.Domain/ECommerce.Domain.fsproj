@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
@@ -18,11 +18,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Equinox.CosmosStore" Version="3.0.6" />
-        <PackageReference Include="Equinox.EventStore" Version="3.0.6" />
-        <PackageReference Include="Equinox.MemoryStore" Version="3.0.6" />
-        <PackageReference Include="FsCodec.SystemTextJson" Version="2.3.2" />
-        <PackageReference Include="Propulsion" Version="2.12.1" />
+        <PackageReference Include="Equinox.CosmosStore" Version="4.0.0-beta.4.2" />
+        <PackageReference Include="Equinox.DynamoStore" Version="4.0.0-beta.4.2" />
+        <PackageReference Include="Equinox.EventStoreDb" Version="4.0.0-beta.4.2" />
+        <PackageReference Include="Equinox.MemoryStore" Version="4.0.0-beta.4.2" />
+        <PackageReference Include="FsCodec.SystemTextJson" Version="3.0.0-rc.2.2" />
+        <PackageReference Include="Propulsion" Version="2.13.0-beta.3" />
     </ItemGroup>
 
 </Project>
