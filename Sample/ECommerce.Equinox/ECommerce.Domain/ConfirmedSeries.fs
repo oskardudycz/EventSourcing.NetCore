@@ -17,6 +17,7 @@ module Events =
         | Snapshotted of        {| active : ConfirmedEpochId |}
         interface TypeShape.UnionContract.IUnionContract
     let codec = Config.EventCodec.forUnion<Event>
+    let codecJsonElement = Config.EventCodec.forUnionJsonElement<Event>
 
 module Fold =
 
@@ -34,10 +35,7 @@ let interpret epochId (state : Fold.State) =
     [if state |> Option.forall (fun cur -> cur < epochId) && epochId >= ConfirmedEpochId.initial then
         yield Events.Started {| epochId = epochId |}]
 
-type Service internal (resolve_ : Equinox.ResolveOption option -> unit -> Equinox.Decider<Events.Event, Fold.State>) =
-
-    let resolve = resolve_ None
-    let resolveStale = resolve_ (Some Equinox.AllowStale)
+type Service internal (resolve : unit -> Equinox.Decider<Events.Event, Fold.State>) =
 
     /// Determines the current active epoch
     /// Uses cached values as epoch transitions are rare, and caller needs to deal with the inherent race condition in any case
@@ -48,20 +46,23 @@ type Service internal (resolve_ : Equinox.ResolveOption option -> unit -> Equino
     /// Mark specified `epochId` as live for the purposes of ingesting
     /// Writers are expected to react to having writes to an epoch denied (due to it being Closed) by anointing a successor via this
     member _.MarkIngestionEpochId epochId : Async<unit> =
-        let decider = resolveStale ()
-        decider.Transact(interpret epochId)
+        let decider = resolve()
+        decider.Transact(interpret epochId, option = Equinox.AllowStale)
 
 module Config =
 
-    let private resolveStream opt = function
+    let private resolveStream = function
         | Config.Store.Memory store ->
             let cat = Config.Memory.create Events.codec Fold.initial Fold.fold store
-            fun sn -> cat.Resolve(sn, ?option = opt)
+            cat.Resolve
         | Config.Store.Esdb (context, cache) ->
             let cat = Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-            fun sn -> cat.Resolve(sn, ?option = opt)
+            cat.Resolve
         | Config.Store.Cosmos (context, cache) ->
-            let cat = Config.Cosmos.createSnapshotted Events.codec Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
-            fun sn -> cat.Resolve(sn, ?option = opt)
-    let private resolveDecider store opt = streamName >> resolveStream opt store >> Config.createDecider
+            let cat = Config.Cosmos.createSnapshotted Events.codecJsonElement Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
+            cat.Resolve
+        | Config.Store.Dynamo (context, cache) ->
+            let cat = Config.Dynamo.createSnapshotted Events.codec Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
+            cat.Resolve
+    let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
     let create = resolveDecider >> Service

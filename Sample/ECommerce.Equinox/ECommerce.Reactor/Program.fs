@@ -1,7 +1,7 @@
 module ECommerce.Reactor.Program
 
 open ECommerce.Infrastructure
-open Propulsion.EventStore
+open Propulsion.EventStoreDb
 open Serilog
 open System
 
@@ -17,19 +17,13 @@ type Configuration(tryGet) =
     member _.CosmosConnection =             get "EQUINOX_COSMOS_CONNECTION"
     member _.CosmosDatabase =               get "EQUINOX_COSMOS_DATABASE"
     member _.CosmosContainer =              get "EQUINOX_COSMOS_CONTAINER"
-    member _.EventStorePort =               tryGet "EQUINOX_ES_PORT" |> Option.map int
-    member _.EventStoreProjectionPort =     tryGet "EQUINOX_ES_PROJ_PORT" |> Option.map int
-    member _.EventStoreHost =               get "EQUINOX_ES_HOST"
-    member _.EventStoreProjectionHost =     tryGet "EQUINOX_ES_PROJ_HOST"
-    member _.EventStoreUsername =           get "EQUINOX_ES_USERNAME"
-    member _.EventStoreProjectionUsername = tryGet "EQUINOX_ES_PROJ_USERNAME"
-    member _.EventStorePassword =           get "EQUINOX_ES_PASSWORD"
-    member _.EventStoreProjectionPassword = tryGet "EQUINOX_ES_PROJ_PASSWORD"
+    member _.EventStoreConnection =         get "EQUINOX_ES_CONNECTION"
+    member _.EventStoreCredentials =        tryGet "EQUINOX_ES_CREDENTIALS"
 
 module Args =
 
     open Argu
-    open Equinox.EventStore
+    open Equinox.EventStoreDb
     [<NoEquality; NoComparison>]
     type Parameters =
         | [<AltCommandLine "-V"; Unique>]   Verbose
@@ -289,25 +283,25 @@ module Args =
 
 let [<Literal>] AppName = "ReactorTemplate"
 
-module Checkpoints =
-
-    open Equinox.CosmosStore
-
-    // In this implementation, we keep the checkpoints in Cosmos when consuming from EventStore
-    module Cosmos =
-
-        let codec = FsCodec.NewtonsoftJson.Codec.Create<Checkpoint.Events.Event>()
-        let access = AccessStrategy.Custom (Checkpoint.Fold.isOrigin, Checkpoint.Fold.transmute)
-        let create groupName (context, cache) =
-            let caching = CachingStrategy.SlidingWindow (cache, TimeSpan.FromMinutes 20.)
-            let cat = CosmosStoreCategory(context, codec, Checkpoint.Fold.fold, Checkpoint.Fold.initial, caching, access)
-            let resolve streamName = cat.Resolve(streamName, Equinox.AllowStale)
-            Checkpoint.CheckpointSeries(groupName, resolve)
+//module Checkpoints =
+//
+//    open Equinox.CosmosStore
+//
+//    // In this implementation, we keep the checkpoints in Cosmos when consuming from EventStore
+//    module Cosmos =
+//
+//        let codec = FsCodec.SystemTextJson.Codec.Create<Checkpoint.Events.Event>()
+//        let access = AccessStrategy.Custom (Checkpoint.Fold.isOrigin, Checkpoint.Fold.transmute)
+//        let create groupName (context, cache) =
+//            let caching = CachingStrategy.SlidingWindow (cache, TimeSpan.FromMinutes 20.)
+//            let cat = CosmosStoreCategory(context, codec, Checkpoint.Fold.fold, Checkpoint.Fold.initial, caching, access)
+//            let resolve streamName = cat.Resolve(streamName, Equinox.AllowStale)
+//            Checkpoint.CheckpointSeries(groupName, resolve)
 
 module EventStoreContext =
 
     let create connection =
-        Equinox.EventStore.EventStoreContext(connection, Equinox.EventStore.BatchingPolicy(maxBatchSize=500))
+        Equinox.EventStoreDb.EventStoreContext(connection, Equinox.EventStoreDb.BatchingPolicy(maxBatchSize=500))
 
 open Propulsion.CosmosStore.Infrastructure // AwaitKeyboardInterruptAsTaskCancelledException
 open ECommerce.Domain
@@ -315,8 +309,8 @@ open ECommerce.Domain
 let build (args : Args.Arguments) =
     match args.SourceParams() with
     | Choice1Of2 (srcE, context, spec) ->
-        let connectEs () = srcE.Connect(Log.Logger, Log.Logger, AppName, Equinox.EventStore.ConnectionStrategy.ClusterSingle Equinox.EventStore.NodePreference.Master)
-        let connectProjEs () = srcE.ConnectProj(Log.Logger, Log.Logger, AppName, Equinox.EventStore.NodePreference.PreferSlave)
+        let connectEs () = srcE.Connect(Log.Logger, Log.Logger, AppName, Equinox.EventStoreDb.ConnectionStrategy.ClusterSingle EventStore.Client.NodePreference.Leader)
+        let connectProjEs () = srcE.ConnectProj(Log.Logger, Log.Logger, AppName, EventStore.Client.NodePreference.Follower)
 
         let cache = Equinox.Cache(AppName, sizeMb = 10)
         let checkpoints = Checkpoints.Cosmos.create spec.groupName (context, cache)
@@ -343,7 +337,7 @@ let build (args : Args.Arguments) =
         let stats = Reactor.Stats(Log.Logger, args.StatsInterval, args.StateInterval)
         let sink = Propulsion.Streams.StreamsProjector.Start(Log.Logger, args.MaxReadAhead, args.MaxConcurrentStreams, handle, stats, args.StatsInterval)
         let source =
-            let mapToStreamItems = Seq.collect Propulsion.CosmosStore.EquinoxNewtonsoftParser.enumStreamEvents
+            let mapToStreamItems = Seq.collect Propulsion.CosmosStore.EquinoxSystemTextJsonParser.enumStreamEvents
             let observer = Propulsion.CosmosStore.CosmosStoreSource.CreateObserver(Log.Logger, sink.StartIngester, mapToStreamItems)
             Propulsion.CosmosStore.CosmosStoreSource.Start(Log.Logger, monitored, leases, processorName, observer, startFromTail, ?maxItems=maxItems, lagReportFreq=lagFrequency)
         [ Async.AwaitKeyboardInterruptAsTaskCancelledException(); source.AwaitWithStopOnCancellation(); sink.AwaitWithStopOnCancellation() ]

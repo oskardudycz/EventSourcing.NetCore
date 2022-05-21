@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
@@ -12,11 +12,12 @@
     <ItemGroup>
         <PackageReference Include="Argu" Version="6.1.1" />
         <PackageReference Include="Destructurama.FSharp" Version="1.2.0" />
-        <PackageReference Include="Equinox.CosmosStore.Prometheus" Version="3.0.6" />
+        <PackageReference Include="Equinox.CosmosStore.Prometheus" Version="4.0.0-beta.4.2" />
+        <PackageReference Include="Equinox.DynamoStore.Prometheus" Version="4.0.0-beta.4.2" />
         <PackageReference Include="prometheus-net.AspNetCore" Version="3.6.0" />
-        <PackageReference Include="Propulsion.CosmosStore" Version="2.12.2" />
-        <PackageReference Include="Propulsion.EventStore" Version="2.12.2" />
-        <PackageReference Include="Propulsion.Feed" Version="2.12.2" />
+        <PackageReference Include="Propulsion.CosmosStore" Version="2.13.0-beta.2" />
+        <PackageReference Include="Propulsion.EventStoreDb" Version="2.13.0-beta.2" />
+        <PackageReference Include="Propulsion.DynamoStore" Version="2.13.0-beta.2" />
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
     </ItemGroup>

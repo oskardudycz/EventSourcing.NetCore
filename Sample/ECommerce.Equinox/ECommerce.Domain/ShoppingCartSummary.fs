@@ -14,6 +14,7 @@ module Events =
         | Ingested of Ingested
         interface TypeShape.UnionContract.IUnionContract
     let codec = Config.EventCodec.forUnion<Event>
+    let codecJsonElement = Config.EventCodec.forUnionJsonElement<Event>
 
 module Fold =
 
@@ -69,7 +70,7 @@ module Config =
         | Config.Store.Esdb (_context, _cache) ->
             failwith "Not implemented: For EventStore its suggested to do a cached read from the write side"
         | Config.Store.Cosmos (context, cache) ->
-            let cat = Config.Cosmos.createRollingState Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
+            let cat = Config.Cosmos.createRollingState Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
             cat.Resolve
     let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
     let create = resolveDecider >> Service
