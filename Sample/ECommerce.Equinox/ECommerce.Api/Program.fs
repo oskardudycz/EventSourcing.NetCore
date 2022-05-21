@@ -6,10 +6,8 @@ open Microsoft.Extensions.DependencyInjection
 open Serilog
 open System
 
-exception MissingArg of message : string with override this.Message = this.message
-
 type Configuration(tryGet) =
-    inherit App.Configuration(tryGet)
+    inherit Args.Configuration(tryGet)
 
 let [<Literal>] AppName = "ECommerce.Web"
 
@@ -20,25 +18,28 @@ module Args =
     [<NoEquality; NoComparison>]
     type Parameters =
         | [<AltCommandLine "-V"; Unique>]   Verbose
-        | [<CliPrefix(CliPrefix.None); Last>] Cosmos of ParseResults<App.CosmosParameters>
-        | [<CliPrefix(CliPrefix.None); Last>] Dynamo of ParseResults<App.DynamoParameters>
-        | [<CliPrefix(CliPrefix.None); Last>] Esdb of ParseResults<App.EsdbParameters>
+        | [<AltCommandLine "-p"; Unique>]   PrometheusPort of int
+        | [<CliPrefix(CliPrefix.None); Last>] Cosmos of ParseResults<Args.Cosmos.Parameters>
+        | [<CliPrefix(CliPrefix.None); Last>] Dynamo of ParseResults<Args.Dynamo.Parameters>
+        | [<CliPrefix(CliPrefix.None); Last>] Esdb of ParseResults<Args.Esdb.Parameters>
         interface IArgParserTemplate with
             member a.Usage = a |> function
                 | Verbose _ ->              "request verbose logging."
+                | PrometheusPort _ ->       "port from which to expose a Prometheus /metrics endpoint. Default: off (optional if environment variable PROMETHEUS_PORT specified)"
                 | Cosmos _ ->               "specify CosmosDB input parameters"
                 | Dynamo _ ->               "specify DynamoDB input parameters"
                 | Esdb _ ->                 "specify EventStore input parameters"
-    and [<NoComparison; NoEquality>] StoreArguments = Cosmos of App.CosmosArguments | Dynamo of App.DynamoArguments | Esdb of App.EsdbArguments
+    and [<NoComparison; NoEquality>] StoreArguments = Cosmos of Args.Cosmos.Arguments | Dynamo of Args.Dynamo.Arguments | Esdb of Args.Esdb.Arguments
     and [<RequireQualifiedAccess>]
         Arguments(c : Configuration, a : ParseResults<Parameters>) =
-        member val Verbose =                a.Contains Parameters.Verbose
+        member val Verbose =                a.Contains Verbose
+        member val PrometheusPort =         a.TryGetResult PrometheusPort |> Option.orElseWith (fun () -> c.PrometheusPort)
         member val Store : StoreArguments =
             match a.TryGetSubCommand() with
-            | Some (Parameters.Cosmos cosmos) -> StoreArguments.Cosmos (App.CosmosArguments (c, cosmos))
-            | Some (Parameters.Dynamo dynamo) -> StoreArguments.Dynamo (App.DynamoArguments (c, dynamo))
-            | Some (Parameters.Esdb es) -> StoreArguments.Esdb (App.EsdbArguments (c, es))
-            | _ -> App.missingArg "Must specify one of cosmos, dynamo or esdb for store"
+            | Some (Parameters.Cosmos cosmos) -> StoreArguments.Cosmos (Args.Cosmos.Arguments (c, cosmos))
+            | Some (Parameters.Dynamo dynamo) -> StoreArguments.Dynamo (Args.Dynamo.Arguments (c, dynamo))
+            | Some (Parameters.Esdb es) -> StoreArguments.Esdb (Args.Esdb.Arguments (c, es))
+            | _ -> Args.missingArg "Must specify one of cosmos, dynamo or esdb for store"
         member x.Connect() =
             let cache = Equinox.Cache (AppName, sizeMb = 10)
             match x.Store with
@@ -72,6 +73,7 @@ type Logging() =
         c   .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
             .WriteTo.Sink(Equinox.CosmosStore.Prometheus.LogSink(customTags))
+            .WriteTo.Sink(Equinox.DynamoStore.Prometheus.LogSink(customTags))
             .Enrich.FromLogContext()
             .WriteTo.Console()
 
@@ -94,8 +96,8 @@ let main argv =
         let metrics = Sinks.tags AppName |> Sinks.equinoxMetricsOnly
         try Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.StoreVerbose).CreateLogger()
             try run args; 0
-            with e when not (e :? MissingArg) -> Log.Fatal(e, "Exiting"); 2
+            with e when not (e :? Args.MissingArg) -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()
-    with MissingArg msg -> eprintfn $"%s{msg}"; 1
+    with Args.MissingArg msg -> eprintfn $"%s{msg}"; 1
         | :? Argu.ArguParseException as e -> eprintfn $"%s{e.Message}"; 1
         | e -> eprintfn $"Exception %s{e.Message}"; 1
