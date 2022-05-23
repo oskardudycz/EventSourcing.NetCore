@@ -13,7 +13,7 @@ type Service(source : ShoppingCart.Service, destination : ShoppingCartSummary.Se
 
 module Config =
 
-    let create (sourceStore, destinationStore) =
+    let create (sourceStore, targetStore) =
         let source = ShoppingCart.Config.create sourceStore
-        let destination = ShoppingCartSummary.Config.create destinationStore
+        let destination = ShoppingCartSummary.Config.create targetStore
         Service(source, destination)

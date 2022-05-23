@@ -19,7 +19,9 @@ module Events =
 
 module Reactions =
 
-    let (|Decode|) (span : Propulsion.Streams.StreamSpan<_>) = span.events |> Seq.choose Events.codec.TryDecode |> Array.ofSeq
+    open FsCodec.Interop
+    let private codec = Events.codec.ToByteArrayCodec()
+    let (|Decode|) (span : Propulsion.Streams.StreamSpan<byte[]>) = span.events |> Seq.choose codec.TryDecode |> Array.ofSeq
     let (|Parse|_|) = function
         | StreamName sellerId, Decode events -> Some (sellerId, events)
         | _ -> None
