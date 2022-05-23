@@ -52,8 +52,8 @@ module CosmosStoreContext =
 
 type Equinox.DynamoStore.DynamoStoreClient with
 
-    member x.LogConfiguration(role : string, ?log) =
-        (defaultArg log Log.Logger).Information("DynamoStore {role:l} Table {table}", role) // TODO next ver has: , x.TableName)
+    member x.LogConfiguration(role, ?log) =
+        (defaultArg log Log.Logger).Information("DynamoStore {role:l} Table {table}", role, x.TableName)
 
 type Equinox.DynamoStore.DynamoStoreConnector with
 

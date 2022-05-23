@@ -108,7 +108,7 @@ module Dynamo =
         let streamsDop =                    a.GetResult(StreamsDop, 4)
         let timeout =                       a.GetResult(RetriesTimeoutS, 60.) |> TimeSpan.FromSeconds
         let retries =                       a.GetResult(Retries, 9)
-        let connector =                     Equinox.DynamoStore.DynamoStoreConnector(serviceUrl, accessKey, secretKey, retries, timeout)
+        let connector =                     Equinox.DynamoStore.DynamoStoreConnector(serviceUrl, accessKey, secretKey, timeout, retries)
         let client =                        connector.CreateClient()
         member val Verbose =                a.Contains Verbose
         member _.Connect() =                let mainClient = connector.ConnectStore(client, "Main", table)

@@ -72,5 +72,8 @@ module Config =
         | Config.Store.Cosmos (context, cache) ->
             let cat = Config.Cosmos.createRollingState Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
             cat.Resolve
+        | Config.Store.Dynamo (context, cache) ->
+            let cat = Config.Dynamo.createRollingState Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
+            cat.Resolve
     let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
     let create = resolveDecider >> Service

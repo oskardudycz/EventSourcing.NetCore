@@ -166,6 +166,9 @@ module Config =
         | Config.Store.Cosmos (context, cache) ->
             let cat = Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
             cat.Resolve
+        | Config.Store.Dynamo (context, cache) ->
+            let cat = Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
+            cat.Resolve
     let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
     let create_ pricer store =
         Service(resolveDecider store, calculatePrice pricer)
