@@ -1,6 +1,7 @@
 module ECommerce.Api.Program
 
 open ECommerce
+open ECommerce.Infrastructure // Args etc
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Serilog
@@ -29,34 +30,30 @@ module Args =
                 | Cosmos _ ->               "specify CosmosDB input parameters"
                 | Dynamo _ ->               "specify DynamoDB input parameters"
                 | Esdb _ ->                 "specify EventStore input parameters"
-    and [<NoComparison; NoEquality>] StoreArguments = Cosmos of Args.Cosmos.Arguments | Dynamo of Args.Dynamo.Arguments | Esdb of Args.Esdb.Arguments
     and [<RequireQualifiedAccess>]
         Arguments(c : Configuration, a : ParseResults<Parameters>) =
         member val Verbose =                a.Contains Verbose
         member val PrometheusPort =         a.TryGetResult PrometheusPort |> Option.orElseWith (fun () -> c.PrometheusPort)
-        member val Store : StoreArguments =
+        member val CacheSizeMb =            10
+        member val StoreArgs : Args.StoreArguments =
             match a.TryGetSubCommand() with
-            | Some (Parameters.Cosmos cosmos) -> StoreArguments.Cosmos (Args.Cosmos.Arguments (c, cosmos))
-            | Some (Parameters.Dynamo dynamo) -> StoreArguments.Dynamo (Args.Dynamo.Arguments (c, dynamo))
-            | Some (Parameters.Esdb es) -> StoreArguments.Esdb (Args.Esdb.Arguments (c, es))
+            | Some (Parameters.Cosmos cosmos) -> Args.StoreArguments.Cosmos (Args.Cosmos.Arguments (c, cosmos))
+            | Some (Parameters.Dynamo dynamo) -> Args.StoreArguments.Dynamo (Args.Dynamo.Arguments (c, dynamo))
+            | Some (Parameters.Esdb es) -> Args.StoreArguments.Esdb (Args.Esdb.Arguments (c, es))
             | _ -> Args.missingArg "Must specify one of cosmos, dynamo or esdb for store"
-        member x.Connect() =
-            let cache = Equinox.Cache (AppName, sizeMb = 10)
-            match x.Store with
-            | StoreArguments.Cosmos ca ->
-                let context = ca.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
+        member x.VerboseStore = Args.verboseRequested x.StoreArgs
+        member x.Connect() : Domain.Config.Store<_> =
+            let cache = Equinox.Cache (AppName, sizeMb = x.CacheSizeMb)
+            match x.StoreArgs with
+            | Args.StoreArguments.Cosmos a ->
+                let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
                 Domain.Config.Store.Cosmos (context, cache)
-            | StoreArguments.Dynamo da ->
-                let context = da.Connect() |> DynamoStoreContext.create
+            | Args.StoreArguments.Dynamo a ->
+                let context = a.Connect() |> DynamoStoreContext.create
                 Domain.Config.Store.Dynamo (context, cache)
-            | StoreArguments.Esdb ea ->
-                let context = ea.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
+            | Args.StoreArguments.Esdb a ->
+                let context = a.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
                 Domain.Config.Store.Esdb (context, cache)
-        member x.StoreVerbose =
-            match x.Store with
-            | StoreArguments.Cosmos a -> a.Verbose
-            | StoreArguments.Dynamo a -> a.Verbose
-            | StoreArguments.Esdb a -> a.Verbose
 
     /// Parse the commandline; can throw exceptions in response to missing arguments and/or `-h`/`--help` args
     let parse tryGetConfigValue argv =
@@ -94,7 +91,7 @@ let run (args : Args.Arguments) =
 let main argv =
     try let args = Args.parse EnvVar.tryGet argv
         let metrics = Sinks.tags AppName |> Sinks.equinoxMetricsOnly
-        try Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.StoreVerbose).CreateLogger()
+        try Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.VerboseStore).CreateLogger()
             try run args; 0
             with e when not (e :? Args.MissingArg) -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()

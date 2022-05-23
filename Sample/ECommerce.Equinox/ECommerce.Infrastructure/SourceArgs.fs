@@ -1,7 +1,6 @@
-module ECommerce.Reactor.Args
+module ECommerce.Infrastructure.SourceArgs
 
 open Argu
-open ECommerce
 open Serilog
 open System
 
@@ -9,7 +8,7 @@ type Configuration(tryGet) =
     inherit Args.Configuration(tryGet)
     member _.DynamoIndexTable =             tryGet Args.INDEX_TABLE
 
-module CosmosSource =
+module Cosmos =
 
     type [<NoEquality; NoComparison>] Parameters =
         | [<AltCommandLine "-V"; Unique>]   Verbose
@@ -56,15 +55,15 @@ module CosmosSource =
         let lagFrequency =                  a.GetResult(LagFreqM, 1.) |> TimeSpan.FromMinutes
         member val Verbose =                a.Contains Verbose
         member private _.ConnectLeases() =  connector.CreateUninitialized(database, leaseContainer)
+        member x.ConnectStoreAndMonitored() = connector.ConnectStoreAndMonitored(database, container)
         member x.MonitoringParams(log : ILogger) =
             let leases : Microsoft.Azure.Cosmos.Container = x.ConnectLeases()
             log.Information("ChangeFeed Leases Database {db} Container {container}. MaxItems limited to {maxItems}",
                 leases.Database.Id, leases.Id, Option.toNullable maxItems)
             if fromTail then log.Warning("(If new projector group) Skipping projection of all existing events.")
             (leases, fromTail, maxItems, lagFrequency)
-        member x.ConnectStoreAndMonitored() = connector.ConnectStoreAndMonitored(database, container)
 
-module DynamoSource =
+module Dynamo =
 
     [<NoEquality; NoComparison>]
     type Parameters =
@@ -140,7 +139,7 @@ module DynamoSource =
                 | Position _ ->             "Override to specified position"
                 | Tranche _ ->              "Specify tranche to override"
 
-module EsdbSource =
+module Esdb =
 
     [<NoEquality; NoComparison>]
     type Parameters =
@@ -162,27 +161,47 @@ module EsdbSource =
 
                 | Cosmos _ ->               "CosmosDB (Checkpoint) Store parameters."
                 | Dynamo _ ->               "DynamoDB (Checkpoint) Store parameters."
+
+    [<RequireQualifiedAccess; NoComparison; NoEquality>]
+    type TargetStoreArguments = Cosmos of Args.Cosmos.Arguments | Dynamo of Args.Dynamo.Arguments
+
     type Arguments(c : Configuration, a : ParseResults<Parameters>) =
+        let        tailSleepInterval =      TimeSpan.FromSeconds 0.5
+        let        maxItems =               100
         member val Verbose =                a.Contains Verbose
         member val ConnectionString =       a.TryGetResult(Connection) |> Option.defaultWith (fun () -> c.EventStoreConnection)
         member val Credentials =            a.TryGetResult(Credentials) |> Option.orElseWith (fun () -> c.EventStoreCredentials) |> Option.toObj
         member val Retries =                a.GetResult(Retries, 3)
         member val Timeout =                a.GetResult(Timeout, 20.) |> TimeSpan.FromSeconds
-(*
+
         member x.Connect(log: ILogger, appName, nodePreference) =
             let connection = x.ConnectionString
             log.Information("EventStore {discovery}", connection)
             let discovery = String.Join(";", connection, x.Credentials) |> Equinox.EventStoreDb.Discovery.ConnectionString
             let tags=["M", Environment.MachineName; "I", Guid.NewGuid() |> string]
             Equinox.EventStoreDb.EventStoreConnector(x.Timeout, x.Retries, tags=tags)
-                .Establish(appName, discovery, Equinox.EventStoreDb.ConnectionStrategy.ClusterSingle nodePreference) *)
-
+                .Establish(appName, discovery, Equinox.EventStoreDb.ConnectionStrategy.ClusterSingle nodePreference)
+        member _.MonitoringParams(log : ILogger) =
+            log.Information("EventStoreSource MaxItems {maxItems}", maxItems)
+            maxItems, tailSleepInterval
         member val CheckpointInterval =     TimeSpan.FromHours 1.
-        member val CheckpointStore : Choice<Args.Cosmos.Arguments, Args.Dynamo.Arguments> =
+        member val TargetStoreArgs : TargetStoreArguments =
             match a.GetSubCommand() with
-            | Cosmos cosmos -> Choice1Of2 <| Args.Cosmos.Arguments (c, cosmos)
-            | Dynamo dynamo -> Choice2Of2 <| Args.Dynamo.Arguments (c, dynamo)
-            | _ -> Args.missingArg "Must specify `cosmos` or `dynamo` checkpoint store when source is `es`"
+            | Cosmos cosmos -> TargetStoreArguments.Cosmos(Args.Cosmos.Arguments (c, cosmos))
+            | Dynamo dynamo -> TargetStoreArguments.Dynamo(Args.Dynamo.Arguments (c, dynamo))
+            | _ -> Args.missingArg "Must specify `cosmos` or `dynamo` target store when source is `esdb`"
+
+[<RequireQualifiedAccess; NoComparison; NoEquality>]
+type Arguments = Cosmos of Cosmos.Arguments | Dynamo of Dynamo.Arguments | Esdb of Esdb.Arguments
+let verboseRequested = function
+    | Arguments.Cosmos a -> a.Verbose
+    | Arguments.Dynamo a -> a.Verbose
+    | Arguments.Esdb a -> a.Verbose
+let dumpMetrics = function
+    | Arguments.Cosmos a -> Equinox.CosmosStore.Core.Log.InternalMetrics.dump
+    | Arguments.Dynamo a -> Equinox.DynamoStore.Core.Log.InternalMetrics.dump
+    | Arguments.Esdb a -> Equinox.EventStoreDb.Log.InternalMetrics.dump
+
 (*
     type [<NoEquality; NoComparison>] Parameters =
         | [<AltCommandLine "-Z"; Unique>]   FromTail
