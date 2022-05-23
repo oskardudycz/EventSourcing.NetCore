@@ -79,7 +79,7 @@ module Args =
             | Args.StoreArguments.Esdb a ->
                 let context = a.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
                 Config.Store.Esdb (context, cache)
-        member x.CheckpointStoreConfig(mainStore) : CheckpointStore.Config =
+        member private x.CheckpointStoreConfig(mainStore) : CheckpointStore.Config =
             match mainStore with
             | Config.Store.Cosmos (context, cache) -> CheckpointStore.Config.Cosmos (context, cache)
             | Config.Store.Dynamo (context, cache) -> CheckpointStore.Config.Dynamo (context, cache)
@@ -95,8 +95,9 @@ module Args =
                         let context = a.Connect() |> DynamoStoreContext.create
                         CheckpointStore.Config.Dynamo (context, cache)
                  | _ -> failwith "unexpected"
-        member x.CreateCheckpointStore(config) : Propulsion.Feed.IFeedCheckpointStore =
-            CheckpointStore.create (x.ConsumerGroupName, x.CheckpointInterval) Config.log config
+        member x.CreateCheckpointStore(mainStore) : Propulsion.Feed.IFeedCheckpointStore =
+            let config = x.CheckpointStoreConfig(mainStore)
+            CheckpointStore.create (x.ConsumerGroupName, x.CheckpointInterval) ECommerce.Domain.Config.log config
 
     /// Parse the commandline; can throw exceptions in response to missing arguments and/or `-h`/`--help` args
     let parse tryGetConfigValue argv =
@@ -113,7 +114,7 @@ let build (args : Args.Arguments) =
         let stats = Ingester.Stats(log, args.StatsInterval, args.StateInterval, logExternalStats = args.DumpStoreMetrics)
         Propulsion.Streams.StreamsProjector.Start(log, args.MaxReadAhead, args.FcsDop, handle, stats, args.StatsInterval)
     let pumpSource =
-        let checkpoints = args.CreateCheckpointStore(args.CheckpointStoreConfig store)
+        let checkpoints = args.CreateCheckpointStore(store)
         let feed = ApiClient.TicketsFeed args.BaseUri
         let source =
             Propulsion.Feed.FeedSource(
