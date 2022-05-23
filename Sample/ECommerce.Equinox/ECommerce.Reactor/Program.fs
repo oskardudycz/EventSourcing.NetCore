@@ -51,7 +51,7 @@ module Args =
         member x.DumpStoreMetrics =         SourceArgs.dumpMetrics x.SourceArgs
         member val CheckpointInterval =     TimeSpan.FromHours 1.
         member val CacheSizeMb =            10
-        member x.CheckpointStoreConfig(mainStore : ECommerce.Domain.Config.Store<_>) : CheckpointStore.Config =
+        member private x.CheckpointStoreConfig(mainStore : ECommerce.Domain.Config.Store<_>) : CheckpointStore.Config =
             match mainStore with
             | ECommerce.Domain.Config.Store.Cosmos (context, cache) -> CheckpointStore.Config.Cosmos (context, cache)
             | ECommerce.Domain.Config.Store.Dynamo (context, cache) -> CheckpointStore.Config.Dynamo (context, cache)
@@ -67,7 +67,8 @@ module Args =
                         let context = a.Connect() |> DynamoStoreContext.create
                         CheckpointStore.Config.Dynamo (context, cache)
                  | _ -> failwith "unexpected"
-        member x.CreateCheckpointStore(config) : Propulsion.Feed.IFeedCheckpointStore =
+        member x.CreateCheckpointStore(mainStore) : Propulsion.Feed.IFeedCheckpointStore =
+            let config = x.CheckpointStoreConfig(mainStore)
             CheckpointStore.create (x.Group, x.CheckpointInterval) ECommerce.Domain.Config.log config
 
     /// Parse the commandline; can throw exceptions in response to missing arguments and/or `-h`/`--help` args
@@ -94,8 +95,8 @@ let build (args : Args.Arguments) =
         let handle = Reactor.Config.create (store, store)
         let sink = buildSink args log handle
         let source =
-            let parseFeedDoc : _ -> _ = Seq.collect Propulsion.CosmosStore.EquinoxSystemTextJsonParser.enumStreamEvents
-                                        >> Seq.filter (fun {stream = s } -> Reactor.isReactionStream s)
+            let parseFeedDoc = Seq.collect Propulsion.CosmosStore.EquinoxSystemTextJsonParser.enumStreamEvents
+                               >> Seq.filter (fun {stream = s } -> Reactor.isReactionStream s)
             let observer = Propulsion.CosmosStore.CosmosStoreSource.CreateObserver(log, sink.StartIngester, parseFeedDoc)
             let leases, startFromTail, maxItems, lagFrequency = a.MonitoringParams(log)
             Propulsion.CosmosStore.CosmosStoreSource.Start(log, monitored, leases, args.Group, observer, startFromTail, ?maxItems = maxItems, lagReportFreq = lagFrequency)
@@ -105,7 +106,7 @@ let build (args : Args.Arguments) =
         let context = storeClient |> DynamoStoreContext.create
         let sourceId = Propulsion.DynamoStore.FeedSourceId.wellKnownId
         let store = Config.Store.Dynamo (context, cache)
-        let checkpoints = args.CreateCheckpointStore(args.CheckpointStoreConfig store)
+        let checkpoints = args.CreateCheckpointStore(store)
         match a.MaybeOverrideRequested() with
         | None -> ()
         | Some (trancheId, group, pos) -> Async.RunSynchronously <| async {
@@ -115,7 +116,7 @@ let build (args : Args.Arguments) =
         let sink = buildSink args log handle
         let source =
             let indexClient, startFromTail,  maxItems, streamsDop = a.MonitoringParams(log)
-            let loadMode = Propulsion.DynamoStore.LoadMode.WithBodies (Reactor.isReactionStream, streamsDop, streamsContext)
+            let loadMode = Propulsion.DynamoStore.LoadMode.Hydrated (Reactor.isReactionStream, streamsDop, streamsContext)
             Propulsion.DynamoStore.DynamoStoreSource(
                 log, args.StatsInterval,
                 indexClient, sourceId, maxItems, TimeSpan.FromSeconds 0.5,
@@ -127,7 +128,7 @@ let build (args : Args.Arguments) =
         let context = conn |> EventStoreContext.create
         let sourceId = Propulsion.EventStoreDb.FeedSourceId.wellKnownId
         let store = Config.Store.Esdb (context, cache)
-        let checkpoints = args.CreateCheckpointStore(args.CheckpointStoreConfig store)
+        let checkpoints = args.CreateCheckpointStore(store)
         // TODO implement checkpoint reset mechanism
         let handle = Reactor.Config.create (store, store)
         let sink = buildSink args log handle
@@ -148,7 +149,7 @@ let run (args : Args.Arguments) = async {
             Async.AwaitKeyboardInterruptAsTaskCancelledException()
             source.AwaitWithStopOnCancellation()
             sink.AwaitWithStopOnCancellation() ]
-    return! Async.Parallel (build args) |> Async.Ignore<unit array> }
+    return! Async.Parallel work |> Async.Ignore<unit array> }
 
 [<EntryPoint>]
 let main argv =

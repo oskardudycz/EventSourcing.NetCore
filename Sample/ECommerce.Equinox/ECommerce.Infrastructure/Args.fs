@@ -96,7 +96,7 @@ module Dynamo =
         let table =                         a.TryGetResult Table      |> Option.defaultWith (fun () -> c.DynamoTable)
         let retries =                       a.GetResult(Retries, 1)
         let timeout =                       a.GetResult(RetriesTimeoutS, 5.) |> TimeSpan.FromSeconds
-        let connector =                     Equinox.DynamoStore.DynamoStoreConnector(serviceUrl, accessKey, secretKey, retries, timeout)
+        let connector =                     Equinox.DynamoStore.DynamoStoreConnector(serviceUrl, accessKey, secretKey, timeout, retries)
         member val Verbose =                a.Contains Verbose
         member _.Connect() =                connector.ConnectStore(connector.CreateClient(), "Main", table)
 
