@@ -7,9 +7,7 @@
 
     <ItemGroup>
         <Compile Include="Infrastructure.fs" />
-        <Compile Include="CheckpointStore.fs" />
         <Compile Include="Args.fs" />
-        <Compile Include="SourceArgs.fs" />
     </ItemGroup>
 
     <ItemGroup>

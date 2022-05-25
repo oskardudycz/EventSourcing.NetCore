@@ -59,45 +59,46 @@ module Args =
         member val CheckpointInterval =     TimeSpan.FromHours 1.
         member val TailSleepInterval =      TimeSpan.FromSeconds 1.
         member val ConsumerGroupName =      "default"
-        member val StoreArgs : Args.StoreArguments =
+        member val StoreArgs : Args.Store =
             match a.TryGetSubCommand() with
-            | Some (Parameters.Cosmos cosmos) -> Args.StoreArguments.Cosmos (Args.Cosmos.Arguments (c, cosmos))
-            | Some (Parameters.Dynamo dynamo) -> Args.StoreArguments.Dynamo (Args.Dynamo.Arguments (c, dynamo))
-            | Some (Parameters.Esdb es) -> Args.StoreArguments.Esdb (Args.Esdb.Arguments (c, es))
+            | Some (Parameters.Cosmos cosmos) -> Args.Store.Cosmos (Args.Cosmos.Arguments (c, cosmos))
+            | Some (Parameters.Dynamo dynamo) -> Args.Store.Dynamo (Args.Dynamo.Arguments (c, dynamo))
+            | Some (Parameters.Esdb es) -> Args.Store.Esdb (Args.Esdb.Arguments (c, es))
             | _ -> Args.missingArg "Must specify one of cosmos, dynamo or esdb for store"
         member x.VerboseStore = Args.verboseRequested x.StoreArgs
         member x.DumpStoreMetrics = Args.dumpMetrics x.StoreArgs
         member x.Connect() : Config.Store<_> =
             let cache = Equinox.Cache (AppName, sizeMb = 10)
             match x.StoreArgs with
-            | Args.StoreArguments.Cosmos a ->
+            | Args.Store.Cosmos a ->
                 let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
                 Config.Store.Cosmos (context, cache)
-            | Args.StoreArguments.Dynamo a ->
+            | Args.Store.Dynamo a ->
                 let context = a.Connect() |> DynamoStoreContext.create
                 Config.Store.Dynamo (context, cache)
-            | Args.StoreArguments.Esdb a ->
+            | Args.Store.Esdb a ->
                 let context = a.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
                 Config.Store.Esdb (context, cache)
-        member private x.CheckpointStoreConfig(mainStore) : CheckpointStore.Config =
+
+        member private x.CheckpointStoreConfig(mainStore) : Args.CheckpointStore.Config =
             match mainStore with
-            | Config.Store.Cosmos (context, cache) -> CheckpointStore.Config.Cosmos (context, cache)
-            | Config.Store.Dynamo (context, cache) -> CheckpointStore.Config.Dynamo (context, cache)
+            | Config.Store.Cosmos (context, cache) -> Args.CheckpointStore.Config.Cosmos (context, cache)
+            | Config.Store.Dynamo (context, cache) -> Args.CheckpointStore.Config.Dynamo (context, cache)
             | Config.Store.Memory _ -> failwith "Unexpected"
             | Config.Store.Esdb (_, cache) ->
                 match x.StoreArgs with
-                | Args.StoreArguments.Esdb a ->
+                | Args.Store.Esdb a ->
                     match a.CheckpointStoreArgs with
                     | CheckpointStoreArguments.Cosmos a ->
                         let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
-                        CheckpointStore.Config.Cosmos (context, cache)
+                        Args.CheckpointStore.Config.Cosmos (context, cache)
                     | CheckpointStoreArguments.Dynamo a ->
                         let context = a.Connect() |> DynamoStoreContext.create
-                        CheckpointStore.Config.Dynamo (context, cache)
+                        Args.CheckpointStore.Config.Dynamo (context, cache)
                  | _ -> failwith "unexpected"
         member x.CreateCheckpointStore(mainStore) : Propulsion.Feed.IFeedCheckpointStore =
             let config = x.CheckpointStoreConfig(mainStore)
-            CheckpointStore.create (x.ConsumerGroupName, x.CheckpointInterval) ECommerce.Domain.Config.log config
+            Args.CheckpointStore.create (x.ConsumerGroupName, x.CheckpointInterval) Config.log config
 
     /// Parse the commandline; can throw exceptions in response to missing arguments and/or `-h`/`--help` args
     let parse tryGetConfigValue argv =
