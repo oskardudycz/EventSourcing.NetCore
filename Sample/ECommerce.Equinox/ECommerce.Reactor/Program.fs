@@ -104,14 +104,8 @@ let build (args : Args.Arguments) =
     | SourceArgs.Arguments.Dynamo a ->
         let storeClient, streamsContext = a.Connect()
         let context = storeClient |> DynamoStoreContext.create
-        let sourceId = Propulsion.DynamoStore.FeedSourceId.wellKnownId
         let store = Config.Store.Dynamo (context, cache)
         let checkpoints = args.CreateCheckpointStore(store)
-        match a.MaybeOverrideRequested() with
-        | None -> ()
-        | Some (trancheId, group, pos) -> Async.RunSynchronously <| async {
-            let checkpointsStore : Propulsion.Feed.ReaderCheckpoint.Service = downcast checkpoints
-            do! checkpointsStore.Override(sourceId, trancheId, pos) }
         let handle = Reactor.Config.create (store, store)
         let sink = buildSink args log handle
         let source =
@@ -119,14 +113,13 @@ let build (args : Args.Arguments) =
             let loadMode = Propulsion.DynamoStore.LoadMode.Hydrated (Reactor.isReactionStream, streamsDop, streamsContext)
             Propulsion.DynamoStore.DynamoStoreSource(
                 log, args.StatsInterval,
-                indexClient, sourceId, maxItems, TimeSpan.FromSeconds 0.5,
+                indexClient, maxItems, TimeSpan.FromSeconds 0.5,
                 checkpoints, sink, loadMode, fromTail = startFromTail, storeLog = Config.log
             ).Start()
         sink, source
     | SourceArgs.Arguments.Esdb a ->
         let conn = a.Connect(log, AppName, EventStore.Client.NodePreference.Leader)
         let context = conn |> EventStoreContext.create
-        let sourceId = Propulsion.EventStoreDb.FeedSourceId.wellKnownId
         let store = Config.Store.Esdb (context, cache)
         let checkpoints = args.CreateCheckpointStore(store)
         // TODO implement checkpoint reset mechanism
@@ -137,7 +130,7 @@ let build (args : Args.Arguments) =
             let includeBodies = true
             Propulsion.EventStoreDb.EventStoreSource(
                 log, args.StatsInterval,
-                conn.ReadConnection, sourceId, maxItems, tailSleepInterval,
+                conn.ReadConnection, maxItems, tailSleepInterval,
                 checkpoints, sink, includeBodies (* TODO impl , storeLog = Config.log *)
             ).Start()
         sink, source
