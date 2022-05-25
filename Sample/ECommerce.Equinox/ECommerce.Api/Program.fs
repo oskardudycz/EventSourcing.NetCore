@@ -35,23 +35,23 @@ module Args =
         member val Verbose =                a.Contains Verbose
         member val PrometheusPort =         a.TryGetResult PrometheusPort |> Option.orElseWith (fun () -> c.PrometheusPort)
         member val CacheSizeMb =            10
-        member val StoreArgs : Args.StoreArguments =
+        member val StoreArgs : Args.Store =
             match a.TryGetSubCommand() with
-            | Some (Parameters.Cosmos cosmos) -> Args.StoreArguments.Cosmos (Args.Cosmos.Arguments (c, cosmos))
-            | Some (Parameters.Dynamo dynamo) -> Args.StoreArguments.Dynamo (Args.Dynamo.Arguments (c, dynamo))
-            | Some (Parameters.Esdb es) -> Args.StoreArguments.Esdb (Args.Esdb.Arguments (c, es))
+            | Some (Parameters.Cosmos cosmos) -> Args.Store.Cosmos (Args.Cosmos.Arguments (c, cosmos))
+            | Some (Parameters.Dynamo dynamo) -> Args.Store.Dynamo (Args.Dynamo.Arguments (c, dynamo))
+            | Some (Parameters.Esdb es) -> Args.Store.Esdb (Args.Esdb.Arguments (c, es))
             | _ -> Args.missingArg "Must specify one of cosmos, dynamo or esdb for store"
         member x.VerboseStore = Args.verboseRequested x.StoreArgs
         member x.Connect() : Domain.Config.Store<_> =
             let cache = Equinox.Cache (AppName, sizeMb = x.CacheSizeMb)
             match x.StoreArgs with
-            | Args.StoreArguments.Cosmos a ->
+            | Args.Store.Cosmos a ->
                 let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
                 Domain.Config.Store.Cosmos (context, cache)
-            | Args.StoreArguments.Dynamo a ->
+            | Args.Store.Dynamo a ->
                 let context = a.Connect() |> DynamoStoreContext.create
                 Domain.Config.Store.Dynamo (context, cache)
-            | Args.StoreArguments.Esdb a ->
+            | Args.Store.Esdb a ->
                 let context = a.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
                 Domain.Config.Store.Esdb (context, cache)
 

@@ -1,6 +1,6 @@
 module ECommerce.Reactor.Program
 
-open ECommerce.Infrastructure // Args, SourceArgs
+open ECommerce.Infrastructure
 open Serilog
 open System
 
@@ -41,35 +41,35 @@ module Args =
         member val IdleDelay =              TimeSpan.FromMilliseconds 10.
         member val StatsInterval =          TimeSpan.FromMinutes 1.
         member val StateInterval =          TimeSpan.FromMinutes 5.
-        member val SourceArgs : SourceArgs.Arguments =
+        member val SourceStore : SourceArgs.Store =
                                             match a.GetSubCommand() with
-                                            | Cosmos a -> SourceArgs.Arguments.Cosmos(SourceArgs.Cosmos.Arguments(c, a))
-                                            | Dynamo a -> SourceArgs.Arguments.Dynamo(SourceArgs.Dynamo.Arguments(c, a))
-                                            | Esdb a -> SourceArgs.Arguments.Esdb(SourceArgs.Esdb.Arguments(c, a))
+                                            | Cosmos a -> SourceArgs.Store.Cosmos (SourceArgs.Cosmos.Arguments(c, a))
+                                            | Dynamo a -> SourceArgs.Store.Dynamo (SourceArgs.Dynamo.Arguments(c, a))
+                                            | Esdb a -> SourceArgs.Store.Esdb (SourceArgs.Esdb.Arguments(c, a))
                                             | a -> Args.missingArg $"Unexpected Store subcommand %A{a}"
-        member x.VerboseStore =             SourceArgs.verboseRequested x.SourceArgs
-        member x.DumpStoreMetrics =         SourceArgs.dumpMetrics x.SourceArgs
+        member x.VerboseStore =             SourceArgs.verboseRequested x.SourceStore
+        member x.DumpStoreMetrics =         SourceArgs.dumpMetrics x.SourceStore
         member val CheckpointInterval =     TimeSpan.FromHours 1.
         member val CacheSizeMb =            10
-        member private x.CheckpointStoreConfig(mainStore : ECommerce.Domain.Config.Store<_>) : CheckpointStore.Config =
+        member private x.CheckpointStoreConfig(mainStore : ECommerce.Domain.Config.Store<_>) : Args.CheckpointStore.Config =
             match mainStore with
-            | ECommerce.Domain.Config.Store.Cosmos (context, cache) -> CheckpointStore.Config.Cosmos (context, cache)
-            | ECommerce.Domain.Config.Store.Dynamo (context, cache) -> CheckpointStore.Config.Dynamo (context, cache)
-            | ECommerce.Domain.Config.Store.Memory _ -> failwith "Unexpected"
+            | ECommerce.Domain.Config.Store.Cosmos (context, cache) -> Args.CheckpointStore.Config.Cosmos (context, cache)
+            | ECommerce.Domain.Config.Store.Dynamo (context, cache) -> Args.CheckpointStore.Config.Dynamo (context, cache)
+            | ECommerce.Domain.Config.Store.Memory _ ->                failwith "Unexpected"
             | ECommerce.Domain.Config.Store.Esdb (_, cache) ->
-                match x.SourceArgs with
-                | SourceArgs.Arguments.Esdb a ->
+                match x.SourceStore with
+                | SourceArgs.Store.Esdb a ->
                     match a.TargetStoreArgs with
                     | TargetStoreArguments.Cosmos a ->
                         let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
-                        CheckpointStore.Config.Cosmos (context, cache)
+                        Args.CheckpointStore.Config.Cosmos (context, cache)
                     | TargetStoreArguments.Dynamo a ->
                         let context = a.Connect() |> DynamoStoreContext.create
-                        CheckpointStore.Config.Dynamo (context, cache)
+                        Args.CheckpointStore.Config.Dynamo (context, cache)
                  | _ -> failwith "unexpected"
         member x.CreateCheckpointStore(mainStore) : Propulsion.Feed.IFeedCheckpointStore =
             let config = x.CheckpointStoreConfig(mainStore)
-            CheckpointStore.create (x.Group, x.CheckpointInterval) ECommerce.Domain.Config.log config
+            Args.CheckpointStore.create (x.Group, x.CheckpointInterval) ECommerce.Domain.Config.log config
 
     /// Parse the commandline; can throw exceptions in response to missing arguments and/or `-h`/`--help` args
     let parse tryGetConfigValue argv : Arguments =
@@ -87,8 +87,8 @@ let buildSink (args : Args.Arguments) log (handle : FsCodec.StreamName * Propuls
 let build (args : Args.Arguments) =
     let log = Log.forGroup args.Group // needs to have a `group` tag for Propulsion.Streams Prometheus metrics
     let cache = Equinox.Cache(AppName, sizeMb = 10)
-    match args.SourceArgs with
-    | SourceArgs.Arguments.Cosmos a->
+    match args.SourceStore with
+    | SourceArgs.Store.Cosmos a->
         let client, monitored = a.ConnectStoreAndMonitored()
         let context = client |> CosmosStoreContext.create
         let store = Config.Store.Cosmos (context, cache)
@@ -101,7 +101,7 @@ let build (args : Args.Arguments) =
             let leases, startFromTail, maxItems, lagFrequency = a.MonitoringParams(log)
             Propulsion.CosmosStore.CosmosStoreSource.Start(log, monitored, leases, args.Group, observer, startFromTail, ?maxItems = maxItems, lagReportFreq = lagFrequency)
         sink, source
-    | SourceArgs.Arguments.Dynamo a ->
+    | SourceArgs.Store.Dynamo a ->
         let storeClient, streamsContext = a.Connect()
         let context = storeClient |> DynamoStoreContext.create
         let store = Config.Store.Dynamo (context, cache)
@@ -117,12 +117,11 @@ let build (args : Args.Arguments) =
                 checkpoints, sink, loadMode, fromTail = startFromTail, storeLog = Config.log
             ).Start()
         sink, source
-    | SourceArgs.Arguments.Esdb a ->
+    | SourceArgs.Store.Esdb a ->
         let conn = a.Connect(log, AppName, EventStore.Client.NodePreference.Leader)
         let context = conn |> EventStoreContext.create
         let store = Config.Store.Esdb (context, cache)
         let checkpoints = args.CreateCheckpointStore(store)
-        // TODO implement checkpoint reset mechanism
         let handle = Reactor.Config.create (store, store)
         let sink = buildSink args log handle
         let source =
@@ -131,7 +130,7 @@ let build (args : Args.Arguments) =
             Propulsion.EventStoreDb.EventStoreSource(
                 log, args.StatsInterval,
                 conn.ReadConnection, maxItems, tailSleepInterval,
-                checkpoints, sink, includeBodies (* TODO impl , storeLog = Config.log *)
+                checkpoints, sink, includeBodies
             ).Start()
         sink, source
 

@@ -1,5 +1,7 @@
-module ECommerce.Infrastructure.SourceArgs
+/// Commandline arguments and/or secrets loading specifications
+module ECommerce.Reactor.SourceArgs
 
+open ECommerce.Infrastructure // Args
 open Argu
 open Serilog
 open System
@@ -129,6 +131,9 @@ module Esdb =
         | [<AltCommandLine "-o">]           Timeout of float
         | [<AltCommandLine "-r">]           Retries of int
 
+// Not implemented in Propulsion.EventStoreDb yet (#good-first-issue)
+//        | [<AltCommandLine "-Z"; Unique>]   FromTail
+
         | [<CliPrefix(CliPrefix.None); Unique(*ExactlyOnce is not supported*); Last>] Cosmos of ParseResults<Args.Cosmos.Parameters>
         | [<CliPrefix(CliPrefix.None); Unique(*ExactlyOnce is not supported*); Last>] Dynamo of ParseResults<Args.Dynamo.Parameters>
         interface IArgParserTemplate with
@@ -139,8 +144,10 @@ module Esdb =
                 | Timeout _ ->              "specify operation timeout in seconds. Default: 20."
                 | Retries _ ->              "specify operation retries. Default: 3."
 
-                | Cosmos _ ->               "CosmosDB (Checkpoint) Store parameters."
-                | Dynamo _ ->               "DynamoDB (Checkpoint) Store parameters."
+//                | FromTail ->               "Start the processing from the Tail"
+
+                | Cosmos _ ->               "CosmosDB Target Store parameters (also used for checkpoint storage)."
+                | Dynamo _ ->               "DynamoDB Target Store parameters (also used for checkpoint storage)."
 
     [<RequireQualifiedAccess; NoComparison; NoEquality>]
     type TargetStoreArguments = Cosmos of Args.Cosmos.Arguments | Dynamo of Args.Dynamo.Arguments
@@ -164,135 +171,25 @@ module Esdb =
         member _.MonitoringParams(log : ILogger) =
             log.Information("EventStoreSource MaxItems {maxItems}", maxItems)
             maxItems, tailSleepInterval
-        member val CheckpointInterval =     TimeSpan.FromHours 1.
+
+        (*  Propulsion.EventStoreDb does not implement a checkpoint storage mechanism,
+            perhaps port https://github.com/absolutejam/Propulsion.EventStoreDB ?
+            or fork/finish https://github.com/jet/dotnet-templates/pull/81
+            alternately one could use a SQL Server DB via Propulsion.SqlStreamStore *)
+        // NOTE as a result we borrow the target/read model store to host the checkpoints in the case of the Reactor app
         member val TargetStoreArgs : TargetStoreArguments =
             match a.GetSubCommand() with
-            | Cosmos cosmos -> TargetStoreArguments.Cosmos(Args.Cosmos.Arguments (c, cosmos))
-            | Dynamo dynamo -> TargetStoreArguments.Dynamo(Args.Dynamo.Arguments (c, dynamo))
+            | Cosmos cosmos -> TargetStoreArguments.Cosmos (Args.Cosmos.Arguments (c, cosmos))
+            | Dynamo dynamo -> TargetStoreArguments.Dynamo (Args.Dynamo.Arguments (c, dynamo))
             | _ -> Args.missingArg "Must specify `cosmos` or `dynamo` target store when source is `esdb`"
 
 [<RequireQualifiedAccess; NoComparison; NoEquality>]
-type Arguments = Cosmos of Cosmos.Arguments | Dynamo of Dynamo.Arguments | Esdb of Esdb.Arguments
+type Store = Cosmos of Cosmos.Arguments | Dynamo of Dynamo.Arguments | Esdb of Esdb.Arguments
 let verboseRequested = function
-    | Arguments.Cosmos a -> a.Verbose
-    | Arguments.Dynamo a -> a.Verbose
-    | Arguments.Esdb a -> a.Verbose
+    | Store.Cosmos a -> a.Verbose
+    | Store.Dynamo a -> a.Verbose
+    | Store.Esdb a -> a.Verbose
 let dumpMetrics = function
-    | Arguments.Cosmos _ -> Equinox.CosmosStore.Core.Log.InternalMetrics.dump
-    | Arguments.Dynamo _ -> Equinox.DynamoStore.Core.Log.InternalMetrics.dump
-    | Arguments.Esdb _ -> Equinox.EventStoreDb.Log.InternalMetrics.dump
-
-(*
-    type [<NoEquality; NoComparison>] Parameters =
-        | [<AltCommandLine "-Z"; Unique>]   FromTail
-        | [<AltCommandLine "-g"; Unique>]   Gorge of int
-        | [<AltCommandLine "-t"; Unique>]   Tail of intervalS: float
-        | [<AltCommandLine "--force"; Unique>] ForceRestart
-        | [<AltCommandLine "-m"; Unique>]   BatchSize of int
-
-        | [<AltCommandLine "-mim"; Unique>] MinBatchSize of int
-        | [<AltCommandLine "-pos"; Unique>] Position of int64
-        | [<AltCommandLine "-c"; Unique>]   Chunk of int
-        | [<AltCommandLine "-pct"; Unique>] Percent of float
-
-        | [<AltCommandLine "-V">]           Verbose
-        | [<AltCommandLine "-o">]           Timeout of float
-        | [<AltCommandLine "-r">]           Retries of int
-        | [<AltCommandLine "-oh">]          HeartbeatTimeout of float
-        | [<AltCommandLine "-h">]           Host of string
-        | [<AltCommandLine "-x">]           Port of int
-        | [<AltCommandLine "-u">]           Username of string
-        | [<AltCommandLine "-p">]           Password of string
-        | [<AltCommandLine "-hp">]          ProjHost of string
-        | [<AltCommandLine "-xp">]          ProjPort of int
-        | [<AltCommandLine "-up">]          ProjUsername of string
-        | [<AltCommandLine "-pp">]          ProjPassword of string
-
-        interface IArgParserTemplate with
-            member a.Usage = a |> function
-                | FromTail ->               "Start the processing from the Tail"
-                | Gorge _ ->                "Request Parallel readers phase during initial catchup, running one chunk (256MB) apart. Default: off"
-                | Tail _ ->                 "attempt to read from tail at specified interval in Seconds. Default: 1"
-                | ForceRestart _ ->         "Forget the current committed position; start from (and commit) specified position. Default: start from specified position or resume from committed."
-                | BatchSize _ ->            "maximum item count to request from feed. Default: 4096"
-                | MinBatchSize _ ->         "minimum item count to drop down to in reaction to read failures. Default: 512"
-                | Position _ ->             "EventStore $all Stream Position to commence from"
-                | Chunk _ ->                "EventStore $all Chunk to commence from"
-                | Percent _ ->              "EventStore $all Stream Position to commence from (as a percentage of current tail position)"
-
-                | Verbose ->                "Include low level Store logging."
-                | Host _ ->                 "TCP mode: specify EventStore hostname to connect to directly. Clustered mode: use Gossip protocol against all A records returned from DNS query. (optional if environment variable EQUINOX_ES_HOST specified)"
-                | Port _ ->                 "specify EventStore custom port. Uses value of environment variable EQUINOX_ES_PORT if specified. Defaults for Cluster and Direct TCP/IP mode are 30778 and 1113 respectively."
-                | Username _ ->             "specify username for EventStore. (optional if environment variable EQUINOX_ES_USERNAME specified)"
-                | Password _ ->             "specify Password for EventStore. (optional if environment variable EQUINOX_ES_PASSWORD specified)"
-                | ProjHost _ ->             "TCP mode: specify Projection EventStore hostname to connect to directly. Clustered mode: use Gossip protocol against all A records returned from DNS query. Defaults to value of es host (-h) unless environment variable EQUINOX_ES_PROJ_HOST is specified."
-                | ProjPort _ ->             "specify Projection EventStore custom port. Defaults to value of es port (-x) unless environment variable EQUINOX_ES_PROJ_PORT is specified."
-                | ProjUsername _ ->         "specify username for Projection EventStore. Defaults to value of es user (-u) unless environment variable EQUINOX_ES_PROJ_USERNAME is specified."
-                | ProjPassword _ ->         "specify Password for Projection EventStore. Defaults to value of es password (-p) unless environment variable EQUINOX_ES_PROJ_PASSWORD is specified."
-                | Timeout _ ->              "specify operation timeout in seconds. Default: 20."
-                | Retries _ ->              "specify operation retries. Default: 3."
-                | HeartbeatTimeout _ ->     "specify heartbeat timeout in seconds. Default: 1.5."
-
-    and Arguments(c : Configuration, a : ParseResults<Parameters>) =
-
-        let ts (x : TimeSpan) = x.TotalSeconds
-        let discovery (host, port) =
-            match port with
-            | None ->   Discovery.GossipDns            host
-            | Some p -> Discovery.GossipDnsCustomPort (host, p)
-        let host =                          a.TryGetResult Host |> Option.defaultWith (fun () -> c.EventStoreHost)
-        let port =                          a.TryGetResult Port |> Option.orElseWith (fun () -> c.EventStorePort)
-        let user =                          a.TryGetResult Username |> Option.defaultWith (fun () -> c.EventStoreUsername)
-        let password =                      a.TryGetResult Password |> Option.defaultWith (fun () -> c.EventStorePassword)
-        member val Gorge =                  a.TryGetResult Gorge
-        member val TailInterval =           a.GetResult(Tail, 1.) |> TimeSpan.FromSeconds
-        member val ForceRestart =           a.Contains ForceRestart
-        member val StartingBatchSize =      a.GetResult(BatchSize, 4096)
-        member val MinBatchSize =           a.GetResult(MinBatchSize, 512)
-        member val StartPos =
-            match a.TryGetResult Position, a.TryGetResult Chunk, a.TryGetResult Percent, a.Contains EsSourceParameters.FromTail with
-            | Some p, _, _, _ ->            Absolute p
-            | _, Some c, _, _ ->            StartPos.Chunk c
-            | _, _, Some p, _ ->            Percentage p
-            | None, None, None, true ->     StartPos.TailOrCheckpoint
-            | None, None, None, _ ->        StartPos.StartOrCheckpoint
-        member val Host =                   host
-        member val Port =                   port
-        member val User =                   user
-        member val Password =               password
-        member val ProjPort =               match a.TryGetResult ProjPort with
-                                            | Some x -> Some x
-                                            | None -> c.EventStoreProjectionPort |> Option.orElse port
-        member val ProjHost =               match a.TryGetResult ProjHost with
-                                            | Some x -> x
-                                            | None -> c.EventStoreProjectionHost |> Option.defaultValue host
-        member val ProjUser =               match a.TryGetResult ProjUsername with
-                                            | Some x -> x
-                                            | None -> c.EventStoreProjectionUsername |> Option.defaultValue user
-        member val ProjPassword =           match a.TryGetResult ProjPassword with
-                                            | Some x -> x
-                                            | None -> c.EventStoreProjectionPassword |> Option.defaultValue password
-        member val Retries =                a.GetResult(EsSourceParameters.Retries, 3)
-        member val Timeout =                a.GetResult(EsSourceParameters.Timeout, 20.) |> TimeSpan.FromSeconds
-        member val Heartbeat =              a.GetResult(HeartbeatTimeout, 1.5) |> TimeSpan.FromSeconds
-
-        member x.ConnectProj(log: ILogger, storeLog: ILogger, appName, nodePreference) =
-            let discovery = discovery (x.ProjHost, x.ProjPort)
-            log.ForContext("projHost", x.ProjHost).ForContext("projPort", x.ProjPort)
-                .Information("Projection EventStore {discovery} heartbeat: {heartbeat}s Timeout: {timeout}s Retries {retries}",
-                    discovery, ts x.Heartbeat, ts x.Timeout, x.Retries)
-            let log=if storeLog.IsEnabled Serilog.Events.LogEventLevel.Debug then Logger.SerilogVerbose storeLog else Logger.SerilogNormal storeLog
-            let tags=["M", Environment.MachineName; "I", Guid.NewGuid() |> string]
-            Connector(x.ProjUser, x.ProjPassword, x.Timeout, x.Retries, log=log, heartbeatTimeout=x.Heartbeat, tags=tags)
-                .Connect(appName + "-Proj", discovery, nodePreference) |> Async.RunSynchronously
-
-        member x.Connect(log: ILogger, storeLog: ILogger, appName, connectionStrategy) =
-            let discovery = discovery (x.Host, x.Port)
-            log.ForContext("host", x.Host).ForContext("port", x.Port)
-                .Information("EventStore {discovery} heartbeat: {heartbeat}s Timeout: {timeout}s Retries {retries}",
-                    discovery, ts x.Heartbeat, ts x.Timeout, x.Retries)
-            let log=if storeLog.IsEnabled Serilog.Events.LogEventLevel.Debug then Logger.SerilogVerbose storeLog else Logger.SerilogNormal storeLog
-            let tags=["M", Environment.MachineName; "I", Guid.NewGuid() |> string]
-            Connector(x.User, x.Password, x.Timeout, x.Retries, log=log, heartbeatTimeout=x.Heartbeat, tags=tags)
-                .Establish(appName, discovery, connectionStrategy) |> Async.RunSynchronously
-    *)
+    | Store.Cosmos _ -> Equinox.CosmosStore.Core.Log.InternalMetrics.dump
+    | Store.Dynamo _ -> Equinox.DynamoStore.Core.Log.InternalMetrics.dump
+    | Store.Esdb _ -> Equinox.EventStoreDb.Log.InternalMetrics.dump
