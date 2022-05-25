@@ -1,3 +1,4 @@
+/// Commandline arguments and/or secrets loading specifications for applications other than Reactors
 module ECommerce.Infrastructure.Args
 
 open Serilog
@@ -120,12 +121,10 @@ module Esdb =
                 | Timeout _ ->              "specify operation timeout in seconds. Default: 20."
                 | Retries _ ->              "specify operation retries. Default: 3."
 
-                (*  Propulsion.EventStoreDb does not implement a checkpointer, perhaps port https://github.com/absolutejam/Propulsion.EventStoreDB ?
-                    or fork/finish https://github.com/jet/dotnet-templates/pull/81
-                    alternately one could use a SQL Server DB via Propulsion.SqlStreamStore *)
-
-                | Cosmos _ ->               "CosmosDB (Checkpoint) Store parameters."
-                | Dynamo _ ->               "DynamoDB (Checkpoint) Store parameters."
+                // Feed Consumer app needs somewhere to store checkpoints
+                // Here we align with the structure of the commandline parameters for the Reactor app and also require a Dynamo or Cosmos instance to be specified
+                | Cosmos _ ->               "CosmosDB (Checkpoint) Store parameters (Not applicable for Web app)."
+                | Dynamo _ ->               "DynamoDB (Checkpoint) Store parameters (Not applicable to Web app)."
 
     [<RequireQualifiedAccess; NoComparison; NoEquality>]
     type CheckpointStoreArguments = Cosmos of Cosmos.Arguments | Dynamo of Dynamo.Arguments
@@ -136,11 +135,18 @@ module Esdb =
         member val Retries =                a.GetResult(Retries, 3)
         member val Timeout =                a.GetResult(Timeout, 20.) |> TimeSpan.FromSeconds
         member _.Verbose =                  a.Contains Verbose
-        member val CheckpointStoreArgs : CheckpointStoreArguments =
+
+        (*  Propulsion.EventStoreDb does not implement a checkpoint storage mechanism,
+            perhaps port https://github.com/absolutejam/Propulsion.EventStoreDB ?
+            or fork/finish https://github.com/jet/dotnet-templates/pull/81
+            alternately one could use a SQL Server DB via Propulsion.SqlStreamStore *)
+        // NOTE only applicable to the FeedConsumer app
+        member _.CheckpointStoreArgs : CheckpointStoreArguments =
             match a.GetSubCommand() with
-            | Cosmos cosmos -> CheckpointStoreArguments.Cosmos(Cosmos.Arguments (c, cosmos))
-            | Dynamo dynamo -> CheckpointStoreArguments.Dynamo(Dynamo.Arguments (c, dynamo))
+            | Cosmos cosmos -> CheckpointStoreArguments.Cosmos (Cosmos.Arguments (c, cosmos))
+            | Dynamo dynamo -> CheckpointStoreArguments.Dynamo (Dynamo.Arguments (c, dynamo))
             | _ -> missingArg "Must specify `cosmos` or `dynamo` target store when source is `esdb`"
+
         member x.Connect(log : ILogger, appName, nodePreference) =
             let connection = x.ConnectionString
             log.Information("EventStore {discovery}", connection)
@@ -150,12 +156,28 @@ module Esdb =
                 .Establish(appName, discovery, Equinox.EventStoreDb.ConnectionStrategy.ClusterSingle nodePreference)
 
 [<RequireQualifiedAccess; NoComparison; NoEquality>]
-type StoreArguments = Cosmos of Cosmos.Arguments | Dynamo of Dynamo.Arguments | Esdb of Esdb.Arguments
+type Store = Cosmos of Cosmos.Arguments | Dynamo of Dynamo.Arguments | Esdb of Esdb.Arguments
 let verboseRequested = function
-    | StoreArguments.Cosmos a -> a.Verbose
-    | StoreArguments.Dynamo a -> a.Verbose
-    | StoreArguments.Esdb a -> a.Verbose
+    | Store.Cosmos a -> a.Verbose
+    | Store.Dynamo a -> a.Verbose
+    | Store.Esdb a -> a.Verbose
 let dumpMetrics = function
-    | StoreArguments.Cosmos a -> Equinox.CosmosStore.Core.Log.InternalMetrics.dump
-    | StoreArguments.Dynamo a -> Equinox.DynamoStore.Core.Log.InternalMetrics.dump
-    | StoreArguments.Esdb a -> Equinox.EventStoreDb.Log.InternalMetrics.dump
+    | Store.Cosmos _ -> Equinox.CosmosStore.Core.Log.InternalMetrics.dump
+    | Store.Dynamo _ -> Equinox.DynamoStore.Core.Log.InternalMetrics.dump
+    | Store.Esdb _ -> Equinox.EventStoreDb.Log.InternalMetrics.dump
+
+// Type used to represent where checkpoints (for either the FeedConsumer position, or for a Reactor's Event Store subscription position) will be stored
+// In a typical app you don't have anything like this as you'll simply use your primary Event Store (see)
+module CheckpointStore =
+
+    [<RequireQualifiedAccess; NoComparison; NoEquality>]
+    type Config =
+        | Cosmos of Equinox.CosmosStore.CosmosStoreContext * Equinox.Core.ICache
+        | Dynamo of Equinox.DynamoStore.DynamoStoreContext * Equinox.Core.ICache
+
+    let create (consumerGroup, checkpointInterval) storeLog : Config -> Propulsion.Feed.IFeedCheckpointStore = function
+        | Config.Cosmos (context, cache) ->
+            Propulsion.Feed.ReaderCheckpoint.CosmosStore.create storeLog (consumerGroup, checkpointInterval) (context, cache)
+        | Config.Dynamo (context, cache) ->
+            Propulsion.Feed.ReaderCheckpoint.DynamoStore.create storeLog (consumerGroup, checkpointInterval) (context, cache)
+
