@@ -127,7 +127,7 @@ type Logging() =
                 let l = match isMetric with None -> l | Some predicate -> l.Filter.ByExcluding(Func<Serilog.Events.LogEvent, bool> predicate)
                 configureConsoleSink l |> ignore)
             |> ignore
-        configuration.WriteTo.Async(bufferSize=65536, blockWhenFull=true, configure=System.Action<_> configure)
+        configuration.WriteTo.Async(bufferSize = 65536, blockWhenFull = true, configure = System.Action<_> configure)
 
     [<System.Runtime.CompilerServices.Extension>]
     static member Sinks(configuration : LoggerConfiguration, configureMetricsSinks, verboseStore) =

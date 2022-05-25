@@ -79,7 +79,6 @@ module Dynamo =
         | [<AltCommandLine "-mi"; Unique>]  MaxItems of int
         | [<AltCommandLine "-Z"; Unique>]   FromTail
         | [<AltCommandLine "-d">]           StreamsDop of int
-        | [<CliPrefix(CliPrefix.None); Last>] Override of ParseResults<OverrideParameters>
         interface IArgParserTemplate with
             member a.Usage = a |> function
                 | Verbose ->                "Include low level Store logging."
@@ -94,7 +93,6 @@ module Dynamo =
                 | MaxItems _ ->             "maximum events to load in a batch. Default: 100"
                 | FromTail _ ->             "(iff the Consumer Name is fresh) - force skip to present Position. Default: Never skip an event."
                 | StreamsDop _ ->           "parallelism when loading events from Store Feed Source. Default 4"
-                | Override _ ->             "Perform a Checkpoint reset before starting"
 
     and Arguments(c : Configuration, a : ParseResults<Parameters>) =
         let serviceUrl =                    a.TryGetResult ServiceUrl |> Option.defaultWith (fun () -> c.DynamoServiceUrl)
@@ -120,24 +118,6 @@ module Dynamo =
             let indexClient = Equinox.DynamoStore.DynamoStoreClient(client, indexTable)
             indexClient.LogConfiguration("Index", log)
             indexClient, fromTail, maxItems, streamsDop
-        member _.MaybeOverrideRequested() =
-            match a.TryGetSubCommand() with
-            | Some (Override a) ->
-                let tranche = a.GetResult Tranche
-                let group =   a.GetResult Group
-                let pos =     a.GetResult Position
-                Log.Warning("Resetting position for Tranche {tranche} for {group} to {position}", tranche, group, pos)
-                Some (tranche, group, pos)
-            | _ -> None
-    and [<NoEquality; NoComparison>] OverrideParameters =
-        | [<AltCommandLine "-g"; Unique>]   Group of string
-        | [<AltCommandLine "-p"; Unique>]   Position of Propulsion.Feed.Position
-        | [<AltCommandLine "-t"; Unique>]   Tranche of Propulsion.Feed.TrancheId
-        interface IArgParserTemplate with
-            member a.Usage = a |> function
-                | Group _ ->                "Consumer Group"
-                | Position _ ->             "Override to specified position"
-                | Tranche _ ->              "Specify tranche to override"
 
 module Esdb =
 
@@ -198,9 +178,9 @@ let verboseRequested = function
     | Arguments.Dynamo a -> a.Verbose
     | Arguments.Esdb a -> a.Verbose
 let dumpMetrics = function
-    | Arguments.Cosmos a -> Equinox.CosmosStore.Core.Log.InternalMetrics.dump
-    | Arguments.Dynamo a -> Equinox.DynamoStore.Core.Log.InternalMetrics.dump
-    | Arguments.Esdb a -> Equinox.EventStoreDb.Log.InternalMetrics.dump
+    | Arguments.Cosmos _ -> Equinox.CosmosStore.Core.Log.InternalMetrics.dump
+    | Arguments.Dynamo _ -> Equinox.DynamoStore.Core.Log.InternalMetrics.dump
+    | Arguments.Esdb _ -> Equinox.EventStoreDb.Log.InternalMetrics.dump
 
 (*
     type [<NoEquality; NoComparison>] Parameters =
