@@ -46,7 +46,7 @@ public class ReservationDetails
     }
 }
 
-public class ReservationDetailsProjection: AggregateProjection<ReservationDetails>
+public class ReservationDetailsProjection: SingleStreamAggregation<ReservationDetails>
 {
     public ReservationDetailsProjection()
     {

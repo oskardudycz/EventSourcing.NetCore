@@ -17,7 +17,7 @@ public class MeetingView
     public DateTime? End { get; set; }
 }
 
-public class MeetingViewProjection: AggregateProjection<MeetingView>
+public class MeetingViewProjection: SingleStreamAggregation<MeetingView>
 {
     public void Apply(MeetingCreated @event, MeetingView view)
     {

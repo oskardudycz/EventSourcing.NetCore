@@ -57,7 +57,7 @@ public class AggregationProjectionsTest: MartenTest
         }
     }
 
-    public class IssueDescriptionsProjection: AggregateProjection<IssueDescriptions>
+    public class IssueDescriptionsProjection: SingleStreamAggregation<IssueDescriptions>
     {
         public void Apply(IssueCreated @event, IssueDescriptions item)
         {
