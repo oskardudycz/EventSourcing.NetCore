@@ -31,8 +31,6 @@ public class Payment: Aggregate
 
     public void Apply(PaymentRequested @event)
     {
-        Version++;
-
         Id = @event.PaymentId;
         OrderId = @event.OrderId;
         Amount = @event.Amount;
@@ -51,8 +49,6 @@ public class Payment: Aggregate
 
     public void Apply(PaymentCompleted @event)
     {
-        Version++;
-
         Status = PaymentStatus.Completed;
     }
 
@@ -69,8 +65,6 @@ public class Payment: Aggregate
 
     public void Apply(PaymentDiscarded @event)
     {
-        Version++;
-
         Status = PaymentStatus.Failed;
     }
 
@@ -87,8 +81,6 @@ public class Payment: Aggregate
 
     public void Apply(PaymentTimedOut @event)
     {
-        Version++;
-
         Status = PaymentStatus.Failed;
     }
 }

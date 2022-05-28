@@ -24,7 +24,6 @@ public class ChangeSeatTests
 
         // Then
         reservation.SeatId.Should().Be(newSeatId);
-        reservation.Version.Should().Be(2);
 
         var @event = reservation.PublishedEvent<ReservationSeatChanged>();
 

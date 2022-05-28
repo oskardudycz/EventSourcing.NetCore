@@ -51,8 +51,6 @@ public class Order: Aggregate
 
     public void Apply(OrderInitialized @event)
     {
-        Version++;
-
         Id = @event.OrderId;
         ClientId = @event.ClientId;
         ProductItems = @event.ProductItems;
@@ -75,8 +73,6 @@ public class Order: Aggregate
 
     public void Apply(OrderPaymentRecorded @event)
     {
-        Version++;
-
         PaymentId = @event.PaymentId;
         Status = OrderStatus.Paid;
     }
@@ -94,8 +90,6 @@ public class Order: Aggregate
 
     public void Apply(OrderCompleted @event)
     {
-        Version++;
-
         Status = OrderStatus.Completed;
     }
 
@@ -112,8 +106,6 @@ public class Order: Aggregate
 
     public void Apply(OrderCancelled @event)
     {
-        Version++;
-
         Status = OrderStatus.Cancelled;
     }
 }

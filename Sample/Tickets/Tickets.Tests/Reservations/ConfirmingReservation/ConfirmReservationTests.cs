@@ -23,7 +23,6 @@ public class ConfirmReservationTests
 
         // Then
         reservation.Status.Should().Be(ReservationStatus.Confirmed);
-        reservation.Version.Should().Be(2);
 
         var @event = reservation.PublishedEvent<ReservationConfirmed>();
 
