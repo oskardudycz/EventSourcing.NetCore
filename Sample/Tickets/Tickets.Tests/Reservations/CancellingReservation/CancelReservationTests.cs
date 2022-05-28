@@ -23,7 +23,6 @@ public class CancelReservationTests
 
         // Then
         reservation.Status.Should().Be(ReservationStatus.Cancelled);
-        reservation.Version.Should().Be(2);
 
         var @event = reservation.PublishedEvent<ReservationCancelled>();
 

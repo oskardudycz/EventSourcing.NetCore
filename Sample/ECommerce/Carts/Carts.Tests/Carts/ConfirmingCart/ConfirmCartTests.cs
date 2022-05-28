@@ -23,7 +23,6 @@ public class ConfirmCartTests
 
         // Then
         cart.Status.Should().Be(ShoppingCartStatus.Confirmed);
-        cart.Version.Should().Be(2);
 
         var @event = cart.PublishedEvent<ShoppingCartConfirmed>();
 

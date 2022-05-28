@@ -17,7 +17,6 @@ internal static class ReservationExtensions
         reservation.Id.Should().Be(id);
         reservation.Number.Should().Be(number);
         reservation.SeatId.Should().Be(seatId);
-        reservation.Version.Should().Be(1);
 
         return reservation;
     }

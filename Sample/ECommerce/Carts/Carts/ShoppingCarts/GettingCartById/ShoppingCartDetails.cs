@@ -24,8 +24,6 @@ public class ShoppingCartDetails
 
     public void Apply(ShoppingCartOpened @event)
     {
-        Version++;
-
         Id = @event.CartId;
         ClientId = @event.ClientId;
         ProductItems = new List<PricedProductItem>();
@@ -34,8 +32,6 @@ public class ShoppingCartDetails
 
     public void Apply(ProductAdded @event)
     {
-        Version++;
-
         var newProductItem = @event.ProductItem;
 
         var existingProductItem = FindProductItemMatchingWith(newProductItem);
@@ -54,8 +50,6 @@ public class ShoppingCartDetails
 
     public void Apply(ProductRemoved @event)
     {
-        Version++;
-
         var productItemToBeRemoved = @event.ProductItem;
 
         var existingProductItem = FindProductItemMatchingWith(@event.ProductItem);
@@ -77,15 +71,11 @@ public class ShoppingCartDetails
 
     public void Apply(ShoppingCartConfirmed @event)
     {
-        Version++;
-
         Status = ShoppingCartStatus.Confirmed;
     }
 
     public void Apply(ShoppingCartCanceled @event)
     {
-        Version++;
-
         Status = ShoppingCartStatus.Canceled;
     }
 
