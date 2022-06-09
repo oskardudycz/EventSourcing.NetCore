@@ -1,3 +1,6 @@
+
+using Microsoft.Net.Http.Headers;
+
 namespace Helpdesk.Api.Core.Http;
 
 public static class ETagExtensions
@@ -7,6 +10,8 @@ public static class ETagExtensions
         if (eTag is null)
             throw new ArgumentNullException(nameof(eTag));
 
-        return int.Parse(eTag.Substring(1, eTag.Length - 2));
+        var value = EntityTagHeaderValue.Parse(eTag).Tag.Value;
+
+        return int.Parse(value.Substring(1, value.Length - 2));
     }
 }

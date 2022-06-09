@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.Marten;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.GetCustomerIncidentsSummary;
@@ -15,6 +17,7 @@ using Weasel.Core;
 using static Microsoft.AspNetCore.Http.Results;
 using static Helpdesk.Api.Incidents.IncidentService;
 using static Helpdesk.Api.Core.Http.ETagExtensions;
+using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +33,11 @@ builder.Services
         options.Projections.Add<IncidentDetailsProjection>();
         options.Projections.Add<IncidentShortInfoProjection>();
         options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
+        options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
     }).AddAsyncDaemon(DaemonMode.Solo);
+
+builder.Services.Configure<JsonOptions>(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();
 
