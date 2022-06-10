@@ -75,9 +75,9 @@ Event Sourcing is a design pattern in which results of business operations are s
 
 It is an alternative way to persist data. In contrast with state-oriented persistence that only keeps the latest version of the entity state, Event Sourcing stores each state change as a separate event.
 
-Thanks for that, no business data is lost. Each operation results in the event stored in the database. That enables extended auditing and diagnostics capabilities (both technically and business-wise). What's more, as events contains the business context, it allows wide business analysis and reporting.
+Thanks to that, no business data is lost. Each operation results in the event stored in the database. That enables extended auditing and diagnostics capabilities (both technically and business-wise). What's more, as events contains the business context, it allows wide business analysis and reporting.
 
-In this repository I'm showing different aspects, patterns around Event Sourcing. From the basic to advanced practices.
+In this repository I'm showing different aspects and patterns around Event Sourcing from the basic to advanced practices.
 
 Read more in my articles:
 -   📝 [How using events helps in a teams' autonomy](https://event-driven.io/en/how_using_events_help_in_teams_autonomy/?utm_source=event_sourcing_net)
@@ -85,7 +85,7 @@ Read more in my articles:
 
 ### 1.2 What is Event?
 
-Events, represent facts in the past. They carry information about something accomplished. It should be named in the past tense, e.g. _"user added"_, _"order confirmed"_. Events are not directed to a specific recipient - they're broadcasted information. It's like telling a story at a party. We hope that someone listens to us, but we may quickly realise that no one is paying attention.
+Events represent facts in the past. They carry information about something accomplished. It should be named in the past tense, e.g. _"user added"_, _"order confirmed"_. Events are not directed to a specific recipient - they're broadcasted information. It's like telling a story at a party. We hope that someone listens to us, but we may quickly realise that no one is paying attention.
 
 Events:
 - are immutable: _"What has been seen, cannot be unseen"_.
@@ -100,9 +100,9 @@ Read more in my articles:
 
 ### 1.3 What is Stream?
 
-Events are logically grouped into streams. In Event Sourcing, streams are the representation of the entities. All the entity state mutations ends up as the persisted events. Entity state is retrieved by reading all the stream events and applying them one by one in the order of appearance.
+Events are logically grouped into streams. In Event Sourcing, streams are the representation of the entities. All the entity state mutations end up as the persisted events. Entity state is retrieved by reading all the stream events and applying them one by one in the order of appearance.
 
-A stream should have a unique identifier representing the specific object. Each event has its own unique position within a stream. This position is usually represented by a numeric, incremental value. This number can be used to define the order of the events while retrieving the state. It can be also used to detect concurrency issues. 
+A stream should have a unique identifier representing the specific object. Each event has its own unique position within a stream. This position is usually represented by a numeric, incremental value. This number can be used to define the order of the events while retrieving the state. It can also be used to detect concurrency issues. 
 
 ### 1.4 Event representation
 
@@ -146,7 +146,7 @@ Sample event JSON can look like:
 ```
 ### 1.5 Event Storage
 
-Event Sourcing is not related to any type of storage implementation. As long as it fulfils the assumptions, it can be implemented having any backing database (relational, document, etc.). The state has to be represented by the append-only log of events. The events are stored in chronological order, and new events are appended to the previous event. Event Stores are the databases' category explicitly designed for such purpose. 
+Event Sourcing is not related to any type of storage implementation. As long as it fulfills the assumptions, it can be implemented having any backing database (relational, document, etc.). The state has to be represented by the append-only log of events. The events are stored in chronological order, and new events are appended to the previous event. Event Stores are the databases' category explicitly designed for such purpose. 
 
 Read more in my article:
 -   📝 [What if I told you that Relational Databases are in fact Event Stores?](https://event-driven.io/en/relational_databases_are_event_stores/?utm_source=event_sourcing_net)
@@ -210,11 +210,11 @@ In Event Sourcing, the state is stored in events. Events are logically grouped i
 ]
 ```
 
-All of those events shares the stream id (`"streamId": "INV/2021/11/01"`), and have incremented stream position.
+All of those events share the stream id (`"streamId": "INV/2021/11/01"`), and have incremented stream positions.
 
-We can get to conclusion that in Event Sourcing entity is represented by stream, so sequence of event correlated by the stream id ordered by stream position.
+In Event Sourcing each entity is represented by its stream: the sequence of events correlated by the stream id ordered by stream position.
 
-To get the current state of entity we need to perform the stream aggregation process. We're translating the set of events into a single entity. This can be done with the following the steps:
+To get the current state of an entity we need to perform the stream aggregation process. We're translating the set of events into a single entity. This can be done with the following steps:
 1. Read all events for the specific stream.
 2. Order them ascending in the order of appearance (by the event's stream position).
 3. Construct the empty object of the entity type (e.g. with default constructor).
