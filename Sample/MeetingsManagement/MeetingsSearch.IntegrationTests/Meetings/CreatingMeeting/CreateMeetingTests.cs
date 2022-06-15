@@ -1,65 +1,54 @@
-using Core.Api.Testing;
 using Core.Events;
 using Core.Testing;
 using FluentAssertions;
-using MeetingsSearch.Api;
 using MeetingsSearch.Meetings;
 using MeetingsSearch.Meetings.CreatingMeeting;
 using Xunit;
+using Ogooreck.API;
+using static Ogooreck.API.ApiSpecification;
 
 namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting;
 
-public class CreateMeetingFixture: ApiWithEventsFixture<Startup>
+public class CreateMeetingTests: IClassFixture<TestWebApplicationFactory<Program>>
 {
-    protected override string ApiUrl => MeetingsSearchApi.MeetingsUrl;
+    private readonly ApiSpecification<Program> API;
+    private readonly TestWebApplicationFactory<Program> fixture;
 
-    public readonly Guid MeetingId = Guid.NewGuid();
-    public readonly string MeetingName = $"Event Sourcing Workshop {DateTime.Now.Ticks}";
-
-    public override async Task InitializeAsync()
+    public CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
     {
-        // prepare event
-        var @event = new EventEnvelope<MeetingCreated>(
+        this.fixture = fixture;
+        API = ApiSpecification<Program>.Setup(fixture);
+    }
+
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task CreateCommand_ShouldPublish_MeetingCreateEvent()
+    {
+        await fixture.PublishInternalEvent(new EventEnvelope<MeetingCreated>(
             new MeetingCreated(
                 MeetingId,
                 MeetingName
             ),
             new EventMetadata("event-id", 1, 2, null)
-        );
+        ));
 
-        // send meeting created event to internal event bus
-        await PublishInternalEvent(@event);
+        await API.Given(
+                URI($"{MeetingsSearchApi.MeetingsUrl}?filter={MeetingName}")
+            )
+            .When(
+                GET_UNTIL(
+                    RESPONSE_BODY_MATCHES<IReadOnlyCollection<Meeting>>(
+                        meetings => meetings.Any(m => m.Id == MeetingId))
+                ))
+            .Then(
+                RESPONSE_BODY<IReadOnlyCollection<Meeting>>(meetings =>
+                    meetings.Should().Contain(meeting =>
+                        meeting.Id == MeetingId
+                        && meeting.Name == MeetingName
+                    )
+                ));
     }
-}
 
-public class CreateMeetingTests: IClassFixture<CreateMeetingFixture>
-{
-    private readonly CreateMeetingFixture fixture;
-
-    public CreateMeetingTests(CreateMeetingFixture fixture)
-    {
-        this.fixture = fixture;
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task MeetingCreated_ShouldUpdateReadModel()
-    {
-        //send query
-        var queryResponse = await fixture.Get(
-            $"?filter={fixture.MeetingName}",
-            maxNumberOfRetries: 10,
-            retryIntervalInMs: 1000,
-            check: async response =>
-                response.IsSuccessStatusCode
-                && (await response.Content.ReadAsStringAsync()).Contains(fixture.MeetingName));
-
-        queryResponse.EnsureSuccessStatusCode();
-
-        var meetings = await queryResponse.GetResultFromJson<IReadOnlyCollection<Meeting>>();
-        meetings.Should().Contain(meeting =>
-            meeting.Id == fixture.MeetingId
-            && meeting.Name == fixture.MeetingName
-        );
-    }
+    private readonly Guid MeetingId = Guid.NewGuid();
+    private readonly string MeetingName = "Event Sourcing Workshop";
 }
