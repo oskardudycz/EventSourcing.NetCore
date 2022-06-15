@@ -2,12 +2,50 @@ using System.Net;
 using Carts.Api.Requests.Carts;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
-using Core.Api.Testing;
-using Core.Testing;
 using FluentAssertions;
 using Xunit;
+using Ogooreck.API;
+using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.RemovingProduct;
+
+public class ConfirmShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetime
+{
+    public Guid ShoppingCartId { get; private set; }
+
+    public readonly Guid ClientId = Guid.NewGuid();
+
+    public readonly ProductItemRequest ProductItem = new(Guid.NewGuid(), 10);
+
+    public async Task InitializeAsync()
+    {
+        var openResponse = await Send(
+            new ApiRequest(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
+        );
+
+        await CREATED(openResponse);
+
+        ShoppingCartId = openResponse.GetCreatedId<Guid>();
+
+        var addResponse = await Send(
+                new ApiRequest(
+                    POST,
+                    URI($"/api/ShoppingCarts/{ShoppingCartId}/products"),
+                    BODY(new AddProductRequest(ProductItem)),
+                    HEADERS(IF_MATCH(1.ToString())))
+            );
+
+        var getResponse = await SEND_UNTIL()
+
+        var addResponse = await Post(
+            $"{ShoppingCartId}/products",
+            new AddProductRequest(ProductItem),
+            new RequestOptions { IfMatch = 1.ToString() }
+        );
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
+}
 
 public class RemoveProductFixture: ApiWithEventsFixture<Startup>
 {
@@ -30,7 +68,7 @@ public class RemoveProductFixture: ApiWithEventsFixture<Startup>
 
         ShoppingCartId = await openResponse.GetResultFromJson<Guid>();
 
-        var addResponse  = await Post(
+        var addResponse = await Post(
             $"{ShoppingCartId}/products",
             new AddProductRequest(ProductItem),
             new RequestOptions { IfMatch = 1.ToString() }

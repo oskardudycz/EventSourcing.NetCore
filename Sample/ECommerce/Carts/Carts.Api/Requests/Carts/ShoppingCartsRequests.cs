@@ -23,8 +23,6 @@ public record RemoveProductRequest(
     PricedProductItemRequest? ProductItem
 );
 
-public record ConfirmShoppingCartRequest;
-
 public record GetCartAtVersionRequest(
     Guid? CartId,
     long? Version
