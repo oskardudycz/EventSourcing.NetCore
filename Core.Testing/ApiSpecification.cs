@@ -42,16 +42,31 @@ public static class ApiSpecification
             return request;
         };
 
-
     public static Action<HttpRequestHeaders> IF_MATCH(string ifMatch, bool isWeak = true) =>
         headers => headers.IfMatch.Add(new EntityTagHeaderValue($"\"{ifMatch}\"", isWeak));
+
+    public static Task<HttpResponseMessage> And(this Task<HttpResponseMessage> response,
+        Func<HttpResponseMessage, HttpResponseMessage> and) =>
+        response.ContinueWith(t => and(t.Result));
+
+
+    public static Task And(this Task<HttpResponseMessage> response, Func<HttpResponseMessage, Task> and) =>
+        response.ContinueWith(t => and(t.Result));
+
+    public static Task And(this Task<HttpResponseMessage> response, Func<Task> and) =>
+        response.ContinueWith(_ => and());
+
+    public static Task And(this Task<HttpResponseMessage> response, Task and) =>
+        response.ContinueWith(_ => and);
 
     ///////////////////
     ////   WHEN    ////
     ///////////////////
     public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> GET = SEND(HttpMethod.Get);
 
-    public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> GET_UNTIL(int sth) => SEND_UNTIL(HttpMethod.Get);
+    public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> GET_UNTIL(
+        Func<HttpResponseMessage, ValueTask<bool>> check) =>
+        SEND_UNTIL(HttpMethod.Get, check);
 
     public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> POST = SEND(HttpMethod.Post);
 
@@ -66,11 +81,37 @@ public static class ApiSpecification
             return api.SendAsync(request);
         };
 
-    public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> SEND_UNTIL(HttpMethod httpMethod) =>
-        (api, request) =>
+    public static Func<HttpClient, HttpRequestMessage, Task<HttpResponseMessage>> SEND_UNTIL(HttpMethod httpMethod,
+        Func<HttpResponseMessage, ValueTask<bool>> check, int maxNumberOfRetries = 5, int retryIntervalInMs = 1000) =>
+        async (api, request) =>
         {
             request.Method = httpMethod;
-            return api.SendAsync(request);
+
+            var retryCount = maxNumberOfRetries;
+            var finished = false;
+
+            HttpResponseMessage? response = null;
+            do
+            {
+                try
+                {
+                    response = await api.SendAsync(request);
+
+                    finished = await check(response);
+                }
+                catch
+                {
+                    if (retryCount == 0)
+                        throw;
+                }
+
+                await Task.Delay(retryIntervalInMs);
+                retryCount--;
+            } while (!finished);
+
+            response.Should().NotBeNull();
+
+            return response!;
         };
 
     ///////////////////
@@ -120,6 +161,15 @@ public static class ApiSpecification
 
             result.Should().BeEquivalentTo(result);
         };
+
+    public static Func<HttpResponseMessage, ValueTask<bool>> RESPONSE_ETAG_IS(object eTag, bool isWeak = true) =>
+        response =>
+        {
+            response.Headers.ETag.Should().NotBeNull();
+            var etagPrefix = isWeak ? "W/" : "";
+            response.Headers.ETag!.Tag.Should().Be($"{etagPrefix}\"{eTag}\"");
+            return new ValueTask<bool>(true);
+        };
 }
 
 public class ApiSpecification<TProgram>: IDisposable where TProgram : class
@@ -158,6 +208,34 @@ public class ApiSpecification<TProgram>: IDisposable where TProgram : class
     public GivenApiSpecificationBuilder Given(
         params Func<HttpRequestMessage, HttpRequestMessage>[] builders) =>
         new(client, builders);
+
+    public async Task<HttpResponseMessage> Scenario(
+        Task<HttpResponseMessage> first,
+        params Func<HttpResponseMessage, Task<HttpResponseMessage>>[] following)
+    {
+        var response = await first;
+
+        foreach (var next in following)
+        {
+            response = await next(response);
+        }
+
+        return response;
+    }
+
+    public async Task<HttpResponseMessage> Scenario(
+        Task<HttpResponseMessage> first,
+        params Task<HttpResponseMessage>[] following)
+    {
+        var response = await first;
+
+        foreach (var next in following)
+        {
+            response = await next;
+        }
+
+        return response;
+    }
 
     /////////////////////
     ////   BUILDER   ////
@@ -218,6 +296,18 @@ public class ApiSpecification<TProgram>: IDisposable where TProgram : class
         client.Dispose();
         applicationFactory.Dispose();
     }
+}
+
+public class AndSpecificationBuilder
+{
+    private readonly Lazy<Task<HttpResponseMessage>> then;
+
+    public AndSpecificationBuilder(Lazy<Task<HttpResponseMessage>> then)
+    {
+        this.then = then;
+    }
+
+    public Task<HttpResponseMessage> Response => then.Value;
 }
 
 public class ApiRequest
@@ -281,4 +371,8 @@ public static class HttpResponseMessageExtensions
         response.TryGetCreatedId<T>(out var createdId)
             ? createdId!
             : throw new ArgumentOutOfRangeException(nameof(response.Headers.Location));
+
+
+    public static string GetCreatedId(this HttpResponseMessage response) =>
+        response.GetCreatedId<string>();
 }

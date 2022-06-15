@@ -1,77 +1,66 @@
-using System.Net;
 using Carts.Api.Requests.Carts;
 using Carts.ShoppingCarts;
-using Carts.ShoppingCarts.FinalizingCart;
 using Carts.ShoppingCarts.GettingCartById;
-using Core.Api.Testing;
-using Core.Testing;
-using FluentAssertions;
+using Ogooreck.API;
 using Xunit;
+using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.Confirming;
 
-public class ConfirmShoppingCartFixture: ApiWithEventsFixture<Startup>
+public class ConfirmShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetime
 {
-    protected override string ApiUrl => "/api/ShoppingCarts";
-
     public Guid ShoppingCartId { get; private set; }
 
     public readonly Guid ClientId = Guid.NewGuid();
 
-    public HttpResponseMessage CommandResponse = default!;
-
-    public override async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        var openResponse = await Post(new OpenShoppingCartRequest(ClientId));
-        openResponse.EnsureSuccessStatusCode();
-
-        ShoppingCartId = await openResponse.GetResultFromJson<Guid>();
-
-        CommandResponse = await Put(
-            $"{ShoppingCartId}/confirmation",
-            new ConfirmShoppingCartRequest(),
-            new RequestOptions { IfMatch = 1.ToString() }
+        var openResponse = await Send(
+            new ApiRequest(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
         );
+
+        await CREATED(openResponse);
+
+        ShoppingCartId = openResponse.GetCreatedId<Guid>();
     }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
+public class ConfirmShoppingCartTests: IClassFixture<Canceling.ConfirmShoppingCartFixture>
 {
-    private readonly ConfirmShoppingCartFixture fixture;
 
-    public ConfirmShoppingCartTests(ConfirmShoppingCartFixture fixture)
-    {
-        this.fixture = fixture;
-    }
+    private readonly ConfirmShoppingCartFixture API;
+
+    public ConfirmShoppingCartTests(ConfirmShoppingCartFixture api) => API = api;
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public void Put_Should_Return_OK()
+    public async Task Put_Should_Return_OK_And_Cancel_Shopping_Cart()
     {
-        var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
-        commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
+        await API
+            .Given(
+                URI($"/api/ShoppingCarts/{API.ShoppingCartId}/confirmation"),
+                HEADERS(IF_MATCH(1.ToString()))
+            )
+            .When(PUT)
+            .Then(OK);
 
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task Delete_Should_Cancel_ShoppingCart()
-    {
-        // prepare query
-        var query = $"{fixture.ShoppingCartId}";
+        await API
+            .Given(
+                URI($"/api/ShoppingCarts/{API.ShoppingCartId}")
+            )
+            .When(GET_UNTIL(RESPONSE_ETAG_IS(2)))
+            .Then(
+                OK,
+                RESPONSE_BODY(new ShoppingCartDetails
+                {
+                    Id = API.ShoppingCartId,
+                    Status = ShoppingCartStatus.Confirmed,
+                    ClientId = API.ClientId,
+                    Version = 2,
+                }));
 
-        //send query
-        var queryResponse = await fixture.Get(query, 30,
-            check: async response => (await response.GetResultFromJson<ShoppingCartDetails>()).Version == 2);
-
-        queryResponse.EnsureSuccessStatusCode();
-
-        var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
-        cartDetails.Should().NotBeNull();
-        cartDetails.Id.Should().Be(fixture.ShoppingCartId);
-        cartDetails.Status.Should().Be(ShoppingCartStatus.Confirmed);
-        cartDetails.ClientId.Should().Be(fixture.ClientId);
-        cartDetails.Version.Should().Be(2);
-
-        fixture.PublishedExternalEventsOfType<CartFinalized>();
+        // API.PublishedExternalEventsOfType<CartFinalized>();
     }
 }

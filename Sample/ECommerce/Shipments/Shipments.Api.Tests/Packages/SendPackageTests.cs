@@ -1,97 +1,51 @@
-using System.Net;
-using Core.Api.Testing;
 using Core.Testing;
-using FluentAssertions;
-using Shipments.Packages;
+using Ogooreck.API;
 using Shipments.Packages.Events.External;
 using Shipments.Packages.Requests;
 using Shipments.Products;
 using Xunit;
+using static Ogooreck.API.ApiSpecification;
 
 namespace Shipments.Api.Tests.Packages;
 
-public class SendPackageFixture: ApiWithEventsFixture<Startup>
+public class SendPackageTests: IClassFixture<TestWebApplicationFactory<Program>>
 {
-    protected override string ApiUrl => "/api/Shipments";
+    private readonly ApiSpecification<Program> API;
+    private readonly TestWebApplicationFactory<Program> fixture;
 
-    public readonly Guid OrderId = Guid.NewGuid();
+    public SendPackageTests(TestWebApplicationFactory<Program> fixture)
+    {
+        this.fixture = fixture;
+        API = ApiSpecification<Program>.Setup(fixture);
+    }
 
-    public readonly DateTime TimeBeforeSending = DateTime.UtcNow;
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public Task SendPackage_ShouldReturn_CreatedStatus_With_PackageId() =>
+        API.Given(
+                URI("/api/products/"),
+                BODY(new SendPackage(OrderId, ProductItems))
+            )
+            .When(POST)
+            .Then(CREATED)
+            .And(response => fixture.ShouldPublishInternalEventOfType<PackageWasSent>(
+                @event =>
+                    @event.PackageId == response.GetCreatedId<Guid>()
+                    && @event.OrderId == OrderId
+                    && @event.SentAt > TimeBeforeSending
+                    && @event.ProductItems.Count == ProductItems.Count
+                    && @event.ProductItems.All(
+                        pi => ProductItems.Exists(
+                            expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
+            ));
 
-    public readonly List<ProductItem> ProductItems = new()
+    private readonly Guid OrderId = Guid.NewGuid();
+
+    private readonly DateTime TimeBeforeSending = DateTime.UtcNow;
+
+    private readonly List<ProductItem> ProductItems = new()
     {
         new ProductItem { ProductId = Guid.NewGuid(), Quantity = 10 },
         new ProductItem { ProductId = Guid.NewGuid(), Quantity = 3 }
     };
-
-    public HttpResponseMessage CommandResponse = default!;
-
-    public override async Task InitializeAsync()
-    {
-        CommandResponse = await Post(new SendPackage(OrderId, ProductItems));
-    }
-}
-
-public class SendPackageTests: IClassFixture<SendPackageFixture>
-{
-    private readonly SendPackageFixture fixture;
-
-    public SendPackageTests(SendPackageFixture fixture)
-    {
-        this.fixture = fixture;
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task SendPackage_ShouldReturn_CreatedStatus_With_PackageId()
-    {
-        var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
-        commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        // get created record id
-        var createdId = await commandResponse.GetResultFromJson<Guid>();
-        createdId.Should().NotBeEmpty();
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task SendPackage_ShouldPublish_PackageWasSentEvent()
-    {
-        var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
-
-        await fixture.ShouldPublishInternalEventOfType<PackageWasSent>(
-            @event =>
-                @event.PackageId == createdId
-                && @event.OrderId == fixture.OrderId
-                && @event.SentAt > fixture.TimeBeforeSending
-                && @event.ProductItems.Count == fixture.ProductItems.Count
-                && @event.ProductItems.All(
-                    pi => fixture.ProductItems.Exists(
-                        expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
-        );
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task SendPackage_ShouldCreate_Package()
-    {
-        var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
-
-        // prepare query
-        var query = $"{createdId}";
-
-        //send query
-        var queryResponse = await fixture.Get(query);
-        queryResponse.EnsureSuccessStatusCode();
-
-        var packageDetails = await queryResponse.GetResultFromJson<Package>();
-        packageDetails.Id.Should().Be(createdId);
-        packageDetails.OrderId.Should().Be(fixture.OrderId);
-        packageDetails.SentAt.Should().BeAfter(fixture.TimeBeforeSending);
-        packageDetails.ProductItems.Should().NotBeEmpty();
-        packageDetails.ProductItems.All(
-                pi => fixture.ProductItems.Exists(
-                    expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
-            .Should().BeTrue();
-    }
 }

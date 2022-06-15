@@ -1,68 +1,45 @@
-using System.Net;
 using Carts.Api.Requests.Carts;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
-using Core.Api.Testing;
 using Core.Testing;
-using FluentAssertions;
+using Ogooreck.API;
 using Xunit;
+using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.Opening;
 
-public class OpenShoppingCartFixture: ApiWithEventsFixture<Startup>
+public class OpenShoppingCartTests: IClassFixture<TestWebApplicationFactory<Program>>
 {
-    protected override string ApiUrl => "/api/ShoppingCarts";
+    private readonly ApiSpecification<Program> API;
+
+    [Fact]
+    public Task Post_ShouldReturn_CreatedStatus_With_CartId() =>
+        API.Scenario(
+            API.Given(
+                    URI("/api/ShoppingCarts/"),
+                    BODY(new OpenShoppingCartRequest(ClientId))
+                )
+                .When(POST)
+                .Then(CREATED),
+
+            response =>
+                API.Given(
+                        URI($"/api/ShoppingCarts/{response.GetCreatedId()}")
+                    )
+                    .When(GET_UNTIL(RESPONSE_ETAG_IS(1)))
+                    .Then(
+                        OK,
+                        RESPONSE_BODY(new ShoppingCartDetails
+                        {
+                            Id = response.GetCreatedId<Guid>(),
+                            Status = ShoppingCartStatus.Canceled,
+                            ClientId = ClientId,
+                            Version = 1,
+                        }))
+        );
+
+    public OpenShoppingCartTests(TestWebApplicationFactory<Program> fixture) =>
+        API = ApiSpecification<Program>.Setup(fixture);
 
     public readonly Guid ClientId = Guid.NewGuid();
-
-    public HttpResponseMessage CommandResponse = default!;
-
-    public override async Task InitializeAsync()
-    {
-        CommandResponse = await Post(new OpenShoppingCartRequest(ClientId));
-    }
-}
-
-public class OpenShoppingCartTests: IClassFixture<OpenShoppingCartFixture>
-{
-    private readonly OpenShoppingCartFixture fixture;
-
-    public OpenShoppingCartTests(OpenShoppingCartFixture fixture)
-    {
-        this.fixture = fixture;
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task Post_Should_Return_CreatedStatus_With_CartId()
-    {
-        var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
-        commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        // get created record id
-        var createdId = await commandResponse.GetResultFromJson<Guid>();
-        createdId.Should().NotBeEmpty();
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task Post_Should_Create_ShoppingCart()
-    {
-        var createdId = await fixture.CommandResponse.GetResultFromJson<Guid>();
-
-        // prepare query
-        var query = $"{createdId}";
-
-        //send query
-        var queryResponse = await fixture.Get(query, 30);
-
-        queryResponse.EnsureSuccessStatusCode();
-
-        var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
-        cartDetails.Should().NotBeNull();
-        cartDetails.Id.Should().Be(createdId);
-        cartDetails.Status.Should().Be(ShoppingCartStatus.Pending);
-        cartDetails.ClientId.Should().Be(fixture.ClientId);
-        cartDetails.Version.Should().Be(1);
-    }
 }
