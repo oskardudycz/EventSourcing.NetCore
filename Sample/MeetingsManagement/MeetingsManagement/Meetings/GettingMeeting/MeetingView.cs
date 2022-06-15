@@ -15,6 +15,8 @@ public class MeetingView
     public DateTime? Start { get; set; }
 
     public DateTime? End { get; set; }
+
+    public int Version { get; set; }
 }
 
 public class MeetingViewProjection: SingleStreamAggregation<MeetingView>

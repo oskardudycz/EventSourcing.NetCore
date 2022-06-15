@@ -122,7 +122,7 @@ public class ShoppingCartsController: Controller
     {
         var result = await queryBus.Send<GetCartById, ShoppingCartDetails>(GetCartById.Create(id));
 
-        Response.TrySetETagResponseHeader(result.Version.ToString());
+        Response.TrySetETagResponseHeader(result.Version);
 
         return result;
     }

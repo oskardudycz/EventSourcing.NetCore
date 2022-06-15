@@ -1,5 +1,6 @@
 using Core.Commands;
 using Core.Queries;
+using Core.WebApi.Headers;
 using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.GettingMeeting;
 using MeetingsManagement.Meetings.SchedulingMeeting;
@@ -21,9 +22,14 @@ public class MeetingsController: Controller
     }
 
     [HttpGet("{id}")]
-    public Task<MeetingView> Get(Guid id)
+    public async Task<MeetingView> Get(Guid id)
     {
-        return queryBus.Send<GetMeeting, MeetingView>(new GetMeeting(id));
+
+        var result = await queryBus.Send<GetMeeting, MeetingView>(new GetMeeting(id));
+
+        Response.TrySetETagResponseHeader(result.Version);
+
+        return result;
     }
 
     [HttpPost]

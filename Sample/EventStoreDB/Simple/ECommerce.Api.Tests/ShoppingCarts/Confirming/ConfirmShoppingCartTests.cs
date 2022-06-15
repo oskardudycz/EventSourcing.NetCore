@@ -1,10 +1,9 @@
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
-using ECommerce.ShoppingCarts.ProductItems;
 using FluentAssertions;
-using Ogooreck.API;
 using Xunit;
+using Ogooreck.API;
 using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.Confirming;

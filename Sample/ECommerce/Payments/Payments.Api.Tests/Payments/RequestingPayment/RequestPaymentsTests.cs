@@ -6,12 +6,12 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Payments.Api.Tests.Payments.RequestingPayment;
 
-public class RequestPaymentsTestsTests: IClassFixture<TestWebApplicationFactory<Program>>
+public class RequestPaymentsTests: IClassFixture<TestWebApplicationFactory<Program>>
 {
     private readonly ApiSpecification<Program> API;
     private readonly TestWebApplicationFactory<Program> fixture;
 
-    public RequestPaymentsTestsTests(TestWebApplicationFactory<Program> fixture)
+    public RequestPaymentsTests(TestWebApplicationFactory<Program> fixture)
     {
         this.fixture = fixture;
         API = ApiSpecification<Program>.Setup(fixture);

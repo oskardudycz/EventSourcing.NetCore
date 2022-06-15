@@ -17,7 +17,8 @@ builder.Services
     .AddKafkaConsumer()
     .AddCoreServices()
     .AddMeetingsSearch(builder.Configuration)
-    .AddCorrelationIdMiddleware();
+    .AddCorrelationIdMiddleware()
+    .AddControllers();
 
 var app = builder.Build();
 
