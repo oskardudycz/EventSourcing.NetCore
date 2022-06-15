@@ -13,7 +13,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.5" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.6" />
     </ItemGroup>
 
 

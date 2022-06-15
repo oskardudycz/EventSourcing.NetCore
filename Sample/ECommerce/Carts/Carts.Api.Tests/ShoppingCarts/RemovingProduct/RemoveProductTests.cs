@@ -1,10 +1,7 @@
-using System.Net;
 using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
 using Carts.ShoppingCarts.Products;
-using Core.Api.Testing;
-using FluentAssertions;
 using Xunit;
 using Ogooreck.API;
 using static Ogooreck.API.ApiSpecification;
