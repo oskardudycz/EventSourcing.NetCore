@@ -25,7 +25,11 @@ public class CancelShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetim
         ShoppingCartId = openResponse.GetCreatedId<Guid>();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync()
+    {
+        Dispose();
+        return Task.CompletedTask;
+    }
 }
 
 public class CancelShoppingCartTests: IClassFixture<CancelShoppingCartFixture>

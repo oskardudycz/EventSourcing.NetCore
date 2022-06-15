@@ -1,8 +1,6 @@
-using Core.Api.Testing;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
-using ECommerce.ShoppingCarts.ProductItems;
 using FluentAssertions;
 using Xunit;
 using Ogooreck.API;
