@@ -1,13 +1,14 @@
-using Carts.Api.Requests.Carts;
+using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
+using Carts.ShoppingCarts.Products;
 using Ogooreck.API;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.Canceling;
 
-public class ConfirmShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetime
+public class CancelShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetime
 {
     public Guid ShoppingCartId { get; private set; }
 
@@ -27,11 +28,11 @@ public class ConfirmShoppingCartFixture: ApiSpecification<Program>, IAsyncLifeti
     public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
+public class CancelShoppingCartTests: IClassFixture<CancelShoppingCartFixture>
 {
-    private readonly ConfirmShoppingCartFixture API;
+    private readonly CancelShoppingCartFixture API;
 
-    public ConfirmShoppingCartTests(ConfirmShoppingCartFixture api) => API = api;
+    public CancelShoppingCartTests(CancelShoppingCartFixture api) => API = api;
 
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -40,7 +41,7 @@ public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
         await API
             .Given(
                 URI($"/api/ShoppingCarts/{API.ShoppingCartId}"),
-                HEADERS(IF_MATCH(1.ToString()))
+                HEADERS(IF_MATCH(1))
             )
             .When(DELETE)
             .Then(OK);
@@ -56,6 +57,7 @@ public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
                 {
                     Id = API.ShoppingCartId,
                     Status = ShoppingCartStatus.Canceled,
+                    ProductItems = new List<PricedProductItem>(),
                     ClientId = API.ClientId,
                     Version = 2,
                 }));

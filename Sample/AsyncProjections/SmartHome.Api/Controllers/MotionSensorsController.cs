@@ -43,7 +43,7 @@ public class MotionSensorsController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/MotionSensors", measurementId);
+        return Created($"/api/MotionSensors/{measurementId}", measurementId);
     }
 
     [HttpPost("rebuild")]

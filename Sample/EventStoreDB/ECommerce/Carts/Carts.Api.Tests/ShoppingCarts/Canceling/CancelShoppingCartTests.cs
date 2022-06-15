@@ -1,72 +1,68 @@
-using System.Net;
 using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
-using Core.Api.Testing;
+using Carts.ShoppingCarts.Products;
 using FluentAssertions;
+using Ogooreck.API;
 using Xunit;
+using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.Canceling;
 
-public class CancelShoppingCartFixture: ApiFixture<Startup>
+public class CancelShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetime
 {
-    protected override string ApiUrl => "/api/ShoppingCarts";
-
     public Guid ShoppingCartId { get; private set; }
 
     public readonly Guid ClientId = Guid.NewGuid();
 
-    public HttpResponseMessage CommandResponse = default!;
-
-    public override async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        var openResponse = await Post(new OpenShoppingCartRequest(ClientId));
-        openResponse.EnsureSuccessStatusCode();
-
-        ShoppingCartId = await openResponse.GetResultFromJson<Guid>();
-
-        CommandResponse = await Delete(
-            $"{ShoppingCartId}",
-            new RequestOptions { IfMatch = 0.ToString() }
+        var openResponse = await Send(
+            new ApiRequest(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
         );
+
+        await CREATED(openResponse);
+
+        ShoppingCartId = openResponse.GetCreatedId<Guid>();
     }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }
 
 public class CancelShoppingCartTests: IClassFixture<CancelShoppingCartFixture>
 {
-    private readonly CancelShoppingCartFixture fixture;
+    private readonly CancelShoppingCartFixture API;
 
-    public CancelShoppingCartTests(CancelShoppingCartFixture fixture)
-    {
-        this.fixture = fixture;
-    }
+    public CancelShoppingCartTests(CancelShoppingCartFixture api) => API = api;
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public void Put_Should_Return_OK()
+    public async Task Delete_Should_Return_OK_And_Cancel_Shopping_Cart()
     {
-        var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
-        commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
+        await API
+            .Given(
+                URI($"/api/ShoppingCarts/{API.ShoppingCartId}"),
+                HEADERS(IF_MATCH(0))
+            )
+            .When(DELETE)
+            .Then(OK);
 
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task Delete_Should_Cancel_ShoppingCart()
-    {
-        // prepare query
-        var query = $"{fixture.ShoppingCartId}";
+        await API
+            .Given(
+                URI($"/api/ShoppingCarts/{API.ShoppingCartId}")
+            )
+            .When(GET_UNTIL(RESPONSE_ETAG_IS(1)))
+            .Then(
+                OK,
+                RESPONSE_BODY<ShoppingCartDetails>(details =>
+                {
+                    details.Id.Should().Be(API.ShoppingCartId);
+                    details.Status.Should().Be(ShoppingCartStatus.Canceled);
+                    details.ProductItems.Should().BeEmpty();
+                    details.ClientId.Should().Be(API.ClientId);
+                    details.Version.Should().Be(1);
+                }));
 
-        //send query
-        var queryResponse = await fixture.Get(query, 30,
-            check: async response => (await response.GetResultFromJson<ShoppingCartDetails>()).Version == 1);
-
-        queryResponse.EnsureSuccessStatusCode();
-
-        var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
-        cartDetails.Should().NotBeNull();
-        cartDetails.Id.Should().Be(fixture.ShoppingCartId);
-        cartDetails.Status.Should().Be(ShoppingCartStatus.Canceled);
-        cartDetails.ClientId.Should().Be(fixture.ClientId);
-        cartDetails.Version.Should().Be(1);
+        // API.PublishedExternalEventsOfType<CartFinalized>();
     }
 }

@@ -47,7 +47,7 @@ public class ShoppingCartsController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/ShoppingCarts", cartId);
+        return Created($"/api/ShoppingCarts/{cartId}", cartId);
     }
 
     [HttpPost("{id}/products")]

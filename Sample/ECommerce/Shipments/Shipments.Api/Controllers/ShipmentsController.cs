@@ -22,7 +22,7 @@ public class ShipmentsController: Controller
 
         var package = await packageService.SendPackage(request, HttpContext.RequestAborted);
 
-        return Created("api/Reservations", package.Id);
+        return Created($"/api/Shipments/{package.Id}", package.Id);
     }
 
     [HttpGet("{id}")]

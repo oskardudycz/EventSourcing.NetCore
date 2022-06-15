@@ -1,7 +1,9 @@
 using System.Net;
-using Carts.Api.Requests.Carts;
+using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
+using Carts.ShoppingCarts.Products;
+using Core.Api.Testing;
 using FluentAssertions;
 using Xunit;
 using Ogooreck.API;
@@ -9,13 +11,15 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.RemovingProduct;
 
-public class ConfirmShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetime
+public class RemoveProductFixture: ApiSpecification<Program>, IAsyncLifetime
 {
     public Guid ShoppingCartId { get; private set; }
 
     public readonly Guid ClientId = Guid.NewGuid();
 
     public readonly ProductItemRequest ProductItem = new(Guid.NewGuid(), 10);
+
+    public decimal UnitPrice;
 
     public async Task InitializeAsync()
     {
@@ -28,107 +32,70 @@ public class ConfirmShoppingCartFixture: ApiSpecification<Program>, IAsyncLifeti
         ShoppingCartId = openResponse.GetCreatedId<Guid>();
 
         var addResponse = await Send(
-                new ApiRequest(
-                    POST,
-                    URI($"/api/ShoppingCarts/{ShoppingCartId}/products"),
-                    BODY(new AddProductRequest(ProductItem)),
-                    HEADERS(IF_MATCH(1.ToString())))
-            );
-
-        var getResponse = await SEND_UNTIL()
-
-        var addResponse = await Post(
-            $"{ShoppingCartId}/products",
-            new AddProductRequest(ProductItem),
-            new RequestOptions { IfMatch = 1.ToString() }
+            new ApiRequest(
+                POST,
+                URI($"/api/ShoppingCarts/{ShoppingCartId}/products"),
+                BODY(new AddProductRequest(ProductItem)),
+                HEADERS(IF_MATCH(1)))
         );
+
+        await OK(addResponse);
+
+        var getResponse = await Send(
+            new ApiRequest(
+                GET_UNTIL(RESPONSE_ETAG_IS(2)),
+                URI($"/api/ShoppingCarts/{ShoppingCartId}")
+            )
+        );
+
+        var cartDetails = await getResponse.GetResultFromJson<ShoppingCartDetails>();
+        UnitPrice = cartDetails.ProductItems.Single().UnitPrice;
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class RemoveProductFixture: ApiWithEventsFixture<Startup>
-{
-    protected override string ApiUrl => "/api/ShoppingCarts";
-
-    public Guid ShoppingCartId { get; private set; }
-
-    public readonly Guid ClientId = Guid.NewGuid();
-
-    public readonly ProductItemRequest ProductItem = new(Guid.NewGuid(), 10);
-
-    public readonly int RemovedCount = 5;
-
-    public HttpResponseMessage CommandResponse = default!;
-
-    public override async Task InitializeAsync()
-    {
-        var openResponse = await Post(new OpenShoppingCartRequest(ClientId));
-        openResponse.EnsureSuccessStatusCode();
-
-        ShoppingCartId = await openResponse.GetResultFromJson<Guid>();
-
-        var addResponse = await Post(
-            $"{ShoppingCartId}/products",
-            new AddProductRequest(ProductItem),
-            new RequestOptions { IfMatch = 1.ToString() }
-        );
-        addResponse.EnsureSuccessStatusCode();
-
-        var queryResponse = await Get($"{ShoppingCartId}", 30,
-            check: async response => (await response.GetResultFromJson<ShoppingCartDetails>()).Version == 2);
-        queryResponse.EnsureSuccessStatusCode();
-
-        var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
-        var unitPrice = cartDetails.ProductItems.Single().UnitPrice;
-
-        CommandResponse = await Delete(
-            $"{ShoppingCartId}/products/{ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={unitPrice}",
-            new RequestOptions { IfMatch = 2.ToString() }
-        );
-    }
-}
-
 public class RemoveProductTests: IClassFixture<RemoveProductFixture>
 {
-    private readonly RemoveProductFixture fixture;
+    private readonly RemoveProductFixture API;
 
-    public RemoveProductTests(RemoveProductFixture fixture)
-    {
-        this.fixture = fixture;
-    }
+    public RemoveProductTests(RemoveProductFixture api) => API = api;
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public void Delete_Should_Return_OK()
+    public async Task Delete_Should_Return_OK_And_Cancel_Shopping_Cart()
     {
-        var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
-        commandResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        await API
+            .Given(
+                URI(
+                    $"/api/ShoppingCarts/{API.ShoppingCartId}/products/{API.ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={API.UnitPrice}"),
+                HEADERS(IF_MATCH(2))
+            )
+            .When(DELETE)
+            .Then(NO_CONTENT);
+
+        await API
+            .Given(
+                URI($"/api/ShoppingCarts/{API.ShoppingCartId}")
+            )
+            .When(GET_UNTIL(RESPONSE_ETAG_IS(3)))
+            .Then(
+                OK,
+                RESPONSE_BODY(new ShoppingCartDetails
+                {
+                    Id = API.ShoppingCartId,
+                    Status = ShoppingCartStatus.Pending,
+                    ClientId = API.ClientId,
+                    ProductItems = new List<PricedProductItem>
+                    {
+                        PricedProductItem.Create(
+                            ProductItem.From(API.ProductItem.ProductId, API.ProductItem.Quantity - RemovedCount),
+                            API.UnitPrice
+                        )
+                    },
+                    Version = 3,
+                }));
     }
 
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task Delete_Should_RemoveProductFrom_ShoppingCart()
-    {
-        // prepare query
-        var query = $"{fixture.ShoppingCartId}";
-
-        //send query
-        var queryResponse = await fixture.Get(query, 30,
-            check: async response => (await response.GetResultFromJson<ShoppingCartDetails>()).Version == 3);
-
-        queryResponse.EnsureSuccessStatusCode();
-
-        var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
-        cartDetails.Should().NotBeNull();
-        cartDetails.Version.Should().Be(3);
-        cartDetails.Id.Should().Be(fixture.ShoppingCartId);
-        cartDetails.Status.Should().Be(ShoppingCartStatus.Pending);
-        cartDetails.ClientId.Should().Be(fixture.ClientId);
-        cartDetails.ProductItems.Should().HaveCount(1);
-
-        var productItem = cartDetails.ProductItems.Single();
-        productItem.ProductId.Should().Be(fixture.ProductItem.ProductId!.Value);
-        productItem.Quantity.Should().Be(fixture.ProductItem.Quantity - fixture.RemovedCount);
-    }
+    private readonly int RemovedCount = 5;
 }

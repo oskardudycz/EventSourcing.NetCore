@@ -1,6 +1,7 @@
-using Carts.Api.Requests.Carts;
+using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
+using Carts.ShoppingCarts.Products;
 using Core.Testing;
 using Ogooreck.API;
 using Xunit;
@@ -32,7 +33,8 @@ public class OpenShoppingCartTests: IClassFixture<TestWebApplicationFactory<Prog
                         RESPONSE_BODY(new ShoppingCartDetails
                         {
                             Id = response.GetCreatedId<Guid>(),
-                            Status = ShoppingCartStatus.Canceled,
+                            Status = ShoppingCartStatus.Pending,
+                            ProductItems = new List<PricedProductItem>(),
                             ClientId = ClientId,
                             Version = 1,
                         }))

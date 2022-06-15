@@ -1,6 +1,7 @@
-using Carts.Api.Requests.Carts;
+using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
+using Carts.ShoppingCarts.Products;
 using Ogooreck.API;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
@@ -27,7 +28,7 @@ public class ConfirmShoppingCartFixture: ApiSpecification<Program>, IAsyncLifeti
     public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class ConfirmShoppingCartTests: IClassFixture<Canceling.ConfirmShoppingCartFixture>
+public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
 {
 
     private readonly ConfirmShoppingCartFixture API;
@@ -41,7 +42,7 @@ public class ConfirmShoppingCartTests: IClassFixture<Canceling.ConfirmShoppingCa
         await API
             .Given(
                 URI($"/api/ShoppingCarts/{API.ShoppingCartId}/confirmation"),
-                HEADERS(IF_MATCH(1.ToString()))
+                HEADERS(IF_MATCH(1))
             )
             .When(PUT)
             .Then(OK);
@@ -57,6 +58,7 @@ public class ConfirmShoppingCartTests: IClassFixture<Canceling.ConfirmShoppingCa
                 {
                     Id = API.ShoppingCartId,
                     Status = ShoppingCartStatus.Confirmed,
+                    ProductItems = new List<PricedProductItem>(),
                     ClientId = API.ClientId,
                     Version = 2,
                 }));

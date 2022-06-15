@@ -43,7 +43,7 @@ public class TemperatureMeasurementsController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/TemperatureMeasurements", measurementId);
+        return Created($"/api/TemperatureMeasurements/{measurementId}", measurementId);
     }
 
 

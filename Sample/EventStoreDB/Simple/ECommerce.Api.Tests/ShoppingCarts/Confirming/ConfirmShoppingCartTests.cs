@@ -1,73 +1,69 @@
-using System.Net;
-using Core.Api.Testing;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
+using ECommerce.ShoppingCarts.ProductItems;
 using FluentAssertions;
+using Ogooreck.API;
 using Xunit;
+using static Ogooreck.API.ApiSpecification;
 
-namespace ECommerce.Api.Tests.ShoppingCarts.Confirming;
+namespace Carts.Api.Tests.ShoppingCarts.Confirming;
 
-public class ConfirmShoppingCartFixture: ApiFixture<Startup>
+public class ConfirmShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetime
 {
-    protected override string ApiUrl => "/api/ShoppingCarts";
-
     public Guid ShoppingCartId { get; private set; }
 
     public readonly Guid ClientId = Guid.NewGuid();
 
-    public HttpResponseMessage CommandResponse = default!;
-
-    public override async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        var openResponse = await Post(new OpenShoppingCartRequest(ClientId));
-        openResponse.EnsureSuccessStatusCode();
-
-        ShoppingCartId = await openResponse.GetResultFromJson<Guid>();
-
-        CommandResponse = await Put(
-            $"{ShoppingCartId}/confirmation",
-            new ConfirmShoppingCartRequest(),
-            new RequestOptions { IfMatch = 0.ToString() }
+        var openResponse = await Send(
+            new ApiRequest(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
         );
+
+        await CREATED(openResponse);
+
+        ShoppingCartId = openResponse.GetCreatedId<Guid>();
     }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }
 
 public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
 {
-    private readonly ConfirmShoppingCartFixture fixture;
 
-    public ConfirmShoppingCartTests(ConfirmShoppingCartFixture fixture)
-    {
-        this.fixture = fixture;
-    }
+    private readonly ConfirmShoppingCartFixture API;
+
+    public ConfirmShoppingCartTests(ConfirmShoppingCartFixture api) => API = api;
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public void Put_Should_Return_OK()
+    public async Task Put_Should_Return_OK_And_Cancel_Shopping_Cart()
     {
-        var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
-        commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
+        await API
+            .Given(
+                URI($"/api/ShoppingCarts/{API.ShoppingCartId}/confirmation"),
+                HEADERS(IF_MATCH(0))
+            )
+            .When(PUT)
+            .Then(OK);
 
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task Put_Should_Confirm_ShoppingCart()
-    {
-        // prepare query
-        var query = $"{fixture.ShoppingCartId}";
+        await API
+            .Given(
+                URI($"/api/ShoppingCarts/{API.ShoppingCartId}")
+            )
+            .When(GET_UNTIL(RESPONSE_ETAG_IS(1)))
+            .Then(
+                OK,
+                RESPONSE_BODY<ShoppingCartDetails>(details =>
+                {
+                    details.Id.Should().Be(API.ShoppingCartId);
+                    details.Status.Should().Be(ShoppingCartStatus.Confirmed);
+                    details.ProductItems.Should().BeEmpty();
+                    details.ClientId.Should().Be(API.ClientId);
+                    details.Version.Should().Be(1);
+                }));
 
-        //send query
-        var queryResponse = await fixture.Get(query, 30,
-            check: async response => (await response.GetResultFromJson<ShoppingCartDetails>()).Version == 1);
-
-        queryResponse.EnsureSuccessStatusCode();
-
-        var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
-        cartDetails.Should().NotBeNull();
-        cartDetails.Id.Should().Be(fixture.ShoppingCartId);
-        cartDetails.Status.Should().Be(ShoppingCartStatus.Confirmed);
-        cartDetails.ClientId.Should().Be(fixture.ClientId);
-        cartDetails.Version.Should().Be(1);
+        // API.PublishedExternalEventsOfType<CartFinalized>();
     }
 }

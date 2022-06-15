@@ -26,7 +26,8 @@ builder.Services
     .AddOptimisticConcurrencyMiddleware(
         sp => sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().TrySet,
         sp => () => sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Value?.ToString()
-    );
+    )
+    .AddControllers();
 
 var app = builder.Build();
 
@@ -51,6 +52,8 @@ app.UseExceptionHandlingMiddleware(exception => exception switch
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce.Api V1");
         c.RoutePrefix = string.Empty;
     });
+
+app.Services.UseECommerceModule();
 
 app.Run();
 

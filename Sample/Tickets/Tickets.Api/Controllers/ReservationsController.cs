@@ -81,7 +81,7 @@ public class ReservationsController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/Reservations", reservationId);
+        return Created($"/api/Reservations/{reservationId}", reservationId);
     }
 
 

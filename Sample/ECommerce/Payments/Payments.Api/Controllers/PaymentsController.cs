@@ -37,7 +37,7 @@ public class PaymentsController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/Payments", paymentId);
+        return Created($"/api/Payments/{paymentId}", paymentId);
     }
 
     [HttpPut("{id}/complete")]

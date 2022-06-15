@@ -26,7 +26,8 @@ builder.Services
     .AddOptimisticConcurrencyMiddleware(
         sp => sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().TrySet,
         sp => () => sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Value?.ToString()
-    );
+    )
+    .AddControllers();
 
 var app = builder.Build();
 

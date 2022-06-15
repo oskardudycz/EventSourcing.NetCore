@@ -1,7 +1,8 @@
-using Carts.Api.Requests.Carts;
+using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
 using Carts.ShoppingCarts.Products;
+using FluentAssertions;
 using Ogooreck.API;
 using static Ogooreck.API.ApiSpecification;
 using Xunit;
@@ -44,30 +45,24 @@ public class AddProductTests: IClassFixture<AddProductFixture>
             .Given(
                 URI($"/api/ShoppingCarts/{API.ShoppingCartId}/products"),
                 BODY(new AddProductRequest(product)),
-                HEADERS(IF_MATCH(1.ToString()))
+                HEADERS(IF_MATCH(1))
             )
             .When(POST)
             .Then(OK);
 
         await API
             .Given(URI($"/api/ShoppingCarts/{API.ShoppingCartId}"))
-            .When(GET)
+            .When(GET_UNTIL(RESPONSE_ETAG_IS(2)))
             .Then(
-                RESPONSE_BODY(
-                    new ShoppingCartDetails
-                    {
-                        Id = API.ShoppingCartId,
-                        Status = ShoppingCartStatus.Pending,
-                        ClientId = API.ClientId,
-                        ProductItems = new List<PricedProductItem>
-                        {
-                            PricedProductItem.Create(
-                                ProductItem.Create(product.ProductId, product.Quantity),
-                                100
-                            )
-                        },
-                        Version = 2
-                    }
-                ));
+                RESPONSE_BODY<ShoppingCartDetails>(details =>
+                {
+                    details.Id.Should().Be(API.ShoppingCartId);
+                    details.Status.Should().Be(ShoppingCartStatus.Pending);
+                    details.ProductItems.Should().HaveCount(1);
+                    details.ProductItems.Single().ProductItem.Should()
+                        .Be(ProductItem.From(product.ProductId, product.Quantity));
+                    details.Version.Should().Be(2);
+                })
+            );
     }
 }
