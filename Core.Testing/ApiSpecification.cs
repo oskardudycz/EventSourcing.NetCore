@@ -182,6 +182,24 @@ public static class ApiSpecification
             response.Headers.ETag.Tag.Should().Be($"\"{eTag}\"");
             return new ValueTask<bool>(true);
         };
+
+    public static Func<HttpResponseMessage, ValueTask<bool>> RESPONSE_SUCCEEDED() =>
+        response =>
+        {
+            response.EnsureSuccessStatusCode();
+            return new ValueTask<bool>(true);
+        };
+
+    public static Func<HttpResponseMessage, ValueTask<bool>> RESPONSE_BODY_MATCHES<TBody>(Func<TBody, bool> assert) =>
+        async response =>
+        {
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.GetResultFromJson<TBody>();
+            result.Should().NotBeNull();
+
+            return assert(result);
+        };
 }
 
 public class ApiSpecification<TProgram>: IDisposable where TProgram : class
