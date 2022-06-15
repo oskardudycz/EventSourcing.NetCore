@@ -128,7 +128,7 @@ public class ShoppingCartsController: Controller
         if (result == null)
             return NotFound();
 
-        Response.TrySetETagResponseHeader(result.Version.ToString());
+        Response.TrySetETagResponseHeader(result.Version);
         return Ok(result);
     }
 

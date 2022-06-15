@@ -9,10 +9,10 @@ public static class ETagExtensions
     public static EntityTagHeaderValue? GetIfMatchRequestHeader(this HttpContext context) =>
         context.Request.GetTypedHeaders().IfMatch.FirstOrDefault();
 
-    public static void TrySetETagResponseHeader(this HttpContext context, string etag) =>
+    public static void TrySetETagResponseHeader(this HttpContext context, object etag) =>
         context.Response.TrySetETagResponseHeader(etag);
 
-    public static void TrySetETagResponseHeader(this HttpResponse response, string etag)
+    public static void TrySetETagResponseHeader(this HttpResponse response, object etag)
     {
         if (!response.IsSuccessful()) return;
 
