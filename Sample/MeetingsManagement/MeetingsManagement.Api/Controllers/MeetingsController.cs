@@ -31,7 +31,7 @@ public class MeetingsController: Controller
     {
         await commandBus.Send(command);
 
-        return Created("api/Meetings", command.Id);
+        return Created($"/api/Meetings/{command.Id}", command.Id);
     }
 
     [HttpPost("{id}/schedule")]

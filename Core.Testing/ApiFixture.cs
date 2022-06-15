@@ -15,7 +15,7 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
     private readonly DummyExternalEventProducer externalEventProducer = new();
     private readonly DummyExternalCommandBus externalCommandBus = new();
 
-    private readonly string schemaName = Guid.NewGuid().ToString("N").ToLower();
+    private readonly string schemaName = $"test{Guid.NewGuid().ToString("N").ToLower()}";
 
     protected override IHost CreateHost(IHostBuilder builder)
     {

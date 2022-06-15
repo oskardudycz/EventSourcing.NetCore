@@ -1,4 +1,4 @@
-﻿namespace Carts.Api.Requests.Carts;
+﻿namespace Carts.Api.Requests;
 
 public record OpenShoppingCartRequest(
     Guid? ClientId

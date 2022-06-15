@@ -1,4 +1,4 @@
-using Carts.Api.Requests.Carts;
+using Carts.Api.Requests;
 using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.GettingCartAtVersion;
@@ -47,7 +47,7 @@ public class ShoppingCartsController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/ShoppingCarts", cartId);
+        return Created($"/api/ShoppingCarts/{cartId}", cartId);
     }
 
     [HttpPost("{id}/products")]
@@ -58,7 +58,7 @@ public class ShoppingCartsController: Controller
     {
         var command = ShoppingCarts.AddingProduct.AddProduct.Create(
             id,
-            ProductItem.Create(
+            ProductItem.From(
                 request?.ProductItem?.ProductId,
                 request?.ProductItem?.Quantity
             )

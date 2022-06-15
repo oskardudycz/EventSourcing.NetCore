@@ -35,7 +35,7 @@ public class ShoppingCartsController: Controller
 
         await handle(command, ct);
 
-        return Created("api/ShoppingCarts", cartId);
+        return Created($"/api/ShoppingCarts/{cartId}", cartId);
     }
 
     [HttpPost("{id}/products")]
