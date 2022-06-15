@@ -26,7 +26,8 @@ builder.Services
     .AddOptimisticConcurrencyMiddleware(
         sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
         sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
-    );
+    )
+    .AddControllers();
 
 var app = builder.Build();
 

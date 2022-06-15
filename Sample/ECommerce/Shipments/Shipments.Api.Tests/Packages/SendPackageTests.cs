@@ -23,7 +23,7 @@ public class SendPackageTests: IClassFixture<TestWebApplicationFactory<Program>>
     [Trait("Category", "Acceptance")]
     public Task SendPackage_ShouldReturn_CreatedStatus_With_PackageId() =>
         API.Given(
-                URI("/api/products/"),
+                URI("/api/Shipments/"),
                 BODY(new SendPackage(OrderId, ProductItems))
             )
             .When(POST)

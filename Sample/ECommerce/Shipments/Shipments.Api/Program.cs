@@ -19,7 +19,8 @@ builder.Services
     .AddKafkaProducer()
     .AddCoreServices()
     .AddShipmentsModule(builder.Configuration)
-    .AddCorrelationIdMiddleware();
+    .AddCorrelationIdMiddleware()
+    .AddControllers();
     // TODO: Add optimistic concurrency here
     // .AddOptimisticConcurrencyMiddleware();
 
