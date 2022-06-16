@@ -3,6 +3,7 @@ using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
 using FluentAssertions;
 using Ogooreck.API;
+using Warehouse.Api.Tests;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 
@@ -10,6 +11,8 @@ namespace Carts.Api.Tests.ShoppingCarts.Canceling;
 
 public class CancelShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetime
 {
+    public CancelShoppingCartFixture(): base(new ShoppingCartsApplicationFactory()) { }
+
     public Guid ShoppingCartId { get; private set; }
 
     public readonly Guid ClientId = Guid.NewGuid();
