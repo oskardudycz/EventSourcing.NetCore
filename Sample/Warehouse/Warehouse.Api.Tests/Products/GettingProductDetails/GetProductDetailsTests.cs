@@ -21,10 +21,10 @@ public class GetProductDetailsTests: IClassFixture<GetProductDetailsFixture>
     [Theory]
     [InlineData(12)]
     [InlineData("not-a-guid")]
-    public Task InvalidGuidId_ShouldReturn_400(object invalidId) =>
+    public Task InvalidGuidId_ShouldReturn_404(object invalidId) =>
         API.Given(URI($"/api/products/{invalidId}"))
             .When(GET)
-            .Then(BAD_REQUEST);
+            .Then(NOT_FOUND);
 
     [Fact]
     public Task NotExistingId_ShouldReturn_404() =>

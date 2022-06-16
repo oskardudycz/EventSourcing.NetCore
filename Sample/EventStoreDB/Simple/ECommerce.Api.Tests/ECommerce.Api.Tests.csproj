@@ -19,7 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\Core.Api.Testing\Core.Api.Testing.csproj" />
         <ProjectReference Include="..\..\..\..\Core.Testing\Core.Testing.csproj" />
         <ProjectReference Include="..\ECommerce.Api\ECommerce.Api.csproj" />
         <ProjectReference Include="..\ECommerce\ECommerce.csproj" />
