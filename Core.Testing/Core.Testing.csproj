@@ -18,7 +18,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Core.Api.Testing\Core.Api.Testing.csproj" />
       <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 </Project>
