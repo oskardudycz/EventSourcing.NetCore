@@ -7,20 +7,21 @@ public class EventsLog
     public List<object> PublishedEvents { get; } = new();
 }
 
-public class EventListener<TEvent>: IEventHandler<TEvent>
-    where TEvent : notnull
+public class EventListener: IEventBus
 {
+    private readonly IEventBus eventBus;
     private readonly EventsLog eventsLog;
 
-    public EventListener(EventsLog eventsLog)
+    public EventListener(EventsLog eventsLog, IEventBus eventBus)
     {
+        this.eventBus = eventBus;
         this.eventsLog = eventsLog;
     }
 
-    public Task Handle(TEvent @event, CancellationToken cancellationToken)
+    public async Task Publish(IEventEnvelope eventEnvelope, CancellationToken ct)
     {
-        eventsLog.PublishedEvents.Add(@event);
-
-        return Task.CompletedTask;
+        eventsLog.PublishedEvents.Add(eventEnvelope);
+        await eventBus.Publish(eventEnvelope, ct);
     }
 }
+

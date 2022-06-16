@@ -22,11 +22,13 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
         builder.ConfigureServices(services =>
         {
             services.AddSingleton(eventsLog)
-                .AddSingleton(typeof(IEventHandler<>), typeof(EventListener<>))
                 .AddSingleton<IExternalEventProducer>(externalEventProducer)
                 .AddSingleton<IEventBus>(sp =>
-                new EventBusDecoratorWithExternalProducer(sp.GetRequiredService<EventBus>(),
-                    sp.GetRequiredService<IExternalEventProducer>()))
+                    new EventListener(eventsLog,
+                        new EventBusDecoratorWithExternalProducer(sp.GetRequiredService<EventBus>(),
+                            sp.GetRequiredService<IExternalEventProducer>())
+                    )
+                )
                 .AddSingleton<IExternalCommandBus>(externalCommandBus)
                 .AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
         });
