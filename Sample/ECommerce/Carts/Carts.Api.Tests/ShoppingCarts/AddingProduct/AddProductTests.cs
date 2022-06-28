@@ -22,6 +22,7 @@ public class AddProductFixture: ApiSpecification<Program>, IAsyncLifetime
         );
 
         await CREATED(openResponse);
+        await RESPONSE_LOCATION_HEADER()(openResponse);
 
         ShoppingCartId = openResponse.GetCreatedId<Guid>();
     }

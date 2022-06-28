@@ -45,7 +45,7 @@ public class IncidentHistoryTransformation: EventProjection
         );
     }
 
-    public IncidentHistory Transform(IEvent<AgentAssigned> input)
+    public IncidentHistory Transform(IEvent<AgentAssignedToIncident> input)
     {
         var (incidentId, agentId, assignedAt) = input.Data;
 

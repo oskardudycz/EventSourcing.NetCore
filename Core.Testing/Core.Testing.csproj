@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Bogus" Version="34.0.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
@@ -14,7 +15,7 @@
         <PackageReference Include="FluentAssertions" Version="6.7.0" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.6" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.6" />
-        <PackageReference Include="Ogooreck" Version="0.1.1" />
+        <PackageReference Include="Ogooreck" Version="0.2.1" />
     </ItemGroup>
 
     <ItemGroup>

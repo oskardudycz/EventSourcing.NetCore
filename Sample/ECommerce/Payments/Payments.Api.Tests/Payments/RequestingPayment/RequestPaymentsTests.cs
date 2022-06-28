@@ -25,7 +25,7 @@ public class RequestPaymentsTests: IClassFixture<TestWebApplicationFactory<Progr
                 BODY(new RequestPaymentRequest {OrderId = OrderId, Amount = Amount})
             )
             .When(POST)
-            .Then(CREATED);
+            .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
     private readonly Guid OrderId = Guid.NewGuid();
 

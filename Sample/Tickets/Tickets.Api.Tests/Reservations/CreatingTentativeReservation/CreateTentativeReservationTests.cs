@@ -26,7 +26,7 @@ public class CreateTentativeReservationTests: IClassFixture<TestWebApplicationFa
                     BODY(new CreateTentativeReservationRequest { SeatId = SeatId })
                 )
                 .When(POST)
-                .Then(CREATED,
+                .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1),
                     response =>
                     {
                         createdReservationId = response.GetCreatedId<Guid>();

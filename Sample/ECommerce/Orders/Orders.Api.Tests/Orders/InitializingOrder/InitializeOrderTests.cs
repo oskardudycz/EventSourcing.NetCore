@@ -29,7 +29,7 @@ public class InitializeOrderTests: IClassFixture<TestWebApplicationFactory<Progr
                 ))
             )
             .When(POST)
-            .Then(CREATED);
+            .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
     private readonly Guid ClientId = Guid.NewGuid();
 

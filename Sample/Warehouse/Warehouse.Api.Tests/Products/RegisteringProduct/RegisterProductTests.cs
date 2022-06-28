@@ -20,7 +20,7 @@ public class RegisterProductTests: IClassFixture<WarehouseTestWebApplicationFact
                 BODY(validRequest)
             )
             .When(POST)
-            .Then(CREATED);
+            .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
     [Theory]
     [MemberData(nameof(InvalidRequests))]
@@ -44,7 +44,7 @@ public class RegisterProductTests: IClassFixture<WarehouseTestWebApplicationFact
                 BODY(request)
             )
             .When(POST)
-            .Then(CREATED);
+            .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
         // second one will fail with conflict
         await API.Given(

@@ -17,7 +17,7 @@ public class ScheduleMeetingFixture: ApiSpecification<Program>, IAsyncLifetime
             new ApiRequest(POST, URI(MeetingsManagementApi.MeetingsUrl), BODY(new CreateMeeting(MeetingId, MeetingName)))
         );
 
-        await CREATED(openResponse);
+        await CREATED_WITH_DEFAULT_HEADERS(eTag: 1)(openResponse);
     }
 
     public Task DisposeAsync() => Task.CompletedTask;

@@ -1,0 +1,46 @@
+using Bogus;
+using Bogus.DataSets;
+using Helpdesk.Api.Incidents;
+using Helpdesk.Api.Incidents.GetIncidentDetails;
+using Helpdesk.Api.Tests.Incidents.Fixtures;
+using Xunit;
+using static Ogooreck.API.ApiSpecification;
+
+namespace Helpdesk.Api.Tests.Incidents;
+
+public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedIncident>
+{
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task RecordCustomerResponseCommand_RecordsResponse()
+    {
+        await API
+            .Given(
+                URI($"/api/customers/{customerId}/incidents/{API.IncidentId}/responses"),
+                BODY(new RecordCustomerResponseToIncidentRequest(content)),
+                HEADERS(IF_MATCH(1))
+            )
+            .When(POST)
+            .Then(OK);
+
+        await API
+            .Given(URI($"/api/incidents/{API.IncidentId}"))
+            .When(GET)
+            .Then(
+                OK,
+                RESPONSE_BODY(
+                    API.Details with
+                    {
+                        Notes = new[] { new IncidentNote(IncidentNoteType.FromCustomer, customerId, content, true) },
+                        Version = 2
+                    }
+                )
+            );
+    }
+
+    private readonly Guid customerId = Guid.NewGuid();
+    private readonly string content = new Lorem().Sentence();
+    private readonly ApiWithLoggedIncident API;
+
+    public RecordCustomerResponseToIncidentTests(ApiWithLoggedIncident api) => API = api;
+}
