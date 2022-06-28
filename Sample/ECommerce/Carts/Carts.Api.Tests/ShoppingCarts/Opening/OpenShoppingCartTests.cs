@@ -3,16 +3,14 @@ using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
 using Carts.ShoppingCarts.Products;
 using Core.Testing;
-using Ogooreck.API;
 using Xunit;
+using Ogooreck.API;
 using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.Opening;
 
 public class OpenShoppingCartTests: IClassFixture<TestWebApplicationFactory<Program>>
 {
-    private readonly ApiSpecification<Program> API;
-
     [Fact]
     public Task Post_ShouldReturn_CreatedStatus_With_CartId() =>
         API.Scenario(
@@ -21,7 +19,7 @@ public class OpenShoppingCartTests: IClassFixture<TestWebApplicationFactory<Prog
                     BODY(new OpenShoppingCartRequest(ClientId))
                 )
                 .When(POST)
-                .Then(CREATED),
+                .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1)),
 
             response =>
                 API.Given(
@@ -43,5 +41,6 @@ public class OpenShoppingCartTests: IClassFixture<TestWebApplicationFactory<Prog
     public OpenShoppingCartTests(TestWebApplicationFactory<Program> fixture) =>
         API = ApiSpecification<Program>.Setup(fixture);
 
-    public readonly Guid ClientId = Guid.NewGuid();
+    private readonly ApiSpecification<Program> API;
+    private readonly Guid ClientId = Guid.NewGuid();
 }

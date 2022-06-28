@@ -25,7 +25,7 @@ public class CreateMeetingTests: IClassFixture<TestWebApplicationFactory<Program
                 BODY(new CreateMeeting(MeetingId, MeetingName))
             )
             .When(POST)
-            .Then(CREATED);
+            .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
     private readonly Guid MeetingId = Guid.NewGuid();
     private readonly string MeetingName = "Event Sourcing Workshop";

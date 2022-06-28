@@ -23,7 +23,7 @@ public class CancelShoppingCartFixture: ApiSpecification<Program>, IAsyncLifetim
             new ApiRequest(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
         );
 
-        await CREATED(openResponse);
+        await CREATED_WITH_DEFAULT_HEADERS(eTag: 0)(openResponse);
 
         ShoppingCartId = openResponse.GetCreatedId<Guid>();
     }

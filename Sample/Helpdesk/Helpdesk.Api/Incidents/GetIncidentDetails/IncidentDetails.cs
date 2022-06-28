@@ -37,7 +37,7 @@ public class IncidentDetailsProjection: SingleStreamAggregation<IncidentDetails>
     public IncidentDetails Apply(IncidentPrioritised prioritised, IncidentDetails current) =>
         current with { Priority = prioritised.Priority };
 
-    public IncidentDetails Apply(AgentAssigned prioritised, IncidentDetails current) =>
+    public IncidentDetails Apply(AgentAssignedToIncident prioritised, IncidentDetails current) =>
         current with { AgentId = prioritised.AgentId };
 
     public IncidentDetails Apply(AgentRespondedToIncident agentResponded, IncidentDetails current) =>

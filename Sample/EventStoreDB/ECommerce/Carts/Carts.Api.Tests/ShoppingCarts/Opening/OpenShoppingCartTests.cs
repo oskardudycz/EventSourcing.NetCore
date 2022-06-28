@@ -22,7 +22,7 @@ public class OpenShoppingCartTests: IClassFixture<TestWebApplicationFactory<Prog
                     BODY(new OpenShoppingCartRequest(ClientId))
                 )
                 .When(POST)
-                .Then(CREATED),
+                .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 0)),
 
             response =>
                 API.Given(

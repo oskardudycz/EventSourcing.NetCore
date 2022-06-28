@@ -20,7 +20,7 @@ public record PrioritiseIncident(
     Guid PrioritisedBy
 );
 
-public record AssignAgent(
+public record AssignAgentToIncident(
     Guid IncidentId,
     Guid AgentId
 );
@@ -80,14 +80,14 @@ internal static class IncidentService
         return new IncidentPrioritised(incidentId, incidentPriority, prioritisedBy, DateTimeOffset.UtcNow);
     }
 
-    public static AgentAssigned Handle(Incident current, AssignAgent command)
+    public static AgentAssignedToIncident Handle(Incident current, AssignAgentToIncident command)
     {
         if (current.Status == IncidentStatus.Closed)
             throw new InvalidOperationException("Incident is already closed");
 
         var (incidentId, agentId) = command;
 
-        return new AgentAssigned(incidentId, agentId, DateTimeOffset.UtcNow);
+        return new AgentAssignedToIncident(incidentId, agentId, DateTimeOffset.UtcNow);
     }
 
     public static AgentRespondedToIncident Handle(

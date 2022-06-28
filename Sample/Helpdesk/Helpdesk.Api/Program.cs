@@ -84,7 +84,7 @@ app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/priority",
             current => Handle(current, new PrioritiseIncident(incidentId, body.Priority, agentId)), ct)
 ).WithTags("Agent");
 
-app.MapPut("api/agents/{agentId:guid}/incidents/{incidentId:guid}/assign",
+app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/assign",
     (
         IDocumentSession documentSession,
         Guid incidentId,
@@ -93,7 +93,7 @@ app.MapPut("api/agents/{agentId:guid}/incidents/{incidentId:guid}/assign",
         CancellationToken ct
     ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            current => Handle(current, new AssignAgent(incidentId, agentId)), ct)
+            current => Handle(current, new AssignAgentToIncident(incidentId, agentId)), ct)
 ).WithTags("Agent");
 
 app.MapPost("api/customers/{customerId:guid}/incidents/{incidentId:guid}/responses/",
@@ -225,3 +225,7 @@ public record RecordAgentResponseToIncidentRequest(
 public record ResolveIncidentRequest(
     ResolutionType Resolution
 );
+
+public partial class Program
+{
+}

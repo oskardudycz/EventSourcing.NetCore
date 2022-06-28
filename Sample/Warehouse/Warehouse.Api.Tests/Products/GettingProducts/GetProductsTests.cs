@@ -83,7 +83,7 @@ public class GetProductsFixture: ApiSpecification<Program>, IAsyncLifetime
                 new ApiRequest(POST, URI("/api/products"), BODY(registerProduct))
             );
 
-            await CREATED(registerResponse);
+            await CREATED_WITH_DEFAULT_HEADERS(eTag: 1)(registerResponse);
 
             var createdId = registerResponse.GetCreatedId<Guid>();
 

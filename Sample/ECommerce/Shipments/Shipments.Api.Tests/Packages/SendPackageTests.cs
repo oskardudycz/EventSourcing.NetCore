@@ -27,7 +27,7 @@ public class SendPackageTests: IClassFixture<TestWebApplicationFactory<Program>>
                 BODY(new SendPackage(OrderId, ProductItems))
             )
             .When(POST)
-            .Then(CREATED)
+            .Then(CREATED_WITH_DEFAULT_HEADERS())
             .And(response => fixture.ShouldPublishInternalEventOfType<PackageWasSent>(
                 @event =>
                     @event.PackageId == response.GetCreatedId<Guid>()

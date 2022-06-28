@@ -23,7 +23,7 @@ public record IncidentPrioritised(
     DateTimeOffset PrioritisedAt
 );
 
-public record AgentAssigned(
+public record AgentAssignedToIncident(
     Guid IncidentId,
     Guid AgentId,
     DateTimeOffset AssignedAt
