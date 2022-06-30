@@ -26,6 +26,12 @@ builder.Services
     .AddSwaggerGen()
     .AddMarten(options =>
     {
+        var schemaName = Environment.GetEnvironmentVariable("SchemaName");
+        if (!string.IsNullOrEmpty(schemaName))
+        {
+            options.Events.DatabaseSchemaName = schemaName;
+            options.DatabaseSchemaName = schemaName;
+        }
         options.Connection(builder.Configuration.GetConnectionString("Incidents"));
         options.UseDefaultSerialization(EnumStorage.AsString, nonPublicMembersStorage: NonPublicMembersStorage.All);
 

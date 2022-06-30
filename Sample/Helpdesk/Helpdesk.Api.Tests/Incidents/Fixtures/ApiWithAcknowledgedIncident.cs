@@ -1,33 +1,18 @@
-using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.GetIncidentDetails;
+using Ogooreck.API;
 using Xunit;
-using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents.Fixtures;
 
-public class ApiWithAcknowledgedIncident: ApiWithResolvedIncident
+public class ApiWithAcknowledgedIncident: ApiSpecification<Program>, IAsyncLifetime
 {
-    public override async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        await base.InitializeAsync();
-
-        await Given(
-                URI($"/api/customers/{CustomerId}/incidents/{IncidentId}/acknowledge"),
-                HEADERS(IF_MATCH(2))
-            )
-            .When(POST)
-            .Then(OK);
-
-        Details = new IncidentDetails(
-            IncidentId,
-            CustomerId,
-            IncidentStatus.ResolutionAcknowledgedByCustomer,
-            Array.Empty<IncidentNote>(),
-            null,
-            null,
-            null,
-            3
-        );
+        Incident = await this.AcknowledgedIncident();
     }
+
+    public IncidentDetails Incident { get; set; } = default!;
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }
 

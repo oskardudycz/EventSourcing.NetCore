@@ -15,7 +15,7 @@ public class PrioritiseIncidentTests: IClassFixture<ApiWithLoggedIncident>
     {
         await API
             .Given(
-                URI($"/api/agents/{agentId}/incidents/{API.IncidentId}/priority"),
+                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/priority"),
                 BODY(new PrioritiseIncidentRequest(priority)),
                 HEADERS(IF_MATCH(1))
             )
@@ -23,12 +23,12 @@ public class PrioritiseIncidentTests: IClassFixture<ApiWithLoggedIncident>
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.IncidentId}"))
+            .Given(URI($"/api/incidents/{API.Incident.Id}"))
             .When(GET)
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Details with
+                    API.Incident with
                     {
                         Priority = priority,
                         Version = 2

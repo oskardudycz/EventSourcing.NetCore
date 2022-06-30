@@ -47,7 +47,7 @@ public class GetProductDetailsFixture: ApiSpecification<Program>, IAsyncLifetime
             new ApiRequest(POST, URI("/api/products"), BODY(registerProduct))
         );
 
-        await CREATED_WITH_DEFAULT_HEADERS(eTag: 1)(registerResponse);
+        await CREATED(registerResponse);
 
         var (sku, name, description) = registerProduct;
         ExistingProduct = new ProductDetails(registerResponse.GetCreatedId<Guid>(), sku!, name!, description);

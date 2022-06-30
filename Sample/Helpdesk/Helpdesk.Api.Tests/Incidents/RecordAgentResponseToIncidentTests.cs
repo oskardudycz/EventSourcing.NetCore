@@ -16,7 +16,7 @@ public class RecordAgentResponseToIncidentTests: IClassFixture<ApiWithLoggedInci
     {
         await API
             .Given(
-                URI($"/api/agents/{agentId}/incidents/{API.IncidentId}/responses"),
+                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/responses"),
                 BODY(new RecordAgentResponseToIncidentRequest(content, visibleToCustomer)),
                 HEADERS(IF_MATCH(1))
             )
@@ -24,12 +24,12 @@ public class RecordAgentResponseToIncidentTests: IClassFixture<ApiWithLoggedInci
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.IncidentId}"))
+            .Given(URI($"/api/incidents/{API.Incident.Id}"))
             .When(GET)
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Details with
+                    API.Incident with
                     {
                         Notes = new[]
                         {

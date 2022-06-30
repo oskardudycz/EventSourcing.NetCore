@@ -15,7 +15,7 @@
         <PackageReference Include="FluentAssertions" Version="6.7.0" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.6" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.6" />
-        <PackageReference Include="Ogooreck" Version="0.2.1" />
+        <PackageReference Include="Ogooreck" Version="0.3.0" />
     </ItemGroup>
 
     <ItemGroup>

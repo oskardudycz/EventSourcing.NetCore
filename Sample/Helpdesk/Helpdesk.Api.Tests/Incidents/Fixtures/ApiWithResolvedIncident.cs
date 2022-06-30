@@ -1,37 +1,18 @@
-using Bogus;
-using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.GetIncidentDetails;
-using static Ogooreck.API.ApiSpecification;
+using Ogooreck.API;
+using Xunit;
 
 namespace Helpdesk.Api.Tests.Incidents.Fixtures;
 
-public class ApiWithResolvedIncident: ApiWithLoggedIncident
+public class ApiWithResolvedIncident: ApiSpecification<Program>, IAsyncLifetime
 {
-    public override async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        await base.InitializeAsync();
-
-        await Given(
-                URI($"/api/agents/{AgentId}/incidents/{IncidentId}/resolve"),
-                BODY(new ResolveIncidentRequest(resolutionType)),
-                HEADERS(IF_MATCH(1))
-            )
-            .When(POST)
-            .Then(OK);
-
-        Details = new IncidentDetails(
-            IncidentId,
-            CustomerId,
-            IncidentStatus.Resolved,
-            Array.Empty<IncidentNote>(),
-            null,
-            null,
-            null,
-            2
-        );
+        Incident = await this.ResolvedIncident();
     }
 
-    public readonly Guid AgentId = Guid.NewGuid();
-    private readonly ResolutionType resolutionType = new Faker().PickRandom<ResolutionType>();
+    public IncidentDetails Incident { get; set; } = default!;
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }
 

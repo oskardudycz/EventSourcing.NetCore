@@ -13,19 +13,19 @@ public class AcknowledgeResolutionIncidentTests: IClassFixture<ApiWithResolvedIn
     {
         await API
             .Given(
-                URI($"/api/customers/{API.CustomerId}/incidents/{API.IncidentId}/acknowledge"),
+                URI($"/api/customers/{API.Incident.CustomerId}/incidents/{API.Incident.Id}/acknowledge"),
                 HEADERS(IF_MATCH(2))
             )
             .When(POST)
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.IncidentId}"))
+            .Given(URI($"/api/incidents/{API.Incident.Id}"))
             .When(GET)
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Details with
+                    API.Incident with
                     {
                         Status = IncidentStatus.ResolutionAcknowledgedByCustomer,
                         Version = 3

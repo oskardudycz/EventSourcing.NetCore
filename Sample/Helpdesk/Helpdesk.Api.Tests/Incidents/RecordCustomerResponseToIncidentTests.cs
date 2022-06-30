@@ -16,7 +16,7 @@ public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedI
     {
         await API
             .Given(
-                URI($"/api/customers/{customerId}/incidents/{API.IncidentId}/responses"),
+                URI($"/api/customers/{customerId}/incidents/{API.Incident.Id}/responses"),
                 BODY(new RecordCustomerResponseToIncidentRequest(content)),
                 HEADERS(IF_MATCH(1))
             )
@@ -24,12 +24,12 @@ public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedI
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.IncidentId}"))
+            .Given(URI($"/api/incidents/{API.Incident.Id}"))
             .When(GET)
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Details with
+                    API.Incident with
                     {
                         Notes = new[] { new IncidentNote(IncidentNoteType.FromCustomer, customerId, content, true) },
                         Version = 2
