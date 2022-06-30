@@ -1,6 +1,5 @@
 using Bogus;
 using Bogus.DataSets;
-using Core.Testing;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.GetIncidentDetails;
 using Xunit;
@@ -9,7 +8,7 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class LogIncidentsTests: IClassFixture<TestWebApplicationFactory<Program>>
+public class LogIncidentsTests: IClassFixture<ApiSpecification<Program>>
 {
     [Fact]
     public Task LogIncident_ShouldSucceed() =>
@@ -42,8 +41,7 @@ public class LogIncidentsTests: IClassFixture<TestWebApplicationFactory<Program>
                     )
         );
 
-    public LogIncidentsTests(TestWebApplicationFactory<Program> fixture) =>
-        API = ApiSpecification<Program>.Setup(fixture);
+    public LogIncidentsTests(ApiSpecification<Program> api) => API = api;
 
     private readonly ApiSpecification<Program> API;
     private readonly Guid CustomerId = Guid.NewGuid();

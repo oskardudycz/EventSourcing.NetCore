@@ -75,7 +75,7 @@ app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/category",
     ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
             current => Handle(current, new CategoriseIncident(incidentId, body.Category, agentId)), ct)
-).WithTags("Agent");;
+).WithTags("Agent");
 
 app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/priority",
     (
