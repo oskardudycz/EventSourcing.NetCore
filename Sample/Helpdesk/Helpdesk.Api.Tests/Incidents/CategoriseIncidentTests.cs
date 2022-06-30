@@ -1,6 +1,5 @@
 using Bogus;
 using Helpdesk.Api.Incidents;
-using Helpdesk.Api.Incidents.GetIncidentDetails;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
@@ -15,7 +14,7 @@ public class CategoriseIncidentTests: IClassFixture<ApiWithLoggedIncident>
     {
         await API
             .Given(
-                URI($"/api/agents/{agentId}/incidents/{API.IncidentId}/category"),
+                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/category"),
                 BODY(new CategoriseIncidentRequest(category)),
                 HEADERS(IF_MATCH(1))
             )
@@ -23,12 +22,12 @@ public class CategoriseIncidentTests: IClassFixture<ApiWithLoggedIncident>
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.IncidentId}"))
+            .Given(URI($"/api/incidents/{API.Incident.Id}"))
             .When(GET)
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Details with
+                    API.Incident with
                     {
                         Category = category,
                         Version = 2

@@ -12,19 +12,19 @@ public class AssignAgentToIncidentTests: IClassFixture<ApiWithLoggedIncident>
     {
         await API
             .Given(
-                URI($"/api/agents/{agentId}/incidents/{API.IncidentId}/assign"),
+                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/assign"),
                 HEADERS(IF_MATCH(1))
             )
             .When(POST)
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.IncidentId}"))
+            .Given(URI($"/api/incidents/{API.Incident.Id}"))
             .When(GET)
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Details with
+                    API.Incident with
                     {
                         AgentId = agentId,
                         Version = 2

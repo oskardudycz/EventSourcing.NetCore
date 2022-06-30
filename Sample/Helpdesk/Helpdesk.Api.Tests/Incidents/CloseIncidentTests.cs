@@ -13,19 +13,19 @@ public class CloseIncidentTests: IClassFixture<ApiWithAcknowledgedIncident>
     {
         await API
             .Given(
-                URI($"/api/agents/{API.AgentId}/incidents/{API.IncidentId}/close"),
+                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/close"),
                 HEADERS(IF_MATCH(3))
             )
             .When(POST)
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.IncidentId}"))
+            .Given(URI($"/api/incidents/{API.Incident.Id}"))
             .When(GET)
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Details with
+                    API.Incident with
                     {
                         Status = IncidentStatus.Closed,
                         Version = 4
@@ -34,7 +34,8 @@ public class CloseIncidentTests: IClassFixture<ApiWithAcknowledgedIncident>
             );
     }
 
-    private readonly ApiWithResolvedIncident API;
+    private readonly ApiWithAcknowledgedIncident API;
+    private Guid agentId = Guid.NewGuid();
 
     public CloseIncidentTests(ApiWithAcknowledgedIncident api) => API = api;
 }
