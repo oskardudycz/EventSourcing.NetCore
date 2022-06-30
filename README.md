@@ -624,7 +624,15 @@ See also fully working, real-world samples of Event Sourcing and CQRS applicatio
 
 Samples are using CQRS architecture. They're sliced based on the business modules and operations. Read more about the assumptions in ["How to slice the codebase effectively?"](https://event-driven.io/en/how_to_slice_the_codebase_effectively/?utm_source=event_sourcing_net).
 
-### 6.1 [ECommerce with Marten](./Sample/ECommerce)
+### 6.1 [Pragmatic Event Sourcing With Marten](./Sample/Helpdesk)
+- Simplest CQRS and Event Sourcing flow using Minimal API,
+- Cutting the number of layers and boilerplate complex code to bare minimum,
+- Using all Marten helpers like `WriteToAggregate`, `AggregateStream` to simplify the processing,
+- Examples of all the typical Marten's projections,
+- Example of how and where to use C# Records, Nullable Reference Types, etc,
+- No Aggregates. Commands are handled in the domain service as pure functions.
+
+### 6.2 [ECommerce with Marten](./Sample/ECommerce)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - microservices example,
@@ -633,14 +641,14 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - Kafka as a messaging platform to integrate microservices,
 - example of the case when some services are event-sourced ([Carts](./Sample/ECommerce/Carts), [Orders](./Sample/ECommerce/Orders), [Payments](./Sample/ECommerce/Payments)) and some are not ([Shipments](./Sample/ECommerce/Shipments) using EntityFramework as ORM)
 
-### 6.2 [Simple EventSourcing with EventStoreDB](./Sample/EventStoreDB/Simple)
+### 6.3 [Simple EventSourcing with EventStoreDB](./Sample/EventStoreDB/Simple)
 - typical Event Sourcing and CQRS flow,
 - functional composition, no aggregates, just data and functions,
 - stores events to  EventStoreDB,
 - Builds read models using [Subscription to `$all`](https://developers.eventstore.com/clients/grpc/subscribing-to-streams/#subscribing-to-all),
 - Read models are stored as Postgres tables using EntityFramework.
 
-### 6.3 [ECommerce with EventStoreDB](./Sample/EventStoreDB/ECommerce) 
+### 6.4 [ECommerce with EventStoreDB](./Sample/EventStoreDB/ECommerce) 
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to  EventStoreDB,

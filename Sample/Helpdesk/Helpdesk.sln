@@ -7,6 +7,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{DD9FA4
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Testing", "..\..\Core.Testing\Core.Testing.csproj", "{A4015DF0-2306-4714-8550-42FDFE5CC447}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "..\..\Core\Core.csproj", "{4A7B23F1-9D46-4FE2-BC16-C7FA0AA456A6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{E8AE5822-B55D-4E6A-B91D-F3993D376B25}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5C3BCB2C-754D-4879-A663-8731CCF0DA2F}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,5 +28,17 @@ Global
 		{03E9705E-AA25-42F2-A851-4ACEF2337B41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03E9705E-AA25-42F2-A851-4ACEF2337B41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03E9705E-AA25-42F2-A851-4ACEF2337B41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4015DF0-2306-4714-8550-42FDFE5CC447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4015DF0-2306-4714-8550-42FDFE5CC447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4015DF0-2306-4714-8550-42FDFE5CC447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4015DF0-2306-4714-8550-42FDFE5CC447}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A7B23F1-9D46-4FE2-BC16-C7FA0AA456A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A7B23F1-9D46-4FE2-BC16-C7FA0AA456A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A7B23F1-9D46-4FE2-BC16-C7FA0AA456A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A7B23F1-9D46-4FE2-BC16-C7FA0AA456A6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4A7B23F1-9D46-4FE2-BC16-C7FA0AA456A6} = {E8AE5822-B55D-4E6A-B91D-F3993D376B25}
+		{A4015DF0-2306-4714-8550-42FDFE5CC447} = {E8AE5822-B55D-4E6A-B91D-F3993D376B25}
 	EndGlobalSection
 EndGlobal

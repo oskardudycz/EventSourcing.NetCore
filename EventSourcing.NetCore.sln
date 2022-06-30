@@ -330,6 +330,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Api", "Sample\Warehouse.MinimalAPI\Warehouse.Api\Warehouse.Api.csproj", "{723AD8CE-E3EF-40F6-9576-CCF2C3DB504E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpdesk", "Helpdesk", "{DC817F16-C74C-4133-B263-72ED456DB95A}"
+	ProjectSection(SolutionItems) = preProject
+		Sample\Helpdesk\README.md = Sample\Helpdesk\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Api", "Sample\Helpdesk\Helpdesk.Api\Helpdesk.Api.csproj", "{7F6C6387-4933-4895-AA31-9E3CAFFAE24E}"
 EndProject
