@@ -3,6 +3,14 @@
 
 Samples are using CQRS architecture. They're sliced based on the business modules and operations. Read more about the assumptions in ["How to slice the codebase effectively?"](https://event-driven.io/en/how_to_slice_the_codebase_effectively/?utm_source=event_sourcing_net).
 
+## [Pragmatic Event Sourcing With Marten](./Helpdesk)
+- Simplest CQRS and Event Sourcing flow using Minimal API,
+- Cutting the number of layers and boilerplate complex code to bare minimum,
+- Using all Marten helpers like `WriteToAggregate`, `AggregateStream` to simplify the processing,
+- Examples of all the typical Marten's projections,
+- Example of how and where to use C# Records, Nullable Reference Types, etc,
+- No Aggregates. Commands are handled in the domain service as pure functions.
+
 ## [ECommerce with Marten](./ECommerce)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
@@ -31,6 +39,12 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - example of how and where to use C# Records, Nullable Reference Types, etc,
 - No Event Sourcing! Using Entity Framework to show that CQRS is not bounded to Event Sourcing or any type of storage,
 - No Aggregates! CQRS do not need DDD. Business logic can be handled in handlers.
+
+## [Warehouse Minimal API](./Warehouse.MinimalAPI/)
+Variation of the previous example, but:
+- using Minimal API,
+- example how to inject handlers in MediatR like style to decouple API from handlers.
+- 📝 Read more [CQRS is simpler than you think with .NET 6 and C# 10](https://event-driven.io/en/cqrs_is_simpler_than_you_think_with_net6/?utm_source=event_sourcing_net) 
 
 ## [Event Versioning](./EventsVersioning)
 Shows how to handle basic event schema versioning scenarios using event and stream transformations (e.g. upcasting):
