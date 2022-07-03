@@ -11,7 +11,7 @@ public class NewNotRequiredProperty
         Guid ShoppingCartId,
         Guid ClientId,
         // Adding new not required property as nullable
-        DateTime? IntializedAt
+        DateTime? InitializedAt
     );
 
     [Fact]
@@ -27,7 +27,7 @@ public class NewNotRequiredProperty
         @event.Should().NotBeNull();
         @event!.ShoppingCartId.Should().Be(oldEvent.ShoppingCartId);
         @event.ClientId.Should().Be(oldEvent.ClientId);
-        @event.IntializedAt.Should().BeNull();
+        @event.InitializedAt.Should().BeNull();
     }
 
     [Fact]

@@ -36,7 +36,7 @@ or read blog article [Simple patterns for events schema versioning](https://even
 
 ## Simple mapping
 
-There are some simple mappings that we could handle on the code structure or serialisation level. I'm using `System.Text.Json` in samples, other serialises may be smarter, but the patterns will be similar. 
+There are some simple mappings that we could handle on the code structure or serialisation level. I'm using `System.Text.Json` in samples, other serialisers may work a bit different, but the patterns will be similar. 
 
 ### New not required property
 
@@ -119,12 +119,12 @@ public class ShoppingCartOpened
 The benefit is that both old and the new structure will be backward and forward compatible. The downside of this solution is that we're still keeping the old JSON structure, so all consumers need to be aware of that and do mapping if they want to use the new structure. Some serialisers like Newtonsoft Json.NET allows to do such magic:
 
 ```csharp
-public class ShoppingCartIntialised
+public class ShoppingCartOpened
 {
     public Guid CartId { get; init; }
     public Guid ClientId { get; init; }
 
-    public ShoppingCartIntialised(
+    public ShoppingCartOpened(
         Guid? cartId,
         Guid clientId,
         Guid? shoppingCartId = null
