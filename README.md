@@ -1097,6 +1097,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [CosmosDB DevBlog - Create a Java Azure Cosmos DB Function Trigger using Visual Studio Code in 2 minutes!](https://devblogs.microsoft.com/cosmosdb/create-a-java-azure-cosmos-db-function-trigger-using-visual-studio-code-in-2-minutes/)
 -   📝 [Towards Data Science - The Design of an Event Store](https://towardsdatascience.com/the-design-of-an-event-store-8c751c47db6f)
 -   📝 [Aspnetrun - CQRS and Event Sourcing in Event Driven Architecture of Ordering Microservices](https://medium.com/aspnetrun/cqrs-and-event-sourcing-in-event-driven-architecture-of-ordering-microservices-fb67dc44da7a)
+-   📝 [Why Microservices Should use Event Sourcing](https://blog.bitsrc.io/why-microservices-should-use-event-sourcing-9755a54ebfb4)
 
 ### 13.20 Event Sourcing Concerns
 -   📝 [Kacper Gunia - EventStoreDB vs Kafka](https://domaincentric.net/blog/eventstoredb-vs-kafka)
