@@ -54,7 +54,7 @@ public static class ShoppingCartExtensions
 public class BusinessLogicTests
 {
     [Fact]
-    public void GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public void RunningSequenceOfBusinessLogic_ShouldGenerateSequenceOfEvents()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();

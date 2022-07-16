@@ -1,6 +1,6 @@
 # Exercise 04 - Appending events to EventStoreDB
 
-Using a defined structure of events from the [previous exercise](../01-EventsDefinition), fill a `AppendEvents` function to store events in [EventStoreDB](https://developers.eventstore.com/clients/grpc/).
+Using a defined structure of events from the [first exercise](../01-EventsDefinition), fill a `AppendEvents` function to store events in [EventStoreDB](https://developers.eventstore.com/clients/grpc/).
 
 ## Prerequisites
 Run [docker-compose](../docker-compose.yml) script from the main workshop repository to start EventStoreDB instance.

@@ -26,9 +26,3 @@ _**Note**: If needed update entities, events or test setup structure_
 Read more in my articles:
 - [CQRS is simpler than you think with .NET 6 and C# 10](https://event-driven.io/en/cqrs_is_simpler_than_you_think_with_net6/?utm_source=event_sourcing_net_workshop)
 - [How to register all CQRS handlers by convention](https://event-driven.io/en/how_to_register_all_mediatr_handlers_by_convention?utm_source=event_sourcing_net_workshop)
-
-## Solutions
-
-Read more in my articles:
-- [Optimistic concurrency for pessimistic times](https://event-driven.io/en/optimistic_concurrency_for_pessimistic_times/?utm_source=event_sourcing_net_workshop)
-- [How to use ETag header for optimistic concurrency](https://event-driven.io/en/how_to_use_etag_header_for_optimistic_concurrency/?utm_source=event_sourcing_net_workshop)

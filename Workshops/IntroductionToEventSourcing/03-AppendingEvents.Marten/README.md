@@ -1,6 +1,6 @@
 # Exercise 03 - Appending events to Marten
 
-Using a defined structure of events from the [previous exercise](../01-EventsDefinition), fill a `AppendEvents` function to store events in [Marten](https://martendb.io).
+Using a defined structure of events from the [first exercise](../01-EventsDefinition), fill a `AppendEvents` function to store events in [Marten](https://martendb.io).
 
 ## Prerequisites
 Run [docker-compose](../docker-compose.yml) script from the main workshop repository to start Postgres instance.
