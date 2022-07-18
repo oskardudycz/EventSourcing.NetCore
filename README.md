@@ -570,7 +570,7 @@ Read more in the article:
 
 ### 2.4 The Light and The Dark Side of the Event-Driven Design
 
-<a href="https://www.youtube.com/watch?v=0pYmuk0-N_4" target="_blank"><img src="https://img.youtube.com/vi/0pYmuk0-N_4/0.jpg" alt="The Light and The Dark Side of the Event-Driven Design" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=ZGugOiYcq8k" target="_blank"><img src="https://img.youtube.com/vi/ZGugOiYcq8k/0.jpg" alt="The Light and The Dark Side of the Event-Driven Design" width="320" height="240" border="10" /></a>
 
 ### 2.5 Conversation with [Yves Lorphelin](https://github.com/ylorph/) about CQRS
 
@@ -927,7 +927,6 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Yves Lorphelin - The Inevitable Event-Centric Book ](https://github.com/ylorph/The-Inevitable-Event-Centric-Book/issues)
 -   📝 [Microsoft - Exploring CQRS and Event Sourcing](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj554200(v=pandp.10))
 
-
 <a href='#event-sourcing-on-production' id='event-sourcing-on-production' class='anchor' aria-hidden='true'></a>
 
 ### 13.2 Event Sourcing on production
@@ -1104,6 +1103,7 @@ The simplest way to start is **installing the [project template](https://github.
 -   📝 [Vijay Nair - Axon and Kafka - How does Axon compare to Apache Kafka?](https://axoniq.io/blog-overview/axon-and-kafka-how-does-axon-compare-to-apache-kafka)
 -   📝 [Jesper Hammarbäck - Apache Kafka is not for Event Sourcing](https://serialized.io/blog/apache-kafka-is-not-for-event-sourcing/)
 -   🎞 [Udi Dahan - Event Sourcing @ DDDEU 2020 Keynote](https://channel9.msdn.com/Events/Azure-Cosmos-DB/Azure-Cosmos-DB-Conf/Implementing-an-Event-Sourcing-strategy-on-Azure)
+-   🎞 [Andrzej Ludwikowski - Event Sourcing - what could possibly go wrong?](https://www.youtube.com/watch?v=_V3C-e0gKoI)
 -   📝 [Vikas Hazrati - Event Sourcing – Does it make sense for your business?](https://blog.knoldus.com/event-sourcing-does-it-make-sense-for-your-business/)
 -   📝 [Mikhail Shilkov - Event Sourcing and IO Complexity](https://mikhail.io/2016/11/event-sourcing-and-io-complexity/)
 -   📝 [Dennis Doomen - The Ugly of Event Sourcing - Real-world Production Issues](https://www.linkedin.com/pulse/ugly-event-sourcing-real-world-production-issues-dennis-doomen/)
