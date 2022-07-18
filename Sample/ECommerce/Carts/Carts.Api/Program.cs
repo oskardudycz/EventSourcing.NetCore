@@ -50,7 +50,7 @@ app.UseExceptionHandlingMiddleware(exception => exception switch
     .UseSwagger()
     .UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tickets V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Carts V1");
         c.RoutePrefix = string.Empty;
     });
 
