@@ -72,4 +72,28 @@ public class StreamLoading: MartenTest
         @event.Should().NotBeNull();
         @event.Id.Should().Be(eventId);
     }
+
+    [Fact]
+    public async Task GivenExistingStreamWithMultipleEvents_WhenEventsAreQueriedOrderedDescending_ThenLastEventIsLoaded()
+    {
+        var streamId = Guid.NewGuid();
+        Session.Events.Append(streamId,
+            new IssueCreated(streamId, "Description"),
+            new IssueUpdated(streamId, "Description"),
+            new IssueUpdated(streamId, "The Last One")
+        );
+        await Session.SaveChangesAsync();
+
+        var lastEvent = Session.Events.QueryAllRawEvents()
+            .Where(e => e.StreamId == streamId)
+            .OrderByDescending(e => e.Version)
+            .FirstOrDefault();
+
+        lastEvent.Should().NotBeNull();
+        lastEvent!.Data.Should().BeOfType<IssueUpdated>();
+
+        var lastUpdatedEvent = (IssueUpdated)lastEvent.Data;
+        lastUpdatedEvent.IssueId.Should().Be(streamId);
+        lastUpdatedEvent.Description.Should().Be("The Last One");
+    }
 }
