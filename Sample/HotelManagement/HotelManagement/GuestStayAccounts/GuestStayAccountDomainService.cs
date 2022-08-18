@@ -1,6 +1,6 @@
-using HotelManagement.Core;
+using HotelManagement.Core.Marten;
 using HotelManagement.GuestStayAccounts;
-using static HotelManagement.Core.Result;
+using Marten;
 
 namespace HotelManagement.GuestStay;
 
@@ -23,50 +23,41 @@ public record CheckOutGuest(
     Guid? GroupCheckOutId = null
 );
 
-public static class GuestStayDomainService
+public class GuestStayDomainService
 {
-    public static GuestCheckedIn Handle(CheckInGuest command) =>
-        new GuestCheckedIn(command.GuestStayId, DateTimeOffset.UtcNow);
+    private readonly IDocumentSession documentSession;
 
-    public static ChargeRecorded Handle(GuestStayAccount state, RecordCharge command)
-    {
-        if (state.Status != GuestStayAccountStatus.Opened)
-            throw new InvalidOperationException("Cannot record charge for not opened account");
+    public GuestStayDomainService(IDocumentSession documentSession) =>
+        this.documentSession = documentSession;
 
-        return new ChargeRecorded(state.Id, command.Amount, DateTimeOffset.UtcNow);
-    }
-
-    public static PaymentRecorded Handle(GuestStayAccount state, RecordPayment command)
-    {
-        if (state.Status != GuestStayAccountStatus.Opened)
-            throw new InvalidOperationException("Cannot record payment for not opened account");
-
-        return new PaymentRecorded(state.Id, command.Amount, DateTimeOffset.UtcNow);
-    }
-
-    public static Result<GuestCheckedOut, GuestCheckoutFailed> Handle(GuestStayAccount state, CheckOutGuest command)
-    {
-        if (state.Status != GuestStayAccountStatus.Opened)
-            throw new InvalidOperationException("Cannot record payment for not opened account");
-
-        if (!state.IsSettled)
-        {
-            return Failure<GuestCheckedOut, GuestCheckoutFailed>(
-                new GuestCheckoutFailed(
-                    state.Id,
-                    GuestCheckoutFailed.FailureReason.BalanceNotSettled,
-                    DateTimeOffset.UtcNow,
-                    command.GroupCheckOutId
-                )
-            );
-        }
-
-        return Success<GuestCheckedOut, GuestCheckoutFailed>(
-            new GuestCheckedOut(
-                state.Id,
-                DateTimeOffset.UtcNow,
-                command.GroupCheckOutId
-            )
+    public Task Handle(CheckInGuest command, CancellationToken ct) =>
+        documentSession.Add<GuestStayAccount>(
+            command.GuestStayId,
+            GuestStayAccount.CheckIn(command.GuestStayId, DateTimeOffset.Now),
+            ct
         );
-    }
+
+    public Task Handle(RecordCharge command, int expectedVersion, CancellationToken ct) =>
+        documentSession.GetAndUpdate<GuestStayAccount>(
+            command.GuestStayId,
+            expectedVersion,
+            state => state.RecordCharge(command.Amount, DateTimeOffset.Now),
+            ct
+        );
+
+    public Task Handle(RecordPayment command, int expectedVersion, CancellationToken ct) =>
+        documentSession.GetAndUpdate<GuestStayAccount>(
+            command.GuestStayId,
+            expectedVersion,
+            state => state.RecordPayment(command.Amount, DateTimeOffset.Now),
+            ct
+        );
+
+    public Task Handle(CheckOutGuest command, CancellationToken ct) =>
+        documentSession.GetAndUpdate<GuestStayAccount>(
+            command.GuestStayId,
+            state => state.CheckOut(DateTimeOffset.Now)
+                .Map<object>(success => success, failed => failed),
+            ct
+        );
 }

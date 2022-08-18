@@ -1,59 +1,59 @@
-namespace HotelManagement.Core;
+namespace HotelManagement.Core.Structures;
 
 public class Result<TSuccess, TError>
 {
-    public Maybe<TSuccess> Left { get; }
-    public Maybe<TError> Right { get; }
+    public Maybe<TSuccess> Success { get; }
+    public Maybe<TError> Error { get; }
 
     public Result(TSuccess value)
     {
-        Left = Maybe<TSuccess>.Of(value);
-        Right = Maybe<TError>.Empty;
+        Success = Maybe<TSuccess>.Of(value);
+        Error = Maybe<TError>.Empty;
     }
 
     public Result(TError value)
     {
-        Left = Maybe<TSuccess>.Empty;
-        Right = Maybe<TError>.Of(value);
+        Success = Maybe<TSuccess>.Empty;
+        Error = Maybe<TError>.Of(value);
     }
 
-    public Result(Maybe<TSuccess> left, Maybe<TError> right)
+    public Result(Maybe<TSuccess> success, Maybe<TError> error)
     {
-        if (!left.IsPresent && !right.IsPresent)
-            throw new ArgumentOutOfRangeException(nameof(right));
+        if (!success.IsPresent && !error.IsPresent)
+            throw new ArgumentOutOfRangeException(nameof(error));
 
-        Left = left;
-        Right = right;
+        Success = success;
+        Error = error;
     }
 
     public TMapped Map<TMapped>(
-        Func<TSuccess, TMapped> mapLeft,
-        Func<TError, TMapped> mapRight
+        Func<TSuccess, TMapped> mapSuccess,
+        Func<TError, TMapped> mapFailure
     )
     {
-        if (Left.IsPresent)
-            return mapLeft(Left.GetOrThrow());
+        if (Success.IsPresent)
+            return mapSuccess(Success.GetOrThrow());
 
-        if (Right.IsPresent)
-            return mapRight(Right.GetOrThrow());
+        if (Error.IsPresent)
+            return mapFailure(Error.GetOrThrow());
 
         throw new Exception("That should never happen!");
     }
 
     public void Switch(
-        Action<TSuccess> onLeft,
-        Action<TError> onRight
+        Action<TSuccess> onSuccess,
+        Action<TError> onFailure
     )
     {
-        if (Left.IsPresent)
+        if (Success.IsPresent)
         {
-            onLeft(Left.GetOrThrow());
+            onSuccess(Success.GetOrThrow());
             return;
         }
 
-        if (Right.IsPresent)
+        if (Error.IsPresent)
         {
-            onRight(Right.GetOrThrow());
+            onFailure(Error.GetOrThrow());
             return;
         }
 
