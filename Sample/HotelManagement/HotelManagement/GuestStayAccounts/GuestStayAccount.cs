@@ -1,3 +1,7 @@
+using HotelManagement.Core;
+using HotelManagement.Core.Structures;
+using static HotelManagement.Core.Structures.Result;
+
 namespace HotelManagement.GuestStayAccounts;
 
 public record GuestCheckedIn(
@@ -38,16 +42,57 @@ public record GuestCheckoutFailed(
 
 public record GuestStayAccount(
     Guid Id,
-    DateTimeOffset CheckedInAt,
     decimal Balance = 0,
-    GuestStayAccountStatus Status = GuestStayAccountStatus.Opened,
-    DateTimeOffset? CheckedOutAt = null
+    GuestStayAccountStatus Status = GuestStayAccountStatus.Opened
 )
 {
     public bool IsSettled => Balance == 0;
 
+
+    public static GuestCheckedIn CheckIn(Guid guestStayId, DateTimeOffset now) =>
+        new GuestCheckedIn(guestStayId, now);
+
+    public ChargeRecorded RecordCharge(decimal amount, DateTimeOffset now)
+    {
+        if (Status != GuestStayAccountStatus.Opened)
+            throw new InvalidOperationException("Cannot record charge for not opened account");
+
+        return new ChargeRecorded(Id, amount, now);
+    }
+
+    public PaymentRecorded RecordPayment(decimal amount, DateTimeOffset now)
+    {
+        if (Status != GuestStayAccountStatus.Opened)
+            throw new InvalidOperationException("Cannot record charge for not opened account");
+
+        return new PaymentRecorded(Id, amount, now);
+    }
+
+    public Result<GuestCheckedOut, GuestCheckoutFailed> CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)
+    {
+        if (Status != GuestStayAccountStatus.Opened)
+            throw new InvalidOperationException("Cannot record payment for not opened account");
+
+        return IsSettled
+            ? Success<GuestCheckedOut, GuestCheckoutFailed>(
+                new GuestCheckedOut(
+                    Id,
+                    DateTimeOffset.UtcNow,
+                    groupCheckoutId
+                )
+            )
+            : Failure<GuestCheckedOut, GuestCheckoutFailed>(
+                new GuestCheckoutFailed(
+                    Id,
+                    GuestCheckoutFailed.FailureReason.BalanceNotSettled,
+                    DateTimeOffset.UtcNow,
+                    groupCheckoutId
+                )
+            );
+    }
+
     public static GuestStayAccount Create(GuestCheckedIn @event) =>
-        new GuestStayAccount(@event.GuestStayId, @event.CheckedInAt);
+        new GuestStayAccount(@event.GuestStayId);
 
     public GuestStayAccount Apply(ChargeRecorded @event) =>
         this with { Balance = Balance - @event.Amount };
