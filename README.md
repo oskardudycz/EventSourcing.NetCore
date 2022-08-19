@@ -1070,6 +1070,8 @@ The simplest way to start is **installing the [project template](https://github.
 -   🎞 [InfoQ - Building Microservices with Event Sourcing and CQRS](https://www.infoq.com/presentations/microservices-event-sourcing-cqrs/)
 -   📝 [Chris Kiehl - Don't Let the Internet Dupe You, Event Sourcing is Hard](https://chriskiehl.com/article/event-sourcing-is-hard)
 -   📝 [AWS - Event sourcing pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/service-per-team.html)
+-   📝 [Event sourcing with Kafka Streams](https://medium.com/dna-technology/event-sourcing-with-kafka-streams-660e5e64ec33)
+-   📝 [Event Sourcing with Kafka and ksqlDB](https://github.com/evgeniy-khist/ksqldb-event-souring)
 -   📝 [Andela - Building Scalable Applications Using Event Sourcing and CQRS](https://andela.com/insights/building-scalable-applications-using-event-sourcing-and-cqrs/)
 -   📝 [WiX Engineering - The Reactive Monolith - How to Move from CRUD to Event Sourcing](https://www.wix.engineering/post/the-reactive-monolith-how-to-move-from-crud-to-event-sourcing)
 -   📝 [Nexocode - CQRS and Event Sourcing as an antidote for problems with retrieving application states](https://nexocode.com/blog/posts/cqrs-and-event-sourcing/)
