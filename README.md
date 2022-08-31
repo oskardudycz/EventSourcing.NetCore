@@ -884,21 +884,13 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
 I gathered and generalized all of the practices used in this tutorial/samples in Nuget Packages maintained by me [GoldenEye Framework](https://github.com/oskardudycz/GoldenEye).
 See more in:
 
--   [GoldenEye DDD package](https://github.com/oskardudycz/GoldenEye/tree/main/src/Core/Backend.Core.DDD) - it provides a set of base and bootstrap classes that helps you to reduce boilerplate code and help you focus on writing business code. You can find all classes like Commands/Queries/Event handlers and many more. To use it run:
+-   [GoldenEye DDD package](https://github.com/oskardudycz/GoldenEye/tree/main/src/Core/Core) - it provides a set of base and bootstrap classes that helps you to reduce boilerplate code and help you focus on writing business code. You can find all classes like Commands/Queries/Event handlers and many more. To use it run:
 
-    `dotnet add package GoldenEye.Backend.Core.DDD`
+    `dotnet add package GoldenEye`
 
--   [GoldenEye Marten package](https://github.com/oskardudycz/GoldenEye/tree/main/src/Core/Backend.Core.Marten) - contains helpers, and abstractions to use Marten as document/event store. Gives you abstractions like repositories etc. To use it run:
+-   [GoldenEye Marten package](https://github.com/oskardudycz/GoldenEye/tree/main/src/Marten/Marten) - contains helpers, and abstractions to use Marten as document/event store. Gives you abstractions like repositories etc. To use it run:
 
-    `dotnet add package GoldenEye.Backend.Core.Marten`
-
-The simplest way to start is **installing the [project template](https://github.com/oskardudycz/GoldenEye/tree/main/src/Templates/SimpleDDD/content) by running**
-
-`dotnet new -i GoldenEye.WebApi.Template.SimpleDDD`
-
-**and then creating a new project based on it:**
-
-`dotnet new SimpleDDD -n NameOfYourProject`
+    `dotnet add package GoldenEye.Marten`
 
 ## 13. Other resources
 
