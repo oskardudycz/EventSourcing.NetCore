@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.2" />
+        <PackageReference Include="Marten.AspNetCore" Version="5.7.0" />
+        <PackageReference Include="Marten" Version="5.7.0" />
+    </ItemGroup>
+</Project>
