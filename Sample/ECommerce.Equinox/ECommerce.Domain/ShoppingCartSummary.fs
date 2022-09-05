@@ -2,7 +2,7 @@ module ECommerce.Domain.ShoppingCartSummary
 
 let [<Literal>] Category = "ShoppingCartSummary"
 
-let streamName = CartId.toString >> FsCodec.StreamName.create Category
+let streamName id = struct (Category, CartId.toString id)
 
 module Events =
 
@@ -63,17 +63,13 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>) =
 
 module Config =
 
-    let private resolveStream = function
+    let private (|Category|) = function
         | Config.Store.Memory store ->
-            let cat = Config.Memory.create Events.codec Fold.initial Fold.fold store
-            cat.Resolve
+            Config.Memory.create Events.codec Fold.initial Fold.fold store
         | Config.Store.Esdb (_context, _cache) ->
             failwith "Not implemented: For EventStore its suggested to do a cached read from the write side"
         | Config.Store.Cosmos (context, cache) ->
-            let cat = Config.Cosmos.createRollingState Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
-            cat.Resolve
+            Config.Cosmos.createRollingState Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
         | Config.Store.Dynamo (context, cache) ->
-            let cat = Config.Dynamo.createRollingState Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
-            cat.Resolve
-    let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
-    let create = resolveDecider >> Service
+            Config.Dynamo.createRollingState Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
+    let create (Category cat) = Service(streamName >> Config.createDecider cat)

@@ -1,9 +1,11 @@
 module ECommerce.Domain.ShoppingCart
 
+open Propulsion.Internal
+
 let [<Literal>] Category = "ShoppingCart"
 
-let streamName = CartId.toString >> FsCodec.StreamName.create Category
-let (|StreamName|_|) = function FsCodec.StreamName.CategoryAndId (Category, CartId.Parse cartId) -> Some cartId | _ -> None
+let streamName id = struct (Category, CartId.toString id)
+let [<return: Struct>] (|StreamName|_|) = function struct (Category, CartId.Parse cartId) -> ValueSome cartId | _ -> ValueNone
 
 module Events =
 
@@ -19,20 +21,19 @@ module Events =
 
 module Reactions =
 
-    open FsCodec.Interop
-    let private codec = Events.codec.ToByteArrayCodec()
-    let (|Decode|) (span : Propulsion.Streams.StreamSpan<byte[]>) = span.events |> Seq.choose codec.TryDecode |> Array.ofSeq
-    let (|Parse|_|) = function
-        | StreamName sellerId, Decode events -> Some (sellerId, events)
-        | _ -> None
+    let private codec = Events.codec
+    let (|Decode|) span = span |> Seq.chooseV codec.TryDecode |> Array.ofSeq
+    let [<return: Struct>] (|Parse|_|) = function
+        | StreamName cartId, Decode events -> ValueSome (cartId, events)
+        | _ -> ValueNone
     let chooseConfirmed = function
-        | Events.Confirmed _ -> Some ()
-        | _ -> None
-    let (|Confirmed|_|) events = Seq.rev events |> Seq.tryPick chooseConfirmed
+        | Events.Confirmed _ -> ValueSome ()
+        | _ -> ValueNone
+    let [<return: Struct>] (|Confirmed|_|) events = Seq.rev events |> Seq.tryPickV chooseConfirmed
     let chooseNotRegistering = function
-        | Events.Registering _ -> None
-        | _ -> Some ()
-    let (|StateChanged|_|) events = Seq.rev events |> Seq.tryPick chooseNotRegistering
+        | Events.Registering _ -> ValueNone
+        | _ -> ValueSome ()
+    let [<return: Struct>] (|StateChanged|_|) events = Seq.rev events |> Seq.tryPickV chooseNotRegistering
 
 module Fold =
 
@@ -156,22 +157,12 @@ module Config =
     let calculatePrice (pricer : ProductId -> Async<decimal>) (productId, _quantity) : Async<decimal> =
         pricer productId
 
-    let private resolveStream = function
-        | Config.Store.Memory store ->
-            let cat = Config.Memory.create Events.codec Fold.initial Fold.fold store
-            cat.Resolve
-        | Config.Store.Esdb (context, cache) ->
-            let cat = Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-            cat.Resolve
-        | Config.Store.Cosmos (context, cache) ->
-            let cat = Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
-            cat.Resolve
-        | Config.Store.Dynamo (context, cache) ->
-            let cat = Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-            cat.Resolve
-    let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
-    let create_ pricer store =
-        Service(resolveDecider store, calculatePrice pricer)
+    let private (|Category|) = function
+        | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
+        | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
+        | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
+        | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
+    let create_ pricer (Category cat) = Service(streamName >> Config.createDecider cat, calculatePrice pricer)
     let create =
         let defaultCalculator = RandomProductPriceCalculator()
         create_ defaultCalculator.Calculate

@@ -1,11 +1,11 @@
 module ECommerce.Domain.Config
 
 let log = Serilog.Log.ForContext("isMetric", true)
-let createDecider stream = Equinox.Decider(log, stream, maxAttempts = 3)
+let createDecider category = Equinox.Decider.resolve log category
 
 module Memory =
 
-    let create codec initial fold store =
+    let create codec initial fold store : Equinox.Category<_, _, _> =
         Equinox.MemoryStore.MemoryStoreCategory(store, codec, fold, initial)
 
 module EventCodec =
@@ -40,7 +40,7 @@ module Dynamo =
 
     let private createCached codec initial fold accessStrategy (context, cache) =
         let cacheStrategy = Equinox.DynamoStore.CachingStrategy.SlidingWindow (cache, System.TimeSpan.FromMinutes 20.)
-        Equinox.DynamoStore.DynamoStoreCategory(context, codec, fold, initial, cacheStrategy, accessStrategy)
+        Equinox.DynamoStore.DynamoStoreCategory(context, codec |> FsCodec.Deflate.EncodeUncompressed, fold, initial, cacheStrategy, accessStrategy)
 
     let createUnoptimized codec initial fold (context, cache) =
         let accessStrategy = Equinox.DynamoStore.AccessStrategy.Unoptimized

@@ -3,6 +3,7 @@ module ECommerce.Reactor.Program
 open ECommerce.Infrastructure
 open Serilog
 open System
+open System.Threading.Tasks
 
 let [<Literal>] AppName = "ECommerce.Reactor"
 
@@ -77,7 +78,7 @@ module Args =
         let parser = ArgumentParser.Create<Parameters>(programName=programName)
         Arguments(SourceArgs.Configuration tryGetConfigValue, parser.ParseCommandLine argv)
 
-open Propulsion.CosmosStore.Infrastructure // AwaitKeyboardInterruptAsTaskCancelledException
+open Propulsion.Internal // AwaitKeyboardInterruptAsTaskCanceledException
 open ECommerce.Domain
 
 let buildSink (args : Args.Arguments) log (handle : FsCodec.StreamName * Propulsion.Streams.StreamSpan<byte[]> -> Async<_ * _>) =
@@ -96,7 +97,7 @@ let build (args : Args.Arguments) =
         let sink = buildSink args log handle
         let source =
             let parseFeedDoc = Seq.collect Propulsion.CosmosStore.EquinoxSystemTextJsonParser.enumStreamEvents
-                               >> Seq.filter (fun {stream = s } -> Reactor.isReactionStream s)
+                               >> Seq.filter (fun s -> Reactor.isReactionStream s)
             let observer = Propulsion.CosmosStore.CosmosStoreSource.CreateObserver(log, sink.StartIngester, parseFeedDoc)
             let leases, startFromTail, maxItems, lagFrequency = a.MonitoringParams(log)
             Propulsion.CosmosStore.CosmosStoreSource.Start(log, monitored, leases, args.Group, observer, startFromTail, ?maxItems = maxItems, lagReportFreq = lagFrequency)
@@ -138,7 +139,7 @@ let run (args : Args.Arguments) = async {
     use _ = args.PrometheusPort |> Option.map startMetricsServer |> Option.toObj
     let sink, source = build args
     let work = [
-            Async.AwaitKeyboardInterruptAsTaskCancelledException()
+            Async.AwaitKeyboardInterruptAsTaskCanceledException()
             source.AwaitWithStopOnCancellation()
             sink.AwaitWithStopOnCancellation() ]
     return! Async.Parallel work |> Async.Ignore<unit array> }
@@ -149,7 +150,7 @@ let main argv =
         let metrics = Sinks.tags AppName |> Sinks.equinoxAndPropulsionReactorMetrics
         try Log.Logger <- LoggerConfiguration().Configure(verbose=args.Verbose).Sinks(metrics, args.VerboseStore).CreateLogger()
             try run args |> Async.RunSynchronously; 0
-            with e when not (e :? Args.MissingArg) -> Log.Fatal(e, "Exiting"); 2
+            with e when not (e :? Args.MissingArg) && not (e :? TaskCanceledException) -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()
     with Args.MissingArg msg -> eprintfn "%s" msg; 1
         | :? Argu.ArguParseException as e -> eprintfn "%s" e.Message; 1
