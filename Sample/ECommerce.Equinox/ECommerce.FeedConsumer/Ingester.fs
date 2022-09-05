@@ -37,7 +37,7 @@ module PipelineEvent =
             context = item)
     let (|ItemsForFc|_|) = function
         | FsCodec.StreamName.CategoryAndIds (_,[|_ ; FcId.Parse fc|]), (s : Propulsion.Streams.StreamSpan<_>) ->
-            Some (fc, s.events |> Seq.map (fun e -> Unchecked.unbox<Item> e.Context))
+            Some (fc, s |> Seq.map (fun e -> Unchecked.unbox<Item> e.Context))
         | _ -> None
 
 let handle maxDop (stream, span) = async {
