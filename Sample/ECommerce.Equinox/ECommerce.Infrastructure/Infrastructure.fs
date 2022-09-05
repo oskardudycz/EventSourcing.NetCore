@@ -148,6 +148,7 @@ module Exception =
             when (e.StatusCode = System.Net.HttpStatusCode.TooManyRequests
                   || e.StatusCode = System.Net.HttpStatusCode.ServiceUnavailable)
                  && not verboseStore -> ()
-        | Equinox.DynamoStore.Exceptions.ProvisionedThroughputExceeded when not verboseStore -> ()
+        | Equinox.DynamoStore.Exceptions.ProvisionedThroughputExceeded
+        | :? TimeoutException when not verboseStore -> ()
         | _ ->
             log.Information(exn, "Unhandled")

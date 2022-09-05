@@ -1,7 +1,7 @@
 module ECommerce.Reactor.Reactor
 
-open ECommerce.Infrastructure // Exception
 open ECommerce.Domain
+open ECommerce.Infrastructure // Exception
 open Metrics
 
 /// Gathers stats based on the outcome of each Span processed for emission, at intervals controlled by `StreamsConsumer`
@@ -27,14 +27,13 @@ type Stats(log, statsInterval, stateInterval, verboseStore, ?logExternalStats) =
         base.DumpStats()
 
 let isReactionStream = function
-    | ShoppingCart.StreamName _ -> true
+    | struct (ShoppingCart.Category, _) -> true
     | _ -> false
-let filterReactorEvents seq = seq |> Seq.filter (fun ({ stream = sn } : Propulsion.Streams.StreamEvent<_>) -> isReactionStream sn)
 
 let handle
         (cartSummary : ShoppingCartSummaryHandler.Service)
         (confirmedCarts : ConfirmedHandler.Service)
-        (stream, span : Propulsion.Streams.StreamSpan<byte[]>) = async {
+        struct (stream, span) = async {
     match stream, span with
     | ShoppingCart.Reactions.Parse (cartId, events) ->
         match events with
@@ -44,15 +43,25 @@ let handle
         match events with
         | ShoppingCart.Reactions.StateChanged ->
             let! worked, version' = cartSummary.TryIngestSummary(cartId)
-            return  Propulsion.Streams.SpanResult.OverrideWritePosition version',
-                    (if worked then Outcome.Ok (1, span.events.Length - 1) else Outcome.Skipped span.events.Length)
-        | _ -> return Propulsion.Streams.SpanResult.AllProcessed, Outcome.NotApplicable span.events.Length
-    | x -> return failwith $"Invalid event %A{x}" } // should be filtered by filterReactorEvents
+            let outcome = if worked then Outcome.Ok (1, Array.length span - 1) else Outcome.Skipped span.Length
+            return struct (Propulsion.Streams.SpanResult.OverrideWritePosition version', outcome)
+        | _ -> return Propulsion.Streams.SpanResult.AllProcessed, Outcome.NotApplicable span.Length
+    | x -> return failwith $"Invalid event %A{x}" } // should be filtered by isReactionStream
 //    | _ -> return Propulsion.Streams.SpanResult.AllProcessed, Outcome.NotApplicable span.events.Length }
 
-module Config =
+type Config private () =
 
     let create (sourceStore, targetStore) =
         let cartSummary = ShoppingCartSummaryHandler.Config.create (sourceStore, targetStore)
         let confirmedCarts = ConfirmedHandler.Config.create (sourceStore, targetStore)
         handle cartSummary confirmedCarts
+
+    static member StartSink(log : Serilog.ILogger, stats : Stats,
+                            handle : struct (FsCodec.StreamName * Propulsion.Streams.Default.StreamSpan) ->
+                                     Async<struct (Propulsion.Streams.SpanResult * Outcome)>,
+                            maxReadAhead : int, maxConcurrentStreams : int, ?wakeForResults, ?idleDelay, ?purgeInterval) =
+        Propulsion.Streams.Default.Config.Start(log, maxReadAhead, maxConcurrentStreams, handle, stats, stats.StatsInterval.Period,
+                                                ?wakeForResults = wakeForResults, ?idleDelay = idleDelay, ?purgeInterval = purgeInterval)
+
+    static member StartSource(log, sink, sourceConfig, filter) =
+        Args.SourceConfig.start (log, Config.log) sink filter sourceConfig

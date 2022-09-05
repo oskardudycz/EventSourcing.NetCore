@@ -6,7 +6,7 @@
 module ECommerce.Domain.ConfirmedEpoch
 
 let [<Literal>] Category = "ConfirmedEpoch"
-let streamName epochId = FsCodec.StreamName.compose Category [ConfirmedSeriesId.toString ConfirmedSeriesId.wellKnownId; ConfirmedEpochId.toString epochId]
+let streamName epochId = struct (Category, FsCodec.StreamName.createStreamId [ConfirmedSeriesId.toString ConfirmedSeriesId.wellKnownId; ConfirmedEpochId.toString epochId])
 
 // NB - these types and the union case names reflect the actual storage formats and hence need to be versioned with care
 [<RequireQualifiedAccess>]
@@ -72,7 +72,7 @@ type Service internal
         // NOTE decider which will initially transact against potentially stale cached state, which will trigger a
         // resync if another writer has gotten in before us. This is a conscious decision in this instance; the bulk
         // of writes are presumed to be coming from within this same process
-        decider.Transact(decide shouldClose carts, option = Equinox.AllowStale)
+        decider.Transact(decide shouldClose carts, load = Equinox.AllowStale)
 
     /// Returns all the items currently held in the stream (Not using AllowStale on the assumption this needs to see updates from other apps)
     member _.Read epochId : Async<Fold.State> =
@@ -81,23 +81,18 @@ type Service internal
 
 module Config =
 
-    let private create_ shouldClose resolve = Service(shouldClose, resolve)
-    let private resolveStream = function
+    let private create_ shouldClose cat = Service(shouldClose, streamName >> Config.createDecider cat)
+    let private (|Category|) = function
         | Config.Store.Memory store ->
-            let cat = Config.Memory.create Events.codec Fold.initial Fold.fold store
-            cat.Resolve
+            Config.Memory.create Events.codec Fold.initial Fold.fold store
         | Config.Store.Esdb (context, cache) ->
-            let cat = Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-            cat.Resolve
+            Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
         | Config.Store.Cosmos (context, cache) ->
-            let cat = Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
-            cat.Resolve
+            Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
         | Config.Store.Dynamo (context, cache) ->
-            let cat = Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-            cat.Resolve
-    let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
+            Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
     let shouldClose maxItemsPerEpoch candidateItems currentItems = Array.length currentItems + Array.length candidateItems >= maxItemsPerEpoch
-    let create maxItemsPerEpoch = resolveDecider >> create_ (shouldClose maxItemsPerEpoch)
+    let create maxItemsPerEpoch (Category cat) = create_ (shouldClose maxItemsPerEpoch) cat
 
 /// Custom Fold and caching logic compared to the IngesterService
 /// - When reading, we want the full Items
@@ -123,18 +118,9 @@ module Reader =
 
     module Config =
 
-        let private resolveStream = function
-            | Config.Store.Memory store ->
-                let cat = Config.Memory.create Events.codec initial fold store
-                cat.Resolve
-            | Config.Store.Esdb (context, cache) ->
-                let cat = Config.Esdb.createUnoptimized Events.codec initial fold (context, cache)
-                cat.Resolve
-            | Config.Store.Cosmos (context, cache) ->
-                let cat = Config.Cosmos.createUnoptimized Events.codecJsonElement initial fold (context, cache)
-                cat.Resolve
-            | Config.Store.Dynamo (context, cache) ->
-                let cat = Config.Dynamo.createUnoptimized Events.codec initial fold (context, cache)
-                cat.Resolve
-        let private resolveDecider store = streamName >> resolveStream store >> Config.createDecider
-        let create = resolveDecider >> Service
+        let private (|Category|) = function
+            | Config.Store.Memory store ->            Config.Memory.create Events.codec initial fold store
+            | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec initial fold (context, cache)
+            | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createUnoptimized Events.codecJsonElement initial fold (context, cache)
+            | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec initial fold (context, cache)
+        let create (Category cat) = Service(streamName >> Config.createDecider cat)
