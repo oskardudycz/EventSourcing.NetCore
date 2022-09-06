@@ -2,7 +2,7 @@ module ECommerce.Reactor.ConfirmedHandler
 
 open ECommerce.Domain
 
-type Service(carts : ShoppingCart.Service, ingester : ConfirmedIngester.Service) =
+type Service internal (carts : ShoppingCart.Service, ingester : ConfirmedIngester.Service) =
 
     member _.TrySummarizeConfirmed(cartId) : Async<bool> = async {
         let! cartSummary, originEpoch = carts.SummarizeWithOriginEpoch(cartId, ingester.ActiveIngestionEpochId)

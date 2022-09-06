@@ -13,8 +13,8 @@ module Events =
     type Event =
         | Ingested of Ingested
         interface TypeShape.UnionContract.IUnionContract
-    let codec = Config.EventCodec.forUnion<Event>
-    let codecJsonElement = Config.EventCodec.forUnionJsonElement<Event>
+    let codec = Config.EventCodec.gen<Event>
+    let codecJsonElement = Config.EventCodec.genJsonElement<Event>
 
 module Fold =
 
@@ -51,7 +51,7 @@ module Ingest =
         | None -> false, []
         | _ -> true, [ Events.Ingested { version = version; value = value } ]
 
-type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>) =
+type Service internal (resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>) =
 
     member _.Read(cartId) : Async<Details.View option> =
         let decider = resolve cartId
@@ -64,12 +64,8 @@ type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>) =
 module Config =
 
     let private (|Category|) = function
-        | Config.Store.Memory store ->
-            Config.Memory.create Events.codec Fold.initial Fold.fold store
-        | Config.Store.Esdb (_context, _cache) ->
-            failwith "Not implemented: For EventStore its suggested to do a cached read from the write side"
-        | Config.Store.Cosmos (context, cache) ->
-            Config.Cosmos.createRollingState Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
-        | Config.Store.Dynamo (context, cache) ->
-            Config.Dynamo.createRollingState Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
+        | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
+        | Config.Store.Esdb (_context, _cache) -> failwith "Not implemented: For EventStore its suggested to do a cached read from the write side"
+        | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createRollingState Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
+        | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createRollingState Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
     let create (Category cat) = Service(streamName >> Config.createDecider cat)
