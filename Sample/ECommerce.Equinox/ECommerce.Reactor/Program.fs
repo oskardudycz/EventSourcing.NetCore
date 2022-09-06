@@ -300,7 +300,7 @@ open Propulsion.Internal // AwaitKeyboardInterruptAsTaskCanceledException
 
 let build (args : Args.Arguments) =
     let consumerGroupName, maxReadAhead, maxConcurrentStreams = args.ProcessorParams()
-    let cache = Equinox.Cache (AppName, sizeMb = 10)
+    let cache = Equinox.Cache(AppName, sizeMb = 10)
     let store, buildSourceConfig, dumpMetrics, targetStore = args.ConnectStoresAndMonitored cache
     let buildProjector dump dop groupName filter handle =
         let log = Log.forGroup groupName // needs to have a `group` tag for Propulsion.Streams Prometheus metrics

@@ -16,8 +16,8 @@ module Events =
         | Confirmed of {| confirmedAt : System.DateTimeOffset |}
         | Registering of {| originEpoch : ConfirmedEpochId |}
         interface TypeShape.UnionContract.IUnionContract
-    let codec = Config.EventCodec.forUnion<Event>
-    let codecJsonElement = Config.EventCodec.forUnionJsonElement<Event>
+    let codec = Config.EventCodec.gen<Event>
+    let codecJsonElement = Config.EventCodec.genJsonElement<Event>
 
 module Reactions =
 
@@ -112,7 +112,7 @@ let summarizeWithOriginEpoch getActiveEpochId state = async {
         let! originEpoch = getActiveEpochId ()
         return (Details.render s |> Option.get, originEpoch), [ Events.Registering {| originEpoch = originEpoch |} ] }
 
-type Service(resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calculatePrice : ProductId * int -> Async<decimal>) =
+type Service internal (resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calculatePrice : ProductId * int -> Async<decimal>) =
 
     member _.Initialize(cartId, clientId) =
         let decider = resolve cartId

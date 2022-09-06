@@ -19,8 +19,8 @@ module Events =
         | Ingested of Ingested
         | Closed
         interface TypeShape.UnionContract.IUnionContract
-    let codec = Config.EventCodec.forUnion<Event>
-    let codecJsonElement = Config.EventCodec.forUnionJsonElement<Event>
+    let codec = Config.EventCodec.gen<Event>
+    let codecJsonElement = Config.EventCodec.genJsonElement<Event>
 
 let ofShoppingCartView cartId (view : ShoppingCart.Details.View) : Events.Cart =
     { cartId = cartId; items = [| for i in view.items -> { productId = i.productId; unitPrice = i.unitPrice; quantity = i.quantity }|] }
@@ -83,14 +83,10 @@ module Config =
 
     let private create_ shouldClose cat = Service(shouldClose, streamName >> Config.createDecider cat)
     let private (|Category|) = function
-        | Config.Store.Memory store ->
-            Config.Memory.create Events.codec Fold.initial Fold.fold store
-        | Config.Store.Esdb (context, cache) ->
-            Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-        | Config.Store.Cosmos (context, cache) ->
-            Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
-        | Config.Store.Dynamo (context, cache) ->
-            Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
+        | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
+        | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
+        | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
+        | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
     let shouldClose maxItemsPerEpoch candidateItems currentItems = Array.length currentItems + Array.length candidateItems >= maxItemsPerEpoch
     let create maxItemsPerEpoch (Category cat) = create_ (shouldClose maxItemsPerEpoch) cat
 

@@ -2,7 +2,7 @@ module ECommerce.Reactor.ShoppingCartSummaryHandler
 
 open ECommerce.Domain
 
-type Service(source : ShoppingCart.Service, destination : ShoppingCartSummary.Service) =
+type Service internal (source : ShoppingCart.Service, destination : ShoppingCartSummary.Service) =
 
     member _.TryIngestSummary(cartId) : Async<bool * int64> = async {
         match! source.SummarizeWithVersion(cartId) with
