@@ -5,7 +5,7 @@ open Propulsion.Internal
 let [<Literal>] Category = "ShoppingCart"
 
 let streamName id = struct (Category, CartId.toString id)
-let [<return: Struct>] (|StreamName|_|) = function struct (Category, CartId.Parse cartId) -> ValueSome cartId | _ -> ValueNone
+let [<return: Struct>] (|StreamName|_|) = function FsCodec.StreamName.CategoryAndId (Category, CartId.Parse cartId) -> ValueSome cartId | _ -> ValueNone
 
 module Events =
 
