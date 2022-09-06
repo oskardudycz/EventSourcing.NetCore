@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Infrastructure.fs" />
         <Compile Include="ConfirmedHandler.fs" />
         <Compile Include="ShoppingCartSummaryHandler.fs" />
         <Compile Include="ReactorMetrics.fs" />
         <Compile Include="Reactor.fs" />
-        <Compile Include="SourceArgs.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
