@@ -33,14 +33,15 @@ module PipelineEvent =
         FsCodec.Core.TimelineEvent.Create(
             index,
             "eventType",
-            null,
+            Unchecked.defaultof<_>,
             context = item)
     let (|ItemsForFc|_|) = function
-        | FsCodec.StreamName.CategoryAndIds (_,[|_ ; FcId.Parse fc|]), (s : Propulsion.Streams.StreamSpan<_>) ->
+        | FsCodec.StreamName.CategoryAndIds (_, [|_ ; FcId.Parse fc|]), (s : Propulsion.Streams.StreamSpan<Propulsion.Streams.Default.EventBody>) ->
             Some (fc, s |> Seq.map (fun e -> Unchecked.unbox<Item> e.Context))
         | _ -> None
 
-let handle maxDop (stream, span) = async {
+let handle maxDop
+        struct (stream, span) : Async<struct (Propulsion.Streams.SpanResult * Outcome)> = async {
     match stream, span with
     | PipelineEvent.ItemsForFc (fc, items) ->
         // Take chunks of max 1000 in order to make handler latency be less 'lumpy'

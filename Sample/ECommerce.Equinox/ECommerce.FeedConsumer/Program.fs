@@ -115,23 +115,22 @@ let build (args : Args.Arguments) =
     let sink =
         let handle = Ingester.handle args.TicketsDop
         let stats = Ingester.Stats(log, args.StatsInterval, args.StateInterval, logExternalStats = args.DumpStoreMetrics)
-        Propulsion.Streams.Projector.Pipeline(log, args.MaxReadAhead, args.FcsDop, handle, stats, args.StatsInterval)
+        Propulsion.Streams.StreamsSink.Start(log, args.MaxReadAhead, args.FcsDop, handle, stats, args.StatsInterval, Propulsion.Streams.Default.eventSize)
     let pumpSource =
         let checkpoints = args.CreateCheckpointStore(store)
         let feed = ApiClient.TicketsFeed args.BaseUri
         let source =
             Propulsion.Feed.FeedSource(
                 log, args.StatsInterval, args.SourceId, args.TailSleepInterval,
-                checkpoints, feed.Poll, sink)
+                checkpoints, sink, feed.Poll)
         source.Pump feed.ReadTranches
     sink, pumpSource
 
 let run args = async {
     let sink, source = build args
     use _ = args.PrometheusPort |> Option.map startMetricsServer |> Option.toObj
-    let pumpUntilCancellation = Async.Parallel >> Async.Ignore<unit array>
     return! [|  Async.AwaitKeyboardInterruptAsTaskCanceledException()
-                source.AwaitWithStopOnCancellation()
+                source
                 sink.AwaitWithStopOnCancellation()
             |] |> Async.Parallel |> Async.Ignore<unit array> }
 
