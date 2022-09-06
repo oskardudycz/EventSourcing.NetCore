@@ -69,7 +69,7 @@ type TicketsFeed(baseUri) =
     let tickets = Session(client).Tickets
 
     // TODO add retries - consumer loop will abort if this throws
-    member _.Poll(trancheId, pos) : Async<Propulsion.Feed.Page<byte[]>> = async {
+    member _.Poll(trancheId, pos) : Async<Propulsion.Feed.Page<Propulsion.Streams.Default.EventBody>> = async {
         let checkpoint = TicketsCheckpoint.ofPosition pos
         let! pg = tickets.Poll(TrancheId.toFcId trancheId, checkpoint)
         let baseIndex = TicketsCheckpoint.toStreamIndex pg.position
