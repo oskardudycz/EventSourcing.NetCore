@@ -13,9 +13,9 @@ module EventCodec =
     open FsCodec.SystemTextJson
 
     let private defaultOptions = Options.Create(autoTypeSafeEnumToJsonString = true)
-    let forUnionJsonElement<'t when 't :> TypeShape.UnionContract.IUnionContract> =
+    let genJsonElement<'t when 't :> TypeShape.UnionContract.IUnionContract> =
         CodecJsonElement.Create<'t>(options = defaultOptions)
-    let forUnion<'t when 't :> TypeShape.UnionContract.IUnionContract> =
+    let gen<'t when 't :> TypeShape.UnionContract.IUnionContract> =
         Codec.Create<'t>(options = defaultOptions)
 
 module Cosmos =
