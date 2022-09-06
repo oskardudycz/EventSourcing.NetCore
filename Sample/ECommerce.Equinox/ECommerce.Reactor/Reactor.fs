@@ -2,6 +2,7 @@ module ECommerce.Reactor.Reactor
 
 open ECommerce.Domain
 open ECommerce.Infrastructure // Exception
+open ECommerce.Reactor.Infrastructure // SourceConfig
 open Metrics
 
 /// Gathers stats based on the outcome of each Span processed for emission, at intervals controlled by `StreamsConsumer`
@@ -33,7 +34,7 @@ let isReactionStream = function
 let handle
         (cartSummary : ShoppingCartSummaryHandler.Service)
         (confirmedCarts : ConfirmedHandler.Service)
-        struct (stream, span) = async {
+        struct (stream, span) : Async<struct (Propulsion.Streams.SpanResult * Outcome)> = async {
     match stream, span with
     | ShoppingCart.Reactions.Parse (cartId, events) ->
         match events with
@@ -44,17 +45,18 @@ let handle
         | ShoppingCart.Reactions.StateChanged ->
             let! worked, version' = cartSummary.TryIngestSummary(cartId)
             let outcome = if worked then Outcome.Ok (1, Array.length span - 1) else Outcome.Skipped span.Length
-            return struct (Propulsion.Streams.SpanResult.OverrideWritePosition version', outcome)
+            return Propulsion.Streams.SpanResult.OverrideWritePosition version', outcome
         | _ -> return Propulsion.Streams.SpanResult.AllProcessed, Outcome.NotApplicable span.Length
     | x -> return failwith $"Invalid event %A{x}" } // should be filtered by isReactionStream
-//    | _ -> return Propulsion.Streams.SpanResult.AllProcessed, Outcome.NotApplicable span.events.Length }
 
-type Config private () =
+module Config =
 
     let create (sourceStore, targetStore) =
         let cartSummary = ShoppingCartSummaryHandler.Config.create (sourceStore, targetStore)
         let confirmedCarts = ConfirmedHandler.Config.create (sourceStore, targetStore)
-        handle cartSummary confirmedCarts
+        isReactionStream, handle cartSummary confirmedCarts
+
+type Config private () =
 
     static member StartSink(log : Serilog.ILogger, stats : Stats,
                             handle : struct (FsCodec.StreamName * Propulsion.Streams.Default.StreamSpan) ->
@@ -64,4 +66,4 @@ type Config private () =
                                                 ?wakeForResults = wakeForResults, ?idleDelay = idleDelay, ?purgeInterval = purgeInterval)
 
     static member StartSource(log, sink, sourceConfig, filter) =
-        Args.SourceConfig.start (log, Config.log) sink filter sourceConfig
+        SourceConfig.start (log, Config.log) sink filter sourceConfig

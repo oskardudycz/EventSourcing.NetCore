@@ -50,20 +50,31 @@ module CosmosStoreContext =
         let maxEvents = 256
         Equinox.CosmosStore.CosmosStoreContext(storeClient, tipMaxEvents=maxEvents)
 
-type Equinox.DynamoStore.DynamoStoreClient with
-
-    member x.LogConfiguration(role, ?log) =
-        (defaultArg log Log.Logger).Information("DynamoStore {role:l} Table {table}", role, x.TableName)
-
 type Equinox.DynamoStore.DynamoStoreConnector with
 
     member x.LogConfiguration() =
         Log.Information("DynamoStore {endpoint} Timeout {timeoutS}s Retries {retries}",
                         x.Endpoint, (let t = x.Timeout in t.TotalSeconds), x.Retries)
 
-    member x.ConnectStore(client, role, table) =
-        x.LogConfiguration()
-        let storeClient = Equinox.DynamoStore.DynamoStoreClient(client, table)
+type Equinox.DynamoStore.DynamoStoreClient with
+
+    member internal x.LogConfiguration(role, ?log) =
+        (defaultArg log Log.Logger).Information("DynamoStore {role:l} Table {table} Archive {archive}", role, x.TableName, Option.toObj x.ArchiveTableName)
+    member client.CreateCheckpointService(consumerGroupName, cache, log, ?checkpointInterval) =
+        let checkpointInterval = defaultArg checkpointInterval (TimeSpan.FromHours 1.)
+        let context = Equinox.DynamoStore.DynamoStoreContext(client)
+        Propulsion.Feed.ReaderCheckpoint.DynamoStore.create log (consumerGroupName, checkpointInterval) (context, cache)
+
+type Equinox.DynamoStore.DynamoStoreContext with
+
+    member internal x.LogConfiguration(log : ILogger) =
+        log.Information("DynamoStore Tip thresholds: {maxTipBytes}b {maxTipEvents}e Query Paging {queryMaxItems} items",
+                        x.TipOptions.MaxBytes, Option.toNullable x.TipOptions.MaxEvents, x.QueryOptions.MaxItems)
+
+type Amazon.DynamoDBv2.IAmazonDynamoDB with
+
+    member x.ConnectStore(role, table) =
+        let storeClient = Equinox.DynamoStore.DynamoStoreClient(x, table)
         storeClient.LogConfiguration(role)
         storeClient
 
@@ -72,6 +83,13 @@ module DynamoStoreContext =
     /// Create with default packing and querying policies. Search for other `module DynamoStoreContext` impls for custom variations
     let create (storeClient : Equinox.DynamoStore.DynamoStoreClient) =
         Equinox.DynamoStore.DynamoStoreContext(storeClient, queryMaxItems = 100)
+
+let [<Literal>] REGION =                    "EQUINOX_DYNAMO_REGION"
+let [<Literal>] SERVICE_URL =               "EQUINOX_DYNAMO_SERVICE_URL"
+let [<Literal>] ACCESS_KEY =                "EQUINOX_DYNAMO_ACCESS_KEY_ID"
+let [<Literal>] SECRET_KEY =                "EQUINOX_DYNAMO_SECRET_ACCESS_KEY"
+let [<Literal>] TABLE =                     "EQUINOX_DYNAMO_TABLE"
+let [<Literal>] INDEX_TABLE =               "EQUINOX_DYNAMO_TABLE_INDEX"
 
 module EventStoreContext =
 
