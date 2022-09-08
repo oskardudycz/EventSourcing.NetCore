@@ -18,10 +18,12 @@ module EventCodec =
     let gen<'t when 't :> TypeShape.UnionContract.IUnionContract> =
         Codec.Create<'t>(options = defaultOptions)
 
+let private defaultCacheDuration = System.TimeSpan.FromMinutes 20.
+
 module Cosmos =
 
     let private createCached codec initial fold accessStrategy (context, cache) =
-        let cacheStrategy = Equinox.CosmosStore.CachingStrategy.SlidingWindow (cache, System.TimeSpan.FromMinutes 20.)
+        let cacheStrategy = Equinox.CosmosStore.CachingStrategy.SlidingWindow (cache, defaultCacheDuration)
         Equinox.CosmosStore.CosmosStoreCategory(context, codec, fold, initial, cacheStrategy, accessStrategy)
 
     let createUnoptimized codec initial fold (context, cache) =
@@ -39,7 +41,7 @@ module Cosmos =
 module Dynamo =
 
     let private createCached codec initial fold accessStrategy (context, cache) =
-        let cacheStrategy = Equinox.DynamoStore.CachingStrategy.SlidingWindow (cache, System.TimeSpan.FromMinutes 20.)
+        let cacheStrategy = Equinox.DynamoStore.CachingStrategy.SlidingWindow (cache, defaultCacheDuration)
         Equinox.DynamoStore.DynamoStoreCategory(context, codec |> FsCodec.Deflate.EncodeUncompressed, fold, initial, cacheStrategy, accessStrategy)
 
     let createUnoptimized codec initial fold (context, cache) =
@@ -57,7 +59,7 @@ module Dynamo =
 module Esdb =
 
     let private createCached codec initial fold accessStrategy (context, cache) =
-        let cacheStrategy = Equinox.EventStoreDb.CachingStrategy.SlidingWindow (cache, System.TimeSpan.FromMinutes 20.)
+        let cacheStrategy = Equinox.EventStoreDb.CachingStrategy.SlidingWindow (cache, defaultCacheDuration)
         Equinox.EventStoreDb.EventStoreCategory(context, codec, fold, initial, cacheStrategy, ?access = accessStrategy)
     let createUnoptimized codec initial fold (context, cache) =
         createCached codec initial fold None (context, cache)
