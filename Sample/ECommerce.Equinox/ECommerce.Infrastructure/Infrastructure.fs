@@ -84,13 +84,6 @@ module DynamoStoreContext =
     let create (storeClient : Equinox.DynamoStore.DynamoStoreClient) =
         Equinox.DynamoStore.DynamoStoreContext(storeClient, queryMaxItems = 100)
 
-let [<Literal>] REGION =                    "EQUINOX_DYNAMO_REGION"
-let [<Literal>] SERVICE_URL =               "EQUINOX_DYNAMO_SERVICE_URL"
-let [<Literal>] ACCESS_KEY =                "EQUINOX_DYNAMO_ACCESS_KEY_ID"
-let [<Literal>] SECRET_KEY =                "EQUINOX_DYNAMO_SECRET_ACCESS_KEY"
-let [<Literal>] TABLE =                     "EQUINOX_DYNAMO_TABLE"
-let [<Literal>] INDEX_TABLE =               "EQUINOX_DYNAMO_TABLE_INDEX"
-
 module EventStoreContext =
 
     let create (storeConnection : Equinox.EventStoreDb.EventStoreConnection) =
