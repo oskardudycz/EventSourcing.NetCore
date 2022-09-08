@@ -84,14 +84,14 @@ module Dynamo =
         interface IArgParserTemplate with
             member a.Usage = a |> function
                 | Verbose ->                "Include low level Store logging."
-                | ServiceUrl _ ->           "specify a server endpoint for a Dynamo account. (optional if environment variable " + SERVICE_URL + " specified)"
-                | AccessKey _ ->            "specify an access key id for a Dynamo account. (optional if environment variable " + ACCESS_KEY + " specified)"
-                | SecretKey _ ->            "specify a secret access key for a Dynamo account. (optional if environment variable " + SECRET_KEY + " specified)"
+                | ServiceUrl _ ->           "specify a server endpoint for a Dynamo account. (optional if environment variable " + Args.SERVICE_URL + " specified)"
+                | AccessKey _ ->            "specify an access key id for a Dynamo account. (optional if environment variable " + Args.ACCESS_KEY + " specified)"
+                | SecretKey _ ->            "specify a secret access key for a Dynamo account. (optional if environment variable " + Args.SECRET_KEY + " specified)"
                 | Retries _ ->              "specify operation retries (default: 9)."
                 | RetriesTimeoutS _ ->      "specify max wait-time including retries in seconds (default: 60)"
-                | Table _ ->                "specify a table name for the primary store. (optional if environment variable " + TABLE + " specified)"
-                | IndexTable _ ->           "specify a table name for the index store. (optional if environment variable " + INDEX_TABLE + " specified. default: `Table`+`IndexSuffix`)"
-                | IndexSuffix _ ->          "specify a suffix for the index store. (optional if environment variable " + INDEX_TABLE + " specified. default: \"-index\")"
+                | Table _ ->                "specify a table name for the primary store. (optional if environment variable " + Args.TABLE + " specified)"
+                | IndexTable _ ->           "specify a table name for the index store. (optional if environment variable " + Args.INDEX_TABLE + " specified. default: `Table`+`IndexSuffix`)"
+                | IndexSuffix _ ->          "specify a suffix for the index store. (optional if environment variable " + Args.INDEX_TABLE + " specified. default: \"-index\")"
                 | MaxItems _ ->             "maximum events to load in a batch. Default: 100"
                 | FromTail _ ->             "(iff the Consumer Name is fresh) - force skip to present Position. Default: Never skip an event."
                 | StreamsDop _ ->           "parallelism when loading events from Store Feed Source. Default 4"
@@ -153,19 +153,20 @@ module Esdb =
                 | Dynamo _ ->               "DynamoDB Target Store parameters (also used for checkpoint storage)."
 
     type Arguments(c : Configuration, a : ParseResults<Parameters>) =
+        let connectionStringLoggable =      a.TryGetResult Connection |> Option.defaultWith (fun () -> c.EventStoreConnection)
+        let credentials =                   a.TryGetResult Credentials |> Option.orElseWith (fun () -> c.EventStoreCredentials)
+        let discovery =                     match credentials with Some x -> String.Join(";", connectionStringLoggable, x) | None -> connectionStringLoggable
+                                            |> Equinox.EventStoreDb.Discovery.ConnectionString
         let startFromTail =                 a.Contains FromTail
         let maxItems =                      a.GetResult(MaxItems, 100)
         let tailSleepInterval =             TimeSpan.FromSeconds 0.5
-        let connectionString =              a.TryGetResult Connection |> Option.defaultWith (fun () -> c.EventStoreConnection)
-        let credentials =                   a.TryGetResult Credentials |> Option.orElseWith (fun () -> c.EventStoreCredentials) |> Option.toObj
         let retries =                       a.GetResult(Retries, 3)
         let timeout =                       a.GetResult(Timeout, 20.) |> TimeSpan.FromSeconds
         let checkpointInterval =            TimeSpan.FromHours 1.
         member val Verbose =                a.Contains Verbose
 
         member _.Connect(log : ILogger, appName, nodePreference) : Equinox.EventStoreDb.EventStoreConnection =
-            log.Information("EventStore {discovery}", connectionString)
-            let discovery = String.Join(";", connectionString, credentials) |> Equinox.EventStoreDb.Discovery.ConnectionString
+            log.Information("EventStore {discovery}", connectionStringLoggable)
             let tags=["M", Environment.MachineName; "I", Guid.NewGuid() |> string]
             Equinox.EventStoreDb.EventStoreConnector(timeout, retries, tags = tags)
                 .Establish(appName, discovery, Equinox.EventStoreDb.ConnectionStrategy.ClusterSingle nodePreference)
