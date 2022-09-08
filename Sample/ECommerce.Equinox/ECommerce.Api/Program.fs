@@ -15,14 +15,13 @@ let [<Literal>] AppName = "ECommerce.Web"
 module Args =
 
     open Argu
-    open Equinox.EventStoreDb
-    [<NoEquality; NoComparison>]
-    type Parameters =
+
+    type [<NoEquality; NoComparison>] Parameters =
         | [<AltCommandLine "-V"; Unique>]   Verbose
         | [<AltCommandLine "-p"; Unique>]   PrometheusPort of int
-        | [<CliPrefix(CliPrefix.None); Last>] Cosmos of ParseResults<Args.CosmosParameters>
-        | [<CliPrefix(CliPrefix.None); Last>] Dynamo of ParseResults<Args.DynamoParameters>
-        | [<CliPrefix(CliPrefix.None); Last>] Esdb of ParseResults<Args.EsdbParameters>
+        | [<CliPrefix(CliPrefix.None); Last>] Cosmos of ParseResults<Args.Cosmos.Parameters>
+        | [<CliPrefix(CliPrefix.None); Last>] Dynamo of ParseResults<Args.Dynamo.Parameters>
+        | [<CliPrefix(CliPrefix.None); Last>] Esdb of ParseResults<Args.Esdb.Parameters>
         interface IArgParserTemplate with
             member a.Usage = a |> function
                 | Verbose _ ->              "request verbose logging."
@@ -35,30 +34,30 @@ module Args =
         member val Verbose =                a.Contains Verbose
         member val PrometheusPort =         a.TryGetResult PrometheusPort |> Option.orElseWith (fun () -> c.PrometheusPort)
         member val CacheSizeMb =            10
-        member val StoreArgs : Args.Store =
+        member val StoreArgs : Args.StoreArgs =
             match a.TryGetSubCommand() with
-            | Some (Parameters.Cosmos cosmos) -> Args.Store.Cosmos (Args.CosmosArguments (c, cosmos))
-            | Some (Parameters.Dynamo dynamo) -> Args.Store.Dynamo (Args.DynamoArguments (c, dynamo))
-            | Some (Parameters.Esdb es) ->       Args.Store.Esdb (Args.EsdbArguments (c, es))
+            | Some (Parameters.Cosmos cosmos) -> Args.StoreArgs.Cosmos (Args.Cosmos.Arguments(c, cosmos))
+            | Some (Parameters.Dynamo dynamo) -> Args.StoreArgs.Dynamo (Args.Dynamo.Arguments(c, dynamo))
+            | Some (Parameters.Esdb es) ->       Args.StoreArgs.Esdb (Args.Esdb.Arguments(c, es))
             | _ -> Args.missingArg "Must specify one of cosmos, dynamo or esdb for store"
-        member x.VerboseStore = Args.verboseRequested x.StoreArgs
+        member x.StoreVerbose =             Args.StoreArgs.verboseRequested x.StoreArgs
         member x.Connect() : Domain.Config.Store<_> =
             let cache = Equinox.Cache (AppName, sizeMb = x.CacheSizeMb)
             match x.StoreArgs with
-            | Args.Store.Cosmos a ->
+            | Args.StoreArgs.Cosmos a ->
                 let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
                 Domain.Config.Store.Cosmos (context, cache)
-            | Args.Store.Dynamo a ->
+            | Args.StoreArgs.Dynamo a ->
                 let context = a.Connect() |> DynamoStoreContext.create
                 Domain.Config.Store.Dynamo (context, cache)
-            | Args.Store.Esdb a ->
+            | Args.StoreArgs.Esdb a ->
                 let context = a.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
                 Domain.Config.Store.Esdb (context, cache)
 
     /// Parse the commandline; can throw exceptions in response to missing arguments and/or `-h`/`--help` args
     let parse tryGetConfigValue argv =
         let programName = Reflection.Assembly.GetEntryAssembly().GetName().Name
-        let parser = ArgumentParser.Create<Parameters>(programName=programName)
+        let parser = ArgumentParser.Create<Parameters>(programName = programName)
         Arguments(Configuration tryGetConfigValue, parser.ParseCommandLine argv)
 
 let run (args : Args.Arguments) =
@@ -79,10 +78,10 @@ let main argv =
     try let args = Args.parse EnvVar.tryGet argv
         let metrics = Sinks.tags AppName |> Sinks.equinoxMetricsOnly
         try Log.Logger <- LoggerConfiguration()
-              .Configure(args.Verbose)
-              .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
-              .Sinks(metrics, args.VerboseStore)
-              .CreateLogger()
+                .Configure(args.Verbose)
+                .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
+                .Sinks(metrics, args.StoreVerbose)
+                .CreateLogger()
             try run args; 0
             with e when not (e :? Args.MissingArg) -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()
