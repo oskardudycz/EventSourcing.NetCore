@@ -84,9 +84,9 @@ module Config =
     let private create_ shouldClose cat = Service(shouldClose, streamName >> Config.createDecider cat)
     let private (|Category|) = function
         | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
-        | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
         | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
         | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
+        | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
     let shouldClose maxItemsPerEpoch candidateItems currentItems = Array.length currentItems + Array.length candidateItems >= maxItemsPerEpoch
     let create maxItemsPerEpoch (Category cat) = create_ (shouldClose maxItemsPerEpoch) cat
 
@@ -116,7 +116,7 @@ module Reader =
 
         let private (|Category|) = function
             | Config.Store.Memory store ->            Config.Memory.create Events.codec initial fold store
-            | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec initial fold (context, cache)
             | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createUnoptimized Events.codecJsonElement initial fold (context, cache)
             | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec initial fold (context, cache)
+            | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec initial fold (context, cache)
         let create (Category cat) = Service(streamName >> Config.createDecider cat)

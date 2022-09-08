@@ -53,7 +53,7 @@ module Config =
 
     let private (|Category|) = function
         | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
-        | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
         | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createSnapshotted Events.codecJsonElement Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
         | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createSnapshotted Events.codec Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
+        | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
     let create (Category cat) = Service(streamName >> Config.createDecider cat)
