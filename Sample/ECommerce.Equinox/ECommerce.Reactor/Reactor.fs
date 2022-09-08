@@ -2,7 +2,6 @@ module ECommerce.Reactor.Reactor
 
 open ECommerce.Domain
 open ECommerce.Infrastructure // Exception
-open ECommerce.Reactor.Infrastructure // SourceConfig
 open Metrics
 
 /// Gathers stats based on the outcome of each Span processed for emission, at intervals controlled by `StreamsConsumer`
@@ -28,7 +27,7 @@ type Stats(log, statsInterval, stateInterval, verboseStore, ?logExternalStats) =
         base.DumpStats()
 
 let isReactionStream = function
-    | struct (ShoppingCart.Category, _) -> true
+    | ShoppingCart.Category -> true
     | _ -> false
 
 let handle
