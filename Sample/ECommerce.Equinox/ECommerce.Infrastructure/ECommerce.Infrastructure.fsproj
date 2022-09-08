@@ -16,10 +16,10 @@
         <PackageReference Include="Equinox.CosmosStore.Prometheus" Version="4.0.0-beta.12" />
         <PackageReference Include="Equinox.DynamoStore.Prometheus" Version="4.0.0-beta.12" />
         <PackageReference Include="prometheus-net.AspNetCore" Version="3.6.0" />
-        <PackageReference Include="Propulsion.CosmosStore" Version="3.0.0-beta.2" />
-        <PackageReference Include="Propulsion.DynamoStore" Version="3.0.0-beta.2" />
-        <PackageReference Include="Propulsion.EventStoreDb" Version="3.0.0-beta.2" />
-        <PackageReference Include="Propulsion.MemoryStore" Version="3.0.0-beta.2" />
+        <PackageReference Include="Propulsion.CosmosStore" Version="3.0.0-beta.3" />
+        <PackageReference Include="Propulsion.DynamoStore" Version="3.0.0-beta.3" />
+        <PackageReference Include="Propulsion.EventStoreDb" Version="3.0.0-beta.3" />
+        <PackageReference Include="Propulsion.MemoryStore" Version="3.0.0-beta.3" />
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
     </ItemGroup>
