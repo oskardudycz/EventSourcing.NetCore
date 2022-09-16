@@ -66,9 +66,20 @@ module Esdb =
     let createLatestKnownEvent codec initial fold (context, cache) =
         createCached codec initial fold (Some Equinox.EventStoreDb.AccessStrategy.LatestKnownEvent) (context, cache)
 
+module Sss =
+
+    let private createCached codec initial fold accessStrategy (context, cache) =
+        let cacheStrategy = Equinox.SqlStreamStore.CachingStrategy.SlidingWindow (cache, defaultCacheDuration)
+        Equinox.SqlStreamStore.SqlStreamStoreCategory(context, codec, fold, initial, cacheStrategy, ?access = accessStrategy)
+    let createUnoptimized codec initial fold (context, cache) =
+        createCached codec initial fold None (context, cache)
+    let createLatestKnownEvent codec initial fold (context, cache) =
+        createCached codec initial fold (Some Equinox.SqlStreamStore.AccessStrategy.LatestKnownEvent) (context, cache)
+
 [<NoComparison; NoEquality; RequireQualifiedAccess>]
 type Store<'t> =
     | Memory of Equinox.MemoryStore.VolatileStore<'t>
     | Cosmos of Equinox.CosmosStore.CosmosStoreContext * Equinox.Core.ICache
     | Dynamo of Equinox.DynamoStore.DynamoStoreContext * Equinox.Core.ICache
     | Esdb of Equinox.EventStoreDb.EventStoreContext * Equinox.Core.ICache
+    | Sss of Equinox.SqlStreamStore.SqlStreamStoreContext * Equinox.Core.ICache

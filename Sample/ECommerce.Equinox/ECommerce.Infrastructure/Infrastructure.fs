@@ -87,8 +87,12 @@ module DynamoStoreContext =
 module EventStoreContext =
 
     let create (storeConnection : Equinox.EventStoreDb.EventStoreConnection) =
-        let batchingPolicy = Equinox.EventStoreDb.BatchingPolicy(maxBatchSize = 200)
-        Equinox.EventStoreDb.EventStoreContext(storeConnection, batchingPolicy)
+        Equinox.EventStoreDb.EventStoreContext(storeConnection, batchSize = 200)
+
+module SqlStreamStoreContext =
+
+    let create (storeConnection : Equinox.SqlStreamStore.SqlStreamStoreConnection) =
+        Equinox.SqlStreamStore.SqlStreamStoreContext(storeConnection, batchSize = 200)
 
 /// Equinox and Propulsion provide metrics as properties in log emissions
 /// These helpers wire those to pass through virtual Log Sinks that expose them as Prometheus metrics.
