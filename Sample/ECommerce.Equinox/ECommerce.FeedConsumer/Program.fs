@@ -31,7 +31,8 @@ module Args =
 
         | [<CliPrefix(CliPrefix.None); Unique; Last>] Cosmos of ParseResults<Args.Cosmos.Parameters>
         | [<CliPrefix(CliPrefix.None); Unique; Last>] Dynamo of ParseResults<Args.Dynamo.Parameters>
-        | [<CliPrefix(CliPrefix.None); Last>] Esdb of ParseResults<Args.Esdb.Parameters>
+        | [<CliPrefix(CliPrefix.None); Unique; Last>] Esdb of ParseResults<Args.Esdb.Parameters>
+        | [<CliPrefix(CliPrefix.None); Unique; Last>] Sss of ParseResults<Args.Sss.Parameters>
         interface IArgParserTemplate with
             member a.Usage = a |> function
                 | Verbose _ ->              "request verbose logging."
@@ -44,6 +45,7 @@ module Args =
                 | Cosmos _ ->               "specify CosmosDB input parameters"
                 | Dynamo _ ->               "specify DynamoDB input parameters"
                 | Esdb _ ->                 "specify EventStore input parameters"
+                | Sss _ ->                  "specify SqlStreamStore input parameters"
 
     type Arguments(c : Configuration, a : ParseResults<Parameters>) =
         member val Verbose =                a.Contains Verbose
@@ -65,25 +67,30 @@ module Args =
             | Some (Parameters.Dynamo dynamo) -> Args.StoreArgs.Dynamo (Args.Dynamo.Arguments(c, dynamo))
             | Some (Parameters.Esdb es) ->       Args.StoreArgs.Esdb   (Args.Esdb.Arguments(c, es))
             | _ -> Args.missingArg "Must specify one of cosmos, dynamo or esdb for store"
-        member x.StoreVerbose =             Args.StoreArgs.verboseRequested x.StoreArgs
+        member x.VerboseStore =             Args.StoreArgs.verboseRequested x.StoreArgs
         member x.DumpStoreMetrics =         Args.StoreArgs.dumpMetrics x.StoreArgs
         member x.Connect() : Config.Store<_> * Propulsion.Feed.IFeedCheckpointStore =
             let cache = Equinox.Cache(AppName, sizeMb = x.CacheSizeMb)
-            let createCheckpoints = Args.CheckpointStore.create (x.ConsumerGroupName, x.CheckpointInterval) Config.log
+            let createCheckpoints = Args.Checkpoints.create (x.ConsumerGroupName, x.CheckpointInterval) Config.log
             match x.StoreArgs with
             | Args.StoreArgs.Cosmos a ->
                 let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
                 let store = Config.Store.Cosmos (context, cache)
-                store, createCheckpoints (Args.CheckpointStore.Config.Cosmos (context, cache))
+                store, createCheckpoints (Args.Checkpoints.Store.Cosmos (context, cache))
             | Args.StoreArgs.Dynamo a ->
                 let context = a.Connect() |> DynamoStoreContext.create
                 let store = Config.Store.Dynamo (context, cache)
-                store, createCheckpoints (Args.CheckpointStore.Config.Dynamo (context, cache))
+                store, createCheckpoints (Args.Checkpoints.Store.Dynamo (context, cache))
             | Args.StoreArgs.Esdb a ->
                 let context = a.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
                 let store = Config.Store.Esdb (context, cache)
-                let checkpointStore = Args.Esdb.TargetStoreArgs.connectCheckpointStore a.TargetStoreArgs cache
+                let checkpointStore = a.ConnectCheckpointStore(cache)
                 store, createCheckpoints checkpointStore
+            | Args.StoreArgs.Sss a ->
+                let context = a.Connect() |> SqlStreamStoreContext.create
+                let store = Config.Store.Sss (context, cache)
+                let checkpointStore = a.CreateCheckpointStoreSql(x.ConsumerGroupName)
+                store, checkpointStore
 
     /// Parse the commandline; can throw exceptions in response to missing arguments and/or `-h`/`--help` args
     let parse tryGetConfigValue argv =
@@ -122,7 +129,7 @@ let run args = async {
 let main argv =
     try let args = Args.parse EnvVar.tryGet argv
         try let metrics = Sinks.equinoxAndPropulsionFeedConsumerMetrics (Sinks.tags AppName)
-            Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.StoreVerbose).CreateLogger()
+            Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.VerboseStore).CreateLogger()
             try run args |> Async.RunSynchronously; 0
             with e when not (e :? Args.MissingArg) && not (e :? System.Threading.Tasks.TaskCanceledException) -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()

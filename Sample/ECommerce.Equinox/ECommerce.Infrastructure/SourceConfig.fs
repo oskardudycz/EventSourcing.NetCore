@@ -23,6 +23,13 @@ type SourceConfig =
         * batchSize : int
         * tailSleepInterval : TimeSpan
         * statsInterval : TimeSpan
+    | Sss of client : SqlStreamStore.IStreamStore
+        * checkpoints : Propulsion.Feed.IFeedCheckpointStore
+        * hydrateBodies : bool
+        * startFromTail : bool
+        * batchSize : int
+        * tailSleepInterval : TimeSpan
+        * statsInterval : TimeSpan
 and [<NoEquality; NoComparison>] CosmosFeedConfig =
     | Ephemeral of processorName : string
     | Persistent of processorName : string * startFromTail : bool * maxItems : int option * lagFrequency : TimeSpan
@@ -68,8 +75,8 @@ module SourceConfig =
                     log, statsInterval,
                     indexStore, batchSizeCutoff, tailSleepInterval,
                     checkpoints, sink, loadMode,
-                    startFromTail = startFromTail, storeLog = storeLog,
-                    trancheIds = [|Propulsion.Feed.TrancheId.parse "0"|]) // TEMP filter for additional clones of index data in target Table
+                    startFromTail = startFromTail, storeLog = storeLog)
+                    // trancheIds = [|Propulsion.Feed.TrancheId.parse "0"|]) // TEMP filter for additional clones of index data in target Table
             source.Start(), Some (fun propagationDelay -> source.Monitor.AwaitCompletion(propagationDelay, ignoreSubsequent = false))
     module Esdb =
         open Propulsion.EventStoreDb
@@ -77,6 +84,16 @@ module SourceConfig =
             (client, checkpoints, hydrateBodies, startFromTail, batchSize, tailSleepInterval, statsInterval) : Propulsion.Pipeline * (TimeSpan -> Async<unit>) option =
             let source =
                 EventStoreSource(
+                    log, statsInterval,
+                    client, batchSize, tailSleepInterval,
+                    checkpoints, sink, categoryFilter, hydrateBodies = hydrateBodies, startFromTail = startFromTail)
+            source.Start(), Some (fun propagationDelay -> source.Monitor.AwaitCompletion(propagationDelay, ignoreSubsequent = false))
+    module Sss =
+        open Propulsion.SqlStreamStore
+        let start log (sink : Propulsion.Streams.Default.Sink) categoryFilter
+            (client, checkpoints, hydrateBodies, startFromTail, batchSize, tailSleepInterval, statsInterval) : Propulsion.Pipeline * (TimeSpan -> Async<unit>) option =
+            let source =
+                SqlStreamStoreSource(
                     log, statsInterval,
                     client, batchSize, tailSleepInterval,
                     checkpoints, sink, categoryFilter, hydrateBodies = hydrateBodies, startFromTail = startFromTail)
@@ -91,3 +108,5 @@ module SourceConfig =
             Dynamo.start (log, storeLog) sink categoryFilter (indexStore, checkpoints, loading, startFromTail, tailSleepInterval, batchSizeCutoff, statsInterval)
         | SourceConfig.Esdb (client, checkpoints, hydrateBodies, startFromTail, batchSize, tailSleepInterval, statsInterval) ->
             Esdb.start log sink categoryFilter (client, checkpoints, hydrateBodies, startFromTail, batchSize, tailSleepInterval, statsInterval)
+        | SourceConfig.Sss (client, checkpoints, hydrateBodies, startFromTail, batchSize, tailSleepInterval, statsInterval) ->
+            Sss.start log sink categoryFilter (client, checkpoints, hydrateBodies, startFromTail, batchSize, tailSleepInterval, statsInterval)
