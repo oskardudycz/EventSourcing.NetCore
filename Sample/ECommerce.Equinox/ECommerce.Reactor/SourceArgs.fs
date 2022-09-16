@@ -1,10 +1,10 @@
-module ECommerce.Reactor.SourceArgs
+module ECommerce.Infrastructure.SourceArgs
 
 open Argu
-open ECommerce.Domain // Config etc
-open ECommerce.Infrastructure // Args etc
 open Serilog
 open System
+
+module Config = ECommerce.Domain.Config
 
 type Configuration(tryGet) =
     inherit Args.Configuration(tryGet)
@@ -24,10 +24,10 @@ module Cosmos =
 
         | [<AltCommandLine "-a"; Unique>]   LeaseContainer of string
         | [<AltCommandLine "-Z"; Unique>]   FromTail
-        | [<AltCommandLine "-mi"; Unique>]  MaxItems of int
+        | [<AltCommandLine "-b"; Unique>]   MaxItems of int
         | [<AltCommandLine "-l"; Unique>]   LagFreqM of float
         interface IArgParserTemplate with
-            member a.Usage = a |> function
+            member p.Usage = p |> function
                 | Verbose ->                "request Verbose Logging from ChangeFeedProcessor and Store. Default: off"
                 | ConnectionMode _ ->       "override the connection mode. Default: Direct."
                 | Connection _ ->           "specify a connection string for a Cosmos account. (optional if environment variable EQUINOX_COSMOS_CONNECTION specified)"
@@ -42,21 +42,21 @@ module Cosmos =
                 | MaxItems _ ->             "maximum item count to supply for the Change Feed query. Default: use response size limit"
                 | LagFreqM _ ->             "specify frequency (minutes) to dump lag stats. Default: 1"
 
-    type Arguments(c : Args.Configuration, a : ParseResults<Parameters>) =
-        let discovery =                     a.TryGetResult Connection |> Option.defaultWith (fun () -> c.CosmosConnection) |> Equinox.CosmosStore.Discovery.ConnectionString
-        let mode =                          a.TryGetResult ConnectionMode
-        let timeout =                       a.GetResult(Timeout, 5.) |> TimeSpan.FromSeconds
-        let retries =                       a.GetResult(Retries, 9)
-        let maxRetryWaitTime =              a.GetResult(RetriesWaitTime, 30.) |> TimeSpan.FromSeconds
+    type Arguments(c : Args.Configuration, p : ParseResults<Parameters>) =
+        let discovery =                     p.TryGetResult Connection |> Option.defaultWith (fun () -> c.CosmosConnection) |> Equinox.CosmosStore.Discovery.ConnectionString
+        let mode =                          p.TryGetResult ConnectionMode
+        let timeout =                       p.GetResult(Timeout, 5.) |> TimeSpan.FromSeconds
+        let retries =                       p.GetResult(Retries, 9)
+        let maxRetryWaitTime =              p.GetResult(RetriesWaitTime, 30.) |> TimeSpan.FromSeconds
         let connector =                     Equinox.CosmosStore.CosmosStoreConnector(discovery, timeout, retries, maxRetryWaitTime, ?mode = mode)
-        let database =                      a.TryGetResult Database  |> Option.defaultWith (fun () -> c.CosmosDatabase)
-        let containerId =                   a.TryGetResult Container |> Option.defaultWith (fun () -> c.CosmosContainer)
-        let leaseContainerId =              a.GetResult(LeaseContainer, containerId + "-aux")
-        let fromTail =                      a.Contains FromTail
-        let maxItems =                      a.TryGetResult MaxItems
+        let database =                      p.TryGetResult Database  |> Option.defaultWith (fun () -> c.CosmosDatabase)
+        let containerId =                   p.TryGetResult Container |> Option.defaultWith (fun () -> c.CosmosContainer)
+        let leaseContainerId =              p.GetResult(LeaseContainer, containerId + "-aux")
+        let fromTail =                      p.Contains FromTail
+        let maxItems =                      p.TryGetResult MaxItems
         let tailSleepInterval =             TimeSpan.FromMilliseconds 500.
-        let lagFrequency =                  a.GetResult(LagFreqM, 1.) |> TimeSpan.FromMinutes
-        member _.Verbose =                  a.Contains Verbose
+        let lagFrequency =                  p.GetResult(LagFreqM, 1.) |> TimeSpan.FromMinutes
+        member _.Verbose =                  p.Contains Verbose
         member private _.ConnectLeases() =  connector.CreateUninitialized(database, leaseContainerId)
         member x.MonitoringParams(log : ILogger) =
             let leases : Microsoft.Azure.Cosmos.Container = x.ConnectLeases()
@@ -64,7 +64,8 @@ module Cosmos =
                 leases.Database.Id, leases.Id, Option.toNullable maxItems)
             if fromTail then log.Warning("(If new projector group) Skipping projection of all existing events.")
             (leases, fromTail, maxItems, tailSleepInterval, lagFrequency)
-        member x.ConnectStoreAndMonitored() = connector.ConnectStoreAndMonitored(database, containerId)
+        member x.ConnectStoreAndMonitored() =
+            connector.ConnectStoreAndMonitored(database, containerId)
 
 module Dynamo =
 
@@ -78,11 +79,11 @@ module Dynamo =
         | [<AltCommandLine "-rt">]          RetriesTimeoutS of float
         | [<AltCommandLine "-i">]           IndexTable of string
         | [<AltCommandLine "-is">]          IndexSuffix of string
-        | [<AltCommandLine "-mi"; Unique>]  MaxItems of int
+        | [<AltCommandLine "-b"; Unique>]   MaxItems of int
         | [<AltCommandLine "-Z"; Unique>]   FromTail
         | [<AltCommandLine "-d">]           StreamsDop of int
         interface IArgParserTemplate with
-            member a.Usage = a |> function
+            member p.Usage = p |> function
                 | Verbose ->                "Include low level Store logging."
                 | ServiceUrl _ ->           "specify a server endpoint for a Dynamo account. (optional if environment variable " + Args.SERVICE_URL + " specified)"
                 | AccessKey _ ->            "specify an access key id for a Dynamo account. (optional if environment variable " + Args.ACCESS_KEY + " specified)"
@@ -96,30 +97,30 @@ module Dynamo =
                 | FromTail _ ->             "(iff the Consumer Name is fresh) - force skip to present Position. Default: Never skip an event."
                 | StreamsDop _ ->           "parallelism when loading events from Store Feed Source. Default 4"
 
-    type Arguments(c : Configuration, a : ParseResults<Parameters>) =
-        let serviceUrl =                    a.TryGetResult ServiceUrl |> Option.defaultWith (fun () -> c.DynamoServiceUrl)
-        let accessKey =                     a.TryGetResult AccessKey  |> Option.defaultWith (fun () -> c.DynamoAccessKey)
-        let secretKey =                     a.TryGetResult SecretKey  |> Option.defaultWith (fun () -> c.DynamoSecretKey)
-        let table =                         a.TryGetResult Table      |> Option.defaultWith (fun () -> c.DynamoTable)
-        let indexSuffix =                   a.GetResult(IndexSuffix, "-index")
-        let indexTable =                    a.TryGetResult IndexTable |> Option.orElseWith  (fun () -> c.DynamoIndexTable) |> Option.defaultWith (fun () -> table + indexSuffix)
-        let fromTail =                      a.Contains FromTail
+    type Arguments(c : Configuration, p : ParseResults<Parameters>) =
+        let serviceUrl =                    p.TryGetResult ServiceUrl |> Option.defaultWith (fun () -> c.DynamoServiceUrl)
+        let accessKey =                     p.TryGetResult AccessKey  |> Option.defaultWith (fun () -> c.DynamoAccessKey)
+        let secretKey =                     p.TryGetResult SecretKey  |> Option.defaultWith (fun () -> c.DynamoSecretKey)
+        let table =                         p.TryGetResult Table      |> Option.defaultWith (fun () -> c.DynamoTable)
+        let indexSuffix =                   p.GetResult(IndexSuffix, "-index")
+        let indexTable =                    p.TryGetResult IndexTable |> Option.orElseWith  (fun () -> c.DynamoIndexTable) |> Option.defaultWith (fun () -> table + indexSuffix)
+        let fromTail =                      p.Contains FromTail
         let tailSleepInterval =             TimeSpan.FromMilliseconds 500.
-        let maxItems =                      a.GetResult(MaxItems, 100)
-        let streamsDop =                    a.GetResult(StreamsDop, 4)
-        let timeout =                       a.GetResult(RetriesTimeoutS, 60.) |> TimeSpan.FromSeconds
-        let retries =                       a.GetResult(Retries, 9)
+        let batchSizeCutoff =               p.GetResult(MaxItems, 100)
+        let streamsDop =                    p.GetResult(StreamsDop, 4)
+        let timeout =                       p.GetResult(RetriesTimeoutS, 60.) |> TimeSpan.FromSeconds
+        let retries =                       p.GetResult(Retries, 9)
         let connector =                     Equinox.DynamoStore.DynamoStoreConnector(serviceUrl, accessKey, secretKey, timeout, retries)
         let client =                        connector.CreateClient()
         let indexStoreClient =              lazy client.ConnectStore("Index", indexTable)
-        member val Verbose =                a.Contains Verbose
+        member val Verbose =                p.Contains Verbose
         member _.Connect() =                connector.LogConfiguration()
                                             client.ConnectStore("Main", table) |> DynamoStoreContext.create
         member _.MonitoringParams(log : ILogger) =
-            log.Information("DynamoStoreSource MaxItems {maxItems} Hydrater parallelism {streamsDop}", maxItems, streamsDop)
+            log.Information("DynamoStoreSource BatchSizeCutoff {batchSizeCutoff} Hydrater parallelism {streamsDop}", batchSizeCutoff, streamsDop)
             let indexStoreClient = indexStoreClient.Value
             if fromTail then log.Warning("(If new projector group) Skipping projection of all existing events.")
-            indexStoreClient, fromTail, maxItems, tailSleepInterval, streamsDop
+            indexStoreClient, fromTail, batchSizeCutoff, tailSleepInterval, streamsDop
         member _.CreateCheckpointStore(group, cache) =
             let indexTable = indexStoreClient.Value
             indexTable.CreateCheckpointService(group, cache, Config.log)
@@ -133,13 +134,13 @@ module Esdb =
         | [<AltCommandLine "-o">]           Timeout of float
         | [<AltCommandLine "-r">]           Retries of int
 
-        | [<AltCommandLine "-mi"; Unique>]  MaxItems of int
+        | [<AltCommandLine "-b"; Unique>]   BatchSize of int
         | [<AltCommandLine "-Z"; Unique>]   FromTail
 
-        | [<CliPrefix(CliPrefix.None); Unique(*ExactlyOnce is not supported*); Last>] Cosmos of ParseResults<Args.Cosmos.Parameters>
-        | [<CliPrefix(CliPrefix.None); Unique(*ExactlyOnce is not supported*); Last>] Dynamo of ParseResults<Args.Dynamo.Parameters>
+        | [<CliPrefix(CliPrefix.None); Unique; Last>] Cosmos of ParseResults<Args.Cosmos.Parameters>
+        | [<CliPrefix(CliPrefix.None); Unique; Last>] Dynamo of ParseResults<Args.Dynamo.Parameters>
         interface IArgParserTemplate with
-            member a.Usage = a |> function
+            member p.Usage = p |> function
                 | Verbose ->                "Include low level Store logging."
                 | Connection _ ->           "EventStore Connection String. (optional if environment variable EQUINOX_ES_CONNECTION specified)"
                 | Credentials _ ->          "Credentials string for EventStore (used as part of connection string, but NOT logged). Default: use EQUINOX_ES_CREDENTIALS environment variable (or assume no credentials)"
@@ -147,23 +148,22 @@ module Esdb =
                 | Retries _ ->              "specify operation retries. Default: 3."
 
                 | FromTail ->               "Start the processing from the Tail"
-                | MaxItems _ ->             "maximum events to load in a batch. Default: 100"
+                | BatchSize _ ->            "maximum events to load in a batch. Default: 100"
 
                 | Cosmos _ ->               "CosmosDB Target Store parameters (also used for checkpoint storage)."
                 | Dynamo _ ->               "DynamoDB Target Store parameters (also used for checkpoint storage)."
-
-    type Arguments(c : Configuration, a : ParseResults<Parameters>) =
-        let connectionStringLoggable =      a.TryGetResult Connection |> Option.defaultWith (fun () -> c.EventStoreConnection)
-        let credentials =                   a.TryGetResult Credentials |> Option.orElseWith (fun () -> c.EventStoreCredentials)
+    type Arguments(c : Configuration, p : ParseResults<Parameters>) =
+        let startFromTail =                 p.Contains FromTail
+        let batchSize =                     p.GetResult(BatchSize, 100)
+        let tailSleepInterval =             TimeSpan.FromSeconds 0.5
+        let connectionStringLoggable =      p.TryGetResult Connection |> Option.defaultWith (fun () -> c.EventStoreConnection)
+        let credentials =                   p.TryGetResult Credentials |> Option.orElseWith (fun () -> c.MaybeEventStoreCredentials)
         let discovery =                     match credentials with Some x -> String.Join(";", connectionStringLoggable, x) | None -> connectionStringLoggable
                                             |> Equinox.EventStoreDb.Discovery.ConnectionString
-        let startFromTail =                 a.Contains FromTail
-        let maxItems =                      a.GetResult(MaxItems, 100)
-        let tailSleepInterval =             TimeSpan.FromSeconds 0.5
-        let retries =                       a.GetResult(Retries, 3)
-        let timeout =                       a.GetResult(Timeout, 20.) |> TimeSpan.FromSeconds
+        let retries =                       p.GetResult(Retries, 3)
+        let timeout =                       p.GetResult(Timeout, 20.) |> TimeSpan.FromSeconds
         let checkpointInterval =            TimeSpan.FromHours 1.
-        member val Verbose =                a.Contains Verbose
+        member val Verbose =                p.Contains Verbose
 
         member _.Connect(log : ILogger, appName, nodePreference) : Equinox.EventStoreDb.EventStoreConnection =
             log.Information("EventStore {discovery}", connectionStringLoggable)
@@ -171,28 +171,84 @@ module Esdb =
             Equinox.EventStoreDb.EventStoreConnector(timeout, retries, tags = tags)
                 .Establish(appName, discovery, Equinox.EventStoreDb.ConnectionStrategy.ClusterSingle nodePreference)
 
-        member private _.TargetStoreArgs : Args.Esdb.TargetStoreArgs =
-            match a.GetSubCommand() with
-            | Cosmos cosmos -> Args.Esdb.TargetStoreArgs.Cosmos (Args.Cosmos.Arguments(c, cosmos))
-            | Dynamo dynamo -> Args.Esdb.TargetStoreArgs.Dynamo (Args.Dynamo.Arguments(c, dynamo))
-            | _ -> Args.missingArg "Must specify `cosmos` or `dynamo` target store when source is `esdb`"
-
         member _.MonitoringParams(log : ILogger) =
-            log.Information("EventStoreSource MaxItems {maxItems} ", maxItems)
-            startFromTail, maxItems, tailSleepInterval
-        member x.ConnectTarget(cache) : Config.Store<_> =
-            match x.TargetStoreArgs with
-            | EsdbTargetStore.Cosmos a ->
-                let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
-                Config.Store.Cosmos (context, cache)
-            | EsdbTargetStore.Dynamo a ->
-                let context = a.Connect() |> DynamoStoreContext.create
-                Config.Store.Dynamo (context, cache)
-        member _.CreateCheckpointStore(group, store : Config.Store<_>) : Propulsion.Feed.IFeedCheckpointStore =
-            let checkpointStore =
-                match store with
-                | Config.Store.Cosmos (context, cache) -> Args.CheckpointStore.Config.Cosmos (context, cache)
-                | Config.Store.Dynamo (context, cache) -> Args.CheckpointStore.Config.Dynamo (context, cache)
-                | Config.Store.Memory _ | Config.Store.Esdb _ -> failwith "unexpected"
-            Args.CheckpointStore.create (group, checkpointInterval) Config.log checkpointStore
-    and  EsdbTargetStore = Args.Esdb.TargetStoreArgs
+            log.Information("EventStoreSource BatchSize {batchSize} ", batchSize)
+            startFromTail, batchSize, tailSleepInterval
+        member _.CreateCheckpointStore(group, store) : Propulsion.Feed.IFeedCheckpointStore =
+            Args.Checkpoints.createCheckpointStore (group, checkpointInterval, store)
+        member private _.TargetStoreArgs : Args.StoreArgs =
+            match p.GetSubCommand() with
+            | Cosmos cosmos -> Args.StoreArgs.Cosmos (Args.Cosmos.Arguments(c, cosmos))
+            | Dynamo dynamo -> Args.StoreArgs.Dynamo (Args.Dynamo.Arguments(c, dynamo))
+            | _ -> Args.missingArg "Must specify `cosmos` or `dynamo` target store when source is `esdb`"
+        member x.ConnectTarget(cache) =
+            Args.StoreArgs.connectTarget x.TargetStoreArgs cache
+
+module Sss =
+
+    // TOCONSIDER: add DB connectors other than MsSql
+    type [<NoEquality; NoComparison>] Parameters =
+        | [<AltCommandLine "-t"; Unique>]   Tail of intervalS: float
+        | [<AltCommandLine "-c"; Unique>]   Connection of string
+        | [<AltCommandLine "-p"; Unique>]   Credentials of string
+        | [<AltCommandLine "-s">]           Schema of string
+
+        | [<AltCommandLine "-b"; Unique>]   BatchSize of int
+        | [<AltCommandLine "-Z"; Unique>]   FromTail
+
+        | [<AltCommandLine "-cc"; Unique>]  CheckpointsConnection of string
+        | [<AltCommandLine "-cp"; Unique>]  CheckpointsCredentials of string
+
+        | [<CliPrefix(CliPrefix.None); Unique; Last>] Cosmos of ParseResults<Args.Cosmos.Parameters>
+        | [<CliPrefix(CliPrefix.None); Unique; Last>] Dynamo of ParseResults<Args.Dynamo.Parameters>
+        interface IArgParserTemplate with
+            member p.Usage = p |> function
+                | Tail _ ->                 "Polling interval in Seconds. Default: 1"
+                | BatchSize _ ->            "Maximum events to request from feed. Default: 512"
+                | Connection _ ->           "Connection string for SqlStreamStore db. Optional if SQLSTREAMSTORE_CONNECTION specified"
+                | Credentials _ ->          "Credentials string for SqlStreamStore db (used as part of connection string, but NOT logged). Default: use SQLSTREAMSTORE_CREDENTIALS environment variable (or assume no credentials)"
+                | Schema _ ->               "Database schema name"
+                | FromTail ->               "Start the processing from the Tail"
+                | CheckpointsConnection _ ->"Connection string for Checkpoints sql db. Optional if SQLSTREAMSTORE_CONNECTION_CHECKPOINTS specified. Default: same as `Connection`"
+                | CheckpointsCredentials _ ->"Credentials string for Checkpoints sql db. (used as part of checkpoints connection string, but NOT logged). Default (when no `CheckpointsConnection`: use `Credentials. Default (when `CheckpointsConnection` specified): use SQLSTREAMSTORE_CREDENTIALS_CHECKPOINTS environment variable (or assume no credentials)"
+                | Cosmos _ ->               "CosmosDB Target Store parameters"
+                | Dynamo _ ->               "DynamoDB Target Store parameters"
+
+    type Arguments(c : Configuration, p : ParseResults<Parameters>) =
+        let startFromTail =                 p.Contains FromTail
+        let tailSleepInterval =             p.GetResult(Tail, 1.) |> TimeSpan.FromSeconds
+        let checkpointEventInterval =       TimeSpan.FromHours 1. // Ignored when storing to Propulsion.SqlStreamStore.ReaderCheckpoint
+        let batchSize =                     p.GetResult(BatchSize, 512)
+        let connection =                    p.TryGetResult Connection |> Option.defaultWith (fun () -> c.SqlStreamStoreConnection)
+        let credentials =                   p.TryGetResult Credentials |> Option.orElseWith (fun () -> c.SqlStreamStoreCredentials) |> Option.toObj
+        let schema =                        p.GetResult(Schema, null)
+
+        member x.BuildCheckpointsConnectionString() =
+            let c, cs =
+                match p.TryGetResult CheckpointsConnection, p.TryGetResult CheckpointsCredentials with
+                | Some c, Some p -> c, String.Join(";", c, p)
+                | None, Some p ->   let c = connection in c, String.Join(";", c, p)
+                | None, None ->     let c = connection in c, String.Join(";", c, credentials)
+                | Some cc, None ->  let p = c.SqlStreamStoreCredentialsCheckpoints |> Option.toObj
+                                    cc, String.Join(";", cc, p)
+            Log.Information("Checkpoints MsSql Connection {connectionString}", c)
+            cs
+        member x.Connect() =
+            let conn, creds, schema, autoCreate = connection, credentials, schema, false
+            let sssConnectionString = String.Join(";", conn, creds)
+            Log.Information("SqlStreamStore MsSql Connection {connectionString} Schema {schema} AutoCreate {autoCreate}", conn, schema, autoCreate)
+            let rawStore = Equinox.SqlStreamStore.MsSql.Connector(sssConnectionString, schema, autoCreate=autoCreate).Connect() |> Async.RunSynchronously
+            Equinox.SqlStreamStore.SqlStreamStoreConnection rawStore
+        member _.MonitoringParams(log : ILogger) =
+            log.Information("SqlStreamStoreSource BatchSize {batchSize} ", batchSize)
+            startFromTail, batchSize, tailSleepInterval
+        member private _.TargetStoreArgs : Args.StoreArgs =
+            match p.GetSubCommand() with
+            | Cosmos cosmos -> Args.StoreArgs.Cosmos (Args.Cosmos.Arguments(c, cosmos))
+            | Dynamo dynamo -> Args.StoreArgs.Dynamo (Args.Dynamo.Arguments(c, dynamo))
+            | _ -> Args.missingArg "Must specify `cosmos` or `dynamo` target store when source is `sss`"
+        member x.CreateCheckpointStoreSql(groupName) : Propulsion.Feed.IFeedCheckpointStore =
+            let connectionString = x.BuildCheckpointsConnectionString()
+            Propulsion.SqlStreamStore.ReaderCheckpoint.Service(connectionString, groupName, checkpointEventInterval)
+        member x.ConnectTarget(cache) =
+            Args.StoreArgs.connectTarget x.TargetStoreArgs cache

@@ -22,6 +22,7 @@ module Args =
         | [<CliPrefix(CliPrefix.None); Last>] Cosmos of ParseResults<Args.Cosmos.Parameters>
         | [<CliPrefix(CliPrefix.None); Last>] Dynamo of ParseResults<Args.Dynamo.Parameters>
         | [<CliPrefix(CliPrefix.None); Last>] Esdb of ParseResults<Args.Esdb.Parameters>
+        | [<CliPrefix(CliPrefix.None); Last>] Sss of ParseResults<Args.Sss.Parameters>
         interface IArgParserTemplate with
             member a.Usage = a |> function
                 | Verbose _ ->              "request verbose logging."
@@ -29,6 +30,7 @@ module Args =
                 | Cosmos _ ->               "specify CosmosDB input parameters"
                 | Dynamo _ ->               "specify DynamoDB input parameters"
                 | Esdb _ ->                 "specify EventStore input parameters"
+                | Sss _ ->                  "specify SqlStreamStore input parameters"
     and [<RequireQualifiedAccess>]
         Arguments(c : Configuration, a : ParseResults<Parameters>) =
         member val Verbose =                a.Contains Verbose
@@ -39,20 +41,12 @@ module Args =
             | Some (Parameters.Cosmos cosmos) -> Args.StoreArgs.Cosmos (Args.Cosmos.Arguments(c, cosmos))
             | Some (Parameters.Dynamo dynamo) -> Args.StoreArgs.Dynamo (Args.Dynamo.Arguments(c, dynamo))
             | Some (Parameters.Esdb es) ->       Args.StoreArgs.Esdb (Args.Esdb.Arguments(c, es))
-            | _ -> Args.missingArg "Must specify one of cosmos, dynamo or esdb for store"
-        member x.StoreVerbose =             Args.StoreArgs.verboseRequested x.StoreArgs
+            | Some (Parameters.Sss sss) ->       Args.StoreArgs.Sss (Args.Sss.Arguments(c, sss))
+            | _ -> Args.missingArg "Must specify one of cosmos, dynamo, esdb or sss for store"
+        member x.VerboseStore =             Args.StoreArgs.verboseRequested x.StoreArgs
         member x.Connect() : Domain.Config.Store<_> =
             let cache = Equinox.Cache (AppName, sizeMb = x.CacheSizeMb)
-            match x.StoreArgs with
-            | Args.StoreArgs.Cosmos a ->
-                let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
-                Domain.Config.Store.Cosmos (context, cache)
-            | Args.StoreArgs.Dynamo a ->
-                let context = a.Connect() |> DynamoStoreContext.create
-                Domain.Config.Store.Dynamo (context, cache)
-            | Args.StoreArgs.Esdb a ->
-                let context = a.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
-                Domain.Config.Store.Esdb (context, cache)
+            Args.StoreArgs.connectTarget x.StoreArgs cache
 
     /// Parse the commandline; can throw exceptions in response to missing arguments and/or `-h`/`--help` args
     let parse tryGetConfigValue argv =
@@ -80,7 +74,7 @@ let main argv =
         try Log.Logger <- LoggerConfiguration()
                 .Configure(args.Verbose)
                 .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
-                .Sinks(metrics, args.StoreVerbose)
+                .Sinks(metrics, args.VerboseStore)
                 .CreateLogger()
             try run args; 0
             with e when not (e :? Args.MissingArg) -> Log.Fatal(e, "Exiting"); 2

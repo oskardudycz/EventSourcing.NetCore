@@ -61,7 +61,7 @@ module Args =
                                             | Dynamo a -> Choice2Of3 <| SourceArgs.Dynamo.Arguments(c, a)
                                             | Esdb a ->   Choice3Of3 <| SourceArgs.Esdb.Arguments(c, a)
                                             | a -> Args.missingArg $"Unexpected Store subcommand %A{a}"
-        member x.StoreVerbose =             match x.Store with
+        member x.VerboseStore =             match x.Store with
                                             | Choice1Of3 s -> s.Verbose
                                             | Choice2Of3 s -> s.Verbose
                                             | Choice3Of3 s -> s.Verbose
@@ -116,7 +116,7 @@ let build (args : Args.Arguments) =
     let store, buildSourceConfig, targetStore = args.ConnectStoreSourceAndTarget()
     let log = Log.forGroup consumerGroupName // needs to have a `group` tag for Propulsion.Streams Prometheus metrics
     let filter, handle = Reactor.Config.create (store, targetStore)
-    let stats = Reactor.Stats(log, args.StatsInterval, args.StateInterval, args.StoreVerbose, logExternalStats = args.DumpStoreMetrics)
+    let stats = Reactor.Stats(log, args.StatsInterval, args.StateInterval, args.VerboseStore, logExternalStats = args.DumpStoreMetrics)
     let sink = Reactor.Config.StartSink(log, stats, handle, maxReadAhead, maxConcurrentStreams,
                                         wakeForResults = args.WakeForResults, idleDelay = args.IdleDelay, purgeInterval = args.PurgeInterval)
     let source, _awaitSource =
@@ -136,7 +136,7 @@ let run (args : Args.Arguments) = async {
 let main argv =
     try let args = Args.parse EnvVar.tryGet argv
         let metrics = Sinks.tags AppName |> Sinks.equinoxAndPropulsionReactorMetrics
-        try Log.Logger <- LoggerConfiguration().Configure(verbose=args.Verbose).Sinks(metrics, args.StoreVerbose).CreateLogger()
+        try Log.Logger <- LoggerConfiguration().Configure(verbose=args.Verbose).Sinks(metrics, args.VerboseStore).CreateLogger()
             try run args |> Async.RunSynchronously; 0
             with e when not (e :? Args.MissingArg) && not (e :? TaskCanceledException) -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()

@@ -67,5 +67,5 @@ module Config =
         | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
         | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createRollingState Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
         | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createRollingState Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
-        | Config.Store.Esdb (_context, _cache) -> failwith "Not implemented: For EventStore its suggested to do a cached read from the write side"
+        | Config.Store.Esdb _ | Config.Store.Sss _ ->  failwith "Not implemented: For EventStore/Sss its suggested to do a cached read from the write side"
     let create (Category cat) = Service(streamName >> Config.createDecider cat)

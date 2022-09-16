@@ -87,6 +87,7 @@ module Config =
         | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
         | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
         | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
+        | Config.Store.Sss (context, cache) ->    Config.Sss.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
     let shouldClose maxItemsPerEpoch candidateItems currentItems = Array.length currentItems + Array.length candidateItems >= maxItemsPerEpoch
     let create maxItemsPerEpoch (Category cat) = create_ (shouldClose maxItemsPerEpoch) cat
 
@@ -119,4 +120,5 @@ module Reader =
             | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createUnoptimized Events.codecJsonElement initial fold (context, cache)
             | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec initial fold (context, cache)
             | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec initial fold (context, cache)
+            | Config.Store.Sss (context, cache) ->    Config.Sss.createUnoptimized Events.codec initial fold (context, cache)
         let create (Category cat) = Service(streamName >> Config.createDecider cat)
