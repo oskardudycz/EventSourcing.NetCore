@@ -50,14 +50,14 @@ public class CustomerIncidentsSummaryGrouper: IAggregateGrouper<Guid>
 {
     private readonly Type[] eventTypes =
     {
-        typeof(IEvent<IncidentResolved>), typeof(IEvent<ResolutionAcknowledgedByCustomer>),
-        typeof(IEvent<IncidentClosed>)
+        typeof(IncidentResolved), typeof(ResolutionAcknowledgedByCustomer),
+        typeof(IncidentClosed)
     };
 
     public async Task Group(IQuerySession session, IEnumerable<IEvent> events, ITenantSliceGroup<Guid> grouping)
     {
         var filteredEvents = events
-            .Where(ev => eventTypes.Contains(ev.GetType()))
+            .Where(ev => eventTypes.Contains(ev.EventType))
             .ToList();
 
         if (!filteredEvents.Any())
