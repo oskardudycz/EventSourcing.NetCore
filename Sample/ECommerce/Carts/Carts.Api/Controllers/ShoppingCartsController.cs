@@ -135,7 +135,6 @@ public class ShoppingCartsController: Controller
         return pagedList.ToResponse();
     }
 
-
     [HttpGet("{id}/history")]
     public async Task<PagedListResponse<ShoppingCartHistory>> GetHistory(Guid id)
     {
