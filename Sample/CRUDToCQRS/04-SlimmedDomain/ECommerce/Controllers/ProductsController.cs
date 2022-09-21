@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Controllers;
 
+[ApiController]
 [Route("api/[controller]")]
 public class ProductsController: CRUDController<Product>
 {
@@ -25,22 +26,18 @@ public class ProductsController: CRUDController<Product>
     {
         request.Id = Guid.NewGuid();
 
-        return CreateAsync<CreateProductRequest, ProductDetailsResponse>(
-            request,
-            ct
-        );
+        return base.CreateAsync(request, ct);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
     public Task<IActionResult> UpdateAsync(
+        Guid id,
         [FromBody] UpdateProductRequest request,
         CancellationToken ct
     )
     {
-        return UpdateAsync<UpdateProductRequest, ProductDetailsResponse>(
-            request,
-            ct
-        );
+        request.Id = id;
+        return base.UpdateAsync(request, ct);
     }
 
     [HttpDelete("{id:guid}")]
