@@ -1,21 +1,21 @@
+using ECommerce.Core.Requests;
 using ECommerce.Core.Responses;
 using ECommerce.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Core.Controllers;
 
-public abstract class CRUDController<TEntity>: Controller where TEntity : class, IEntity, new()
+public abstract class CRUDController: Controller
 {
-    protected readonly ICRUDService<TEntity> service;
+    protected readonly ICRUDService service;
 
-    protected CRUDController(ICRUDService<TEntity> service)
+    protected CRUDController(ICRUDService service)
     {
         this.service = service;
     }
 
     protected async Task<IActionResult> CreateAsync<TCreateRequest, TCreateResponse>(
         TCreateRequest request,
-        Func<object, string> getCreatedUri,
         CancellationToken ct
     ) where TCreateResponse : ICreatedResponse
     {
@@ -27,7 +27,7 @@ public abstract class CRUDController<TEntity>: Controller where TEntity : class,
     protected async Task<IActionResult> UpdateAsync<TUpdateRequest, TUpdateResponse>(
         TUpdateRequest request,
         CancellationToken ct
-    )
+    ) where TUpdateRequest: IUpdateRequest
     {
         var result = await service.UpdateAsync<TUpdateRequest, TUpdateResponse>(request, ct);
 

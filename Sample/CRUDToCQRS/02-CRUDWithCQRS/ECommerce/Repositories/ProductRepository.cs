@@ -1,9 +1,10 @@
 using ECommerce.Core.Repositories;
+using ECommerce.Model;
 using ECommerce.Storage;
 
-namespace ECommerce.Domain.Products;
+namespace ECommerce.Repositories;
 
-public class ProductRepository: CRUDRepository<ECommerceDbContext, Product>
+public class ProductRepository: Repository<Product>
 {
     public ProductRepository(ECommerceDbContext dbContext) : base(dbContext)
     {

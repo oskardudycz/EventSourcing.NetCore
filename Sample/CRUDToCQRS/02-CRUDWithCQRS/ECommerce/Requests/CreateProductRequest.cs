@@ -9,7 +9,10 @@ public record CreateProductRequest(
     string? Description,
     string ProducerName,
     string? AdditionalInfo
-);
+): ICreateRequest
+{
+    public Guid Id { get; set; }
+}
 
 public record UpdateProductRequest(
     [FromRoute]

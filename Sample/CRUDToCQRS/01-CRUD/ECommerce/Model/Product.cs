@@ -1,6 +1,6 @@
 using ECommerce.Core;
 
-namespace ECommerce.Domain.Products;
+namespace ECommerce.Model;
 
 public class Product: IEntity
 {
