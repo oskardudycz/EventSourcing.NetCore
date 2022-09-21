@@ -1,6 +1,3 @@
-using ECommerce.Core.Requests;
-using Microsoft.AspNetCore.Mvc;
-
 namespace ECommerce.Requests;
 
 public record CreateProductRequest(
@@ -10,12 +7,3 @@ public record CreateProductRequest(
     string ProducerName,
     string? AdditionalInfo
 );
-
-public record UpdateProductRequest(
-    [FromRoute]
-    Guid Id,
-    string Name,
-    string? Description,
-    string ProducerName,
-    string? AdditionalInfo
-): IUpdateRequest;

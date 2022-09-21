@@ -12,13 +12,3 @@ public record CreateProductRequest(
 {
     public Guid Id { get; set; }
 }
-
-public record UpdateProductRequest(
-    string Name,
-    string? Description,
-    string ProducerName,
-    string? AdditionalInfo
-): IUpdateRequest
-{
-    public Guid Id { get; set; }
-};
