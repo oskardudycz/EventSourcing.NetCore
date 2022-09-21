@@ -13,34 +13,28 @@ public abstract class Repository<TEntity>: IRepository<TEntity>
         this.dbContext = dbContext;
     }
 
-    public TEntity Add(TEntity entity)
+    public void Add(TEntity entity)
     {
         if (entity == null)
             throw new ArgumentNullException(nameof(entity));
 
-        var entry = dbContext.Add(entity);
-
-        return entry.Entity;
+        dbContext.Add(entity);
     }
 
-    public TEntity Update(TEntity entity)
+    public void Update(TEntity entity)
     {
         if (entity == null)
             throw new ArgumentNullException(nameof(entity));
 
-        var entry = dbContext.Update(entity);
-
-        return entry.Entity;
+        dbContext.Update(entity);
     }
 
-    public TEntity Delete(TEntity entity)
+    public void Delete(TEntity entity)
     {
         if (entity == null)
             throw new ArgumentNullException(nameof(entity));
 
-        var entry = dbContext.Remove(entity);
-
-        return entry.Entity;
+        dbContext.Remove(entity);
     }
 
     public ValueTask<TEntity?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -54,10 +48,5 @@ public abstract class Repository<TEntity>: IRepository<TEntity>
     public Task SaveChangesAsync(CancellationToken ct)
     {
         return dbContext.SaveChangesAsync(ct);
-    }
-
-    public IQueryable<TEntity> Query()
-    {
-        return dbContext.Set<TEntity>();
     }
 }
