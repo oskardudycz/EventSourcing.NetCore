@@ -1,7 +1,8 @@
 using AutoMapper;
-using ECommerce.Requests;
+using ECommerce.Domain.Products.Contracts.Requests;
+using ECommerce.Domain.Products.Entity;
 
-namespace ECommerce.Model;
+namespace ECommerce.Domain.Products.Config;
 
 public class ProductProfile : Profile
 {
