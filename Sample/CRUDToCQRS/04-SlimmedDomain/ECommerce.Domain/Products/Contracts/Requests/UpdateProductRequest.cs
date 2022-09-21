@@ -2,13 +2,12 @@ using ECommerce.Domain.Core.Requests;
 
 namespace ECommerce.Domain.Products.Contracts.Requests;
 
-public record CreateProductRequest(
-    string Sku,
+public record UpdateProductRequest(
     string Name,
     string? Description,
     string ProducerName,
     string? AdditionalInfo
-): ICreateRequest
+): IUpdateRequest
 {
     public Guid Id { get; set; }
-}
+};
