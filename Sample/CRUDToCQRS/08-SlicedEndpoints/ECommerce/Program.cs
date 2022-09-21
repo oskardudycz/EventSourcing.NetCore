@@ -1,0 +1,29 @@
+using ECommerce.Domain;
+using Microsoft.OpenApi.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+    .AddRouting()
+    .AddECommerce()
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "ECommerce", Version = "V1" });
+    });
+
+var app = builder.Build();
+
+app.UseRouting()
+    .UseEndpoints(endpoints =>
+    {
+        endpoints.UseECommerceEndpoints();
+    })
+    .UseSwagger()
+    .UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce V1");
+        c.RoutePrefix = string.Empty;
+    });
+
+app.Run();
