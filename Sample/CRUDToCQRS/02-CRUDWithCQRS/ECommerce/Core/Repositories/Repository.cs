@@ -2,12 +2,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Core.Repositories;
 
-public class CRUDRepository<TEntity>: ICRUDRepository<TEntity>
+public abstract class Repository<TEntity>: IRepository<TEntity>
     where TEntity : class, IEntity
 {
     private readonly DbContext dbContext;
 
-    protected CRUDRepository(DbContext dbContext)
+    protected Repository(DbContext dbContext)
     {
         this.dbContext = dbContext;
     }
@@ -42,9 +42,12 @@ public class CRUDRepository<TEntity>: ICRUDRepository<TEntity>
         return entry.Entity;
     }
 
-    public ValueTask<TEntity?> FindByIdAsync(Guid id, CancellationToken ct)
+    public ValueTask<TEntity?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return dbContext.Set<TEntity>().FindAsync(new object?[] { id }, ct);
+        return dbContext.Set<TEntity>().FindAsync(
+            new object?[] { id },
+            cancellationToken: cancellationToken
+        );
     }
 
     public Task SaveChangesAsync(CancellationToken ct)

@@ -1,14 +1,21 @@
+using System.Net;
+using ECommerce.Model;
 using ECommerce.Repositories;
 using ECommerce.Services;
 using ECommerce.Storage;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddDbContext<ECommerceDbContext>()
+    .AddTransient(sp => sp.GetRequiredService<ECommerceDbContext>().Set<Product>())
+    .AddTransient(sp => sp.GetRequiredService<ECommerceDbContext>().Set<Product>().AsNoTracking())
+    .AddScoped<ProductReadOnlyRepository>()
     .AddScoped<ProductRepository>()
     .AddScoped<ProductService>()
+    .AddScoped<ProductReadOnlyService>()
     .AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "ECommerce", Version = "V1" });

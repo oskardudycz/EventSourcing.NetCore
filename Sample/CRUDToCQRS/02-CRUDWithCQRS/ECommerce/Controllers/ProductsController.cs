@@ -1,4 +1,5 @@
 using ECommerce.Core.Controllers;
+using ECommerce.Model;
 using ECommerce.Requests;
 using ECommerce.Responses;
 using ECommerce.Services;
@@ -7,9 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace ECommerce.Controllers;
 
 [Route("api/[controller]")]
-public class ProductsController: CRUDController
+public class ProductsController: CRUDController<Product>
 {
-    public ProductsController(ProductService service): base(service)
+    protected override Func<object, string> GetEntityByIdUri { get; } = id => $"/api/Products/{id}";
+
+    public ProductsController(ProductService service, ProductReadOnlyService readOnlyService)
+        : base(service, readOnlyService)
     {
     }
 
@@ -19,6 +23,8 @@ public class ProductsController: CRUDController
         CancellationToken ct
     )
     {
+        request.Id = Guid.NewGuid();
+
         return CreateAsync<CreateProductRequest, ProductDetailsResponse>(
             request,
             ct
@@ -46,7 +52,7 @@ public class ProductsController: CRUDController
     [HttpGet("{id}")]
     public Task<ProductDetailsResponse> GetById(Guid id, CancellationToken ct)
     {
-        return service.GetByIdAsync<ProductDetailsResponse>(id, ct);
+        return ReadOnlyService.GetByIdAsync<ProductDetailsResponse>(id, ct);
     }
 
     [HttpGet]
@@ -56,6 +62,6 @@ public class ProductsController: CRUDController
         [FromQuery] int pageSize = 20
     )
     {
-        return service.GetPagedAsync<ProductShortInfoResponse>(ct, pageNumber, pageSize);
+        return ReadOnlyService.GetPagedAsync<ProductShortInfoResponse>(ct, pageNumber, pageSize);
     }
 }

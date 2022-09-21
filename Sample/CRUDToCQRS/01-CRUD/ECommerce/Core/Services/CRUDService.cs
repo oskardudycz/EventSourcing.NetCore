@@ -1,18 +1,18 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using ECommerce.Core.Repositories;
+using ECommerce.Core.Requests;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Core.Services;
 
-public class CRUDService<TRepository, TEntity>: ICRUDService<TEntity>
-    where TRepository : ICRUDRepository<TEntity>
+public abstract class CRUDService<TEntity>: ICRUDService
     where TEntity : class, IEntity, new()
 {
-    private readonly TRepository repository;
+    private readonly ICRUDRepository<TEntity> repository;
     private readonly IMapper mapper;
 
-    public CRUDService(TRepository repository, IMapper mapper)
+    protected CRUDService(ICRUDRepository<TEntity> repository, IMapper mapper)
     {
         this.repository = repository;
         this.mapper = mapper;
@@ -30,10 +30,14 @@ public class CRUDService<TRepository, TEntity>: ICRUDService<TEntity>
         return await GetByIdAsync<TCreateResponse>(entity.Id, ct);
     }
 
-    public async Task<TUpdateResponse> UpdateAsync<TUpdateRequest, TUpdateResponse>(TUpdateRequest request,
-        CancellationToken ct)
+    public async Task<TUpdateResponse> UpdateAsync<TUpdateRequest, TUpdateResponse>(
+        TUpdateRequest request,
+        CancellationToken ct
+    ) where TUpdateRequest: IUpdateRequest
     {
-        var entity = mapper.Map<TUpdateRequest, TEntity>(request);
+        var entity = await GetEntityByIdAsync(request.Id, ct);
+
+        entity = mapper.Map(request, entity);
 
         repository.Update(entity);
 
@@ -66,6 +70,7 @@ public class CRUDService<TRepository, TEntity>: ICRUDService<TEntity>
             .ProjectTo<TResponse>(mapper.ConfigurationProvider)
             .ToListAsync(ct);
     }
+
     public IQueryable<TEntity> Query()
     {
         return repository.Query();
