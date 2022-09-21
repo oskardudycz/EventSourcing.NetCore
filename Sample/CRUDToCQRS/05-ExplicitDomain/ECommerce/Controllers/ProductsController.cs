@@ -1,7 +1,6 @@
 using ECommerce.Core.Controllers;
 using ECommerce.Domain.Products.Contracts.Requests;
 using ECommerce.Domain.Products.Contracts.Responses;
-using ECommerce.Domain.Products.Entity;
 using ECommerce.Domain.Products.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,47 +8,54 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController: CRUDController<Product>
+public class ProductsController: Controller
 {
-    protected override Func<object, string> GetEntityByIdUri { get; } = id => $"/api/Products/{id}";
+    private readonly ProductService service;
+    private readonly ProductReadOnlyService readOnlyService;
 
     public ProductsController(ProductService service, ProductReadOnlyService readOnlyService)
-        : base(service, readOnlyService)
     {
+        this.service = service;
+        this.readOnlyService = readOnlyService;
     }
 
     [HttpPost]
-    public Task<IActionResult> CreateAsync(
+    public async Task<IActionResult> CreateAsync(
         [FromBody] CreateProductRequest request,
         CancellationToken ct
     )
     {
         request.Id = Guid.NewGuid();
+        await service.CreateAsync(request, ct);
 
-        return base.CreateAsync(request, ct);
+        return this.Created(request.Id);
     }
 
-    [HttpPut("{id:guid}")]
-    public Task<IActionResult> UpdateAsync(
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(
         Guid id,
         [FromBody] UpdateProductRequest request,
         CancellationToken ct
     )
     {
         request.Id = id;
-        return UpdateAsync<UpdateProductRequest>(request, ct);
+        await service.UpdateAsync(request, ct);
+
+        return this.OkWithLocation(id);
     }
 
     [HttpDelete("{id:guid}")]
-    public new Task<IActionResult> DeleteByIdAsync([FromRoute] Guid id, CancellationToken ct)
+    public async Task<IActionResult> DeleteByIdAsync([FromRoute] Guid id, CancellationToken ct)
     {
-        return base.DeleteByIdAsync(id, ct);
+        await service.DeleteByIdAsync(id, ct);
+
+        return NoContent();
     }
 
     [HttpGet("{id}")]
-    public Task<ProductDetailsResponse> GetById(Guid id, CancellationToken ct)
+    public Task<ProductDetailsResponse?> GetById(Guid id, CancellationToken ct)
     {
-        return ReadOnlyService.GetByIdAsync<ProductDetailsResponse>(id, ct);
+        return readOnlyService.GetByIdAsync(id, ct);
     }
 
     [HttpGet]
@@ -59,6 +65,6 @@ public class ProductsController: CRUDController<Product>
         [FromQuery] int pageSize = 20
     )
     {
-        return ReadOnlyService.GetPagedAsync<ProductShortInfoResponse>(ct, pageNumber, pageSize);
+        return readOnlyService.GetPagedAsync(ct, pageNumber, pageSize);
     }
 }

@@ -6,7 +6,7 @@ namespace ECommerce.Domain.Products.Services;
 
 public class ProductReadOnlyService: ReadOnlyOnlyService<Product>
 {
-    public ProductReadOnlyService(IQueryable<Product> repository, IMapper mapper) : base(repository, mapper)
+    public ProductReadOnlyService(IQueryable<Product> query, IMapper mapper) : base(query, mapper)
     {
     }
 }

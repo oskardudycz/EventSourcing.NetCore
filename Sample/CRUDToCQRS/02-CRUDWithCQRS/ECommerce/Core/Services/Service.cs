@@ -16,7 +16,7 @@ public class Service<TEntity>: IService
         this.mapper = mapper;
     }
 
-    public Task CreateAsync<TCreateRequest, TCreateResponse>(TCreateRequest request,
+    public Task CreateAsync<TCreateRequest>(TCreateRequest request,
         CancellationToken ct)
     {
         var entity = mapper.Map<TCreateRequest, TEntity>(request);
@@ -26,7 +26,7 @@ public class Service<TEntity>: IService
         return repository.SaveChangesAsync(ct);
     }
 
-    public async Task UpdateAsync<TUpdateRequest, TUpdateResponse>(
+    public async Task UpdateAsync<TUpdateRequest>(
         TUpdateRequest request,
         CancellationToken ct
     ) where TUpdateRequest : IUpdateRequest

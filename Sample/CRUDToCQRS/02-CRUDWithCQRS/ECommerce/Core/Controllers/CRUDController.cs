@@ -24,7 +24,7 @@ public abstract class CRUDController<TEntity>: Controller where TEntity : class,
         CancellationToken ct
     ) where TCreateRequest : ICreateRequest
     {
-        await Service.CreateAsync<TCreateRequest, TCreateResponse>(request, ct);
+        await Service.CreateAsync(request, ct);
 
         return Created(GetEntityByIdUri(request.Id), request.Id);
     }
@@ -34,7 +34,7 @@ public abstract class CRUDController<TEntity>: Controller where TEntity : class,
         CancellationToken ct
     ) where TUpdateRequest: IUpdateRequest
     {
-        await Service.UpdateAsync<TUpdateRequest, TUpdateResponse>(request, ct);
+        await Service.UpdateAsync(request, ct);
 
         Response.Headers.Location = GetEntityByIdUri(request.Id);
 

@@ -20,22 +20,22 @@ public abstract class CRUDController<TEntity>: Controller where TEntity : class,
         ReadOnlyService = readOnlyService;
     }
 
-    protected async Task<IActionResult> CreateAsync<TCreateRequest, TCreateResponse>(
+    protected async Task<IActionResult> CreateAsync<TCreateRequest>(
         TCreateRequest request,
         CancellationToken ct
     ) where TCreateRequest : ICreateRequest
     {
-        await Service.CreateAsync<TCreateRequest, TCreateResponse>(request, ct);
+        await Service.CreateAsync(request, ct);
 
         return Created(GetEntityByIdUri(request.Id), request.Id);
     }
 
-    protected async Task<IActionResult> UpdateAsync<TUpdateRequest, TUpdateResponse>(
+    protected async Task<IActionResult> UpdateAsync<TUpdateRequest>(
         TUpdateRequest request,
         CancellationToken ct
     ) where TUpdateRequest: IUpdateRequest
     {
-        await Service.UpdateAsync<TUpdateRequest, TUpdateResponse>(request, ct);
+        await Service.UpdateAsync(request, ct);
 
         Response.Headers.Location = GetEntityByIdUri(request.Id);
 
