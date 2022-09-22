@@ -1,5 +1,6 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using ECommerce.Core.Entities;
 using ECommerce.Core.Repositories;
 using ECommerce.Core.Requests;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +19,10 @@ public abstract class CRUDService<TEntity>: ICRUDService
         this.mapper = mapper;
     }
 
-    public async Task<TCreateResponse> CreateAsync<TCreateRequest, TCreateResponse>(TCreateRequest request,
-        CancellationToken ct)
+    public async Task<TCreateResponse> CreateAsync<TCreateRequest, TCreateResponse>(
+        TCreateRequest request,
+        CancellationToken ct
+    )
     {
         var entity = mapper.Map<TCreateRequest, TEntity>(request);
 
@@ -33,7 +36,7 @@ public abstract class CRUDService<TEntity>: ICRUDService
     public async Task<TUpdateResponse> UpdateAsync<TUpdateRequest, TUpdateResponse>(
         TUpdateRequest request,
         CancellationToken ct
-    ) where TUpdateRequest: IUpdateRequest
+    ) where TUpdateRequest : IUpdateRequest
     {
         var entity = await GetEntityByIdAsync(request.Id, ct);
 
