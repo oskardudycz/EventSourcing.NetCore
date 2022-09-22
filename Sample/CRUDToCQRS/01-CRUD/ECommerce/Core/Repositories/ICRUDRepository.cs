@@ -1,3 +1,5 @@
+using ECommerce.Core.Entities;
+
 namespace ECommerce.Core.Repositories;
 
 public interface ICRUDRepository<TEntity> where TEntity : class, IEntity

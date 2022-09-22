@@ -1,3 +1,4 @@
+using ECommerce.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Core.Repositories;

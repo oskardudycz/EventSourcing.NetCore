@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Domain.Core.Services;
 
-public class Service<TEntity>: IService
+public abstract class Service<TEntity>: IService
     where TEntity : class, IEntity, new()
 {
     private readonly DbContext dbContext;
     private readonly IMapper mapper;
 
-    public Service(DbContext dbContext, IMapper mapper)
+    protected Service(DbContext dbContext, IMapper mapper)
     {
         this.dbContext = dbContext;
         this.mapper = mapper;

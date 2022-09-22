@@ -1,9 +1,6 @@
-using ECommerce.Core;
-using ECommerce.Core.Entities;
+namespace ECommerce.Domain.Products;
 
-namespace ECommerce.Model;
-
-public class Product: IEntity
+public class Product
 {
     public Guid Id { get; set; } = default;
     public string Sku { get; set; } = default!;
