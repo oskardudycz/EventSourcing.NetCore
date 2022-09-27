@@ -8,10 +8,10 @@
         <PackageReference Include="MediatR" Version="10.0.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Polly" Version="7.2.3" />
-        <PackageReference Include="RestSharp" Version="108.0.1" />
+        <PackageReference Include="RestSharp" Version="108.0.2" />
     </ItemGroup>
 
     <ItemGroup>
