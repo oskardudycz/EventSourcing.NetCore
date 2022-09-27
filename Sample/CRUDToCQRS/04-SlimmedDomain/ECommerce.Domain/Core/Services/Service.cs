@@ -9,7 +9,7 @@ namespace ECommerce.Domain.Core.Services;
 public abstract class Service<TEntity>: IService
     where TEntity : class, IEntity, new()
 {
-    private readonly DbContext dbContext;
+    protected readonly DbContext dbContext;
     private readonly IMapper mapper;
 
     protected Service(DbContext dbContext, IMapper mapper)

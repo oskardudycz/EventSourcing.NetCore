@@ -19,7 +19,7 @@ public abstract class CRUDController<TEntity>: Controller where TEntity : class,
         ReadOnlyService = readOnlyService;
     }
 
-    protected async Task<IActionResult> CreateAsync<TCreateRequest, TCreateResponse>(
+    protected async Task<IActionResult> CreateAsync<TCreateRequest>(
         TCreateRequest request,
         CancellationToken ct
     ) where TCreateRequest : ICreateRequest
@@ -29,7 +29,7 @@ public abstract class CRUDController<TEntity>: Controller where TEntity : class,
         return Created(GetEntityByIdUri(request.Id), request.Id);
     }
 
-    protected async Task<IActionResult> UpdateAsync<TUpdateRequest, TUpdateResponse>(
+    protected async Task<IActionResult> UpdateAsync<TUpdateRequest>(
         TUpdateRequest request,
         CancellationToken ct
     ) where TUpdateRequest: IUpdateRequest
