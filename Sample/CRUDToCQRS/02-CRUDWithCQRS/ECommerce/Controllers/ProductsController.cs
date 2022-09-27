@@ -26,7 +26,7 @@ public class ProductsController: CRUDController<Product>
     {
         request.Id = Guid.NewGuid();
 
-        return CreateAsync<CreateProductRequest, ProductDetailsResponse>(
+        return CreateAsync<CreateProductRequest>(
             request,
             ct
         );
@@ -38,7 +38,7 @@ public class ProductsController: CRUDController<Product>
         CancellationToken ct
     )
     {
-        return UpdateAsync<UpdateProductRequest, ProductDetailsResponse>(
+        return UpdateAsync<UpdateProductRequest>(
             request,
             ct
         );

@@ -46,7 +46,7 @@ public class ProductsController: Controller
         CancellationToken ct
     )
     {
-        var command = request.ToCommand(Guid.NewGuid());
+        var command = request.ToCommand(id);
 
         await dbContext.UpdateAndSaveChanges<Product>(
             command.Id,
