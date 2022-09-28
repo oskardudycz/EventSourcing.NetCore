@@ -145,13 +145,13 @@ public class ProjectionsTests
                 EventMetadata.For(1, ++logPosition))
         };
 
-        var eventBus = new EventBus();
+        var eventBus = new EventStore();
         var database = new Database();
 
         // TODO:
         // 1. Register here your event handlers using `eventBus.Register`.
         // 2. Store results in database.
-        eventBus.Publish(events);
+        eventBus.Append(events);
 
         // first confirmed
         var shoppingCart = database.Get<ShoppingCartDetails>(shoppingCartId)!;
