@@ -1,6 +1,6 @@
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 
-public class EventBus
+public class EventStore
 {
     private readonly Dictionary<Type, List<Action<EventEnvelope>>> handlers = new();
 
@@ -18,7 +18,7 @@ public class EventBus
             handlers.Add(eventType, new List<Action<EventEnvelope>> { WrappedHandler });
     }
 
-    public void Publish(EventEnvelope eventEnvelope)
+    public void Append(EventEnvelope eventEnvelope)
     {
         if (!handlers.TryGetValue(eventEnvelope.Data.GetType(), out var eventHandlers)) return;
 
@@ -33,11 +33,11 @@ public class EventBus
         }
     }
 
-    public void Publish(params EventEnvelope[] eventEnvelopes)
+    public void Append(params EventEnvelope[] eventEnvelopes)
     {
         foreach (var @event in eventEnvelopes)
         {
-            Publish(@event);
+            Append(@event);
         }
     }
 }

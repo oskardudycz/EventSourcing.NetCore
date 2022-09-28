@@ -360,7 +360,7 @@ public class ProjectionsTests
                 EventMetadata.For(1, ++logPosition))
         };
 
-        var eventBus = new EventBus();
+        var eventBus = new EventStore();
         var database = new Database();
 
         // TODO:
@@ -382,7 +382,7 @@ public class ProjectionsTests
         eventBus.Register<ShoppingCartConfirmed>(shoppingCartShortInfoProjection.Handle);
         eventBus.Register<ShoppingCartCanceled>(shoppingCartShortInfoProjection.Handle);
 
-        eventBus.Publish(events);
+        eventBus.Append(events);
 
         // first confirmed
         var shoppingCart = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartDetails>(shoppingCartId, 5)!;
