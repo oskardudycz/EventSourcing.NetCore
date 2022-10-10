@@ -1065,6 +1065,7 @@ See more in:
 -   📝 [AWS - Event sourcing pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/service-per-team.html)
 -   📝 [Event sourcing with Kafka Streams](https://medium.com/dna-technology/event-sourcing-with-kafka-streams-660e5e64ec33)
 -   📝 [Event Sourcing with Kafka and ksqlDB](https://github.com/evgeniy-khist/ksqldb-event-souring)
+-   📝 [Hands On: Trying Out Event Sourcing with Confluent Cloud](https://developer.confluent.io/learn-kafka/event-sourcing/hands-on-confluent-cloud/)
 -   📝 [Andela - Building Scalable Applications Using Event Sourcing and CQRS](https://andela.com/insights/building-scalable-applications-using-event-sourcing-and-cqrs/)
 -   📝 [WiX Engineering - The Reactive Monolith - How to Move from CRUD to Event Sourcing](https://www.wix.engineering/post/the-reactive-monolith-how-to-move-from-crud-to-event-sourcing)
 -   📝 [Nexocode - CQRS and Event Sourcing as an antidote for problems with retrieving application states](https://nexocode.com/blog/posts/cqrs-and-event-sourcing/)
@@ -1092,6 +1093,7 @@ See more in:
 -   📝 [Towards Data Science - The Design of an Event Store](https://towardsdatascience.com/the-design-of-an-event-store-8c751c47db6f)
 -   📝 [Aspnetrun - CQRS and Event Sourcing in Event Driven Architecture of Ordering Microservices](https://medium.com/aspnetrun/cqrs-and-event-sourcing-in-event-driven-architecture-of-ordering-microservices-fb67dc44da7a)
 -   📝 [Why Microservices Should use Event Sourcing](https://blog.bitsrc.io/why-microservices-should-use-event-sourcing-9755a54ebfb4)
+-   📝 [Event-driven architecture with microservices using event sourcing and CQRS](https://medium.com/@tprkvolkan/event-driven-architecture-with-microservices-using-event-sourcing-and-cqrs-1cc516c20143)
 
 ### 13.20 Event Sourcing Concerns
 -   📝 [Kacper Gunia - EventStoreDB vs Kafka](https://domaincentric.net/blog/eventstoredb-vs-kafka)
