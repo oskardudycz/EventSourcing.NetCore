@@ -21,7 +21,7 @@ public class BackgroundWorker: BackgroundService
         Task.Run(async () =>
         {
             await Task.Yield();
-            logger.LogInformation("Background worker stopped");
+            logger.LogInformation("Background worker started");
             await perform(stoppingToken);
             logger.LogInformation("Background worker stopped");
         }, stoppingToken);
