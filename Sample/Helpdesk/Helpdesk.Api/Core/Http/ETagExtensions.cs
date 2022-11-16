@@ -12,6 +12,9 @@ public static class ETagExtensions
 
         var value = EntityTagHeaderValue.Parse(eTag).Tag.Value;
 
+        if (value is null)
+            throw new ArgumentNullException(nameof(eTag));
+
         return int.Parse(value.Substring(1, value.Length - 2));
     }
 }

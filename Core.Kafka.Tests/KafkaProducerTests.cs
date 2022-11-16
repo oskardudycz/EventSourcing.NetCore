@@ -13,7 +13,7 @@ public class KafkaProducerTests
 {
     private readonly IConfiguration kafkaConfig = new ConfigurationBuilder()
         .AddInMemoryCollection(
-            new Dictionary<string, string>
+            new Dictionary<string, string?>
             {
                 { "KafkaProducer:ProducerConfig:BootstrapServers", "localhost:9092" },
                 { "KafkaProducer:Topic", "MeetingsManagement" },

@@ -1,4 +1,5 @@
 using Confluent.Kafka;
+using Core.Configuration;
 using Microsoft.Extensions.Configuration;
 
 namespace Core.Kafka.Producers;
@@ -11,10 +12,8 @@ public class KafkaProducerConfig
 
 public static class KafkaProducerConfigExtensions
 {
-    public const string DefaultConfigKey = "KafkaProducer";
+    private const string DefaultConfigKey = "KafkaProducer";
 
-    public static KafkaProducerConfig GetKafkaProducerConfig(this IConfiguration configuration)
-    {
-        return configuration.GetSection(DefaultConfigKey).Get<KafkaProducerConfig>();
-    }
+    public static KafkaProducerConfig GetKafkaProducerConfig(this IConfiguration configuration) =>
+        configuration.GetRequiredConfig<KafkaProducerConfig>(DefaultConfigKey);
 }

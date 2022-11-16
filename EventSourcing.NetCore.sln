@@ -15,9 +15,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A406B86-7F72-4773-B99C-545CCACC92B0}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		DOCKERFILE = DOCKERFILE
 		README.md = README.md
 		Directory.Build.props = Directory.Build.props
+		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{E1B97A7B-97C3-4C14-9BE6-ACE0AF45CE61}"

@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using Marten;
 using Marten.Events.Aggregation;
-using Marten.Events.Daemon.Resiliency;
 using Marten.Schema.Identity;
 using Weasel.Core;
 using static Microsoft.AspNetCore.Http.Results;
@@ -19,8 +18,10 @@ builder.Services
             options.Events.DatabaseSchemaName = schemaName;
             options.DatabaseSchemaName = schemaName;
         }
+
         options.AutoCreateSchemaObjects = AutoCreate.All;
-        options.Connection(builder.Configuration.GetConnectionString("Incidents"));
+        options.Connection(builder.Configuration.GetConnectionString("Incidents") ??
+                           throw new InvalidOperationException());
         options.UseDefaultSerialization(EnumStorage.AsString, nonPublicMembersStorage: NonPublicMembersStorage.All);
 
         options.CreateDatabasesForTenants(c =>
@@ -46,8 +47,10 @@ builder.Services
     .UseLightweightSessions()
     .OptimizeArtifactWorkflow();
 
-builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(o =>
+    o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o =>
+    o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();
 
@@ -66,17 +69,18 @@ app.MapPost("/api/chain", async (IDocumentSession session, string name, Cancella
     return Created($"/api/chain/{chainId}", chainId);
 });
 
-app.MapPost("/api/chain/{chainId:guid}/name", async (IDocumentSession session, Guid chainId, string name, CancellationToken ct) =>
-{
-    var @event = new HotelChainNameChanged(chainId, name);
+app.MapPost("/api/chain/{chainId:guid}/name",
+    async (IDocumentSession session, Guid chainId, string name, CancellationToken ct) =>
+    {
+        var @event = new HotelChainNameChanged(chainId, name);
 
-    var correlationId = Guid.NewGuid().ToString();
-    session.CorrelationId = correlationId;
-    session.CausationId = correlationId;
-    session.Events.Append(chainId, @event);
+        var correlationId = Guid.NewGuid().ToString();
+        session.CorrelationId = correlationId;
+        session.CausationId = correlationId;
+        session.Events.Append(chainId, @event);
 
-    await session.SaveChangesAsync(ct);
-});
+        await session.SaveChangesAsync(ct);
+    });
 
 if (app.Environment.IsDevelopment())
 {
@@ -107,5 +111,5 @@ public class HotelChainProjection: SingleStreamAggregation<HotelChain>
         new(@event.ChainId, @event.Name);
 
     public HotelChain Apply(HotelChainNameChanged @event, HotelChain current) =>
-        current with { Name = @event.Name};
+        current with { Name = @event.Name };
 }
