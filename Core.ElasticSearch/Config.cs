@@ -1,3 +1,4 @@
+using Core.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
@@ -13,10 +14,11 @@ public class ElasticSearchConfig
 public static class ElasticSearchConfigExtensions
 {
     private const string DefaultConfigKey = "ElasticSearch";
+
     public static IServiceCollection AddElasticsearch(
         this IServiceCollection services, IConfiguration configuration, Action<ConnectionSettings>? config = null)
     {
-        var elasticSearchConfig = configuration.GetSection(DefaultConfigKey).Get<ElasticSearchConfig>();
+        var elasticSearchConfig = configuration.GetRequiredConfig<ElasticSearchConfig>(DefaultConfigKey);
 
         var settings = new ConnectionSettings(new Uri(elasticSearchConfig.Url))
             .DefaultIndex(elasticSearchConfig.DefaultIndex);

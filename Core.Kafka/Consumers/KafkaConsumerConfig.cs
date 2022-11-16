@@ -1,4 +1,5 @@
 using Confluent.Kafka;
+using Core.Configuration;
 using Microsoft.Extensions.Configuration;
 
 namespace Core.Kafka.Consumers;
@@ -13,10 +14,10 @@ public class KafkaConsumerConfig
 
 public static class KafkaConsumerConfigExtensions
 {
-    public const string DefaultConfigKey = "KafkaConsumer";
+    private const string DefaultConfigKey = "KafkaConsumer";
 
     public static KafkaConsumerConfig GetKafkaConsumerConfig(this IConfiguration configuration)
     {
-        return configuration.GetSection(DefaultConfigKey).Get<KafkaConsumerConfig>();
+        return configuration.GetRequiredConfig<KafkaConsumerConfig>(DefaultConfigKey);
     }
 }

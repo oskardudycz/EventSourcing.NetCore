@@ -1,4 +1,5 @@
 using Core.BackgroundWorkers;
+using Core.Configuration;
 using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Subscriptions;
 using EventStore.Client;
@@ -23,7 +24,7 @@ public static class EventStoreDBConfigExtensions
 
     public static IServiceCollection AddEventStoreDB(this IServiceCollection services, IConfiguration config, EventStoreDBOptions? options = null)
     {
-        var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
+        var eventStoreDBConfig = config.GetRequiredConfig<EventStoreDBConfig>(DefaultConfigKey);
 
         services
             .AddSingleton(new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))

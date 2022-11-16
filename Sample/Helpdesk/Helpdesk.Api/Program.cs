@@ -32,7 +32,7 @@ builder.Services
             options.Events.DatabaseSchemaName = schemaName;
             options.DatabaseSchemaName = schemaName;
         }
-        options.Connection(builder.Configuration.GetConnectionString("Incidents"));
+        options.Connection(builder.Configuration.GetConnectionString("Incidents") ?? throw new InvalidOperationException());
         options.UseDefaultSerialization(EnumStorage.AsString, nonPublicMembersStorage: NonPublicMembersStorage.All);
 
         options.Projections.Add<IncidentHistoryTransformation>();

@@ -11,13 +11,13 @@ public static class TracingHeadersExtensions
 
     public static CorrelationId? GetCorrelationId(this HttpRequest request) =>
         request.Headers.TryGetValue(CorrelationIdHeaderName, out var correlationId)
-            ? new CorrelationId(correlationId)
+            ? new CorrelationId(correlationId!)
             : null;
 
 
     public static CausationId? GetCausationId(this HttpRequest request) =>
         request.Headers.TryGetValue(CausationIdHeaderName, out var correlationId)
-            ? new CausationId(correlationId)
+            ? new CausationId(correlationId!)
             : null;
 
     public static void SetCorrelationId(this HttpResponse response, CorrelationId correlationId) =>

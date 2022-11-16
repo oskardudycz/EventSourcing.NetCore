@@ -1,3 +1,4 @@
+using Core.Configuration;
 using Core.Ids;
 using Core.Marten.Events;
 using Core.Marten.Ids;
@@ -39,7 +40,7 @@ public static class MartenConfigExtensions
         string configKey = DefaultConfigKey
     )
     {
-        var martenConfig = config.GetSection(configKey).Get<Config>();
+        var martenConfig = config.GetRequiredConfig<Config>(configKey);
 
         services
             .AddScoped<IIdGenerator, MartenIdGenerator>()

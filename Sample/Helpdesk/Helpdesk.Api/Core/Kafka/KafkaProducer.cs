@@ -14,7 +14,8 @@ public class KafkaProducer: IProjection
 
     public KafkaProducer(IConfiguration configuration)
     {
-        config = configuration.GetSection(DefaultConfigKey).Get<KafkaProducerConfig>();
+        config = configuration.GetRequiredSection(DefaultConfigKey).Get<KafkaProducerConfig>() ??
+                 throw new InvalidOperationException();
     }
 
     public async Task ApplyAsync(IDocumentOperations operations, IReadOnlyList<StreamAction> streamsActions,

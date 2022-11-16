@@ -22,6 +22,9 @@ public static class ETagExtensions
     public static string GetSanitizedValue(this EntityTagHeaderValue eTag)
     {
         var value = eTag.Tag.Value;
+
+        if (value is null)
+            throw new ArgumentNullException(nameof(eTag));
         // trim first and last quote characters
         return value.Substring(1, value.Length - 2);
     }

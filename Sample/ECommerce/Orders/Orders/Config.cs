@@ -1,3 +1,4 @@
+using Core.Configuration;
 using Orders.Orders;
 using Core.Marten;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,7 @@ public static class Config
     {
         return services
             .AddSingleton(sp =>
-                config.GetSection(ExternalServicesConfig.ConfigName).Get<ExternalServicesConfig>()
+                config.GetRequiredConfig<ExternalServicesConfig>(ExternalServicesConfig.ConfigName)
             )
             .AddMarten(config, options =>
             {
