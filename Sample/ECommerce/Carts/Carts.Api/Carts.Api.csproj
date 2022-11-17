@@ -12,6 +12,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
+        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.4.0-beta.3" />
     </ItemGroup>
 
     <ItemGroup>

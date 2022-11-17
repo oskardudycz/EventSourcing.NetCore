@@ -19,7 +19,7 @@ public class RequestPaymentsTests: IClassFixture<TestWebApplicationFactory<Progr
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public Task RequestPayment_ShouldReturn_CreatedStatus_With_PaymentId() =>
+    public Task  RequestPayment_ShouldReturn_CreatedStatus_With_PaymentId() =>
         API.Given(
                 URI("/api/Payments/"),
                 BODY(new RequestPaymentRequest {OrderId = OrderId, Amount = Amount})
