@@ -7,10 +7,10 @@ namespace Warehouse.Api.Core.Commands;
 
 public interface ICommandHandler<in T>
 {
-    ValueTask Handle(T command, CancellationToken token);
+    Task Handle(T command, CancellationToken token);
 }
 
-public delegate ValueTask CommandHandler<in T>(T query, CancellationToken ct);
+public delegate Task CommandHandler<in T>(T query, CancellationToken ct);
 
 public static class CommandHandlerConfiguration
 {
@@ -31,7 +31,7 @@ public static class CommandHandlerConfiguration
         }
 
         services
-            .AddTransient<Func<T, CancellationToken, ValueTask>>(
+            .AddTransient<Func<T, CancellationToken, Task>>(
                 sp => sp.GetRequiredService<ICommandHandler<T>>().Handle
             )
             .AddTransient<CommandHandler<T>>(

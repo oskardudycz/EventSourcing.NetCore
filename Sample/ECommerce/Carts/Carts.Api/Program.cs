@@ -12,6 +12,7 @@ using Core.WebApi.Swagger;
 using Core.WebApi.Tracing;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
+using Npgsql;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +32,10 @@ builder.Services
         sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
     )
     .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
-        options.Configure(t => t.AddJaegerExporter())
+        options.Configure(t =>
+            t.AddJaegerExporter()
+                .AddNpgsql()
+        ).DisableConsoleExporter(true)
     ))
     .AddControllers()
     .AddNewtonsoftJson(opt => opt.SerializerSettings.WithDefaults());

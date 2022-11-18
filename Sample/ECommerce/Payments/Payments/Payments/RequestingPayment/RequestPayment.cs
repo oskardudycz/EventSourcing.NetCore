@@ -9,7 +9,7 @@ public record RequestPayment(
     Guid PaymentId,
     Guid OrderId,
     decimal Amount
-): ICommand
+)
 {
     public static RequestPayment Create(
         Guid? paymentId,
@@ -43,7 +43,7 @@ public class HandleRequestPayment:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(RequestPayment command, CancellationToken cancellationToken)
+    public async Task Handle(RequestPayment command, CancellationToken cancellationToken)
     {
         var (paymentId, orderId, amount) = command;
 
@@ -54,6 +54,5 @@ public class HandleRequestPayment:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

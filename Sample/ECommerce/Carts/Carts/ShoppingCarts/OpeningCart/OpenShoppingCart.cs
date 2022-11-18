@@ -8,7 +8,7 @@ namespace Carts.ShoppingCarts.OpeningCart;
 public record OpenShoppingCart(
     Guid CartId,
     Guid ClientId
-): ICommand
+)
 {
     public static OpenShoppingCart Create(Guid? cartId, Guid? clientId)
     {
@@ -36,7 +36,7 @@ internal class HandleOpenShoppingCart:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(OpenShoppingCart command, CancellationToken cancellationToken)
+    public async Task Handle(OpenShoppingCart command, CancellationToken cancellationToken)
     {
         var (cartId, clientId) = command;
 
@@ -47,6 +47,5 @@ internal class HandleOpenShoppingCart:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

@@ -8,7 +8,7 @@ namespace Payments.Payments.CompletingPayment;
 
 public record CompletePayment(
     Guid PaymentId
-): ICommand
+)
 {
     public static CompletePayment Create(Guid? paymentId)
     {
@@ -34,7 +34,7 @@ public class HandleCompletePayment:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(CompletePayment command, CancellationToken cancellationToken)
+    public async Task Handle(CompletePayment command, CancellationToken cancellationToken)
     {
         var paymentId = command.PaymentId;
 
@@ -62,6 +62,5 @@ public class HandleCompletePayment:
                 }
             }
         );
-        return Unit.Value;
     }
 }

@@ -8,7 +8,7 @@ namespace Orders.Orders.CancellingOrder;
 public record CancelOrder(
     Guid OrderId,
     OrderCancellationReason CancellationReason
-): ICommand
+)
 {
     public static CancelOrder Create(Guid? orderId, OrderCancellationReason? cancellationReason)
     {
@@ -37,7 +37,7 @@ public class HandleCancelOrder:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(CancelOrder command, CancellationToken cancellationToken)
+    public async Task Handle(CancelOrder command, CancellationToken cancellationToken)
     {
         await scope.Do((expectedVersion, traceMetadata) =>
             orderRepository.GetAndUpdate(
@@ -48,6 +48,5 @@ public class HandleCancelOrder:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

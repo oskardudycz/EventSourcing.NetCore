@@ -7,7 +7,7 @@ namespace Tickets.Reservations.ConfirmingReservation;
 
 public record ConfirmReservation(
     Guid ReservationId
-): ICommand
+)
 {
     public static ConfirmReservation Create(Guid? reservationId)
     {
@@ -33,7 +33,7 @@ internal class HandleConfirmReservation:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(ConfirmReservation command, CancellationToken cancellationToken)
+    public async Task Handle(ConfirmReservation command, CancellationToken cancellationToken)
     {
         await scope.Do((expectedVersion, traceMetadata) =>
             repository.GetAndUpdate(
@@ -44,7 +44,5 @@ internal class HandleConfirmReservation:
                 cancellationToken
             )
         );
-
-        return Unit.Value;
     }
 }

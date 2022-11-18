@@ -8,7 +8,7 @@ namespace Payments.Payments.DiscardingPayment;
 public record DiscardPayment(
     Guid PaymentId,
     DiscardReason DiscardReason
-): ICommand
+)
 {
     public static DiscardPayment Create(Guid? paymentId, DiscardReason? discardReason)
     {
@@ -36,7 +36,7 @@ public class HandleDiscardPayment:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(DiscardPayment command, CancellationToken cancellationToken)
+    public async Task Handle(DiscardPayment command, CancellationToken cancellationToken)
     {
         var (paymentId, _) = command;
 
@@ -49,6 +49,5 @@ public class HandleDiscardPayment:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

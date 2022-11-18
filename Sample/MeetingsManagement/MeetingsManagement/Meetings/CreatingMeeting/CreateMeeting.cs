@@ -8,7 +8,7 @@ namespace MeetingsManagement.Meetings.CreatingMeeting;
 public record CreateMeeting(
     Guid Id,
     string Name
-): ICommand;
+);
 
 internal class HandleCreateMeeting:
     ICommandHandler<CreateMeeting>
@@ -25,7 +25,7 @@ internal class HandleCreateMeeting:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(CreateMeeting command, CancellationToken cancellationToken)
+    public async Task Handle(CreateMeeting command, CancellationToken cancellationToken)
     {
         var (id, name) = command;
 
@@ -36,6 +36,5 @@ internal class HandleCreateMeeting:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

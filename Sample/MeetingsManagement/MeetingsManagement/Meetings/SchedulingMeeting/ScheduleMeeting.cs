@@ -1,7 +1,6 @@
 using Core.Commands;
 using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 using MeetingsManagement.Meetings.ValueObjects;
 
 namespace MeetingsManagement.Meetings.SchedulingMeeting;
@@ -9,7 +8,7 @@ namespace MeetingsManagement.Meetings.SchedulingMeeting;
 public record ScheduleMeeting(
     Guid MeetingId,
     DateRange Occurs
-): ICommand;
+);
 
 internal class HandleScheduleMeeting:
     ICommandHandler<ScheduleMeeting>
@@ -26,7 +25,7 @@ internal class HandleScheduleMeeting:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(ScheduleMeeting command, CancellationToken cancellationToken)
+    public async Task Handle(ScheduleMeeting command, CancellationToken cancellationToken)
     {
         var (meetingId, dateRange) = command;
 
@@ -39,6 +38,5 @@ internal class HandleScheduleMeeting:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

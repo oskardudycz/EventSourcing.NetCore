@@ -1,6 +1,7 @@
 using Core.Commands;
 using Core.Events;
 using Core.Ids;
+using Core.OpenTelemetry;
 using Core.Queries;
 using Core.Requests;
 using Core.Tracing;
@@ -17,10 +18,10 @@ public static class Config
     public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
         services.AddMediatR()
-            .AddScoped<ICommandBus, CommandBus>()
             .AddScoped<IQueryBus, QueryBus>()
             .AddTracing()
-            .AddEventBus();
+            .AddEventBus()
+            .AddCommandBus();
 
         services.TryAddScoped<IExternalCommandBus, ExternalCommandBus>();
 
@@ -47,6 +48,8 @@ public static class Config
             (scopedServiceProvider, eventEnvelope) => sp.GetRequiredService<ITracingScopeFactory>()
                 .CreateTraceScope(scopedServiceProvider, eventEnvelope)
         );
+
+        services.AddSingleton<IActivityScope, ActivityScope>();
 
         return services;
     }

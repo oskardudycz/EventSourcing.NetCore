@@ -1,13 +1,12 @@
 using Core.Commands;
 using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.CancelingCart;
 
 public record CancelShoppingCart(
     Guid CartId
-): ICommand
+)
 {
     public static CancelShoppingCart Create(Guid cartId)
     {
@@ -33,7 +32,7 @@ internal class HandleCancelShoppingCart:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(CancelShoppingCart command, CancellationToken cancellationToken)
+    public async Task Handle(CancelShoppingCart command, CancellationToken cancellationToken)
     {
         await scope.Do((expectedVersion, traceMetadata) =>
             cartRepository.GetAndUpdate(
@@ -44,6 +43,5 @@ internal class HandleCancelShoppingCart:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }
