@@ -3,14 +3,13 @@ using Carts.ShoppingCarts.Products;
 using Core.Commands;
 using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.AddingProduct;
 
 public record AddProduct(
     Guid CartId,
     ProductItem ProductItem
-): ICommand
+)
 {
     public static AddProduct Create(Guid cartId, ProductItem productItem)
     {
@@ -39,7 +38,7 @@ internal class HandleAddProduct:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(AddProduct command, CancellationToken cancellationToken)
+    public async Task Handle(AddProduct command, CancellationToken cancellationToken)
     {
         var (cartId, productItem) = command;
 
@@ -52,6 +51,5 @@ internal class HandleAddProduct:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

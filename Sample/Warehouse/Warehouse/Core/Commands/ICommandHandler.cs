@@ -5,7 +5,7 @@ namespace Warehouse.Core.Commands;
 
 public interface ICommandHandler<in T>
 {
-    ValueTask Handle(T command, CancellationToken token);
+    Task Handle(T command, CancellationToken token);
 }
 
 public static class CommandHandlerConfiguration
@@ -34,7 +34,7 @@ public static class CommandHandlerConfiguration
         => context.RequestServices.GetRequiredService<ICommandHandler<T>>();
 
 
-    public static ValueTask SendCommand<T>(this HttpContext context, T command)
+    public static Task SendCommand<T>(this HttpContext context, T command)
         => context.GetCommandHandler<T>()
             .Handle(command, context.RequestAborted);
 }

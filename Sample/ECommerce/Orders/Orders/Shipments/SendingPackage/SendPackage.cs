@@ -5,21 +5,11 @@ using Orders.Products;
 
 namespace Orders.Shipments.SendingPackage;
 
-public class SendPackage : ICommand
+public record SendPackage(
+    Guid OrderId,
+    IReadOnlyList<ProductItem> ProductItems
+)
 {
-    public Guid OrderId { get; }
-
-    public IReadOnlyList<ProductItem> ProductItems { get; }
-
-    private SendPackage(
-        Guid orderId,
-        IReadOnlyList<ProductItem> productItems
-    )
-    {
-        OrderId = orderId;
-        ProductItems = productItems;
-    }
-
     public static SendPackage Create(
         Guid orderId,
         IReadOnlyList<ProductItem> productItems
@@ -46,14 +36,12 @@ public class HandleSendPackage:
         this.externalCommandBus = externalCommandBus;
     }
 
-    public async Task<Unit> Handle(SendPackage command, CancellationToken cancellationToken)
+    public async Task Handle(SendPackage command, CancellationToken cancellationToken)
     {
         await externalCommandBus.Post(
             externalServicesConfig.ShipmentsUrl!,
             "shipments",
             command,
             cancellationToken);
-
-        return Unit.Value;
     }
 }

@@ -5,7 +5,7 @@ using OpenTelemetry.Trace;
 
 namespace Core.OpenTelemetry;
 
-public static class OpenTelemetryExtensions
+public static class TelemetryExtensions
 {
     public static IServiceCollection AddOpenTelemetry(
         this IServiceCollection services,
@@ -20,19 +20,19 @@ public static class OpenTelemetryExtensions
     {
         Activity.DefaultIdFormat = ActivityIdFormat.W3C;
 
-        AppContext.SetSwitch("Azure.Experimental.EnableActivitySource", true);
-
         services
             .AddOpenTelemetryTracing(builder =>
             {
                 options.ConfigureTracerProvider(builder
-                    .AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .SetResourceBuilder(
-                        ResourceBuilder.CreateDefault()
-                            .AddService(serviceName)
-                            .AddTelemetrySdk()
-                    ));
+                        .AddSource(ActivitySourceProvider.DefaultSourceName)
+                        .AddAspNetCoreInstrumentation()
+                        .AddHttpClientInstrumentation()
+                        .SetResourceBuilder(
+                            ResourceBuilder.CreateDefault()
+                                .AddService(serviceName)
+                                .AddTelemetrySdk()
+                        ))
+                    .SetSampler(new AlwaysOnSampler());
 
                 if (!options.ShouldDisableConsoleExporter)
                     builder.AddConsoleExporter();

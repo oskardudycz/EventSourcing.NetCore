@@ -8,7 +8,7 @@ namespace Payments.Payments.TimingOutPayment;
 public record TimeOutPayment(
     Guid PaymentId,
     DateTime TimedOutAt
-): ICommand
+)
 {
     public static TimeOutPayment Create(Guid? paymentId, DateTime? timedOutAt)
     {
@@ -36,7 +36,7 @@ public class HandleTimeOutPayment:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(TimeOutPayment command, CancellationToken cancellationToken)
+    public async Task Handle(TimeOutPayment command, CancellationToken cancellationToken)
     {
         var (paymentId, _) = command;
 
@@ -49,6 +49,5 @@ public class HandleTimeOutPayment:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

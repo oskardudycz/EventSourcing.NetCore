@@ -8,7 +8,7 @@ namespace Tickets.Reservations.ChangingReservationSeat;
 public record ChangeReservationSeat(
     Guid ReservationId,
     Guid SeatId
-): ICommand
+)
 {
     public static ChangeReservationSeat Create(Guid? reservationId, Guid? seatId)
     {
@@ -39,7 +39,7 @@ internal class HandleChangeReservationSeat:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(ChangeReservationSeat command, CancellationToken cancellationToken)
+    public async Task Handle(ChangeReservationSeat command, CancellationToken cancellationToken)
     {
         await scope.Do((expectedVersion, traceMetadata) =>
             repository.GetAndUpdate(
@@ -50,6 +50,5 @@ internal class HandleChangeReservationSeat:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

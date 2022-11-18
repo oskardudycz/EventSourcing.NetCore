@@ -34,46 +34,68 @@ public class OrderSaga:
     }
 
     // Happy path
-    public Task Handle(CartFinalized @event, CancellationToken cancellationToken)
+    public async Task Handle(CartFinalized @event, CancellationToken ct)
     {
         var orderId = idGenerator.New();
 
-        return commandBus.Send(InitializeOrder.Create(orderId, @event.ClientId, @event.ProductItems, @event.TotalPrice));
-    }
-
-    public Task Handle(OrderInitialized @event, CancellationToken cancellationToken)
-    {
-        return commandBus.Send(RequestPayment.Create(@event.OrderId, @event.TotalPrice));
-    }
-
-    public async Task Handle(PaymentFinalized @event, CancellationToken cancellationToken)
-    {
-        await commandBus.Send(RecordOrderPayment.Create(@event.OrderId, @event.PaymentId, @event.FinalizedAt));
-    }
-
-    public Task Handle(OrderPaymentRecorded @event, CancellationToken cancellationToken)
-    {
-        return commandBus.Send(
-            SendPackage.Create(
-                @event.OrderId,
-                @event.ProductItems.Select(pi => new ProductItem(pi.ProductId, pi.Quantity)).ToList()
-            )
+        await commandBus.Send(
+            InitializeOrder.Create(orderId, @event.ClientId, @event.ProductItems, @event.TotalPrice),
+            ct
         );
     }
 
-    public Task Handle(PackageWasSent @event, CancellationToken cancellationToken)
+    public async Task Handle(OrderInitialized @event, CancellationToken ct)
     {
-        return commandBus.Send(CompleteOrder.Create(@event.OrderId));
+        await commandBus.Send(
+            RequestPayment.Create(@event.OrderId, @event.TotalPrice),
+            ct
+        );
+    }
+
+    public async Task Handle(PaymentFinalized @event, CancellationToken ct)
+    {
+        await commandBus.Send(
+            RecordOrderPayment.Create(@event.OrderId, @event.PaymentId, @event.FinalizedAt),
+            ct
+        );
+    }
+
+    public async Task Handle(OrderPaymentRecorded @event, CancellationToken ct)
+    {
+        await commandBus.Send(
+            SendPackage.Create(
+                @event.OrderId,
+                @event.ProductItems.Select(pi => new ProductItem(pi.ProductId, pi.Quantity)).ToList()
+            ),
+            ct
+        );
+    }
+
+    public async Task Handle(PackageWasSent @event, CancellationToken ct)
+    {
+        await commandBus.Send(
+            CompleteOrder.Create(@event.OrderId),
+            ct
+        );
     }
 
     // Compensation
-    public Task Handle(ProductWasOutOfStock @event, CancellationToken cancellationToken)
+    public async Task Handle(ProductWasOutOfStock @event, CancellationToken ct)
     {
-        return commandBus.Send(CancelOrder.Create(@event.OrderId, (OrderCancellationReason) OrderCancellationReason.ProductWasOutOfStock));
+        await commandBus.Send(
+            CancelOrder.Create(@event.OrderId, OrderCancellationReason.ProductWasOutOfStock),
+            ct
+        );
     }
 
-    public Task Handle(OrderCancelled @event, CancellationToken cancellationToken)
+    public async Task Handle(OrderCancelled @event, CancellationToken ct)
     {
-        return @event.PaymentId.HasValue ? commandBus.Send(DiscardPayment.Create(@event.PaymentId.Value)) : Task.CompletedTask;
+        if (!@event.PaymentId.HasValue)
+            return;
+
+        await commandBus.Send(
+            DiscardPayment.Create(@event.PaymentId.Value),
+            ct
+        );
     }
 }

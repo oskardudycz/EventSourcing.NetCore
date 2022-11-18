@@ -40,7 +40,7 @@ internal class HandleCreateTentativeReservation:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(CreateTentativeReservation command, CancellationToken cancellationToken)
+    public async Task Handle(CreateTentativeReservation command, CancellationToken cancellationToken)
     {
         var (reservationId, seatId) = command;
 
@@ -55,6 +55,5 @@ internal class HandleCreateTentativeReservation:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

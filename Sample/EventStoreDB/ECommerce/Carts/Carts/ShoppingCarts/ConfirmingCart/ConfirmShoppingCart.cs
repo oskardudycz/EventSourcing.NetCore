@@ -7,7 +7,7 @@ namespace Carts.ShoppingCarts.ConfirmingCart;
 
 public record ConfirmShoppingCart(
     Guid CartId
-): ICommand
+)
 {
     public static ConfirmShoppingCart Create(Guid? cartId)
     {
@@ -33,7 +33,7 @@ internal class HandleConfirmCart:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(ConfirmShoppingCart command, CancellationToken cancellationToken)
+    public async Task Handle(ConfirmShoppingCart command, CancellationToken cancellationToken)
     {
         await scope.Do((expectedRevision, eventMetadata) =>
             cartRepository.GetAndUpdate(
@@ -44,7 +44,5 @@ internal class HandleConfirmCart:
                 cancellationToken
             )
         );
-
-        return Unit.Value;
     }
 }

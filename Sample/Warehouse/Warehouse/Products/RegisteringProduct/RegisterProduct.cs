@@ -17,7 +17,7 @@ internal class HandleRegisterProduct : ICommandHandler<RegisterProduct>
         this.productWithSKUExists = productWithSKUExists;
     }
 
-    public async ValueTask Handle(RegisterProduct command, CancellationToken ct)
+    public async Task Handle(RegisterProduct command, CancellationToken ct)
     {
         var product = new Product(
             command.ProductId,

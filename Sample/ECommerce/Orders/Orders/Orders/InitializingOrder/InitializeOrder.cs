@@ -11,7 +11,7 @@ public record InitializeOrder(
     Guid ClientId,
     IReadOnlyList<PricedProductItem> ProductItems,
     decimal TotalPrice
-): ICommand
+)
 {
     public static InitializeOrder Create(
         Guid? orderId,
@@ -48,7 +48,7 @@ public class HandleInitializeOrder:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(InitializeOrder command, CancellationToken cancellationToken)
+    public async Task Handle(InitializeOrder command, CancellationToken cancellationToken)
     {
         var (orderId, clientId, productItems, totalPrice) = command;
 
@@ -59,6 +59,5 @@ public class HandleInitializeOrder:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

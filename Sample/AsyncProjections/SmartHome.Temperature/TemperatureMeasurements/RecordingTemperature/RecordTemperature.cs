@@ -1,14 +1,13 @@
 using Core.Commands;
 using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 
 public record RecordTemperature(
     Guid MeasurementId,
     decimal Temperature
-): ICommand
+)
 {
     public static RecordTemperature Create(Guid measurementId, decimal temperature)
     {
@@ -36,7 +35,7 @@ public class HandleRecordTemperature:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(RecordTemperature command, CancellationToken cancellationToken)
+    public async Task Handle(RecordTemperature command, CancellationToken cancellationToken)
     {
         var (measurementId, temperature) = command;
 
@@ -49,6 +48,5 @@ public class HandleRecordTemperature:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

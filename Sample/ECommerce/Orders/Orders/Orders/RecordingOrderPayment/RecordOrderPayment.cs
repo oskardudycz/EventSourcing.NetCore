@@ -9,7 +9,7 @@ public record RecordOrderPayment(
     Guid OrderId,
     Guid PaymentId,
     DateTime PaymentRecordedAt
-): ICommand
+)
 {
     public static RecordOrderPayment Create(Guid? orderId, Guid? paymentId, DateTime? paymentRecordedAt)
     {
@@ -39,7 +39,7 @@ public class HandleRecordOrderPayment:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(RecordOrderPayment command, CancellationToken cancellationToken)
+    public async Task Handle(RecordOrderPayment command, CancellationToken cancellationToken)
     {
         var (orderId, paymentId, recordedAt) = command;
 
@@ -52,6 +52,5 @@ public class HandleRecordOrderPayment:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

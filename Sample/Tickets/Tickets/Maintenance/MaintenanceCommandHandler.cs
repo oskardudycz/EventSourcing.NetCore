@@ -1,6 +1,5 @@
 using Core.Commands;
 using Marten;
-using MediatR;
 using Tickets.Maintenance.Commands;
 
 namespace Tickets.Maintenance;
@@ -15,11 +14,9 @@ public class MaintenanceCommandHandler:
         this.documentStore = documentStore;
     }
 
-    public async Task<Unit> Handle(RebuildProjection command, CancellationToken cancellationToken)
+    public async Task Handle(RebuildProjection command, CancellationToken cancellationToken)
     {
         using var daemon = await documentStore.BuildProjectionDaemonAsync();
         await daemon.RebuildProjection(command.ViewName, cancellationToken);
-
-        return Unit.Value;
     }
 }

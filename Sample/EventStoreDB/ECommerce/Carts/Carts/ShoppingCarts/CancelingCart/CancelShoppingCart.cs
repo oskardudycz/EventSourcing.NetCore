@@ -1,13 +1,12 @@
 using Core.Commands;
 using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.CancelingCart;
 
 public record CancelShoppingCart(
     Guid CartId
-): ICommand
+)
 {
     public static CancelShoppingCart Create(Guid? cartId)
     {
@@ -33,7 +32,7 @@ internal class HandleCancelCart:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(CancelShoppingCart command, CancellationToken cancellationToken)
+    public async Task Handle(CancelShoppingCart command, CancellationToken cancellationToken)
     {
         await scope.Do((expectedRevision, eventMetadata) =>
             cartRepository.GetAndUpdate(
@@ -44,7 +43,5 @@ internal class HandleCancelCart:
                 cancellationToken
             )
         );
-
-        return Unit.Value;
     }
 }

@@ -2,14 +2,13 @@ using Carts.ShoppingCarts.Products;
 using Core.Commands;
 using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.RemovingProduct;
 
 public record RemoveProduct(
     Guid CartId,
     PricedProductItem ProductItem
-): ICommand
+)
 {
     public static RemoveProduct Create(Guid cartId, PricedProductItem productItem)
     {
@@ -35,7 +34,7 @@ internal class HandleRemoveProduct:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(RemoveProduct command, CancellationToken cancellationToken)
+    public async Task Handle(RemoveProduct command, CancellationToken cancellationToken)
     {
         var (cartId, productItem) = command;
 
@@ -48,6 +47,5 @@ internal class HandleRemoveProduct:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

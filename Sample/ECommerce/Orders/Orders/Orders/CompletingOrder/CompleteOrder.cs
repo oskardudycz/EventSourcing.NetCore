@@ -7,7 +7,7 @@ namespace Orders.Orders.CompletingOrder;
 
 public record CompleteOrder(
     Guid OrderId
-): ICommand
+)
 {
     public static CompleteOrder Create(Guid? orderId)
     {
@@ -33,7 +33,7 @@ public class HandleCompleteOrder:
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(CompleteOrder command, CancellationToken cancellationToken)
+    public async Task Handle(CompleteOrder command, CancellationToken cancellationToken)
     {
         await scope.Do((expectedVersion, traceMetadata) =>
             orderRepository.GetAndUpdate(
@@ -44,6 +44,5 @@ public class HandleCompleteOrder:
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }

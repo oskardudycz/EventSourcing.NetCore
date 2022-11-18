@@ -1,10 +1,9 @@
 using Core.Commands;
 using Marten;
-using MediatR;
 
 namespace SmartHome.Temperature.MotionSensors.RebuildingMotionSensorsViews;
 
-public record RebuildMotionSensorsViews: ICommand;
+public record RebuildMotionSensorsViews;
 
 public class HandleRebuildMotionSensorsViews :
     ICommandHandler<RebuildMotionSensorsViews>
@@ -18,10 +17,9 @@ public class HandleRebuildMotionSensorsViews :
         this.session = session;
     }
 
-    public async Task<Unit> Handle(RebuildMotionSensorsViews command, CancellationToken cancellationToken)
+    public async Task Handle(RebuildMotionSensorsViews command, CancellationToken cancellationToken)
     {
         using var daemon = await session.DocumentStore.BuildProjectionDaemonAsync();
         await daemon.RebuildProjection<MotionSensor>(cancellationToken);
-        return Unit.Value;
     }
 }

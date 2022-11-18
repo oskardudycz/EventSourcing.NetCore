@@ -7,7 +7,7 @@ namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 
 public record InstallMotionSensor(
     Guid MotionSensorId
-) : ICommand
+)
 {
     public static InstallMotionSensor Create(
         Guid motionSensorId
@@ -35,7 +35,7 @@ public class HandleInstallMotionSensor :
         this.scope = scope;
     }
 
-    public async Task<Unit> Handle(InstallMotionSensor command, CancellationToken cancellationToken)
+    public async Task Handle(InstallMotionSensor command, CancellationToken cancellationToken)
     {
         await scope.Do((_, eventMetadata) =>
             repository.Add(
@@ -46,6 +46,5 @@ public class HandleInstallMotionSensor :
                 cancellationToken
             )
         );
-        return Unit.Value;
     }
 }
