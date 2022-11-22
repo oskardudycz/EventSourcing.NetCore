@@ -26,7 +26,10 @@ public static class TelemetryExtensions
                 options.ConfigureTracerProvider(builder
                         .AddSource(ActivitySourceProvider.DefaultSourceName)
                         .AddAspNetCoreInstrumentation()
-                        .AddHttpClientInstrumentation()
+                        .AddHttpClientInstrumentation(o =>
+                        {
+                            o.RecordException = true;
+                        })
                         .SetResourceBuilder(
                             ResourceBuilder.CreateDefault()
                                 .AddService(serviceName)
