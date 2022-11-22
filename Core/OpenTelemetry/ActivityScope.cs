@@ -4,18 +4,22 @@ namespace Core.OpenTelemetry;
 
 public interface IActivityScope
 {
-    Activity? Start(string name, params KeyValuePair<string, object?>[] tags);
+    Activity? Start(string name) =>
+        Start(name, new StartActivityOptions());
+
+    Activity? Start(string name, StartActivityOptions options);
 
     Task Run(
         string name,
         Func<CancellationToken, Task> run,
         CancellationToken ct
-    ) => Run(name, run, new Dictionary<string, object?>(), ct);
+    ) => Run(name, run, new StartActivityOptions(), ct);
 
     Task Run(
         string name,
         Func<CancellationToken, Task> run,
-        Dictionary<string, object?> tags, CancellationToken ct
+        StartActivityOptions options,
+        CancellationToken ct
     );
 }
 
@@ -23,24 +27,24 @@ public class ActivityScope: IActivityScope
 {
     private const string CommandHandlerPrefix = "commandhandler";
 
-    public Activity? Start(string name, params KeyValuePair<string, object?>[] tags) =>
+    public Activity? Start(string name, StartActivityOptions options) =>
         ActivitySourceProvider.Instance
             .CreateActivity(
                 $"{CommandHandlerPrefix}.{name}",
                 ActivityKind.Internal,
-                parentContext: default,
+                parentId: options.ParentId,
                 idFormat: ActivityIdFormat.W3C,
-                tags: tags
+                tags: options.Tags
             )?.Start();
 
     public async Task Run(
         string name,
         Func<CancellationToken, Task> run,
-        Dictionary<string, object?> tags,
+        StartActivityOptions options,
         CancellationToken ct
     )
     {
-        using var activity = Start(name, tags.ToArray());
+        using var activity = Start(name, options);
 
         try
         {
@@ -54,4 +58,11 @@ public class ActivityScope: IActivityScope
             throw;
         }
     }
+}
+
+public record StartActivityOptions
+{
+    public Dictionary<string, object?> Tags { get; set; } = new();
+
+    public string? ParentId { get; set; }
 }
