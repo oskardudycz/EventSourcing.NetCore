@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Reflection;
+using Core.OpenTelemetry;
 using Core.Tracing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,35 +17,48 @@ public class EventBus: IEventBus
 {
     private readonly IServiceProvider serviceProvider;
     private readonly Func<IServiceProvider, IEventEnvelope?, TracingScope> createTracingScope;
+    private readonly IActivityScope activityScope;
     private readonly AsyncPolicy retryPolicy;
     private static readonly ConcurrentDictionary<Type, MethodInfo> PublishMethods = new();
 
     public EventBus(
         IServiceProvider serviceProvider,
         Func<IServiceProvider, IEventEnvelope?, TracingScope> createTracingScope,
+        IActivityScope activityScope,
         AsyncPolicy retryPolicy
     )
     {
         this.serviceProvider = serviceProvider;
         this.createTracingScope = createTracingScope;
+        this.activityScope = activityScope;
         this.retryPolicy = retryPolicy;
     }
 
     private async Task Publish<TEvent>(TEvent @event, CancellationToken ct)
+        where TEvent : notnull
     {
         var eventEnvelope = @event as IEventEnvelope;
         using var scope = serviceProvider.CreateScope();
         using var tracingScope = createTracingScope(scope.ServiceProvider, eventEnvelope);
 
+        var eventName = eventEnvelope?.Data.GetType().Name ?? typeof(TEvent).Name;
         var eventHandlers =
             scope.ServiceProvider.GetServices<IEventHandler<TEvent>>();
 
         foreach (var eventHandler in eventHandlers)
         {
-            await retryPolicy.ExecuteAsync(async token =>
-            {
-                await eventHandler.Handle(@event, token);
-            }, ct);
+            var activityName = $"{eventHandler.GetType().Name}/{eventName}";
+
+            await activityScope.Run(
+                activityName,
+                token => retryPolicy.ExecuteAsync(c => eventHandler.Handle(@event, c), token),
+                new StartActivityOptions
+                {
+                    ParentId = eventEnvelope?.Metadata?.Trace?.CausationId?.Value,
+                    Tags = {{ TelemetryTags.EventHandling.Event, eventName }}
+                },
+                ct
+            );
         }
     }
 
@@ -75,6 +89,7 @@ public static class EventBusExtensions
         services.AddSingleton(sp => new EventBus(
             sp,
             sp.GetRequiredService<ITracingScopeFactory>().CreateTraceScope,
+            sp.GetRequiredService<IActivityScope>(),
             asyncPolicy ?? Policy.NoOpAsync()
         ));
         services

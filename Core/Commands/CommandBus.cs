@@ -9,17 +9,17 @@ public class CommandBus: ICommandBus
 {
     private readonly IServiceProvider serviceProvider;
     private readonly AsyncPolicy retryPolicy;
-    private readonly IActivityScope activitySourceCreator;
+    private readonly IActivityScope activityScope;
 
     public CommandBus(
         IServiceProvider serviceProvider,
-        IActivityScope activitySourceCreator,
+        IActivityScope activityScope,
         AsyncPolicy retryPolicy
     )
     {
         this.serviceProvider = serviceProvider;
         this.retryPolicy = retryPolicy;
-        this.activitySourceCreator = activitySourceCreator;
+        this.activityScope = activityScope;
     }
 
     public Task Send<TCommand>(TCommand command, CancellationToken ct = default)
@@ -32,10 +32,10 @@ public class CommandBus: ICommandBus
         var commandName = typeof(TCommand).Name;
         var activityName = $"{commandHandler.GetType().Name}/{commandName}";
 
-        return activitySourceCreator.Run(
+        return activityScope.Run(
             activityName,
             token => retryPolicy.ExecuteAsync(c => commandHandler.Handle(command, c), token),
-            new Dictionary<string, object?> { { TelemetryTags.CommandHandling.Command, commandName } },
+            new StartActivityOptions { Tags = {{ TelemetryTags.CommandHandling.Command, commandName }}},
             ct
         );
     }
