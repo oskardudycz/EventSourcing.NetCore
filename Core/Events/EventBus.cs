@@ -34,14 +34,37 @@ public class EventBus: IEventBus
         this.retryPolicy = retryPolicy;
     }
 
-    private async Task Publish<TEvent>(TEvent @event, CancellationToken ct)
+    private async Task Publish<TEvent>(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct)
         where TEvent : notnull
     {
-        var eventEnvelope = @event as IEventEnvelope;
         using var scope = serviceProvider.CreateScope();
         using var tracingScope = createTracingScope(scope.ServiceProvider, eventEnvelope);
 
-        var eventName = eventEnvelope?.Data.GetType().Name ?? typeof(TEvent).Name;
+        var eventName = eventEnvelope.Data.GetType().Name;
+
+        var activityOptions = new StartActivityOptions
+        {
+            ParentId = eventEnvelope.Metadata.Trace?.CausationId?.Value,
+            Tags = { { TelemetryTags.EventHandling.Event, eventName } }
+        };
+
+        var eventEnvelopeHandlers =
+            scope.ServiceProvider.GetServices<IEventHandler<EventEnvelope<TEvent>>>();
+
+        foreach (var eventHandler in eventEnvelopeHandlers)
+        {
+            var activityName = $"{eventHandler.GetType().Name}/{eventName}";
+
+            await activityScope.Run(
+                activityName,
+                (_, token) => retryPolicy.ExecuteAsync(c => eventHandler.Handle(eventEnvelope, c), token),
+                activityOptions,
+                ct
+            );
+        }
+
+        // publish also just event data
+        // thanks to that both handlers with envelope and without will be called
         var eventHandlers =
             scope.ServiceProvider.GetServices<IEventHandler<TEvent>>();
 
@@ -51,30 +74,21 @@ public class EventBus: IEventBus
 
             await activityScope.Run(
                 activityName,
-                token => retryPolicy.ExecuteAsync(c => eventHandler.Handle(@event, c), token),
-                new StartActivityOptions
-                {
-                    ParentId = eventEnvelope?.Metadata?.Trace?.CausationId?.Value,
-                    Tags = {{ TelemetryTags.EventHandling.Event, eventName }}
-                },
+                (_, token) => retryPolicy.ExecuteAsync(c => eventHandler.Handle(eventEnvelope.Data, c), token),
+                activityOptions,
                 ct
             );
         }
     }
 
-    public async Task Publish(IEventEnvelope eventEnvelope, CancellationToken ct)
+    public Task Publish(IEventEnvelope eventEnvelope, CancellationToken ct)
     {
-        // publish also just event data
-        // thanks to that both handlers with envelope and without will be called
-        await (Task)GetGenericPublishFor(eventEnvelope.Data)
-            .Invoke(this, new[] { eventEnvelope.Data, ct })!;
-
-        await (Task)GetGenericPublishFor(eventEnvelope)
+        return (Task)GetGenericPublishFor(eventEnvelope)
             .Invoke(this, new object[] { eventEnvelope, ct })!;
     }
 
-    private static MethodInfo GetGenericPublishFor(object @event) =>
-        PublishMethods.GetOrAdd(@event.GetType(), eventType =>
+    private static MethodInfo GetGenericPublishFor(IEventEnvelope @event) =>
+        PublishMethods.GetOrAdd(@event.Data.GetType(), eventType =>
             typeof(EventBus)
                 .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
                 .Single(m => m.Name == nameof(Publish) && m.GetGenericArguments().Any())

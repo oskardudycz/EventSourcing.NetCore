@@ -1,6 +1,10 @@
+using System.Diagnostics;
 using Core.Aggregates;
+using Core.OpenTelemetry;
 using Core.Tracing;
 using Marten;
+using OpenTelemetry;
+using OpenTelemetry.Context.Propagation;
 
 namespace Core.Marten.Repository;
 
@@ -19,57 +23,97 @@ public interface IMartenRepository<T> where T : class, IAggregate
 public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggregate
 {
     private readonly IDocumentSession documentSession;
+    private readonly IActivityScope activityScope;
+    private readonly TextMapPropagator propagator = Propagators.DefaultTextMapPropagator;
 
     public MartenRepository(
-        IDocumentSession documentSession
+        IDocumentSession documentSession,
+        IActivityScope activityScope
     )
     {
         this.documentSession = documentSession;
+        this.activityScope = activityScope;
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         documentSession.Events.AggregateStreamAsync<T>(id, token: cancellationToken);
 
-    public async Task<long> Add(T aggregate, TraceMetadata? traceMetadata = null,
-        CancellationToken cancellationToken = default)
-    {
-        documentSession.CorrelationId = traceMetadata?.CorrelationId?.Value;
-        documentSession.CausationId = traceMetadata?.CausationId?.Value;
+    public Task<long> Add(T aggregate, TraceMetadata? traceMetadata = null,
+        CancellationToken cancellationToken = default) =>
+        activityScope.Run($"{typeof(MartenRepository<T>).Name}/{nameof(Add)}",
+            async (activity, ct) =>
+            {
+            //     documentSession.CorrelationId = activity?.TraceId.ToHexString();
+            //     documentSession.CausationId = activity?.HasRemoteParent == true ? activity.ParentId : null;
+                documentSession.CorrelationId = traceMetadata?.CorrelationId?.Value;
+                documentSession.CausationId = traceMetadata?.CausationId?.Value;
 
-        var events = aggregate.DequeueUncommittedEvents();
+                if (activity?.Context != null)
+                {
+                    propagator.Inject(new PropagationContext(activity.Context, Baggage.Current), documentSession,
+                        InjectTraceContextIntoBasicProperties);
+                }
 
-        documentSession.Events.StartStream<Aggregate>(
-            aggregate.Id,
-            events
+                var events = aggregate.DequeueUncommittedEvents();
+
+                documentSession.Events.StartStream<Aggregate>(
+                    aggregate.Id,
+                    events
+                );
+
+                await documentSession.SaveChangesAsync(ct);
+
+                return (long)events.Length;
+            },
+            new StartActivityOptions { Tags = { { TelemetryTags.Logic.Entity, typeof(T).Name } } },
+            cancellationToken
         );
 
-        await documentSession.SaveChangesAsync(cancellationToken);
+    public Task<long> Update(T aggregate, long? expectedVersion = null, TraceMetadata? traceMetadata = null,
+        CancellationToken cancellationToken = default) =>
+        activityScope.Run($"{typeof(MartenRepository<T>).Name}/{nameof(Add)}",
+            async (activity, ct) =>
+            {
+                documentSession.CorrelationId = traceMetadata?.CorrelationId?.Value;
+                documentSession.CausationId = traceMetadata?.CausationId?.Value;
 
-        return events.Length;
-    }
+                if (activity?.Context != null)
+                {
+                    propagator.Inject(new PropagationContext(activity.Context, Baggage.Current), documentSession,
+                        InjectTraceContextIntoBasicProperties);
+                }
 
-    public async Task<long> Update(T aggregate, long? expectedVersion = null, TraceMetadata? traceMetadata = null,
-        CancellationToken cancellationToken = default)
-    {
-        documentSession.CorrelationId = traceMetadata?.CorrelationId?.Value;
-        documentSession.CausationId = traceMetadata?.CausationId?.Value;
+                var events = aggregate.DequeueUncommittedEvents();
 
-        var events = aggregate.DequeueUncommittedEvents();
+                var nextVersion = (expectedVersion ?? aggregate.Version) + events.Length;
 
-        var nextVersion = (expectedVersion ?? aggregate.Version) + events.Length;
+                documentSession.Events.Append(
+                    aggregate.Id,
+                    nextVersion,
+                    events
+                );
 
-        documentSession.Events.Append(
-            aggregate.Id,
-            nextVersion,
-            events
+                await documentSession.SaveChangesAsync(ct);
+
+                return nextVersion;
+            },
+            new StartActivityOptions { Tags = { { TelemetryTags.Logic.Entity, typeof(T).Name } } },
+            cancellationToken
         );
-
-        await documentSession.SaveChangesAsync(cancellationToken);
-
-        return nextVersion;
-    }
 
     public Task<long> Delete(T aggregate, long? expectedVersion = null, TraceMetadata? traceMetadata = null,
         CancellationToken cancellationToken = default) =>
         Update(aggregate, expectedVersion, traceMetadata, cancellationToken);
+
+    private void InjectTraceContextIntoBasicProperties(IDocumentSession session, string key, string value)
+    {
+        try
+        {
+            session.SetHeader(key, value);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Failed to inject trace context." + ex.Message);
+        }
+    }
 }

@@ -34,7 +34,7 @@ public class CommandBus: ICommandBus
 
         return activityScope.Run(
             activityName,
-            token => retryPolicy.ExecuteAsync(c => commandHandler.Handle(command, c), token),
+            (_, token) => retryPolicy.ExecuteAsync(c => commandHandler.Handle(command, c), token),
             new StartActivityOptions { Tags = {{ TelemetryTags.CommandHandling.Command, commandName }}},
             ct
         );

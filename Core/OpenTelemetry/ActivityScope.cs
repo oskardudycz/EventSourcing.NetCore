@@ -11,13 +11,26 @@ public interface IActivityScope
 
     Task Run(
         string name,
-        Func<CancellationToken, Task> run,
+        Func<Activity?, CancellationToken, Task> run,
         CancellationToken ct
     ) => Run(name, run, new StartActivityOptions(), ct);
 
     Task Run(
         string name,
-        Func<CancellationToken, Task> run,
+        Func<Activity?, CancellationToken, Task> run,
+        StartActivityOptions options,
+        CancellationToken ct
+    );
+
+    Task<TResult> Run<TResult>(
+        string name,
+        Func<Activity?, CancellationToken, Task<TResult>> run,
+        CancellationToken ct
+    ) => Run(name, run, new StartActivityOptions(), ct);
+
+    Task<TResult> Run<TResult>(
+        string name,
+        Func<Activity?, CancellationToken, Task<TResult>> run,
         StartActivityOptions options,
         CancellationToken ct
     );
@@ -39,18 +52,42 @@ public class ActivityScope: IActivityScope
 
     public async Task Run(
         string name,
-        Func<CancellationToken, Task> run,
+        Func<Activity?, CancellationToken, Task> run,
         StartActivityOptions options,
         CancellationToken ct
     )
     {
-        using var activity = Start(name, options);
+        using var activity = Start(name, options) ?? Activity.Current;
 
         try
         {
-            await run(ct);
+            await run(activity, ct);
 
             activity?.SetStatus(ActivityStatusCode.Ok);
+        }
+        catch
+        {
+            activity?.SetStatus(ActivityStatusCode.Error);
+            throw;
+        }
+    }
+
+    public async Task<TResult> Run<TResult>(
+        string name,
+        Func<Activity?, CancellationToken, Task<TResult>> run,
+        StartActivityOptions options,
+        CancellationToken ct
+    )
+    {
+        using var activity = Start(name, options) ?? Activity.Current;
+
+        try
+        {
+            var result = await run(activity, ct);
+
+            activity?.SetStatus(ActivityStatusCode.Ok);
+
+            return result;
         }
         catch
         {

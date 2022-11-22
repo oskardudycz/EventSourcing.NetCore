@@ -5,12 +5,14 @@ using Core.Tracing.Correlation;
 using Marten;
 using Marten.Events;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Context.Propagation;
 
 namespace Core.Marten.Subscriptions;
 
 public class MartenEventPublisher: IMartenEventsConsumer
 {
     private readonly IServiceProvider serviceProvider;
+    private readonly TextMapPropagator propagator = Propagators.DefaultTextMapPropagator;
 
     public MartenEventPublisher(
         IServiceProvider serviceProvider
