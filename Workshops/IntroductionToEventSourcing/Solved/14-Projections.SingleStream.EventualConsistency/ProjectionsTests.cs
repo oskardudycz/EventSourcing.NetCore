@@ -308,59 +308,7 @@ public class ProjectionsTests
         var otherPendingShoppingCartId = Guid.NewGuid();
         var otherClientId = Guid.NewGuid();
 
-        var logPosition = 0ul;
-
-        var events = new EventEnvelope[]
-        {
-            // first confirmed
-            new EventEnvelope<ShoppingCartOpened>(new ShoppingCartOpened(shoppingCartId, clientId),
-                EventMetadata.For(1, ++logPosition)),
-            new EventEnvelope<ProductItemAddedToShoppingCart>(
-                new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
-                EventMetadata.For(2, ++logPosition)),
-            new EventEnvelope<ProductItemAddedToShoppingCart>(
-                new ProductItemAddedToShoppingCart(shoppingCartId, tShirt), EventMetadata.For(3, ++logPosition)),
-            new EventEnvelope<ProductItemRemovedFromShoppingCart>(
-                new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes),
-                EventMetadata.For(4, ++logPosition)),
-            new EventEnvelope<ShoppingCartConfirmed>(new ShoppingCartConfirmed(shoppingCartId, DateTime.UtcNow),
-                EventMetadata.For(5, ++logPosition)),
-
-            // cancelled
-            new EventEnvelope<ShoppingCartOpened>(new ShoppingCartOpened(cancelledShoppingCartId, clientId),
-                EventMetadata.For(1, ++logPosition)),
-            new EventEnvelope<ProductItemAddedToShoppingCart>(
-                new ProductItemAddedToShoppingCart(cancelledShoppingCartId, dress),
-                EventMetadata.For(2, ++logPosition)),
-            new EventEnvelope<ShoppingCartCanceled>(new ShoppingCartCanceled(cancelledShoppingCartId, DateTime.UtcNow),
-                EventMetadata.For(3, ++logPosition)),
-
-            // confirmed but other client
-            new EventEnvelope<ShoppingCartOpened>(new ShoppingCartOpened(otherClientShoppingCartId, otherClientId),
-                EventMetadata.For(1, ++logPosition)),
-            new EventEnvelope<ProductItemAddedToShoppingCart>(
-                new ProductItemAddedToShoppingCart(otherClientShoppingCartId, dress),
-                EventMetadata.For(2, ++logPosition)),
-            new EventEnvelope<ShoppingCartConfirmed>(
-                new ShoppingCartConfirmed(otherClientShoppingCartId, DateTime.UtcNow),
-                EventMetadata.For(3, ++logPosition)),
-
-            // second confirmed
-            new EventEnvelope<ShoppingCartOpened>(new ShoppingCartOpened(otherConfirmedShoppingCartId, clientId),
-                EventMetadata.For(1, ++logPosition)),
-            new EventEnvelope<ProductItemAddedToShoppingCart>(
-                new ProductItemAddedToShoppingCart(otherConfirmedShoppingCartId, trousers),
-                EventMetadata.For(2, ++logPosition)),
-            new EventEnvelope<ShoppingCartConfirmed>(
-                new ShoppingCartConfirmed(otherConfirmedShoppingCartId, DateTime.UtcNow),
-                EventMetadata.For(3, ++logPosition)),
-
-            // first pending
-            new EventEnvelope<ShoppingCartOpened>(new ShoppingCartOpened(otherPendingShoppingCartId, clientId),
-                EventMetadata.For(1, ++logPosition))
-        };
-
-        var eventBus = new EventStore();
+        var eventStore = new EventStore();
         var database = new Database();
 
         // TODO:
@@ -368,21 +316,44 @@ public class ProjectionsTests
         // 2. Store results in database.
         var shoppingCartDetailsProjection = new ShoppingCartDetailsProjection(database);
 
-        eventBus.Register<ShoppingCartOpened>(shoppingCartDetailsProjection.Handle);
-        eventBus.Register<ProductItemAddedToShoppingCart>(shoppingCartDetailsProjection.Handle);
-        eventBus.Register<ProductItemRemovedFromShoppingCart>(shoppingCartDetailsProjection.Handle);
-        eventBus.Register<ShoppingCartConfirmed>(shoppingCartDetailsProjection.Handle);
-        eventBus.Register<ShoppingCartCanceled>(shoppingCartDetailsProjection.Handle);
+        eventStore.Register<ShoppingCartOpened>(shoppingCartDetailsProjection.Handle);
+        eventStore.Register<ProductItemAddedToShoppingCart>(shoppingCartDetailsProjection.Handle);
+        eventStore.Register<ProductItemRemovedFromShoppingCart>(shoppingCartDetailsProjection.Handle);
+        eventStore.Register<ShoppingCartConfirmed>(shoppingCartDetailsProjection.Handle);
+        eventStore.Register<ShoppingCartCanceled>(shoppingCartDetailsProjection.Handle);
 
         var shoppingCartShortInfoProjection = new ShoppingCartShortInfoProjection(database);
 
-        eventBus.Register<ShoppingCartOpened>(shoppingCartShortInfoProjection.Handle);
-        eventBus.Register<ProductItemAddedToShoppingCart>(shoppingCartShortInfoProjection.Handle);
-        eventBus.Register<ProductItemRemovedFromShoppingCart>(shoppingCartShortInfoProjection.Handle);
-        eventBus.Register<ShoppingCartConfirmed>(shoppingCartShortInfoProjection.Handle);
-        eventBus.Register<ShoppingCartCanceled>(shoppingCartShortInfoProjection.Handle);
+        eventStore.Register<ShoppingCartOpened>(shoppingCartShortInfoProjection.Handle);
+        eventStore.Register<ProductItemAddedToShoppingCart>(shoppingCartShortInfoProjection.Handle);
+        eventStore.Register<ProductItemRemovedFromShoppingCart>(shoppingCartShortInfoProjection.Handle);
+        eventStore.Register<ShoppingCartConfirmed>(shoppingCartShortInfoProjection.Handle);
+        eventStore.Register<ShoppingCartCanceled>(shoppingCartShortInfoProjection.Handle);
 
-        eventBus.Append(events);
+        // first confirmed
+        eventStore.Append(shoppingCartId, new ShoppingCartOpened(shoppingCartId, clientId));
+        eventStore.Append(shoppingCartId, new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes));
+        eventStore.Append(shoppingCartId, new ProductItemAddedToShoppingCart(shoppingCartId, tShirt));
+        eventStore.Append(shoppingCartId, new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes));
+        eventStore.Append(shoppingCartId, new ShoppingCartConfirmed(shoppingCartId, DateTime.UtcNow));
+
+        // cancelled
+        eventStore.Append(cancelledShoppingCartId, new ShoppingCartOpened(cancelledShoppingCartId, clientId));
+        eventStore.Append(cancelledShoppingCartId, new ProductItemAddedToShoppingCart(cancelledShoppingCartId, dress));
+        eventStore.Append(cancelledShoppingCartId, new ShoppingCartCanceled(cancelledShoppingCartId, DateTime.UtcNow));
+
+        // confirmed but other client
+        eventStore.Append(otherClientShoppingCartId, new ShoppingCartOpened(otherClientShoppingCartId, otherClientId));
+        eventStore.Append(otherClientShoppingCartId, new ProductItemAddedToShoppingCart(otherClientShoppingCartId, dress));
+        eventStore.Append(otherClientShoppingCartId, new ShoppingCartConfirmed(otherClientShoppingCartId, DateTime.UtcNow));
+
+        // second confirmed
+        eventStore.Append(otherConfirmedShoppingCartId, new ShoppingCartOpened(otherConfirmedShoppingCartId, clientId));
+        eventStore.Append(otherConfirmedShoppingCartId, new ProductItemAddedToShoppingCart(otherConfirmedShoppingCartId, trousers));
+        eventStore.Append(otherConfirmedShoppingCartId, new ShoppingCartConfirmed(otherConfirmedShoppingCartId, DateTime.UtcNow));
+
+        // first pending
+        eventStore.Append(otherPendingShoppingCartId, new ShoppingCartOpened(otherPendingShoppingCartId, clientId));
 
         // first confirmed
         var shoppingCart = database.GetExpectingGreaterOrEqualVersionWithRetries<ShoppingCartDetails>(shoppingCartId, 5)!;
