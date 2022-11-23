@@ -1,8 +1,8 @@
-using System.Diagnostics;
 using Core.Aggregates;
 using Core.OpenTelemetry;
 using Core.Tracing;
 using Marten;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 
@@ -24,15 +24,18 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
 {
     private readonly IDocumentSession documentSession;
     private readonly IActivityScope activityScope;
+    private readonly ILogger<MartenRepository<T>> logger;
     private readonly TextMapPropagator propagator = Propagators.DefaultTextMapPropagator;
 
     public MartenRepository(
         IDocumentSession documentSession,
-        IActivityScope activityScope
+        IActivityScope activityScope,
+        ILogger<MartenRepository<T>> logger
     )
     {
         this.documentSession = documentSession;
         this.activityScope = activityScope;
+        this.logger = logger;
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
@@ -43,8 +46,8 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
         activityScope.Run($"{typeof(MartenRepository<T>).Name}/{nameof(Add)}",
             async (activity, ct) =>
             {
-            //     documentSession.CorrelationId = activity?.TraceId.ToHexString();
-            //     documentSession.CausationId = activity?.HasRemoteParent == true ? activity.ParentId : null;
+                //     documentSession.CorrelationId = activity?.TraceId.ToHexString();
+                //     documentSession.CausationId = activity?.HasRemoteParent == true ? activity.ParentId : null;
                 documentSession.CorrelationId = traceMetadata?.CorrelationId?.Value;
                 documentSession.CausationId = traceMetadata?.CausationId?.Value;
 
@@ -71,7 +74,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
 
     public Task<long> Update(T aggregate, long? expectedVersion = null, TraceMetadata? traceMetadata = null,
         CancellationToken cancellationToken = default) =>
-        activityScope.Run($"{typeof(MartenRepository<T>).Name}/{nameof(Add)}",
+        activityScope.Run($"MartenRepository/{nameof(Add)}",
             async (activity, ct) =>
             {
                 documentSession.CorrelationId = traceMetadata?.CorrelationId?.Value;
@@ -113,7 +116,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Failed to inject trace context." + ex.Message);
+            logger.LogError(ex, "Failed to inject trace context.");
         }
     }
 }

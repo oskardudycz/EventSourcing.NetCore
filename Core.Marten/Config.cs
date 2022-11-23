@@ -3,6 +3,7 @@ using Core.Ids;
 using Core.Marten.Events;
 using Core.Marten.Ids;
 using Core.Marten.Subscriptions;
+using Core.OpenTelemetry;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
@@ -73,7 +74,14 @@ public static class MartenConfigExtensions
 
         options.Projections.Add(
             new MartenSubscription(
-                new[] { new MartenEventPublisher(serviceProvider) },
+                new[]
+                {
+                    new MartenEventPublisher(
+                        serviceProvider,
+                        serviceProvider.GetRequiredService<IActivityScope>(),
+                        serviceProvider.GetRequiredService<ILogger<MartenEventPublisher>>()
+                    )
+                },
                 serviceProvider.GetRequiredService<ILogger<MartenSubscription>>()
             ),
             ProjectionLifecycle.Async,
@@ -84,6 +92,7 @@ public static class MartenConfigExtensions
         {
             options.Events.MetadataConfig.CausationIdEnabled = true;
             options.Events.MetadataConfig.CorrelationIdEnabled = true;
+            options.Events.MetadataConfig.HeadersEnabled = true;
         }
 
         configureOptions?.Invoke(options);
