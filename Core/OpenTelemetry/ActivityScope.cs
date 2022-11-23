@@ -41,14 +41,23 @@ public class ActivityScope: IActivityScope
     private const string CommandHandlerPrefix = "commandhandler";
 
     public Activity? Start(string name, StartActivityOptions options) =>
-        ActivitySourceProvider.Instance
-            .CreateActivity(
-                $"{CommandHandlerPrefix}.{name}",
-                ActivityKind.Internal,
-                parentId: options.ParentId,
-                idFormat: ActivityIdFormat.W3C,
-                tags: options.Tags
-            )?.Start();
+        options.Parent.HasValue
+            ? ActivitySourceProvider.Instance
+                .CreateActivity(
+                    $"{CommandHandlerPrefix}.{name}",
+                    options.Kind,
+                    parentContext: options.Parent.Value,
+                    idFormat: ActivityIdFormat.W3C,
+                    tags: options.Tags
+                )?.Start()
+            : ActivitySourceProvider.Instance
+                .CreateActivity(
+                    $"{CommandHandlerPrefix}.{name}",
+                    options.Kind,
+                    parentId: options.ParentId,
+                    idFormat: ActivityIdFormat.W3C,
+                    tags: options.Tags
+                )?.Start();
 
     public async Task Run(
         string name,
@@ -102,4 +111,8 @@ public record StartActivityOptions
     public Dictionary<string, object?> Tags { get; set; } = new();
 
     public string? ParentId { get; set; }
+
+    public ActivityContext? Parent { get; set; }
+
+    public ActivityKind Kind = ActivityKind.Internal;
 }
