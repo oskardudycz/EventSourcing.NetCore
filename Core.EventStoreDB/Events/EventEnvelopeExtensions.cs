@@ -9,7 +9,7 @@ public static class EventEnvelopeExtensions
     public static IEventEnvelope? ToEventEnvelope(this ResolvedEvent resolvedEvent)
     {
         var eventData = resolvedEvent.Deserialize();
-        var eventMetadata = resolvedEvent.DeserializeMetadata();
+        var eventMetadata = resolvedEvent.DeserializePropagationContext();
 
         if (eventData == null)
             return null;

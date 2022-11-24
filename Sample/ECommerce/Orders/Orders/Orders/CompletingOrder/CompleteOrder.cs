@@ -35,12 +35,11 @@ public class HandleCompleteOrder:
 
     public async Task Handle(CompleteOrder command, CancellationToken cancellationToken)
     {
-        await scope.Do((expectedVersion, traceMetadata) =>
+        await scope.Do(expectedVersion =>
             orderRepository.GetAndUpdate(
                 command.OrderId,
                 order => order.Complete(),
                 expectedVersion,
-                traceMetadata,
                 cancellationToken
             )
         );

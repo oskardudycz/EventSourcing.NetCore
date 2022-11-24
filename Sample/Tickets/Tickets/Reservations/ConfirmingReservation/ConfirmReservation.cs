@@ -35,12 +35,11 @@ internal class HandleConfirmReservation:
 
     public async Task Handle(ConfirmReservation command, CancellationToken cancellationToken)
     {
-        await scope.Do((expectedVersion, traceMetadata) =>
+        await scope.Do(expectedVersion =>
             repository.GetAndUpdate(
                 command.ReservationId,
                 payment => payment.Confirm(),
                 expectedVersion,
-                traceMetadata,
                 cancellationToken
             )
         );

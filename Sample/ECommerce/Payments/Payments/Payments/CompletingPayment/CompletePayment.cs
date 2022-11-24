@@ -38,7 +38,7 @@ public class HandleCompletePayment:
     {
         var paymentId = command.PaymentId;
 
-        await scope.Do(async (expectedVersion, traceMetadata) =>
+        await scope.Do(async expectedVersion =>
             {
                 try
                 {
@@ -46,7 +46,6 @@ public class HandleCompletePayment:
                         paymentId,
                         payment => payment.Complete(),
                         expectedVersion,
-                        traceMetadata,
                         cancellationToken
                     );
                 }
@@ -56,7 +55,6 @@ public class HandleCompletePayment:
                         paymentId,
                         payment => payment.Discard(DiscardReason.UnexpectedError),
                         expectedVersion,
-                        traceMetadata,
                         cancellationToken
                     );
                 }

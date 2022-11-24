@@ -35,12 +35,11 @@ public class HandleStartTemperatureMeasurement:
 
     public async Task Handle(StartTemperatureMeasurement command, CancellationToken cancellationToken)
     {
-        await scope.Do((_, eventMetadata) =>
+        await scope.Do(_ =>
             repository.Add(
                 TemperatureMeasurement.Start(
                     command.MeasurementId
                 ),
-                eventMetadata,
                 cancellationToken
             )
         );

@@ -1,15 +1,9 @@
-﻿using System.Text;
-using Core.Events;
-using Core.Marten.Repository;
+﻿using Core.Events;
 using Core.OpenTelemetry;
-using Core.Tracing;
-using Core.Tracing.Causation;
-using Core.Tracing.Correlation;
 using Marten;
 using Marten.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry.Context.Propagation;
 
 namespace Core.Marten.Subscriptions;
 
@@ -18,7 +12,6 @@ public class MartenEventPublisher: IMartenEventsConsumer
     private readonly IServiceProvider serviceProvider;
     private readonly IActivityScope activityScope;
     private readonly ILogger<MartenEventPublisher> logger;
-    private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
 
     public MartenEventPublisher(
         IServiceProvider serviceProvider,
@@ -40,7 +33,7 @@ public class MartenEventPublisher: IMartenEventsConsumer
         foreach (var @event in streamActions.SelectMany(streamAction => streamAction.Events))
         {
             var parentContext =
-                Propagator.Extract(default, @event.Headers, ExtractTraceContextFromEventMetadata);
+                TelemetryPropagator.Extract(@event.Headers, ExtractTraceContextFromEventMetadata);
 
             await activityScope.Run($"{nameof(MartenEventPublisher)}/{nameof(ConsumeAsync)}",
                 async (_, ct) =>
@@ -52,10 +45,7 @@ public class MartenEventPublisher: IMartenEventsConsumer
                         @event.Id.ToString(),
                         (ulong)@event.Version,
                         (ulong)@event.Sequence,
-                        new TraceMetadata(
-                            @event.CorrelationId != null ? new CorrelationId(@event.CorrelationId) : null,
-                            @event.CausationId != null ? new CausationId(@event.CausationId) : null
-                        )
+                        parentContext
                     );
 
                     await eventBus.Publish(EventEnvelopeFactory.From(@event.Data, eventMetadata), ct);

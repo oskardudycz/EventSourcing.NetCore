@@ -1,5 +1,4 @@
 using Core.Events;
-using Core.Tracing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.EventStoreDB.OptimisticConcurrency;
@@ -12,9 +11,8 @@ public class EventStoreDBAppendScope: AppendScope<ulong>, IEventStoreDBAppendSco
 {
     public EventStoreDBAppendScope(
         Func<ulong?> getExpectedVersion,
-        Action<ulong> setNextExpectedVersion,
-        Func<TraceMetadata?> getEventMetadata
-    ): base(getExpectedVersion, setNextExpectedVersion, getEventMetadata)
+        Action<ulong> setNextExpectedVersion
+    ): base(getExpectedVersion, setNextExpectedVersion)
     {
     }
 }
@@ -31,12 +29,10 @@ public static class EventStoreDBAppendScopeExtensions
                     var expectedStreamVersionProvider =
                         sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>();
                     var nextStreamVersionProvider = sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>();
-                    var traceMetadataProvider = sp.GetRequiredService<ITraceMetadataProvider>();
 
                     return new EventStoreDBAppendScope(
                         () => expectedStreamVersionProvider.Value,
-                        nextStreamVersionProvider.Set,
-                        traceMetadataProvider.Get
+                        nextStreamVersionProvider.Set
                     );
                 });
 }

@@ -41,12 +41,11 @@ internal class HandleRemoveProduct:
     {
         var (cartId, pricedProductItem) = command;
 
-        await scope.Do((expectedRevision, eventMetadata) =>
+        await scope.Do(expectedRevision =>
             cartRepository.GetAndUpdate(
                 cartId,
                 cart => cart.RemoveProduct(pricedProductItem),
                 expectedRevision,
-                eventMetadata,
                 cancellationToken
             )
         );

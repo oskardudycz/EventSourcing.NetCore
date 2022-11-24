@@ -29,10 +29,9 @@ internal class HandleCreateMeeting:
     {
         var (id, name) = command;
 
-        await scope.Do((_, eventMetadata) =>
+        await scope.Do(_ =>
             repository.Add(
                 Meeting.New(id, name),
-                eventMetadata,
                 cancellationToken
             )
         );

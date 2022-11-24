@@ -39,12 +39,11 @@ public class HandleCancelOrder:
 
     public async Task Handle(CancelOrder command, CancellationToken cancellationToken)
     {
-        await scope.Do((expectedVersion, traceMetadata) =>
+        await scope.Do(expectedVersion =>
             orderRepository.GetAndUpdate(
                 command.OrderId,
                 order => order.Cancel(command.CancellationReason),
                 expectedVersion,
-                traceMetadata,
                 cancellationToken
             )
         );

@@ -40,10 +40,9 @@ internal class HandleOpenShoppingCart:
     {
         var (cartId, clientId) = command;
 
-        await scope.Do((_, eventMetadata) =>
+        await scope.Do(_ =>
             cartRepository.Add(
                 ShoppingCart.Open(cartId, clientId),
-                eventMetadata,
                 cancellationToken
             )
         );

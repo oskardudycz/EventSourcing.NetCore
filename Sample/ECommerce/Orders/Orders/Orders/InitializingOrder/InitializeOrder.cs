@@ -52,10 +52,9 @@ public class HandleInitializeOrder:
     {
         var (orderId, clientId, productItems, totalPrice) = command;
 
-        await scope.Do((_, eventMetadata) =>
+        await scope.Do(_ =>
             orderRepository.Add(
                 Order.Initialize(orderId, clientId, productItems, totalPrice),
-                eventMetadata,
                 cancellationToken
             )
         );

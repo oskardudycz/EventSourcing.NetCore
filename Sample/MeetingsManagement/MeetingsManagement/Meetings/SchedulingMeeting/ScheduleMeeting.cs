@@ -29,12 +29,11 @@ internal class HandleScheduleMeeting:
     {
         var (meetingId, dateRange) = command;
 
-        await scope.Do((expectedVersion, traceMetadata) =>
+        await scope.Do(expectedVersion =>
             repository.GetAndUpdate(
                 meetingId,
                 meeting => meeting.Schedule(dateRange),
                 expectedVersion,
-                traceMetadata,
                 cancellationToken
             )
         );

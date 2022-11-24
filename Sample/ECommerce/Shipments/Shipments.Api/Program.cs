@@ -4,7 +4,6 @@ using Core.Exceptions;
 using Core.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.Swagger;
-using Core.WebApi.Tracing;
 using Microsoft.OpenApi.Models;
 using Shipments;
 
@@ -19,7 +18,6 @@ builder.Services
     .AddKafkaProducer()
     .AddCoreServices()
     .AddShipmentsModule(builder.Configuration)
-    .AddCorrelationIdMiddleware()
     .AddControllers();
     // TODO: Add optimistic concurrency here
     // .AddOptimisticConcurrencyMiddleware();
@@ -33,7 +31,6 @@ app.UseExceptionHandlingMiddleware(exception => exception switch
         // ConcurrencyException => HttpStatusCode.PreconditionFailed,
         _ => HttpStatusCode.InternalServerError
     })
-    .UseCorrelationIdMiddleware()
     // TODO: Add optimistic concurrency here
     // .UseOptimisticConcurrencyMiddleware()
     .UseRouting()

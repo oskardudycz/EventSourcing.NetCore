@@ -43,12 +43,11 @@ public class HandleRecordOrderPayment:
     {
         var (orderId, paymentId, recordedAt) = command;
 
-        await scope.Do((expectedVersion, traceMetadata) =>
+        await scope.Do(expectedVersion =>
             orderRepository.GetAndUpdate(
                 orderId,
                 order => order.RecordPayment(paymentId, recordedAt),
                 expectedVersion,
-                traceMetadata,
                 cancellationToken
             )
         );

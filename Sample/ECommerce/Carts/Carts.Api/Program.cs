@@ -9,7 +9,6 @@ using Core.Serialization.Newtonsoft;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
-using Core.WebApi.Tracing;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
 using Npgsql;
@@ -26,7 +25,6 @@ builder.Services
     .AddKafkaProducer()
     .AddCoreServices()
     .AddCartsModule(builder.Configuration)
-    .AddCorrelationIdMiddleware()
     .AddOptimisticConcurrencyMiddleware(
         sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
         sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
@@ -48,7 +46,6 @@ app.UseExceptionHandlingMiddleware(exception => exception switch
         ConcurrencyException => HttpStatusCode.PreconditionFailed,
         _ => HttpStatusCode.InternalServerError
     })
-    .UseCorrelationIdMiddleware()
     .UseOptimisticConcurrencyMiddleware()
     .UseRouting()
     .UseAuthorization()

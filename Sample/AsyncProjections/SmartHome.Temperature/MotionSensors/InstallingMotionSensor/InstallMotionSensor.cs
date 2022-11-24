@@ -37,12 +37,11 @@ public class HandleInstallMotionSensor :
 
     public async Task Handle(InstallMotionSensor command, CancellationToken cancellationToken)
     {
-        await scope.Do((_, eventMetadata) =>
+        await scope.Do(_ =>
             repository.Add(
                 MotionSensor.Install(
                     command.MotionSensorId
                 ),
-                eventMetadata,
                 cancellationToken
             )
         );

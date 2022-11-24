@@ -5,7 +5,6 @@ using Core.Exceptions;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
-using Core.WebApi.Tracing;
 using ECommerce;
 using EventStore.Client;
 using ECommerce.Core;
@@ -22,7 +21,6 @@ builder.Services
     .AddCoreServices(builder.Configuration)
     .AddEventStoreDBSubscriptionToAll()
     .AddECommerceModule(builder.Configuration)
-    .AddCorrelationIdMiddleware()
     .AddOptimisticConcurrencyMiddleware(
         sp => sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().TrySet,
         sp => () => sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Value?.ToString()
@@ -37,7 +35,6 @@ app.UseExceptionHandlingMiddleware(exception => exception switch
         WrongExpectedVersionException => HttpStatusCode.PreconditionFailed,
         _ => HttpStatusCode.InternalServerError
     })
-    .UseCorrelationIdMiddleware()
     .UseOptimisticConcurrencyMiddleware()
     .UseHttpsRedirection()
     .UseRouting()

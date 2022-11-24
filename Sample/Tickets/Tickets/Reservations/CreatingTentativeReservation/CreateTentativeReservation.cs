@@ -44,14 +44,13 @@ internal class HandleCreateTentativeReservation:
     {
         var (reservationId, seatId) = command;
 
-        await scope.Do((_, eventMetadata) =>
+        await scope.Do(_ =>
             repository.Add(
                 Reservation.CreateTentative(
                     reservationId,
                     reservationNumberGenerator,
                     seatId
                 ),
-                eventMetadata,
                 cancellationToken
             )
         );
