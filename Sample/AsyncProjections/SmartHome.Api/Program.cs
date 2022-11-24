@@ -5,7 +5,6 @@ using Core.Marten.OptimisticConcurrency;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
-using Core.WebApi.Tracing;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
 using SmartHome.Temperature;
@@ -20,7 +19,6 @@ builder.Services
     })
     .AddCoreServices()
     .AddTemperaturesModule(builder.Configuration)
-    .AddCorrelationIdMiddleware()
     .AddOptimisticConcurrencyMiddleware(
         sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
         sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
@@ -34,7 +32,6 @@ app.UseExceptionHandlingMiddleware(exception => exception switch
         ConcurrencyException => HttpStatusCode.PreconditionFailed,
         _ => HttpStatusCode.InternalServerError
     })
-    .UseCorrelationIdMiddleware()
     .UseOptimisticConcurrencyMiddleware()
     .UseRouting()
     .UseAuthorization()

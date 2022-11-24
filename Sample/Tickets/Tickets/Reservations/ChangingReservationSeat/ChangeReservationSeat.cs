@@ -41,12 +41,11 @@ internal class HandleChangeReservationSeat:
 
     public async Task Handle(ChangeReservationSeat command, CancellationToken cancellationToken)
     {
-        await scope.Do((expectedVersion, traceMetadata) =>
+        await scope.Do(expectedVersion =>
             repository.GetAndUpdate(
                 command.ReservationId,
                 reservation => reservation.ChangeSeat(command.SeatId),
                 expectedVersion,
-                traceMetadata,
                 cancellationToken
             )
         );

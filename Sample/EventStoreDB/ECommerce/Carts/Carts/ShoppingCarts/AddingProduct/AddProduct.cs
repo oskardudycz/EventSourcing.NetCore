@@ -3,7 +3,6 @@ using Carts.ShoppingCarts.Products;
 using Core.Commands;
 using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.AddingProduct;
 
@@ -45,12 +44,11 @@ internal class HandleAddProduct:
     {
         var (cartId, productItem) = command;
 
-        await scope.Do((expectedRevision, eventMetadata) =>
+        await scope.Do(expectedRevision =>
             cartRepository.GetAndUpdate(
                 cartId,
                 cart => cart.AddProduct(productPriceCalculator, productItem),
                 expectedRevision,
-                eventMetadata,
                 cancellationToken
             )
         );

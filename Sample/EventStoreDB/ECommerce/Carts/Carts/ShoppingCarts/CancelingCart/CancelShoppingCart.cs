@@ -34,12 +34,11 @@ internal class HandleCancelCart:
 
     public async Task Handle(CancelShoppingCart command, CancellationToken cancellationToken)
     {
-        await scope.Do((expectedRevision, eventMetadata) =>
+        await scope.Do(expectedRevision =>
             cartRepository.GetAndUpdate(
                 command.CartId,
                 cart => cart.Cancel(),
                 expectedRevision,
-                eventMetadata,
                 cancellationToken
             )
         );

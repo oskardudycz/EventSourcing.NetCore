@@ -1,32 +1,27 @@
-﻿using Core.Tracing;
-
-namespace Core.Events;
+﻿namespace Core.Events;
 
 public interface IAppendScope<TVersion> where TVersion: struct
 {
-    Task Do(Func<TVersion?, TraceMetadata?, Task<TVersion>> handler);
+    Task Do(Func<TVersion?, Task<TVersion>> handler);
 }
 
 public class AppendScope<TVersion>: IAppendScope<TVersion> where TVersion: struct
 {
     private readonly Func<TVersion?> getExpectedVersion;
     private readonly Action<TVersion> setNextExpectedVersion;
-    private readonly Func<TraceMetadata?> getEventMetadata;
 
     public AppendScope(
         Func<TVersion?> getExpectedVersion,
-        Action<TVersion> setNextExpectedVersion,
-        Func<TraceMetadata?> getEventMetadata
+        Action<TVersion> setNextExpectedVersion
     )
     {
         this.getExpectedVersion = getExpectedVersion;
         this.setNextExpectedVersion = setNextExpectedVersion;
-        this.getEventMetadata = getEventMetadata;
     }
 
-    public async Task Do(Func<TVersion?, TraceMetadata?, Task<TVersion>> handler)
+    public async Task Do(Func<TVersion?, Task<TVersion>> handler)
     {
-        var nextVersion = await handler(getExpectedVersion(), getEventMetadata());
+        var nextVersion = await handler(getExpectedVersion());
 
         setNextExpectedVersion(nextVersion);
     }

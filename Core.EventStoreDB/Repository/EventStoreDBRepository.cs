@@ -2,43 +2,32 @@
 using Core.Events;
 using Core.EventStoreDB.Events;
 using Core.EventStoreDB.Serialization;
-using Core.Tracing;
+using Core.OpenTelemetry;
 using EventStore.Client;
+using OpenTelemetry.Context.Propagation;
 
 namespace Core.EventStoreDB.Repository;
 
 public interface IEventStoreDBRepository<T> where T : class, IAggregate
 {
     Task<T?> Find(Guid id, CancellationToken cancellationToken);
-
-    Task<ulong> Add(
-        T aggregate,
-        TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default
-    );
-
-    Task<ulong> Update(
-        T aggregate,
-        ulong? expectedRevision = null,
-        TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default
-    );
-
-    Task<ulong> Delete(
-        T aggregate,
-        ulong? expectedRevision = null,
-        TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default
-    );
+    Task<ulong> Add(T aggregate, CancellationToken ct = default);
+    Task<ulong> Update(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default);
+    Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default);
 }
 
 public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : class, IAggregate
 {
     private readonly EventStoreClient eventStore;
+    private readonly IActivityScope activityScope;
 
-    public EventStoreDBRepository(EventStoreClient eventStore)
+    public EventStoreDBRepository(
+        EventStoreClient eventStore,
+        IActivityScope activityScope
+    )
     {
-        this.eventStore = eventStore ?? throw new ArgumentNullException(nameof(eventStore));
+        this.eventStore = eventStore;
+        this.activityScope = activityScope;
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
@@ -47,43 +36,63 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
             cancellationToken
         );
 
-    public async Task<ulong> Add(T aggregate, TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default)
-    {
-        var result = await eventStore.AppendToStreamAsync(
-            StreamNameMapper.ToStreamId<T>(aggregate.Id),
-            StreamState.NoStream,
-            GetEventsToStore(aggregate, traceMetadata),
-            cancellationToken: ct
+    public Task<ulong> Add(T aggregate, CancellationToken token = default) =>
+        activityScope.Run($"{typeof(EventStoreDBRepository<T>).Name}/{nameof(Add)}",
+            async (activity, ct) =>
+            {
+                var result = await eventStore.AppendToStreamAsync(
+                    StreamNameMapper.ToStreamId<T>(aggregate.Id),
+                    StreamState.NoStream,
+                    GetEventsToStore(aggregate, TelemetryPropagator.GetPropagationContext(activity)),
+                    cancellationToken: ct
+                );
+                return result.NextExpectedStreamRevision.ToUInt64();
+            },
+            token
         );
-        return result.NextExpectedStreamRevision;
-    }
 
-    public async Task<ulong> Update(T aggregate, ulong? expectedRevision = null, TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default)
-    {
-        var eventsToAppend = GetEventsToStore(aggregate, traceMetadata);
-        var nextVersion = expectedRevision ?? (ulong)(aggregate.Version - eventsToAppend.Count);
+    public Task<ulong> Update(T aggregate, ulong? expectedRevision = null, CancellationToken token = default) =>
+        activityScope.Run($"{typeof(EventStoreDBRepository<T>).Name}/{nameof(Update)}",
+            async (activity, ct) =>
+            {
+                var eventsToAppend = GetEventsToStore(aggregate, TelemetryPropagator.GetPropagationContext(activity));
+                var nextVersion = expectedRevision ?? (ulong)(aggregate.Version - eventsToAppend.Count);
 
-        var result = await eventStore.AppendToStreamAsync(
-            StreamNameMapper.ToStreamId<T>(aggregate.Id),
-            nextVersion,
-            eventsToAppend,
-            cancellationToken: ct
+                var result = await eventStore.AppendToStreamAsync(
+                    StreamNameMapper.ToStreamId<T>(aggregate.Id),
+                    nextVersion,
+                    eventsToAppend,
+                    cancellationToken: ct
+                );
+                return result.NextExpectedStreamRevision.ToUInt64();
+            },
+            token
         );
-        return result.NextExpectedStreamRevision;
-    }
 
-    public Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default) =>
-        Update(aggregate, expectedRevision, traceMetadata, ct);
+    public Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, CancellationToken token = default) =>
+        activityScope.Run($"{typeof(EventStoreDBRepository<T>).Name}/{nameof(Delete)}",
+            async (activity, ct) =>
+            {
+                var eventsToAppend = GetEventsToStore(aggregate, TelemetryPropagator.GetPropagationContext(activity));
+                var nextVersion = expectedRevision ?? (ulong)(aggregate.Version - eventsToAppend.Count);
 
-    private static List<EventData> GetEventsToStore(T aggregate, TraceMetadata? traceMetadata)
+                var result = await eventStore.AppendToStreamAsync(
+                    StreamNameMapper.ToStreamId<T>(aggregate.Id),
+                    nextVersion,
+                    eventsToAppend,
+                    cancellationToken: ct
+                );
+                return result.NextExpectedStreamRevision.ToUInt64();
+            },
+            token
+        );
+
+    private static List<EventData> GetEventsToStore(T aggregate, PropagationContext? propagationContext)
     {
         var events = aggregate.DequeueUncommittedEvents();
 
         return events
-            .Select(@event => @event.ToJsonEventData(traceMetadata))
+            .Select(@event => @event.ToJsonEventData(propagationContext))
             .ToList();
     }
 }

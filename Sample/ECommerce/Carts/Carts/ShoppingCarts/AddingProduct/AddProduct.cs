@@ -42,12 +42,11 @@ internal class HandleAddProduct:
     {
         var (cartId, productItem) = command;
 
-        await scope.Do((expectedVersion, traceMetadata) =>
+        await scope.Do(expectedVersion =>
             cartRepository.GetAndUpdate(
                 cartId,
                 cart => cart.AddProduct(productPriceCalculator, productItem),
                 expectedVersion,
-                traceMetadata,
                 cancellationToken
             )
         );

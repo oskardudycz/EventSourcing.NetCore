@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Core.Tracing;
+﻿using OpenTelemetry.Context.Propagation;
 
 namespace Core.Events;
 
@@ -7,7 +6,7 @@ public record EventMetadata(
     string EventId,
     ulong StreamPosition,
     ulong LogPosition,
-    TraceMetadata? Trace
+    PropagationContext? PropagationContext
 );
 
 public interface IEventEnvelope

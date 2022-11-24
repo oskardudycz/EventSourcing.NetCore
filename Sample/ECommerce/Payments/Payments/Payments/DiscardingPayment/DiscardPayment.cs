@@ -40,12 +40,11 @@ public class HandleDiscardPayment:
     {
         var (paymentId, _) = command;
 
-        await scope.Do((expectedVersion, traceMetadata) =>
+        await scope.Do(expectedVersion =>
             paymentRepository.GetAndUpdate(
                 paymentId,
                 payment => payment.TimeOut(),
                 expectedVersion,
-                traceMetadata,
                 cancellationToken
             )
         );

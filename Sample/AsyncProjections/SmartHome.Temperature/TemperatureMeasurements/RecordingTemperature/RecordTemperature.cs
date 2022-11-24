@@ -39,12 +39,11 @@ public class HandleRecordTemperature:
     {
         var (measurementId, temperature) = command;
 
-        await scope.Do((expectedVersion, traceMetadata) =>
+        await scope.Do(expectedVersion =>
             repository.GetAndUpdate(
                 measurementId,
                 reservation => reservation.Record(temperature),
                 expectedVersion,
-                traceMetadata,
                 cancellationToken
             )
         );

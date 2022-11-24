@@ -2,7 +2,6 @@ using Core;
 using Core.Kafka;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.Swagger;
-using Core.WebApi.Tracing;
 using MeetingsSearch;
 using Microsoft.OpenApi.Models;
 
@@ -17,13 +16,11 @@ builder.Services
     .AddKafkaConsumer()
     .AddCoreServices()
     .AddMeetingsSearch(builder.Configuration)
-    .AddCorrelationIdMiddleware()
     .AddControllers();
 
 var app = builder.Build();
 
 app.UseExceptionHandlingMiddleware()
-    .UseCorrelationIdMiddleware()
     .UseRouting()
     .UseAuthorization()
     .UseEndpoints(endpoints =>

@@ -47,10 +47,9 @@ public class HandleRequestPayment:
     {
         var (paymentId, orderId, amount) = command;
 
-        await scope.Do((_, eventMetadata) =>
+        await scope.Do(_ =>
             paymentRepository.Add(
                 Payment.Initialize(paymentId, orderId, amount),
-                eventMetadata,
                 cancellationToken
             )
         );
