@@ -20,16 +20,26 @@ public static class SerializationExtensions
         return settings;
     }
 
+    public static JsonSerializerSettings WithConverters(this JsonSerializerSettings settings, params JsonConverter[] converters)
+    {
+        foreach (var converter in converters)
+        {
+            settings.Converters.Add(converter);
+        }
+        return settings;
+    }
+
     /// <summary>
     /// Deserialize object from json with JsonNet
     /// </summary>
     /// <typeparam name="T">Type of the deserialized object</typeparam>
     /// <param name="json">json string</param>
+    /// <param name="converters"></param>
     /// <returns>deserialized object</returns>
-    public static T FromJson<T>(this string json)
+    public static T FromJson<T>(this string json, params JsonConverter[] converters)
     {
         return JsonConvert.DeserializeObject<T>(json,
-            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver())!;
+            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver().WithConverters(converters))!;
     }
 
 
@@ -39,22 +49,24 @@ public static class SerializationExtensions
     /// <typeparam name="T">Type of the deserialized object</typeparam>
     /// <param name="json">json string</param>
     /// <param name="type">object type</param>
+    /// <param name="converters"></param>
     /// <returns>deserialized object</returns>
-    public static object? FromJson(this string json, Type type)
+    public static object? FromJson(this string json, Type type, params JsonConverter[] converters)
     {
         return JsonConvert.DeserializeObject(json, type,
-            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver());
+            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver().WithConverters(converters));
     }
 
     /// <summary>
     /// Serialize object to json with JsonNet
     /// </summary>
     /// <param name="obj">object to serialize</param>
+    /// <param name="converters"></param>
     /// <returns>json string</returns>
-    public static string ToJson(this object obj)
+    public static string ToJson(this object obj, params JsonConverter[] converters)
     {
         return JsonConvert.SerializeObject(obj,
-            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver());
+            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver().WithConverters(converters));
     }
 
     /// <summary>

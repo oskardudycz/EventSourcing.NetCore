@@ -2,6 +2,7 @@ using Core.BackgroundWorkers;
 using Core.Configuration;
 using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Subscriptions;
+using Core.OpenTelemetry;
 using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -58,6 +59,8 @@ public static class EventStoreDBConfigExtensions
 
                 var eventStoreDBSubscriptionToAll =
                     serviceProvider.GetRequiredService<EventStoreDBSubscriptionToAll>();
+
+                TelemetryPropagator.UseDefaultCompositeTextMapPropagator();
 
                 return new BackgroundWorker(
                     logger,

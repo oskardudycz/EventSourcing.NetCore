@@ -1,15 +1,11 @@
-﻿using Core.OpenTelemetry;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenTelemetry.Context.Propagation;
 
-namespace Core.EventStoreDB.Events;
+namespace Core.OpenTelemetry.Serialization;
 
-public class EventStoreDBEventMetadataJsonConverter: JsonConverter
+public class PropagationContextJsonConverter: JsonConverter
 {
-    private const string CorrelationIdPropertyName = "$correlationId";
-    private const string CausationIdPropertyName = "$causationId";
-
     private const string TraceParentPropertyName = "traceparent";
     private const string TraceStatePropertyName = "tracestate";
 
@@ -27,12 +23,6 @@ public class EventStoreDBEventMetadataJsonConverter: JsonConverter
         }
 
         writer.WriteStartObject();
-        writer.WritePropertyName(CorrelationIdPropertyName);
-        writer.WriteValue(propagationContext.ActivityContext.TraceId.ToHexString());
-
-        writer.WritePropertyName(CausationIdPropertyName);
-        writer.WriteValue(propagationContext.ActivityContext.SpanId.ToHexString());
-
         propagationContext.Inject(writer, SerializePropagationContext);
     }
 
