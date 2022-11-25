@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using Core.Events;
+using Core.OpenTelemetry.Serialization;
 using Core.Reflection;
 using Core.Serialization.Newtonsoft;
 
@@ -17,6 +18,6 @@ public static class EventEnvelopeExtensions
         var eventEnvelopeType = typeof(EventEnvelope<>).MakeGenericType(eventType);
 
         // deserialize event
-        return message.Message.Value.FromJson(eventEnvelopeType) as IEventEnvelope;
+        return message.Message.Value.FromJson(eventEnvelopeType, new PropagationContextJsonConverter()) as IEventEnvelope;
     }
 }

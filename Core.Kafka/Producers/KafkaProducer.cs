@@ -3,6 +3,7 @@ using Confluent.Kafka;
 using Core.Events;
 using Core.Events.External;
 using Core.OpenTelemetry;
+using Core.OpenTelemetry.Serialization;
 using Core.Serialization.Newtonsoft;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -43,7 +44,7 @@ public class KafkaProducer: IExternalEventProducer
                             // store event type name in message Key
                             Key = @event.Data.GetType().Name,
                             // serialize event to message Value
-                            Value = @event.ToJson()
+                            Value = @event.ToJson(new PropagationContextJsonConverter())
                         }, ct).ConfigureAwait(false);
                 },
                 new StartActivityOptions

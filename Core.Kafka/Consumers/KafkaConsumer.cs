@@ -95,7 +95,7 @@ public class KafkaConsumer: IExternalEventConsumer
                 async (_, ct) =>
                 {
                     // publish event to internal event bus
-                    await eventBus.Publish(eventEnvelope, token);
+                    await eventBus.Publish(eventEnvelope, ct);
 
                     consumer.Commit();
                 },
