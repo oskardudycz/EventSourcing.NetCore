@@ -15,7 +15,9 @@ public static class Config
     public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
         // TODO: Remove MediatR
-        services.AddMediatR()
+        services
+            .AddSingleton<IActivityScope, ActivityScope>()
+            .AddMediatR()
             .AddScoped<IQueryBus, QueryBus>()
             .AddEventBus()
             .AddCommandBus();

@@ -18,6 +18,7 @@ public class EventStoreDBEventMetadataJsonConverterTests
     {
         Activity.DefaultIdFormat = ActivityIdFormat.W3C;
         ActivitySourceProvider.AddDummyListener();
+        TelemetryPropagator.UseDefaultCompositeTextMapPropagator();
     }
 
     [Fact]
@@ -33,22 +34,30 @@ public class EventStoreDBEventMetadataJsonConverterTests
 
         json.Should()
             .Be(
-                $"{{\"$correlationId\":\"{activity.Context.TraceId}\",\"$causationId\":\"{activity.Context.SpanId}\"}}");
+                $"{{\"$correlationId\":\"{activity.Context.TraceId}\",\"$causationId\":\"{activity.Context.SpanId}\",\"traceparent\":\"00-{propagationContext.ActivityContext.TraceId}-{propagationContext.ActivityContext.SpanId}-01\"}}");
     }
 
     [Fact]
-    public void DeSerialize_ForNonEmptyEventMetadata_ShouldSucceed()
+    public void Deserialize_ForNonEmptyEventMetadata_ShouldSucceed()
     {
-        // // Given
-        // var correlationId = new GuidCorrelationIdFactory().New();
-        // var causationId = new GuidCausationIdFactory().New();
-        // var expectedEventMetadata = new PropagationContext(correlationId, causationId);
-        // var json = $"{{\"$correlationId\":\"{correlationId.Value}\",\"$causationId\":\"{causationId.Value}\"}}";
-        //
-        // // When
-        // var eventMetadata = JsonConvert.DeserializeObject<PropagationContext>(json, jsonConverter);
-        //
-        //
-        // eventMetadata.Should().Be(expectedEventMetadata);
+        // Given
+        const string traceId = "83c414374747d7383946dcf56830cb79";
+        const string spanId = "0c180e05010f2d3f";
+        var expectedPropagationContext = new PropagationContext(
+            new ActivityContext(
+                ActivityTraceId.CreateFromString(traceId),
+                ActivitySpanId.CreateFromString(spanId),
+                ActivityTraceFlags.Recorded,
+                isRemote: true
+            ),
+            Baggage.Create()
+        );
+        var json =
+            $"{{\"$correlationId\":\"{traceId}\",\"$causationId\":\"{spanId}\",\"traceparent\":\"00-{traceId}-{spanId}-01\"}}";
+
+        // When
+        var propagationContext = JsonConvert.DeserializeObject<PropagationContext>(json, jsonConverter);
+
+        propagationContext.Should().Be(expectedPropagationContext);
     }
 }

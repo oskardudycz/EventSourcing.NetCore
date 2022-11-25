@@ -1,9 +1,12 @@
+using System.Diagnostics;
 using Core.Events;
 using Core.EventStoreDB.Events;
+using Core.OpenTelemetry;
 using Core.Threading;
 using EventStore.Client;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using EventTypeFilter = EventStore.Client.EventTypeFilter;
 
 namespace Core.EventStoreDB.Subscriptions;
 
@@ -25,6 +28,7 @@ public class EventStoreDBSubscriptionToAll
     private readonly IEventBus eventBus;
     private readonly EventStoreClient eventStoreClient;
     private readonly ISubscriptionCheckpointRepository checkpointRepository;
+    private readonly IActivityScope activityScope;
     private readonly ILogger<EventStoreDBSubscriptionToAll> logger;
     private EventStoreDBSubscriptionToAllOptions subscriptionOptions = default!;
     private string SubscriptionId => subscriptionOptions.SubscriptionId;
@@ -35,14 +39,15 @@ public class EventStoreDBSubscriptionToAll
         EventStoreClient eventStoreClient,
         IEventBus eventBus,
         ISubscriptionCheckpointRepository checkpointRepository,
+        IActivityScope activityScope,
         ILogger<EventStoreDBSubscriptionToAll> logger
     )
     {
-        this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        this.eventStoreClient = eventStoreClient ?? throw new ArgumentNullException(nameof(eventStoreClient));
-        this.checkpointRepository =
-            checkpointRepository ?? throw new ArgumentNullException(nameof(checkpointRepository));
-        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        this.eventBus = eventBus;
+        this.eventStoreClient = eventStoreClient;
+        this.checkpointRepository = checkpointRepository;
+        this.activityScope = activityScope;
+        this.logger = logger;
     }
 
     public async Task SubscribeToAll(EventStoreDBSubscriptionToAllOptions subscriptionOptions, CancellationToken ct)
@@ -58,7 +63,7 @@ public class EventStoreDBSubscriptionToAll
         var checkpoint = await checkpointRepository.Load(SubscriptionId, ct);
 
         await eventStoreClient.SubscribeToAllAsync(
-            checkpoint == null? FromAll.Start : FromAll.After(new Position(checkpoint.Value, checkpoint.Value)),
+            checkpoint == null ? FromAll.Start : FromAll.After(new Position(checkpoint.Value, checkpoint.Value)),
             HandleEvent,
             subscriptionOptions.ResolveLinkTos,
             HandleDrop,
@@ -70,8 +75,11 @@ public class EventStoreDBSubscriptionToAll
         logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
     }
 
-    private async Task HandleEvent(StreamSubscription subscription, ResolvedEvent resolvedEvent,
-        CancellationToken ct)
+    private async Task HandleEvent(
+        StreamSubscription subscription,
+        ResolvedEvent resolvedEvent,
+        CancellationToken token
+    )
     {
         try
         {
@@ -96,10 +104,22 @@ public class EventStoreDBSubscriptionToAll
                 return;
             }
 
-            // publish event to internal event bus
-            await eventBus.Publish(eventEnvelope, ct);
+            await activityScope.Run($"{nameof(EventStoreDBSubscriptionToAll)}/{nameof(HandleEvent)}",
+                async (_, ct) =>
+                {
+                    // publish event to internal event bus
+                    await eventBus.Publish(eventEnvelope, ct);
 
-            await checkpointRepository.Store(SubscriptionId, resolvedEvent.Event.Position.CommitPosition, ct);
+                    await checkpointRepository.Store(SubscriptionId, resolvedEvent.Event.Position.CommitPosition, ct);
+                },
+                new StartActivityOptions
+                {
+                    Tags = { { TelemetryTags.EventHandling.Event, eventEnvelope.Data.GetType() } },
+                    Parent = eventEnvelope.Metadata.PropagationContext?.ActivityContext,
+                    Kind = ActivityKind.Consumer
+                },
+                token
+            );
         }
         catch (Exception e)
         {
