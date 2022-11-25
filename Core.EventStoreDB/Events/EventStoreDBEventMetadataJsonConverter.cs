@@ -60,15 +60,15 @@ public class EventStoreDBEventMetadataJsonConverter: JsonConverter
 
             switch (propertyName)
             {
-                case CorrelationIdPropertyName:
+                case TraceParentPropertyName:
                     traceParent = propertyValue;
                     break;
-                case CausationIdPropertyName:
+                case TraceStatePropertyName:
                     traceState = propertyValue;
                     break;
             }
         } while (true);
-        
+
         var parentContext = TelemetryPropagator.Extract(
             new Dictionary<string, string?>
             {

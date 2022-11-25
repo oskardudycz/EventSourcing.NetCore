@@ -1,7 +1,10 @@
+using System.Diagnostics;
 using Confluent.Kafka;
 using Core.Events;
 using Core.Events.External;
 using Core.Kafka.Events;
+using Core.Kafka.Producers;
+using Core.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -9,21 +12,25 @@ namespace Core.Kafka.Consumers;
 
 public class KafkaConsumer: IExternalEventConsumer
 {
-    private readonly ILogger<KafkaConsumer> logger;
-    private readonly IEventBus eventBus;
     private readonly KafkaConsumerConfig config;
+    private readonly IEventBus eventBus;
+    private readonly IActivityScope activityScope;
+    private readonly ILogger<KafkaConsumer> logger;
 
     public KafkaConsumer(
-        ILogger<KafkaConsumer> logger,
         IConfiguration configuration,
-        IEventBus eventBus
+        IEventBus eventBus,
+        IActivityScope activityScope,
+        ILogger<KafkaConsumer> logger
     )
     {
-        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        this.eventBus = eventBus;
 
         if (configuration == null)
             throw new ArgumentNullException(nameof(configuration));
+
+        this.eventBus = eventBus;
+        this.activityScope = activityScope;
+        this.logger = logger;
 
         // get configuration from appsettings.json
         config = configuration.GetKafkaConsumerConfig();
@@ -55,14 +62,14 @@ public class KafkaConsumer: IExternalEventConsumer
         }
     }
 
-    private async Task ConsumeNextEvent(IConsumer<string, string> consumer, CancellationToken cancellationToken)
+    private async Task ConsumeNextEvent(IConsumer<string, string> consumer, CancellationToken token)
     {
         try
         {
             //lol ^_^ - remove this hack when this GH issue is solved: https://github.com/dotnet/extensions/issues/2149#issuecomment-518709751
             await Task.Yield();
             // wait for the upcoming message, consume it when arrives
-            var message = consumer.Consume(cancellationToken);
+            var message = consumer.Consume(token);
 
             // get event type from name stored in message.Key
             var eventEnvelope = message.ToEventEnvelope();
@@ -84,10 +91,22 @@ public class KafkaConsumer: IExternalEventConsumer
                 return;
             }
 
-            // publish event to internal event bus
-            await eventBus.Publish(eventEnvelope, cancellationToken);
+            await activityScope.Run($"{nameof(KafkaConsumer)}/{nameof(ConsumeNextEvent)}",
+                async (_, ct) =>
+                {
+                    // publish event to internal event bus
+                    await eventBus.Publish(eventEnvelope, token);
 
-            consumer.Commit();
+                    consumer.Commit();
+                },
+                new StartActivityOptions
+                {
+                    Tags = { { TelemetryTags.EventHandling.Event, eventEnvelope.Data.GetType() } },
+                    Parent = eventEnvelope.Metadata.PropagationContext?.ActivityContext,
+                    Kind = ActivityKind.Consumer
+                },
+                token
+            );
         }
         catch (Exception e)
         {
