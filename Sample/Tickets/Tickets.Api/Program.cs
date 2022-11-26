@@ -2,12 +2,15 @@ using System.Net;
 using Core;
 using Core.Exceptions;
 using Core.Marten.OptimisticConcurrency;
+using Core.OpenTelemetry;
 using Core.Serialization.Newtonsoft;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
+using Npgsql;
+using OpenTelemetry.Trace;
 using Tickets;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +27,12 @@ builder.Services
         sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
         sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
     )
+    .AddOpenTelemetry("Tickets", OpenTelemetryOptions.Build(options =>
+        options.Configure(t =>
+            t.AddJaegerExporter()
+                .AddNpgsql()
+        ).DisableConsoleExporter(true)
+    ))
     .AddControllers()
     .AddNewtonsoftJson(opt => opt.SerializerSettings.WithDefaults());
 

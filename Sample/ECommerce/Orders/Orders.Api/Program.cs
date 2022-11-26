@@ -3,11 +3,14 @@ using Core;
 using Core.Exceptions;
 using Core.Kafka;
 using Core.Marten.OptimisticConcurrency;
+using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
+using Npgsql;
+using OpenTelemetry.Trace;
 using Orders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +28,12 @@ builder.Services
         sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
         sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
     )
+    .AddOpenTelemetry("Orders", OpenTelemetryOptions.Build(options =>
+        options.Configure(t =>
+            t.AddJaegerExporter()
+                .AddNpgsql()
+        ).DisableConsoleExporter(true)
+    ))
     .AddControllers();
 
 var app = builder.Build();

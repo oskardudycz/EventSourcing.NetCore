@@ -2,6 +2,7 @@ using System.Net;
 using Core.EventStoreDB;
 using Core.EventStoreDB.OptimisticConcurrency;
 using Core.Exceptions;
+using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
@@ -9,6 +10,7 @@ using ECommerce;
 using EventStore.Client;
 using ECommerce.Core;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,11 @@ builder.Services
         sp => sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().TrySet,
         sp => () => sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Value?.ToString()
     )
+    .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
+        options.Configure(t =>
+            t.AddJaegerExporter()
+        ).DisableConsoleExporter(true)
+    ))
     .AddControllers();
 
 var app = builder.Build();

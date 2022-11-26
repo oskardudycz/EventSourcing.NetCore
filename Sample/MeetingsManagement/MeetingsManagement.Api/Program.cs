@@ -3,12 +3,14 @@ using Core;
 using Core.Exceptions;
 using Core.Kafka;
 using Core.Marten.OptimisticConcurrency;
+using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Marten.Exceptions;
 using MeetingsManagement;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,11 @@ builder.Services
         sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
         sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
     )
+    .AddOpenTelemetry("MeetingsManagement", OpenTelemetryOptions.Build(options =>
+        options.Configure(t =>
+            t.AddJaegerExporter()
+        ).DisableConsoleExporter(true)
+    ))
     .AddControllers();
 
 var app = builder.Build();
