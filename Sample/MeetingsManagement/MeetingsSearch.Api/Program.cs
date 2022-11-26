@@ -1,9 +1,11 @@
 using Core;
 using Core.Kafka;
+using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.Swagger;
 using MeetingsSearch;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,11 @@ builder.Services
     .AddKafkaConsumer()
     .AddCoreServices()
     .AddMeetingsSearch(builder.Configuration)
+    .AddOpenTelemetry("MeetingsSearch", OpenTelemetryOptions.Build(options =>
+        options.Configure(t =>
+            t.AddJaegerExporter()
+        ).DisableConsoleExporter(true)
+    ))
     .AddControllers();
 
 var app = builder.Build();
