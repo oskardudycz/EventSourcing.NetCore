@@ -7,6 +7,7 @@ using Core.Kafka.Producers;
 using Core.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static Core.Extensions.DictionaryExtensions;
 
 namespace Core.Kafka.Consumers;
 
@@ -101,7 +102,18 @@ public class KafkaConsumer: IExternalEventConsumer
                 },
                 new StartActivityOptions
                 {
-                    Tags = { { TelemetryTags.EventHandling.Event, eventEnvelope.Data.GetType() } },
+                    Tags = Merge(
+                        TelemetryTags.Messaging.Kafka.ConsumerTags(
+                            config.ConsumerConfig.GroupId,
+                            message.Topic,
+                            message.Message.Key,
+                            message.Partition.Value.ToString(),
+                            config.ConsumerConfig.GroupId
+                        ),
+                        new Dictionary<string, object?>
+                        {
+                            { TelemetryTags.EventHandling.Event, eventEnvelope.Data.GetType() }
+                        }),
                     Parent = eventEnvelope.Metadata.PropagationContext?.ActivityContext,
                     Kind = ActivityKind.Consumer
                 },
