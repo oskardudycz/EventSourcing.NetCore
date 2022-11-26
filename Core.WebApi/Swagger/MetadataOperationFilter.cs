@@ -24,21 +24,5 @@ public class MetadataOperationFilter: IOperationFilter
                 Required = context.ApiDescription.HttpMethod != HttpMethod.Post.Method
             });
         }
-
-        operation.Parameters.Add(new OpenApiParameter
-        {
-            Name = "X-Correlation-ID",
-            In = ParameterLocation.Header,
-            Description = "Correlation Id",
-            Required = false
-        });
-
-        operation.Parameters.Add(new OpenApiParameter
-        {
-            Name = "X-Causation-ID",
-            In = ParameterLocation.Header,
-            Description = "Causation Id",
-            Required = false
-        });
     }
 }

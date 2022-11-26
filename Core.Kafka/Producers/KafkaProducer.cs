@@ -7,6 +7,7 @@ using Core.OpenTelemetry.Serialization;
 using Core.Serialization.Newtonsoft;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static Core.Extensions.DictionaryExtensions;
 
 namespace Core.Kafka.Producers;
 
@@ -49,7 +50,16 @@ public class KafkaProducer: IExternalEventProducer
                 },
                 new StartActivityOptions
                 {
-                    Tags = { { TelemetryTags.EventHandling.Event, @event.Data.GetType() } },
+                    Tags = Merge(
+                        TelemetryTags.Messaging.Kafka.ProducerTags(
+                            config.Topic,
+                            config.Topic,
+                            @event.Data.GetType().Name
+                        ),
+                        new Dictionary<string, object?>
+                        {
+                            { TelemetryTags.EventHandling.Event, @event.Data.GetType() }
+                        }),
                     Kind = ActivityKind.Producer
                 },
                 token
@@ -57,7 +67,7 @@ public class KafkaProducer: IExternalEventProducer
         }
         catch (Exception e)
         {
-            logger.LogError("Error producing Kafka message: {Message} {StackTrace}",e.Message, e.StackTrace);
+            logger.LogError("Error producing Kafka message: {Message} {StackTrace}", e.Message, e.StackTrace);
             throw;
         }
     }
