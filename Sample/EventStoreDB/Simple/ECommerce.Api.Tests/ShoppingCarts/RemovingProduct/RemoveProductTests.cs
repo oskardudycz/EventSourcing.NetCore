@@ -1,3 +1,4 @@
+using System.Globalization;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
@@ -67,7 +68,7 @@ public class RemoveProductTests: IClassFixture<RemoveProductFixture>
         await API
             .Given(
                 URI(
-                    $"/api/ShoppingCarts/{API.ShoppingCartId}/products/{API.ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={API.UnitPrice}"),
+                    $"/api/ShoppingCarts/{API.ShoppingCartId}/products/{API.ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={API.UnitPrice.ToString(CultureInfo.InvariantCulture)}"),
                 HEADERS(IF_MATCH(1))
             )
             .When(DELETE)
