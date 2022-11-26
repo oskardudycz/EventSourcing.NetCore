@@ -25,7 +25,7 @@ public class MeetingsController: Controller
     public async Task<MeetingView> Get(Guid id)
     {
 
-        var result = await queryBus.Send<GetMeeting, MeetingView>(new GetMeeting(id));
+        var result = await queryBus.Query<GetMeeting, MeetingView>(new GetMeeting(id));
 
         Response.TrySetETagResponseHeader(result.Version);
 

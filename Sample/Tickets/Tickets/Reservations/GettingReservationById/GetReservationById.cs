@@ -6,7 +6,7 @@ namespace Tickets.Reservations.GettingReservationById;
 
 public record GetReservationById(
     Guid ReservationId
-): IQuery<ReservationDetails>;
+);
 
 
 internal class HandleGetReservationById :

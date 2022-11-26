@@ -6,7 +6,7 @@ namespace Carts.ShoppingCarts.GettingCartById;
 
 public record GetCartById(
     Guid CartId
-    ) : IQuery<ShoppingCartDetails>
+)
 {
     public static GetCartById Create(Guid? cartId)
     {

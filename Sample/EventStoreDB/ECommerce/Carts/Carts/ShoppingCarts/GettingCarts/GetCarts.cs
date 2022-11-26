@@ -7,7 +7,7 @@ namespace Carts.ShoppingCarts.GettingCarts;
 public record GetCarts(
     int PageNumber,
     int PageSize
-): IQuery<IPagedList<ShoppingCartShortInfo>>
+)
 {
     public static GetCarts Create(int? pageNumber = 1, int? pageSize = 20)
     {

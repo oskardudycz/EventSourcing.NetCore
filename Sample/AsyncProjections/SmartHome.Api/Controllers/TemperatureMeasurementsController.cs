@@ -28,7 +28,7 @@ public class TemperatureMeasurementsController: Controller
 
     [HttpGet]
     public Task<IReadOnlyList<TemperatureMeasurement>> Get() =>
-        queryBus.Send<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>(
+        queryBus.Query<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>(
             new GetTemperatureMeasurements()
         );
 

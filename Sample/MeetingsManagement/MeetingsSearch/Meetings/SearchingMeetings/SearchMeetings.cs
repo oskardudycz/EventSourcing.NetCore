@@ -3,7 +3,7 @@ using Core.Queries;
 
 namespace MeetingsSearch.Meetings.SearchingMeetings;
 
-public class SearchMeetings: IQuery<IReadOnlyCollection<Meeting>>
+public class SearchMeetings
 {
     public string Filter { get; }
 

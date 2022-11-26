@@ -37,13 +37,13 @@ public class ReservationsController: Controller
     [HttpGet("{id}")]
     public Task<ReservationDetails> Get(Guid id)
     {
-        return queryBus.Send<GetReservationById, ReservationDetails>(new GetReservationById(id));
+        return queryBus.Query<GetReservationById, ReservationDetails>(new GetReservationById(id));
     }
 
     [HttpGet]
     public async Task<PagedListResponse<ReservationShortInfo>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
     {
-        var pagedList = await queryBus.Send<GetReservations, IPagedList<ReservationShortInfo>>(GetReservations.Create(pageNumber, pageSize));
+        var pagedList = await queryBus.Query<GetReservations, IPagedList<ReservationShortInfo>>(GetReservations.Create(pageNumber, pageSize));
 
         return PagedListResponse.From(pagedList);
     }
@@ -52,7 +52,7 @@ public class ReservationsController: Controller
     [HttpGet("{id}/history")]
     public async Task<PagedListResponse<ReservationHistory>> GetHistory(Guid id)
     {
-        var pagedList = await queryBus.Send<GetReservationHistory, IPagedList<ReservationHistory>>(GetReservationHistory.Create(id));
+        var pagedList = await queryBus.Query<GetReservationHistory, IPagedList<ReservationHistory>>(GetReservationHistory.Create(id));
 
         return PagedListResponse.From(pagedList);
     }
@@ -63,7 +63,7 @@ public class ReservationsController: Controller
         if (request == null)
             throw new ArgumentNullException(nameof(request));
 
-        return queryBus.Send<GetReservationAtVersion, ReservationDetails>(GetReservationAtVersion.Create(id, request.Version));
+        return queryBus.Query<GetReservationAtVersion, ReservationDetails>(GetReservationAtVersion.Create(id, request.Version));
     }
 
     [HttpPost]
