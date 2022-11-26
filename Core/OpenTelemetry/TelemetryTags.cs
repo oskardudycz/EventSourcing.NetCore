@@ -12,6 +12,11 @@ public static class TelemetryTags
         public const string Command = $"{ActivitySourceProvider.DefaultSourceName}.command";
     }
 
+    public static class QueryHandling
+    {
+        public const string Query = $"{ActivitySourceProvider.DefaultSourceName}.query";
+    }
+
     public static class EventHandling
     {
         public const string Event = $"{ActivitySourceProvider.DefaultSourceName}.event";

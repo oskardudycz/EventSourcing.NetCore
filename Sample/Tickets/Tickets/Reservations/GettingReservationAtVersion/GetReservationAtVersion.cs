@@ -8,7 +8,7 @@ namespace Tickets.Reservations.GettingReservationAtVersion;
 public record GetReservationAtVersion(
     Guid ReservationId,
     int Version
-): IQuery<ReservationDetails>
+)
 {
     public static GetReservationAtVersion Create(Guid reservationId, int version)
     {

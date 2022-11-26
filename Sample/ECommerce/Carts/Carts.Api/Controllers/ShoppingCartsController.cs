@@ -120,7 +120,7 @@ public class ShoppingCartsController: Controller
     [HttpGet("{id}")]
     public async Task<ShoppingCartDetails> Get(Guid id)
     {
-        var result = await queryBus.Send<GetCartById, ShoppingCartDetails>(GetCartById.Create(id));
+        var result = await queryBus.Query<GetCartById, ShoppingCartDetails>(GetCartById.Create(id));
 
         Response.TrySetETagResponseHeader(result.Version);
 
@@ -130,7 +130,7 @@ public class ShoppingCartsController: Controller
     [HttpGet]
     public async Task<PagedListResponse<ShoppingCartShortInfo>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
     {
-        var pagedList = await queryBus.Send<GetCarts, IPagedList<ShoppingCartShortInfo>>(GetCarts.Create(pageNumber, pageSize));
+        var pagedList = await queryBus.Query<GetCarts, IPagedList<ShoppingCartShortInfo>>(GetCarts.Create(pageNumber, pageSize));
 
         return pagedList.ToResponse();
     }
@@ -139,7 +139,7 @@ public class ShoppingCartsController: Controller
     [HttpGet("{id}/history")]
     public async Task<PagedListResponse<ShoppingCartHistory>> GetHistory(Guid id)
     {
-        var pagedList = await queryBus.Send<GetCartHistory, IPagedList<ShoppingCartHistory>>(GetCartHistory.Create(id));
+        var pagedList = await queryBus.Query<GetCartHistory, IPagedList<ShoppingCartHistory>>(GetCartHistory.Create(id));
 
         return pagedList.ToResponse();
     }
@@ -147,6 +147,6 @@ public class ShoppingCartsController: Controller
     [HttpGet("{id}/versions")]
     public Task<ShoppingCartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersionRequest? query)
     {
-        return queryBus.Send<GetCartAtVersion, ShoppingCartDetails>(GetCartAtVersion.Create(id, query?.Version));
+        return queryBus.Query<GetCartAtVersion, ShoppingCartDetails>(GetCartAtVersion.Create(id, query?.Version));
     }
 }

@@ -8,7 +8,7 @@ namespace Carts.ShoppingCarts.GettingCartAtVersion;
 public record GetCartAtVersion(
     Guid CartId,
     long Version
-) : IQuery<ShoppingCartDetails>
+)
 {
     public static GetCartAtVersion Create(Guid? cartId, long? version)
     {

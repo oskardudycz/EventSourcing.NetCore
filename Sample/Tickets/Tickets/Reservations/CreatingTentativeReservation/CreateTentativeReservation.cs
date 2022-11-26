@@ -9,7 +9,7 @@ namespace Tickets.Reservations.CreatingTentativeReservation;
 public record CreateTentativeReservation(
     Guid ReservationId,
     Guid SeatId
-    ) : ICommand
+    )
 {
     public static CreateTentativeReservation Create(Guid? reservationId, Guid? seatId)
     {

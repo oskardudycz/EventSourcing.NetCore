@@ -8,7 +8,7 @@ public record GetCartHistory(
     Guid CartId,
     int PageNumber,
     int PageSize
-): IQuery<IPagedList<ShoppingCartHistory>>
+)
 {
     public static GetCartHistory Create(Guid cartId, int pageNumber = 1, int pageSize = 20)
     {

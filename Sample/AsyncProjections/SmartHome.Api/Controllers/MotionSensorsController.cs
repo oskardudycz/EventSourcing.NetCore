@@ -29,7 +29,7 @@ public class MotionSensorsController: Controller
     [HttpGet]
     public Task<IReadOnlyList<MotionSensor>> Get()
     {
-        return queryBus.Send<GetMotionSensors, IReadOnlyList<MotionSensor>>(GetMotionSensors.Create());
+        return queryBus.Query<GetMotionSensors, IReadOnlyList<MotionSensor>>(GetMotionSensors.Create());
     }
 
     [HttpPost]

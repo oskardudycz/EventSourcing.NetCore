@@ -18,6 +18,6 @@ public class MeetingsController: Controller
     [HttpGet]
     public Task<IReadOnlyCollection<Meeting>> Search([FromQuery]string filter)
     {
-        return queryBus.Send<SearchMeetings, IReadOnlyCollection<Meeting>>(new SearchMeetings(filter));
+        return queryBus.Query<SearchMeetings, IReadOnlyCollection<Meeting>>(new SearchMeetings(filter));
     }
 }
