@@ -10,7 +10,7 @@ var reservationId = "RES/01";
 var seatId = "SEAT/22";
 var customerId = "CUS/291";
 
-var reservation = new ReservationId (
+var reservation = new Reservation(
     reservationId,
     seatId,
     customerId 
@@ -26,7 +26,7 @@ var reservationId = new ReservationId("RES/01");
 var seatId = new SeatId("SEAT/22");
 var customerId = new CustomerId("CUS/291");
 
-var reservation = new ReservationId (
+var reservation = new Reservation(
     reservationId,
     seatId,
     customerId 
