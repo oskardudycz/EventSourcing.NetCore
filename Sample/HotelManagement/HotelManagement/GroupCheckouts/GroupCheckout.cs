@@ -1,5 +1,4 @@
-using HotelManagement.Core;
-using HotelManagement.Core.Structures;
+using Core.Structures;
 
 namespace HotelManagement.GroupCheckouts;
 

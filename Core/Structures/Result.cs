@@ -1,4 +1,4 @@
-namespace HotelManagement.Core.Structures;
+namespace Core.Structures;
 
 public class Result<TSuccess, TError>
 {
