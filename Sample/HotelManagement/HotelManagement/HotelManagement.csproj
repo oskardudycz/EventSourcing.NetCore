@@ -1,11 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <PackageReference Include="Marten" Version="5.7.0" />
+        <PackageReference Include="Marten" Version="6.0.0-alpha.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Core.Marten\Core.Marten.csproj" />
+      <ProjectReference Include="..\..\..\Core\Core.csproj" />
     </ItemGroup>
 
 </Project>

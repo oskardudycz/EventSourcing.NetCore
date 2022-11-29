@@ -1,7 +1,7 @@
-using HotelManagement.Core.Structures;
+using Core.Structures;
 using Marten;
 
-namespace HotelManagement.Core.Marten;
+namespace Core.Marten.Extensions;
 
 public static class DocumentSessionExtensions
 {

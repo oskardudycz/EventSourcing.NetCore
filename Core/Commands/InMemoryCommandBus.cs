@@ -5,13 +5,13 @@ using Polly;
 
 namespace Core.Commands;
 
-public class CommandBus: ICommandBus
+public class InMemoryCommandBus: ICommandBus
 {
     private readonly IServiceProvider serviceProvider;
     private readonly AsyncPolicy retryPolicy;
     private readonly IActivityScope activityScope;
 
-    public CommandBus(
+    public InMemoryCommandBus(
         IServiceProvider serviceProvider,
         IActivityScope activityScope,
         AsyncPolicy retryPolicy
@@ -47,13 +47,13 @@ public static class EventBusExtensions
     {
         services
             .AddScoped(sp =>
-                new CommandBus(
+                new InMemoryCommandBus(
                     sp,
                     sp.GetRequiredService<IActivityScope>(),
                     asyncPolicy ?? Policy.NoOpAsync()
                 ))
             .TryAddScoped<ICommandBus>(sp =>
-                sp.GetRequiredService<CommandBus>()
+                sp.GetRequiredService<InMemoryCommandBus>()
             );
 
         return services;

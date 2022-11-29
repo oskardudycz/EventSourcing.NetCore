@@ -1,8 +1,7 @@
-using HotelManagement.Core.Marten;
-using HotelManagement.GuestStayAccounts;
+using Core.Marten.Extensions;
 using Marten;
 
-namespace HotelManagement.GuestStay;
+namespace HotelManagement.GuestStayAccounts;
 
 public record CheckInGuest(
     Guid GuestStayId
@@ -10,12 +9,12 @@ public record CheckInGuest(
 
 public record RecordCharge(
     Guid GuestStayId,
-    Decimal Amount
+    decimal Amount
 );
 
 public record RecordPayment(
     Guid GuestStayId,
-    Decimal Amount
+    decimal Amount
 );
 
 public record CheckOutGuest(

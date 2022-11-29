@@ -1,6 +1,5 @@
-using HotelManagement.Core;
-using HotelManagement.Core.Structures;
-using static HotelManagement.Core.Structures.Result;
+using Core.Structures;
+using static Core.Structures.Result;
 
 namespace HotelManagement.GuestStayAccounts;
 
@@ -11,13 +10,13 @@ public record GuestCheckedIn(
 
 public record ChargeRecorded(
     Guid GuestStayId,
-    Decimal Amount,
+    decimal Amount,
     DateTimeOffset RecordedAt
 );
 
 public record PaymentRecorded(
     Guid GuestStayId,
-    Decimal Amount,
+    decimal Amount,
     DateTimeOffset RecordedAt
 );
 
@@ -47,7 +46,6 @@ public record GuestStayAccount(
 )
 {
     public bool IsSettled => Balance == 0;
-
 
     public static GuestCheckedIn CheckIn(Guid guestStayId, DateTimeOffset now) =>
         new GuestCheckedIn(guestStayId, now);

@@ -1,5 +1,5 @@
-using HotelManagement.Core.Messaging;
-using HotelManagement.GuestStay;
+using Core.Commands;
+using HotelManagement.GuestStayAccounts;
 
 namespace HotelManagement.GroupCheckouts;
 

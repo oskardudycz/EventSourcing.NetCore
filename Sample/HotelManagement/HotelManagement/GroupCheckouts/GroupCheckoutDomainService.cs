@@ -1,6 +1,4 @@
-using HotelManagement.Core.Marten;
-using HotelManagement.GuestStay;
-using HotelManagement.GroupCheckouts;
+using Core.Marten.Extensions;
 using Marten;
 
 namespace HotelManagement.GroupCheckouts;
