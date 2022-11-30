@@ -8,7 +8,7 @@ namespace Marten.Integration.Tests.TestsInfrastructure;
 [Collection("Marten")]
 public abstract class MartenTest: IDisposable
 {
-    protected readonly IDocumentSession Session = default!;
+    protected IDocumentSession Session = default!;
 
     protected IEventStore EventStore
     {
@@ -27,28 +27,23 @@ public abstract class MartenTest: IDisposable
             Session = CreateSession();
     }
 
-    protected virtual IDocumentSession CreateSession(Action<StoreOptions>? storeOptions = null)
-    {
-        return DocumentSessionProvider.Get(SchemaName, storeOptions);
-    }
+    protected virtual IDocumentSession CreateSession(Action<StoreOptions>? storeOptions = null) =>
+        DocumentSessionProvider.Get(SchemaName, storeOptions);
 
     public void Dispose()
     {
         Session?.Dispose();
 
         var sql = $"DROP SCHEMA {SchemaName} CASCADE;";
-        using (var conn = new NpgsqlConnection(Settings.ConnectionString))
-        {
-            conn.Open();
-            using (var tran = conn.BeginTransaction(IsolationLevel.ReadCommitted))
-            {
-                var command = conn.CreateCommand();
-                command.CommandText = sql;
 
-                command.ExecuteNonQuery();
+        using var conn = new NpgsqlConnection(Settings.ConnectionString);
+        conn.Open();
 
-                tran.Commit();
-            }
-        }
+        using var tran = conn.BeginTransaction(IsolationLevel.ReadCommitted);
+        var command = conn.CreateCommand();
+        command.CommandText = sql;
+        command.ExecuteNonQuery();
+
+        tran.Commit();
     }
 }
