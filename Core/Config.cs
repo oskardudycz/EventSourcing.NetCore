@@ -16,7 +16,7 @@ public static class Config
         services
             .AddSingleton<IActivityScope, ActivityScope>()
             .AddEventBus()
-            .AddCommandBus()
+            .AddInMemoryCommandBus()
             .AddQueryBus();
 
         services.TryAddScoped<IExternalCommandBus, ExternalCommandBus>();

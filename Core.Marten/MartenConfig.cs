@@ -14,7 +14,7 @@ using Weasel.Core;
 
 namespace Core.Marten;
 
-public class Config
+public class MartenConfig
 {
     private const string DefaultSchema = "public";
 
@@ -36,36 +36,45 @@ public static class MartenConfigExtensions
 
     public static IServiceCollection AddMarten(
         this IServiceCollection services,
-        IConfiguration config,
+        IConfiguration configuration,
         Action<StoreOptions>? configureOptions = null,
         string configKey = DefaultConfigKey
+    ) =>
+        services.AddMarten(
+            configuration.GetRequiredConfig<MartenConfig>(configKey),
+            configureOptions
+        );
+
+    public static IServiceCollection AddMarten(
+        this IServiceCollection services,
+        MartenConfig martenConfig,
+        Action<StoreOptions>? configureOptions = null
     )
     {
-        var martenConfig = config.GetRequiredConfig<Config>(configKey);
-
         services
             .AddScoped<IIdGenerator, MartenIdGenerator>()
             .AddMartenAppendScope()
             .AddMarten(sp => SetStoreOptions(sp, martenConfig, configureOptions))
             .ApplyAllDatabaseChangesOnStartup()
-            .AddAsyncDaemon(DaemonMode.Solo);
+            .OptimizeArtifactWorkflow()
+            .AddAsyncDaemon(martenConfig.DaemonMode);
 
         return services;
     }
 
     private static StoreOptions SetStoreOptions(
         IServiceProvider serviceProvider,
-        Config config,
+        MartenConfig martenConfig,
         Action<StoreOptions>? configureOptions = null
     )
     {
         var options = new StoreOptions();
-        options.Connection(config.ConnectionString);
+        options.Connection(martenConfig.ConnectionString);
         options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
 
         var schemaName = Environment.GetEnvironmentVariable("SchemaName");
-        options.Events.DatabaseSchemaName = schemaName ?? config.WriteModelSchema;
-        options.DatabaseSchemaName = schemaName ?? config.ReadModelSchema;
+        options.Events.DatabaseSchemaName = schemaName ?? martenConfig.WriteModelSchema;
+        options.DatabaseSchemaName = schemaName ?? martenConfig.ReadModelSchema;
 
         options.UseDefaultSerialization(
             EnumStorage.AsString,
@@ -88,7 +97,7 @@ public static class MartenConfigExtensions
             "MartenSubscription"
         );
 
-        if (config.UseMetadata)
+        if (martenConfig.UseMetadata)
         {
             options.Events.MetadataConfig.CausationIdEnabled = true;
             options.Events.MetadataConfig.CorrelationIdEnabled = true;
