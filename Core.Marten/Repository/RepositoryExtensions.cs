@@ -11,7 +11,7 @@ public static class RepositoryExtensions
         CancellationToken cancellationToken = default
     ) where T : class, IAggregate
     {
-        var entity = await repository.Find(id, cancellationToken);
+        var entity = await repository.Find(id, cancellationToken).ConfigureAwait(false);
 
         return entity ?? throw AggregateNotFoundException.For<T>(id);
     }
@@ -24,10 +24,10 @@ public static class RepositoryExtensions
         CancellationToken cancellationToken = default
     ) where T : class, IAggregate
     {
-        var entity = await repository.Get(id, cancellationToken);
+        var entity = await repository.Get(id, cancellationToken).ConfigureAwait(false);
 
         action(entity);
 
-        return await repository.Update(entity, expectedVersion, cancellationToken);
+        return await repository.Update(entity, expectedVersion, cancellationToken).ConfigureAwait(false);
     }
 }

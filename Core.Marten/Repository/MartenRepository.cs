@@ -47,7 +47,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
                     events
                 );
 
-                await documentSession.SaveChangesAsync(ct);
+                await documentSession.SaveChangesAsync(ct).ConfigureAwait(false);
 
                 return (long)events.Length;
             },
@@ -71,7 +71,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
                     events
                 );
 
-                await documentSession.SaveChangesAsync(ct);
+                await documentSession.SaveChangesAsync(ct).ConfigureAwait(false);
 
                 return nextVersion;
             },
@@ -95,7 +95,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
                     events
                 );
 
-                await documentSession.SaveChangesAsync(ct);
+                await documentSession.SaveChangesAsync(ct).ConfigureAwait(false);
 
                 return nextVersion;
             },
@@ -121,7 +121,7 @@ public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggrega
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to inject trace context.");
+            logger.LogError(ex, "Failed to inject trace context");
         }
     }
 }

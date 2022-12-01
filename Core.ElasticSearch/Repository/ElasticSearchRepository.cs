@@ -26,7 +26,7 @@ public class ElasticSearchRepository<T>: IElasticSearchRepository<T> where T : c
 
     public async Task<T?> Find(Guid id, CancellationToken cancellationToken)
     {
-        var response = await elasticClient.GetAsync<T>(id, ct: cancellationToken);
+        var response = await elasticClient.GetAsync<T>(id, ct: cancellationToken).ConfigureAwait(false);
         return response?.Source;
     }
 

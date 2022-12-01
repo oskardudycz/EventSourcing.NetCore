@@ -60,7 +60,7 @@ public class EventStoreDBSubscriptionToAll
 
         logger.LogInformation("Subscription to all '{SubscriptionId}'", subscriptionOptions.SubscriptionId);
 
-        var checkpoint = await checkpointRepository.Load(SubscriptionId, ct);
+        var checkpoint = await checkpointRepository.Load(SubscriptionId, ct).ConfigureAwait(false);
 
         await eventStoreClient.SubscribeToAllAsync(
             checkpoint == null ? FromAll.Start : FromAll.After(new Position(checkpoint.Value, checkpoint.Value)),
@@ -70,7 +70,7 @@ public class EventStoreDBSubscriptionToAll
             subscriptionOptions.FilterOptions,
             subscriptionOptions.Credentials,
             ct
-        );
+        ).ConfigureAwait(false);
 
         logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
     }
@@ -108,9 +108,10 @@ public class EventStoreDBSubscriptionToAll
                 async (_, ct) =>
                 {
                     // publish event to internal event bus
-                    await eventBus.Publish(eventEnvelope, ct);
+                    await eventBus.Publish(eventEnvelope, ct).ConfigureAwait(false);
 
-                    await checkpointRepository.Store(SubscriptionId, resolvedEvent.Event.Position.CommitPosition, ct);
+                    await checkpointRepository.Store(SubscriptionId, resolvedEvent.Event.Position.CommitPosition, ct)
+                        .ConfigureAwait(false);
                 },
                 new StartActivityOptions
                 {
@@ -119,7 +120,7 @@ public class EventStoreDBSubscriptionToAll
                     Kind = ActivityKind.Consumer
                 },
                 token
-            );
+            ).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -162,7 +163,9 @@ public class EventStoreDBSubscriptionToAll
                 // As this is a background process then we don't need to have async context here.
                 using (NoSynchronizationContextScope.Enter())
                 {
+#pragma warning disable VSTHRD002
                     SubscribeToAll(subscriptionOptions, cancellationToken).Wait(cancellationToken);
+#pragma warning restore VSTHRD002
                 }
 
                 resubscribed = true;

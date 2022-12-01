@@ -51,7 +51,7 @@ public class KafkaConsumer: IExternalEventConsumer
             while (!cancellationToken.IsCancellationRequested)
             {
                 // consume event from Kafka
-                await ConsumeNextEvent(consumer, cancellationToken);
+                await ConsumeNextEvent(consumer, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (Exception e)
@@ -96,7 +96,7 @@ public class KafkaConsumer: IExternalEventConsumer
                 async (_, ct) =>
                 {
                     // publish event to internal event bus
-                    await eventBus.Publish(eventEnvelope, ct);
+                    await eventBus.Publish(eventEnvelope, ct).ConfigureAwait(false);
 
                     consumer.Commit();
                 },
@@ -118,7 +118,7 @@ public class KafkaConsumer: IExternalEventConsumer
                     Kind = ActivityKind.Consumer
                 },
                 token
-            );
+            ).ConfigureAwait(false);
         }
         catch (Exception e)
         {

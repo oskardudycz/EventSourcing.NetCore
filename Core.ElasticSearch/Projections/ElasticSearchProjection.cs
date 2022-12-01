@@ -28,7 +28,7 @@ public class ElasticSearchProjection<TEvent, TView> : IEventHandler<EventEnvelop
         var id = getId(eventEnvelope.Data);
         var indexName = IndexNameMapper.ToIndexName<TView>();
 
-        var entity = (await elasticClient.GetAsync<TView>(id, i => i.Index(indexName), ct))?.Source ??
+        var entity = (await elasticClient.GetAsync<TView>(id, i => i.Index(indexName), ct).ConfigureAwait(false))?.Source ??
                      (TView) Activator.CreateInstance(typeof(TView), true)!;
 
         entity.When(eventEnvelope);
@@ -37,7 +37,7 @@ public class ElasticSearchProjection<TEvent, TView> : IEventHandler<EventEnvelop
             entity,
             i => i.Index(indexName).Id(id).VersionType(VersionType.External).Version((long)eventEnvelope.Metadata.StreamPosition),
             ct
-        );
+        ).ConfigureAwait(false);
     }
 }
 

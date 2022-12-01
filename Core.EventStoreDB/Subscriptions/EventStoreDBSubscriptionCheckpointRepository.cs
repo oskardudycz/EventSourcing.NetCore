@@ -22,12 +22,12 @@ public class EventStoreDBSubscriptionCheckpointRepository: ISubscriptionCheckpoi
         var result = eventStoreClient.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1,
             cancellationToken: ct);
 
-        if (await result.ReadState == ReadState.StreamNotFound)
+        if (await result.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
         {
             return null;
         }
 
-        ResolvedEvent? @event = await result.FirstOrDefaultAsync(ct);
+        ResolvedEvent? @event = await result.FirstOrDefaultAsync(ct).ConfigureAwait(false);
 
         return @event?.Deserialize<CheckpointStored>()?.Position;
     }
@@ -46,7 +46,7 @@ public class EventStoreDBSubscriptionCheckpointRepository: ISubscriptionCheckpoi
                 StreamState.StreamExists,
                 eventToAppend,
                 cancellationToken: ct
-            );
+            ).ConfigureAwait(false);
         }
         catch (WrongExpectedVersionException)
         {
@@ -58,7 +58,7 @@ public class EventStoreDBSubscriptionCheckpointRepository: ISubscriptionCheckpoi
                 StreamState.NoStream,
                 new StreamMetadata(1),
                 cancellationToken: ct
-            );
+            ).ConfigureAwait(false);
 
             // append event again expecting stream to not exist
             await eventStoreClient.AppendToStreamAsync(
@@ -66,7 +66,7 @@ public class EventStoreDBSubscriptionCheckpointRepository: ISubscriptionCheckpoi
                 StreamState.NoStream,
                 eventToAppend,
                 cancellationToken: ct
-            );
+            ).ConfigureAwait(false);
         }
     }
 

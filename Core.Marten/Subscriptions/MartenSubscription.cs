@@ -35,7 +35,7 @@ public class MartenSubscription: IProjection
         {
             foreach (var consumer in consumers)
             {
-                await consumer.ConsumeAsync(operations, streams, ct);
+                await consumer.ConsumeAsync(operations, streams, ct).ConfigureAwait(false);
             }
         }
         catch (Exception exc)

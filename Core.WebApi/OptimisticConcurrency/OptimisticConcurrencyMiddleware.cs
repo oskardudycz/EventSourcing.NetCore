@@ -40,7 +40,7 @@ public class OptimisticConcurrencyMiddleware
             return Task.CompletedTask;
         });
 
-        await next(context);
+        await next(context).ConfigureAwait(false);
     }
 
     private void TryGetExpectedVersionFromRequestIfMatchHeader(
