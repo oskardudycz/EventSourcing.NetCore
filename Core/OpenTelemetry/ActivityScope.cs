@@ -70,7 +70,7 @@ public class ActivityScope: IActivityScope
 
         try
         {
-            await run(activity, ct);
+            await run(activity, ct).ConfigureAwait(false);
 
             activity?.SetStatus(ActivityStatusCode.Ok);
         }
@@ -92,7 +92,7 @@ public class ActivityScope: IActivityScope
 
         try
         {
-            var result = await run(activity, ct);
+            var result = await run(activity, ct).ConfigureAwait(false);
 
             activity?.SetStatus(ActivityStatusCode.Ok);
 

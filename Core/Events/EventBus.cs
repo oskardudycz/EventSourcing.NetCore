@@ -51,7 +51,7 @@ public class EventBus: IEventBus
                 (_, token) => retryPolicy.ExecuteAsync(c => eventHandler.Handle(eventEnvelope, c), token),
                 activityOptions,
                 ct
-            );
+            ).ConfigureAwait(false);
         }
 
         // publish also just event data
@@ -68,7 +68,7 @@ public class EventBus: IEventBus
                 (_, token) => retryPolicy.ExecuteAsync(c => eventHandler.Handle(eventEnvelope.Data, c), token),
                 activityOptions,
                 ct
-            );
+            ).ConfigureAwait(false);
         }
     }
 

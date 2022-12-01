@@ -52,7 +52,7 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
         using var scope = Services.CreateScope();
         var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
 
-        await eventBus.Publish(eventEnvelope, ct);
+        await eventBus.Publish(eventEnvelope, ct).ConfigureAwait(false);
     }
 
     public IReadOnlyCollection<TEvent> PublishedInternalEventsOfType<TEvent>() =>
@@ -82,7 +82,7 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
                     throw;
             }
 
-            await Task.Delay(retryIntervalInMs);
+            await Task.Delay(retryIntervalInMs).ConfigureAwait(false);
             retryCount--;
         } while (!finished);
     }

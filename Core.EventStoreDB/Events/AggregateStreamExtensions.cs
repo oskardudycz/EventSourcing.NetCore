@@ -22,7 +22,7 @@ public static class AggregateStreamExtensions
             cancellationToken: cancellationToken
         );
 
-        if (await readResult.ReadState == ReadState.StreamNotFound)
+        if (await readResult.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
             return null;
 
         var aggregate = (T)Activator.CreateInstance(typeof(T), true)!;

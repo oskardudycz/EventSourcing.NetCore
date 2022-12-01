@@ -13,4 +13,6 @@
       <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
+
+    <Import Project="../Core.Build.props" />
 </Project>

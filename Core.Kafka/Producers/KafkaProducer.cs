@@ -63,7 +63,7 @@ public class KafkaProducer: IExternalEventProducer
                     Kind = ActivityKind.Producer
                 },
                 token
-            );
+            ).ConfigureAwait(false);
         }
         catch (Exception e)
         {

@@ -45,7 +45,7 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
                     StreamState.NoStream,
                     GetEventsToStore(aggregate, TelemetryPropagator.GetPropagationContext(activity)),
                     cancellationToken: ct
-                );
+                ).ConfigureAwait(false);
                 return result.NextExpectedStreamRevision.ToUInt64();
             },
             token
@@ -63,7 +63,7 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
                     nextVersion,
                     eventsToAppend,
                     cancellationToken: ct
-                );
+                ).ConfigureAwait(false);
                 return result.NextExpectedStreamRevision.ToUInt64();
             },
             token
@@ -81,7 +81,7 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
                     nextVersion,
                     eventsToAppend,
                     cancellationToken: ct
-                );
+                ).ConfigureAwait(false);
                 return result.NextExpectedStreamRevision.ToUInt64();
             },
             token

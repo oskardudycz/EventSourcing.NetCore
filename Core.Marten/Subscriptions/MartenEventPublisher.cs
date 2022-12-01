@@ -48,7 +48,8 @@ public class MartenEventPublisher: IMartenEventsConsumer
                         parentContext
                     );
 
-                    await eventBus.Publish(EventEnvelopeFactory.From(@event.Data, eventMetadata), ct);
+                    await eventBus.Publish(EventEnvelopeFactory.From(@event.Data, eventMetadata), ct)
+                        .ConfigureAwait(false);
                 },
                 new StartActivityOptions
                 {
@@ -56,7 +57,7 @@ public class MartenEventPublisher: IMartenEventsConsumer
                     Parent = parentContext.ActivityContext
                 },
                 cancellationToken
-            );
+            ).ConfigureAwait(false);
         }
     }
 

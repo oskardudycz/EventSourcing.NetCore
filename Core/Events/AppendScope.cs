@@ -21,7 +21,7 @@ public class AppendScope<TVersion>: IAppendScope<TVersion> where TVersion: struc
 
     public async Task Do(Func<TVersion?, Task<TVersion>> handler)
     {
-        var nextVersion = await handler(getExpectedVersion());
+        var nextVersion = await handler(getExpectedVersion()).ConfigureAwait(false);
 
         setNextExpectedVersion(nextVersion);
     }

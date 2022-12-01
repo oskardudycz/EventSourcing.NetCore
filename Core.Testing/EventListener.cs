@@ -21,7 +21,7 @@ public class EventListener: IEventBus
     public async Task Publish(IEventEnvelope eventEnvelope, CancellationToken ct)
     {
         eventsLog.PublishedEvents.Add(eventEnvelope);
-        await eventBus.Publish(eventEnvelope, ct);
+        await eventBus.Publish(eventEnvelope, ct).ConfigureAwait(false);
     }
 }
 

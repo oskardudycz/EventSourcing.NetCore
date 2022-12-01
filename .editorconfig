@@ -156,3 +156,41 @@ csharp_space_between_method_call_empty_parameter_list_parentheses = false
 # Wrapping preferences
 csharp_preserve_single_line_statements = false
 csharp_preserve_single_line_blocks = true
+
+
+###############################
+# Reliability Inspections     #
+###############################
+
+# CA2012: Use ValueTasks correctly
+dotnet_diagnostic.CA2012.severity = error
+
+# VSTHRD002 Avoid problematic synchronous waits
+dotnet_diagnostic.VSTHRD002.severity = warning
+
+# VSTHRD011 Use AsyncLazy<T>
+dotnet_diagnostic.VSTHRD011.severity = warning
+
+# VSTHRD100 Avoid async void methods
+dotnet_diagnostic.VSTHRD100.severity = error
+
+# VSTHRD101 Avoid unsupported async delegates
+dotnet_diagnostic.VSTHRD101.severity = error
+
+# VSTHRD102 Implement internal logic asynchronously
+dotnet_diagnostic.VSTHRD102.severity = error
+
+# VSTHRD103 Call async methods when in an async method
+dotnet_diagnostic.VSTHRD103.severity = error
+
+# VSTHRD110 Observe result of async calls
+dotnet_diagnostic.VSTHRD110.severity = warning
+
+# VSTHRD111 Use .ConfigureAwait(bool)
+dotnet_diagnostic.VSTHRD111.severity = error
+
+# VSTHRD112 Implement System.IAsyncDisposable
+dotnet_diagnostic.VSTHRD112.severity = error
+
+# VSTHRD200 Use Async suffix for async methods
+dotnet_diagnostic.VSTHRD200.severity = none

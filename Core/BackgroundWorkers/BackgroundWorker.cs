@@ -22,7 +22,7 @@ public class BackgroundWorker: BackgroundService
         {
             await Task.Yield();
             logger.LogInformation("Background worker started");
-            await perform(stoppingToken);
+            await perform(stoppingToken).ConfigureAwait(false);
             logger.LogInformation("Background worker stopped");
         }, stoppingToken);
 }
