@@ -40,7 +40,7 @@ public class GuestStayDomainService
                 command.GroupCheckoutId,
                 command.ClerkId,
                 command.GuestStayIds,
-                DateTimeOffset.Now
+                DateTimeOffset.UtcNow
             ),
             ct
         );
@@ -48,7 +48,7 @@ public class GuestStayDomainService
     public Task Handle(RecordGuestCheckoutsInitiation command, CancellationToken ct) =>
         documentSession.GetAndUpdate<GroupCheckout>(
             command.GroupCheckoutId,
-            state => state.RecordGuestCheckoutsInitiation(command.InitiatedGuestStayIds, DateTimeOffset.Now),
+            state => state.RecordGuestCheckoutsInitiation(command.InitiatedGuestStayIds, DateTimeOffset.UtcNow),
             ct
         );
 

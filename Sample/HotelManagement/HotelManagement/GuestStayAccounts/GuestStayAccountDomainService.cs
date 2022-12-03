@@ -32,7 +32,7 @@ public class GuestStayDomainService
     public Task Handle(CheckInGuest command, CancellationToken ct) =>
         documentSession.Add<GuestStayAccount>(
             command.GuestStayId,
-            GuestStayAccount.CheckIn(command.GuestStayId, DateTimeOffset.Now),
+            GuestStayAccount.CheckIn(command.GuestStayId, DateTimeOffset.UtcNow),
             ct
         );
 
@@ -40,7 +40,7 @@ public class GuestStayDomainService
         documentSession.GetAndUpdate<GuestStayAccount>(
             command.GuestStayId,
             expectedVersion,
-            state => state.RecordCharge(command.Amount, DateTimeOffset.Now),
+            state => state.RecordCharge(command.Amount, DateTimeOffset.UtcNow),
             ct
         );
 
@@ -48,14 +48,14 @@ public class GuestStayDomainService
         documentSession.GetAndUpdate<GuestStayAccount>(
             command.GuestStayId,
             expectedVersion,
-            state => state.RecordPayment(command.Amount, DateTimeOffset.Now),
+            state => state.RecordPayment(command.Amount, DateTimeOffset.UtcNow),
             ct
         );
 
     public Task Handle(CheckOutGuest command, CancellationToken ct) =>
         documentSession.GetAndUpdate<GuestStayAccount>(
             command.GuestStayId,
-            state => state.CheckOut(DateTimeOffset.Now)
+            state => state.CheckOut(DateTimeOffset.UtcNow)
                 .Map<object>(success => success, failed => failed),
             ct
         );

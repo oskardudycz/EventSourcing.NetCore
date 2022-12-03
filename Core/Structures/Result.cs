@@ -65,5 +65,5 @@ public static class Result
 {
     public static Result<TSuccess, TError> Success<TSuccess, TError>(TSuccess success) => new(success);
 
-    public static Result<TSuccess, TError> Failure<TSuccess, TError>(TError success) => new(success);
+    public static Result<TSuccess, TError> Failure<TSuccess, TError>(TError error) => new(error);
 }
