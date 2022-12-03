@@ -5,7 +5,7 @@ namespace Carts.Tests.Builders;
 
 internal class CartBuilder
 {
-    private Func<ShoppingCart> build  = () => new ShoppingCart();
+    private Func<ShoppingCart> build = () => new ShoppingCart();
 
     public CartBuilder Opened()
     {

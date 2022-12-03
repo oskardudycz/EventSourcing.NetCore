@@ -25,4 +25,6 @@
       <ProjectReference Include="..\Helpdesk.Api\Helpdesk.Api.csproj" />
     </ItemGroup>
 
+    <Import Project="..\..\..\Tests.Build.props"/>
+
 </Project>
