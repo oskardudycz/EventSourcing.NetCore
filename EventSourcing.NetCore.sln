@@ -338,6 +338,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Api.Tests", "Sample\Helpdesk\Helpdesk.Api.Tests\Helpdesk.Api.Tests.csproj", "{525AA67F-1D3A-4752-9A3F-A6A82819CF70}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HotelManagement", "HotelManagement", "{2D239E0E-D194-4746-AF55-CEF03A65F2F5}"
+	ProjectSection(SolutionItems) = preProject
+		Sample\HotelManagement\README.md = Sample\HotelManagement\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelManagement.Tests", "Sample\HotelManagement\HotelManagement.Tests\HotelManagement.Tests.csproj", "{FC2B0AED-92D9-4020-B902-AED8A2CA653D}"
 EndProject

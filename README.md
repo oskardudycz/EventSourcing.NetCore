@@ -18,10 +18,11 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
     - [2.2. Practical Introduction to Event Sourcing with EventStoreDB](#22-practical-introduction-to-event-sourcing-with-eventstoredb)
     - [2.3 Let's build the worst Event Sourcing system!](#23-lets-build-the-worst-event-sourcing-system)
     - [2.4 The Light and The Dark Side of the Event-Driven Design](#24-the-light-and-the-dark-side-of-the-event-driven-design)
-    - [2.5 Conversation with Yves Lorphelin about CQRS](#25-conversation-with-yves-lorphelin-about-cqrs)
-    - [2.6. CQRS is Simpler than you think with C#9 & NET5](#26-cqrs-is-simpler-than-you-think-with-c9--net5)
-    - [2.7. Never Lose Data Again - Event Sourcing to the Rescue!](#27-never-lose-data-again---event-sourcing-to-the-rescue)
-    - [2.8. How to deal with privacy and GDPR in Event-Sourced systems](#28-how-to-deal-with-privacy-and-gdpr-in-event-sourced-systems)
+    - [2.5 Implementing Distributed Processes](#25-implementing-distributed-processes)
+    - [2.6 Conversation with Yves Lorphelin about CQRS](#26-conversation-with-yves-lorphelin-about-cqrs)
+    - [2.7. CQRS is Simpler than you think with C#9 & NET5](#27-cqrs-is-simpler-than-you-think-with-c9--net5)
+    - [2.8. Never Lose Data Again - Event Sourcing to the Rescue!](#28-never-lose-data-again---event-sourcing-to-the-rescue)
+    - [2.9. How to deal with privacy and GDPR in Event-Sourced systems](#29-how-to-deal-with-privacy-and-gdpr-in-event-sourced-systems)
   - [3. Support](#3-support)
   - [4. Prerequisites](#4-prerequisites)
   - [5. Tools used](#5-tools-used)
@@ -29,14 +30,15 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
     - [6.1 Pragmatic Event Sourcing With Marten](#61-pragmatic-event-sourcing-with-marten)
     - [6.2 ECommerce with Marten](#62-ecommerce-with-marten)
     - [6.3 Simple EventSourcing with EventStoreDB](#63-simple-eventsourcing-with-eventstoredb)
-    - [6.4 ECommerce with EventStoreDB](#64-ecommerce-with-eventstoredb)
-    - [6.5 Warehouse](#65-warehouse)
-    - [6.6 Warehouse Minimal API](#66-warehouse-minimal-api)
-    - [6.7 Event Versioning](#67-event-versioning)
-    - [6.8 Event Pipelines](#68-event-pipelines)
-    - [6.9 Meetings Management with Marten](#69-meetings-management-with-marten)
-    - [6.10 Cinema Tickets Reservations with Marten](#610-cinema-tickets-reservations-with-marten)
-    - [6.11 SmartHome IoT with Marten](#611-smarthome-iot-with-marten)
+    - [6.4 Implementing Distributed Processes](#64-implementing-distributed-processes)
+    - [6.5 ECommerce with EventStoreDB](#65-ecommerce-with-eventstoredb)
+    - [6.6 Warehouse](#66-warehouse)
+    - [6.7 Warehouse Minimal API](#67-warehouse-minimal-api)
+    - [6.8 Event Versioning](#68-event-versioning)
+    - [6.9 Event Pipelines](#69-event-pipelines)
+    - [6.10 Meetings Management with Marten](#610-meetings-management-with-marten)
+    - [6.11 Cinema Tickets Reservations with Marten](#611-cinema-tickets-reservations-with-marten)
+    - [6.12 SmartHome IoT with Marten](#612-smarthome-iot-with-marten)
   - [7. Self-paced training Kits](#7-self-paced-training-kits)
     - [7.1 Introduction to Event Sourcing](#71-introduction-to-event-sourcing)
     - [7.2 Build your own Event Store](#72-build-your-own-event-store)
@@ -570,19 +572,23 @@ Read more in the article:
 
 <a href="https://www.youtube.com/watch?v=ZGugOiYcq8k" target="_blank"><img src="https://img.youtube.com/vi/ZGugOiYcq8k/0.jpg" alt="The Light and The Dark Side of the Event-Driven Design" width="320" height="240" border="10" /></a>
 
-### 2.5 Conversation with [Yves Lorphelin](https://github.com/ylorph/) about CQRS
+### 2.5 Implementing Distributed Processes
+
+<a href="https://www.architecture-weekly.com/p/webinar-3-implementing-distributed" target="_blank"><img src="https://substackcdn.com/image/fetch/w_1920,h_1080,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-video.s3.amazonaws.com%2Fvideo_upload%2Fpost%2F69413446%2F526b9100-7271-4482-99e7-9559416e9848%2Ftranscoded-00624.png" alt="Implementing Distributed Processes" width="320" border="10" /></a>
+
+### 2.6 Conversation with [Yves Lorphelin](https://github.com/ylorph/) about CQRS
 
 <a href="https://www.youtube.com/watch?v=D-3N2vQ7ADE" target="_blank"><img src="https://img.youtube.com/vi/D-3N2vQ7ADE/0.jpg" alt="Event Store Conversations: Yves Lorphelin talks to Oskar Dudycz about CQRS (EN)" width="320" height="240" border="10" /></a>
 
-### 2.6. CQRS is Simpler than you think with C#9 & NET5
+### 2.7. CQRS is Simpler than you think with C#9 & NET5
 
 <a href="https://www.youtube.com/watch?v=eOPlg-eB4As" target="_blank"><img src="https://img.youtube.com/vi/eOPlg-eB4As/0.jpg" alt="CQRS is Simpler than you think with C#9 & NET5" width="320" height="240" border="10" /></a>
 
-### 2.7. Never Lose Data Again - Event Sourcing to the Rescue!
+### 2.8. Never Lose Data Again - Event Sourcing to the Rescue!
 
 <a href="https://www.youtube.com/watch?v=fDC465jJoDk" target="_blank"><img src="https://img.youtube.com/vi/fDC465jJoDk/0.jpg" alt="Never Lose Data Again - Event Sourcing to the Rescue!" width="320" height="240" border="10" /></a>
 
-### 2.8. How to deal with privacy and GDPR in Event-Sourced systems
+### 2.9. How to deal with privacy and GDPR in Event-Sourced systems
 
 <a href="https://www.youtube.com/watch?v=CI7JPFLlpBw" target="_blank"><img src="https://img.youtube.com/vi/CI7JPFLlpBw/0.jpg" alt="How to deal with privacy and GDPR in Event-Sourced systems" width="320" height="240" border="10" /></a>
 
@@ -646,26 +652,34 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - Builds read models using [Subscription to `$all`](https://developers.eventstore.com/clients/grpc/subscribing-to-streams/#subscribing-to-all),
 - Read models are stored as Postgres tables using EntityFramework.
 
-### 6.4 [ECommerce with EventStoreDB](./Sample/EventStoreDB/ECommerce)
+### 6.4 [Implementing Distributed Processes](./Sample/HotelManagement)
+- orchestrate and coordinate business workflow spanning across multiple aggregates using [Saga pattern](https://event-driven.io/en/saga_process_manager_distributed_transactions/),
+- handle distributed processing both for asynchronous commands scheduling and events publishing,
+- getting at-least-once delivery guarantee,
+- implementing command store and outbox pattern on top of Marten and EventStoreDB,
+- unit testing aggregates and Saga with a little help from [Ogooreck](https://github.com/oskardudycz/Ogooreck),
+- testing asynchronous code.
+
+### 6.5 [ECommerce with EventStoreDB](./Sample/EventStoreDB/ECommerce)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to  EventStoreDB,
 - Builds read models using [Subscription to `$all`](https://developers.eventstore.com/clients/grpc/subscribing-to-streams/#subscribing-to-all).
 - Read models are stored as Marten documents.
 
-### 6.5 [Warehouse](./Sample/Warehouse)
+### 6.6 [Warehouse](./Sample/Warehouse)
 - simplest CQRS flow using .NET Endpoints,
 - example of how and where to use C# Records, Nullable Reference Types, etc,
 - No Event Sourcing! Using Entity Framework to show that CQRS is not bounded to Event Sourcing or any type of storage,
 - No Aggregates! CQRS do not need DDD. Business logic can be handled in handlers.
 
-### 6.6 [Warehouse Minimal API](./Sample/Warehouse.MinimalAPI/)
+### 6.7 [Warehouse Minimal API](./Sample/Warehouse.MinimalAPI/)
 Variation of the previous example, but:
 - using Minimal API,
 - example how to inject handlers in MediatR like style to decouple API from handlers.
 - 📝 Read more [CQRS is simpler than you think with .NET 6 and C# 10](https://event-driven.io/en/cqrs_is_simpler_than_you_think_with_net6/?utm_source=event_sourcing_net)
 
-### 6.7 [Event Versioning](./Sample/EventsVersioning)
+### 6.8 [Event Versioning](./Sample/EventsVersioning)
 Shows how to handle basic event schema versioning scenarios using event and stream transformations (e.g. upcasting):
 - [Simple mapping](./Sample/EventsVersioning/#simple-mapping)
   - [New not required property](./Sample/EventsVersioning/#new-not-required-property)
@@ -680,7 +694,7 @@ Shows how to handle basic event schema versioning scenarios using event and stre
 - [Summary](./Sample/EventsVersioning/#summary)
 - 📝 [Simple patterns for events schema versioning](https://event-driven.io/en/simple_events_versioning_patterns/?utm_source=event_sourcing_net)
 
-### 6.8 [Event Pipelines](./Sample/EventPipelines)
+### 6.9 [Event Pipelines](./Sample/EventPipelines)
 Shows how to compose event handlers in the processing pipelines to:
 - filter events,
 - transform them,
@@ -692,7 +706,7 @@ Shows how to compose event handlers in the processing pipelines to:
 - integrates with MediatR if you want to.
 - 📝 Read more [How to build a simple event pipeline](https://event-driven.io/en/how_to_build_simple_event_pipeline/?utm_source=event_sourcing_net)
 
-### 6.9 [Meetings Management with Marten](./Sample/MeetingsManagement/)
+### 6.10 [Meetings Management with Marten](./Sample/MeetingsManagement/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - microservices example,
@@ -700,12 +714,12 @@ Shows how to compose event handlers in the processing pipelines to:
 - Kafka as a messaging platform to integrate microservices,
 - read models handled in separate microservice and stored to other database (ElasticSearch)
 
-### 6.10 [Cinema Tickets Reservations with Marten](./Sample/Tickets/)
+### 6.11 [Cinema Tickets Reservations with Marten](./Sample/Tickets/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to Marten.
 
-### 6.11 [SmartHome IoT with Marten](./Sample/AsyncProjections/)
+### 6.12 [SmartHome IoT with Marten](./Sample/AsyncProjections/)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to Marten,
