@@ -1,15 +1,12 @@
-using Core.Testing;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
-using ECommerce.ShoppingCarts.ProductItems;
 using FluentAssertions;
 using Ogooreck.API;
-using Warehouse.Api.Tests;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 
-namespace Carts.Api.Tests.ShoppingCarts.Opening;
+namespace ECommerce.Api.Tests.ShoppingCarts.Opening;
 
 public class OpenShoppingCartTests: IClassFixture<ShoppingCartsApplicationFactory>
 {

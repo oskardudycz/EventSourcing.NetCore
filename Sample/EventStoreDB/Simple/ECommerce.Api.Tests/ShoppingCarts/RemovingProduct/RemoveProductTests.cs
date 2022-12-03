@@ -3,12 +3,11 @@ using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
 using FluentAssertions;
-using Xunit;
 using Ogooreck.API;
-using Warehouse.Api.Tests;
+using Xunit;
 using static Ogooreck.API.ApiSpecification;
 
-namespace Carts.Api.Tests.ShoppingCarts.RemovingProduct;
+namespace ECommerce.Api.Tests.ShoppingCarts.RemovingProduct;
 
 public class RemoveProductFixture: ApiSpecification<Program>, IAsyncLifetime
 {

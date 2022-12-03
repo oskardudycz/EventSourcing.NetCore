@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Warehouse.Api.Tests;
+namespace ECommerce.Api.Tests;
 
 public class ShoppingCartsApplicationFactory: TestWebApplicationFactory<Program>
 {

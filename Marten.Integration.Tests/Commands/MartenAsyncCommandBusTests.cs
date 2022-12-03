@@ -33,6 +33,12 @@ public class MartenAsyncCommandBusTests: MartenTest
             .AddSingleton<IHostEnvironment, HostingEnvironment>(
                 _ => new HostingEnvironment { EnvironmentName = Environments.Development }
             )
+            .AddSingleton<IEventBus>(sp =>
+                new EventCatcher(
+                    eventListener,
+                    sp.GetRequiredService<EventBus>()
+                )
+            )
             .AddCoreServices()
             .AddMarten(new MartenConfig
             {
@@ -49,8 +55,7 @@ public class MartenAsyncCommandBusTests: MartenTest
                 Policy.NoOpAsync()
             ))
             .AddSingleton(eventListener)
-            .AddCommandForwarder()
-            .AddScoped(typeof(IEventHandler<>), typeof(EventCatcher<>));
+            .AddCommandForwarder();
 
         var serviceProvider = services.BuildServiceProvider();
         Session = serviceProvider.GetRequiredService<IDocumentSession>();
