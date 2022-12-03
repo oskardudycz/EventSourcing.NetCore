@@ -24,4 +24,6 @@
         </PackageReference>
     </ItemGroup>
 
+    <Import Project="..\Tests.Build.props"/>
+
 </Project>

@@ -1,0 +1,23 @@
+name: Test Report
+
+on:
+    workflow_run:
+        workflows: ['Build and Test']
+        types:
+            - completed
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Publish test results
+              uses: phoenix-actions/test-reporting@v10
+              if: success() || failure()
+              with:
+                  name: Tests Results
+                  artifact: test-results
+                  reporter: dotnet-trx
+                  path: '**/test-results.trx'
+                  output-to: 'step-summary'
+                  fail-on-error: 'false'

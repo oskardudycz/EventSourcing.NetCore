@@ -12,7 +12,6 @@ internal static class CartExtensions
         Guid id,
         Guid clientId)
     {
-
         shoppingCart.Id.Should().Be(id);
         shoppingCart.ClientId.Should().Be(clientId);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Pending);

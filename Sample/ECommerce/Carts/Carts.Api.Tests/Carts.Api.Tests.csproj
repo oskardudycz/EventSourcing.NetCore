@@ -24,4 +24,6 @@
       <ProjectReference Include="..\Carts.Api\Carts.Api.csproj" />
     </ItemGroup>
 
+    <Import Project="..\..\..\..\Tests.Build.props"/>
+
 </Project>
