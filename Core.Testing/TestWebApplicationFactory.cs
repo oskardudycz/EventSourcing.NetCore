@@ -6,14 +6,15 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Open.ChannelExtensions;
 
 namespace Core.Testing;
 
 public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject> where TProject : class
 {
-    private readonly EventsLog eventsLog = new();
     private readonly DummyExternalEventProducer externalEventProducer = new();
     private readonly DummyExternalCommandBus externalCommandBus = new();
+    private readonly EventListener eventListener = new();
 
     private readonly string schemaName = $"test{Guid.NewGuid().ToString("N").ToLower()}";
 
@@ -21,16 +22,12 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
     {
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton(eventsLog)
+            services
                 .AddSingleton<IExternalEventProducer>(externalEventProducer)
-                .AddSingleton<IEventBus>(sp =>
-                    new EventListener(eventsLog,
-                        new EventBusDecoratorWithExternalProducer(sp.GetRequiredService<EventBus>(),
-                            sp.GetRequiredService<IExternalEventProducer>())
-                    )
-                )
+                .AddSingleton(eventListener)
                 .AddSingleton<IExternalCommandBus>(externalCommandBus)
-                .AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
+                .AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>()
+                .AddScoped(typeof(IEventHandler<>), typeof(EventCatcher<>));
         });
 
 
@@ -55,35 +52,41 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
         await eventBus.Publish(eventEnvelope, ct).ConfigureAwait(false);
     }
 
-    public IReadOnlyCollection<TEvent> PublishedInternalEventsOfType<TEvent>() =>
-        eventsLog.PublishedEvents.OfType<TEvent>().ToList();
+
+    public IAsyncEnumerable<TEvent> PublishedInternalEventsOfType<TEvent>(
+        CancellationToken ct = default
+    ) =>
+        PublishedInternalEventsOfType((TEvent _) => true, ct);
+
+    public IAsyncEnumerable<TEvent> PublishedInternalEventsOfType<TEvent>(
+        Func<TEvent, bool> predicate,
+        CancellationToken ct = default
+    ) =>
+        eventListener.Reader
+            .Filter(x => x is TEvent)
+            .Transform(x => (TEvent)x)
+            .Filter(predicate)
+            .ReadAllAsync(ct);
+
 
     public async Task ShouldPublishInternalEventOfType<TEvent>(
-        Expression<Func<TEvent, bool>> predicate,
-        int maxNumberOfRetries = 5,
-        int retryIntervalInMs = 1000)
+        Func<TEvent, bool> predicate,
+        long timeout = 5000
+    )
     {
-        var retryCount = maxNumberOfRetries;
-        var finished = false;
-
-        do
+        try
         {
-            try
-            {
-                PublishedInternalEventsOfType<TEvent>().Should()
-                    .HaveCount(1)
-                    .And.Contain(predicate);
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(TimeSpan.FromMilliseconds(timeout));
 
-                finished = true;
-            }
-            catch
+            await foreach (var _ in PublishedInternalEventsOfType(predicate, cts.Token).ConfigureAwait(false))
             {
-                if (retryCount == 0)
-                    throw;
+                return;
             }
-
-            await Task.Delay(retryIntervalInMs).ConfigureAwait(false);
-            retryCount--;
-        } while (!finished);
+        }
+        catch (OperationCanceledException)
+        {
+            0.Should().Be(1, "No events matching criteria were published");
+        }
     }
 }

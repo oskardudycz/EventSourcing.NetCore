@@ -25,7 +25,7 @@ public class InMemoryCommandBus: ICommandBus
     public async Task Send<TCommand>(TCommand command, CancellationToken ct = default)
         where TCommand : notnull
     {
-        var wasHandled = await TrySend(command, ct);
+        var wasHandled = await TrySend(command, ct).ConfigureAwait(true);
 
         if(!wasHandled)
             throw new InvalidOperationException($"Unable to find handler for command '{command.GetType().Name}'");
@@ -47,7 +47,7 @@ public class InMemoryCommandBus: ICommandBus
             (_, token) => retryPolicy.ExecuteAsync(c => commandHandler.Handle(command, c), token),
             new StartActivityOptions { Tags = { { TelemetryTags.CommandHandling.Command, commandName } } },
             ct
-        );
+        ).ConfigureAwait(false);
 
         return true;
     }

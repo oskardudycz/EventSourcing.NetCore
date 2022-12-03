@@ -18,6 +18,6 @@ public class MartenCommandForwarder<T>: IEventHandler<T> where T : notnull
 
     public async Task Handle(T command, CancellationToken ct)
     {
-        await commandBus.TrySend(command, ct);
+        await commandBus.TrySend(command, ct).ConfigureAwait(false);
     }
 }
