@@ -40,6 +40,17 @@ public class Result<TSuccess, TError>
         throw new Exception("That should never happen!");
     }
 
+    public object FlatMap()
+    {
+        if (Success.IsPresent)
+            return Success.GetOrThrow()!;
+
+        if (Error.IsPresent)
+            return Error.GetOrThrow()!;
+
+        throw new Exception("That should never happen!");
+    }
+
     public void Switch(
         Action<TSuccess> onSuccess,
         Action<TError> onFailure

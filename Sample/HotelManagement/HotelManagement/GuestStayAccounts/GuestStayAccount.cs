@@ -35,6 +35,7 @@ public record GuestCheckoutFailed(
 {
     public enum FailureReason
     {
+        NotOpened,
         BalanceNotSettled
     }
 }
@@ -69,13 +70,20 @@ public record GuestStayAccount(
     public Result<GuestCheckedOut, GuestCheckoutFailed> CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)
     {
         if (Status != GuestStayAccountStatus.Opened)
-            throw new InvalidOperationException("Cannot record payment for not opened account");
+            return Failure<GuestCheckedOut, GuestCheckoutFailed>(
+                new GuestCheckoutFailed(
+                    Id,
+                    GuestCheckoutFailed.FailureReason.NotOpened,
+                    now,
+                    groupCheckoutId
+                )
+            );
 
         return IsSettled
             ? Success<GuestCheckedOut, GuestCheckoutFailed>(
                 new GuestCheckedOut(
                     Id,
-                    DateTimeOffset.UtcNow,
+                    now,
                     groupCheckoutId
                 )
             )
@@ -83,7 +91,7 @@ public record GuestStayAccount(
                 new GuestCheckoutFailed(
                     Id,
                     GuestCheckoutFailed.FailureReason.BalanceNotSettled,
-                    DateTimeOffset.UtcNow,
+                    now,
                     groupCheckoutId
                 )
             );
@@ -104,6 +112,6 @@ public record GuestStayAccount(
 
 public enum GuestStayAccountStatus
 {
-    Opened,
-    CheckedOut
+    Opened = 1,
+    CheckedOut = 2
 }
