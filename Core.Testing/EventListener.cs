@@ -1,27 +1,47 @@
+using System.Threading.Channels;
 using Core.Events;
 
 namespace Core.Testing;
 
-public class EventsLog
+public class EventListener
 {
-    public List<object> PublishedEvents { get; } = new();
-}
+    private readonly Channel<object> events = Channel.CreateUnbounded<object>(
+        new UnboundedChannelOptions { SingleWriter = true, AllowSynchronousContinuations = false }
+    );
 
-public class EventListener: IEventBus
-{
-    private readonly IEventBus eventBus;
-    private readonly EventsLog eventsLog;
+    public ChannelReader<object> Reader => events.Reader;
+    public ChannelWriter<object> Writer => events.Writer;
 
-    public EventListener(EventsLog eventsLog, IEventBus eventBus)
+    public async Task Handle(object @event, CancellationToken ct)
     {
-        this.eventBus = eventBus;
-        this.eventsLog = eventsLog;
+        await events.Writer.WriteAsync(@event, ct).ConfigureAwait(false);
     }
 
-    public async Task Publish(IEventEnvelope eventEnvelope, CancellationToken ct)
+    public async Task<object> WaitForProcessing(object @event, CancellationToken ct)
     {
-        eventsLog.PublishedEvents.Add(eventEnvelope);
-        await eventBus.Publish(eventEnvelope, ct).ConfigureAwait(false);
+        await foreach (var item in events.Reader.ReadAllAsync(ct).ConfigureAwait(false))
+        {
+            if (item.Equals(@event))
+                return item;
+        }
+
+        throw new Exception("No events were found");
+    }
+
+    public IAsyncEnumerable<object> ReadAll(CancellationToken ct) =>
+        events.Reader.ReadAllAsync(ct);
+}
+
+public class EventCatcher<T>: IEventHandler<T>
+{
+    private readonly EventListener listener;
+
+    public EventCatcher(EventListener listener) =>
+        this.listener = listener;
+
+    public Task Handle(T @event, CancellationToken ct)
+    {
+        return listener.Handle(@event!, ct);
     }
 }
 
