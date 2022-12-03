@@ -1,3 +1,4 @@
+using Core.Extensions;
 using Core.Structures;
 
 namespace HotelManagement.GroupCheckouts;
@@ -73,9 +74,11 @@ public record GroupCheckout(
             {
                 var guestCheckoutCompleted = new GuestCheckoutCompleted(Id, guestStayId, now);
 
-                return AreAnyOngoingCheckouts
+                var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Completed);
+
+                return AreAnyOngoingCheckouts(guestStayCheckouts)
                     ? new object[] { guestCheckoutCompleted }
-                    : new[] { guestCheckoutCompleted, Finalize(now) };
+                    : new[] { guestCheckoutCompleted, Finalize(guestStayCheckouts, now) };
             });
 
     public Maybe<object[]> RecordGuestCheckoutFailure(
@@ -88,35 +91,37 @@ public record GroupCheckout(
             {
                 var guestCheckoutFailed = new GuestCheckoutFailed(Id, guestStayId, now);
 
-                return AreAnyOngoingCheckouts
+                var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Failed);
+
+                return AreAnyOngoingCheckouts(guestStayCheckouts)
                     ? new object[] { guestCheckoutFailed }
-                    : new[] { guestCheckoutFailed, Finalize(now) };
+                    : new[] { guestCheckoutFailed, Finalize(guestStayCheckouts, now) };
             });
 
-    private object Finalize(DateTimeOffset now) =>
-        !AreAnyFailedCheckouts
+    private object Finalize(Dictionary<Guid, CheckoutStatus> guestStayCheckouts, DateTimeOffset now) =>
+        !AreAnyFailedCheckouts(guestStayCheckouts)
             ? new GroupCheckoutCompleted
             (
                 Id,
-                CheckoutsWith(CheckoutStatus.Failed),
+                CheckoutsWith(guestStayCheckouts, CheckoutStatus.Completed),
                 now
             )
             : new GroupCheckoutFailed
             (
                 Id,
-                CheckoutsWith(CheckoutStatus.Completed),
-                CheckoutsWith(CheckoutStatus.Failed),
+                CheckoutsWith(guestStayCheckouts, CheckoutStatus.Completed),
+                CheckoutsWith(guestStayCheckouts, CheckoutStatus.Failed),
                 now
             );
 
-    private bool AreAnyOngoingCheckouts =>
-        GuestStayCheckouts.Values.Any(status => status is CheckoutStatus.Initiated or CheckoutStatus.Pending);
+    private static bool AreAnyOngoingCheckouts(Dictionary<Guid, CheckoutStatus> guestStayCheckouts) =>
+        guestStayCheckouts.Values.Any(status => status is CheckoutStatus.Initiated or CheckoutStatus.Pending);
 
-    private bool AreAnyFailedCheckouts =>
-        GuestStayCheckouts.Values.Any(status => status is CheckoutStatus.Failed);
+    private static bool AreAnyFailedCheckouts(Dictionary<Guid, CheckoutStatus> guestStayCheckouts) =>
+        guestStayCheckouts.Values.Any(status => status is CheckoutStatus.Failed);
 
-    private Guid[] CheckoutsWith(CheckoutStatus status) =>
-        GuestStayCheckouts
+    private static Guid[] CheckoutsWith(Dictionary<Guid, CheckoutStatus> guestStayCheckouts, CheckoutStatus status) =>
+        guestStayCheckouts
             .Where(pair => pair.Value == status)
             .Select(pair => pair.Key)
             .ToArray();
