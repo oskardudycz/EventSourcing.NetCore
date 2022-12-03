@@ -5,22 +5,22 @@ namespace HotelManagement.GroupCheckouts;
 
 public class GroupCheckoutSaga
 {
-    private readonly ICommandBus commandBus;
+    private readonly IAsyncCommandBus commandBus;
 
-    public GroupCheckoutSaga(ICommandBus commandBus) =>
+    public GroupCheckoutSaga(IAsyncCommandBus commandBus) =>
         this.commandBus = commandBus;
 
     public async Task Handle(GroupCheckoutInitiated @event, CancellationToken ct)
     {
         foreach (var guestAccountId in @event.GuestStayIds)
         {
-            await commandBus.Send(
+            await commandBus.Schedule(
                 new CheckOutGuest(guestAccountId, @event.GroupCheckoutId),
                 ct
             );
         }
 
-        await commandBus.Send(
+        await commandBus.Schedule(
             new RecordGuestCheckoutsInitiation(
                 @event.GroupCheckoutId,
                 @event.GuestStayIds
@@ -34,7 +34,7 @@ public class GroupCheckoutSaga
         if (!@event.GroupCheckOutId.HasValue)
             return Task.CompletedTask;
 
-        return commandBus.Send(
+        return commandBus.Schedule(
             new RecordGuestCheckoutCompletion(
                 @event.GroupCheckOutId.Value,
                 @event.GuestStayId,
@@ -49,7 +49,7 @@ public class GroupCheckoutSaga
         if (!@event.GroupCheckOutId.HasValue)
             return Task.CompletedTask;
 
-        return commandBus.Send(
+        return commandBus.Schedule(
             new RecordGuestCheckoutFailure(
                 @event.GroupCheckOutId.Value,
                 @event.GuestStayId,
