@@ -1,6 +1,7 @@
 using Core;
 using Core.Commands;
 using Core.Events;
+using Core.Events.External;
 using Core.EventStoreDB;
 using Core.EventStoreDB.Commands;
 using Core.EventStoreDB.Events;
@@ -35,6 +36,12 @@ public class EventStoreDBAsyncCommandBusTests
             .AddSingleton<IHostEnvironment, HostingEnvironment>(
                 _ => new HostingEnvironment { EnvironmentName = Environments.Development }
             )
+            .AddSingleton<IEventBus>(sp =>
+                new EventCatcher(
+                    eventListener,
+                    sp.GetRequiredService<EventBus>()
+                )
+            )
             .AddCoreServices()
             .AddEventStoreDB(new EventStoreDBConfig
             {
@@ -50,8 +57,7 @@ public class EventStoreDBAsyncCommandBusTests
                 Policy.NoOpAsync()
             ))
             .AddSingleton(eventListener)
-            .AddCommandForwarder()
-            .AddScoped(typeof(IEventHandler<>), typeof(EventCatcher<>));
+            .AddCommandForwarder();
 
         var serviceProvider = services.BuildServiceProvider();
         eventStoreClient = serviceProvider.GetRequiredService<EventStoreClient>();

@@ -32,16 +32,23 @@ public class EventListener
         events.Reader.ReadAllAsync(ct);
 }
 
-public class EventCatcher<T>: IEventHandler<T>
+public class EventCatcher: IEventBus
 {
     private readonly EventListener listener;
+    private readonly IEventBus eventBus;
 
-    public EventCatcher(EventListener listener) =>
-        this.listener = listener;
-
-    public Task Handle(T @event, CancellationToken ct)
+    public EventCatcher(EventListener listener, IEventBus eventBus)
     {
-        return listener.Handle(@event!, ct);
+        this.listener = listener;
+        this.eventBus = eventBus;
+    }
+
+    public async Task Publish(IEventEnvelope @event, CancellationToken ct)
+    {
+        await eventBus.Publish(@event, ct).ConfigureAwait(false);
+
+        await listener.Handle(@event, ct).ConfigureAwait(false);
+        await listener.Handle(@event.Data, ct).ConfigureAwait(false);
     }
 }
 

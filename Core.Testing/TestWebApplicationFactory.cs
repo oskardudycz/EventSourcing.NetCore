@@ -24,10 +24,16 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
         {
             services
                 .AddSingleton<IExternalEventProducer>(externalEventProducer)
+                .AddSingleton<IEventBus>(sp =>
+                    new EventCatcher(
+                        eventListener,
+                        new EventBusDecoratorWithExternalProducer(sp.GetRequiredService<EventBus>(),
+                            sp.GetRequiredService<IExternalEventProducer>())
+                    )
+                )
                 .AddSingleton(eventListener)
                 .AddSingleton<IExternalCommandBus>(externalCommandBus)
-                .AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>()
-                .AddScoped(typeof(IEventHandler<>), typeof(EventCatcher<>));
+                .AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
         });
 
 
