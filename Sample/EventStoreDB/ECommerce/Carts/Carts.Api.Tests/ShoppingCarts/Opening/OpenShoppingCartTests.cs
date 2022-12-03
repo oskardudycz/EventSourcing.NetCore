@@ -20,7 +20,7 @@ public class OpenShoppingCartTests: IClassFixture<TestWebApplicationFactory<Prog
             API.Given(
                     URI("/api/ShoppingCarts/"),
                     BODY(new OpenShoppingCartRequest(ClientId))
-                )
+                    )
                 .When(POST)
                 .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 0)),
 

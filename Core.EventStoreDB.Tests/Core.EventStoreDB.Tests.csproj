@@ -12,6 +12,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Core.EventStoreDB\Core.EventStoreDB.csproj"/>
+        <ProjectReference Include="..\Core.Testing\Core.Testing.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
