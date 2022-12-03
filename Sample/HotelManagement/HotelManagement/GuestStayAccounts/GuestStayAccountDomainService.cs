@@ -55,8 +55,7 @@ public class GuestStayDomainService
     public Task Handle(CheckOutGuest command, CancellationToken ct) =>
         documentSession.GetAndUpdate<GuestStayAccount>(
             command.GuestStayId,
-            state => state.CheckOut(DateTimeOffset.UtcNow)
-                .Map<object>(success => success, failed => failed),
+            state => state.CheckOut(DateTimeOffset.UtcNow).FlatMap(),
             ct
         );
 }
