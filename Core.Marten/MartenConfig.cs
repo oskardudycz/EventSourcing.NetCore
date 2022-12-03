@@ -1,5 +1,6 @@
 using Core.Configuration;
 using Core.Ids;
+using Core.Marten.Commands;
 using Core.Marten.Events;
 using Core.Marten.Ids;
 using Core.Marten.Subscriptions;
@@ -38,17 +39,20 @@ public static class MartenConfigExtensions
         this IServiceCollection services,
         IConfiguration configuration,
         Action<StoreOptions>? configureOptions = null,
-        string configKey = DefaultConfigKey
+        string configKey = DefaultConfigKey,
+        bool useExternalBus = false
     ) =>
         services.AddMarten(
             configuration.GetRequiredConfig<MartenConfig>(configKey),
-            configureOptions
+            configureOptions,
+            useExternalBus
         );
 
     public static IServiceCollection AddMarten(
         this IServiceCollection services,
         MartenConfig martenConfig,
-        Action<StoreOptions>? configureOptions = null
+        Action<StoreOptions>? configureOptions = null,
+        bool useExternalBus = false
     )
     {
         services
@@ -56,8 +60,11 @@ public static class MartenConfigExtensions
             .AddMartenAppendScope()
             .AddMarten(sp => SetStoreOptions(sp, martenConfig, configureOptions))
             .ApplyAllDatabaseChangesOnStartup()
-            .OptimizeArtifactWorkflow()
+            //.OptimizeArtifactWorkflow()
             .AddAsyncDaemon(martenConfig.DaemonMode);
+
+        if (useExternalBus)
+            services.AddMartenAsyncCommandBus();
 
         return services;
     }

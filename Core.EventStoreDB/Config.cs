@@ -23,10 +23,22 @@ public static class EventStoreDBConfigExtensions
 {
     private const string DefaultConfigKey = "EventStore";
 
-    public static IServiceCollection AddEventStoreDB(this IServiceCollection services, IConfiguration config, EventStoreDBOptions? options = null)
-    {
-        var eventStoreDBConfig = config.GetRequiredConfig<EventStoreDBConfig>(DefaultConfigKey);
+    public static IServiceCollection AddEventStoreDB(
+        this IServiceCollection services,
+        IConfiguration config,
+        EventStoreDBOptions? options = null
+    ) =>
+        services.AddEventStoreDB(
+            config.GetRequiredConfig<EventStoreDBConfig>(DefaultConfigKey),
+            options
+        );
 
+    public static IServiceCollection AddEventStoreDB(
+        this IServiceCollection services,
+        EventStoreDBConfig eventStoreDBConfig,
+        EventStoreDBOptions? options = null
+    )
+    {
         services
             .AddSingleton(new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
             .AddEventStoreDBAppendScope()

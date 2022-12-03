@@ -3,7 +3,7 @@ using Core.Exceptions;
 using Core.OpenTelemetry;
 using EventStore.Client;
 
-namespace ECommerce.Core.EventStoreDB;
+namespace Core.EventStoreDB.Events;
 
 public static class EventStoreDBExtensions
 {
@@ -21,7 +21,7 @@ public static class EventStoreDBExtensions
             cancellationToken: cancellationToken
         );
 
-        if (await readResult.ReadState == ReadState.StreamNotFound)
+        if (await readResult.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
             throw AggregateNotFoundException.For<TEntity>(id);
 
         return await readResult
@@ -30,7 +30,7 @@ public static class EventStoreDBExtensions
                 getDefault(),
                 when,
                 cancellationToken
-            );
+            ).ConfigureAwait(false);
     }
 
     public static async Task<List<object>> ReadStream(
@@ -45,12 +45,12 @@ public static class EventStoreDBExtensions
             cancellationToken: cancellationToken
         );
 
-        if (await readResult.ReadState == ReadState.StreamNotFound)
+        if (await readResult.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
             return new List<object>();
 
         return await readResult
             .Select(@event => @event.Deserialize()!)
-            .ToListAsync(cancellationToken: cancellationToken);
+            .ToListAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     public static async Task<ulong> Append(
@@ -66,7 +66,7 @@ public static class EventStoreDBExtensions
             StreamState.NoStream,
             new[] { @event.ToJsonEventData(TelemetryPropagator.GetPropagationContext()) },
             cancellationToken: cancellationToken
-        );
+        ).ConfigureAwait(false);
         return result.NextExpectedStreamRevision;
     }
 
@@ -84,7 +84,7 @@ public static class EventStoreDBExtensions
             expectedRevision,
             new[] { @event.ToJsonEventData(TelemetryPropagator.GetPropagationContext()) },
             cancellationToken: cancellationToken
-        );
+        ).ConfigureAwait(false);
 
         return result.NextExpectedStreamRevision;
     }

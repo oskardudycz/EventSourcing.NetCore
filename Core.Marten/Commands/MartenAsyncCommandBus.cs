@@ -1,5 +1,6 @@
 using Core.Commands;
 using Marten;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Marten.Commands;
 
@@ -20,5 +21,17 @@ public class MartenAsyncCommandBus : IAsyncCommandBus
     {
         documentSession.Events.Append(CommandsStreamId, command);
         return documentSession.SaveChangesAsync(ct);
+    }
+}
+
+
+public static class Config
+{
+    public static IServiceCollection AddMartenAsyncCommandBus(
+        this IServiceCollection services
+    )
+    {
+        return services.AddScoped<IAsyncCommandBus, MartenAsyncCommandBus>()
+            .AddCommandForwarder();
     }
 }

@@ -1,30 +1,32 @@
 using Core;
 using Core.Commands;
 using Core.Events;
-using Core.Marten;
-using Core.Marten.Commands;
+using Core.EventStoreDB;
+using Core.EventStoreDB.Commands;
+using Core.EventStoreDB.Events;
 using Core.OpenTelemetry;
 using Core.Testing;
+using EventStore.Client;
 using FluentAssertions;
-using Marten.Events.Daemon;
-using Marten.Integration.Tests.TestsInfrastructure;
+using Google.Protobuf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using Polly;
 using Xunit;
 
-namespace Marten.Integration.Tests.Commands;
+namespace EventStoreDB.Integration.Tests.Commands;
 
-public class MartenAsyncCommandBusTests: MartenTest
+public class EventStoreDBAsyncCommandBusTests
 {
-    private readonly MartenAsyncCommandBus martenAsyncCommandBus;
+    private readonly EventStoreDBAsyncCommandBus martenAsyncCommandBus;
     private readonly List<Guid> userIds = new();
     private readonly EventListener eventListener = new();
-    private readonly AsyncProjectionHostedService asyncDaemon;
     private readonly CancellationToken ct = new CancellationTokenSource().Token;
+    private readonly EventStoreClient eventStoreClient;
+    private readonly IHostedService subscriptionToAll;
 
-    public MartenAsyncCommandBusTests(): base(false)
+    public EventStoreDBAsyncCommandBusTests()
     {
         var services = new ServiceCollection();
 
@@ -34,12 +36,11 @@ public class MartenAsyncCommandBusTests: MartenTest
                 _ => new HostingEnvironment { EnvironmentName = Environments.Development }
             )
             .AddCoreServices()
-            .AddMarten(new MartenConfig
+            .AddEventStoreDB(new EventStoreDBConfig
             {
-                ConnectionString = Settings.ConnectionString,
-                WriteModelSchema = SchemaName,
-                ReadModelSchema = SchemaName
+                ConnectionString = "esdb://localhost:2113?tls=false"
             })
+            .AddEventStoreDBSubscriptionToAll()
             .AddCommandHandler<AddUser, AddUserCommandHandler>(
                 _ => new AddUserCommandHandler(userIds)
             )
@@ -53,31 +54,31 @@ public class MartenAsyncCommandBusTests: MartenTest
             .AddScoped(typeof(IEventHandler<>), typeof(EventCatcher<>));
 
         var serviceProvider = services.BuildServiceProvider();
-        Session = serviceProvider.GetRequiredService<IDocumentSession>();
+        eventStoreClient = serviceProvider.GetRequiredService<EventStoreClient>();
 
-        asyncDaemon = (AsyncProjectionHostedService)serviceProvider.GetRequiredService<IHostedService>();
+        subscriptionToAll = serviceProvider.GetRequiredService<IHostedService>();
 
-        martenAsyncCommandBus = new MartenAsyncCommandBus(Session);
+        martenAsyncCommandBus = new EventStoreDBAsyncCommandBus(eventStoreClient);
     }
 
     [Fact]
-    public async Task CommandIsStoredInMartenAndForwardedToCommandHandler()
+    public async Task CommandIsStoredInEventStoreDBAndForwardedToCommandHandler()
     {
         // Given
         var userId = Guid.NewGuid();
         var command = new AddUser(userId);
 
         // When
-        await asyncDaemon.StartAsync(ct);
+        await subscriptionToAll.StartAsync(ct);
 
         await martenAsyncCommandBus.Schedule(command, ct);
 
         // Then
         await eventListener.WaitForProcessing(command, ct);
 
-        var commands = await Session.Events.FetchStreamAsync(MartenAsyncCommandBus.CommandsStreamId, token: ct);
+        var commands = await eventStoreClient.ReadStream(EventStoreDBAsyncCommandBus.CommandsStreamId, ct);
         commands.Should().HaveCountGreaterThanOrEqualTo(1);
-        commands.Select(e => e.Data).OfType<AddUser>()
+        commands.OfType<AddUser>()
             .Count(e => e.UserId == userId)
             .Should().Be(1);
 
