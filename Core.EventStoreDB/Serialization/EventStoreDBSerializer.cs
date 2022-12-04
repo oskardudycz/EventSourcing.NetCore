@@ -26,7 +26,7 @@ public static class EventStoreDBSerializer
     public static object? Deserialize(this ResolvedEvent resolvedEvent)
     {
         // get type
-        var eventType = EventTypeMapper.ToType(resolvedEvent.Event.EventType);
+        var eventType = EventTypeMapper.Instance.ToType(resolvedEvent.Event.EventType);
 
         if (eventType == null)
             return null;
@@ -42,7 +42,7 @@ public static class EventStoreDBSerializer
     public static PropagationContext? DeserializePropagationContext(this ResolvedEvent resolvedEvent)
     {
         // get type
-        var eventType = EventTypeMapper.ToType(resolvedEvent.Event.EventType);
+        var eventType = EventTypeMapper.Instance.ToType(resolvedEvent.Event.EventType);
 
         if (eventType == null)
             return null;
@@ -57,7 +57,7 @@ public static class EventStoreDBSerializer
     public static EventData ToJsonEventData(this object @event, object? metadata = null) =>
         new(
             Uuid.NewUuid(),
-            EventTypeMapper.ToName(@event.GetType()),
+            EventTypeMapper.Instance.ToName(@event.GetType()),
             Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@event, SerializerSettings)),
             Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(metadata ?? new { }, SerializerSettings))
         );

@@ -22,6 +22,7 @@ public static class Config
         services.TryAddScoped<IExternalCommandBus, ExternalCommandBus>();
 
         services.TryAddScoped<IIdGenerator, NulloIdGenerator>();
+        services.TryAddSingleton(EventTypeMapper.Instance);
 
         return services;
     }
