@@ -19,6 +19,6 @@
       <ProjectReference Include="..\ECommerce.V1\ECommerce.V1.csproj" />
     </ItemGroup>
 
-    <Import Project="..\..\..\Tests.Build.props"/>
+    <Import Project="..\..\..\Tests.Build.props" />
 
 </Project>
