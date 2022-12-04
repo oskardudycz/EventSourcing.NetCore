@@ -27,6 +27,7 @@ public class EventStoreDBSubscriptionToAll
 {
     private readonly IEventBus eventBus;
     private readonly EventStoreClient eventStoreClient;
+    private readonly EventTypeMapper eventTypeMapper;
     private readonly ISubscriptionCheckpointRepository checkpointRepository;
     private readonly IActivityScope activityScope;
     private readonly ILogger<EventStoreDBSubscriptionToAll> logger;
@@ -37,6 +38,7 @@ public class EventStoreDBSubscriptionToAll
 
     public EventStoreDBSubscriptionToAll(
         EventStoreClient eventStoreClient,
+        EventTypeMapper eventTypeMapper,
         IEventBus eventBus,
         ISubscriptionCheckpointRepository checkpointRepository,
         IActivityScope activityScope,
@@ -45,6 +47,7 @@ public class EventStoreDBSubscriptionToAll
     {
         this.eventBus = eventBus;
         this.eventStoreClient = eventStoreClient;
+        this.eventTypeMapper = eventTypeMapper;
         this.checkpointRepository = checkpointRepository;
         this.activityScope = activityScope;
         this.logger = logger;
@@ -200,7 +203,7 @@ public class EventStoreDBSubscriptionToAll
 
     private bool IsCheckpointEvent(ResolvedEvent resolvedEvent)
     {
-        if (resolvedEvent.Event.EventType != EventTypeMapper.ToName<CheckpointStored>()) return false;
+        if (resolvedEvent.Event.EventType != eventTypeMapper.ToName<CheckpointStored>()) return false;
 
         logger.LogInformation("Checkpoint event - ignoring");
         return true;
