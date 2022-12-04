@@ -723,7 +723,7 @@ Shows how to compose event handlers in the processing pipelines to:
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
 - stores events to Marten,
-- asynchronous projections rebuild using AsynDaemon feature.
+- asynchronous projections rebuild using AsyncDaemon feature.
 
 ## 7. Self-paced training Kits
 
