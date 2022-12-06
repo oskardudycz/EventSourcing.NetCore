@@ -13,15 +13,15 @@
     <ItemGroup>
         <PackageReference Include="Argu" Version="6.1.1" />
         <PackageReference Include="Destructurama.FSharp" Version="1.2.0" />
-        <PackageReference Include="Equinox.CosmosStore.Prometheus" Version="4.0.0-rc.1.3" />
-        <PackageReference Include="Equinox.DynamoStore.Prometheus" Version="4.0.0-rc.1.3" />
-        <PackageReference Include="Equinox.SqlStreamStore.MsSql" Version="4.0.0-rc.1.3" />
+        <PackageReference Include="Equinox.CosmosStore.Prometheus" Version="4.0.0-rc.5.2" />
+        <PackageReference Include="Equinox.DynamoStore.Prometheus" Version="4.0.0-rc.5.2" />
+        <PackageReference Include="Equinox.SqlStreamStore.MsSql" Version="4.0.0-rc.5.2" />
         <PackageReference Include="prometheus-net.AspNetCore" Version="3.6.0" />
-        <PackageReference Include="Propulsion.CosmosStore" Version="3.0.0-beta.4.3" />
-        <PackageReference Include="Propulsion.DynamoStore" Version="3.0.0-beta.4.3" />
-        <PackageReference Include="Propulsion.EventStoreDb" Version="3.0.0-beta.4.3" />
-        <PackageReference Include="Propulsion.SqlStreamStore" Version="3.0.0-beta.4.3" />
-        <PackageReference Include="Propulsion.MemoryStore" Version="3.0.0-beta.4.3" />
+        <PackageReference Include="Propulsion.CosmosStore" Version="3.0.0-beta.6" />
+        <PackageReference Include="Propulsion.DynamoStore" Version="3.0.0-beta.6" />
+        <PackageReference Include="Propulsion.EventStoreDb" Version="3.0.0-beta.6" />
+        <PackageReference Include="Propulsion.SqlStreamStore" Version="3.0.0-beta.6" />
+        <PackageReference Include="Propulsion.MemoryStore" Version="3.0.0-beta.6" />
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
         <ProjectReference Include="../ECommerce.Domain/ECommerce.Domain.fsproj" />

@@ -6,7 +6,7 @@
 module ECommerce.Domain.ConfirmedEpoch
 
 let [<Literal>] Category = "ConfirmedEpoch"
-let streamName epochId = struct (Category, FsCodec.StreamName.createStreamId [ConfirmedSeriesId.toString ConfirmedSeriesId.wellKnownId; ConfirmedEpochId.toString epochId])
+let streamId epochId = Equinox.StreamId.gen2 ConfirmedSeriesId.toString ConfirmedEpochId.toString (ConfirmedSeriesId.wellKnownId, epochId)
 
 // NB - these types and the union case names reflect the actual storage formats and hence need to be versioned with care
 [<RequireQualifiedAccess>]
@@ -81,7 +81,7 @@ type Service internal
 
 module Config =
 
-    let private create_ shouldClose cat = Service(shouldClose, streamName >> Config.createDecider cat)
+    let private create_ shouldClose cat = Service(shouldClose, streamId >> Config.createDecider cat Category)
     let private (|Category|) = function
         | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
         | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
@@ -121,4 +121,4 @@ module Reader =
             | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec initial fold (context, cache)
             | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec initial fold (context, cache)
             | Config.Store.Sss (context, cache) ->    Config.Sss.createUnoptimized Events.codec initial fold (context, cache)
-        let create (Category cat) = Service(streamName >> Config.createDecider cat)
+        let create (Category cat) = Service(streamId >> Config.createDecider cat Category)
