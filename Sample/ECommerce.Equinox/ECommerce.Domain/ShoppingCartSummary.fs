@@ -2,7 +2,7 @@ module ECommerce.Domain.ShoppingCartSummary
 
 let [<Literal>] Category = "ShoppingCartSummary"
 
-let streamName id = struct (Category, CartId.toString id)
+let streamId = Equinox.StreamId.gen CartId.toString
 
 module Events =
 
@@ -68,4 +68,4 @@ module Config =
         | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createRollingState Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
         | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createRollingState Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
         | Config.Store.Esdb _ | Config.Store.Sss _ ->  failwith "Not implemented: For EventStore/Sss its suggested to do a cached read from the write side"
-    let create (Category cat) = Service(streamName >> Config.createDecider cat)
+    let create (Category cat) = Service(streamId >> Config.createDecider cat Category)

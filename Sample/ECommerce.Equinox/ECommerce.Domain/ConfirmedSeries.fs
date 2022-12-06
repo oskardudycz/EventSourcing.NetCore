@@ -6,7 +6,7 @@ module ECommerce.Domain.ConfirmedSeries
 let [<Literal>] Category = "ConfirmedSeries"
 // TOCONSIDER: if you need multiple lists series/epochs in a single system, the Series and Epoch streams should have a SeriesId in the stream name
 // See also the implementation in the feedSource template, where the Series aggregate also functions as an index of series held in the system
-let streamName () = struct (Category, ConfirmedSeriesId.toString ConfirmedSeriesId.wellKnownId)
+let streamId () = Equinox.StreamId.gen ConfirmedSeriesId.toString ConfirmedSeriesId.wellKnownId
 
 // NB - these types and the union case names reflect the actual storage formats and hence need to be versioned with care
 [<RequireQualifiedAccess>]
@@ -57,4 +57,4 @@ module Config =
         | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createSnapshotted Events.codec Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
         | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
         | Config.Store.Sss (context, cache) ->    Config.Sss.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-    let create (Category cat) = Service(streamName >> Config.createDecider cat)
+    let create (Category cat) = Service(streamId >> Config.createDecider cat Category)

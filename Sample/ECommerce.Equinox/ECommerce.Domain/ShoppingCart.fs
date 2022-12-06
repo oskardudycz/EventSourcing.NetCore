@@ -4,7 +4,7 @@ open Propulsion.Internal
 
 let [<Literal>] Category = "ShoppingCart"
 
-let streamName id = struct (Category, CartId.toString id)
+let streamId = Equinox.StreamId.gen CartId.toString
 let [<return: Struct>] (|StreamName|_|) = function FsCodec.StreamName.CategoryAndId (Category, CartId.Parse cartId) -> ValueSome cartId | _ -> ValueNone
 
 module Events =
@@ -163,7 +163,7 @@ module Config =
         | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
         | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
         | Config.Store.Sss (context, cache) ->    Config.Sss.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-    let create_ pricer (Category cat) = Service(streamName >> Config.createDecider cat, calculatePrice pricer)
+    let create_ pricer (Category cat) = Service(streamId >> Config.createDecider cat Category, calculatePrice pricer)
     let create =
         let defaultCalculator = RandomProductPriceCalculator()
         create_ defaultCalculator.Calculate
