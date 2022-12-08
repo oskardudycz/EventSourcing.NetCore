@@ -1,5 +1,5 @@
 using Core.Aggregates;
-using Core.Marten.OptimisticConcurrency;
+using Core.OptimisticConcurrency;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Marten.Repository;
@@ -22,8 +22,8 @@ public static class Config
             services.AddScoped<IMartenRepository<T>, MartenRepositoryWithETagDecorator<T>>(
                 sp => new MartenRepositoryWithETagDecorator<T>(
                     sp.GetRequiredService<MartenRepository<T>>(),
-                    () => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().Value,
-                    value => sp.GetRequiredService<MartenNextStreamVersionProvider>().Set(value)
+                    sp.GetRequiredService<IExpectedResourceVersionProvider>(),
+                    sp.GetRequiredService<INextResourceVersionProvider>()
                 )
             );
         }

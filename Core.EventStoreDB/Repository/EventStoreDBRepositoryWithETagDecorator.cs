@@ -1,6 +1,5 @@
 using Core.Aggregates;
-using Core.EventStoreDB.OptimisticConcurrency;
-using Microsoft.Extensions.DependencyInjection;
+using Core.OptimisticConcurrency;
 
 namespace Core.EventStoreDB.Repository;
 
@@ -8,18 +7,18 @@ public class EventStoreDBRepositoryWithETagDecorator<T>: IEventStoreDBRepository
     where T : class, IAggregate
 {
     private readonly IEventStoreDBRepository<T> inner;
-    private readonly Func<ulong?> getExpectedVersion;
-    private readonly Action<ulong> setNextExpectedVersion;
+    private readonly IExpectedResourceVersionProvider expectedResourceVersionProvider;
+    private readonly INextResourceVersionProvider nextResourceVersionProvider;
 
     public EventStoreDBRepositoryWithETagDecorator(
         IEventStoreDBRepository<T> inner,
-        Func<ulong?> getExpectedVersion,
-        Action<ulong> setNextExpectedVersion
+        IExpectedResourceVersionProvider expectedResourceVersionProvider,
+        INextResourceVersionProvider nextResourceVersionProvider
     )
     {
         this.inner = inner;
-        this.getExpectedVersion = getExpectedVersion;
-        this.setNextExpectedVersion = setNextExpectedVersion;
+        this.expectedResourceVersionProvider = expectedResourceVersionProvider;
+        this.nextResourceVersionProvider = nextResourceVersionProvider;
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
@@ -32,7 +31,7 @@ public class EventStoreDBRepositoryWithETagDecorator<T>: IEventStoreDBRepository
             cancellationToken
         ).ConfigureAwait(true);
 
-        setNextExpectedVersion(nextExpectedVersion);
+        nextResourceVersionProvider.TrySet(nextExpectedVersion.ToString());
 
         return nextExpectedVersion;
     }
@@ -42,11 +41,11 @@ public class EventStoreDBRepositoryWithETagDecorator<T>: IEventStoreDBRepository
     {
         var nextExpectedVersion = await inner.Update(
             aggregate,
-            expectedVersion ?? getExpectedVersion(),
+            expectedVersion ?? GetExpectedVersion(),
             cancellationToken
         ).ConfigureAwait(true);
 
-        setNextExpectedVersion(nextExpectedVersion);
+        nextResourceVersionProvider.TrySet(nextExpectedVersion.ToString());
 
         return nextExpectedVersion;
     }
@@ -55,20 +54,22 @@ public class EventStoreDBRepositoryWithETagDecorator<T>: IEventStoreDBRepository
     {
         var nextExpectedVersion = await inner.Delete(
             aggregate,
-            expectedVersion ?? getExpectedVersion(),
+            expectedVersion ?? GetExpectedVersion(),
             cancellationToken
         ).ConfigureAwait(true);
 
-        setNextExpectedVersion(nextExpectedVersion);
+        nextResourceVersionProvider.TrySet(nextExpectedVersion.ToString());
 
         return nextExpectedVersion;
     }
-}
 
-public static class EventStoreDBAppendScopeExtensions
-{
-    public static IServiceCollection AddEventStoreDBAppendScope(this IServiceCollection services) =>
-        services
-            .AddScoped<EventStoreDBExpectedStreamRevisionProvider, EventStoreDBExpectedStreamRevisionProvider>()
-            .AddScoped<EventStoreDBNextStreamRevisionProvider, EventStoreDBNextStreamRevisionProvider>();
+    private ulong? GetExpectedVersion()
+    {
+        var value = expectedResourceVersionProvider.Value;
+
+        if (string.IsNullOrWhiteSpace(value) || !ulong.TryParse(value, out var expectedVersion))
+            return null;
+
+        return expectedVersion;
+    }
 }

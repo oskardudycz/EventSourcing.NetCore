@@ -1,5 +1,5 @@
 using Core.Aggregates;
-using Core.EventStoreDB.OptimisticConcurrency;
+using Core.OptimisticConcurrency;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.EventStoreDB.Repository;
@@ -22,8 +22,8 @@ public static class Config
             services.AddScoped<IEventStoreDBRepository<T>, EventStoreDBRepositoryWithETagDecorator<T>>(
                 sp => new EventStoreDBRepositoryWithETagDecorator<T>(
                     sp.GetRequiredService<EventStoreDBRepository<T>>(),
-                    () => sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().Value,
-                    value => sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Set(value)
+                    sp.GetRequiredService<IExpectedResourceVersionProvider>(),
+                    sp.GetRequiredService<INextResourceVersionProvider>()
                 )
             );
         }

@@ -1,7 +1,6 @@
 using System.Net;
 using Core;
 using Core.Exceptions;
-using Core.Marten.OptimisticConcurrency;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
@@ -19,10 +18,7 @@ builder.Services
     })
     .AddCoreServices()
     .AddTemperaturesModule(builder.Configuration)
-    .AddOptimisticConcurrencyMiddleware(
-        sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
-        sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
-    );
+    .AddOptimisticConcurrencyMiddleware();
 
 var app = builder.Build();
 

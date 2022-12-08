@@ -2,7 +2,6 @@ using System.Net;
 using Carts;
 using Core;
 using Core.EventStoreDB;
-using Core.EventStoreDB.OptimisticConcurrency;
 using Core.Exceptions;
 using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
@@ -23,10 +22,7 @@ builder.Services
     .AddCoreServices()
     .AddEventStoreDBSubscriptionToAll()
     .AddCartsModule(builder.Configuration)
-    .AddOptimisticConcurrencyMiddleware(
-        sp => sp.GetRequiredService<EventStoreDBExpectedStreamRevisionProvider>().TrySet,
-        sp => () => sp.GetRequiredService<EventStoreDBNextStreamRevisionProvider>().Value?.ToString()
-    )
+    .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
         options.Configure(t =>
             t.AddJaegerExporter()
