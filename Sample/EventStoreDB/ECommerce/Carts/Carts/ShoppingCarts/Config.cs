@@ -20,8 +20,9 @@ namespace Carts.ShoppingCarts;
 internal static class CartsConfig
 {
     internal static IServiceCollection AddCarts(this IServiceCollection services) =>
-        services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>()
-            .AddScoped<IEventStoreDBRepository<ShoppingCart>, EventStoreDBRepository<ShoppingCart>>()
+        services
+            .AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>()
+            .AddEventStoreDBRepository<ShoppingCart>()
             .AddCommandHandlers()
             .AddProjections()
             .AddQueryHandlers();

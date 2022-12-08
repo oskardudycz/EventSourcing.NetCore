@@ -14,9 +14,9 @@ public class MaintenanceCommandHandler:
         this.documentStore = documentStore;
     }
 
-    public async Task Handle(RebuildProjection command, CancellationToken cancellationToken)
+    public async Task Handle(RebuildProjection command, CancellationToken ct)
     {
         using var daemon = await documentStore.BuildProjectionDaemonAsync();
-        await daemon.RebuildProjection(command.ViewName, cancellationToken);
+        await daemon.RebuildProjection(command.ViewName, ct);
     }
 }

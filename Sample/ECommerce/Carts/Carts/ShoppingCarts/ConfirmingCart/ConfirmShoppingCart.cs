@@ -24,10 +24,10 @@ internal class HandleConfirmShoppingCart:
     public HandleConfirmShoppingCart(IMartenRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
 
-    public Task Handle(ConfirmShoppingCart command, CancellationToken cancellationToken) =>
+    public Task Handle(ConfirmShoppingCart command, CancellationToken ct) =>
         cartRepository.GetAndUpdate(
             command.CartId,
             cart => cart.Confirm(),
-            cancellationToken: cancellationToken
+            ct: ct
         );
 }

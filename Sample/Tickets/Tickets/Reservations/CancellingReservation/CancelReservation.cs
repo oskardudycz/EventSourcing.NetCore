@@ -24,10 +24,10 @@ internal class HandleCancelReservation:
     public HandleCancelReservation(IMartenRepository<Reservation> repository) =>
         this.repository = repository;
 
-    public Task Handle(CancelReservation command, CancellationToken cancellationToken) =>
+    public Task Handle(CancelReservation command, CancellationToken ct) =>
         repository.GetAndUpdate(
             command.ReservationId,
             reservation => reservation.Cancel(),
-            cancellationToken: cancellationToken
+            ct: ct
         );
 }

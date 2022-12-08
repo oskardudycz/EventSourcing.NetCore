@@ -30,10 +30,10 @@ internal class HandleChangeReservationSeat:
     public HandleChangeReservationSeat(IMartenRepository<Reservation> repository) =>
         this.repository = repository;
 
-    public Task Handle(ChangeReservationSeat command, CancellationToken cancellationToken) =>
+    public Task Handle(ChangeReservationSeat command, CancellationToken ct) =>
         repository.GetAndUpdate(
             command.ReservationId,
             reservation => reservation.ChangeSeat(command.SeatId),
-            cancellationToken: cancellationToken
+            ct: ct
         );
 }

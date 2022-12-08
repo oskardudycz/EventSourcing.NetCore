@@ -27,14 +27,14 @@ public class HandleDiscardPayment:
     public HandleDiscardPayment(IMartenRepository<Payment> paymentRepository) =>
         this.paymentRepository = paymentRepository;
 
-    public Task Handle(DiscardPayment command, CancellationToken cancellationToken)
+    public Task Handle(DiscardPayment command, CancellationToken ct)
     {
         var (paymentId, _) = command;
 
         return paymentRepository.GetAndUpdate(
             paymentId,
             payment => payment.TimeOut(),
-            cancellationToken: cancellationToken
+            ct: ct
         );
     }
 }

@@ -28,10 +28,10 @@ public class HandleCancelOrder:
     public HandleCancelOrder(IMartenRepository<Order> orderRepository) =>
         this.orderRepository = orderRepository;
 
-    public Task Handle(CancelOrder command, CancellationToken cancellationToken) =>
+    public Task Handle(CancelOrder command, CancellationToken ct) =>
         orderRepository.GetAndUpdate(
             command.OrderId,
             order => order.Cancel(command.CancellationReason),
-            cancellationToken: cancellationToken
+            ct: ct
         );
 }

@@ -27,13 +27,13 @@ internal class HandleOpenShoppingCart:
     public HandleOpenShoppingCart(IMartenRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
 
-    public Task Handle(OpenShoppingCart command, CancellationToken cancellationToken)
+    public Task Handle(OpenShoppingCart command, CancellationToken ct)
     {
         var (cartId, clientId) = command;
 
         return cartRepository.Add(
             ShoppingCart.Open(cartId, clientId),
-            cancellationToken
+            ct
         );
     }
 }

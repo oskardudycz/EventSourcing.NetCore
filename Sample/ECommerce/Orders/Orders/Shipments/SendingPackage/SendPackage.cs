@@ -35,12 +35,12 @@ public class HandleSendPackage:
         this.externalCommandBus = externalCommandBus;
     }
 
-    public async Task Handle(SendPackage command, CancellationToken cancellationToken)
+    public async Task Handle(SendPackage command, CancellationToken ct)
     {
         await externalCommandBus.Post(
             externalServicesConfig.ShipmentsUrl!,
             "shipments",
             command,
-            cancellationToken);
+            ct);
     }
 }

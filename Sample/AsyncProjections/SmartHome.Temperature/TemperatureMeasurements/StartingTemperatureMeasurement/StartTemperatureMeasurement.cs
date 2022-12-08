@@ -24,11 +24,11 @@ public class HandleStartTemperatureMeasurement:
     public HandleStartTemperatureMeasurement(IMartenRepository<TemperatureMeasurement> repository) =>
         this.repository = repository;
 
-    public Task Handle(StartTemperatureMeasurement command, CancellationToken cancellationToken) =>
+    public Task Handle(StartTemperatureMeasurement command, CancellationToken ct) =>
         repository.Add(
             TemperatureMeasurement.Start(
                 command.MeasurementId
             ),
-            cancellationToken
+            ct
         );
 }

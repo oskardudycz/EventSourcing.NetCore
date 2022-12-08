@@ -30,14 +30,14 @@ public class HandleRecordOrderPayment:
     public HandleRecordOrderPayment(IMartenRepository<Order> orderRepository) =>
         this.orderRepository = orderRepository;
 
-    public Task Handle(RecordOrderPayment command, CancellationToken cancellationToken)
+    public Task Handle(RecordOrderPayment command, CancellationToken ct)
     {
         var (orderId, paymentId, recordedAt) = command;
 
         return orderRepository.GetAndUpdate(
             orderId,
             order => order.RecordPayment(paymentId, recordedAt),
-            cancellationToken: cancellationToken
+            ct: ct
         );
     }
 }

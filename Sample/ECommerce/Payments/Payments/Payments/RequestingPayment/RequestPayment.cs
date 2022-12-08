@@ -34,13 +34,13 @@ public class HandleRequestPayment:
     public HandleRequestPayment(IMartenRepository<Payment> paymentRepository) =>
         this.paymentRepository = paymentRepository;
 
-    public Task Handle(RequestPayment command, CancellationToken cancellationToken)
+    public Task Handle(RequestPayment command, CancellationToken ct)
     {
         var (paymentId, orderId, amount) = command;
 
         return paymentRepository.Add(
             Payment.Initialize(paymentId, orderId, amount),
-            cancellationToken
+            ct
         );
     }
 }

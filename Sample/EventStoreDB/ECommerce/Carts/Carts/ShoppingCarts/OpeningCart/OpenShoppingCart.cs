@@ -1,5 +1,4 @@
 using Core.Commands;
-using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
 
 namespace Carts.ShoppingCarts.OpeningCart;
@@ -24,26 +23,17 @@ internal class HandleOpenCart:
     ICommandHandler<OpenShoppingCart>
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
-    private readonly IEventStoreDBAppendScope scope;
 
-    public HandleOpenCart(
-        IEventStoreDBRepository<ShoppingCart> cartRepository,
-        IEventStoreDBAppendScope scope
-    )
-    {
+    public HandleOpenCart(IEventStoreDBRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(OpenShoppingCart command, CancellationToken cancellationToken)
+    public Task Handle(OpenShoppingCart command, CancellationToken ct)
     {
         var (cartId, clientId) = command;
 
-        await scope.Do(_ =>
-            cartRepository.Add(
-                ShoppingCart.Open(cartId, clientId),
-                cancellationToken
-            )
+        return cartRepository.Add(
+            ShoppingCart.Open(cartId, clientId),
+            ct
         );
     }
 }

@@ -24,10 +24,10 @@ internal class HandleConfirmReservation:
     public HandleConfirmReservation(IMartenRepository<Reservation> repository) =>
         this.repository = repository;
 
-    public Task Handle(ConfirmReservation command, CancellationToken cancellationToken) =>
+    public Task Handle(ConfirmReservation command, CancellationToken ct) =>
         repository.GetAndUpdate(
             command.ReservationId,
             payment => payment.Confirm(),
-            cancellationToken: cancellationToken
+            ct: ct
         );
 }
