@@ -72,16 +72,10 @@ public class OptimisticConcurrencyMiddleware
 
 public static class OptimisticConcurrencyMiddlewareConfig
 {
-    public static IServiceCollection AddOptimisticConcurrencyMiddleware(
-        this IServiceCollection services,
-        Func<IServiceProvider, Func<string, bool>>? trySetExpectedVersion = null,
-        Func<IServiceProvider, Func<string?>>? getNextVersion = null
-    )
+    public static IServiceCollection AddOptimisticConcurrencyMiddleware(this IServiceCollection services)
     {
-        services.TryAddScoped<IExpectedResourceVersionProvider>(sp =>
-            new ExpectedResourceVersionProvider(trySetExpectedVersion?.Invoke(sp)));
-        services.TryAddScoped<INextResourceVersionProvider>(sp =>
-            new NextResourceVersionProvider(getNextVersion?.Invoke(sp)));
+        services.TryAddScoped<IExpectedResourceVersionProvider, ExpectedResourceVersionProvider>();
+        services.TryAddScoped<INextResourceVersionProvider, NextResourceVersionProvider>();
 
         return services;
     }

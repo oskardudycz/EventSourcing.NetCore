@@ -1,7 +1,6 @@
 using System.Net;
 using Core;
 using Core.Exceptions;
-using Core.Marten.OptimisticConcurrency;
 using Core.OpenTelemetry;
 using Core.Serialization.Newtonsoft;
 using Core.WebApi.Middlewares.ExceptionHandling;
@@ -23,10 +22,7 @@ builder.Services
     })
     .AddCoreServices()
     .AddTicketsModule(builder.Configuration)
-    .AddOptimisticConcurrencyMiddleware(
-        sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
-        sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
-    )
+    .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Tickets", OpenTelemetryOptions.Build(options =>
         options.Configure(t =>
             t.AddJaegerExporter()

@@ -57,7 +57,6 @@ public static class MartenConfigExtensions
     {
         services
             .AddScoped<IIdGenerator, MartenIdGenerator>()
-            .AddMartenAppendScope()
             .AddMarten(sp => SetStoreOptions(sp, martenConfig, configureOptions))
             .ApplyAllDatabaseChangesOnStartup()
             //.OptimizeArtifactWorkflow()

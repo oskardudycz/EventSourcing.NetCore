@@ -3,7 +3,6 @@ using Carts;
 using Core;
 using Core.Exceptions;
 using Core.Kafka;
-using Core.Marten.OptimisticConcurrency;
 using Core.OpenTelemetry;
 using Core.Serialization.Newtonsoft;
 using Core.WebApi.Middlewares.ExceptionHandling;
@@ -25,10 +24,7 @@ builder.Services
     .AddKafkaProducer()
     .AddCoreServices()
     .AddCartsModule(builder.Configuration)
-    .AddOptimisticConcurrencyMiddleware(
-        sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
-        sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
-    )
+    .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
         options.Configure(t =>
             t.AddJaegerExporter()

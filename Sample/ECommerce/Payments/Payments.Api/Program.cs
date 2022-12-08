@@ -2,7 +2,6 @@ using System.Net;
 using Core;
 using Core.Exceptions;
 using Core.Kafka;
-using Core.Marten.OptimisticConcurrency;
 using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
@@ -24,10 +23,7 @@ builder.Services
     .AddKafkaProducer()
     .AddCoreServices()
     .AddPaymentsModule(builder.Configuration)
-    .AddOptimisticConcurrencyMiddleware(
-        sp => sp.GetRequiredService<MartenExpectedStreamVersionProvider>().TrySet,
-        sp => () => sp.GetRequiredService<MartenNextStreamVersionProvider>().Value?.ToString()
-    )
+    .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Payments", OpenTelemetryOptions.Build(options =>
         options.Configure(t =>
             t.AddJaegerExporter()

@@ -1,6 +1,5 @@
 ﻿using Core.Aggregates;
-using Core.Marten.OptimisticConcurrency;
-using Microsoft.Extensions.DependencyInjection;
+using Core.OptimisticConcurrency;
 
 namespace Core.Marten.Repository;
 
@@ -8,18 +7,18 @@ public class MartenRepositoryWithETagDecorator<T>: IMartenRepository<T>
     where T : class, IAggregate
 {
     private readonly IMartenRepository<T> inner;
-    private readonly Func<long?> getExpectedVersion;
-    private readonly Action<long> setNextExpectedVersion;
+    private readonly IExpectedResourceVersionProvider expectedResourceVersionProvider;
+    private readonly INextResourceVersionProvider nextResourceVersionProvider;
 
     public MartenRepositoryWithETagDecorator(
         IMartenRepository<T> inner,
-        Func<long?> getExpectedVersion,
-        Action<long> setNextExpectedVersion
+        IExpectedResourceVersionProvider expectedResourceVersionProvider,
+        INextResourceVersionProvider nextResourceVersionProvider
     )
     {
         this.inner = inner;
-        this.getExpectedVersion = getExpectedVersion;
-        this.setNextExpectedVersion = setNextExpectedVersion;
+        this.expectedResourceVersionProvider = expectedResourceVersionProvider;
+        this.nextResourceVersionProvider = nextResourceVersionProvider;
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
@@ -32,7 +31,7 @@ public class MartenRepositoryWithETagDecorator<T>: IMartenRepository<T>
             cancellationToken
         ).ConfigureAwait(true);
 
-        setNextExpectedVersion(nextExpectedVersion);
+        nextResourceVersionProvider.TrySet(nextExpectedVersion.ToString());
 
         return nextExpectedVersion;
     }
@@ -42,11 +41,11 @@ public class MartenRepositoryWithETagDecorator<T>: IMartenRepository<T>
     {
         var nextExpectedVersion = await inner.Update(
             aggregate,
-            expectedVersion ?? getExpectedVersion(),
+            expectedVersion ?? GetExpectedVersion(),
             cancellationToken
         ).ConfigureAwait(true);
 
-        setNextExpectedVersion(nextExpectedVersion);
+        nextResourceVersionProvider.TrySet(nextExpectedVersion.ToString());
 
         return nextExpectedVersion;
     }
@@ -55,20 +54,22 @@ public class MartenRepositoryWithETagDecorator<T>: IMartenRepository<T>
     {
         var nextExpectedVersion = await inner.Delete(
             aggregate,
-            expectedVersion ?? getExpectedVersion(),
+            expectedVersion ?? GetExpectedVersion(),
             cancellationToken
         ).ConfigureAwait(true);
 
-        setNextExpectedVersion(nextExpectedVersion);
+        nextResourceVersionProvider.TrySet(nextExpectedVersion.ToString());
 
         return nextExpectedVersion;
     }
-}
 
-public static class MartenAppendScopeExtensions
-{
-    public static IServiceCollection AddMartenAppendScope(this IServiceCollection services) =>
-        services
-            .AddScoped<MartenExpectedStreamVersionProvider, MartenExpectedStreamVersionProvider>()
-            .AddScoped<MartenNextStreamVersionProvider, MartenNextStreamVersionProvider>();
+    private long? GetExpectedVersion()
+    {
+        var value = expectedResourceVersionProvider.Value;
+
+        if (string.IsNullOrWhiteSpace(value) || !long.TryParse(value, out var expectedVersion))
+            return null;
+
+        return expectedVersion;
+    }
 }
