@@ -1,7 +1,5 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Tickets.Reservations.ConfirmingReservation;
 
@@ -22,26 +20,14 @@ internal class HandleConfirmReservation:
     ICommandHandler<ConfirmReservation>
 {
     private readonly IMartenRepository<Reservation> repository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleConfirmReservation(
-        IMartenRepository<Reservation> repository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleConfirmReservation(IMartenRepository<Reservation> repository) =>
         this.repository = repository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(ConfirmReservation command, CancellationToken cancellationToken)
-    {
-        await scope.Do(expectedVersion =>
-            repository.GetAndUpdate(
-                command.ReservationId,
-                payment => payment.Confirm(),
-                expectedVersion,
-                cancellationToken
-            )
+    public Task Handle(ConfirmReservation command, CancellationToken cancellationToken) =>
+        repository.GetAndUpdate(
+            command.ReservationId,
+            payment => payment.Confirm(),
+            cancellationToken: cancellationToken
         );
-    }
 }

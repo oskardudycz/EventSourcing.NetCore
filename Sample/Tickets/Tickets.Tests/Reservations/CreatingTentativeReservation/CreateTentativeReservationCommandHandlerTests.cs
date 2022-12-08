@@ -2,7 +2,6 @@ using FluentAssertions;
 using Tickets.Reservations;
 using Tickets.Reservations.CreatingTentativeReservation;
 using Tickets.Tests.Extensions.Reservations;
-using Tickets.Tests.Stubs.Events;
 using Tickets.Tests.Stubs.Reservations;
 using Tickets.Tests.Stubs.Storage;
 using Xunit;
@@ -20,8 +19,7 @@ public class CreateTentativeReservationCommandHandlerTests
 
         var commandHandler = new HandleCreateTentativeReservation(
             repository,
-            numberGenerator,
-            new DummyMartenAppendScope()
+            numberGenerator
         );
 
         var command = CreateTentativeReservation.Create(Guid.NewGuid(), Guid.NewGuid());

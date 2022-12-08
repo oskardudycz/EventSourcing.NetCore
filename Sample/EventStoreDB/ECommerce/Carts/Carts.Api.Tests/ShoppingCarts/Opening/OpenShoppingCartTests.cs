@@ -1,7 +1,6 @@
 using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
-using Carts.ShoppingCarts.Products;
 using Core.Testing;
 using FluentAssertions;
 using Ogooreck.API;

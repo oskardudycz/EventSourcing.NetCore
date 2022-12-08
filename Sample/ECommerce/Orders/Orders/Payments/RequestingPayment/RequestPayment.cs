@@ -1,6 +1,5 @@
 using Core.Commands;
 using Core.Requests;
-using MediatR;
 
 namespace Orders.Payments.RequestingPayment;
 

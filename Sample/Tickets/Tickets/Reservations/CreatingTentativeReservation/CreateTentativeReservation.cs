@@ -1,7 +1,5 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 using Tickets.Reservations.NumberGeneration;
 
 namespace Tickets.Reservations.CreatingTentativeReservation;
@@ -9,7 +7,7 @@ namespace Tickets.Reservations.CreatingTentativeReservation;
 public record CreateTentativeReservation(
     Guid ReservationId,
     Guid SeatId
-    )
+)
 {
     public static CreateTentativeReservation Create(Guid? reservationId, Guid? seatId)
     {
@@ -27,32 +25,27 @@ internal class HandleCreateTentativeReservation:
 {
     private readonly IMartenRepository<Reservation> repository;
     private readonly IReservationNumberGenerator reservationNumberGenerator;
-    private readonly IMartenAppendScope scope;
 
     public HandleCreateTentativeReservation(
         IMartenRepository<Reservation> repository,
-        IReservationNumberGenerator reservationNumberGenerator,
-        IMartenAppendScope scope
+        IReservationNumberGenerator reservationNumberGenerator
     )
     {
         this.repository = repository;
         this.reservationNumberGenerator = reservationNumberGenerator;
-        this.scope = scope;
     }
 
-    public async Task Handle(CreateTentativeReservation command, CancellationToken cancellationToken)
+    public Task Handle(CreateTentativeReservation command, CancellationToken cancellationToken)
     {
         var (reservationId, seatId) = command;
 
-        await scope.Do(_ =>
-            repository.Add(
-                Reservation.CreateTentative(
-                    reservationId,
-                    reservationNumberGenerator,
-                    seatId
-                ),
-                cancellationToken
-            )
+        return repository.Add(
+            Reservation.CreateTentative(
+                reservationId,
+                reservationNumberGenerator,
+                seatId
+            ),
+            cancellationToken
         );
     }
 }

@@ -1,7 +1,5 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Orders.Orders.CompletingOrder;
 
@@ -22,26 +20,14 @@ public class HandleCompleteOrder:
     ICommandHandler<CompleteOrder>
 {
     private readonly IMartenRepository<Order> orderRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleCompleteOrder(
-        IMartenRepository<Order> orderRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleCompleteOrder(IMartenRepository<Order> orderRepository) =>
         this.orderRepository = orderRepository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(CompleteOrder command, CancellationToken cancellationToken)
-    {
-        await scope.Do(expectedVersion =>
-            orderRepository.GetAndUpdate(
-                command.OrderId,
-                order => order.Complete(),
-                expectedVersion,
-                cancellationToken
-            )
+    public Task Handle(CompleteOrder command, CancellationToken cancellationToken) =>
+        orderRepository.GetAndUpdate(
+            command.OrderId,
+            order => order.Complete(),
+            cancellationToken: cancellationToken
         );
-    }
 }

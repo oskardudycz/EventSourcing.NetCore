@@ -1,5 +1,4 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
 using MeetingsManagement.Meetings.ValueObjects;
 
@@ -14,28 +13,18 @@ internal class HandleScheduleMeeting:
     ICommandHandler<ScheduleMeeting>
 {
     private readonly IMartenRepository<Meeting> repository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleScheduleMeeting(
-        IMartenRepository<Meeting> repository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleScheduleMeeting(IMartenRepository<Meeting> repository) =>
         this.repository = repository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(ScheduleMeeting command, CancellationToken cancellationToken)
+    public Task Handle(ScheduleMeeting command, CancellationToken cancellationToken)
     {
         var (meetingId, dateRange) = command;
 
-        await scope.Do(expectedVersion =>
-            repository.GetAndUpdate(
-                meetingId,
-                meeting => meeting.Schedule(dateRange),
-                expectedVersion,
-                cancellationToken
-            )
+        return repository.GetAndUpdate(
+            meetingId,
+            meeting => meeting.Schedule(dateRange),
+            cancellationToken: cancellationToken
         );
     }
 }

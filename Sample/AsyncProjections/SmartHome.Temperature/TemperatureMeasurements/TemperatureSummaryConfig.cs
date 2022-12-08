@@ -14,7 +14,7 @@ public static class TemperatureSummaryConfig
 {
     internal static IServiceCollection AddTemperatureMeasurements(this IServiceCollection services) =>
         services
-            .AddScoped<IMartenRepository<TemperatureMeasurement>, MartenRepository<TemperatureMeasurement>>()
+            .AddMartenRepository<TemperatureMeasurement>()
             .AddCommandHandlers()
             .AddQueryHandlers();
 

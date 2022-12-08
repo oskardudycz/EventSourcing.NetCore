@@ -1,7 +1,6 @@
 using Core;
 using Core.Commands;
 using Core.Events;
-using Core.Events.External;
 using Core.EventStoreDB;
 using Core.EventStoreDB.Commands;
 using Core.EventStoreDB.Events;
@@ -9,7 +8,6 @@ using Core.OpenTelemetry;
 using Core.Testing;
 using EventStore.Client;
 using FluentAssertions;
-using Google.Protobuf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;

@@ -1,7 +1,6 @@
 using Core.Commands;
 using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.OpeningCart;
 

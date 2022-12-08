@@ -15,7 +15,8 @@ namespace Payments.Payments;
 internal static class PaymentsConfig
 {
     internal static IServiceCollection AddPayments(this IServiceCollection services) =>
-        services.AddScoped<IMartenRepository<Payment>, MartenRepository<Payment>>()
+        services
+            .AddMartenRepository<Payment>()
             .AddCommandHandlers()
             .AddEventHandlers();
 

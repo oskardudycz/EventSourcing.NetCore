@@ -1,6 +1,5 @@
 using Core.Commands;
 using Core.Requests;
-using MediatR;
 using Orders.Products;
 
 namespace Orders.Shipments.SendingPackage;

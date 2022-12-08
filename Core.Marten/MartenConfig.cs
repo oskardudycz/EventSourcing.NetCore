@@ -1,8 +1,8 @@
 using Core.Configuration;
 using Core.Ids;
 using Core.Marten.Commands;
-using Core.Marten.Events;
 using Core.Marten.Ids;
+using Core.Marten.Repository;
 using Core.Marten.Subscriptions;
 using Core.OpenTelemetry;
 using Marten;

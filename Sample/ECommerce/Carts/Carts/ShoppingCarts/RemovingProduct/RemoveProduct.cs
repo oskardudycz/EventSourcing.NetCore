@@ -1,6 +1,5 @@
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
 
 namespace Carts.ShoppingCarts.RemovingProduct;
@@ -23,28 +22,18 @@ internal class HandleRemoveProduct:
     ICommandHandler<RemoveProduct>
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleRemoveProduct(
-        IMartenRepository<ShoppingCart> cartRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleRemoveProduct(IMartenRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(RemoveProduct command, CancellationToken cancellationToken)
+    public Task Handle(RemoveProduct command, CancellationToken cancellationToken)
     {
         var (cartId, productItem) = command;
 
-        await scope.Do(expectedVersion =>
-            cartRepository.GetAndUpdate(
-                cartId,
-                cart => cart.RemoveProduct(productItem),
-                expectedVersion,
-                cancellationToken
-            )
+        return cartRepository.GetAndUpdate(
+            cartId,
+            cart => cart.RemoveProduct(productItem),
+            cancellationToken: cancellationToken
         );
     }
 }

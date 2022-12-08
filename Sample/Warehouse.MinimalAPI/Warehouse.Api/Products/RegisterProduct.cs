@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Warehouse.Api.Core.Commands;
+﻿using Warehouse.Api.Core.Commands;
 
 namespace Warehouse.Api.Products;
 
