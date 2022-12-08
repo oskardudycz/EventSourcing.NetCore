@@ -1,7 +1,5 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Orders.Orders.RecordingOrderPayment;
 
@@ -28,28 +26,18 @@ public class HandleRecordOrderPayment:
     ICommandHandler<RecordOrderPayment>
 {
     private readonly IMartenRepository<Order> orderRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleRecordOrderPayment(
-        IMartenRepository<Order> orderRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleRecordOrderPayment(IMartenRepository<Order> orderRepository) =>
         this.orderRepository = orderRepository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(RecordOrderPayment command, CancellationToken cancellationToken)
+    public Task Handle(RecordOrderPayment command, CancellationToken cancellationToken)
     {
         var (orderId, paymentId, recordedAt) = command;
 
-        await scope.Do(expectedVersion =>
-            orderRepository.GetAndUpdate(
-                orderId,
-                order => order.RecordPayment(paymentId, recordedAt),
-                expectedVersion,
-                cancellationToken
-            )
+        return orderRepository.GetAndUpdate(
+            orderId,
+            order => order.RecordPayment(paymentId, recordedAt),
+            cancellationToken: cancellationToken
         );
     }
 }

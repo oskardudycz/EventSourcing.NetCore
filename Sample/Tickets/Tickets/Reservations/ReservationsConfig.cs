@@ -21,7 +21,7 @@ internal static class ReservationsConfig
     internal static IServiceCollection AddReservations(this IServiceCollection services) =>
         services
             .AddScoped<IReservationNumberGenerator, ReservationNumberGenerator>()
-            .AddScoped<IMartenRepository<Reservation>, MartenRepository<Reservation>>()
+            .AddMartenRepository<Reservation>()
             .AddCommandHandlers()
             .AddQueryHandlers();
 

@@ -1,5 +1,4 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
 
 namespace Tickets.Reservations.CancellingReservation;
@@ -21,26 +20,14 @@ internal class HandleCancelReservation:
     ICommandHandler<CancelReservation>
 {
     private readonly IMartenRepository<Reservation> repository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleCancelReservation(
-        IMartenRepository<Reservation> repository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleCancelReservation(IMartenRepository<Reservation> repository) =>
         this.repository = repository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(CancelReservation command, CancellationToken cancellationToken)
-    {
-        await scope.Do(expectedVersion =>
-            repository.GetAndUpdate(
-                command.ReservationId,
-                reservation => reservation.Cancel(),
-                expectedVersion,
-                cancellationToken
-            )
+    public Task Handle(CancelReservation command, CancellationToken cancellationToken) =>
+        repository.GetAndUpdate(
+            command.ReservationId,
+            reservation => reservation.Cancel(),
+            cancellationToken: cancellationToken
         );
-    }
 }

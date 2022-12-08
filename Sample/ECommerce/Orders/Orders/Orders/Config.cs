@@ -18,7 +18,8 @@ internal static class OrdersConfig
 {
     internal static IServiceCollection AddOrders(this IServiceCollection services)
     {
-        return services.AddScoped<IMartenRepository<Order>, MartenRepository<Order>>()
+        return services
+            .AddMartenRepository<Order>()
             .AddCommandHandlers()
             .AddEventHandlers();
     }

@@ -1,7 +1,6 @@
 using Carts.Pricing;
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
 
 namespace Carts.ShoppingCarts.AddingProduct;
@@ -25,30 +24,24 @@ internal class HandleAddProduct:
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
     private readonly IProductPriceCalculator productPriceCalculator;
-    private readonly IMartenAppendScope scope;
 
     public HandleAddProduct(
         IMartenRepository<ShoppingCart> cartRepository,
-        IProductPriceCalculator productPriceCalculator,
-        IMartenAppendScope scope
+        IProductPriceCalculator productPriceCalculator
     )
     {
         this.cartRepository = cartRepository;
         this.productPriceCalculator = productPriceCalculator;
-        this.scope = scope;
     }
 
-    public async Task Handle(AddProduct command, CancellationToken cancellationToken)
+    public Task Handle(AddProduct command, CancellationToken cancellationToken)
     {
         var (cartId, productItem) = command;
 
-        await scope.Do(expectedVersion =>
-            cartRepository.GetAndUpdate(
-                cartId,
-                cart => cart.AddProduct(productPriceCalculator, productItem),
-                expectedVersion,
-                cancellationToken
-            )
+        return cartRepository.GetAndUpdate(
+            cartId,
+            cart => cart.AddProduct(productPriceCalculator, productItem),
+            cancellationToken: cancellationToken
         );
     }
 }

@@ -1,4 +1,3 @@
-using Core.Structures;
 using HotelManagement.GuestStayAccounts;
 using Ogooreck.BusinessLogic;
 using Xunit;

@@ -1,7 +1,5 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Tickets.Reservations.ChangingReservationSeat;
 
@@ -28,26 +26,14 @@ internal class HandleChangeReservationSeat:
     ICommandHandler<ChangeReservationSeat>
 {
     private readonly IMartenRepository<Reservation> repository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleChangeReservationSeat(
-        IMartenRepository<Reservation> repository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleChangeReservationSeat(IMartenRepository<Reservation> repository) =>
         this.repository = repository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(ChangeReservationSeat command, CancellationToken cancellationToken)
-    {
-        await scope.Do(expectedVersion =>
-            repository.GetAndUpdate(
-                command.ReservationId,
-                reservation => reservation.ChangeSeat(command.SeatId),
-                expectedVersion,
-                cancellationToken
-            )
+    public Task Handle(ChangeReservationSeat command, CancellationToken cancellationToken) =>
+        repository.GetAndUpdate(
+            command.ReservationId,
+            reservation => reservation.ChangeSeat(command.SeatId),
+            cancellationToken: cancellationToken
         );
-    }
 }

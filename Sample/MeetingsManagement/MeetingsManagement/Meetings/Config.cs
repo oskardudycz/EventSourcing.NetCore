@@ -13,7 +13,7 @@ public static class Config
 {
     public static IServiceCollection AddMeeting(this IServiceCollection services) =>
         services
-            .AddScoped<IMartenRepository<Meeting>, MartenRepository<Meeting>>()
+            .AddMartenRepository<Meeting>()
             .AddCommandHandler<CreateMeeting, HandleCreateMeeting>()
             .AddCommandHandler<ScheduleMeeting, HandleScheduleMeeting>()
             .AddQueryHandler<GetMeeting, MeetingView?, HandleGetMeeting>();

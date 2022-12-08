@@ -1,7 +1,5 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Orders.Orders.CancellingOrder;
 
@@ -26,26 +24,14 @@ public class HandleCancelOrder:
     ICommandHandler<CancelOrder>
 {
     private readonly IMartenRepository<Order> orderRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleCancelOrder(
-        IMartenRepository<Order> orderRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleCancelOrder(IMartenRepository<Order> orderRepository) =>
         this.orderRepository = orderRepository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(CancelOrder command, CancellationToken cancellationToken)
-    {
-        await scope.Do(expectedVersion =>
-            orderRepository.GetAndUpdate(
-                command.OrderId,
-                order => order.Cancel(command.CancellationReason),
-                expectedVersion,
-                cancellationToken
-            )
+    public Task Handle(CancelOrder command, CancellationToken cancellationToken) =>
+        orderRepository.GetAndUpdate(
+            command.OrderId,
+            order => order.Cancel(command.CancellationReason),
+            cancellationToken: cancellationToken
         );
-    }
 }

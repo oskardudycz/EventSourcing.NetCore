@@ -23,7 +23,7 @@ internal static class CartsConfig
 {
     internal static IServiceCollection AddCarts(this IServiceCollection services) =>
         services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>()
-            .AddScoped<IMartenRepository<ShoppingCart>, MartenRepository<ShoppingCart>>()
+            .AddMartenRepository<ShoppingCart>()
             .AddCommandHandlers()
             .AddQueryHandlers()
             .AddEventHandlers();

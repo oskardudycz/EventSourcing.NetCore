@@ -3,7 +3,6 @@ using Confluent.Kafka;
 using Core.Events;
 using Core.Events.External;
 using Core.Kafka.Events;
-using Core.Kafka.Producers;
 using Core.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

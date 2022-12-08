@@ -1,7 +1,5 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.OpeningCart;
 
@@ -25,26 +23,17 @@ internal class HandleOpenShoppingCart:
     ICommandHandler<OpenShoppingCart>
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleOpenShoppingCart(
-        IMartenRepository<ShoppingCart> cartRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleOpenShoppingCart(IMartenRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(OpenShoppingCart command, CancellationToken cancellationToken)
+    public Task Handle(OpenShoppingCart command, CancellationToken cancellationToken)
     {
         var (cartId, clientId) = command;
 
-        await scope.Do(_ =>
-            cartRepository.Add(
-                ShoppingCart.Open(cartId, clientId),
-                cancellationToken
-            )
+        return cartRepository.Add(
+            ShoppingCart.Open(cartId, clientId),
+            cancellationToken
         );
     }
 }

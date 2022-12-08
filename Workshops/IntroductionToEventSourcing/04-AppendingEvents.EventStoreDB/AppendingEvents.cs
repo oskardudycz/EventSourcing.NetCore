@@ -1,4 +1,3 @@
-using System.Text.Json;
 using EventStore.Client;
 using FluentAssertions;
 using Xunit;

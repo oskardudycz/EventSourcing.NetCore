@@ -13,7 +13,7 @@ public static class MotionSensorConfig
 {
     internal static IServiceCollection AddMotionSensors(this IServiceCollection services) =>
         services
-            .AddScoped<IMartenRepository<MotionSensor>, MartenRepository<MotionSensor>>()
+            .AddMartenRepository<MotionSensor>()
             .AddCommandHandlers()
             .AddQueryHandlers();
 

@@ -1,5 +1,4 @@
 using Core.Aggregates;
-using Core.Events;
 
 namespace Tickets.Tests.Extensions;
 

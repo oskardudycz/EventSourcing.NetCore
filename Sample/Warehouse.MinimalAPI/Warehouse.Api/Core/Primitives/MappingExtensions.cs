@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Warehouse.Api.Core.Primitives;
+﻿namespace Warehouse.Api.Core.Primitives;
 
 internal static class MappingExtensions
 {

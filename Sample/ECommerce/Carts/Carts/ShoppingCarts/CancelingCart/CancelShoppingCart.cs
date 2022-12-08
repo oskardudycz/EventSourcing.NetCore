@@ -1,5 +1,4 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
 
 namespace Carts.ShoppingCarts.CancelingCart;
@@ -21,26 +20,14 @@ internal class HandleCancelShoppingCart:
     ICommandHandler<CancelShoppingCart>
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleCancelShoppingCart(
-        IMartenRepository<ShoppingCart> cartRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleCancelShoppingCart(IMartenRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(CancelShoppingCart command, CancellationToken cancellationToken)
-    {
-        await scope.Do(expectedVersion =>
-            cartRepository.GetAndUpdate(
-                command.CartId,
-                cart => cart.Cancel(),
-                expectedVersion,
-                cancellationToken
-            )
+    public Task Handle(CancelShoppingCart command, CancellationToken cancellationToken) =>
+        cartRepository.GetAndUpdate(
+            command.CartId,
+            cart => cart.Cancel(),
+            cancellationToken: cancellationToken
         );
-    }
 }
