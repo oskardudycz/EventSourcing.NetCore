@@ -1,4 +1,5 @@
 using Core.Aggregates;
+using Core.OpenTelemetry;
 using Core.OptimisticConcurrency;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,22 +9,29 @@ public static class Config
 {
     public static IServiceCollection AddEventStoreDBRepository<T>(
         this IServiceCollection services,
-        bool withAppendScope = true
+        bool withAppendScope = true,
+        bool withTelemetry = true
     ) where T : class, IAggregate
     {
-        services.AddScoped<EventStoreDBRepository<T>, EventStoreDBRepository<T>>();
+        services.AddScoped<IEventStoreDBRepository<T>, EventStoreDBRepository<T>>();
 
-        if (!withAppendScope)
+        if (withAppendScope)
         {
-            services.AddScoped<IEventStoreDBRepository<T>, EventStoreDBRepository<T>>();
-        }
-        else
-        {
-            services.AddScoped<IEventStoreDBRepository<T>, EventStoreDBRepositoryWithETagDecorator<T>>(
-                sp => new EventStoreDBRepositoryWithETagDecorator<T>(
-                    sp.GetRequiredService<EventStoreDBRepository<T>>(),
+            services.Decorate<IEventStoreDBRepository<T>>(
+                (inner, sp) => new EventStoreDBRepositoryWithETagDecorator<T>(
+                    inner,
                     sp.GetRequiredService<IExpectedResourceVersionProvider>(),
                     sp.GetRequiredService<INextResourceVersionProvider>()
+                )
+            );
+        }
+
+        if (withTelemetry)
+        {
+            services.Decorate<IEventStoreDBRepository<T>>(
+                (inner, sp) => new EventStoreDBRepositoryWithTelemetryDecorator<T>(
+                    inner,
+                    sp.GetRequiredService<IActivityScope>()
                 )
             );
         }
