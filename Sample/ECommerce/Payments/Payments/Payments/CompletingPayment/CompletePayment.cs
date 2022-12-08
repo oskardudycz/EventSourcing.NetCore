@@ -25,7 +25,7 @@ public class HandleCompletePayment:
     public HandleCompletePayment(IMartenRepository<Payment> paymentRepository) =>
         this.paymentRepository = paymentRepository;
 
-    public async Task Handle(CompletePayment command, CancellationToken cancellationToken)
+    public async Task Handle(CompletePayment command, CancellationToken ct)
     {
         var paymentId = command.PaymentId;
 
@@ -34,7 +34,7 @@ public class HandleCompletePayment:
             await paymentRepository.GetAndUpdate(
                 paymentId,
                 payment => payment.Complete(),
-                cancellationToken: cancellationToken
+                ct: ct
             );
         }
         catch
@@ -42,7 +42,7 @@ public class HandleCompletePayment:
             await paymentRepository.GetAndUpdate(
                 paymentId,
                 payment => payment.Discard(DiscardReason.UnexpectedError),
-                cancellationToken: cancellationToken
+                ct: ct
             );
         }
     }

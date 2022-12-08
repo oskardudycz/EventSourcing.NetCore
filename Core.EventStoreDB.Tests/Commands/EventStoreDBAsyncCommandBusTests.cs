@@ -99,7 +99,7 @@ internal class AddUserCommandHandler: ICommandHandler<AddUser>
     public AddUserCommandHandler(List<Guid> userIds) =>
         this.userIds = userIds;
 
-    public Task Handle(AddUser command, CancellationToken cancellationToken)
+    public Task Handle(AddUser command, CancellationToken ct)
     {
         userIds.Add(command.UserId);
 

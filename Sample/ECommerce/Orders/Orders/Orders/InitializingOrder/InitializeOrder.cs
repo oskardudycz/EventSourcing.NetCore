@@ -39,13 +39,13 @@ public class HandleInitializeOrder:
     public HandleInitializeOrder(IMartenRepository<Order> orderRepository) =>
         this.orderRepository = orderRepository;
 
-    public Task Handle(InitializeOrder command, CancellationToken cancellationToken)
+    public Task Handle(InitializeOrder command, CancellationToken ct)
     {
         var (orderId, clientId, productItems, totalPrice) = command;
 
         return orderRepository.Add(
             Order.Initialize(orderId, clientId, productItems, totalPrice),
-            cancellationToken
+            ct
         );
     }
 }

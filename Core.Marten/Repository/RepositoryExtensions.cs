@@ -21,13 +21,13 @@ public static class RepositoryExtensions
         Guid id,
         Action<T> action,
         long? expectedVersion = null,
-        CancellationToken cancellationToken = default
+        CancellationToken ct = default
     ) where T : class, IAggregate
     {
-        var entity = await repository.Get(id, cancellationToken).ConfigureAwait(false);
+        var entity = await repository.Get(id, ct).ConfigureAwait(false);
 
         action(entity);
 
-        return await repository.Update(entity, expectedVersion, cancellationToken).ConfigureAwait(false);
+        return await repository.Update(entity, expectedVersion, ct).ConfigureAwait(false);
     }
 }

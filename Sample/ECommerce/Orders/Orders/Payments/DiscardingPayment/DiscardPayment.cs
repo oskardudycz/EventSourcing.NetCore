@@ -30,13 +30,13 @@ public class HandleDiscardPayment:
         this.externalCommandBus = externalCommandBus;
     }
 
-    public async Task Handle(DiscardPayment command, CancellationToken cancellationToken)
+    public async Task Handle(DiscardPayment command, CancellationToken ct)
     {
         await externalCommandBus.Delete(
             externalServicesConfig.PaymentsUrl!,
             "payments",
             command,
-            cancellationToken
+            ct
         );
     }
 }

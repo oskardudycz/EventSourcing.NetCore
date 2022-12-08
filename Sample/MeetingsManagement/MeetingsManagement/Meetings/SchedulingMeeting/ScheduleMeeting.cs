@@ -17,14 +17,14 @@ internal class HandleScheduleMeeting:
     public HandleScheduleMeeting(IMartenRepository<Meeting> repository) =>
         this.repository = repository;
 
-    public Task Handle(ScheduleMeeting command, CancellationToken cancellationToken)
+    public Task Handle(ScheduleMeeting command, CancellationToken ct)
     {
         var (meetingId, dateRange) = command;
 
         return repository.GetAndUpdate(
             meetingId,
             meeting => meeting.Schedule(dateRange),
-            cancellationToken: cancellationToken
+            ct: ct
         );
     }
 }

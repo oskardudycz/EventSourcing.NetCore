@@ -27,14 +27,14 @@ public class HandleRecordTemperature:
     public HandleRecordTemperature(IMartenRepository<TemperatureMeasurement> repository) =>
         this.repository = repository;
 
-    public Task Handle(RecordTemperature command, CancellationToken cancellationToken)
+    public Task Handle(RecordTemperature command, CancellationToken ct)
     {
         var (measurementId, temperature) = command;
 
         return repository.GetAndUpdate(
             measurementId,
             reservation => reservation.Record(temperature),
-            cancellationToken: cancellationToken
+            ct: ct
         );
     }
 }

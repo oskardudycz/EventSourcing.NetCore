@@ -1,6 +1,5 @@
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
-using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
 
 namespace Carts.ShoppingCarts.RemovingProduct;
@@ -25,28 +24,18 @@ internal class HandleRemoveProduct:
     ICommandHandler<RemoveProduct>
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
-    private readonly IEventStoreDBAppendScope scope;
 
-    public HandleRemoveProduct(
-        IEventStoreDBRepository<ShoppingCart> cartRepository,
-        IEventStoreDBAppendScope scope
-    )
-    {
+    public HandleRemoveProduct(IEventStoreDBRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(RemoveProduct command, CancellationToken cancellationToken)
+    public Task Handle(RemoveProduct command, CancellationToken ct)
     {
         var (cartId, pricedProductItem) = command;
 
-        await scope.Do(expectedRevision =>
-            cartRepository.GetAndUpdate(
-                cartId,
-                cart => cart.RemoveProduct(pricedProductItem),
-                expectedRevision,
-                cancellationToken
-            )
+        return cartRepository.GetAndUpdate(
+            cartId,
+            cart => cart.RemoveProduct(pricedProductItem),
+            ct: ct
         );
     }
 }

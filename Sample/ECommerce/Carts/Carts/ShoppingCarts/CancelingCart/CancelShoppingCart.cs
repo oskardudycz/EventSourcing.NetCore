@@ -24,10 +24,10 @@ internal class HandleCancelShoppingCart:
     public HandleCancelShoppingCart(IMartenRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
 
-    public Task Handle(CancelShoppingCart command, CancellationToken cancellationToken) =>
+    public Task Handle(CancelShoppingCart command, CancellationToken ct) =>
         cartRepository.GetAndUpdate(
             command.CartId,
             cart => cart.Cancel(),
-            cancellationToken: cancellationToken
+            ct: ct
         );
 }

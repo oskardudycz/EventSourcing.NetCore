@@ -24,10 +24,10 @@ public class HandleCompleteOrder:
     public HandleCompleteOrder(IMartenRepository<Order> orderRepository) =>
         this.orderRepository = orderRepository;
 
-    public Task Handle(CompleteOrder command, CancellationToken cancellationToken) =>
+    public Task Handle(CompleteOrder command, CancellationToken ct) =>
         orderRepository.GetAndUpdate(
             command.OrderId,
             order => order.Complete(),
-            cancellationToken: cancellationToken
+            ct: ct
         );
 }

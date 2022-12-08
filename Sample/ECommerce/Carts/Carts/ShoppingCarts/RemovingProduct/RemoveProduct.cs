@@ -26,14 +26,14 @@ internal class HandleRemoveProduct:
     public HandleRemoveProduct(IMartenRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
 
-    public Task Handle(RemoveProduct command, CancellationToken cancellationToken)
+    public Task Handle(RemoveProduct command, CancellationToken ct)
     {
         var (cartId, productItem) = command;
 
         return cartRepository.GetAndUpdate(
             cartId,
             cart => cart.RemoveProduct(productItem),
-            cancellationToken: cancellationToken
+            ct: ct
         );
     }
 }

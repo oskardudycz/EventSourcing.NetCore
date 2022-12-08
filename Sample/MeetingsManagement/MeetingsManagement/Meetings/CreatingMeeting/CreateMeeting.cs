@@ -16,13 +16,13 @@ internal class HandleCreateMeeting:
     public HandleCreateMeeting(IMartenRepository<Meeting> repository) =>
         this.repository = repository;
 
-    public Task Handle(CreateMeeting command, CancellationToken cancellationToken)
+    public Task Handle(CreateMeeting command, CancellationToken ct)
     {
         var (id, name) = command;
 
         return repository.Add(
             Meeting.New(id, name),
-            cancellationToken
+            ct
         );
     }
 }

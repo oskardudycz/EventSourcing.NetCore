@@ -35,7 +35,7 @@ internal class HandleCreateTentativeReservation:
         this.reservationNumberGenerator = reservationNumberGenerator;
     }
 
-    public Task Handle(CreateTentativeReservation command, CancellationToken cancellationToken)
+    public Task Handle(CreateTentativeReservation command, CancellationToken ct)
     {
         var (reservationId, seatId) = command;
 
@@ -45,7 +45,7 @@ internal class HandleCreateTentativeReservation:
                 reservationNumberGenerator,
                 seatId
             ),
-            cancellationToken
+            ct
         );
     }
 }

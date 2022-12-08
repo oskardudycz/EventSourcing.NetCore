@@ -1,5 +1,4 @@
 using Core.Commands;
-using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
 
 namespace Carts.ShoppingCarts.CancelingCart;
@@ -21,26 +20,14 @@ internal class HandleCancelCart:
     ICommandHandler<CancelShoppingCart>
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
-    private readonly IEventStoreDBAppendScope scope;
 
-    public HandleCancelCart(
-        IEventStoreDBRepository<ShoppingCart> cartRepository,
-        IEventStoreDBAppendScope scope
-    )
-    {
+    public HandleCancelCart(IEventStoreDBRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task Handle(CancelShoppingCart command, CancellationToken cancellationToken)
-    {
-        await scope.Do(expectedRevision =>
-            cartRepository.GetAndUpdate(
-                command.CartId,
-                cart => cart.Cancel(),
-                expectedRevision,
-                cancellationToken
-            )
+    public Task Handle(CancelShoppingCart command, CancellationToken ct) =>
+        cartRepository.GetAndUpdate(
+            command.CartId,
+            cart => cart.Cancel(),
+            ct: ct
         );
-    }
 }

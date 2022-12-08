@@ -17,9 +17,9 @@ public class HandleRebuildMotionSensorsViews :
         this.session = session;
     }
 
-    public async Task Handle(RebuildMotionSensorsViews command, CancellationToken cancellationToken)
+    public async Task Handle(RebuildMotionSensorsViews command, CancellationToken ct)
     {
         using var daemon = await session.DocumentStore.BuildProjectionDaemonAsync();
-        await daemon.RebuildProjection<MotionSensor>(cancellationToken);
+        await daemon.RebuildProjection<MotionSensor>(ct);
     }
 }

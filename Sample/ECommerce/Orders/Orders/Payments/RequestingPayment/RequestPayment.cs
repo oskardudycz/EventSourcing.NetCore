@@ -32,13 +32,13 @@ public class HandleRequestPayment:
         this.externalCommandBus = externalCommandBus;
     }
 
-    public async Task Handle(RequestPayment command, CancellationToken cancellationToken)
+    public async Task Handle(RequestPayment command, CancellationToken ct)
     {
         await externalCommandBus.Post(
             externalServicesConfig.PaymentsUrl!,
             "payments",
             command,
-            cancellationToken
+            ct
         );
     }
 }

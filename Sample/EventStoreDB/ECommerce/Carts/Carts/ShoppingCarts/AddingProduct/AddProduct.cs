@@ -1,7 +1,6 @@
 using Carts.Pricing;
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
-using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
 
 namespace Carts.ShoppingCarts.AddingProduct;
@@ -27,30 +26,24 @@ internal class HandleAddProduct:
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
     private readonly IProductPriceCalculator productPriceCalculator;
-    private readonly IEventStoreDBAppendScope scope;
 
     public HandleAddProduct(
         IEventStoreDBRepository<ShoppingCart> cartRepository,
-        IProductPriceCalculator productPriceCalculator,
-        IEventStoreDBAppendScope scope
+        IProductPriceCalculator productPriceCalculator
     )
     {
         this.cartRepository = cartRepository;
         this.productPriceCalculator = productPriceCalculator;
-        this.scope = scope;
     }
 
-    public async Task Handle(AddProduct command, CancellationToken cancellationToken)
+    public Task Handle(AddProduct command, CancellationToken ct)
     {
         var (cartId, productItem) = command;
 
-        await scope.Do(expectedRevision =>
-            cartRepository.GetAndUpdate(
-                cartId,
-                cart => cart.AddProduct(productPriceCalculator, productItem),
-                expectedRevision,
-                cancellationToken
-            )
+        return cartRepository.GetAndUpdate(
+            cartId,
+            cart => cart.AddProduct(productPriceCalculator, productItem),
+            ct: ct
         );
     }
 }

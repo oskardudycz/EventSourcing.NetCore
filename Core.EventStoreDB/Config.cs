@@ -1,6 +1,6 @@
 using Core.BackgroundWorkers;
 using Core.Configuration;
-using Core.EventStoreDB.OptimisticConcurrency;
+using Core.EventStoreDB.Repository;
 using Core.EventStoreDB.Subscriptions;
 using Core.OpenTelemetry;
 using EventStore.Client;

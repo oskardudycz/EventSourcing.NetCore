@@ -34,14 +34,14 @@ internal class HandleAddProduct:
         this.productPriceCalculator = productPriceCalculator;
     }
 
-    public Task Handle(AddProduct command, CancellationToken cancellationToken)
+    public Task Handle(AddProduct command, CancellationToken ct)
     {
         var (cartId, productItem) = command;
 
         return cartRepository.GetAndUpdate(
             cartId,
             cart => cart.AddProduct(productPriceCalculator, productItem),
-            cancellationToken: cancellationToken
+            ct: ct
         );
     }
 }
