@@ -2,7 +2,7 @@
 
 # Implementing Distributed Processes
 
-Distributed processes management using Group Guests Checkout as the example Domain.
+Distributed process management using Guest Group Checkout as the example domain.
 
 It was modelled and explained in detail in the [Implementing Distributed Processes Webinar](https://www.architecture-weekly.com/p/webinar-3-implementing-distributed):
 
