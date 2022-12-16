@@ -68,14 +68,17 @@ type TicketsFeed(baseUri) =
     let client = new HttpClient(BaseAddress = baseUri)
     let tickets = Session(client).Tickets
 
+    let batch pg items : Propulsion.Feed.Page<Propulsion.Streams.Default.EventBody> =
+        { checkpoint = TicketsCheckpoint.toPosition pg.checkpoint; items = items; isTail = not pg.closed }
+
     // TODO add retries - consumer loop will abort if this throws
-    member _.Poll(trancheId, pos) : Async<Propulsion.Feed.Page<Propulsion.Streams.Default.EventBody>> = async {
+    member _.Poll(trancheId, pos, ct) = task {
         let checkpoint = TicketsCheckpoint.ofPosition pos
-        let! pg = tickets.Poll(TrancheId.toFcId trancheId, checkpoint)
+        let! pg = tickets.Poll(TrancheId.toFcId trancheId, checkpoint) |> fun f -> Async.StartImmediateAsTask(f, cancellationToken = ct)
         let baseIndex = TicketsCheckpoint.toStreamIndex pg.position
         let map (x : ItemDto) : Ingester.PipelineEvent.Item = { id = x.id; payload = x.payload }
         let items = pg.tickets |> Array.mapi (fun i x -> Ingester.PipelineEvent.ofIndexAndItem (baseIndex + int64 i) (map x))
-        return { checkpoint = TicketsCheckpoint.toPosition pg.checkpoint; items = items; isTail = not pg.closed }
+        return batch pg items
     }
 
     // TODO add retries - consumer loop will not commence if this emits an exception
