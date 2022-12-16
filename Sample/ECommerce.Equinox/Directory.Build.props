@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+      <!--        TODO remove when on newer SDK-->
+      <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+  </PropertyGroup>
+</Project>
