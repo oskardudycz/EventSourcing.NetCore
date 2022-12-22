@@ -76,8 +76,6 @@ public class ShoppingCartId: StronglyTypedValue<Guid>
 {
     private ShoppingCartId(Guid value): base(value)
     {
-        if (value == Guid.Empty)
-            throw new ArgumentOutOfRangeException(nameof(value));
     }
 
     public static readonly ShoppingCartId Unknown = new(Guid.Empty);
@@ -250,7 +248,7 @@ public record ShoppingCart(
         };
     }
 
-    public static ShoppingCart Default() =>
+    public static ShoppingCart Default =>
         new(ShoppingCartId.Unknown, ClientId.Unknown, default, new Dictionary<ProductId, Quantity>());
 }
 
@@ -277,7 +275,7 @@ public static class ProductItemsExtensions
 
 public class ShoppingCartEventsSerde
 {
-    public (string, JsonObject) Serialize(ShoppingCartEvent @event)
+    public (string EventType, JsonObject Data) Serialize(ShoppingCartEvent @event)
     {
         return @event switch
         {
@@ -376,29 +374,38 @@ public static class Json
         );
 
     public static JsonObject ToJson(this Price value) => value.Value.ToJson();
+
     public static JsonObject ToJson(this PricedProductItem value) =>
         Object(
             Node("productId", value.ProductId.ToJson()),
             Node("quantity", value.Quantity.ToJson()),
             Node("unitPrice", value.UnitPrice.ToJson())
         );
+
     public static ShoppingCartId ToShoppingCartId(this JsonElement value) =>
         ShoppingCartId.Parse(value.GetString());
+
     public static ProductId ToProductId(this JsonElement value) =>
         ProductId.Parse(value.GetString());
+
     public static ClientId ToClientId(this JsonElement value) =>
         ClientId.Parse(value.GetString());
+
     public static Currency ToCurrency(this JsonElement value) =>
         Enum.Parse<Currency>(value.GetString() ?? throw new ArgumentOutOfRangeException());
+
     public static Amount ToAmount(this JsonElement value) =>
         Amount.Parse(value.GetInt32());
+
     public static Quantity ToQuantity(this JsonElement value) =>
         Quantity.Parse(value.GetUInt32());
+
     public static Money ToMoney(this JsonElement value) =>
         new(
             value.GetProperty("amount").ToAmount(),
             value.GetProperty("currency").ToCurrency()
         );
+
     public static LocalDateTime ToLocalDateTime(this JsonElement value) =>
         LocalDateTime.Parse(DateTimeOffset.Parse(value.GetString() ?? throw new ArgumentOutOfRangeException()));
 
