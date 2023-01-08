@@ -8,6 +8,23 @@ You can watch:
 
 and read:
 - 📝 [Let's build event store in one hour!](https://event-driven.io/en/lets_build_event_store_in_one_hour/?utm_source=event_sourcing_net)
+
+## Description
+
+**Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics. See more in [here](./01-EventStoreBasics/).
+
+1. [Streams Table](./01-CreateStreamsTable)
+2. [Events Table](./02-CreateEventsTable)
+3. [Appending Events](./03-CreateAppendEventFunction)
+4. [Optimistic Concurrency Handling](./03-OptimisticConcurrency)
+5. [Event Store Methods](./04-EventStoreMethods)
+6. [Stream Aggregation](./05-StreamAggregation)
+7. [Time Travelling](./06-TimeTraveling)
+8. [Aggregate and Repositories](./07-AggregateAndRepository)
+9. [Snapshots](./08-Snapshots)
+10. [Projections](./09-Projections)
+11. [Projections With Marten](./10-ProjectionsWithMarten)
+
 ## Prerequisites
 
 1. Install git - https://git-scm.com/downloads.
@@ -36,19 +53,3 @@ and read:
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `admin@pgadmin.org`, Password: `admin`
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
-
-## Description
-
-**Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics. See more in [here](./01-EventStoreBasics/).
-
-1. [Streams Table](./01-CreateStreamsTable)
-2. [Events Table](./02-CreateEventsTable)
-3. [Appending Events](./03-CreateAppendEventFunction)
-4. [Optimistic Concurrency Handling](./03-OptimisticConcurrency)
-5. [Event Store Methods](./04-EventStoreMethods)
-6. [Stream Aggregation](./05-StreamAggregation)
-7. [Time Travelling](./06-TimeTraveling)
-8. [Aggregate and Repositories](./07-AggregateAndRepository)
-9. [Snapshots](./08-Snapshots)
-10. [Projections](./09-Projections)
-11. [Projections With Marten](./10-ProjectionsWithMarten)
