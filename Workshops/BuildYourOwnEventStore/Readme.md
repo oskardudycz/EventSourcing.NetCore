@@ -2,6 +2,12 @@
 
 # Build Your Own Event Store Self-Paced Kit
 
+You can watch:
+
+<a href="https://www.youtube.com/watch?v=gaoZdtQSOTo&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=2" target="_blank"><img src="https://img.youtube.com/vi/gaoZdtQSOTo/0.jpg" alt="Let's build event store in one hour!" width="640" height="480" border="10" /></a>
+
+and read:
+- 📝 [Let's build event store in one hour!](https://event-driven.io/en/lets_build_event_store_in_one_hour/?utm_source=event_sourcing_net)
 ## Prerequisites
 
 1. Install git - https://git-scm.com/downloads.
