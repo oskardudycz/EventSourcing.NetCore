@@ -129,6 +129,9 @@ public class ShoppingCart: Aggregate
         if(Status != ShoppingCartStatus.Pending)
             throw new InvalidOperationException($"Confirming cart in '{Status}' status is not allowed.");
 
+        if (ProductItems.Count == 0)
+            throw new InvalidOperationException($"Confirming empty cart is not allowed.");
+
         var @event = ShoppingCartConfirmed.Create(Id, DateTime.UtcNow);
 
         Enqueue(@event);
