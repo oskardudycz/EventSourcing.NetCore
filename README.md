@@ -1129,6 +1129,7 @@ See more in:
 -   📝 [Aspnetrun - CQRS and Event Sourcing in Event Driven Architecture of Ordering Microservices](https://medium.com/aspnetrun/cqrs-and-event-sourcing-in-event-driven-architecture-of-ordering-microservices-fb67dc44da7a)
 -   📝 [Why Microservices Should use Event Sourcing](https://blog.bitsrc.io/why-microservices-should-use-event-sourcing-9755a54ebfb4)
 -   📝 [Event-driven architecture with microservices using event sourcing and CQRS](https://medium.com/@tprkvolkan/event-driven-architecture-with-microservices-using-event-sourcing-and-cqrs-1cc516c20143)
+-   📝 [Datomic: Event Sourcing without the hassle](https://vvvvalvalval.github.io/posts/2018-11-12-datomic-event-sourcing-without-the-hassle.html)
 
 ### 12.20 Event Sourcing Concerns
 -   📝 [Kacper Gunia - EventStoreDB vs Kafka](https://domaincentric.net/blog/eventstoredb-vs-kafka)
