@@ -16,7 +16,7 @@ namespace MarketBasketAnalytics.MarketBasketAnalysis
     public static class CartProductItemsMatching
     {
         public static async Task<IReadOnlyList<CartProductItemsMatched>> Handle(
-            Func<Func<Dictionary<Guid, int>?, object, Dictionary<Guid, int>>, string, CancellationToken, Task<Dictionary<Guid, int>?>> aggregateStream,
+            Func<Func<Dictionary<Guid, int>, object, Dictionary<Guid, int>>, string, CancellationToken, Task<Dictionary<Guid, int>?>> aggregateStream,
             ShoppingCartConfirmed @event,
             CancellationToken ct
         )

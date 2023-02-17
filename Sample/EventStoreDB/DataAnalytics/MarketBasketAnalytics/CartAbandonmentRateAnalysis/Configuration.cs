@@ -1,9 +1,6 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using DataAnalytics.Core.ElasticSearch;
-using DataAnalytics.Core.Entities;
-using DataAnalytics.Core.Events;
+﻿using Core.ElasticSearch.Repository;
+using Core.Events;
+using Core.EventStoreDB.Events;
 using EventStore.Client;
 using MarketBasketAnalytics.Carts;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,12 +17,12 @@ namespace MarketBasketAnalytics.CartAbandonmentRateAnalysis
                     var eventStore = sp.GetRequiredService<EventStoreClient>();
 
                     var @event = await CartAbandonmentRate.Handle(
-                        eventStore.AggregateStream,
+                        (evolve, streamName, t) => eventStore.Find(evolve, streamName, t),
                         shoppingCartAbandoned,
                         ct
                     );
 
-                    await eventStore.AppendToNewStream(
+                    await eventStore.Append(
                         CartAbandonmentRate.ToStreamId(shoppingCartAbandoned.ShoppingCartId),
                         @event,
                         ct

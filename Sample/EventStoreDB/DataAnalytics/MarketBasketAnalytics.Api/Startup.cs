@@ -1,10 +1,6 @@
-﻿using DataAnalytics.Core;
-using DataAnalytics.Core.Subscriptions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Core;
+using Core.ElasticSearch;
+using Core.EventStoreDB;
 using Microsoft.OpenApi.Models;
 
 namespace MarketBasketAnalytics.Api
@@ -27,9 +23,10 @@ namespace MarketBasketAnalytics.Api
                 {
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ECommerce.Api", Version = "v1" });
                 })
-                .AddCoreServices(Configuration)
-                .AddMarketBasketAnalytics()
-                .AddSubscriptionToAll();
+                .AddEventStoreDB(Configuration)
+                .AddElasticsearch(Configuration)
+                .AddCoreServices()
+                .AddMarketBasketAnalytics(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
