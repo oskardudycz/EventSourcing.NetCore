@@ -1,10 +1,7 @@
-﻿using System;
-using System.Linq;
-using DataAnalytics.Core.Entities;
-using DataAnalytics.Core.Events;
-using DataAnalytics.Core.Serialisation;
+﻿using Core.Events;
+using Core.EventStoreDB.Events;
+using Core.EventStoreDB.Serialization;
 using EventStore.Client;
-using MarketBasketAnalytics.CartAbandonmentRateAnalysis;
 using MarketBasketAnalytics.Carts;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,7 +16,7 @@ namespace MarketBasketAnalytics.MarketBasketAnalysis
                     var eventStore = sp.GetRequiredService<EventStoreClient>();
 
                     var events = await CartProductItemsMatching.Handle(
-                        eventStore.AggregateStream,
+                        (evolve, streamName, t) => eventStore.Find(evolve, streamName, t),
                         shoppingCartConfirmed,
                         ct
                     );
