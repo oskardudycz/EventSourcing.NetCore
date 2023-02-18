@@ -16,12 +16,12 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
   - [2. Videos](#2-videos)
     - [2.1. Practical Event Sourcing with Marten](#21-practical-event-sourcing-with-marten)
     - [2.2. Let's build event store in one hour!](#22-lets-build-event-store-in-one-hour)
-    - [2.3. Practical Introduction to Event Sourcing with EventStoreDB](#23-practical-introduction-to-event-sourcing-with-eventstoredb)
-    - [2.4 Let's build the worst Event Sourcing system!](#24-lets-build-the-worst-event-sourcing-system)
-    - [2.5 The Light and The Dark Side of the Event-Driven Design](#25-the-light-and-the-dark-side-of-the-event-driven-design)
-    - [2.6 Implementing Distributed Processes](#26-implementing-distributed-processes)
-    - [2.7 Conversation with Yves Lorphelin about CQRS](#27-conversation-with-yves-lorphelin-about-cqrs)
-    - [2.8. CQRS is Simpler than you think with C#9 \& NET5](#28-cqrs-is-simpler-than-you-think-with-c9--net5)
+    - [2.3. CQRS is Simpler than you think with C#11 \& NET7](#23-cqrs-is-simpler-than-you-think-with-c11--net7)
+    - [2.4. Practical Introduction to Event Sourcing with EventStoreDB](#24-practical-introduction-to-event-sourcing-with-eventstoredb)
+    - [2.5 Let's build the worst Event Sourcing system!](#25-lets-build-the-worst-event-sourcing-system)
+    - [2.6 The Light and The Dark Side of the Event-Driven Design](#26-the-light-and-the-dark-side-of-the-event-driven-design)
+    - [2.7 Implementing Distributed Processes](#27-implementing-distributed-processes)
+    - [2.8 Conversation with Yves Lorphelin about CQRS](#28-conversation-with-yves-lorphelin-about-cqrs)
     - [2.9. Never Lose Data Again - Event Sourcing to the Rescue!](#29-never-lose-data-again---event-sourcing-to-the-rescue)
     - [2.10. How to deal with privacy and GDPR in Event-Sourced systems](#210-how-to-deal-with-privacy-and-gdpr-in-event-sourced-systems)
   - [3. Support](#3-support)
@@ -573,29 +573,29 @@ Read more in the article:
 
 <a href="https://www.youtube.com/watch?v=gaoZdtQSOTo&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=2" target="_blank"><img src="https://img.youtube.com/vi/gaoZdtQSOTo/0.jpg" alt="Let's build event store in one hour!" width="320" height="240" border="10" /></a>
 
-### 2.3. Practical Introduction to Event Sourcing with EventStoreDB
+### 2.3. CQRS is Simpler than you think with C#11 & NET7
+
+<a href="https://www.youtube.com/watch?v=iY7LO289qnQ" target="_blank"><img src="https://img.youtube.com/vi/iY7LO289qnQ/0.jpg" alt="CQRS is Simpler than you think with C#11 & NET7" width="320" height="240" border="10" /></a>
+
+### 2.4. Practical Introduction to Event Sourcing with EventStoreDB
 
 <a href="https://www.youtube.com/watch?v=rqYPVzjoxqI" target="_blank"><img src="https://img.youtube.com/vi/rqYPVzjoxqI/0.jpg" alt="Practical introduction to Event Sourcing with EventStoreDB" width="320" height="240" border="10" /></a>
 
-### 2.4 Let's build the worst Event Sourcing system!
+### 2.5 Let's build the worst Event Sourcing system!
 
 <a href="https://www.youtube.com/watch?v=Lu-skMQ-vAw" target="_blank"><img src="https://img.youtube.com/vi/Lu-skMQ-vAw/0.jpg" alt="Let's build the worst Event Sourcing system!" width="320" height="240" border="10" /></a>
 
-### 2.5 The Light and The Dark Side of the Event-Driven Design
+### 2.6 The Light and The Dark Side of the Event-Driven Design
 
 <a href="https://www.youtube.com/watch?v=ZGugOiYcq8k" target="_blank"><img src="https://img.youtube.com/vi/ZGugOiYcq8k/0.jpg" alt="The Light and The Dark Side of the Event-Driven Design" width="320" height="240" border="10" /></a>
 
-### 2.6 Implementing Distributed Processes
+### 2.7 Implementing Distributed Processes
 
 <a href="https://www.architecture-weekly.com/p/webinar-3-implementing-distributed" target="_blank"><img src="https://substackcdn.com/image/fetch/w_1920,h_1080,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-video.s3.amazonaws.com%2Fvideo_upload%2Fpost%2F69413446%2F526b9100-7271-4482-99e7-9559416e9848%2Ftranscoded-00624.png" alt="Implementing Distributed Processes" width="320" border="10" /></a>
 
-### 2.7 Conversation with [Yves Lorphelin](https://github.com/ylorph/) about CQRS
+### 2.8 Conversation with [Yves Lorphelin](https://github.com/ylorph/) about CQRS
 
 <a href="https://www.youtube.com/watch?v=D-3N2vQ7ADE" target="_blank"><img src="https://img.youtube.com/vi/D-3N2vQ7ADE/0.jpg" alt="Event Store Conversations: Yves Lorphelin talks to Oskar Dudycz about CQRS (EN)" width="320" height="240" border="10" /></a>
-
-### 2.8. CQRS is Simpler than you think with C#9 & NET5
-
-<a href="https://www.youtube.com/watch?v=eOPlg-eB4As" target="_blank"><img src="https://img.youtube.com/vi/eOPlg-eB4As/0.jpg" alt="CQRS is Simpler than you think with C#9 & NET5" width="320" height="240" border="10" /></a>
 
 ### 2.9. Never Lose Data Again - Event Sourcing to the Rescue!
 
