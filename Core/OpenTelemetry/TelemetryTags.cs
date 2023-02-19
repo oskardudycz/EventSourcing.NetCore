@@ -5,6 +5,7 @@ public static class TelemetryTags
     public static class Logic
     {
         public const string Entity = $"{ActivitySourceProvider.DefaultSourceName}.entity";
+        public const string Stream = $"{ActivitySourceProvider.DefaultSourceName}.stream";
     }
 
     public static class CommandHandling

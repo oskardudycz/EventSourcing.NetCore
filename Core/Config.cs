@@ -14,7 +14,7 @@ public static class Config
     public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
         services
-            .AddSingleton<IActivityScope, ActivityScope>()
+            .AddSingleton(ActivityScope.Instance)
             .AddEventBus()
             .AddInMemoryCommandBus()
             .AddQueryBus();

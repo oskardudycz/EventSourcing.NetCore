@@ -38,13 +38,15 @@ public interface IActivityScope
 
 public class ActivityScope: IActivityScope
 {
-    private const string CommandHandlerPrefix = "commandhandler";
+    public static readonly IActivityScope Instance = new ActivityScope();
+
+    private const string GeneralPrefix = "event_driven_io";
 
     public Activity? Start(string name, StartActivityOptions options) =>
         options.Parent.HasValue
             ? ActivitySourceProvider.Instance
                 .CreateActivity(
-                    $"{CommandHandlerPrefix}.{name}",
+                    $"{GeneralPrefix}.{name}",
                     options.Kind,
                     parentContext: options.Parent.Value,
                     idFormat: ActivityIdFormat.W3C,
@@ -52,7 +54,7 @@ public class ActivityScope: IActivityScope
                 )?.Start()
             : ActivitySourceProvider.Instance
                 .CreateActivity(
-                    $"{CommandHandlerPrefix}.{name}",
+                    $"{GeneralPrefix}.{name}",
                     options.Kind,
                     parentId: options.ParentId,
                     idFormat: ActivityIdFormat.W3C,
