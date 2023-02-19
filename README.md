@@ -485,7 +485,7 @@ public class ReservationNumber: StronglyTypedValue<string>
 {
     public ReservationNumber(string value) : base(value)
     {
-        if (string.IsNullOrEmpty(value) || value.StartsWith("RES/") || value.Length <= 4)
+        if (string.IsNullOrEmpty(value) || !value.StartsWith("RES/") || value.Length <= 4)
             throw new ArgumentOutOfRangeException(nameof(value));
     }
 }
