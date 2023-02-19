@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using Core.Aggregates;
+﻿using Core.Aggregates;
+using Core.Marten.OpenTelemetry;
 using Core.OpenTelemetry;
 using Marten;
 using Microsoft.Extensions.Logging;
@@ -34,7 +34,7 @@ public class MartenRepositoryWithTracingDecorator<T>: IMartenRepository<T>
         activityScope.Run($"MartenRepository/{nameof(Add)}",
             (activity, ct) =>
             {
-                PropagateTelemetry(activity);
+                documentSession.PropagateTelemetry(activity, logger);
 
                 return inner.Add(aggregate, ct);
             },
@@ -46,7 +46,7 @@ public class MartenRepositoryWithTracingDecorator<T>: IMartenRepository<T>
         activityScope.Run($"MartenRepository/{nameof(Update)}",
             (activity, ct) =>
             {
-                PropagateTelemetry(activity);
+                documentSession.PropagateTelemetry(activity, logger);
 
                 return inner.Update(aggregate, expectedVersion, ct);
             },
@@ -58,33 +58,11 @@ public class MartenRepositoryWithTracingDecorator<T>: IMartenRepository<T>
         activityScope.Run($"MartenRepository/{nameof(Delete)}",
             (activity, ct) =>
             {
-                PropagateTelemetry(activity);
+                documentSession.PropagateTelemetry(activity, logger);
 
                 return inner.Delete(aggregate, expectedVersion, ct);
             },
             new StartActivityOptions { Tags = { { TelemetryTags.Logic.Entity, typeof(T).Name } } },
             token
         );
-
-    private void PropagateTelemetry(Activity? activity)
-    {
-        var propagationContext = activity.Propagate(documentSession, InjectTelemetryIntoDocumentSession);
-
-        if (!propagationContext.HasValue) return;
-
-        documentSession.CorrelationId = propagationContext.Value.ActivityContext.TraceId.ToHexString();
-        documentSession.CausationId = propagationContext.Value.ActivityContext.SpanId.ToHexString();
-    }
-
-    private void InjectTelemetryIntoDocumentSession(IDocumentSession session, string key, string value)
-    {
-        try
-        {
-            session.SetHeader(key, value);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to inject trace context");
-        }
-    }
 }
