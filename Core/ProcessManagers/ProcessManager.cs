@@ -1,3 +1,5 @@
+using Core.Structures;
+
 namespace Core.ProcessManagers;
 
 public abstract class ProcessManager: ProcessManager<Guid>, IProcessManager

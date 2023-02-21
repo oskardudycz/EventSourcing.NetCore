@@ -4,7 +4,7 @@ using Core.Structures;
 namespace HotelManagement.Choreography.GroupCheckouts;
 
 public record GroupCheckoutInitiated(
-    Guid GroupCheckoutId,
+    Guid GroupCheckOutId,
     Guid ClerkId,
     Guid[] GuestStayIds,
     DateTimeOffset InitiatedAt
@@ -55,48 +55,50 @@ public record GroupCheckout(
     ) =>
         new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStayIds, initiatedAt);
 
-    public Maybe<GuestCheckoutsInitiated> RecordGuestCheckoutsInitiation(
+    public GuestCheckoutsInitiated? RecordGuestCheckoutsInitiation(
         Guid[] initiatedGuestStayIds,
         DateTimeOffset now
-    ) =>
-        Maybe.If(
-            Status == CheckoutStatus.Initiated,
-            () => new GuestCheckoutsInitiated(Id, initiatedGuestStayIds, now)
-        );
+    )
+    {
+        if (Status == CheckoutStatus.Initiated)
+            return null;
 
-    public Maybe<object[]> RecordGuestCheckoutCompletion(
+        return new GuestCheckoutsInitiated(Id, initiatedGuestStayIds, now);
+    }
+
+    public object[] RecordGuestCheckoutCompletion(
         Guid guestStayId,
         DateTimeOffset now
-    ) =>
-        Maybe.If(
-            Status == CheckoutStatus.Initiated && GuestStayCheckouts[guestStayId] != CheckoutStatus.Completed,
-            () =>
-            {
-                var guestCheckoutCompleted = new GuestCheckoutCompleted(Id, guestStayId, now);
+    )
+    {
+        if (Status == CheckoutStatus.Initiated && GuestStayCheckouts[guestStayId] != CheckoutStatus.Completed)
+            return Array.Empty<object>();
 
-                var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Completed);
+        var guestCheckoutCompleted = new GuestCheckoutCompleted(Id, guestStayId, now);
 
-                return AreAnyOngoingCheckouts(guestStayCheckouts)
-                    ? new object[] { guestCheckoutCompleted }
-                    : new[] { guestCheckoutCompleted, Finalize(guestStayCheckouts, now) };
-            });
+        var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Completed);
 
-    public Maybe<object[]> RecordGuestCheckoutFailure(
+        return AreAnyOngoingCheckouts(guestStayCheckouts)
+            ? new object[] { guestCheckoutCompleted }
+            : new[] { guestCheckoutCompleted, Finalize(guestStayCheckouts, now) };
+    }
+
+    public object[] RecordGuestCheckoutFailure(
         Guid guestStayId,
         DateTimeOffset now
-    ) =>
-        Maybe.If(
-            Status == CheckoutStatus.Initiated && GuestStayCheckouts[guestStayId] != CheckoutStatus.Failed,
-            () =>
-            {
-                var guestCheckoutFailed = new GuestCheckoutFailed(Id, guestStayId, now);
+    )
+    {
+        if(Status == CheckoutStatus.Initiated && GuestStayCheckouts[guestStayId] != CheckoutStatus.Failed)
+            return Array.Empty<object>();
 
-                var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Failed);
+        var guestCheckoutFailed = new GuestCheckoutFailed(Id, guestStayId, now);
 
-                return AreAnyOngoingCheckouts(guestStayCheckouts)
-                    ? new object[] { guestCheckoutFailed }
-                    : new[] { guestCheckoutFailed, Finalize(guestStayCheckouts, now) };
-            });
+        var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Failed);
+
+        return AreAnyOngoingCheckouts(guestStayCheckouts)
+            ? new object[] { guestCheckoutFailed }
+            : new[] { guestCheckoutFailed, Finalize(guestStayCheckouts, now) };
+    }
 
     private object Finalize(Dictionary<Guid, CheckoutStatus> guestStayCheckouts, DateTimeOffset now) =>
         !AreAnyFailedCheckouts(guestStayCheckouts)
@@ -128,7 +130,7 @@ public record GroupCheckout(
 
     public static GroupCheckout Create(GroupCheckoutInitiated @event) =>
         new GroupCheckout(
-            @event.GroupCheckoutId,
+            @event.GroupCheckOutId,
             @event.GuestStayIds.ToDictionary(id => id, _ => CheckoutStatus.Pending)
         );
 
