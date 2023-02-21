@@ -1,7 +1,8 @@
+using Core.Commands;
 using Core.Marten.Extensions;
 using Marten;
 
-namespace HotelManagement.Saga.GroupCheckouts;
+namespace HotelManagement.Sagas.GroupCheckouts;
 
 public record InitiateGroupCheckout(
     Guid GroupCheckoutId,
@@ -26,7 +27,11 @@ public record RecordGuestCheckoutFailure(
     DateTimeOffset FailedAt
 );
 
-public class GuestStayDomainService
+public class GuestStayDomainService:
+    ICommandHandler<InitiateGroupCheckout>,
+    ICommandHandler<RecordGuestCheckoutsInitiation>,
+    ICommandHandler<RecordGuestCheckoutCompletion>,
+    ICommandHandler<RecordGuestCheckoutFailure>
 {
     private readonly IDocumentSession documentSession;
 
