@@ -42,6 +42,17 @@ public static class DocumentSessionExtensionsWithOpenTelemetry
             ct
         );
 
+    public static Task GetAndUpdate<T, TEvent>(
+        this IDocumentSession documentSession,
+        Guid id,
+        Func<T, Maybe<TEvent>> handle,
+        CancellationToken ct
+    ) where T : class =>
+        documentSession.WithTelemetry<T>(
+            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, handle, token),
+            ct
+        );
+
     public static Task GetAndUpdate<T>(
         this IDocumentSession documentSession,
         Guid id,

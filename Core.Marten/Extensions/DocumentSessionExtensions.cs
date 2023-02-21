@@ -34,6 +34,15 @@ public static class DocumentSessionExtensions
         documentSession.Events.WriteToAggregate<T>(id, stream =>
             stream.AppendOne(handle(stream.Aggregate)), ct);
 
+    public static Task GetAndUpdate<T, TEvent>(
+        this IDocumentSession documentSession,
+        Guid id,
+        Func<T, Maybe<TEvent>> handle,
+        CancellationToken ct
+    ) where T : class =>
+        documentSession.Events.WriteToAggregate<T>(id, stream =>
+            handle(stream.Aggregate).IfExists(@event => stream.AppendOne(@event)), ct);
+
     public static Task GetAndUpdate<T>(
         this IDocumentSession documentSession,
         Guid id,

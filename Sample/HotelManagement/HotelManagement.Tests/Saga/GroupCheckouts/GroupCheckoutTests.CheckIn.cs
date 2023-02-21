@@ -1,8 +1,8 @@
-using HotelManagement.GroupCheckouts;
+using HotelManagement.Saga.GroupCheckouts;
 using Ogooreck.BusinessLogic;
 using Xunit;
 
-namespace HotelManagement.Tests.GroupCheckouts;
+namespace HotelManagement.Tests.Saga.GroupCheckouts;
 
 public partial class GroupCheckoutTests
 {

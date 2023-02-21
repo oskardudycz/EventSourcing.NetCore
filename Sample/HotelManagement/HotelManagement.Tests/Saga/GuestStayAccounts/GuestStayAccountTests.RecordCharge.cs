@@ -1,30 +1,31 @@
-using HotelManagement.GuestStayAccounts;
+using HotelManagement.Saga.GuestStayAccounts;
 using Ogooreck.BusinessLogic;
 using Xunit;
 
-namespace HotelManagement.Tests.GuestStayAccounts;
-
-using static GuestCheckoutFailed;
+namespace HotelManagement.Tests.Saga.GuestStayAccounts;
 
 public partial class GuestStayAccountTests
 {
-    private readonly Guid groupCheckoutId = Guid.NewGuid();
-
     [Fact]
-    public void GivenNonExistingGuestStayAccount_WhenCheckOut_ThenFails() =>
+    public void GivenNonExistingGuestStayAccount_WhenRecordCharge_ThenFails() =>
         Spec.Given()
-            .When(state => state.CheckOut(now, groupCheckoutId).FlatMap())
-            .Then(new GuestCheckoutFailed(Guid.Empty, FailureReason.NotOpened, now, groupCheckoutId));
+            .When(state => state.RecordCharge(faker.Random.Decimal(0.1M), now))
+            .ThenThrows<InvalidOperationException>();
 
     [Fact]
-    public void GivenCheckedInGuestStayAccount_WhenCheckOut_ThenSucceeds() =>
-        Spec.Given(new GuestCheckedIn(guestStayAccountId, faker.Date.RecentOffset()))
-            .When(state => state.CheckOut(now, groupCheckoutId).FlatMap())
-            .Then(new GuestCheckedOut(guestStayAccountId, now, groupCheckoutId));
-
-    [Fact]
-    public void GivenUnsettledCheckedInGuestStayAccountWithCharge_WhenCheckOut_ThenFailsWithEvent()
+    public void GivenCheckedInGuestStayAccount_WhenRecordCharge_ThenSucceeds()
     {
+        var amount = faker.Random.Decimal(0.1M);
+
+        Spec.Given(new GuestCheckedIn(guestStayAccountId, faker.Date.RecentOffset()))
+            .When(state => state.RecordCharge(amount, now))
+            .Then(new ChargeRecorded(guestStayAccountId, amount, now));
+    }
+
+    [Fact]
+    public void GivenUnsettledCheckedInGuestStayAccountWithCharge_WhenRecordCharge_ThenSucceeds()
+    {
+        var amount = faker.Random.Decimal(0.1M);
         var checkedInDate = faker.Date.RecentOffset();
 
         Spec.Given(
@@ -32,13 +33,14 @@ public partial class GuestStayAccountTests
                 new ChargeRecorded(guestStayAccountId, faker.Random.Decimal(0.1M),
                     faker.Date.RecentOffset(refDate: checkedInDate))
             )
-            .When(state => state.CheckOut(now, groupCheckoutId).FlatMap())
-            .Then(new GuestCheckoutFailed(guestStayAccountId, FailureReason.BalanceNotSettled, now, groupCheckoutId));
+            .When(state => state.RecordCharge(amount, now))
+            .Then(new ChargeRecorded(guestStayAccountId, amount, now));
     }
 
     [Fact]
-    public void GivenUnsettledCheckedInGuestStayAccountWithPayment_WhenCheckOut_ThenFailsWithEvent()
+    public void GivenUnsettledCheckedInGuestStayAccountWithPayment_WhenRecordCharge_ThenSucceeds()
     {
+        var amount = faker.Random.Decimal(0.1M);
         var checkedInDate = faker.Date.RecentOffset();
 
         Spec.Given(
@@ -46,12 +48,12 @@ public partial class GuestStayAccountTests
                 new PaymentRecorded(guestStayAccountId, faker.Random.Decimal(0.1M),
                     faker.Date.RecentOffset(refDate: checkedInDate))
             )
-            .When(state => state.CheckOut(now, groupCheckoutId).FlatMap())
-            .Then(new GuestCheckoutFailed(guestStayAccountId, FailureReason.BalanceNotSettled, now, groupCheckoutId));
+            .When(state => state.RecordCharge(amount, now))
+            .Then(new ChargeRecorded(guestStayAccountId, amount, now));
     }
 
     [Fact]
-    public void GivenCheckedInWithSettledChargesGuestStayAccount_WhenCheckOut_ThenSucceeds()
+    public void GivenCheckedInWithSettledChargesGuestStayAccount_WhenRecordCharge_ThenFails()
     {
         var settledAmount = faker.Random.Decimal(0.1M);
         var checkedInDate = faker.Date.RecentOffset();
@@ -61,12 +63,12 @@ public partial class GuestStayAccountTests
                 new ChargeRecorded(guestStayAccountId, settledAmount, faker.Date.RecentOffset(refDate: checkedInDate)),
                 new PaymentRecorded(guestStayAccountId, settledAmount, faker.Date.RecentOffset(refDate: checkedInDate))
             )
-            .When(state => state.CheckOut(now, groupCheckoutId).FlatMap())
-            .Then(new GuestCheckedOut(guestStayAccountId, now, groupCheckoutId));
+            .When(state => state.RecordCharge(faker.Random.Decimal(0.1M), now))
+            .ThenThrows<InvalidOperationException>();
     }
 
     [Fact]
-    public void GivenCheckedInWithNotSettledChargesGuestStayAccount_WhenCheckOut_ThenFails()
+    public void GivenCheckedInWithNotSettledChargesGuestStayAccount_WhenRecordCharge_ThenFails()
     {
         var chargeAmount = faker.Random.Decimal(0.1M);
         var checkedInDate = faker.Date.RecentOffset();
@@ -74,15 +76,14 @@ public partial class GuestStayAccountTests
         Spec.Given(
                 new GuestCheckedIn(guestStayAccountId, faker.Date.RecentOffset()),
                 new ChargeRecorded(guestStayAccountId, chargeAmount, faker.Date.RecentOffset(refDate: checkedInDate)),
-                new PaymentRecorded(guestStayAccountId, faker.Random.Decimal(chargeAmount),
-                    faker.Date.RecentOffset(refDate: checkedInDate))
+                new PaymentRecorded(guestStayAccountId, faker.Random.Decimal(chargeAmount), faker.Date.RecentOffset(refDate: checkedInDate))
             )
-            .When(state => state.CheckOut(now, groupCheckoutId).FlatMap())
-            .Then(new GuestCheckoutFailed(guestStayAccountId, FailureReason.BalanceNotSettled, now, groupCheckoutId));
+            .When(state => state.RecordCharge(faker.Random.Decimal(0.1M), now))
+            .ThenThrows<InvalidOperationException>();
     }
 
     [Fact]
-    public void GivenCheckedOutGuestStayAccount_WhenCheckOut_ThenSucceeds()
+    public void GivenCheckedOutGuestStayAccount_WhenRecordCharge_ThenFails()
     {
         var checkedInDate = faker.Date.RecentOffset();
 
@@ -90,12 +91,12 @@ public partial class GuestStayAccountTests
                 new GuestCheckedIn(guestStayAccountId, faker.Date.RecentOffset()),
                 new GuestCheckedOut(guestStayAccountId, faker.Date.RecentOffset(refDate: checkedInDate))
             )
-            .When(state => state.CheckOut(now, groupCheckoutId).FlatMap())
+            .When(state => state.RecordCharge(faker.Random.Decimal(0.1M), now))
             .ThenThrows<InvalidOperationException>();
     }
 
     [Fact]
-    public void GivenCheckedOutWithSettledChargesGuestStayAccount_WhenCheckOut_ThenFails()
+    public void GivenCheckedOutWithSettledChargesGuestStayAccount_WhenRecordCharge_ThenFails()
     {
         var settledAmount = faker.Random.Decimal(0.1M);
         var checkedInDate = faker.Date.RecentOffset();
@@ -106,7 +107,7 @@ public partial class GuestStayAccountTests
                 new PaymentRecorded(guestStayAccountId, settledAmount, faker.Date.RecentOffset(refDate: checkedInDate)),
                 new GuestCheckedOut(guestStayAccountId, faker.Date.RecentOffset(refDate: checkedInDate))
             )
-            .When(state => state.CheckOut(now, groupCheckoutId).FlatMap())
-            .Then(new GuestCheckoutFailed(guestStayAccountId, FailureReason.NotOpened, now, groupCheckoutId));
+            .When(state => state.RecordCharge(faker.Random.Decimal(0.1M), now))
+            .ThenThrows<InvalidOperationException>();
     }
 }

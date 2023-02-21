@@ -1,11 +1,11 @@
 using Core.Commands;
 using FluentAssertions;
-using HotelManagement.GroupCheckouts;
-using HotelManagement.GuestStayAccounts;
+using HotelManagement.Saga.GroupCheckouts;
+using HotelManagement.Saga.GuestStayAccounts;
 using Xunit;
-using GuestCheckoutFailed = HotelManagement.GuestStayAccounts.GuestCheckoutFailed;
+using GuestCheckoutFailed = HotelManagement.Saga.GuestStayAccounts.GuestCheckoutFailed;
 
-namespace HotelManagement.Tests.GroupCheckouts;
+namespace HotelManagement.Tests.Saga.GroupCheckouts;
 
 using static GuestCheckoutFailed;
 

@@ -1,7 +1,7 @@
 using Core.Extensions;
 using Core.Structures;
 
-namespace HotelManagement.GroupCheckouts;
+namespace HotelManagement.Saga.GroupCheckouts;
 
 public record GroupCheckoutInitiated(
     Guid GroupCheckoutId,

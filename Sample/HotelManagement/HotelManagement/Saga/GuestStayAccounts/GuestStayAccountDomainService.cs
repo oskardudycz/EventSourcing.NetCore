@@ -1,7 +1,7 @@
 using Core.Marten.Extensions;
 using Marten;
 
-namespace HotelManagement.GuestStayAccounts;
+namespace HotelManagement.Saga.GuestStayAccounts;
 
 public record CheckInGuest(
     Guid GuestStayId
@@ -37,25 +37,25 @@ public class GuestStayDomainService
         );
 
     public Task Handle(RecordCharge command, int expectedVersion, CancellationToken ct) =>
-        documentSession.GetAndUpdate<GuestStayAccount>(
+        documentSession.GetAndUpdate(
             command.GuestStayId,
             expectedVersion,
-            state => state.RecordCharge(command.Amount, DateTimeOffset.UtcNow),
+            (GuestStayAccount state) => state.RecordCharge(command.Amount, DateTimeOffset.UtcNow),
             ct
         );
 
     public Task Handle(RecordPayment command, int expectedVersion, CancellationToken ct) =>
-        documentSession.GetAndUpdate<GuestStayAccount>(
+        documentSession.GetAndUpdate(
             command.GuestStayId,
             expectedVersion,
-            state => state.RecordPayment(command.Amount, DateTimeOffset.UtcNow),
+            (GuestStayAccount state) => state.RecordPayment(command.Amount, DateTimeOffset.UtcNow),
             ct
         );
 
     public Task Handle(CheckOutGuest command, CancellationToken ct) =>
-        documentSession.GetAndUpdate<GuestStayAccount>(
+        documentSession.GetAndUpdate(
             command.GuestStayId,
-            state => state.CheckOut(DateTimeOffset.UtcNow).FlatMap(),
+            (GuestStayAccount state) => state.CheckOut(DateTimeOffset.UtcNow).FlatMap(),
             ct
         );
 }

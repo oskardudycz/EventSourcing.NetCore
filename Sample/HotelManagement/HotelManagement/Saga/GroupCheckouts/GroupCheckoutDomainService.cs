@@ -1,7 +1,7 @@
 using Core.Marten.Extensions;
 using Marten;
 
-namespace HotelManagement.GroupCheckouts;
+namespace HotelManagement.Saga.GroupCheckouts;
 
 public record InitiateGroupCheckout(
     Guid GroupCheckoutId,
@@ -46,23 +46,23 @@ public class GuestStayDomainService
         );
 
     public Task Handle(RecordGuestCheckoutsInitiation command, CancellationToken ct) =>
-        documentSession.GetAndUpdate<GroupCheckout>(
+        documentSession.GetAndUpdate(
             command.GroupCheckoutId,
-            state => state.RecordGuestCheckoutsInitiation(command.InitiatedGuestStayIds, DateTimeOffset.UtcNow),
+            (GroupCheckout state) => state.RecordGuestCheckoutsInitiation(command.InitiatedGuestStayIds, DateTimeOffset.UtcNow),
             ct
         );
 
     public Task Handle(RecordGuestCheckoutCompletion command, CancellationToken ct) =>
-        documentSession.GetAndUpdate<GroupCheckout>(
+        documentSession.GetAndUpdate(
             command.GuestStayId,
-            state => state.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt),
+            (GroupCheckout state) => state.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt),
             ct
         );
 
     public Task Handle(RecordGuestCheckoutFailure command, CancellationToken ct) =>
-        documentSession.GetAndUpdate<GroupCheckout>(
+        documentSession.GetAndUpdate(
             command.GuestStayId,
-            state => state.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt),
+            (GroupCheckout state) => state.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt),
             ct
         );
 }

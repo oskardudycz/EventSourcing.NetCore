@@ -20,4 +20,8 @@
         </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.3" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Saga" />
+    </ItemGroup>
 </Project>
