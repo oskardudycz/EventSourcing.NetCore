@@ -1,8 +1,8 @@
 using Bogus;
-using HotelManagement.Saga.GuestStayAccounts;
+using HotelManagement.Sagas.GuestStayAccounts;
 using Ogooreck.BusinessLogic;
 
-namespace HotelManagement.Tests.Saga.GuestStayAccounts;
+namespace HotelManagement.Tests.Sagas.GuestStayAccounts;
 
 public partial class GuestStayAccountTests
 {

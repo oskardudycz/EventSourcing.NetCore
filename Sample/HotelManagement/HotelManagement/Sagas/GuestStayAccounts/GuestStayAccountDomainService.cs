@@ -1,7 +1,8 @@
+using Core.Commands;
 using Core.Marten.Extensions;
 using Marten;
 
-namespace HotelManagement.Saga.GuestStayAccounts;
+namespace HotelManagement.Sagas.GuestStayAccounts;
 
 public record CheckInGuest(
     Guid GuestStayId
@@ -9,12 +10,14 @@ public record CheckInGuest(
 
 public record RecordCharge(
     Guid GuestStayId,
-    decimal Amount
+    decimal Amount,
+    int ExpectedVersion
 );
 
 public record RecordPayment(
     Guid GuestStayId,
-    decimal Amount
+    decimal Amount,
+    int ExpectedVersion
 );
 
 public record CheckOutGuest(
@@ -22,7 +25,11 @@ public record CheckOutGuest(
     Guid? GroupCheckOutId = null
 );
 
-public class GuestStayDomainService
+public class GuestStayDomainService:
+    ICommandHandler<CheckInGuest>,
+    ICommandHandler<RecordCharge>,
+    ICommandHandler<RecordPayment>,
+    ICommandHandler<CheckOutGuest>
 {
     private readonly IDocumentSession documentSession;
 
@@ -36,18 +43,18 @@ public class GuestStayDomainService
             ct
         );
 
-    public Task Handle(RecordCharge command, int expectedVersion, CancellationToken ct) =>
+    public Task Handle(RecordCharge command, CancellationToken ct) =>
         documentSession.GetAndUpdate(
             command.GuestStayId,
-            expectedVersion,
+            command.ExpectedVersion,
             (GuestStayAccount state) => state.RecordCharge(command.Amount, DateTimeOffset.UtcNow),
             ct
         );
 
-    public Task Handle(RecordPayment command, int expectedVersion, CancellationToken ct) =>
+    public Task Handle(RecordPayment command,CancellationToken ct) =>
         documentSession.GetAndUpdate(
             command.GuestStayId,
-            expectedVersion,
+            command.ExpectedVersion,
             (GuestStayAccount state) => state.RecordPayment(command.Amount, DateTimeOffset.UtcNow),
             ct
         );

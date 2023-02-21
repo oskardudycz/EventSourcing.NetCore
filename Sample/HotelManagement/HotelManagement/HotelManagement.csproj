@@ -14,9 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Choreography" />
-      <Folder Include="ProcessManager" />
-      <Folder Include="Saga" />
+      <Folder Include="Sagas" />
     </ItemGroup>
 
 </Project>
