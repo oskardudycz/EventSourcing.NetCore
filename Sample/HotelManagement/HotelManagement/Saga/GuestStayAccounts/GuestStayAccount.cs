@@ -1,7 +1,7 @@
 using Core.Structures;
 using static Core.Structures.Result;
 
-namespace HotelManagement.GuestStayAccounts;
+namespace HotelManagement.Saga.GuestStayAccounts;
 
 public record GuestCheckedIn(
     Guid GuestStayId,

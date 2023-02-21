@@ -1,7 +1,7 @@
 using Core.Commands;
-using HotelManagement.GuestStayAccounts;
+using HotelManagement.Saga.GuestStayAccounts;
 
-namespace HotelManagement.GroupCheckouts;
+namespace HotelManagement.Saga.GroupCheckouts;
 
 public class GroupCheckoutSaga
 {

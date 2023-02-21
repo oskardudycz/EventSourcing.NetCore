@@ -1,8 +1,8 @@
-using HotelManagement.GuestStayAccounts;
+using HotelManagement.Saga.GuestStayAccounts;
 using Ogooreck.BusinessLogic;
 using Xunit;
 
-namespace HotelManagement.Tests.GuestStayAccounts;
+namespace HotelManagement.Tests.Saga.GuestStayAccounts;
 
 public partial class GuestStayAccountTests
 {
