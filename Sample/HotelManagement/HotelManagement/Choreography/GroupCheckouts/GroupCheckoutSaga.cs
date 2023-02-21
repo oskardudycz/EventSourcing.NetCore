@@ -19,14 +19,14 @@ public class GroupCheckoutSaga:
         foreach (var guestAccountId in @event.GuestStayIds)
         {
             await commandBus.Schedule(
-                new CheckOutGuest(guestAccountId, @event.GroupCheckoutId),
+                new CheckOutGuest(guestAccountId, @event.GroupCheckOutId),
                 ct
             );
         }
 
         await commandBus.Schedule(
             new RecordGuestCheckoutsInitiation(
-                @event.GroupCheckoutId,
+                @event.GroupCheckOutId,
                 @event.GuestStayIds
             ),
             ct
