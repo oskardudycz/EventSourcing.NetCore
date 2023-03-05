@@ -1,9 +1,8 @@
 ﻿using Core.ElasticSearch.Indices;
 using Core.Events;
 using Core.Projections;
-using Elasticsearch.Net;
+using Elastic.Clients.Elasticsearch;
 using Microsoft.Extensions.DependencyInjection;
-using Nest;
 
 namespace Core.ElasticSearch.Projections;
 
@@ -11,11 +10,11 @@ public class ElasticSearchProjection<TEvent, TView> : IEventHandler<EventEnvelop
     where TView : class, IProjection
     where TEvent : notnull
 {
-    private readonly IElasticClient elasticClient;
+    private readonly ElasticsearchClient elasticClient;
     private readonly Func<TEvent, string> getId;
 
     public ElasticSearchProjection(
-        IElasticClient elasticClient,
+        ElasticsearchClient elasticClient,
         Func<TEvent, string> getId
     )
     {
@@ -50,7 +49,7 @@ public static class ElasticSearchProjectionConfig
     {
         services.AddTransient<IEventHandler<EventEnvelope<TEvent>>>(sp =>
         {
-            var session = sp.GetRequiredService<IElasticClient>();
+            var session = sp.GetRequiredService<ElasticsearchClient>();
 
             return new ElasticSearchProjection<TEvent, TView>(session, getId);
         });

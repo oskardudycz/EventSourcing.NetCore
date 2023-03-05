@@ -58,7 +58,7 @@ public class OutOfOrderProjectionsTest: MartenTest
             options.Projections.SelfAggregate<IssuesList>();
         });
 
-        return store.OpenSession();
+        return store.LightweightSession();
     }
 
     [Fact]

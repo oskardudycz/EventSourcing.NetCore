@@ -1,10 +1,10 @@
 ﻿using Core.ElasticSearch.Repository;
 using Core.Events;
 using Core.EventStoreDB.Events;
+using Elastic.Clients.Elasticsearch;
 using EventStore.Client;
 using MarketBasketAnalytics.Carts;
 using Microsoft.Extensions.DependencyInjection;
-using Nest;
 
 namespace MarketBasketAnalytics.CartAbandonmentRateAnalysis
 {
@@ -30,12 +30,12 @@ namespace MarketBasketAnalytics.CartAbandonmentRateAnalysis
                 })
                 .AddEventHandler<ShoppingCartConfirmed>(async (sp, shoppingCartConfirmed, ct) =>
                 {
-                    var elastic = sp.GetRequiredService<IElasticClient>();
+                    var elastic = sp.GetRequiredService<ElasticsearchClient>();
 
                     var summaryId = CartAbandonmentRatesSummary.SummaryId;
 
                     var summary = await CartAbandonmentRatesSummary.Handle(
-                        token => elastic.Find<CartAbandonmentRatesSummary>(summaryId, token),
+                        async token => (await elastic.GetAsync<CartAbandonmentRatesSummary>(summaryId, cancellationToken: token)).Source,
                         shoppingCartConfirmed,
                         ct
                     );
@@ -44,7 +44,7 @@ namespace MarketBasketAnalytics.CartAbandonmentRateAnalysis
                 })
                 .AddEventHandler<CartAbandonmentRateCalculated>(async (sp, shoppingCartAbandoned, ct) =>
                 {
-                    var elastic = sp.GetRequiredService<IElasticClient>();
+                    var elastic = sp.GetRequiredService<ElasticsearchClient>();
 
                     var summaryId = CartAbandonmentRatesSummary.SummaryId;
 

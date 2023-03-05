@@ -1,5 +1,5 @@
 using Core.ElasticSearch.Indices;
-using Nest;
+using Elastic.Clients.Elasticsearch;
 using IAggregate = Core.Aggregates.IAggregate;
 
 namespace Core.ElasticSearch.Repository;
@@ -15,10 +15,10 @@ public interface IElasticSearchRepository<T> where T : class, IAggregate, new()
 
 public class ElasticSearchRepository<T>: IElasticSearchRepository<T> where T : class, IAggregate, new()
 {
-    private readonly IElasticClient elasticClient;
+    private readonly ElasticsearchClient elasticClient;
 
     public ElasticSearchRepository(
-        IElasticClient elasticClient
+        ElasticsearchClient elasticClient
     )
     {
         this.elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
@@ -26,7 +26,7 @@ public class ElasticSearchRepository<T>: IElasticSearchRepository<T> where T : c
 
     public async Task<T?> Find(Guid id, CancellationToken cancellationToken)
     {
-        var response = await elasticClient.GetAsync<T>(id, ct: cancellationToken).ConfigureAwait(false);
+        var response = await elasticClient.GetAsync<T>(id, cancellationToken).ConfigureAwait(false);
         return response?.Source;
     }
 
@@ -37,11 +37,11 @@ public class ElasticSearchRepository<T>: IElasticSearchRepository<T> where T : c
 
     public Task Update(T aggregate, CancellationToken cancellationToken)
     {
-        return elasticClient.UpdateAsync<T>(aggregate.Id, i => i.Doc(aggregate).Index(IndexNameMapper.ToIndexName<T>()), cancellationToken);
+        return elasticClient.UpdateAsync<T, object>(IndexNameMapper.ToIndexName<T>(), aggregate.Id, i => i.Doc(aggregate), cancellationToken);
     }
 
     public Task Delete(T aggregate, CancellationToken cancellationToken)
     {
-        return elasticClient.DeleteAsync<T>(aggregate.Id, ct: cancellationToken);
+        return elasticClient.DeleteAsync<T>(aggregate.Id, cancellationToken);
     }
 }

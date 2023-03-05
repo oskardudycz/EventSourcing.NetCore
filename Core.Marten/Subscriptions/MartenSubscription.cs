@@ -44,6 +44,8 @@ public class MartenSubscription: IProjection
             throw;
         }
     }
+
+    public bool EnableDocumentTrackingDuringRebuilds { get; set; }
 }
 
 public interface IMartenEventsConsumer

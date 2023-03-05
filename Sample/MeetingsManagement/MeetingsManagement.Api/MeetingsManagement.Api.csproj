@@ -5,9 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten" Version="6.0.0-alpha.4" />
-        <PackageReference Include="MediatR" Version="12.0.0" />
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.4.0-beta.3" />
+        <PackageReference Include="Marten" Version="6.0.0-alpha.9" />
+        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.4.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.3" />
     </ItemGroup>

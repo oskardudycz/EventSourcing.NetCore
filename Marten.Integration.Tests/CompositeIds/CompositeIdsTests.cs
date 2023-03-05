@@ -261,7 +261,7 @@ public class CompositeIdsTests: MartenTest
             options.Projections.SelfAggregate<Reservation>();
         });
 
-        return store.OpenSession();
+        return store.LightweightSession();
     }
 
     [Fact]

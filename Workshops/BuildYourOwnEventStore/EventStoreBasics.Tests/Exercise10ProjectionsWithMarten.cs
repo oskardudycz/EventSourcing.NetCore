@@ -181,7 +181,7 @@ public class Exercise10ProjectionsWithMarten
             // options.Projections.Add(new UserDashboardProjection());
         });
 
-        documentSession = store.OpenSession();
+        documentSession = store.LightweightSession();
 
         userRepository = new MartenRepository<User>(documentSession);
         orderRepository = new MartenRepository<Order>(documentSession);

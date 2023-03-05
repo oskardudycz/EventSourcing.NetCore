@@ -84,7 +84,7 @@ public class AggregationProjectionsTest: MartenTest
             options.Projections.Add(new IssueDescriptionsProjection());
         });
 
-        return store.OpenSession();
+        return store.LightweightSession();
     }
 
     [Fact]

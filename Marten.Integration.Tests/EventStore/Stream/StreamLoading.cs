@@ -70,7 +70,7 @@ public class StreamLoading: MartenTest
 
         //Then
         @event.Should().NotBeNull();
-        @event.Id.Should().Be(eventId);
+        @event!.Id.Should().Be(eventId);
     }
 
     [Fact]

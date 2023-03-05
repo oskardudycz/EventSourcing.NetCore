@@ -6,6 +6,6 @@ public static class DocumentSessionProvider
     {
         var store = DocumentStoreProvider.Get(schemaName, setOptions);
 
-        return store.OpenSession();
+        return store.LightweightSession();
     }
 }

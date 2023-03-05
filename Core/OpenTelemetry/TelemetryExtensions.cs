@@ -21,7 +21,8 @@ public static class TelemetryExtensions
         Activity.DefaultIdFormat = ActivityIdFormat.W3C;
 
         services
-            .AddOpenTelemetryTracing(builder =>
+            .AddOpenTelemetry()
+            .WithTracing(builder =>
             {
                 options.ConfigureTracerProvider(builder
                         .AddSource(ActivitySourceProvider.DefaultSourceName)

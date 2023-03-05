@@ -75,7 +75,7 @@ public class StreamStarting: MartenTest
         var streamState = EventStore.FetchStreamState(streamId);
 
         streamState.Should().NotBeNull();
-        streamState.Version.Should().Be(1);
+        streamState!.Version.Should().Be(1);
     }
 
     [Fact]

@@ -81,7 +81,7 @@ public class StoreInitializationTests
                 options.Events.DatabaseSchemaName = Settings.SchemaName;
             });
 
-            using var session = store.OpenSession();
+            using var session = store.LightweightSession();
             using var transaction = session.Connection!.BeginTransaction();
             ConnectionShouldBeEstablished(store);
 
@@ -93,11 +93,9 @@ public class StoreInitializationTests
 
     private static void ConnectionShouldBeEstablished(IDocumentStore store)
     {
-        using (var session = store.OpenSession())
-        {
-            var result = session.Query<int>("SELECT 1");
+        using var session = store.LightweightSession();
+        var result = session.Query<int>("SELECT 1");
 
-            result.Should().NotBeNull();
-        }
+        result.Should().NotBeNull();
     }
 }
