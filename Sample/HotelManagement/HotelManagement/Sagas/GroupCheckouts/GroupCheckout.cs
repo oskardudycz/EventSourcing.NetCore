@@ -25,7 +25,7 @@ public record GuestCheckoutCompleted(
 public record GuestCheckoutFailed(
     Guid GroupCheckoutId,
     Guid GuestStayId,
-    DateTimeOffset CompletedAt
+    DateTimeOffset FailedAt
 );
 
 public record GroupCheckoutCompleted(
