@@ -7,3 +7,15 @@ public enum ProjectStatus
     Completed,
     Cancelled
 }
+
+public record ProjectCreated(
+    Guid ProjectId,
+    string Name,
+    DateTimeOffset? StartDate,
+    DateTimeOffset? EndDate,
+    ProjectStatus Status,
+    string Slug,
+    Guid WorkspaceId,
+    Guid CreatedById,
+    bool IsBacklog
+);
