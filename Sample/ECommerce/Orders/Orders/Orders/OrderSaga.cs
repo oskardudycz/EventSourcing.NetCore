@@ -19,10 +19,10 @@ public class OrderSaga:
     IEventHandler<CartFinalized>,
     IEventHandler<OrderInitialized>,
     IEventHandler<PaymentFinalized>,
+    IEventHandler<OrderPaymentRecorded>,
     IEventHandler<PackageWasSent>,
     IEventHandler<ProductWasOutOfStock>,
-    IEventHandler<OrderCancelled>,
-    IEventHandler<OrderPaymentRecorded>
+    IEventHandler<OrderCancelled>
 {
     private readonly IIdGenerator idGenerator;
     private readonly ICommandBus commandBus;

@@ -12,7 +12,7 @@ Write the code that fulfils this logic. Remember that in Event Sourcing each bus
 
 ![events](./assets/events.jpg)
 
-There are two variations:
+There are three variations:
 1. Immutable, with functional command handlers composition and entities as anemic data model: [Immutable/BusinessLogicTests.cs](./Immutable/BusinessLogicTests.cs).
 2. Classical, mutable aggregates (rich domain model): [Mutable/BusinessLogicTests.cs](./Mutable/BusinessLogicTests.cs).
 3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/BusinessLogicTests.cs](./Mixed/BusinessLogicTests.cs).
@@ -20,5 +20,3 @@ There are two variations:
 Select your preferred approach (or all) to solve this use case using EventStoreDB. Fill appropriate [EventStoreClientExtensions](./Tools/)
 
 _**Note**: If needed update entities, events or test setup structure_
-
-
