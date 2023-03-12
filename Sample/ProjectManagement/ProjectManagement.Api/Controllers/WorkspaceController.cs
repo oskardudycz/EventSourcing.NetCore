@@ -27,13 +27,10 @@ public class WorkspaceController: ControllerBase
         var workspaceId = MartenIdGenerator.New();
         var backlogId = MartenIdGenerator.New();
 
-        var workspaceCreated = Handle(new CreateWorkspace(workspaceId, request.Name, request.TaskPrefix, userId));
-        var backlogCreated = Handle(new CreateBacklogProject(backlogId, workspaceId, userId));
-
-        documentSession.Events.Append(workspaceId, workspaceCreated);
-        documentSession.Events.Append(backlogId, backlogCreated);
-        
-        await documentSession.SaveChangesAsync();
+        await documentSession.ComposeAsync(
+            (workspaceId, Handle(new CreateWorkspace(workspaceId, request.Name, request.TaskPrefix, userId))),
+            (backlogId, Handle(new CreateBacklogProject(backlogId, workspaceId, userId)))
+        );
 
         var workspace = await documentSession.LoadAsync<WorkspaceDetails>(workspaceId);
 
