@@ -4,6 +4,7 @@ using ProjectManagement.Workspaces;
 using Marten;
 using Microsoft.AspNetCore.Mvc;
 using ProjectManagement.Projects;
+using ProjectManagement.Scenarios.WorkspaceCreation;
 
 namespace ProjectManagement.Api.Controllers;
 
@@ -23,13 +24,10 @@ public class WorkspaceController: ControllerBase
     [HttpPost]
     public async Task<ActionResult<WorkspaceDetails>> Post(CreateWorkspaceRequest request)
     {
-        var userId = GetUserId(HttpContext);
-        var workspaceId = MartenIdGenerator.New();
-        var backlogId = MartenIdGenerator.New();
-
-        await documentSession.ComposeAsync(
-            (workspaceId, Handle(new CreateWorkspace(workspaceId, request.Name, request.TaskPrefix, userId))),
-            (backlogId, Handle(new CreateBacklogProject(backlogId, workspaceId, userId)))
+        var workspaceId = await documentSession.CreateWorkspace(
+            GetUserId(HttpContext),
+            request.Name,
+            request.TaskPrefix
         );
 
         var workspace = await documentSession.LoadAsync<WorkspaceDetails>(workspaceId);
