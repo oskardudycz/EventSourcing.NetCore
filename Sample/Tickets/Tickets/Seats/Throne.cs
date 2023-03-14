@@ -2,18 +2,9 @@ using Core.Aggregates;
 
 namespace Tickets.Seats;
 
-public class Throne : Aggregate
+public class Throne : Seat
 {
-    public Guid ConcertId { get; private set; }
-
-    public string Number { get; private set; }
-
-    public decimal Price { get; private set; }
-
-    public Throne(Guid concertId, string number, decimal price)
+    public Throne(Guid concertId, string number, decimal price): base(concertId, number, price)
     {
-        ConcertId = concertId;
-        Number = number;
-        Price = price;
     }
 }
