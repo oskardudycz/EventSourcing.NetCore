@@ -4,9 +4,9 @@ namespace Tickets.Concerts;
 
 public class Event : Aggregate
 {
-    public string Name { get; private set; }
+    public string Name { get; }
 
-    public DateTime Date { get; private set; }
+    public DateTime Date { get; }
 
     public Event(string name, DateTime date)
     {
