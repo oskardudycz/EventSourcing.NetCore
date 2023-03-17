@@ -26,12 +26,9 @@ builder.Services
     .AddSwaggerGen()
     .AddMarten(options =>
     {
-        var schemaName = Environment.GetEnvironmentVariable("SchemaName");
-        if (!string.IsNullOrEmpty(schemaName))
-        {
-            options.Events.DatabaseSchemaName = schemaName;
-            options.DatabaseSchemaName = schemaName;
-        }
+        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Helpdesk";
+        options.Events.DatabaseSchemaName = schemaName;
+        options.DatabaseSchemaName = schemaName;
         options.Connection(builder.Configuration.GetConnectionString("Incidents") ?? throw new InvalidOperationException());
         options.UseDefaultSerialization(EnumStorage.AsString, nonPublicMembersStorage: NonPublicMembersStorage.All);
 
@@ -40,7 +37,9 @@ builder.Services
         options.Projections.Add<IncidentShortInfoProjection>();
         options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
         options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
-    }).AddAsyncDaemon(DaemonMode.Solo);
+    })
+    .UseLightweightSessions()
+    .AddAsyncDaemon(DaemonMode.Solo);
 
 builder.Services.Configure<JsonOptions>(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));

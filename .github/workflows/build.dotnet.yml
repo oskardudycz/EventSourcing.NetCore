@@ -12,13 +12,13 @@ jobs:
 
         steps:
             - name: Check Out Repo
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
             - name: Start containers
               run: docker-compose -f "docker-compose.ci.yml" up -d
 
             - name: Setup .NET Core
-              uses: actions/setup-dotnet@v1
+              uses: actions/setup-dotnet@v3
               with:
                   dotnet-version: "7.0.x"
 
@@ -32,7 +32,7 @@ jobs:
               run: dotnet test --configuration Release --no-build --filter Category!=SkipCI --logger "trx;LogFileName=test-results.trx"
 
             - name: Upload test results
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: success() || failure()
               with:
                 name: test-results

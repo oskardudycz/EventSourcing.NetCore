@@ -80,7 +80,7 @@ public partial class GroupCheckoutTests
             )
             .When(state => state.RecordGuestCheckoutFailure(guestStaysIds[2], now).GetOrThrow())
             .Then(
-                new GuestCheckoutCompleted(groupCheckoutId, guestStaysIds[2], now),
+                new GuestCheckoutFailed(groupCheckoutId, guestStaysIds[2], now),
                 new GroupCheckoutFailed(
                     groupCheckoutId,
                     new[] { guestStaysIds[0] },

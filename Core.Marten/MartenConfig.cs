@@ -58,6 +58,7 @@ public static class MartenConfigExtensions
         services
             .AddScoped<IIdGenerator, MartenIdGenerator>()
             .AddMarten(sp => SetStoreOptions(sp, martenConfig, configureOptions))
+            .UseLightweightSessions()
             .ApplyAllDatabaseChangesOnStartup()
             //.OptimizeArtifactWorkflow()
             .AddAsyncDaemon(martenConfig.DaemonMode);
