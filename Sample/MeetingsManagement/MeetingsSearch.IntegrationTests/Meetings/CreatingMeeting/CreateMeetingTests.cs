@@ -20,7 +20,7 @@ public class CreateMeetingTests: IClassFixture<TestWebApplicationFactory<Program
         API = ApiSpecification<Program>.Setup(fixture);
     }
 
-    [Fact(Skip = "Skipped for now until Elastic is fully bumped")]
+    [Fact]
     [Trait("Category", "Acceptance")]
     public async Task CreateCommand_ShouldPublish_MeetingCreateEvent()
     {
