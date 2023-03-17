@@ -137,15 +137,24 @@ public class EventStoreDBSubscriptionToAll
 
     private void HandleDrop(StreamSubscription _, SubscriptionDroppedReason reason, Exception? exception)
     {
+        if (exception is RpcException { StatusCode: StatusCode.Cancelled })
+        {
+            logger.LogWarning(
+                "Subscription to all '{SubscriptionId}' dropped by client",
+                SubscriptionId
+            );
+
+            return;
+        }
+
         logger.LogError(
             exception,
-            "Subscription to all '{SubscriptionId}' dropped with '{Reason}'",
+            "Subscription to all '{SubscriptionId}' dropped with '{StatusCode}' and '{Reason}'",
             SubscriptionId,
+            (exception as RpcException)?.StatusCode ?? StatusCode.Unknown,
             reason
         );
 
-        if (exception is RpcException { StatusCode: StatusCode.Cancelled })
-            return;
 
         Resubscribe();
     }

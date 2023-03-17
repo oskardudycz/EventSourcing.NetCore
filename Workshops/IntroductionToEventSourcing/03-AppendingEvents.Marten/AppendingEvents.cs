@@ -82,7 +82,11 @@ public class GettingStateFromEventsTests
         const string connectionString =
             "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'";
 
-        using var documentStore = DocumentStore.For(connectionString);
+        using var documentStore = DocumentStore.For(options =>
+        {
+            options.Connection(connectionString);
+            options.DatabaseSchemaName = options.Events.DatabaseSchemaName = "IntroductionToEventSourcing";
+        });
         await using var documentSession = documentStore.LightweightSession();
 
         documentSession.Listeners.Add(MartenEventsChangesListener.Instance);
