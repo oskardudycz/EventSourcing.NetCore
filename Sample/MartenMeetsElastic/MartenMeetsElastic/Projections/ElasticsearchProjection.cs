@@ -29,7 +29,7 @@ public abstract class ElasticsearchProjection: IProjection
     {
         var existsResponse = await ElasticsearchClient.Indices.ExistsAsync(IndexName, cancellation);
         if (!existsResponse.Exists)
-            SetupMapping(ElasticsearchClient);
+            await SetupMapping(ElasticsearchClient);
 
         var events = streamActions.SelectMany(streamAction => streamAction.Events)
             .Where(@event => handledEventTypes.Contains(@event.EventType))
@@ -38,7 +38,10 @@ public abstract class ElasticsearchProjection: IProjection
         await ApplyAsync(ElasticsearchClient, events);
     }
 
-    protected virtual void SetupMapping(ElasticsearchClient client) { }
+    protected virtual Task SetupMapping(ElasticsearchClient client)
+    {
+        return client.Indices.CreateAsync(IndexName);
+    }
 
     protected virtual Task ApplyAsync(ElasticsearchClient client, IEvent[] events) =>
         ApplyAsync(
@@ -63,7 +66,7 @@ public abstract class ElasticsearchProjection<TDocument>:
     protected override string IndexName => IndexNameMapper.ToIndexName<TDocument>();
 
     private readonly Dictionary<Type, ProjectEvent> projectors = new();
-    protected abstract Func<TDocument, string> DocumentId { get; }
+    private Func<TDocument, string> getDocumentId = default!;
 
     protected void Projects<TEvent>(
         Func<TEvent, string> getId,
@@ -83,38 +86,48 @@ public abstract class ElasticsearchProjection<TDocument>:
     private new void Projects<TEvent>() =>
         base.Projects<TEvent>();
 
+    protected void DocumentId(Func<TDocument, string> documentId) =>
+        getDocumentId = documentId;
+
     protected override async Task ApplyAsync(ElasticsearchClient client, object[] events)
     {
-        var ids = events.Select(GetDocumentId).ToList();
+        try
+        {
+            var ids = events.Select(GetDocumentId).ToList();
 
-        var searchResponse = await client.SearchAsync<TDocument>(s => s
-            .Index(IndexName)
-            .Query(q => q.Ids(new IdsQuery { Values = new Ids(ids) }))
-        );
+            var searchResponse = await client.SearchAsync<TDocument>(s => s
+                .Index(IndexName)
+                .Query(q => q.Ids(new IdsQuery { Values = new Ids(ids) }))
+            );
 
-        var existingDocuments = searchResponse.Documents.ToDictionary(ks => DocumentId(ks), vs => vs);
+            var existingDocuments = searchResponse.Documents.ToDictionary(ks => getDocumentId(ks), vs => vs);
 
-        var updatedDocuments = events.Select((@event, i) =>
-            Apply(existingDocuments.GetValueOrDefault(ids[i], GetDefault(@event)), @event)
-        ).ToList();
+            var updatedDocuments = events.Select((@event, i) =>
+                Apply(existingDocuments.GetValueOrDefault(ids[i], GetDefault(@event)), @event)
+            ).ToList();
 
-        var bulkAll = client.BulkAll(
-            updatedDocuments,
-            SetBulkOptions
-        );
+            var bulkAll = client.BulkAll(updatedDocuments, SetBulkOptions);
 
-        bulkAll.Wait(TimeSpan.FromSeconds(5), _ => Console.WriteLine("Data indexed"));
+            bulkAll.Wait(TimeSpan.FromSeconds(5), _ => Console.WriteLine("Data indexed"));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
+
+    protected override Task SetupMapping(ElasticsearchClient client) =>
+        client.Indices.CreateAsync<TDocument>(opt => opt.Index(IndexName));
+
+    protected virtual TDocument GetDefault(object @event) =>
+        ObjectFactory<TDocument>.GetDefaultOrUninitialized();
+
+    protected virtual void SetBulkOptions(BulkAllRequestDescriptor<TDocument> options) =>
+        options.Index(IndexName);
 
     private string GetDocumentId(object @event) =>
         projectors[@event.GetType()].GetId(@event);
 
     private TDocument Apply(TDocument document, object @event) =>
         projectors[@event.GetType()].Apply(document, @event);
-
-
-    protected virtual TDocument GetDefault(object @event) => ObjectFactory<TDocument>.GetDefaultOrUninitialized();
-
-    protected virtual void SetBulkOptions(BulkAllRequestDescriptor<TDocument> options) =>
-        options.Index(IndexName);
 }
