@@ -8,7 +8,7 @@ public interface IProjection
 
 public abstract class Projection : IProjection
 {
-    private readonly Dictionary<Type, Action<object>> handlers = new Dictionary<Type, Action<object>>();
+    private readonly Dictionary<Type, Action<object>> handlers = new();
 
     public Type[] Handles => handlers.Keys.ToArray();
 
