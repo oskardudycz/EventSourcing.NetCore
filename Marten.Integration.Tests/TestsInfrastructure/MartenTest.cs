@@ -1,4 +1,5 @@
 using System.Data;
+using FluentAssertions;
 using Marten.Events;
 using Npgsql;
 using Xunit;
@@ -45,5 +46,16 @@ public abstract class MartenTest: IDisposable
         command.ExecuteNonQuery();
 
         tran.Commit();
+    }
+
+    protected Task SaveChangesAsync() =>
+        Session.SaveChangesAsync();
+
+    protected async Task SaveChangesAsyncShouldFailWith<TException>() where TException: Exception
+    {
+        var saveChanges = SaveChangesAsync;
+        await saveChanges.Should().ThrowAsync<TException>();
+
+        Session = CreateSession();
     }
 }
