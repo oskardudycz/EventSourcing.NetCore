@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using SlimDownYourAggregate.Slimmed;
 
 namespace SlimDownYourAggregate.Core.EF;
 
@@ -40,18 +41,18 @@ public class DummyDbContext: DbContext
 
 public class DummyCommandHandler
 {
-    private readonly EFRepository<DummyDbContext, Dummy> repository;
+    private readonly EFRepository<DummyDbContext, ChemicalReactionModel> repository;
 
-    public DummyCommandHandler(EFRepository<DummyDbContext, Dummy> repository) =>
+    public DummyCommandHandler(EFRepository<DummyDbContext, ChemicalReactionModel> repository) =>
         this.repository = repository;
 
     public Task Handle(AddDummy command, CancellationToken ct) =>
-        repository.AddAsync(Dummy.Create(command.Name), ct);
+        repository.AddAsync(new Slimmed.ChemicalReaction( /**We'd put data from command*/), ct);
 
-    public Task Handle(UpdateDummyName command, CancellationToken ct) =>
+    public Task Handle(StartReaction command, CancellationToken ct) =>
         repository.GetAndUpdateAsync(
             command.Id,
-            state => state.SetName(command.Name),
+            state => ChemicalReactionService.Decide(state.ToChemicalReaction(), command),
             ct
         );
 }
