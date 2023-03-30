@@ -34,11 +34,12 @@ public class EFRepository<TDbContext, T> where TDbContext : DbContext where T : 
     }
 }
 
-public static class MongoRepositoryExtensions
+public static class EFRepositoryExtensions
 {
     public static async Task GetAndUpdateAsync<TDbContext, T>(
         this EFRepository<TDbContext, T> repository,
-        string id, Action<T> handle,
+        string id,
+        Action<T> handle,
         CancellationToken ct
     ) where TDbContext : DbContext where T : class
     {
