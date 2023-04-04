@@ -1113,6 +1113,7 @@ See more in:
 -   📝 [Zartis - Event Sourcing with CQRS](https://www.zartis.com/event-sourcing-with-cqrs/)
 -   📝 [Nordstrom - Event-sourcing at Nordstrom: Part 1](https://medium.com/tech-at-nordstrom/adventures-in-event-sourced-architecture-part-1-cc21d06187c7)
 -   📝 [Nordstrom - Event-sourcing at Nordstrom: Part 2](https://medium.com/tech-at-nordstrom/event-sourcing-at-nordstrom-part-2-f64c416d1885)
+-   📝 [What is Event Sourcing Design Pattern in Microservice Architecture? How does it work?](https://medium.com/javarevisited/what-is-event-sourcing-design-pattern-in-microservices-architecture-how-does-it-work-b38c996d445a)
 -   🎞 [Techtter - CQRS - Event Sourcing || Deep Dive on Building Event Driven Systems](https://www.youtube.com/watch?v=3TwLEoLtpw0)
 -   🎞 [Tech Mind Factory - Event Sourcing with Azure SQL and Entity Framework Core](https://www.youtube.com/watch?v=-BhDW3GeSqg)
 -   🎞 [Tech Primers - Event Sourcing & CQRS | Stock Exchange Microservices Architecture | System Design Primer](https://www.youtube.com/watch?v=E-7TBZxmkXE)
