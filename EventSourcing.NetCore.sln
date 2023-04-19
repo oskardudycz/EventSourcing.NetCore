@@ -410,8 +410,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectManagement", "Projec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectManagement.Api", "Sample\ProjectManagement\ProjectManagement.Api\ProjectManagement.Api.csproj", "{C40285BE-B07E-4036-8E77-61BE26FD11AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectManagement", "Sample\ProjectManagement\ProjectManagement\ProjectManagement.csproj", "{35FA0D3F-8127-47DA-AE71-75EC68C3447F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectManagement", "Sample\ProjectManagement\ProjectManagement\ProjectManagement.csproj", "{FF0820B0-3481-412D-A3FC-208C035F4774}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MartenMeetsElastic", "MartenMeetsElastic", "{69A7ABA3-E234-4465-B991-97A884BD30B2}"

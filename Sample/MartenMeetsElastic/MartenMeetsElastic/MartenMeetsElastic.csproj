@@ -6,10 +6,10 @@
 
 
     <ItemGroup>
-        <PackageReference Include="Marten" Version="6.0.0-alpha.9" />
-        <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.0.5" />
+        <PackageReference Include="Marten" Version="6.0.0-rc.1" />
+        <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.1.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.3" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     </ItemGroup>
 
@@ -18,5 +18,5 @@
       <ProjectReference Include="..\..\..\Core.ElasticSearch\Core.ElasticSearch.csproj" />
       <ProjectReference Include="..\..\..\Core.Marten\Core.Marten.csproj" />
     </ItemGroup>
-    
+
 </Project>

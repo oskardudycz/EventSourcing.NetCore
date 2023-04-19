@@ -4,7 +4,6 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentAssertions;
 using JasperFx.Core;
 using Marten;
-using Marten.Events;
 using Marten.Events.Daemon;
 using MartenMeetsElastic.Projections;
 using Xunit;
@@ -56,6 +55,7 @@ public class OrderProjectionRaw: ElasticsearchProjection
     protected override Task ApplyAsync(ElasticsearchClient client, object[] events)
     {
         // (...) TODO
+        return Task.CompletedTask;
     }
 }
 
