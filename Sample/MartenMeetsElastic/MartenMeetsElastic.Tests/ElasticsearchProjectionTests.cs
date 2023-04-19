@@ -11,11 +11,6 @@ using Xunit;
 
 namespace MartenMeetsElastic.Tests;
 
-public record UserInfo(
-    string Id,
-    string UserName
-);
-
 public record OrderInitiated(
     string OrderId,
     string OrderNumber,
@@ -33,6 +28,11 @@ public record OrderCompleted(
     string UserName
 );
 
+public record UserInfo(
+    string Id,
+    string UserName
+);
+
 public record Order(
     string Id,
     string OrderNumber,
@@ -40,6 +40,24 @@ public record Order(
     string Status,
     string? ShipmentAddress
 );
+
+public class OrderProjectionRaw: ElasticsearchProjection
+{
+    protected override string IndexName => "Document";
+
+    public OrderProjectionRaw()
+    {
+        Projects<OrderInitiated>();
+        Projects<OrderShipmentAddressAssigned>();
+        Projects<OrderCompleted>();
+    }
+
+
+    protected override Task ApplyAsync(ElasticsearchClient client, object[] events)
+    {
+        // (...) TODO
+    }
+}
 
 public class OrderProjection: ElasticsearchProjection<Order>
 {
