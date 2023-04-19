@@ -1,5 +1,6 @@
 using Core.ElasticSearch.Indices;
 using Core.Queries;
+using Elastic.Clients.Elasticsearch;
 
 namespace MeetingsSearch.Meetings.SearchingMeetings;
 
@@ -17,14 +18,10 @@ internal class HandleSearchMeetings: IQueryHandler<SearchMeetings, IReadOnlyColl
 {
     private const int MaxItemsCount = 1000;
 
-    private readonly Nest.IElasticClient elasticClient;
+    private readonly ElasticsearchClient elasticClient;
 
-    public HandleSearchMeetings(
-        Nest.IElasticClient elasticClient
-    )
-    {
+    public HandleSearchMeetings(ElasticsearchClient elasticClient) =>
         this.elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-    }
 
     public async Task<IReadOnlyCollection<Meeting>> Handle(SearchMeetings query, CancellationToken cancellationToken)
     {
