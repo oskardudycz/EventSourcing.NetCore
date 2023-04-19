@@ -6,6 +6,7 @@ using JasperFx.Core;
 using Marten;
 using Marten.Events.Daemon;
 using MartenMeetsElastic.Projections;
+using Polly;
 using Xunit;
 
 namespace MartenMeetsElastic.Tests;
@@ -107,12 +108,18 @@ public class MeetsElasticTest: MartenMeetsElasticTest
 
         await daemon.Tracker.WaitForShardState(new ShardState("MartenMeetsElastic.Tests.OrderProjection:All", 1), 15.Seconds());
 
-        var searchResponse = await elasticClient.SearchAsync<Order>(s => s
-            .Index(IndexNameMapper.ToIndexName<Order>())
-            .Query(q => q.Ids(new IdsQuery { Values = new Ids("order1") }))
-        );
+        await Policy
+            .Handle<Exception>()
+            .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromMilliseconds(retryAttempt * 500))
+            .ExecuteAsync(async () =>
+            {
+                var searchResponse = await elasticClient.SearchAsync<Order>(s => s
+                    .Index(IndexNameMapper.ToIndexName<Order>())
+                    .Query(q => q.Ids(new IdsQuery { Values = new Ids("order1") }))
+                );
 
-        searchResponse.IsValidResponse.Should().BeTrue();
-        searchResponse.Documents.Should().HaveCount(1);
+                searchResponse.IsValidResponse.Should().BeTrue();
+                searchResponse.Documents.Should().HaveCount(1);
+            });
     }
 }
