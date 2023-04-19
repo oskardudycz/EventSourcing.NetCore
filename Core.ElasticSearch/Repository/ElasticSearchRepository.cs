@@ -5,7 +5,7 @@ using IAggregate = Core.Aggregates.IAggregate;
 namespace Core.ElasticSearch.Repository;
 
 
-public interface IElasticSearchRepository<T> where T : class, IAggregate, new()
+public interface IElasticSearchRepository<T> where T : class, IAggregate
 {
     Task<T?> Find(Guid id, CancellationToken cancellationToken);
     Task Add(T aggregate, CancellationToken cancellationToken);
@@ -13,7 +13,7 @@ public interface IElasticSearchRepository<T> where T : class, IAggregate, new()
     Task Delete(T aggregate, CancellationToken cancellationToken);
 }
 
-public class ElasticSearchRepository<T>: IElasticSearchRepository<T> where T : class, IAggregate, new()
+public class ElasticSearchRepository<T>: IElasticSearchRepository<T> where T : class, IAggregate
 {
     private readonly ElasticsearchClient elasticClient;
 
