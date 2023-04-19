@@ -26,7 +26,7 @@ public enum IncidentNoteType
     FromCustomer
 }
 
-public class IncidentDetailsProjection: SingleStreamAggregation<IncidentDetails>
+public class IncidentDetailsProjection: SingleStreamProjection<IncidentDetails>
 {
     public static IncidentDetails Create(IncidentLogged logged) =>
         new(logged.IncidentId, logged.CustomerId, IncidentStatus.Pending, Array.Empty<IncidentNote>());

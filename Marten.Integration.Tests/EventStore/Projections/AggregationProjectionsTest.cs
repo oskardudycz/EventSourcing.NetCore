@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Marten.Events.Aggregation;
+using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Weasel.Core;
 using Xunit;
@@ -57,7 +58,7 @@ public class AggregationProjectionsTest: MartenTest
         }
     }
 
-    public class IssueDescriptionsProjection: SingleStreamAggregation<IssueDescriptions>
+    public class IssueDescriptionsProjection: SingleStreamProjection<IssueDescriptions>
     {
         public void Apply(IssueCreated @event, IssueDescriptions item)
         {
@@ -80,8 +81,8 @@ public class AggregationProjectionsTest: MartenTest
             options.Events.DatabaseSchemaName = SchemaName;
 
             //It's needed to manually set that inline aggregation should be applied
-            options.Projections.SelfAggregate<IssuesList>();
-            options.Projections.Add(new IssueDescriptionsProjection());
+            options.Projections.Snapshot<IssuesList>(SnapshotLifecycle.Inline);
+            options.Projections.Add(new IssueDescriptionsProjection(), ProjectionLifecycle.Inline);
         });
 
         return store.LightweightSession();

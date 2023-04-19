@@ -86,7 +86,7 @@ public class ShoppingCartDetails
     }
 }
 
-public class CartDetailsProjection : SingleStreamAggregation<ShoppingCartDetails>
+public class CartDetailsProjection : SingleStreamProjection<ShoppingCartDetails>
 {
     public CartDetailsProjection()
     {

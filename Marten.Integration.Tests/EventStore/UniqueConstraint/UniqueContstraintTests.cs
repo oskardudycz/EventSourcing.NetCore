@@ -29,7 +29,7 @@ public class UniqueContstraintTests: MartenTest
         string Email
     );
 
-    public class UserNameGuardProjection: SingleStreamAggregation<UserNameGuard>
+    public class UserNameGuardProjection: SingleStreamProjection<UserNameGuard>
     {
         public UserNameGuardProjection() =>
             DeleteEvent<UserDeleted>();

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Xunit;
 
@@ -44,7 +45,7 @@ public class InlineAggregationStorage: MartenTest
         return base.CreateSession(options =>
         {
             //It's needed to manually set that inline aggregation should be applied
-            options.Projections.SelfAggregate<IssuesList>();
+            options.Projections.Snapshot<IssuesList>(SnapshotLifecycle.Inline);
         });
     }
 

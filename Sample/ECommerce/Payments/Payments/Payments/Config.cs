@@ -2,6 +2,7 @@ using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;
 using Marten;
+using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Payments.Payments.CompletingPayment;
 using Payments.Payments.DiscardingPayment;
@@ -36,6 +37,6 @@ internal static class PaymentsConfig
     internal static void ConfigurePayments(this StoreOptions options)
     {
         // Snapshots
-        options.Projections.SelfAggregate<Payment>();
+        options.Projections.Snapshot<Payment>(SnapshotLifecycle.Inline);
     }
 }

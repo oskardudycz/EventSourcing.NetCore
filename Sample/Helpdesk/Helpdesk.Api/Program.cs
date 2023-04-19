@@ -32,9 +32,9 @@ builder.Services
         options.Connection(builder.Configuration.GetConnectionString("Incidents") ?? throw new InvalidOperationException());
         options.UseDefaultSerialization(EnumStorage.AsString, nonPublicMembersStorage: NonPublicMembersStorage.All);
 
-        options.Projections.Add<IncidentHistoryTransformation>();
-        options.Projections.Add<IncidentDetailsProjection>();
-        options.Projections.Add<IncidentShortInfoProjection>();
+        options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
+        options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
+        options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
         options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
     })
