@@ -2,6 +2,7 @@ using Core.Commands;
 using Core.Marten.Repository;
 using Core.Queries;
 using Marten;
+using Marten.Events.Projections;
 using Marten.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 using Tickets.Reservations.CancellingReservation;
@@ -42,7 +43,7 @@ internal static class ReservationsConfig
     internal static void ConfigureReservations(this StoreOptions options)
     {
         // Snapshots
-        options.Projections.SelfAggregate<Reservation>();
+        options.Projections.Snapshot<Reservation>(SnapshotLifecycle.Inline);
         options.Schema.For<Reservation>().Index(x => x.SeatId, x =>
         {
             x.IsUnique = true;
@@ -61,10 +62,10 @@ internal static class ReservationsConfig
         // options.Schema.For<Reservation>().UniqueIndex(x => x.SeatId);
 
         // projections
-        options.Projections.Add<ReservationDetailsProjection>();
-        options.Projections.Add<ReservationShortInfoProjection>();
+        options.Projections.Add<ReservationDetailsProjection>(ProjectionLifecycle.Inline);
+        options.Projections.Add<ReservationShortInfoProjection>(ProjectionLifecycle.Inline);
 
         // transformation
-        options.Projections.Add<ReservationHistoryTransformation>();
+        options.Projections.Add<ReservationHistoryTransformation>(ProjectionLifecycle.Inline);
     }
 }

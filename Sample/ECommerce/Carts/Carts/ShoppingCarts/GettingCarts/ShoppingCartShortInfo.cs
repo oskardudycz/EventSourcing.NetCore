@@ -43,7 +43,7 @@ public class ShoppingCartShortInfo
     }
 }
 
-public class CartShortInfoProjection : SingleStreamAggregation<ShoppingCartShortInfo>
+public class CartShortInfoProjection : SingleStreamProjection<ShoppingCartShortInfo>
 {
     public CartShortInfoProjection()
     {

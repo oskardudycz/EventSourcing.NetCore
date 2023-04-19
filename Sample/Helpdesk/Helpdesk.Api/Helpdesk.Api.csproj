@@ -6,8 +6,8 @@
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Marten.AspNetCore" Version="6.0.0-alpha.9" />
-        <PackageReference Include="Marten" Version="6.0.0-alpha.9" />
-        <PackageReference Include="Confluent.Kafka" Version="2.0.2" />
+        <PackageReference Include="Marten.AspNetCore" Version="6.0.0-rc.1" />
+        <PackageReference Include="Marten" Version="6.0.0-rc.1" />
+        <PackageReference Include="Confluent.Kafka" Version="2.1.0" />
     </ItemGroup>
 </Project>

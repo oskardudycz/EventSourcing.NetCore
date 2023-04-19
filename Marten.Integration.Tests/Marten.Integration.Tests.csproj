@@ -18,7 +18,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.10.0" />
-        <PackageReference Include="Marten" Version="6.0.0-alpha.9" />
+        <PackageReference Include="Marten" Version="6.0.0-rc.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />

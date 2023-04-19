@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Marten.Schema;
 using Newtonsoft.Json;
@@ -258,7 +259,7 @@ public class CompositeIdsTests: MartenTest
             options.Events.DatabaseSchemaName = SchemaName;
             options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.All);
 
-            options.Projections.SelfAggregate<Reservation>();
+            options.Projections.Snapshot<Reservation>(SnapshotLifecycle.Inline);
         });
 
         return store.LightweightSession();

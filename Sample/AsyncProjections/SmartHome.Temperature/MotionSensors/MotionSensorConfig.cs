@@ -2,6 +2,7 @@ using Core.Commands;
 using Core.Marten.Repository;
 using Core.Queries;
 using Marten;
+using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using SmartHome.Temperature.MotionSensors.GettingMotionSensor;
 using SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
@@ -27,6 +28,6 @@ public static class MotionSensorConfig
     internal static void ConfigureMotionSensors(this StoreOptions options)
     {
         // Snapshots
-        options.Projections.SelfAggregate<MotionSensor>();
+        options.Projections.Snapshot<MotionSensor>(SnapshotLifecycle.Inline);
     }
 }

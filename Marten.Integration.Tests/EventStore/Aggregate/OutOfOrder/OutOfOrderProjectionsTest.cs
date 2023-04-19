@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Weasel.Core;
 using Xunit;
@@ -55,7 +56,7 @@ public class OutOfOrderProjectionsTest: MartenTest
             options.Events.DatabaseSchemaName = SchemaName;
 
             //It's needed to manually set that inline aggregation should be applied
-            options.Projections.SelfAggregate<IssuesList>();
+            options.Projections.Snapshot<IssuesList>(SnapshotLifecycle.Inline);
         });
 
         return store.LightweightSession();
