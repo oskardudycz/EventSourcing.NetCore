@@ -2,13 +2,32 @@ namespace SlimDownYourAggregate.Slimmed;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+
+public enum ReactionState
+{
+    NotStarted,
+    InProgress,
+    Completed
+}
 
 public record ChemicalReactionModel(
-    Guid Id,
+    string Id,
     List<ReactionParticipant> Participants,
     ReactionState State
-);
+)
+{
+    public ChemicalReactionModel Evolve(ChemicalReactionModel model, ChemicalReactionEvent @event) =>
+        @event switch
+        {
+            ChemicalReactionEvent.Initiated initiated =>
+                new ChemicalReactionModel(initiated.Id, initiated.Participants, ReactionState.NotStarted),
+            ChemicalReactionEvent.Started started =>
+                model with { State = ReactionState.InProgress },
+            ChemicalReactionEvent.Completed finished =>
+                model with { State = ReactionState.Completed },
+            _ => throw new ArgumentOutOfRangeException(nameof(@event))
+        };
+}
 
 public static class ChemicalReactionModelExtensions
 {
@@ -16,8 +35,8 @@ public static class ChemicalReactionModelExtensions
         model.State switch
         {
             ReactionState.NotStarted => new ChemicalReaction.NotStarted(),
-            ReactionState.InProgress => new ChemicalReaction.Started(),
-            ReactionState.Completed => new ChemicalReaction.Finished(),
+            ReactionState.InProgress => new ChemicalReaction.InProgress(),
+            ReactionState.Completed => new ChemicalReaction.Completed(),
             _ => throw new ArgumentOutOfRangeException()
         };
 
@@ -32,7 +51,7 @@ public static class ChemicalReactionModelExtensions
             ChemicalReactionEvent.Started started =>
                 model with { State = ReactionState.InProgress },
 
-            ChemicalReactionEvent.Finished finished =>
+            ChemicalReactionEvent.Completed finished =>
                 model with { State = ReactionState.Completed },
 
             _ => throw new ArgumentOutOfRangeException(nameof(@event), @event, null)
@@ -47,28 +66,28 @@ public record ReactionParticipantModel(
     ParticipantType Type
 );
 
-public abstract record ChemicalReactionCommand
+public abstract record ChemicalReactionCommand(string Id)
 {
     public record Initiate(
-        Guid Id,
-        List<ReactionParticipant> Participants,
-        double InitialMoles,
-        double FinalMoles
-    ): ChemicalReactionCommand;
+        string Id,
+        List<ReactionParticipant> Participants
+    ): ChemicalReactionCommand(Id);
 
     public record Start(
-        DateTimeOffset StartedAt
-    ): ChemicalReactionCommand;
+        string Id,
+        DateTimeOffset Now
+    ): ChemicalReactionCommand(Id);
 
     public record Finish(
-        DateTimeOffset FinishedAt
-    ): ChemicalReactionCommand;
+        string Id,
+        DateTimeOffset Now
+    ): ChemicalReactionCommand(Id);
 }
 
 public abstract record ChemicalReactionEvent
 {
     public record Initiated(
-        Guid Id,
+        string Id,
         List<ReactionParticipant> Participants,
         double InitialMoles,
         double FinalMoles
@@ -78,12 +97,10 @@ public abstract record ChemicalReactionEvent
         DateTimeOffset StartedAt
     ): ChemicalReactionEvent;
 
-    public record Finished(
+    public record Completed(
         DateTimeOffset FinishedAt
     ): ChemicalReactionEvent;
 }
-
-
 
 public static class ChemicalReactionService
 {
@@ -92,37 +109,27 @@ public static class ChemicalReactionService
         return command switch
         {
             ChemicalReactionCommand.Initiate initiate =>
-            {
-                if(state is not ChemicalReaction.NotInitiated)
-                    throw new InvalidOperationException();
-
-                return new ChemicalReaction.Initiated(command...);
-            },
+                state is ChemicalReaction.NotInitiated
+                    ? ChemicalReaction.NotInitiated.Initiate(initiate.Id, initiate.Participants)
+                    : throw new InvalidOperationException(),
             ChemicalReactionCommand.Start start =>
-            {
-                if(state is not ChemicalReaction.Initiated initiated)
-                    throw new InvalidOperationException();
-
-                return initiated.Start(command...);
-            }
+                state is ChemicalReaction.NotStarted notStarted
+                    ? notStarted.Start(start.Now)
+                    : throw new InvalidOperationException(),
             ChemicalReactionCommand.Finish finish =>
-            {
-                if(state is not ChemicalReaction.Started started)
-                    throw new InvalidOperationException();
-
-                return started.StopReaction(command...);
-            }
+                state is ChemicalReaction.InProgress started
+                    ? started.Stop(finish.Now)
+                    : throw new InvalidOperationException(),
             _ => throw new ArgumentOutOfRangeException(nameof(command))
-        }
+        };
     }
 }
 
 public abstract record ChemicalReaction
 {
-    public record NotInitiated;
-    public record Initiated: ChemicalReaction
+    public record NotInitiated: ChemicalReaction
     {
-        public static ChemicalReactionEvent.Initiated Initiate(Guid id, List<ReactionParticipant> participants)
+        public static ChemicalReactionEvent.Initiated Initiate(string id, List<ReactionParticipant> participants)
         {
             if (participants.Count < 2)
                 throw new ArgumentException("A chemical reaction must have at least two participants.");
@@ -136,20 +143,23 @@ public abstract record ChemicalReaction
             return new ChemicalReactionEvent.Initiated(id, participants, initialMoles, finalMoles);
         }
 
-        public ChemicalReactionEvent.Started Start(DateTimeOffset now) =>
-            new ChemicalReactionEvent.Started(now);
-
         private static bool IsMoleConservationSatisfied(double initialMoles, double finalMoles) =>
             Math.Abs(initialMoles - finalMoles) < 1e-6;
     }
 
-    public record Started: ChemicalReaction
+    public record NotStarted: ChemicalReaction
     {
-        public ChemicalReactionEvent.Finished StopReaction(DateTimeOffset now) =>
-            new ChemicalReactionEvent.Finished(now);
+        public ChemicalReactionEvent.Started Start(DateTimeOffset now) =>
+            new ChemicalReactionEvent.Started(now);
     }
 
-    public record Finished: ChemicalReaction;
+    public record InProgress: ChemicalReaction
+    {
+        public ChemicalReactionEvent.Completed Stop(DateTimeOffset now) =>
+            new ChemicalReactionEvent.Completed(now);
+    }
+
+    public record Completed: ChemicalReaction;
 }
 
 public class ReactionParticipant

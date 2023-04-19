@@ -5,54 +5,25 @@ using SlimDownYourAggregate.Slimmed;
 
 namespace SlimDownYourAggregate.Core.EF;
 
-public class Dummy
-{
-    [BsonId] public string Id { get; private init; }
-
-    public string Name { get; private set; }
-
-    public static Dummy Create(string name) =>
-        new Dummy(ObjectId.GenerateNewId().ToString(), name);
-
-    [BsonConstructor]
-    private Dummy(string id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
-
-    public void SetName(string name)
-    {
-        Name = name;
-    }
-}
-
-public record AddDummy(string Name);
-
-public record UpdateDummyName(string Id, string Name);
-
-public class DummyDbContext: DbContext
+public class ChemicalReactionDbContext: DbContext
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Dummy>();
+        modelBuilder.Entity<ChemicalReactionModel>();
     }
 }
 
-public class DummyCommandHandler
+public class ChemicalReactionCommandHandler
 {
-    private readonly EFRepository<DummyDbContext, ChemicalReactionModel> repository;
+    private readonly EFRepository<ChemicalReactionDbContext, ChemicalReactionModel> repository;
 
-    public DummyCommandHandler(EFRepository<DummyDbContext, ChemicalReactionModel> repository) =>
+    public ChemicalReactionCommandHandler(EFRepository<ChemicalReactionDbContext, ChemicalReactionModel> repository) =>
         this.repository = repository;
 
-    public Task Handle(AddDummy command, CancellationToken ct) =>
-        repository.AddAsync(new Slimmed.ChemicalReaction( /**We'd put data from command*/), ct);
-
-    public Task Handle(StartReaction command, CancellationToken ct) =>
+    public Task Handle(ChemicalReactionCommand command, CancellationToken ct) =>
         repository.GetAndUpdateAsync(
             command.Id,
-            state => ChemicalReactionService.Decide(state.ToChemicalReaction(), command),
+            state => ChemicalReactionService.Decide(command, state.ToChemicalReaction()),
             ct
         );
 }
