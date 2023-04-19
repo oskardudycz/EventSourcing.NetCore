@@ -1,4 +1,4 @@
-namespace SlimDownYourAggregate;
+namespace SlimDownYourAggregate.Initial;
 
 using System;
 using System.Collections.Generic;
