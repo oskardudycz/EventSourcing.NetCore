@@ -84,30 +84,28 @@ public class TenancyPerSchema
 
         AddMarten(services);
 
-        using (var sp = services.BuildServiceProvider())
+        using var sp = services.BuildServiceProvider();
+        // simulate scope per HTTP request with different tenant
+        using (var firstScope = sp.CreateScope())
         {
-            // simulate scope per HTTP request with different tenant
-            using (var firstScope = sp.CreateScope())
-            {
-                firstScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = FirstTenant;
+            firstScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = FirstTenant;
 
-                using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
-                {
-                    session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), FirstTenant));
-                    session.SaveChanges();
-                }
+            using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
+            {
+                session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), FirstTenant));
+                session.SaveChanges();
             }
+        }
 
-            // simulate scope per HTTP request with different tenant
-            using (var secondScope = sp.CreateScope())
+        // simulate scope per HTTP request with different tenant
+        using (var secondScope = sp.CreateScope())
+        {
+            secondScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = SecondTenant;
+
+            using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
             {
-                secondScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = SecondTenant;
-
-                using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
-                {
-                    session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), SecondTenant));
-                    session.SaveChanges();
-                }
+                session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), SecondTenant));
+                session.SaveChanges();
             }
         }
     }
