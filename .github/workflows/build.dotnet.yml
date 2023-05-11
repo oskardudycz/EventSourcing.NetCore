@@ -17,7 +17,7 @@ jobs:
             - name: Start containers
               run: docker-compose -f "docker-compose.ci.yml" up -d
 
-            - name: Setup .NET Core
+            - name: Setup .NET
               uses: actions/setup-dotnet@v3
               with:
                   dotnet-version: "7.0.x"

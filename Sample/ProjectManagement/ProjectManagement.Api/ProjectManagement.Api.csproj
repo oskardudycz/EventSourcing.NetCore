@@ -9,7 +9,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Marten.AspNetCore" Version="6.0.0-rc.1" />
+        <PackageReference Include="Marten.AspNetCore" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
