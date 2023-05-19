@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
 namespace Helpdesk.Api.Core.Http;
@@ -16,5 +17,14 @@ public static class ETagExtensions
             throw new ArgumentNullException(nameof(eTag));
 
         return int.Parse(value.Substring(1, value.Length - 2));
+    }
+}
+
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public class FromIfMatchHeaderAttribute: FromHeaderAttribute
+{
+    public FromIfMatchHeaderAttribute()
+    {
+        Name = "If-Match";
     }
 }

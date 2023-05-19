@@ -80,13 +80,6 @@ public class IncidentHistoryTransformation: EventProjection
         );
     }
 
-    public record IncidentResolved(
-        Guid IncidentId,
-        ResolutionType Resolution,
-        Guid ResolvedBy,
-        DateTimeOffset ResolvedAt
-    );
-
     public IncidentHistory Transform(IEvent<IncidentResolved> input)
     {
         var (incidentId, resolution, resolvedBy, resolvedAt) = input.Data;

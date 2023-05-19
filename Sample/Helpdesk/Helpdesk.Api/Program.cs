@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
+using Helpdesk.Api.Core.Http;
 using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.Marten;
+using Helpdesk.Api.Core.SignalR;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.GetCustomerIncidentsSummary;
 using Helpdesk.Api.Incidents.GetIncidentDetails;
@@ -12,11 +14,14 @@ using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Pagination;
 using Marten.Schema.Identity;
+using Marten.Services.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Weasel.Core;
-using static Microsoft.AspNetCore.Http.Results;
+using static Microsoft.AspNetCore.Http.TypedResults;
 using static Helpdesk.Api.Incidents.IncidentService;
 using static Helpdesk.Api.Core.Http.ETagExtensions;
+using static System.DateTimeOffset;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,29 +29,55 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
-    .AddMarten(options =>
+    .AddMarten(sp =>
     {
+        var options = new StoreOptions();
         var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Helpdesk";
         options.Events.DatabaseSchemaName = schemaName;
         options.DatabaseSchemaName = schemaName;
-        options.Connection(builder.Configuration.GetConnectionString("Incidents") ?? throw new InvalidOperationException());
-        options.UseDefaultSerialization(EnumStorage.AsString, nonPublicMembersStorage: NonPublicMembersStorage.All);
+        options.Connection(builder.Configuration.GetConnectionString("Incidents") ??
+                           throw new InvalidOperationException());
+        options.UseDefaultSerialization(
+            EnumStorage.AsString,
+            nonPublicMembersStorage: NonPublicMembersStorage.All,
+            serializerType: SerializerType.SystemTextJson
+        );
 
         options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
         options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
         options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
+        options.Projections.Add(
+            new SignalRProducer((IHubContext)sp.GetRequiredService<IHubContext<IncidentsHub>>()),
+            ProjectionLifecycle.Async
+        );
+        return options;
     })
     .UseLightweightSessions()
     .AddAsyncDaemon(DaemonMode.Solo);
 
-builder.Services.Configure<JsonOptions>(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services
+    .AddCors(options =>
+        options.AddPolicy("ClientPermission", policy =>
+            policy.WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+        )
+    )
+    .Configure<JsonOptions>(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+    .Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o =>
+        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+    .AddSignalR();
 
 var app = builder.Build();
 
-app.MapPost("api/customers/{customerId:guid}/incidents/",
+var customersIncidents = app.MapGroup("api/customers/{customerId:guid}/incidents/").WithTags("Customer", "Incident");
+var agentIncidents = app.MapGroup("api/agents/{agentId:guid}/incidents/").WithTags("Agent", "Incident");
+var incidents = app.MapGroup("api/incidents").WithTags("Incident");
+
+customersIncidents.MapPost("",
     async (
         IDocumentSession documentSession,
         Guid customerId,
@@ -57,69 +88,69 @@ app.MapPost("api/customers/{customerId:guid}/incidents/",
         var incidentId = CombGuidIdGeneration.NewGuid();
 
         await documentSession.Add<Incident>(incidentId,
-            Handle(new LogIncident(incidentId, customerId, contact, description, customerId)), ct);
+            Handle(new LogIncident(incidentId, customerId, contact, description, customerId, Now)), ct);
 
         return Created($"/api/incidents/{incidentId}", incidentId);
     }
-).WithTags("Customer");
+);
 
-app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/category",
+agentIncidents.MapPost("{incidentId:guid}/category",
     (
-        IDocumentSession documentSession,
-        Guid incidentId,
-        Guid agentId,
-        [FromHeader(Name = "If-Match")] string eTag,
-        CategoriseIncidentRequest body,
-        CancellationToken ct
-    ) =>
+            IDocumentSession documentSession,
+            Guid incidentId,
+            Guid agentId,
+            [FromIfMatchHeader] string eTag,
+            CategoriseIncidentRequest body,
+            CancellationToken ct
+        ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            current => Handle(current, new CategoriseIncident(incidentId, body.Category, agentId)), ct)
-).WithTags("Agent");
+            state => Handle(state, new CategoriseIncident(incidentId, body.Category, agentId, Now)), ct)
+);
 
-app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/priority",
+agentIncidents.MapPost("{incidentId:guid}/priority",
     (
-        IDocumentSession documentSession,
-        Guid incidentId,
-        Guid agentId,
-        [FromHeader(Name = "If-Match")] string eTag,
-        PrioritiseIncidentRequest body,
-        CancellationToken ct
-    ) =>
+            IDocumentSession documentSession,
+            Guid incidentId,
+            Guid agentId,
+            [FromIfMatchHeader] string eTag,
+            PrioritiseIncidentRequest body,
+            CancellationToken ct
+        ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            current => Handle(current, new PrioritiseIncident(incidentId, body.Priority, agentId)), ct)
-).WithTags("Agent");
+            state => Handle(state, new PrioritiseIncident(incidentId, body.Priority, agentId, Now)), ct)
+);
 
-app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/assign",
+agentIncidents.MapPost("{incidentId:guid}/assign",
     (
-        IDocumentSession documentSession,
-        Guid incidentId,
-        Guid agentId,
-        [FromHeader(Name = "If-Match")] string eTag,
-        CancellationToken ct
-    ) =>
+            IDocumentSession documentSession,
+            Guid incidentId,
+            Guid agentId,
+            [FromIfMatchHeader] string eTag,
+            CancellationToken ct
+        ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            current => Handle(current, new AssignAgentToIncident(incidentId, agentId)), ct)
-).WithTags("Agent");
+            state => Handle(state, new AssignAgentToIncident(incidentId, agentId, Now)), ct)
+);
 
-app.MapPost("api/customers/{customerId:guid}/incidents/{incidentId:guid}/responses/",
+customersIncidents.MapPost("{incidentId:guid}/responses/",
     (
-        IDocumentSession documentSession,
-        Guid incidentId,
-        Guid customerId,
-        [FromHeader(Name = "If-Match")] string eTag,
-        RecordCustomerResponseToIncidentRequest body,
-        CancellationToken ct
-    ) =>
+            IDocumentSession documentSession,
+            Guid incidentId,
+            Guid customerId,
+            [FromIfMatchHeader] string eTag,
+            RecordCustomerResponseToIncidentRequest body,
+            CancellationToken ct
+        ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            current => Handle(current,
+            state => Handle(state,
                 new RecordCustomerResponseToIncident(incidentId,
-                    new IncidentResponse.FromCustomer(customerId, body.Content))), ct)
-).WithTags("Customer");
+                    new IncidentResponse.FromCustomer(customerId, body.Content), Now)), ct)
+);
 
-app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/responses/",
+agentIncidents.MapPost("{incidentId:guid}/responses/",
     (
         IDocumentSession documentSession,
-        [FromHeader(Name = "If-Match")] string eTag,
+        [FromIfMatchHeader] string eTag,
         Guid incidentId,
         Guid agentId,
         RecordAgentResponseToIncidentRequest body,
@@ -129,73 +160,73 @@ app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/responses/",
         var (content, visibleToCustomer) = body;
 
         return documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            current => Handle(current,
+            state => Handle(state,
                 new RecordAgentResponseToIncident(incidentId,
-                    new IncidentResponse.FromAgent(agentId, content, visibleToCustomer))), ct);
+                    new IncidentResponse.FromAgent(agentId, content, visibleToCustomer), Now)), ct);
     }
-).WithTags("Agent");
+);
 
-app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/resolve",
+agentIncidents.MapPost("{incidentId:guid}/resolve",
     (
-        IDocumentSession documentSession,
-        Guid incidentId,
-        Guid agentId,
-        [FromHeader(Name = "If-Match")] string eTag,
-        ResolveIncidentRequest body,
-        CancellationToken ct
-    ) =>
+            IDocumentSession documentSession,
+            Guid incidentId,
+            Guid agentId,
+            [FromIfMatchHeader] string eTag,
+            ResolveIncidentRequest body,
+            CancellationToken ct
+        ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            current => Handle(current, new ResolveIncident(incidentId, body.Resolution, agentId)), ct)
-).WithTags("Agent");
+            state => Handle(state, new ResolveIncident(incidentId, body.Resolution, agentId, Now)), ct)
+);
 
-app.MapPost("api/customers/{customerId:guid}/incidents/{incidentId:guid}/acknowledge",
+customersIncidents.MapPost("{incidentId:guid}/acknowledge",
     (
-        IDocumentSession documentSession,
-        Guid incidentId,
-        Guid customerId,
-        [FromHeader(Name = "If-Match")] string eTag,
-        CancellationToken ct
-    ) =>
+            IDocumentSession documentSession,
+            Guid incidentId,
+            Guid customerId,
+            [FromIfMatchHeader] string eTag,
+            CancellationToken ct
+        ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            current => Handle(current, new AcknowledgeResolution(incidentId, customerId)), ct)
-).WithTags("Customer");
+            state => Handle(state, new AcknowledgeResolution(incidentId, customerId, Now)), ct)
+);
 
-app.MapPost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/close",
+agentIncidents.MapPost("{incidentId:guid}/close",
     async (
         IDocumentSession documentSession,
         Guid incidentId,
         Guid agentId,
-        [FromHeader(Name = "If-Match")] string eTag,
+        [FromIfMatchHeader] string eTag,
         CancellationToken ct) =>
     {
         await documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            current => Handle(current, new CloseIncident(incidentId, agentId)), ct);
+            state => Handle(state, new CloseIncident(incidentId, agentId, Now)), ct);
 
         return Ok();
     }
-).WithTags("Agent");
+);
 
-app.MapGet("api/customers/{customerId:guid}/incidents/",
+customersIncidents.MapGet("",
     (IQuerySession querySession, Guid customerId, [FromQuery] int? pageNumber, [FromQuery] int? pageSize,
             CancellationToken ct) =>
         querySession.Query<IncidentShortInfo>().Where(i => i.CustomerId == customerId)
             .ToPagedListAsync(pageNumber ?? 1, pageSize ?? 10, ct)
-).WithTags("Customer");
+);
 
-app.MapGet("api/incidents/{incidentId:guid}",
+incidents.MapGet("{incidentId:guid}",
     (HttpContext context, IQuerySession querySession, Guid incidentId) =>
         querySession.Json.WriteById<IncidentDetails>(incidentId, context)
-).WithTags("Incident");
+);
 
-app.MapGet("api/incidents/{incidentId:guid}/history",
+incidents.MapGet("{incidentId:guid}/history",
     (HttpContext context, IQuerySession querySession, Guid incidentId) =>
         querySession.Query<IncidentHistory>().Where(i => i.IncidentId == incidentId).WriteArray(context)
-).WithTags("Incident");
+);
 
-app.MapGet("api/customers/{customerId:guid}/incidents-summary",
+customersIncidents.MapGet("incidents-summary",
     (HttpContext context, IQuerySession querySession, Guid customerId) =>
         querySession.Json.WriteById<CustomerIncidentsSummary>(customerId, context)
-).WithTags("Customer");
+);
 
 if (app.Environment.IsDevelopment())
 {
@@ -203,7 +234,15 @@ if (app.Environment.IsDevelopment())
         .UseSwaggerUI();
 }
 
+
+app.UseCors("ClientPermission");
+app.MapHub<IncidentsHub>("/hubs/incidents");
+
 app.Run();
+
+public class IncidentsHub: Hub
+{
+}
 
 public record LogIncidentRequest(
     Contact Contact,
