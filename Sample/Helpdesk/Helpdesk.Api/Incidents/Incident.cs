@@ -70,22 +70,12 @@ public enum IncidentStatus
 
 public record Incident(
     Guid Id,
-    IncidentStatus Status = IncidentStatus.Pending,
-    bool HasOutstandingResponseToCustomer = false,
-    IncidentCategory? Category = null,
-    IncidentPriority? Priority = null,
-    Guid? AgentId = null,
-    int Version = 1
+    IncidentStatus Status,
+    bool HasOutstandingResponseToCustomer = false
 )
 {
     public static Incident Create(IncidentLogged logged) =>
-        new(logged.IncidentId);
-
-    public Incident Apply(IncidentCategorised categorised) =>
-        this with { Category = categorised.Category };
-
-    public Incident Apply(IncidentPrioritised prioritised) =>
-        this with { Priority = prioritised.Priority };
+        new(logged.IncidentId, IncidentStatus.Pending);
 
     public Incident Apply(AgentRespondedToIncident agentResponded) =>
         this with { HasOutstandingResponseToCustomer = false };
