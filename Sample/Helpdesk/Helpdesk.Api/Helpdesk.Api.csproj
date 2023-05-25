@@ -15,4 +15,10 @@
         <PackageReference Include="Confluent.Kafka" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Core\Marten\" />
+      <Folder Include="Core\SignalR\" />
+      <Folder Include="Incidents\" />
+    </ItemGroup>
 </Project>
