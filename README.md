@@ -65,8 +65,8 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
     - [12.16 Distributed processes](#1216-distributed-processes)
     - [12.17 Domain Driven Design](#1217-domain-driven-design)
     - [12.18 Whitepapers](#1218-whitepapers)
-    - [12.19 This is NOT Event Sourcing (but Event Streaming)](#1219-this-is-not-event-sourcing-but-event-streaming)
-    - [12.20 Event Sourcing Concerns](#1220-event-sourcing-concerns)
+    - [12.19 Event Sourcing Concerns](#1219-event-sourcing-concerns)
+    - [12.20 This is NOT Event Sourcing (but Event Streaming)](#1220-this-is-not-event-sourcing-but-event-streaming)
     - [12.21 Architecture Weekly](#1221-architecture-weekly)
 
 ## 1. Event Sourcing
@@ -1105,13 +1105,27 @@ See more in:
 
 ### 12.18 Whitepapers
 -   📖 [Pat Helland - Immutability Changes Everything](http://cidrdb.org/cidr2015/Papers/CIDR15_Paper16.pdf)
+-   📖 [S. Copei, A. Zündorf - Commutative Event Sourcing vs. Triple Graph Grammars](https://arxiv.org/abs/2101.08626)
 -   📖 [C. Mohan, D. Haderle, B. Lindsay, H. Pirahesh and P. Schwarz - ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging](http://db.csail.mit.edu/madden/html/aries.pdf)
 -   📖 [P. O'Neil, E. Cheng, D. Gawlick, E. O'Neil - The Log-Structured Merge-Tree (LSM-Tree)](https://www.cs.umb.edu/~poneil/lsmtree.pdf)
--   📖 [S. Copei, A. Zündorf - Commutative Event Sourcing vs. Triple Graph Grammars](https://arxiv.org/abs/2101.08626)
+
+### 12.19 Event Sourcing Concerns
+-   📝 [Kacper Gunia - EventStoreDB vs Kafka](https://domaincentric.net/blog/eventstoredb-vs-kafka)
+-   📝 [Anton Stöckl - Event Sourcing: Why Kafka is not suitable as an Event Store](https://medium.com/@TonyBologni/event-sourcing-why-kafka-is-not-suitable-as-an-event-store-796e5d9ab63c)
+-   📝 [Domenic Cassini - Why is Kafka not Ideal for Event Sourcing?](https://dcassisi.com/2023/05/06/why-is-kafka-not-ideal-for-event-sourcing/)
+-   📝 [Vijay Nair - Axon and Kafka - How does Axon compare to Apache Kafka?](https://axoniq.io/blog-overview/axon-and-kafka-how-does-axon-compare-to-apache-kafka)
+-   📝 [Jesper Hammarbäck - Apache Kafka is not for Event Sourcing](https://serialized.io/blog/apache-kafka-is-not-for-event-sourcing/)
+-   🎞 [Udi Dahan - Event Sourcing @ DDDEU 2020 Keynote](https://channel9.msdn.com/Events/Azure-Cosmos-DB/Azure-Cosmos-DB-Conf/Implementing-an-Event-Sourcing-strategy-on-Azure)
+-   🎞 [Andrzej Ludwikowski - Event Sourcing - what could possibly go wrong?](https://www.youtube.com/watch?v=_V3C-e0gKoI)
+-   📝 [Vikas Hazrati - Event Sourcing – Does it make sense for your business?](https://blog.knoldus.com/event-sourcing-does-it-make-sense-for-your-business/)
+-   📝 [Mikhail Shilkov - Event Sourcing and IO Complexity](https://mikhail.io/2016/11/event-sourcing-and-io-complexity/)
+-   📝 [Dennis Doomen - The Ugly of Event Sourcing - Real-world Production Issues](https://www.linkedin.com/pulse/ugly-event-sourcing-real-world-production-issues-dennis-doomen/)
+-   📝 [Hugo Rocha - What they don’t tell you about event sourcing](https://medium.com/@hugo.oliveira.rocha/what-they-dont-tell-you-about-event-sourcing-6afc23c69e9a)
+-   📝 [Oskar uit de Bos - Stop overselling Event Sourcing as the silver bullet to microservice architectures](https://medium.com/swlh/stop-overselling-event-sourcing-as-the-silver-bullet-to-microservice-architectures-f43ca25ff9e7)
 
 <a href='#this-is-not-event-sourcing' id='this-is-not-event-sourcing' class='anchor' aria-hidden='true'></a>
 
-### 12.19 This is NOT Event Sourcing (but Event Streaming)
+### 12.20 This is NOT Event Sourcing (but Event Streaming)
 -   📝 [Confluent - Event sourcing, CQRS, stream processing and Apache Kafka: What's the connection?](https://www.confluent.io/blog/event-sourcing-cqrs-stream-processing-apache-kafka-whats-connection/)
 -   🎞 [InfoQ - Building Microservices with Event Sourcing and CQRS](https://www.infoq.com/presentations/microservices-event-sourcing-cqrs/)
 -   📝 [Chris Kiehl - Don't Let the Internet Dupe You, Event Sourcing is Hard](https://chriskiehl.com/article/event-sourcing-is-hard)
@@ -1149,19 +1163,6 @@ See more in:
 -   📝 [Why Microservices Should use Event Sourcing](https://blog.bitsrc.io/why-microservices-should-use-event-sourcing-9755a54ebfb4)
 -   📝 [Event-driven architecture with microservices using event sourcing and CQRS](https://medium.com/@tprkvolkan/event-driven-architecture-with-microservices-using-event-sourcing-and-cqrs-1cc516c20143)
 -   📝 [Datomic: Event Sourcing without the hassle](https://vvvvalvalval.github.io/posts/2018-11-12-datomic-event-sourcing-without-the-hassle.html)
-
-### 12.20 Event Sourcing Concerns
--   📝 [Kacper Gunia - EventStoreDB vs Kafka](https://domaincentric.net/blog/eventstoredb-vs-kafka)
--   📝 [Anton Stöckl - Event Sourcing: Why Kafka is not suitable as an Event Store](https://medium.com/@TonyBologni/event-sourcing-why-kafka-is-not-suitable-as-an-event-store-796e5d9ab63c)
--   📝 [Vijay Nair - Axon and Kafka - How does Axon compare to Apache Kafka?](https://axoniq.io/blog-overview/axon-and-kafka-how-does-axon-compare-to-apache-kafka)
--   📝 [Jesper Hammarbäck - Apache Kafka is not for Event Sourcing](https://serialized.io/blog/apache-kafka-is-not-for-event-sourcing/)
--   🎞 [Udi Dahan - Event Sourcing @ DDDEU 2020 Keynote](https://channel9.msdn.com/Events/Azure-Cosmos-DB/Azure-Cosmos-DB-Conf/Implementing-an-Event-Sourcing-strategy-on-Azure)
--   🎞 [Andrzej Ludwikowski - Event Sourcing - what could possibly go wrong?](https://www.youtube.com/watch?v=_V3C-e0gKoI)
--   📝 [Vikas Hazrati - Event Sourcing – Does it make sense for your business?](https://blog.knoldus.com/event-sourcing-does-it-make-sense-for-your-business/)
--   📝 [Mikhail Shilkov - Event Sourcing and IO Complexity](https://mikhail.io/2016/11/event-sourcing-and-io-complexity/)
--   📝 [Dennis Doomen - The Ugly of Event Sourcing - Real-world Production Issues](https://www.linkedin.com/pulse/ugly-event-sourcing-real-world-production-issues-dennis-doomen/)
--   📝 [Hugo Rocha - What they don’t tell you about event sourcing](https://medium.com/@hugo.oliveira.rocha/what-they-dont-tell-you-about-event-sourcing-6afc23c69e9a)
--   📝 [Oskar uit de Bos - Stop overselling Event Sourcing as the silver bullet to microservice architectures](https://medium.com/swlh/stop-overselling-event-sourcing-as-the-silver-bullet-to-microservice-architectures-f43ca25ff9e7)
 
 ### 12.21 Architecture Weekly
 If you're interested in Architecture resources, check my other repository: https://github.com/oskardudycz/ArchitectureWeekly/.
