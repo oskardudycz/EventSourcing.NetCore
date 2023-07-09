@@ -23,12 +23,10 @@ public record GetCarts(
 internal class HandleGetCarts:
     IQueryHandler<GetCarts, IPagedList<ShoppingCartShortInfo>>
 {
-    private readonly IDocumentSession querySession;
+    private readonly IQuerySession querySession;
 
-    public HandleGetCarts(IDocumentSession querySession)
-    {
+    public HandleGetCarts(IQuerySession querySession) =>
         this.querySession = querySession;
-    }
 
     public Task<IPagedList<ShoppingCartShortInfo>> Handle(GetCarts request, CancellationToken cancellationToken)
     {

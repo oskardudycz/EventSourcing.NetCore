@@ -21,6 +21,6 @@ public static class EventEnvelopeExtensions
             eventMetadata
         );
 
-        return EventEnvelopeFactory.From(eventData, metaData);
+        return EventEnvelope.From(eventData, metaData);
     }
 }

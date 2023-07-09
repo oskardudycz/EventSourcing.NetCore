@@ -26,12 +26,10 @@ public record GetCartHistory(
 internal class HandleGetCartHistory:
     IQueryHandler<GetCartHistory, IPagedList<CartHistory>>
 {
-    private readonly IDocumentSession querySession;
+    private readonly IQuerySession querySession;
 
-    public HandleGetCartHistory(IDocumentSession querySession)
-    {
+    public HandleGetCartHistory(IQuerySession querySession) =>
         this.querySession = querySession;
-    }
 
     public Task<IPagedList<CartHistory>> Handle(GetCartHistory query, CancellationToken cancellationToken)
     {
