@@ -21,13 +21,9 @@ internal class HandleGetCartById:
 {
     private readonly IQuerySession querySession;
 
-    public HandleGetCartById(IQuerySession querySession)
-    {
+    public HandleGetCartById(IQuerySession querySession) =>
         this.querySession = querySession;
-    }
 
-    public Task<ShoppingCartDetails?> Handle(GetCartById query, CancellationToken cancellationToken)
-    {
-        return querySession.LoadAsync<ShoppingCartDetails>(query.CartId, cancellationToken);
-    }
+    public Task<ShoppingCartDetails?> Handle(GetCartById query, CancellationToken cancellationToken) =>
+        querySession.LoadAsync<ShoppingCartDetails>(query.CartId, cancellationToken);
 }

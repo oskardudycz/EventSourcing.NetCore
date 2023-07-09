@@ -48,7 +48,7 @@ public class MartenEventPublisher: IMartenEventsConsumer
                         parentContext
                     );
 
-                    await eventBus.Publish(EventEnvelopeFactory.From(@event.Data, eventMetadata), ct)
+                    await eventBus.Publish(EventEnvelope.From(@event.Data, eventMetadata), ct)
                         .ConfigureAwait(false);
                 },
                 new StartActivityOptions
