@@ -2,10 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Oakton" Version="6.0.2" />
+        <PackageReference Include="Marten.CommandLine" Version="6.0.4" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Marten.AspNetCore" Version="6.0.4" />
         <PackageReference Include="Marten" Version="6.0.4" />
