@@ -1,6 +1,15 @@
-name: Publish Docker
+name: Bulild Helpdesk Docker
 
-on: [push]
+on:
+  # run it on push to the default repository branch
+  push:
+    branches: [main]
+    paths:
+      - "Sample/Helpdesk/**"
+  # run it during pull request
+  pull_request:
+    paths:
+      - "Sample/Helpdesk/**"
 
 jobs:
     build:
@@ -24,8 +33,11 @@ jobs:
               id: docker_build
               uses: docker/build-push-action@v4
               with:
-                  push: ${{ github.ref == 'refs/heads/main'}}
-                  tags: oskardudycz/eventsourcing.netcore:latest
+                  context: "./Sample/Helpdesk/Helpdesk.Api"
+                  push: false
+                  tags: oskardudycz/eventsourcing.netcore.helpdesk:latest
+                  build-args: |
+                    "project_name=Helpdesk.Api"
 
             - name: Image digest
               run: echo ${{ steps.docker_build.outputs.digest }}

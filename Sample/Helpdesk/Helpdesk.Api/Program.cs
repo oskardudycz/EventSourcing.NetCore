@@ -8,6 +8,7 @@ using Helpdesk.Api.Incidents.GetCustomerIncidentsSummary;
 using Helpdesk.Api.Incidents.GetIncidentDetails;
 using Helpdesk.Api.Incidents.GetIncidentHistory;
 using Helpdesk.Api.Incidents.GetIncidentShortInfo;
+using JasperFx.CodeGeneration;
 using Marten;
 using Marten.AspNetCore;
 using Marten.Events.Daemon.Resiliency;
@@ -17,6 +18,7 @@ using Marten.Schema.Identity;
 using Marten.Services.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Oakton;
 using Weasel.Core;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static Helpdesk.Api.Incidents.IncidentService;
@@ -26,23 +28,27 @@ using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddMarten(sp =>
     {
         var options = new StoreOptions();
+
         var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Helpdesk";
         options.Events.DatabaseSchemaName = schemaName;
         options.DatabaseSchemaName = schemaName;
         options.Connection(builder.Configuration.GetConnectionString("Incidents") ??
                            throw new InvalidOperationException());
+
         options.UseDefaultSerialization(
             EnumStorage.AsString,
             nonPublicMembersStorage: NonPublicMembersStorage.All,
             serializerType: SerializerType.SystemTextJson
         );
 
+        options.Projections.LiveStreamAggregation<Incident>();
         options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
         options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
@@ -52,8 +58,10 @@ builder.Services
             new SignalRProducer((IHubContext)sp.GetRequiredService<IHubContext<IncidentsHub>>()),
             ProjectionLifecycle.Async
         );
+
         return options;
     })
+    .OptimizeArtifactWorkflow(TypeLoadMode.Static)
     .UseLightweightSessions()
     .AddAsyncDaemon(DaemonMode.Solo);
 
@@ -70,6 +78,8 @@ builder.Services
     .Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o =>
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
     .AddSignalR();
+
+builder.Host.ApplyOaktonExtensions();
 
 var app = builder.Build();
 
@@ -238,7 +248,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("ClientPermission");
 app.MapHub<IncidentsHub>("/hubs/incidents");
 
-app.Run();
+return await app.RunOaktonCommands(args);
 
 public class IncidentsHub: Hub
 {
