@@ -1,5 +1,3 @@
-using Core.Validation;
-
 namespace Reservations.Guests.GettingGuestByExternalId;
 
 public record GetGuestIdByExternalId

@@ -15,13 +15,13 @@ public record RoomReserved
 
 public record RoomReservationConfirmed
 (
-    string Id,
+    string ReservationId,
     DateTimeOffset ConfirmedAt
 );
 
 public record RoomReservationCancelled
 (
-    string Id,
+    string ReservationId,
     DateTimeOffset CancelledAt
 );
 

@@ -1,6 +1,7 @@
 using Core.Events;
 using JasperFx.Core;
 using Marten;
+using Reservations.Guests;
 using Reservations.Guests.GettingGuestByExternalId;
 using static Reservations.Guests.GuestExternalId;
 using static Reservations.Guests.GettingGuestByExternalId.GetGuestIdByExternalId;
@@ -18,19 +19,28 @@ public record BookingComRoomReservationMade
     DateTimeOffset MadeAt
 );
 
+
+public delegate ValueTask<GuestId> GetGuestId(GetGuestIdByExternalId query, CancellationToken ct);
+
 public class BookingComRoomReservationMadeHandler: IEventHandler<BookingComRoomReservationMade>
 {
     private readonly IDocumentSession session;
+    private readonly GetGuestId getGuestId;
 
-    public BookingComRoomReservationMadeHandler(IDocumentSession session) =>
+    public BookingComRoomReservationMadeHandler(
+        IDocumentSession session,
+        GetGuestId getGuestId)
+    {
         this.session = session;
+        this.getGuestId = getGuestId;
+    }
 
     public async Task Handle(BookingComRoomReservationMade @event, CancellationToken ct)
     {
         var (bookingComReservationId, roomTypeText, from, to, bookingComGuestId, numberOfPeople, madeAt) = @event;
         var reservationId = CombGuidIdGeneration.NewGuid().ToString();
 
-        var guestId = await Query(new GetGuestIdByExternalId(FromPrefix("BCOM", bookingComGuestId)), ct);
+        var guestId = await getGuestId(new GetGuestIdByExternalId(FromPrefix("BCOM", bookingComGuestId)), ct);
         var roomType = Enum.Parse<RoomType>(roomTypeText);
 
         var command = ReserveRoom.FromExternal(
