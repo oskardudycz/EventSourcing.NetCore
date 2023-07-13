@@ -5,7 +5,7 @@ namespace Reservations.RoomReservations.ReservingRoom;
 
 public record ReserveRoom
 (
-    string Id,
+    string ReservationId,
     RoomType RoomType,
     DateOnly From,
     DateOnly To,
@@ -27,7 +27,7 @@ public record ReserveRoom
             throw new InvalidOperationException("Not enough available rooms!");
 
         return new RoomReserved(
-            command.Id,
+            command.ReservationId,
             command.ExternalId,
             command.RoomType,
             command.From,
