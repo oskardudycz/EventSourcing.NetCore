@@ -9,16 +9,11 @@ using Xunit.Sdk;
 
 namespace Helpdesk.Api.Tests;
 
-public sealed class AssemblyFixture : XunitTestFramework, IDisposable
+public sealed class AssemblyFixture : XunitTestFramework
 {
     public AssemblyFixture(IMessageSink messageSink)
         :base(messageSink)
     {
         OaktonEnvironment.AutoStartHost = true;
-    }
-
-    public new void Dispose()
-    {
-        base.Dispose();
     }
 }
