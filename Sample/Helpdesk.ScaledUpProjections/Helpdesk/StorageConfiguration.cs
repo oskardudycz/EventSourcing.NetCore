@@ -1,5 +1,4 @@
-﻿using Helpdesk.Core;
-using Helpdesk.Core.Marten;
+﻿using Helpdesk.Core.Marten;
 using Helpdesk.Incidents;
 using Helpdesk.Incidents.GetIncidentDetails;
 using Helpdesk.Incidents.GetIncidentHistory;

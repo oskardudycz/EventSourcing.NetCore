@@ -9,9 +9,8 @@
 
     <ItemGroup>
         <PackageReference Include="Marten.CommandLine" Version="6.0.5" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Marten.AspNetCore" Version="6.0.5" />
         <PackageReference Include="Marten" Version="6.0.5" />
+        <PackageReference Include="Confluent.Kafka" Version="2.2.0" />
     </ItemGroup>
 
     <ItemGroup>

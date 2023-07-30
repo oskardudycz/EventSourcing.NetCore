@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk", "Helpdesk\Helpde
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.SignalR", "Helpdesk.SignalR\Helpdesk.SignalR.csproj", "{FA50346F-88F5-47B9-8047-3A668C4826CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Projections", "Helpdesk.Projections\Helpdesk.Projections.csproj", "{52267B33-6A66-402A-BDBB-8F7ED4DF6FA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Kafka", "Helpdesk.Kafka\Helpdesk.Kafka.csproj", "{6084EFF8-7E51-4F44-B1ED-AA5FEA000CAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +45,14 @@ Global
 		{FA50346F-88F5-47B9-8047-3A668C4826CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA50346F-88F5-47B9-8047-3A668C4826CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA50346F-88F5-47B9-8047-3A668C4826CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52267B33-6A66-402A-BDBB-8F7ED4DF6FA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52267B33-6A66-402A-BDBB-8F7ED4DF6FA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52267B33-6A66-402A-BDBB-8F7ED4DF6FA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52267B33-6A66-402A-BDBB-8F7ED4DF6FA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6084EFF8-7E51-4F44-B1ED-AA5FEA000CAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6084EFF8-7E51-4F44-B1ED-AA5FEA000CAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6084EFF8-7E51-4F44-B1ED-AA5FEA000CAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6084EFF8-7E51-4F44-B1ED-AA5FEA000CAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
