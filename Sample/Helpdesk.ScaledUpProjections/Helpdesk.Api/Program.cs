@@ -1,24 +1,19 @@
 using System.Text.Json.Serialization;
+using Helpdesk;
 using Helpdesk.Api;
 using Helpdesk.Api.Core.Http;
-using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.Marten;
 using Helpdesk.Incidents;
 using Helpdesk.Incidents.GetCustomerIncidentsSummary;
 using Helpdesk.Incidents.GetIncidentDetails;
 using Helpdesk.Incidents.GetIncidentHistory;
 using Helpdesk.Incidents.GetIncidentShortInfo;
-using JasperFx.CodeGeneration;
 using Marten;
 using Marten.AspNetCore;
-using Marten.Events.Daemon.Resiliency;
-using Marten.Events.Projections;
 using Marten.Pagination;
 using Marten.Schema.Identity;
-using Marten.Services.Json;
 using Microsoft.AspNetCore.Mvc;
 using Oakton;
-using Weasel.Core;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,32 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
-    .AddMarten(options =>
-    {
-        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Helpdesk";
-        options.Events.DatabaseSchemaName = schemaName;
-        options.DatabaseSchemaName = schemaName;
-        options.Connection(builder.Configuration.GetConnectionString("Incidents") ??
-                           throw new InvalidOperationException());
-
-        options.UseDefaultSerialization(
-            EnumStorage.AsString,
-            nonPublicMembersStorage: NonPublicMembersStorage.All,
-            serializerType: SerializerType.SystemTextJson
-        );
-
-        options.Projections.LiveStreamAggregation<Incident>();
-        options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
-        options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
-        options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
-        options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
-        options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
-
-        options.Projections.DaemonLockId = 5555;
-    })
-    .OptimizeArtifactWorkflow(TypeLoadMode.Static)
-    .UseLightweightSessions()
-    .AddAsyncDaemon(DaemonMode.HotCold);
+    .AddMartenForHelpdeskInlineOnly(builder.Configuration);
 
 builder.Services
     .Configure<JsonOptions>(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()))
