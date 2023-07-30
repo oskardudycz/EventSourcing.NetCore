@@ -6,16 +6,16 @@ ARG dotnet_version=7.0
 ########################################
 FROM mcr.microsoft.com/dotnet/sdk:${dotnet_version}-alpine AS builder
 # Project file name, mandatory parameter, e.g. Helpdesk.Api
-ARG project_name
 ARG run_codegen=true
 
 # Setup working directory for project
 WORKDIR /app
 
-COPY ./${project_name}.csproj ./
+COPY ./Helpdesk/Helpdesk.csproj ./Helpdesk/Helpdesk.csproj
+COPY ./Helpdesk.Api/Helpdesk.Api.csproj ./Helpdesk.Api/Helpdesk.Api.csproj
 
 # Restore nuget packages
-RUN dotnet restore ./${project_name}.csproj
+RUN dotnet restore ./Helpdesk.Api/Helpdesk.Api.csproj
 
 # Copy project files
 COPY ./ ./
@@ -25,7 +25,7 @@ RUN if [ "run_codegen" = true ] ; then dotnet run -- codegen write & dotnet run 
 
 # Build project with Release configuration
 # and no restore, as we did it already
-RUN dotnet build -c Release --no-restore ./${project_name}.csproj
+RUN dotnet build -c Release --no-restore ./Helpdesk.Api/Helpdesk.Api.csproj
 
 ## Test project with Release configuration
 ## and no build, as we did it already
@@ -35,7 +35,7 @@ RUN dotnet build -c Release --no-restore ./${project_name}.csproj
 # and no build, as we did it already
 WORKDIR /app/
 RUN ls
-RUN dotnet publish -c Release --no-build -o out
+RUN dotnet publish -c Release --no-build -o out ./Helpdesk.Api/Helpdesk.Api.csproj
 
 ########################################
 #  Second stage of multistage build
@@ -44,19 +44,18 @@ RUN dotnet publish -c Release --no-build -o out
 #    that won't have source codes
 ########################################
 FROM mcr.microsoft.com/dotnet/aspnet:${dotnet_version}-alpine
-ARG project_name
 ARG dotnet_version=7.0
 
 # Setup working directory for project
-WORKDIR /app
+WORKDIR /app/
 
 # Copy published in previous stage binaries
 # from the `builder` image
-COPY --from=builder /app/out .
+COPY --from=builder /app/Helpdesk.Api/out .
 
 # Set URL that App will be exposed
 ENV ASPNETCORE_URLS="http://*:5000"
-ENV PROJECT_DLL="${project_name}.dll"
+ENV PROJECT_DLL="Helpdesk.Api.dll"
 
 # sets entry point command to automatically
 # run application on `docker run`
