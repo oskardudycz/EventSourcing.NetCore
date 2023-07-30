@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using Helpdesk.Api.Core.Http;
 using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.Marten;
-using Helpdesk.Api.Core.SignalR;
 using Helpdesk.Incidents;
 using Helpdesk.Incidents.GetCustomerIncidentsSummary;
 using Helpdesk.Incidents.GetIncidentDetails;
@@ -17,7 +16,6 @@ using Marten.Pagination;
 using Marten.Schema.Identity;
 using Marten.Services.Json;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Oakton;
 using Weasel.Core;
 using static Microsoft.AspNetCore.Http.TypedResults;
@@ -28,14 +26,11 @@ using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
-    .AddMarten(sp =>
+    .AddMarten(options =>
     {
-        var options = new StoreOptions();
-
         var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Helpdesk";
         options.Events.DatabaseSchemaName = schemaName;
         options.DatabaseSchemaName = schemaName;
@@ -54,30 +49,15 @@ builder.Services
         options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
         options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
-        options.Projections.Add(
-            new SignalRProducer((IHubContext)sp.GetRequiredService<IHubContext<IncidentsHub>>()),
-            ProjectionLifecycle.Async
-        );
-
-        return options;
     })
     .OptimizeArtifactWorkflow(TypeLoadMode.Static)
     .UseLightweightSessions()
-    .AddAsyncDaemon(DaemonMode.Solo);
+    .AddAsyncDaemon(DaemonMode.HotCold);
 
 builder.Services
-    .AddCors(options =>
-        options.AddPolicy("ClientPermission", policy =>
-            policy.WithOrigins("http://localhost:3000")
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials()
-        )
-    )
     .Configure<JsonOptions>(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()))
     .Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o =>
-        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
-    .AddSignalR();
+        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Host.ApplyOaktonExtensions();
 
@@ -246,13 +226,8 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseCors("ClientPermission");
-app.MapHub<IncidentsHub>("/hubs/incidents");
 
 return await app.RunOaktonCommands(args);
-
-public class IncidentsHub: Hub
-{
-}
 
 public record LogIncidentRequest(
     Contact Contact,

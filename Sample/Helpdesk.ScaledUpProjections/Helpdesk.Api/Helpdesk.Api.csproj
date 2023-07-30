@@ -9,15 +9,10 @@
 
     <ItemGroup>
         <PackageReference Include="Marten.CommandLine" Version="6.0.4" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Marten.AspNetCore" Version="6.0.4" />
         <PackageReference Include="Marten" Version="6.0.4" />
         <PackageReference Include="Confluent.Kafka" Version="2.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup>

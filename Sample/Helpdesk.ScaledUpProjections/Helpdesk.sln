@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Api.Tests", "Helpd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk", "Helpdesk\Helpdesk.csproj", "{C2996855-AD6D-45F3-BFB9-71D3D4A1C56C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.SignalR", "Helpdesk.SignalR\Helpdesk.SignalR.csproj", "{FA50346F-88F5-47B9-8047-3A668C4826CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{C2996855-AD6D-45F3-BFB9-71D3D4A1C56C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2996855-AD6D-45F3-BFB9-71D3D4A1C56C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2996855-AD6D-45F3-BFB9-71D3D4A1C56C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA50346F-88F5-47B9-8047-3A668C4826CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA50346F-88F5-47B9-8047-3A668C4826CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA50346F-88F5-47B9-8047-3A668C4826CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA50346F-88F5-47B9-8047-3A668C4826CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
