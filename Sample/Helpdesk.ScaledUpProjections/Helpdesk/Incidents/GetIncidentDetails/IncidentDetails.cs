@@ -1,6 +1,6 @@
 using Marten.Events.Aggregation;
 
-namespace Helpdesk.Api.Incidents.GetIncidentDetails;
+namespace Helpdesk.Incidents.GetIncidentDetails;
 
 public record IncidentDetails(
     Guid Id,

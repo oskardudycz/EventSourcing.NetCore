@@ -1,4 +1,4 @@
-namespace Helpdesk.Api.Incidents;
+namespace Helpdesk.Incidents;
 
 public record LogIncident(
     Guid IncidentId,
@@ -60,7 +60,7 @@ public record CloseIncident(
     DateTimeOffset Now
 );
 
-internal static class IncidentService
+public static class IncidentService
 {
     public static IncidentLogged Handle(LogIncident command)
     {

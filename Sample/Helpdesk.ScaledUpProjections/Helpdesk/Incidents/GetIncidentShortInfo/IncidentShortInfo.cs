@@ -1,6 +1,6 @@
 using Marten.Events.Aggregation;
 
-namespace Helpdesk.Api.Incidents.GetIncidentShortInfo;
+namespace Helpdesk.Incidents.GetIncidentShortInfo;
 
 public record IncidentShortInfo(
     Guid Id,

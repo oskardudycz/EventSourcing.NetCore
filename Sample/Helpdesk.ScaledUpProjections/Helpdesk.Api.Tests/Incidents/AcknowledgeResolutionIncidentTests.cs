@@ -1,5 +1,5 @@
-using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
+using Helpdesk.Incidents;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 

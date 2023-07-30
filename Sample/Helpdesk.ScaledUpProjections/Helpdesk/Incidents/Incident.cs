@@ -1,4 +1,4 @@
-namespace Helpdesk.Api.Incidents;
+namespace Helpdesk.Incidents;
 
 public record IncidentLogged(
     Guid IncidentId,

@@ -1,4 +1,4 @@
-using Helpdesk.Api.Incidents.GetIncidentDetails;
+using Helpdesk.Incidents.GetIncidentDetails;
 using Ogooreck.API;
 using Xunit;
 
