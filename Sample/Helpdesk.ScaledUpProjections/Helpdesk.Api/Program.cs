@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Helpdesk.Api;
 using Helpdesk.Api.Core.Http;
 using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.Marten;
@@ -18,10 +19,6 @@ using Marten.Services.Json;
 using Microsoft.AspNetCore.Mvc;
 using Oakton;
 using Weasel.Core;
-using static Microsoft.AspNetCore.Http.TypedResults;
-using static Helpdesk.Incidents.IncidentService;
-using static Helpdesk.Api.Core.Http.ETagExtensions;
-using static System.DateTimeOffset;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +46,8 @@ builder.Services
         options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
         options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
+
+        options.Projections.DaemonLockId = 5555;
     })
     .OptimizeArtifactWorkflow(TypeLoadMode.Static)
     .UseLightweightSessions()
@@ -78,9 +77,9 @@ customersIncidents.MapPost("",
         var incidentId = CombGuidIdGeneration.NewGuid();
 
         await documentSession.Add<Incident>(incidentId,
-            Handle(new LogIncident(incidentId, customerId, contact, description, customerId, Now)), ct);
+            IncidentService.Handle(new LogIncident(incidentId, customerId, contact, description, customerId, DateTimeOffset.Now)), ct);
 
-        return Created($"/api/incidents/{incidentId}", incidentId);
+        return TypedResults.Created($"/api/incidents/{incidentId}", incidentId);
     }
 );
 
@@ -93,8 +92,8 @@ agentIncidents.MapPost("{incidentId:guid}/category",
             CategoriseIncidentRequest body,
             CancellationToken ct
         ) =>
-        documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new CategoriseIncident(incidentId, body.Category, agentId, Now)), ct)
+        documentSession.GetAndUpdate<Incident>(incidentId, ETagExtensions.ToExpectedVersion(eTag),
+            state => IncidentService.Handle(state, new CategoriseIncident(incidentId, body.Category, agentId, DateTimeOffset.Now)), ct)
 );
 
 agentIncidents.MapPost("{incidentId:guid}/priority",
@@ -106,8 +105,8 @@ agentIncidents.MapPost("{incidentId:guid}/priority",
             PrioritiseIncidentRequest body,
             CancellationToken ct
         ) =>
-        documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new PrioritiseIncident(incidentId, body.Priority, agentId, Now)), ct)
+        documentSession.GetAndUpdate<Incident>(incidentId, ETagExtensions.ToExpectedVersion(eTag),
+            state => IncidentService.Handle(state, new PrioritiseIncident(incidentId, body.Priority, agentId, DateTimeOffset.Now)), ct)
 );
 
 agentIncidents.MapPost("{incidentId:guid}/assign",
@@ -118,8 +117,8 @@ agentIncidents.MapPost("{incidentId:guid}/assign",
             [FromIfMatchHeader] string eTag,
             CancellationToken ct
         ) =>
-        documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new AssignAgentToIncident(incidentId, agentId, Now)), ct)
+        documentSession.GetAndUpdate<Incident>(incidentId, ETagExtensions.ToExpectedVersion(eTag),
+            state => IncidentService.Handle(state, new AssignAgentToIncident(incidentId, agentId, DateTimeOffset.Now)), ct)
 );
 
 customersIncidents.MapPost("{incidentId:guid}/responses/",
@@ -131,10 +130,10 @@ customersIncidents.MapPost("{incidentId:guid}/responses/",
             RecordCustomerResponseToIncidentRequest body,
             CancellationToken ct
         ) =>
-        documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state,
+        documentSession.GetAndUpdate<Incident>(incidentId, ETagExtensions.ToExpectedVersion(eTag),
+            state => IncidentService.Handle(state,
                 new RecordCustomerResponseToIncident(incidentId,
-                    new IncidentResponse.FromCustomer(customerId, body.Content), Now)), ct)
+                    new IncidentResponse.FromCustomer(customerId, body.Content), DateTimeOffset.Now)), ct)
 );
 
 agentIncidents.MapPost("{incidentId:guid}/responses/",
@@ -149,10 +148,10 @@ agentIncidents.MapPost("{incidentId:guid}/responses/",
     {
         var (content, visibleToCustomer) = body;
 
-        return documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state,
+        return documentSession.GetAndUpdate<Incident>(incidentId, ETagExtensions.ToExpectedVersion(eTag),
+            state => IncidentService.Handle(state,
                 new RecordAgentResponseToIncident(incidentId,
-                    new IncidentResponse.FromAgent(agentId, content, visibleToCustomer), Now)), ct);
+                    new IncidentResponse.FromAgent(agentId, content, visibleToCustomer), DateTimeOffset.Now)), ct);
     }
 );
 
@@ -165,8 +164,8 @@ agentIncidents.MapPost("{incidentId:guid}/resolve",
             ResolveIncidentRequest body,
             CancellationToken ct
         ) =>
-        documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new ResolveIncident(incidentId, body.Resolution, agentId, Now)), ct)
+        documentSession.GetAndUpdate<Incident>(incidentId, ETagExtensions.ToExpectedVersion(eTag),
+            state => IncidentService.Handle(state, new ResolveIncident(incidentId, body.Resolution, agentId, DateTimeOffset.Now)), ct)
 );
 
 customersIncidents.MapPost("{incidentId:guid}/acknowledge",
@@ -177,8 +176,8 @@ customersIncidents.MapPost("{incidentId:guid}/acknowledge",
             [FromIfMatchHeader] string eTag,
             CancellationToken ct
         ) =>
-        documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new AcknowledgeResolution(incidentId, customerId, Now)), ct)
+        documentSession.GetAndUpdate<Incident>(incidentId, ETagExtensions.ToExpectedVersion(eTag),
+            state => IncidentService.Handle(state, new AcknowledgeResolution(incidentId, customerId, DateTimeOffset.Now)), ct)
 );
 
 agentIncidents.MapPost("{incidentId:guid}/close",
@@ -189,10 +188,10 @@ agentIncidents.MapPost("{incidentId:guid}/close",
         [FromIfMatchHeader] string eTag,
         CancellationToken ct) =>
     {
-        await documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new CloseIncident(incidentId, agentId, Now)), ct);
+        await documentSession.GetAndUpdate<Incident>(incidentId, ETagExtensions.ToExpectedVersion(eTag),
+            state => IncidentService.Handle(state, new CloseIncident(incidentId, agentId, DateTimeOffset.Now)), ct);
 
-        return Ok();
+        return TypedResults.Ok();
     }
 );
 
@@ -224,37 +223,37 @@ if (app.Environment.IsDevelopment())
         .UseSwaggerUI();
 }
 
-
-app.UseCors("ClientPermission");
-
 return await app.RunOaktonCommands(args);
 
-public record LogIncidentRequest(
-    Contact Contact,
-    string Description
-);
-
-public record CategoriseIncidentRequest(
-    IncidentCategory Category
-);
-
-public record PrioritiseIncidentRequest(
-    IncidentPriority Priority
-);
-
-public record RecordCustomerResponseToIncidentRequest(
-    string Content
-);
-
-public record RecordAgentResponseToIncidentRequest(
-    string Content,
-    bool VisibleToCustomer
-);
-
-public record ResolveIncidentRequest(
-    ResolutionType Resolution
-);
-
-public partial class Program
+namespace Helpdesk.Api
 {
+    public record LogIncidentRequest(
+        Contact Contact,
+        string Description
+    );
+
+    public record CategoriseIncidentRequest(
+        IncidentCategory Category
+    );
+
+    public record PrioritiseIncidentRequest(
+        IncidentPriority Priority
+    );
+
+    public record RecordCustomerResponseToIncidentRequest(
+        string Content
+    );
+
+    public record RecordAgentResponseToIncidentRequest(
+        string Content,
+        bool VisibleToCustomer
+    );
+
+    public record ResolveIncidentRequest(
+        ResolutionType Resolution
+    );
+
+    public partial class Program
+    {
+    }
 }

@@ -1,14 +1,15 @@
 using System.Text.Json.Serialization;
-using Helpdesk.Api.Core.SignalR;
+using Helpdesk.SignalR;
+using Helpdesk.SignalR.Core.SignalR;
 using JasperFx.CodeGeneration;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Services.Json;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;
 using Oakton;
 using Weasel.Core;
-using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,8 @@ builder.Services
             new SignalRProducer((IHubContext)sp.GetRequiredService<IHubContext<IncidentsHub>>()),
             ProjectionLifecycle.Async
         );
+
+        options.Projections.DaemonLockId = 6666;
 
         return options;
     })
@@ -63,10 +66,13 @@ app.MapHub<IncidentsHub>("/hubs/incidents");
 
 return await app.RunOaktonCommands(args);
 
-public class IncidentsHub: Hub
+namespace Helpdesk.SignalR
 {
-}
+    public class IncidentsHub: Hub
+    {
+    }
 
-public partial class Program
-{
+    public partial class Program
+    {
+    }
 }
