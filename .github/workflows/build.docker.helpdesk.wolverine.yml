@@ -1,0 +1,43 @@
+name: Bulild Helpdesk.Wolverine Docker
+
+on:
+  # run it on push to the default repository branch
+  push:
+    branches: [main]
+    paths:
+      - "Sample/Helpdesk.Wolverine/**"
+  # run it during pull request
+  pull_request:
+    paths:
+      - "Sample/Helpdesk.Wolverine/**"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check Out Repo
+              uses: actions/checkout@v3
+
+            - name: Login to DockerHub
+              uses: docker/login-action@v2
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Set up Docker Buildx
+              id: buildx
+              uses: docker/setup-buildx-action@v2
+
+            - name: Build and push
+              id: docker_build
+              uses: docker/build-push-action@v4
+              with:
+                  context: "./Sample/Helpdesk.Wolverine/Helpdesk.Api"
+                  push: false
+                  tags: oskardudycz/eventsourcing.netcore.helpdesk.wolverine:latest
+                  build-args: |
+                    "project_name=Helpdesk.Api"
+
+            - name: Image digest
+              run: echo ${{ steps.docker_build.outputs.digest }}
