@@ -20,12 +20,7 @@ public static class IncidentsApi
 {
     public static void MapIncidentsEndpoints(this WebApplication app)
     {
-        var customersIncidents =
-            app.MapGroup("api/customers/{customerId:guid}/incidents/").WithTags("Customer", "Incident");
-        var agentIncidents = app.MapGroup("api/agents/{agentId:guid}/incidents/").WithTags("Agent", "Incident");
-        var incidents = app.MapGroup("api/incidents").WithTags("Incident");
-
-        customersIncidents.MapPost("",
+        app.MapPost("/api/customers/{customerId:guid}/incidents",
             async (
                 IDocumentSession documentSession,
                 Guid customerId,
@@ -42,7 +37,7 @@ public static class IncidentsApi
             }
         );
 
-        agentIncidents.MapPost("{incidentId:guid}/category",
+        app.MapPost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/category",
             (
                     IDocumentSession documentSession,
                     Guid incidentId,
@@ -55,7 +50,7 @@ public static class IncidentsApi
                     state => Handle(state, new CategoriseIncident(incidentId, body.Category, agentId, Now)), ct)
         );
 
-        agentIncidents.MapPost("{incidentId:guid}/priority",
+        app.MapPost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/priority",
             (
                     IDocumentSession documentSession,
                     Guid incidentId,
@@ -68,7 +63,7 @@ public static class IncidentsApi
                     state => Handle(state, new PrioritiseIncident(incidentId, body.Priority, agentId, Now)), ct)
         );
 
-        agentIncidents.MapPost("{incidentId:guid}/assign",
+        app.MapPost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/assign",
             (
                     IDocumentSession documentSession,
                     Guid incidentId,
@@ -80,7 +75,7 @@ public static class IncidentsApi
                     state => Handle(state, new AssignAgentToIncident(incidentId, agentId, Now)), ct)
         );
 
-        customersIncidents.MapPost("{incidentId:guid}/responses/",
+        app.MapPost("/api/customers/{customerId:guid}/incidents/{incidentId:guid}/responses/",
             (
                     IDocumentSession documentSession,
                     Guid incidentId,
@@ -95,7 +90,7 @@ public static class IncidentsApi
                             new IncidentResponse.FromCustomer(customerId, body.Content), Now)), ct)
         );
 
-        agentIncidents.MapPost("{incidentId:guid}/responses/",
+        app.MapPost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/responses/",
             (
                 IDocumentSession documentSession,
                 [FromIfMatchHeader] string eTag,
@@ -114,7 +109,7 @@ public static class IncidentsApi
             }
         );
 
-        agentIncidents.MapPost("{incidentId:guid}/resolve",
+        app.MapPost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/resolve",
             (
                     IDocumentSession documentSession,
                     Guid incidentId,
@@ -127,7 +122,7 @@ public static class IncidentsApi
                     state => Handle(state, new ResolveIncident(incidentId, body.Resolution, agentId, Now)), ct)
         );
 
-        customersIncidents.MapPost("{incidentId:guid}/acknowledge",
+        app.MapPost("/api/customers/{customerId:guid}/incidents/{incidentId:guid}/acknowledge",
             (
                     IDocumentSession documentSession,
                     Guid incidentId,
@@ -139,7 +134,7 @@ public static class IncidentsApi
                     state => Handle(state, new AcknowledgeResolution(incidentId, customerId, Now)), ct)
         );
 
-        agentIncidents.MapPost("{incidentId:guid}/close",
+        app.MapPost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/close",
             async (
                 IDocumentSession documentSession,
                 Guid incidentId,
@@ -154,24 +149,24 @@ public static class IncidentsApi
             }
         );
 
-        customersIncidents.MapGet("",
+        app.MapGet("/api/customers/{customerId:guid}/incidents/",
             (IQuerySession querySession, Guid customerId, [FromQuery] int? pageNumber, [FromQuery] int? pageSize,
                     CancellationToken ct) =>
                 querySession.Query<IncidentShortInfo>().Where(i => i.CustomerId == customerId)
                     .ToPagedListAsync(pageNumber ?? 1, pageSize ?? 10, ct)
         );
 
-        incidents.MapGet("{incidentId:guid}",
+        app.MapGet("/api/incidents/{incidentId:guid}",
             (HttpContext context, IQuerySession querySession, Guid incidentId) =>
                 querySession.Json.WriteById<IncidentDetails>(incidentId, context)
         );
 
-        incidents.MapGet("{incidentId:guid}/history",
+        app.MapGet("/api/incidents/{incidentId:guid}/history",
             (HttpContext context, IQuerySession querySession, Guid incidentId) =>
                 querySession.Query<IncidentHistory>().Where(i => i.IncidentId == incidentId).WriteArray(context)
         );
 
-        customersIncidents.MapGet("incidents-summary",
+        app.MapGet("/api/customers/{customerId:guid}/incidents/incidents-summary",
             (HttpContext context, IQuerySession querySession, Guid customerId) =>
                 querySession.Json.WriteById<CustomerIncidentsSummary>(customerId, context)
         );
