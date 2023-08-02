@@ -39,7 +39,8 @@ builder.Services
         options.UseDefaultSerialization(
             EnumStorage.AsString,
             nonPublicMembersStorage: NonPublicMembersStorage.All,
-            serializerType: SerializerType.SystemTextJson
+            serializerType: SerializerType.SystemTextJson,
+            casing: Casing.CamelCase
         );
 
         options.Projections.LiveStreamAggregation<Incident>();
