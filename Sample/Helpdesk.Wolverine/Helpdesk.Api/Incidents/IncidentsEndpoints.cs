@@ -3,6 +3,7 @@ using Helpdesk.Api.Core.Marten;
 using JasperFx.Core;
 using Marten;
 using Wolverine.Http;
+using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static Helpdesk.Api.Incidents.IncidentService;
 using static Helpdesk.Api.Core.Http.ETagExtensions;
@@ -13,20 +14,16 @@ namespace Helpdesk.Api.Incidents;
 public static class IncidentsEndpoints
 {
     [WolverinePost("/api/customers/{customerId:guid}/incidents")]
-    public static async Task<IResult> LogIncident
-    (
-        Guid customerId,
-        LogIncidentRequest body,
-        IDocumentSession documentSession,
-        CancellationToken ct)
+    public static (CreationResponse, IStartStream) LogIncident(Guid customerId, LogIncidentRequest body)
     {
         var (contact, description) = body;
         var incidentId = CombGuidIdGeneration.NewGuid();
 
-        await documentSession.Add<Incident>(incidentId,
-            Handle(new LogIncident(incidentId, customerId, contact, description, customerId, Now)), ct);
+        var result = Handle(new LogIncident(incidentId, customerId, contact, description, customerId, Now));
 
-        return Created($"/api/incidents/{incidentId}", incidentId);
+        var startStream = MartenOps.StartStream<Incident>(result);
+
+        return (new CreationResponse($"/api/incidents/{startStream.StreamId}"), startStream);
     }
 
     [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/category")]
