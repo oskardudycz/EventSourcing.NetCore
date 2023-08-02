@@ -1,14 +1,7 @@
 using Helpdesk.Api.Core.Http;
 using Helpdesk.Api.Core.Marten;
-using Helpdesk.Api.Incidents.GetCustomerIncidentsSummary;
-using Helpdesk.Api.Incidents.GetIncidentDetails;
-using Helpdesk.Api.Incidents.GetIncidentHistory;
-using Helpdesk.Api.Incidents.GetIncidentShortInfo;
 using JasperFx.Core;
 using Marten;
-using Marten.AspNetCore;
-using Marten.Pagination;
-using Microsoft.AspNetCore.Mvc;
 using Wolverine.Http;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static Helpdesk.Api.Incidents.IncidentService;
@@ -173,31 +166,6 @@ public static class IncidentsEndpoints
             state => Handle(state, new CloseIncident(incidentId, agentId, Now)), ct);
 
         return Ok();
-    }
-
-    public static void MapIncidentsEndpoints(this WebApplication app)
-    {
-        app.MapGet("/api/customers/{customerId:guid}/incidents/",
-            (IQuerySession querySession, Guid customerId, [FromQuery] int? pageNumber, [FromQuery] int? pageSize,
-                    CancellationToken ct) =>
-                querySession.Query<IncidentShortInfo>().Where(i => i.CustomerId == customerId)
-                    .ToPagedListAsync(pageNumber ?? 1, pageSize ?? 10, ct)
-        );
-
-        app.MapGet("/api/incidents/{incidentId:guid}",
-            (HttpContext context, IQuerySession querySession, Guid incidentId) =>
-                querySession.Json.WriteById<IncidentDetails>(incidentId, context)
-        );
-
-        app.MapGet("/api/incidents/{incidentId:guid}/history",
-            (HttpContext context, IQuerySession querySession, Guid incidentId) =>
-                querySession.Query<IncidentHistory>().Where(i => i.IncidentId == incidentId).WriteArray(context)
-        );
-
-        app.MapGet("/api/customers/{customerId:guid}/incidents/incidents-summary",
-            (HttpContext context, IQuerySession querySession, Guid customerId) =>
-                querySession.Json.WriteById<CustomerIncidentsSummary>(customerId, context)
-        );
     }
 }
 
