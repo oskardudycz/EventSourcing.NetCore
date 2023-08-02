@@ -9,6 +9,8 @@ using Marten;
 using Marten.AspNetCore;
 using Marten.Pagination;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using Wolverine.Http;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static Helpdesk.Api.Incidents.IncidentService;
 using static Helpdesk.Api.Core.Http.ETagExtensions;
@@ -16,26 +18,44 @@ using static System.DateTimeOffset;
 
 namespace Helpdesk.Api.Incidents;
 
-public static class IncidentsApi
+public static class IncidentsEndpoints
 {
+    [SwaggerOperation(Tags = new[] { "Incidents" })]
+    [WolverinePost("/api/customers/{customerId:guid}/incidents")]
+    public static async Task<IResult> LogIncident
+    (
+        Guid customerId,
+        LogIncidentRequest body,
+        IDocumentSession documentSession,
+        CancellationToken ct)
+    {
+        var (contact, description) = body;
+        var incidentId = CombGuidIdGeneration.NewGuid();
+
+        await documentSession.Add<Incident>(incidentId,
+            Handle(new LogIncident(incidentId, customerId, contact, description, customerId, Now)), ct);
+
+        return Created($"/api/incidents/{incidentId}", incidentId);
+    }
+
     public static void MapIncidentsEndpoints(this WebApplication app)
     {
-        app.MapPost("/api/customers/{customerId:guid}/incidents",
-            async (
-                IDocumentSession documentSession,
-                Guid customerId,
-                LogIncidentRequest body,
-                CancellationToken ct) =>
-            {
-                var (contact, description) = body;
-                var incidentId = CombGuidIdGeneration.NewGuid();
-
-                await documentSession.Add<Incident>(incidentId,
-                    Handle(new LogIncident(incidentId, customerId, contact, description, customerId, Now)), ct);
-
-                return Created($"/api/incidents/{incidentId}", incidentId);
-            }
-        );
+        // app.MapPost("/api/customers/{customerId:guid}/incidents",
+        //     async (
+        //         IDocumentSession documentSession,
+        //         Guid customerId,
+        //         LogIncidentRequest body,
+        //         CancellationToken ct) =>
+        //     {
+        //         var (contact, description) = body;
+        //         var incidentId = CombGuidIdGeneration.NewGuid();
+        //
+        //         await documentSession.Add<Incident>(incidentId,
+        //             Handle(new LogIncident(incidentId, customerId, contact, description, customerId, Now)), ct);
+        //
+        //         return Created($"/api/incidents/{incidentId}", incidentId);
+        //     }
+        // );
 
         app.MapPost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/category",
             (

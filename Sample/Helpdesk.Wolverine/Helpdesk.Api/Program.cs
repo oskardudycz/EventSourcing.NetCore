@@ -13,8 +13,10 @@ using Marten.Events.Projections;
 using Marten.Services.Json;
 using Microsoft.AspNetCore.SignalR;
 using Oakton;
+using Oakton.Resources;
 using Weasel.Core;
 using Wolverine;
+using Wolverine.Http;
 using Wolverine.Marten;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
@@ -59,6 +61,8 @@ builder.Services
     // Add Marten/PostgreSQL integration with Wolverine's outbox
     .IntegrateWithWolverine();
 
+builder.Services.AddResourceSetupOnStartup();
+
 builder.Services
     .AddCors(options =>
         options.AddPolicy("ClientPermission", policy =>
@@ -90,6 +94,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("ClientPermission");
 app.MapHub<IncidentsHub>("/hubs/incidents");
+
+// Let's add in Wolverine HTTP endpoints to the routing tree
+app.MapWolverineEndpoints();
 
 return await app.RunOaktonCommands(args);
 
