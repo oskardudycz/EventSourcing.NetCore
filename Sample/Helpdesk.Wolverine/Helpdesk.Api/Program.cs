@@ -80,7 +80,10 @@ builder.Services
 
 builder.Host.ApplyOaktonExtensions();
 // Configure Wolverine
-builder.Host.UseWolverine();
+builder.Host.UseWolverine(opts =>
+{
+    opts.Policies.AutoApplyTransactions();
+});
 
 var app = builder.Build();
 
