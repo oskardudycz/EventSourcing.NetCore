@@ -1,4 +1,4 @@
-name: Bulild Helpdesk.Wolverine Docker
+name: Build Helpdesk.Wolverine Docker
 
 on:
   # run it on push to the default repository branch
