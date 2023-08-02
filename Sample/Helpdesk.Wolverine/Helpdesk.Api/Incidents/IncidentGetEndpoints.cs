@@ -10,33 +10,26 @@ using Wolverine.Http;
 
 namespace Helpdesk.Api.Incidents;
 
-public class IncidentGetEndpoints
+public static class IncidentGetEndpoints
 {
-    [WolverineGet("/api/customers/{customerId:guid}/incidents/")]
-    public Task<IPagedList<IncidentShortInfo>> GetCustomerIncidents
-    (IQuerySession querySession, Guid customerId, [FromQuery] int? pageNumber, [FromQuery] int? pageSize,
-        CancellationToken ct) =>
-        querySession.Query<IncidentShortInfo>().Where(i => i.CustomerId == customerId)
-            .ToPagedListAsync(pageNumber ?? 1, pageSize ?? 10, ct);
-
     // That for some reason doesn't work for me
     // [WolverineGet("/api/incidents/{incidentId:guid}")]
-    // public Task GetIncidentById([FromQuery] Guid incidentId, IQuerySession querySession, HttpContext context) =>
+    // public static Task GetIncidentById([FromRoute] Guid incidentId, IQuerySession querySession, HttpContext context) =>
     //     querySession.Json.WriteById<IncidentDetails>(incidentId, context);
 
     [WolverineGet("/api/incidents/{incidentId:guid}")]
-    public Task<IncidentDetails?> GetIncidentById([FromQuery] Guid incidentId, IQuerySession querySession,
+    public static Task<IncidentDetails?> GetIncidentById([FromRoute] Guid incidentId, IQuerySession querySession,
         CancellationToken ct) =>
         querySession.LoadAsync<IncidentDetails>(incidentId, ct);
 
-    // That for some reason doesn't work for me
+    //That for some reason doesn't work for me
     // [WolverineGet("/api/incidents/{incidentId:guid}/history")]
-    // public Task GetIncidentHistory([FromQuery]Guid incidentId, HttpContext context, IQuerySession querySession) =>
+    // public static Task GetIncidentHistory([FromRoute]Guid incidentId, HttpContext context, IQuerySession querySession) =>
     //     querySession.Query<IncidentHistory>().Where(i => i.IncidentId == incidentId).WriteArray(context);
 
     [WolverineGet("/api/incidents/{incidentId:guid}/history")]
-    public Task<IReadOnlyList<IncidentHistory>> GetIncidentHistory(
-        [FromQuery] Guid incidentId,
+    public static Task<IReadOnlyList<IncidentHistory>> GetIncidentHistory(
+        [FromRoute] Guid incidentId,
         IQuerySession querySession,
         CancellationToken ct
     ) =>
@@ -44,15 +37,24 @@ public class IncidentGetEndpoints
 
     // That for some reason doesn't work for me
     // [WolverineGet("/api/customers/{customerId:guid}/incidents/incidents-summary")]
-    // public Task GetCustomerIncidentsSummary([FromQuery] Guid customerId, HttpContext context,
+    // public static Task GetCustomerIncidentsSummary([FromRoute] Guid customerId, HttpContext context,
     //     IQuerySession querySession) =>
     //     querySession.Json.WriteById<CustomerIncidentsSummary>(customerId, context);
 
     [WolverineGet("/api/customers/{customerId:guid}/incidents/incidents-summary")]
-    public Task GetCustomerIncidentsSummary(
-        [FromQuery] Guid customerId,
+    public static Task<CustomerIncidentsSummary?> GetCustomerIncidentsSummary(
+        [FromRoute] Guid customerId,
         IQuerySession querySession,
         CancellationToken ct
     ) =>
         querySession.LoadAsync<CustomerIncidentsSummary>(customerId, ct);
+
+
+    [WolverineGet("/api/customers/{customerId:guid}/incidents/")]
+    public static Task<IPagedList<IncidentShortInfo>> GetCustomerIncidents
+    (IQuerySession querySession, [FromRoute] Guid customerId, [FromQuery] int? pageNumber, [FromQuery] int? pageSize,
+        CancellationToken ct) =>
+        querySession.Query<IncidentShortInfo>().Where(i => i.CustomerId == customerId)
+            .ToPagedListAsync(pageNumber ?? 1, pageSize ?? 10, ct);
+
 }
