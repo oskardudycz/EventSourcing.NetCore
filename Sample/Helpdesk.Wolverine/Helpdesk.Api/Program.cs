@@ -83,8 +83,6 @@ builder.Host.UseWolverine();
 
 var app = builder.Build();
 
-app.MapIncidentsEndpoints();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()
