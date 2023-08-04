@@ -202,6 +202,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{F078A982-331A-4EB6-B6F8-34464359B05D}"
 ProjectSection(SolutionItems) = preProject
 	.github\workflows\build.dotnet.yml = .github\workflows\build.dotnet.yml
+	.github\workflows\build.dotnet.testcontainers.yml = .github\workflows\build.dotnet.testcontainers.yml
 	.github\workflows\publish.docker.yml = .github\workflows\publish.docker.yml
 	.github\workflows\build.dotnet.testreport.yml = .github\workflows\build.dotnet.testreport.yml
 EndProjectSection
