@@ -113,7 +113,7 @@ public class AsyncDocumentChangesForwarder: IChangeListener
     }
 }
 
-public class DocumentChangesForwarding: MartenTest, IAsyncDisposable
+public class DocumentChangesForwarding: MartenTest
 {
     [Fact]
     public async Task GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
@@ -135,8 +135,10 @@ public class DocumentChangesForwarding: MartenTest, IAsyncDisposable
             cts.Token);
     }
 
-    public DocumentChangesForwarding()
+    public override async Task InitializeAsync()
     {
+        await base.InitializeAsync();
+
         var services = new ServiceCollection();
 
         services.AddLogging();
@@ -144,7 +146,7 @@ public class DocumentChangesForwarding: MartenTest, IAsyncDisposable
         services.AddMarten(options =>
             {
                 options.DatabaseSchemaName = SchemaName;
-                options.Connection(Settings.ConnectionString);
+                options.Connection(ConnectionString);
                 options.Projections.Add<ProjectInfoProjection>(ProjectionLifecycle.Async);
                 options.Projections.AsyncListeners.Add(
                     new AsyncListenerWrapper(
@@ -158,21 +160,28 @@ public class DocumentChangesForwarding: MartenTest, IAsyncDisposable
             }).AddAsyncDaemon(DaemonMode.Solo)
             .UseLightweightSessions();
 
-        using var sp = services.BuildServiceProvider();
+        await using var sp = services.BuildServiceProvider();
         serviceScope = sp.CreateScope();
         daemon = serviceScope.ServiceProvider.GetRequiredService<IHostedService>();
         documentSession = serviceScope.ServiceProvider.GetRequiredService<IDocumentSession>();
     }
 
-    private readonly IHostedService daemon;
-    private readonly IServiceScope serviceScope;
-    private readonly IDocumentSession documentSession;
-    private readonly EventListener eventListener = new();
-    private readonly MessagingSystemStub messagingSystemStub = new();
+    private IHostedService daemon = default!;
+    private IServiceScope serviceScope = default!;
+    private IDocumentSession documentSession = default!;
+    private EventListener eventListener = new();
+    private MessagingSystemStub messagingSystemStub = new();
 
-    public async ValueTask DisposeAsync()
+    public override async Task DisposeAsync()
     {
         await daemon.StopAsync(default);
         serviceScope.Dispose();
+
+        await base.DisposeAsync();
+    }
+
+    public DocumentChangesForwarding(): base(false, false)
+    {
+
     }
 }

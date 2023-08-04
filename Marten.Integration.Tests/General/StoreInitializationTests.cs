@@ -1,11 +1,12 @@
 using FluentAssertions;
+using Marten.Integration.Tests.TestsInfrastructure;
 using Npgsql;
 using Weasel.Core;
 using Xunit;
 
 namespace Marten.Integration.Tests.General;
 
-public class StoreInitializationTests
+public class StoreInitializationTests: MartenTest
 {
     [Fact]
     public void GivenWrongConnectionString_WhenDocumentSessionIsInitialized_ThenConnectionIsCreated()
@@ -25,7 +26,7 @@ public class StoreInitializationTests
     {
         var ex = Record.Exception(() =>
         {
-            var store = DocumentStore.For(Settings.ConnectionString);
+            var store = DocumentStore.For(ConnectionString);
 
             ConnectionShouldBeEstablished(store);
         });
@@ -40,9 +41,9 @@ public class StoreInitializationTests
         {
             var store = DocumentStore.For(options =>
             {
-                options.Connection(Settings.ConnectionString);
+                options.Connection(ConnectionString);
                 options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.Events.DatabaseSchemaName = Settings.SchemaName;
+                options.Events.DatabaseSchemaName = SchemaName;
             });
 
             ConnectionShouldBeEstablished(store);
@@ -58,9 +59,9 @@ public class StoreInitializationTests
         {
             var store = DocumentStore.For(options =>
             {
-                options.Connection(() => new NpgsqlConnection(Settings.ConnectionString));
+                options.Connection(() => new NpgsqlConnection(ConnectionString));
                 options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.Events.DatabaseSchemaName = Settings.SchemaName;
+                options.Events.DatabaseSchemaName = SchemaName;
             });
 
             ConnectionShouldBeEstablished(store);
@@ -76,9 +77,9 @@ public class StoreInitializationTests
         {
             var store = DocumentStore.For(options =>
             {
-                options.Connection(Settings.ConnectionString);
+                options.Connection(ConnectionString);
                 options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.Events.DatabaseSchemaName = Settings.SchemaName;
+                options.Events.DatabaseSchemaName = SchemaName;
             });
 
             using var session = store.LightweightSession();
@@ -97,5 +98,10 @@ public class StoreInitializationTests
         var result = session.Query<int>("SELECT 1");
 
         result.Should().NotBeNull();
+    }
+
+    public StoreInitializationTests(): base(false, false)
+    {
+
     }
 }

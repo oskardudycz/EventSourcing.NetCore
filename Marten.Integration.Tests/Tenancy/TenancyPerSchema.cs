@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Data;
+using Marten.Integration.Tests.TestsInfrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -72,10 +73,15 @@ public record TestDocumentForTenancy(
     string Name
 );
 
-public class TenancyPerSchema
+public class TenancyPerSchema: MartenTest
 {
     private const string FirstTenant = "Tenant1";
     private const string SecondTenant = "Tenant2";
+
+    public TenancyPerSchema(): base(false)
+    {
+
+    }
 
     [Fact]
     public void GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
@@ -110,7 +116,7 @@ public class TenancyPerSchema
         }
     }
 
-    private static void AddMarten(IServiceCollection services)
+    private void AddMarten(IServiceCollection services)
     {
         // simulate http context
         services.AddScoped<DummyTenancyContext>();
@@ -121,7 +127,7 @@ public class TenancyPerSchema
         services.AddSingleton<Action<string, StoreOptions>>((tenantId, options) =>
         {
             options.DatabaseSchemaName = tenantId;
-            options.Connection(Settings.ConnectionString);
+            options.Connection(ConnectionString);
         });
 
         services.AddScoped<ISessionFactory, TenancyPerSchemaSessionFactory>();

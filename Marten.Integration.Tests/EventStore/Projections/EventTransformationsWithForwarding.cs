@@ -128,7 +128,7 @@ public class AsyncDocumentChangesForwarder: IChangeListener
     }
 }
 
-public class EventTransformationsWithForwarding: MartenTest, IAsyncDisposable
+public class EventTransformationsWithForwarding: MartenTest
 {
     [Fact(Skip = "That Doesn't work yet :(")]
     public async Task GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
@@ -159,7 +159,7 @@ public class EventTransformationsWithForwarding: MartenTest, IAsyncDisposable
         services.AddMarten(options =>
             {
                 options.DatabaseSchemaName = SchemaName;
-                options.Connection(Settings.ConnectionString);
+                options.Connection(ConnectionString);
                 options.Projections.Add<ProjectInfoProjection>(ProjectionLifecycle.Async);
                 options.Projections.AsyncListeners.Add(
                     new AsyncListenerWrapper(
@@ -186,7 +186,7 @@ public class EventTransformationsWithForwarding: MartenTest, IAsyncDisposable
     private readonly EventListener eventListener = new();
     private readonly MessagingSystemStub messagingSystemStub = new();
 
-    public async ValueTask DisposeAsync()
+    public override async Task DisposeAsync()
     {
         await daemon.StopAsync(default);
         serviceScope.Dispose();

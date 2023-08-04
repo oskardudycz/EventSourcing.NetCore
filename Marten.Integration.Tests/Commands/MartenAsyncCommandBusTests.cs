@@ -18,53 +18,6 @@ namespace Marten.Integration.Tests.Commands;
 
 public class MartenAsyncCommandBusTests: MartenTest
 {
-    private readonly MartenAsyncCommandBus martenAsyncCommandBus;
-    private readonly List<Guid> userIds = new();
-    private readonly EventListener eventListener = new();
-    private readonly AsyncProjectionHostedService asyncDaemon;
-    private readonly CancellationToken ct = new CancellationTokenSource().Token;
-
-    public MartenAsyncCommandBusTests(): base(false)
-    {
-        var services = new ServiceCollection();
-
-        services
-            .AddLogging()
-            .AddSingleton<IHostEnvironment, HostingEnvironment>(
-                _ => new HostingEnvironment { EnvironmentName = Environments.Development }
-            )
-            .AddSingleton<IEventBus>(sp =>
-                new EventCatcher(
-                    eventListener,
-                    sp.GetRequiredService<EventBus>()
-                )
-            )
-            .AddCoreServices()
-            .AddMarten(new MartenConfig
-            {
-                ConnectionString = Settings.ConnectionString,
-                WriteModelSchema = SchemaName,
-                ReadModelSchema = SchemaName
-            })
-            .AddCommandHandler<AddUser, AddUserCommandHandler>(
-                _ => new AddUserCommandHandler(userIds)
-            )
-            .AddScoped(sp => new InMemoryCommandBus(
-                sp,
-                new ActivityScope(),
-                Policy.NoOpAsync()
-            ))
-            .AddSingleton(eventListener)
-            .AddCommandForwarder();
-
-        var serviceProvider = services.BuildServiceProvider();
-        Session = serviceProvider.GetRequiredService<IDocumentSession>();
-
-        asyncDaemon = (AsyncProjectionHostedService)serviceProvider.GetRequiredService<IHostedService>();
-
-        martenAsyncCommandBus = new MartenAsyncCommandBus(Session);
-    }
-
     [Fact]
     public async Task CommandIsStoredInMartenAndForwardedToCommandHandler()
     {
@@ -87,6 +40,58 @@ public class MartenAsyncCommandBusTests: MartenTest
             .Should().Be(1);
 
         userIds.Should().Contain(userId);
+    }
+
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+        var services = new ServiceCollection();
+
+        services
+            .AddLogging()
+            .AddSingleton<IHostEnvironment, HostingEnvironment>(
+                _ => new HostingEnvironment { EnvironmentName = Environments.Development }
+            )
+            .AddSingleton<IEventBus>(sp =>
+                new EventCatcher(
+                    eventListener,
+                    sp.GetRequiredService<EventBus>()
+                )
+            )
+            .AddCoreServices()
+            .AddMarten(new MartenConfig
+            {
+                ConnectionString = ConnectionString,
+                WriteModelSchema = SchemaName,
+                ReadModelSchema = SchemaName
+            })
+            .AddCommandHandler<AddUser, AddUserCommandHandler>(
+                _ => new AddUserCommandHandler(userIds)
+            )
+            .AddScoped(sp => new InMemoryCommandBus(
+                sp,
+                new ActivityScope(),
+                Policy.NoOpAsync()
+            ))
+            .AddSingleton(eventListener)
+            .AddCommandForwarder();
+
+        var serviceProvider = services.BuildServiceProvider();
+        var session = serviceProvider.GetRequiredService<IDocumentSession>();
+
+        asyncDaemon = (AsyncProjectionHostedService)serviceProvider.GetRequiredService<IHostedService>();
+
+        martenAsyncCommandBus = new MartenAsyncCommandBus(session);
+    }
+
+    private MartenAsyncCommandBus martenAsyncCommandBus = default!;
+    private readonly List<Guid> userIds = new();
+    private readonly EventListener eventListener = new();
+    private AsyncProjectionHostedService asyncDaemon = default!;
+    private readonly CancellationToken ct = new CancellationTokenSource().Token;
+
+    public MartenAsyncCommandBusTests(): base(true)
+    {
     }
 }
 
