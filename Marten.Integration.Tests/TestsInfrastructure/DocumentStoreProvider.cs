@@ -4,14 +4,16 @@ namespace Marten.Integration.Tests.TestsInfrastructure;
 
 public static class DocumentStoreProvider
 {
-    public static IDocumentStore Get(string? schemaName = null, Action<StoreOptions>? setOptions = null)
+    private const string SchemaName = "EventStore";
+
+    public static IDocumentStore Get(string connectionString, string? schemaName = null, Action<StoreOptions>? setOptions = null)
     {
         return DocumentStore.For(options =>
         {
-            options.Connection(Settings.ConnectionString);
+            options.Connection(connectionString);
             options.AutoCreateSchemaObjects = AutoCreate.All;
-            options.DatabaseSchemaName = schemaName ?? Settings.SchemaName;
-            options.Events.DatabaseSchemaName = schemaName ?? Settings.SchemaName;
+            options.DatabaseSchemaName = schemaName ?? SchemaName;
+            options.Events.DatabaseSchemaName = schemaName ?? SchemaName;
 
             setOptions?.Invoke(options);
         });

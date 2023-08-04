@@ -50,7 +50,7 @@ public class OutOfOrderProjectionsTest: MartenTest
     {
         var store = DocumentStore.For(options =>
         {
-            options.Connection(Settings.ConnectionString);
+            options.Connection(ConnectionString);
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.DatabaseSchemaName = SchemaName;
             options.Events.DatabaseSchemaName = SchemaName;
