@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build and Test with TestContainers
 
 on:
   push:
@@ -14,9 +14,6 @@ jobs:
             - name: Check Out Repo
               uses: actions/checkout@v3
 
-            - name: Start containers
-              run: docker-compose -f "docker-compose.ci.yml" up -d
-
             - name: Setup .NET
               uses: actions/setup-dotnet@v3
               with:
@@ -29,7 +26,7 @@ jobs:
               run: dotnet build --configuration Release --no-restore
 
             - name: Run tests
-              run: dotnet test --configuration Release --no-build --filter "Category!=SkipCI&FullyQualifiedName!~Marten.Integration.Tests" --logger "trx;LogFileName=test-results.trx"
+              run: dotnet test --configuration Release --no-build --filter "Category!=SkipCI&FullyQualifiedName~Marten.Integration.Tests" --logger "trx;LogFileName=test-results.trx"
 
             - name: Upload test results
               uses: actions/upload-artifact@v3
@@ -37,7 +34,3 @@ jobs:
               with:
                 name: test-results
                 path: '**/test-results.trx'
-
-            - name: Stop containers
-              if: always()
-              run: docker-compose -f "docker-compose.yml" down
