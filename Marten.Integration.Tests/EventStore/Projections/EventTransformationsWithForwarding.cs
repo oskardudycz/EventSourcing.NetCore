@@ -150,7 +150,7 @@ public class EventTransformationsWithForwarding: MartenTest
             cts.Token);
     }
 
-    public EventTransformationsWithForwarding()
+    public EventTransformationsWithForwarding(MartenFixture fixture) : base(fixture.PostgreSqlContainer)
     {
         var services = new ServiceCollection();
 

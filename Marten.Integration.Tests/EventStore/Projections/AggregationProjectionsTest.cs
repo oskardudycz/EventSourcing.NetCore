@@ -38,14 +38,17 @@ public class AggregationProjectionsTest: MartenTest
         public void Apply(IssueUpdated @event)
         {
             Issues[@event.IssueId] = Issues[@event.IssueId]
-                with {Description = @event.Description};
+                with
+                {
+                    Description = @event.Description
+                };
         }
     }
 
     public class IssueDescriptions
     {
         public Guid Id { get; set; }
-        public Dictionary<Guid, string> Descriptions { get; } = new ();
+        public Dictionary<Guid, string> Descriptions { get; } = new();
 
         public void Apply(IssueCreated @event)
         {
@@ -96,10 +99,8 @@ public class AggregationProjectionsTest: MartenTest
 
         var events = new object[]
         {
-            new IssueCreated(issue1Id, "Description 1"),
-            new IssueUpdated(issue1Id, "Description 1 New"),
-            new IssueCreated(issue2Id, "Description 2"),
-            new IssueUpdated(issue1Id, "Description 1 Super New"),
+            new IssueCreated(issue1Id, "Description 1"), new IssueUpdated(issue1Id, "Description 1 New"),
+            new IssueCreated(issue2Id, "Description 2"), new IssueUpdated(issue1Id, "Description 1 Super New"),
             new IssueUpdated(issue2Id, "Description 2 New"),
         };
 
@@ -123,6 +124,7 @@ public class AggregationProjectionsTest: MartenTest
         issuesListFromLiveAggregation!.Issues.Count.Should().Be(2);
         issuesListFromInlineAggregation!.Issues.Count.Should().Be(2);
         projection!.Descriptions.Count.Should().Be(2);
-
     }
+
+    public AggregationProjectionsTest(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

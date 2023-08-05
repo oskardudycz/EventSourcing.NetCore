@@ -35,7 +35,7 @@ public class UniqueContstraintTests: MartenTest
             DeleteEvent<UserDeleted>();
 
         public UserNameGuard Create(UserCreated @event) =>
-            new (@event.UserId, @event.Email);
+            new(@event.UserId, @event.Email);
 
         public UserNameGuard Apply(UserEmailUpdated @event, UserNameGuard guard) =>
             guard with { Email = @event.Email };
@@ -95,4 +95,6 @@ public class UniqueContstraintTests: MartenTest
         EventStore.StartStream(new UserCreated(Guid.NewGuid(), "yet.another@email.com"));
         await Session.SaveChangesAsync();
     }
+
+    public UniqueContstraintTests(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

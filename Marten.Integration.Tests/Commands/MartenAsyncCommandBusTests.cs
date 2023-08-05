@@ -90,7 +90,7 @@ public class MartenAsyncCommandBusTests: MartenTest
     private AsyncProjectionHostedService asyncDaemon = default!;
     private readonly CancellationToken ct = new CancellationTokenSource().Token;
 
-    public MartenAsyncCommandBusTests(): base(true)
+    public MartenAsyncCommandBusTests(MartenFixture fixture) : base(fixture.PostgreSqlContainer, true)
     {
     }
 }

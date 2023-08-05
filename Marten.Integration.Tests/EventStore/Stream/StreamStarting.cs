@@ -22,7 +22,7 @@ public record Issue(
 
 public class StreamStarting: MartenTest
 {
-    [Fact (Skip = "Skipped because of https://github.com/JasperFx/marten/issues/1648")]
+    [Fact(Skip = "Skipped because of https://github.com/JasperFx/marten/issues/1648")]
     public void GivenNoEvents_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
     {
         var @event = new IssueCreated(Guid.NewGuid(), "Description");
@@ -84,8 +84,7 @@ public class StreamStarting: MartenTest
         var taskId = Guid.NewGuid();
         var events = new object[]
         {
-            new IssueCreated(taskId, "Description1"),
-            new IssueUpdated(taskId, "Description2")
+            new IssueCreated(taskId, "Description1"), new IssueUpdated(taskId, "Description2")
         };
 
         var streamId = EventStore.StartStream(events);
@@ -94,4 +93,6 @@ public class StreamStarting: MartenTest
 
         Session.SaveChanges();
     }
+
+    public StreamStarting(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

@@ -36,7 +36,10 @@ public class InlineAggregationStorage: MartenTest
         public void Apply(IssueUpdated @event)
         {
             Issues[@event.IssueId] = Issues[@event.IssueId]
-                with {Description = @event.Description};
+                with
+                {
+                    Description = @event.Description
+                };
         }
     }
 
@@ -57,10 +60,8 @@ public class InlineAggregationStorage: MartenTest
 
         var events = new object[]
         {
-            new IssueCreated(issue1Id, "Description 1"),
-            new IssueUpdated(issue1Id, "Description 1 New"),
-            new IssueCreated(issue2Id, "Description 2"),
-            new IssueUpdated(issue1Id, "Description 1 Super New"),
+            new IssueCreated(issue1Id, "Description 1"), new IssueUpdated(issue1Id, "Description 1 New"),
+            new IssueCreated(issue2Id, "Description 2"), new IssueUpdated(issue1Id, "Description 1 Super New"),
             new IssueUpdated(issue2Id, "Description 2 New"),
         };
 
@@ -81,4 +82,6 @@ public class InlineAggregationStorage: MartenTest
         issuesListFromLiveAggregation.Issues.Count.Should().Be(2);
         issuesListFromLiveAggregation.Issues.Count.Should().Be(issuesListFromInlineAggregation.Issues.Count);
     }
+
+    public InlineAggregationStorage(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }
