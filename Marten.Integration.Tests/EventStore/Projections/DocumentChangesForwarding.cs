@@ -180,7 +180,7 @@ public class DocumentChangesForwarding: MartenTest
         await base.DisposeAsync();
     }
 
-    public DocumentChangesForwarding(): base(false, false)
+    public DocumentChangesForwarding(MartenFixture fixture) : base(fixture.PostgreSqlContainer, false, false)
     {
 
     }

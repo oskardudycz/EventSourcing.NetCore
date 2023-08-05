@@ -74,7 +74,8 @@ public class StreamLoading: MartenTest
     }
 
     [Fact]
-    public async Task GivenExistingStreamWithMultipleEvents_WhenEventsAreQueriedOrderedDescending_ThenLastEventIsLoaded()
+    public async Task
+        GivenExistingStreamWithMultipleEvents_WhenEventsAreQueriedOrderedDescending_ThenLastEventIsLoaded()
     {
         var streamId = Guid.NewGuid();
         Session.Events.Append(streamId,
@@ -96,4 +97,6 @@ public class StreamLoading: MartenTest
         lastUpdatedEvent.IssueId.Should().Be(streamId);
         lastUpdatedEvent.Description.Should().Be("The Last One");
     }
+
+    public StreamLoading(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

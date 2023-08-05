@@ -95,4 +95,6 @@ public class StreamLoadingFromExactState: MartenTest
         events = EventStore.FetchStream(streamId, 100);
         events.Count.Should().Be(4);
     }
+
+    public StreamLoadingFromExactState(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

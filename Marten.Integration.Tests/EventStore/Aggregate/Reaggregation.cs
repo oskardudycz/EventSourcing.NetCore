@@ -59,7 +59,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
     public class Reaggregation: MartenTest
     {
-        public Reaggregation() : base(false)
+        public Reaggregation(MartenFixture fixture) : base(fixture.PostgreSqlContainer, false)
         {
         }
 

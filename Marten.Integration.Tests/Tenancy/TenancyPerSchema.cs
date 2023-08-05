@@ -78,7 +78,7 @@ public class TenancyPerSchema: MartenTest
     private const string FirstTenant = "Tenant1";
     private const string SecondTenant = "Tenant2";
 
-    public TenancyPerSchema(): base(false)
+    public TenancyPerSchema(MartenFixture fixture): base(fixture.PostgreSqlContainer, false)
     {
 
     }

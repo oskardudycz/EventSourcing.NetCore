@@ -94,4 +94,6 @@ public class OutOfOrderProjectionsTest: MartenTest
         issuesListFromLiveAggregation!.Issues.Count.Should().Be(2);
         issuesListFromLiveAggregation!.Issues.Count.Should().Be(issuesListFromInlineAggregation!.Issues.Count);
     }
+
+    public OutOfOrderProjectionsTest(MartenFixture fixture) : base(fixture.PostgreSqlContainer){}
 }

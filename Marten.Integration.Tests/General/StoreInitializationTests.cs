@@ -100,7 +100,7 @@ public class StoreInitializationTests: MartenTest
         result.Should().NotBeNull();
     }
 
-    public StoreInitializationTests(): base(false, false)
+    public StoreInitializationTests(MartenFixture fixture) : base(fixture.PostgreSqlContainer, false, false)
     {
 
     }
