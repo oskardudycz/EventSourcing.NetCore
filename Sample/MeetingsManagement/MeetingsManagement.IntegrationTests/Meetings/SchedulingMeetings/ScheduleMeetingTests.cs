@@ -8,31 +8,12 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings;
 
-
-public class ScheduleMeetingFixture: ApiSpecification<Program>, IAsyncLifetime
-{
-    public async Task InitializeAsync()
-    {
-        var openResponse = await Send(
-            new ApiRequest(POST, URI(MeetingsManagementApi.MeetingsUrl), BODY(new CreateMeeting(MeetingId, MeetingName)))
-        );
-
-        await CREATED_WITH_DEFAULT_HEADERS(eTag: 1)(openResponse);
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
-
-    public readonly Guid MeetingId = Guid.NewGuid();
-    public readonly string MeetingName = "Event Sourcing Workshop";
-}
-
-public class ScheduleMeetingTests: IClassFixture<ScheduleMeetingFixture>
+public class ScheduleMeetingTests: IClassFixture<ApiSpecification<Program>>
 {
 
-    private readonly ScheduleMeetingFixture API;
+    private readonly ApiSpecification<Program> API;
 
-    public ScheduleMeetingTests(ScheduleMeetingFixture api) => API = api;
+    public ScheduleMeetingTests(ApiSpecification<Program> api) => API = api;
 
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -40,24 +21,24 @@ public class ScheduleMeetingTests: IClassFixture<ScheduleMeetingFixture>
     {
         await API
             .Given(
-                URI($"{MeetingsManagementApi.MeetingsUrl}/{API.MeetingId}/schedule"),
+                "Created Meeting",
+                SEND(POST, URI(MeetingsManagementApi.MeetingsUrl), BODY(new CreateMeeting(MeetingId, MeetingName)))
+            )
+            .When(
+                POST,
+                URI(ctx => $"{MeetingsManagementApi.MeetingsUrl}/{ctx.GetCreatedId()}/schedule"),
                 BODY(DateRange.Create(Start, End)),
                 HEADERS(IF_MATCH(1))
             )
-            .When(POST)
-            .Then(OK);
-
-        await API
-            .Given(
-                URI($"{MeetingsManagementApi.MeetingsUrl}/{API.MeetingId}")
-            )
-            .When(GET_UNTIL(RESPONSE_ETAG_IS(2)))
+            .Then(OK)
+            .AndWhen(GET, URI(ctx => $"{MeetingsManagementApi.MeetingsUrl}/{ctx.GetCreatedId()}"))
+            .Until(RESPONSE_ETAG_IS(2))
             .Then(
                 OK,
                 RESPONSE_BODY<MeetingView>(meeting =>
                 {
-                    meeting.Id.Should().Be(API.MeetingId);
-                    meeting.Name.Should().Be(API.MeetingName);
+                    meeting.Id.Should().Be(MeetingId);
+                    meeting.Name.Should().Be(MeetingName);
                     meeting.Start.Should().Be(Start);
                     meeting.End.Should().Be(End);
                 }));
@@ -65,4 +46,7 @@ public class ScheduleMeetingTests: IClassFixture<ScheduleMeetingFixture>
 
     private readonly DateTime Start = DateTime.UtcNow;
     private readonly DateTime End = DateTime.UtcNow;
+
+    public readonly Guid MeetingId = Guid.NewGuid();
+    public readonly string MeetingName = "Event Sourcing Workshop";
 }

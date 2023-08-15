@@ -13,25 +13,25 @@ public class ResolveIncidentTests: IClassFixture<ApiWithLoggedIncident>
     public async Task ResolveCommand_Succeeds()
     {
         await API
-            .Given(
+            .Given()
+            .When(
+                POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/resolve"),
                 BODY(new ResolveIncidentRequest(resolutionType)),
                 HEADERS(IF_MATCH(1))
             )
-            .When(POST)
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.Incident.Id}"))
-            .When(GET)
+            .Given()
+            .When(
+                GET,
+                URI($"/api/incidents/{API.Incident.Id}")
+            )
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Incident with
-                    {
-                        Status = IncidentStatus.Resolved,
-                        Version = 2
-                    }
+                    API.Incident with { Status = IncidentStatus.Resolved, Version = 2 }
                 )
             );
     }

@@ -22,11 +22,12 @@ public class SendPackageTests: IClassFixture<TestWebApplicationFactory<Program>>
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task SendPackage_ShouldReturn_CreatedStatus_With_PackageId() =>
-        API.Given(
+        API.Given()
+            .When(
+                POST,
                 URI("/api/Shipments/"),
                 BODY(new SendPackage(OrderId, ProductItems))
             )
-            .When(POST)
             .Then(CREATED_WITH_DEFAULT_HEADERS())
             .And(response => fixture.ShouldPublishInternalEventOfType<PackageWasSent>(
                 @event =>

@@ -1,69 +1,47 @@
 using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
-using Carts.ShoppingCarts.Products;
 using FluentAssertions;
 using Ogooreck.API;
-using static Ogooreck.API.ApiSpecification;
 using Xunit;
+using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.AddingProduct;
 
-public class AddProductFixture: ApiSpecification<Program>, IAsyncLifetime
+using static ShoppingCartsApi;
+
+public class AddProductTests: IClassFixture<ApiSpecification<Program>>
 {
-    public Guid ShoppingCartId { get; private set; }
+    private readonly ApiSpecification<Program> API;
 
-    public readonly Guid ClientId = Guid.NewGuid();
+    public AddProductTests(ApiSpecification<Program> api) => API = api;
 
-    public async Task InitializeAsync()
-    {
-        var openResponse = await Send(
-            new ApiRequest(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
-        );
-
-        await CREATED(openResponse);
-        await RESPONSE_LOCATION_HEADER()(openResponse);
-
-        ShoppingCartId = openResponse.GetCreatedId<Guid>();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-}
-
-public class AddProductTests: IClassFixture<AddProductFixture>
-{
-    private readonly AddProductFixture API;
-
-    public AddProductTests(AddProductFixture api) => API = api;
+    private readonly ProductItemRequest product = new(Guid.NewGuid(), 1);
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task Post_Should_AddProductItem_To_ShoppingCart()
-    {
-        var product = new ProductItemRequest(Guid.NewGuid(), 1);
-
-        await API
-            .Given(
-                URI($"/api/ShoppingCarts/{API.ShoppingCartId}/products"),
+    public Task Post_Should_AddProductItem_To_ShoppingCart() =>
+        API
+            .Given("Opened Shopping Cart", OpenShoppingCart())
+            .When(
+                "Add new product",
+                POST,
+                URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}/products"),
                 BODY(new AddProductRequest(product)),
                 HEADERS(IF_MATCH(1))
             )
-            .When(POST)
-            .Then(OK);
-
-        await API
-            .Given(URI($"/api/ShoppingCarts/{API.ShoppingCartId}"))
-            .When(GET_UNTIL(RESPONSE_ETAG_IS(2)))
+            .Then(OK)
+            .And()
+            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
             .Then(
-                RESPONSE_BODY<ShoppingCartDetails>(details =>
+                RESPONSE_BODY<ShoppingCartDetails>((details, ctx) =>
                 {
-                    details.Id.Should().Be(API.ShoppingCartId);
+                    details.Id.Should().Be(ctx.OpenedShoppingCartId());
                     details.Status.Should().Be(ShoppingCartStatus.Pending);
-                    details.ProductItems.Should().HaveCount(1);
-                    details.ProductItems.Single().ProductItem.Should()
-                        .Be(ProductItem.From(product.ProductId, product.Quantity));
+                    var productItem = details.ProductItems.Single();
+                    productItem.Quantity.Should().Be(product.Quantity);
+                    productItem.ProductId.Should().Be(product.ProductId!.Value);
                     details.Version.Should().Be(2);
                 })
             );
-    }
 }

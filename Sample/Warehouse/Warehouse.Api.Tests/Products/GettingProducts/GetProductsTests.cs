@@ -15,8 +15,8 @@ public class GetProductsTests: IClassFixture<GetProductsFixture>
 
     [Fact]
     public Task ValidRequest_With_NoParams_ShouldReturn_200() =>
-        API.Given(URI("/api/products/"))
-            .When(GET)
+        API.Given()
+            .When(GET, URI("/api/products/"))
             .Then(OK, RESPONSE_BODY(API.RegisteredProducts));
 
     [Fact]
@@ -25,8 +25,8 @@ public class GetProductsTests: IClassFixture<GetProductsFixture>
         var registeredProduct = API.RegisteredProducts.First();
         var filter = registeredProduct.Sku[1..];
 
-        return API.Given(URI($"/api/products/?filter={filter}"))
-            .When(GET)
+        return API.Given()
+            .When(GET, URI($"/api/products/?filter={filter}"))
             .Then(OK, RESPONSE_BODY(new List<ProductListItem> { registeredProduct }));
     }
 
@@ -41,23 +41,23 @@ public class GetProductsTests: IClassFixture<GetProductsFixture>
             .Take(pageSize)
             .ToList();
 
-        return API.Given(URI($"/api/products/?page={page}&pageSize={pageSize}"))
-            .When(GET)
+        return API.Given()
+            .When(GET, URI($"/api/products/?page={page}&pageSize={pageSize}"))
             .Then(OK, RESPONSE_BODY(pagedRecords));
     }
 
     [Fact]
     public Task NegativePage_ShouldReturn_400() =>
-        API.Given(URI($"/api/products/?page={-20}"))
-            .When(GET)
+        API.Given()
+            .When(GET, URI($"/api/products/?page={-20}"))
             .Then(BAD_REQUEST);
 
     [Theory]
     [InlineData(0)]
     [InlineData(-20)]
     public Task NegativeOrZeroPageSize_ShouldReturn_400(int pageSize) =>
-        API.Given(URI($"/api/products/?pageSize={pageSize}"))
-            .When(GET)
+        API.Given()
+            .When(GET, URI($"/api/products/?pageSize={pageSize}"))
             .Then(BAD_REQUEST);
 }
 
@@ -79,13 +79,10 @@ public class GetProductsFixture: ApiSpecification<Program>, IAsyncLifetime
 
         foreach (var registerProduct in productsToRegister)
         {
-            var registerResponse = await Send(
-                new ApiRequest(POST, URI("/api/products"), BODY(registerProduct))
-            );
-
-            await CREATED(registerResponse);
-
-            var createdId = registerResponse.GetCreatedId<Guid>();
+            var createdId = await Given()
+                .When(POST, URI("/api/products"), BODY(registerProduct))
+                .Then(CREATED)
+                .GetCreatedId<Guid>();
 
             var (sku, name, _) = registerProduct;
             RegisteredProducts.Add(new ProductListItem(createdId, sku!, name!));

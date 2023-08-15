@@ -13,23 +13,25 @@ public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedI
     public async Task RecordCustomerResponseCommand_RecordsResponse()
     {
         await API
-            .Given(
+            .Given()
+            .When(
+                POST,
                 URI($"/api/customers/{customerId}/incidents/{API.Incident.Id}/responses"),
                 BODY(new RecordCustomerResponseToIncidentRequest(content)),
                 HEADERS(IF_MATCH(1))
             )
-            .When(POST)
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.Incident.Id}"))
-            .When(GET)
+            .Given()
+            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(
                     API.Incident with
                     {
-                        Notes = new[] { new IncidentNote(IncidentNoteType.FromCustomer, customerId, content, true) },
+                        Notes =
+                        new[] { new IncidentNote(IncidentNoteType.FromCustomer, customerId, content, true) },
                         Version = 2
                     }
                 )

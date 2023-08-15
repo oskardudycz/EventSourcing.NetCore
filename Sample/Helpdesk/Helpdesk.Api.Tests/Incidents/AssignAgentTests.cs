@@ -11,24 +11,19 @@ public class AssignAgentToIncidentTests: IClassFixture<ApiWithLoggedIncident>
     public async Task AssignAgentCommand_ChangesIncidentCategory()
     {
         await API
-            .Given(
+            .Given()
+            .When(
+                POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/assign"),
                 HEADERS(IF_MATCH(1))
             )
-            .When(POST)
-            .Then(OK);
-
-        await API
-            .Given(URI($"/api/incidents/{API.Incident.Id}"))
-            .When(GET)
+            .Then(OK)
+            .And()
+            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Incident with
-                    {
-                        AgentId = agentId,
-                        Version = 2
-                    }
+                    API.Incident with { AgentId = agentId, Version = 2 }
                 )
             );
     }

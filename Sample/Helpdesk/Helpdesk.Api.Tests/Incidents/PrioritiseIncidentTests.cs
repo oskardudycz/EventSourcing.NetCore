@@ -13,17 +13,18 @@ public class PrioritiseIncidentTests: IClassFixture<ApiWithLoggedIncident>
     public async Task PrioritiseCommand_ChangesIncidentPriority()
     {
         await API
-            .Given(
+            .Given()
+            .When(
+                POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/priority"),
                 BODY(new PrioritiseIncidentRequest(priority)),
                 HEADERS(IF_MATCH(1))
             )
-            .When(POST)
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.Incident.Id}"))
-            .When(GET)
+            .Given()
+            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(

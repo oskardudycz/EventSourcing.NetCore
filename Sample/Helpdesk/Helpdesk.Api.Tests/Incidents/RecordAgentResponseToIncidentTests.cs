@@ -14,17 +14,18 @@ public class RecordAgentResponseToIncidentTests: IClassFixture<ApiWithLoggedInci
     public async Task RecordAgentResponseCommand_RecordsResponse()
     {
         await API
-            .Given(
+            .Given()
+            .When(
+                POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/responses"),
                 BODY(new RecordAgentResponseToIncidentRequest(content, visibleToCustomer)),
                 HEADERS(IF_MATCH(1))
             )
-            .When(POST)
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.Incident.Id}"))
-            .When(GET)
+            .Given()
+            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(

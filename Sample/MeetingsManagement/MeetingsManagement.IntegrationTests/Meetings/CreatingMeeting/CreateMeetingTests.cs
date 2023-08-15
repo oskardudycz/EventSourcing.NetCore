@@ -20,11 +20,12 @@ public class CreateMeetingTests: IClassFixture<TestWebApplicationFactory<Program
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task CreateCommand_ShouldPublish_MeetingCreateEvent() =>
-        API.Given(
+        API.Given()
+            .When(
+                POST,
                 URI(MeetingsManagementApi.MeetingsUrl),
                 BODY(new CreateMeeting(MeetingId, MeetingName))
             )
-            .When(POST)
             .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
     private readonly Guid MeetingId = Guid.NewGuid();

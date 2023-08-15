@@ -15,21 +15,23 @@ public class RegisterProductTests: IClassFixture<WarehouseTestWebApplicationFact
     [Theory]
     [MemberData(nameof(ValidRequests))]
     public Task ValidRequest_ShouldReturn_201(RegisterProductRequest validRequest) =>
-        API.Given(
+        API.Given()
+            .When(
+                POST,
                 URI("/api/products/"),
                 BODY(validRequest)
             )
-            .When(POST)
             .Then(CREATED);
 
     [Theory]
     [MemberData(nameof(InvalidRequests))]
     public Task InvalidRequest_ShouldReturn_400(RegisterProductRequest invalidRequest) =>
-        API.Given(
+        API.Given()
+            .When(
+                POST,
                 URI("/api/products"),
                 BODY(invalidRequest)
             )
-            .When(POST)
             .Then(BAD_REQUEST);
 
     [Fact]
@@ -39,19 +41,21 @@ public class RegisterProductTests: IClassFixture<WarehouseTestWebApplicationFact
         var request = new RegisterProductRequest("AA2039485", ValidName, ValidDescription);
 
         // first one should succeed
-        await API.Given(
+        await API.Given()
+            .When(
+                POST,
                 URI("/api/products/"),
                 BODY(request)
             )
-            .When(POST)
             .Then(CREATED);
 
         // second one will fail with conflict
-        await API.Given(
+        await API.Given()
+            .When(
+                POST,
                 URI("/api/products/"),
                 BODY(request)
             )
-            .When(POST)
             .Then(CONFLICT);
     }
 

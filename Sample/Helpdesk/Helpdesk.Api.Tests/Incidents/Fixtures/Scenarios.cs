@@ -43,12 +43,10 @@ public static class Scenarios
         var resolvedType = faker.PickRandom<ResolutionType>();
         var incident = await api.LoggedIncident();
 
-        var response = await api.Scenario(
+        return await api.Scenario(
             api.ResolveIncident(incident.Id, agentId, resolvedType),
             _ => api.GetIncidentDetails(incident.Id)
-        );
-
-        return await response.GetResultFromJson<IncidentDetails>();
+        ).GetResponseBody<IncidentDetails>();
     }
 
     public static async Task<IncidentDetails> AcknowledgedIncident(
@@ -57,58 +55,55 @@ public static class Scenarios
     {
         var incident = await api.ResolvedIncident();
 
-        var response = await api.Scenario(
+        return await api.Scenario(
             api.AcknowledgeIncident(incident.Id, incident.CustomerId),
             _ => api.GetIncidentDetails(incident.Id)
-        );
-
-        return await response.GetResultFromJson<IncidentDetails>();
+        ).GetResponseBody<IncidentDetails>();
     }
 
-    private static Task<HttpResponseMessage> LogIncident(
+    private static Task<Result> LogIncident(
         this ApiSpecification<Program> api,
         Guid customerId,
         Contact contact,
         string incidentDescription
     ) =>
-        api.Given(
-                URI($"api/customers/{customerId}/incidents/"),
-                BODY(new LogIncidentRequest(contact, incidentDescription))
-            )
-            .When(POST)
+        api.Given()
+            .When(POST, URI($"api/customers/{customerId}/incidents/"), BODY(new LogIncidentRequest(contact, incidentDescription)))
             .Then(CREATED_WITH_DEFAULT_HEADERS(locationHeaderPrefix: "/api/incidents/"));
 
-    private static Task<HttpResponseMessage> ResolveIncident<T>(
+    private static Task<Result> ResolveIncident<T>(
         this ApiSpecification<T> api,
         Guid incidentId,
         Guid agentId,
         ResolutionType resolutionType
     ) where T : class =>
-        api.Given(
+        api.Given()
+            .When(
+                POST,
                 URI($"/api/agents/{agentId}/incidents/{incidentId}/resolve"),
                 BODY(new ResolveIncidentRequest(resolutionType)),
                 HEADERS(IF_MATCH(1))
             )
-            .When(POST)
             .Then(OK);
 
-    private static Task<HttpResponseMessage> AcknowledgeIncident<T>(
+    private static Task<Result> AcknowledgeIncident<T>(
         this ApiSpecification<T> api,
         Guid incidentId,
         Guid customerId
     ) where T : class =>
-        api.Given(
+        api.Given()
+            .When(
+                POST,
                 URI($"/api/customers/{customerId}/incidents/{incidentId}/acknowledge"),
                 HEADERS(IF_MATCH(2))
-            )
-            .When(POST)
+             )
             .Then(OK);
 
-    private static Task<HttpResponseMessage> GetIncidentDetails(
+    private static Task<Result> GetIncidentDetails(
         this ApiSpecification<Program> api,
         Guid incidentId
     ) =>
-        api.Given(URI($"/api/incidents/{incidentId}"))
-            .When(GET)
+        api.Given()
+            .When(GET, URI($"/api/incidents/{incidentId}"))
             .Then(OK);
 }
