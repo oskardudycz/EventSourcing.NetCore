@@ -13,25 +13,22 @@ public class CategoriseIncidentTests: IClassFixture<ApiWithLoggedIncident>
     public async Task CategoriseCommand_ChangesIncidentCategory()
     {
         await API
-            .Given(
+            .Given()
+            .When(
+                POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/category"),
                 BODY(new CategoriseIncidentRequest(category)),
                 HEADERS(IF_MATCH(1))
             )
-            .When(POST)
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.Incident.Id}"))
-            .When(GET)
+            .Given()
+            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Incident with
-                    {
-                        Category = category,
-                        Version = 2
-                    }
+                    API.Incident with { Category = category, Version = 2 }
                 )
             );
     }
@@ -41,5 +38,4 @@ public class CategoriseIncidentTests: IClassFixture<ApiWithLoggedIncident>
     private readonly ApiWithLoggedIncident API;
 
     public CategoriseIncidentTests(ApiWithLoggedIncident api) => API = api;
-
 }

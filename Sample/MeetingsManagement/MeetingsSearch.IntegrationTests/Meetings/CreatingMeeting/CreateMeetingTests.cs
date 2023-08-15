@@ -32,14 +32,15 @@ public class CreateMeetingTests: IClassFixture<TestWebApplicationFactory<Program
             new EventMetadata("event-id", 1, 2, null)
         ));
 
-        await API.Given(
+        await API.Given()
+            .When(
+                GET,
                 URI($"{MeetingsSearchApi.MeetingsUrl}?filter={MeetingName}")
             )
-            .When(
-                GET_UNTIL(
-                    RESPONSE_BODY_MATCHES<IReadOnlyCollection<Meeting>>(
-                        meetings => meetings.Any(m => m.Id == MeetingId))
-                ))
+            .Until(
+                RESPONSE_BODY_MATCHES<IReadOnlyCollection<Meeting>>(
+                    meetings => meetings.Any(m => m.Id == MeetingId))
+            )
             .Then(
                 RESPONSE_BODY<IReadOnlyCollection<Meeting>>(meetings =>
                     meetings.Should().Contain(meeting =>

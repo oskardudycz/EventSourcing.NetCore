@@ -19,12 +19,13 @@ public class RequestPaymentsTests: IClassFixture<TestWebApplicationFactory<Progr
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public Task  RequestPayment_ShouldReturn_CreatedStatus_With_PaymentId() =>
-        API.Given(
+    public Task RequestPayment_ShouldReturn_CreatedStatus_With_PaymentId() =>
+        API.Given()
+            .When(
+                POST,
                 URI("/api/Payments/"),
-                BODY(new RequestPaymentRequest {OrderId = OrderId, Amount = Amount})
+                BODY(new RequestPaymentRequest { OrderId = OrderId, Amount = Amount })
             )
-            .When(POST)
             .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
     private readonly Guid OrderId = Guid.NewGuid();

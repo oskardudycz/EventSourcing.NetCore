@@ -4,8 +4,8 @@ using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
 using Carts.ShoppingCarts.Products;
 using FluentAssertions;
-using Xunit;
 using Ogooreck.API;
+using Xunit;
 using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.RemovingProduct;
@@ -22,32 +22,24 @@ public class RemoveProductFixture: ApiSpecification<Program>, IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var openResponse = await Send(
-            new ApiRequest(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
-        );
-
-        await CREATED_WITH_DEFAULT_HEADERS(eTag: 0)(openResponse);
-
-        ShoppingCartId = openResponse.GetCreatedId<Guid>();
-
-        var addResponse = await Send(
-            new ApiRequest(
+        var cartDetails = await Given()
+            .When(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
+            .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 0))
+            .And()
+            .When(
                 POST,
-                URI($"/api/ShoppingCarts/{ShoppingCartId}/products"),
+                URI(ctx => $"/api/ShoppingCarts/{ctx.GetCreatedId()}/products"),
                 BODY(new AddProductRequest(ProductItem)),
-                HEADERS(IF_MATCH(0)))
-        );
-
-        await OK(addResponse);
-
-        var getResponse = await Send(
-            new ApiRequest(
-                GET_UNTIL(RESPONSE_ETAG_IS(1)),
-                URI($"/api/ShoppingCarts/{ShoppingCartId}")
+                HEADERS(IF_MATCH(0))
             )
-        );
+            .Then(OK)
+            .And()
+            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.GetCreatedId()}"))
+            .Until(RESPONSE_ETAG_IS(1))
+            .Then(OK)
+            .GetResponseBody<ShoppingCartDetails>();
 
-        var cartDetails = await getResponse.GetResultFromJson<ShoppingCartDetails>();
+        ShoppingCartId = cartDetails.Id;
         UnitPrice = cartDetails.ProductItems.Single().UnitPrice;
     }
 
@@ -65,19 +57,17 @@ public class RemoveProductTests: IClassFixture<RemoveProductFixture>
     public async Task Delete_Should_Return_OK_And_Cancel_Shopping_Cart()
     {
         await API
-            .Given(
+            .Given()
+            .When(
+                DELETE,
                 URI(
                     $"/api/ShoppingCarts/{API.ShoppingCartId}/products/{API.ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={API.UnitPrice.ToString(CultureInfo.InvariantCulture)}"),
                 HEADERS(IF_MATCH(1))
             )
-            .When(DELETE)
-            .Then(NO_CONTENT);
-
-        await API
-            .Given(
-                URI($"/api/ShoppingCarts/{API.ShoppingCartId}")
-            )
-            .When(GET_UNTIL(RESPONSE_ETAG_IS(2)))
+            .Then(NO_CONTENT)
+            .And()
+            .When(GET, URI($"/api/ShoppingCarts/{API.ShoppingCartId}"))
+            .Until(RESPONSE_ETAG_IS(2))
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>
@@ -86,9 +76,13 @@ public class RemoveProductTests: IClassFixture<RemoveProductFixture>
                     details.Status.Should().Be(ShoppingCartStatus.Pending);
                     details.ProductItems.Should().HaveCount(1);
                     var productItem = details.ProductItems.Single();
-                    productItem.Should().Be(
-                        PricedProductItem.From(
-                            ProductItem.From(API.ProductItem.ProductId, API.ProductItem.Quantity - RemovedCount),
+                    productItem.Should().BeEquivalentTo(
+                        new PricedProductItem(
+                            new ProductItem
+                            (
+                                API.ProductItem.ProductId!.Value,
+                                API.ProductItem.Quantity!.Value - RemovedCount
+                            ),
                             API.UnitPrice
                         ));
                     details.ClientId.Should().Be(API.ClientId);

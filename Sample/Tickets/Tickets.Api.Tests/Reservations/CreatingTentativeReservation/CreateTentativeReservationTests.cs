@@ -15,86 +15,65 @@ namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation;
 public class CreateTentativeReservationTests: IClassFixture<TestWebApplicationFactory<Program>>
 {
     [Fact]
-    public async Task Post_ShouldReturn_CreatedStatus_With_CartId()
-    {
-        var createdReservationId = Guid.Empty;
+    public Task Post_ShouldReturn_CreatedStatus_With_CartId() =>
+        API.Given()
+            .When(
+                POST,
+                URI("/api/Reservations/"),
+                BODY(new CreateTentativeReservationRequest { SeatId = SeatId })
+            )
+            .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1))
+            .And()
+            .When(GET, URI(ctx => $"/api/Reservations/{ctx.GetCreatedId()}"))
+            .Then(
+                OK,
+                RESPONSE_BODY<ReservationDetails>((reservation, ctx) =>
+                {
+                    reservation.Id.Should().Be(ctx.GetCreatedId<Guid>());
+                    reservation.Status.Should().Be(ReservationStatus.Tentative);
+                    reservation.SeatId.Should().Be(SeatId);
+                    reservation.Number.Should().NotBeEmpty();
+                    reservation.Version.Should().Be(1);
+                })
+            )
+            .And()
+            .When(GET, URI("/api/Reservations/"))
+            .Then(
+                OK,
+                RESPONSE_BODY<PagedListResponse<ReservationShortInfo>>((reservations, ctx) =>
+                {
+                    reservations.Should().NotBeNull();
+                    reservations.Items.Should().NotBeNull();
 
-        await API.Scenario(
-            // Create Reservations
-            API.Given(
-                    URI("/api/Reservations/"),
-                    BODY(new CreateTentativeReservationRequest { SeatId = SeatId })
-                )
-                .When(POST)
-                .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1),
-                    response =>
-                    {
-                        createdReservationId = response.GetCreatedId<Guid>();
-                        return ValueTask.CompletedTask;
-                    }),
+                    reservations.Items.Should().HaveCount(1);
+                    reservations.TotalItemCount.Should().Be(1);
+                    reservations.HasNextPage.Should().Be(false);
 
-            // Get reservation details
-            _ => API.Given(
-                    URI($"/api/Reservations/{createdReservationId}")
-                )
-                .When(GET)
-                .Then(
-                    OK,
-                    RESPONSE_BODY<ReservationDetails>(reservation =>
-                    {
-                        reservation.Id.Should().Be(createdReservationId);
-                        reservation.Status.Should().Be(ReservationStatus.Tentative);
-                        reservation.SeatId.Should().Be(SeatId);
-                        reservation.Number.Should().NotBeEmpty();
-                        reservation.Version.Should().Be(1);
-                    })),
+                    var reservationInfo = reservations.Items.Single();
 
-            // Get reservations list
-            _ => API.Given(
-                    URI("/api/Reservations/")
-                )
-                .When(GET)
-                .Then(
-                    OK,
-                    RESPONSE_BODY<PagedListResponse<ReservationShortInfo>>(reservations =>
-                    {
-                        reservations.Should().NotBeNull();
-                        reservations.Items.Should().NotBeNull();
+                    reservationInfo.Id.Should().Be(ctx.GetCreatedId());
+                    reservationInfo.Number.Should().NotBeNull().And.NotBeEmpty();
+                    reservationInfo.Status.Should().Be(ReservationStatus.Tentative);
+                }))
+            .And()
+            .When(GET, URI(ctx => $"/api/Reservations/{ctx.GetCreatedId()}/history"))
+            .Then(
+                OK,
+                RESPONSE_BODY<PagedListResponse<ReservationHistory>>((reservations, ctx) =>
+                {
+                    reservations.Should().NotBeNull();
+                    reservations.Items.Should().NotBeNull();
 
-                        reservations.Items.Should().HaveCount(1);
-                        reservations.TotalItemCount.Should().Be(1);
-                        reservations.HasNextPage.Should().Be(false);
+                    reservations.Items.Should().HaveCount(1);
+                    reservations.TotalItemCount.Should().Be(1);
+                    reservations.HasNextPage.Should().Be(false);
 
-                        var reservationInfo = reservations.Items.Single();
+                    var reservationInfo = reservations.Items.Single();
 
-                        reservationInfo.Id.Should().Be(createdReservationId);
-                        reservationInfo.Number.Should().NotBeNull().And.NotBeEmpty();
-                        reservationInfo.Status.Should().Be(ReservationStatus.Tentative);
-                    })),
-
-            // Get reservation history
-            _ => API.Given(
-                    URI($"/api/Reservations/{createdReservationId}/history")
-                )
-                .When(GET)
-                .Then(
-                    OK,
-                    RESPONSE_BODY<PagedListResponse<ReservationHistory>>(reservations =>
-                    {
-                        reservations.Should().NotBeNull();
-                        reservations.Items.Should().NotBeNull();
-
-                        reservations.Items.Should().HaveCount(1);
-                        reservations.TotalItemCount.Should().Be(1);
-                        reservations.HasNextPage.Should().Be(false);
-
-                        var reservationInfo = reservations.Items.Single();
-
-                        reservationInfo.ReservationId.Should().Be(createdReservationId);
-                        reservationInfo.Description.Should().StartWith("Created tentative reservation with number");
-                    }))
-        );
-    }
+                    reservationInfo.ReservationId.Should().Be(ctx.GetCreatedId<Guid>());
+                    reservationInfo.Description.Should().StartWith("Created tentative reservation with number");
+                })
+            );
 
     private readonly Guid SeatId = Guid.NewGuid();
 

@@ -15,18 +15,17 @@ public class OpenShoppingCartTests: IClassFixture<ShoppingCartsApplicationFactor
     [Fact]
     public Task Post_ShouldReturn_CreatedStatus_With_CartId() =>
         API.Scenario(
-            API.Given(
+            API.Given()
+                .When(
+                    POST,
                     URI("/api/ShoppingCarts/"),
                     BODY(new OpenShoppingCartRequest(ClientId))
                 )
-                .When(POST)
                 .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 0)),
-
             response =>
-                API.Given(
-                        URI($"/api/ShoppingCarts/{response.GetCreatedId()}")
-                    )
-                    .When(GET_UNTIL(RESPONSE_ETAG_IS(0)))
+                API.Given()
+                    .When(GET, URI($"/api/ShoppingCarts/{response.GetCreatedId()}"))
+                    .Until(RESPONSE_ETAG_IS(0))
                     .Then(
                         OK,
                         RESPONSE_BODY<ShoppingCartDetails>(details =>

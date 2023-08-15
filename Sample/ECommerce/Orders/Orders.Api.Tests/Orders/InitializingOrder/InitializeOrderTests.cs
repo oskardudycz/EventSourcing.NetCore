@@ -20,7 +20,9 @@ public class InitializeOrderTests: IClassFixture<TestWebApplicationFactory<Progr
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task InitializeOrder_ShouldReturn_CreatedStatus_With_OrderId() =>
-        API.Given(
+        API.Given()
+            .When(
+                POST,
                 URI("/api/Orders/"),
                 BODY(new InitOrderRequest(
                     ClientId,
@@ -28,7 +30,6 @@ public class InitializeOrderTests: IClassFixture<TestWebApplicationFactory<Progr
                     TotalPrice
                 ))
             )
-            .When(POST)
             .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
     private readonly Guid ClientId = Guid.NewGuid();

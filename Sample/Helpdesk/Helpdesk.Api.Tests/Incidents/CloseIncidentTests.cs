@@ -12,24 +12,21 @@ public class CloseIncidentTests: IClassFixture<ApiWithAcknowledgedIncident>
     public async Task ResolveCommand_Succeeds()
     {
         await API
-            .Given(
+            .Given()
+            .When(
+                POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/close"),
                 HEADERS(IF_MATCH(3))
             )
-            .When(POST)
             .Then(OK);
 
         await API
-            .Given(URI($"/api/incidents/{API.Incident.Id}"))
-            .When(GET)
+            .Given()
+            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Incident with
-                    {
-                        Status = IncidentStatus.Closed,
-                        Version = 4
-                    }
+                    API.Incident with { Status = IncidentStatus.Closed, Version = 4 }
                 )
             );
     }

@@ -14,22 +14,22 @@ public class GetProductDetailsTests: IClassFixture<GetProductDetailsFixture>
 
     [Fact]
     public Task ValidRequest_With_NoParams_ShouldReturn_200() =>
-        API.Given(URI($"/api/products/{API.ExistingProduct.Id}"))
-            .When(GET)
+        API.Given()
+            .When(GET, URI($"/api/products/{API.ExistingProduct.Id}"))
             .Then(OK, RESPONSE_BODY(API.ExistingProduct));
 
     [Theory]
     [InlineData(12)]
     [InlineData("not-a-guid")]
     public Task InvalidGuidId_ShouldReturn_404(object invalidId) =>
-        API.Given(URI($"/api/products/{invalidId}"))
-            .When(GET)
+        API.Given()
+            .When(GET, URI($"/api/products/{invalidId}"))
             .Then(NOT_FOUND);
 
     [Fact]
     public Task NotExistingId_ShouldReturn_404() =>
-        API.Given(URI($"/api/products/{Guid.NewGuid()}"))
-            .When(GET)
+        API.Given()
+            .When(GET, URI($"/api/products/{Guid.NewGuid()}"))
             .Then(NOT_FOUND);
 }
 
@@ -43,14 +43,13 @@ public class GetProductDetailsFixture: ApiSpecification<Program>, IAsyncLifetime
     public async Task InitializeAsync()
     {
         var registerProduct = new RegisterProductRequest("IN11111", "ValidName", "ValidDescription");
-        var registerResponse = await Send(
-            new ApiRequest(POST, URI("/api/products"), BODY(registerProduct))
-        );
-
-        await CREATED(registerResponse);
+        var productId = await Given()
+            .When(POST, URI("/api/products"), BODY(registerProduct))
+            .Then(CREATED)
+            .GetCreatedId<Guid>();
 
         var (sku, name, description) = registerProduct;
-        ExistingProduct = new ProductDetails(registerResponse.GetCreatedId<Guid>(), sku!, name!, description);
+        ExistingProduct = new ProductDetails(productId, sku!, name!, description);
     }
 
     public Task DisposeAsync() => Task.CompletedTask;

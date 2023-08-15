@@ -9,19 +9,19 @@ public class AcknowledgeResolutionIncidentTests: IClassFixture<ApiWithResolvedIn
 {
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task ResolveCommand_Succeeds()
-    {
-        await API
-            .Given(
+    public  Task ResolveCommand_Succeeds() =>
+        API
+            .Given()
+            .When(
+                POST,
                 URI($"/api/customers/{API.Incident.CustomerId}/incidents/{API.Incident.Id}/acknowledge"),
                 HEADERS(IF_MATCH(2))
             )
-            .When(POST)
-            .Then(OK);
+            .Then(OK)
 
-        await API
-            .Given(URI($"/api/incidents/{API.Incident.Id}"))
-            .When(GET)
+            .And()
+
+            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(
@@ -32,7 +32,6 @@ public class AcknowledgeResolutionIncidentTests: IClassFixture<ApiWithResolvedIn
                     }
                 )
             );
-    }
 
     private readonly ApiWithResolvedIncident API;
 
