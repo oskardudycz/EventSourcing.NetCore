@@ -2,7 +2,7 @@ using FluentAssertions;
 using IntroductionToEventSourcing.BusinessLogic.Tools;
 using Xunit;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
+namespace IntroductionToEventSourcing.BusinessLogic.Immutable.Solution1;
 
 // EVENTS
 public record ShoppingCartOpened(
