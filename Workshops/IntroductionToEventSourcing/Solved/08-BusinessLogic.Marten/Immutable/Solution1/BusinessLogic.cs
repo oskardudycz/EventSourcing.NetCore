@@ -1,4 +1,4 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
+namespace IntroductionToEventSourcing.BusinessLogic.Immutable.Solution1;
 
 // ENTITY
 public record ShoppingCart(

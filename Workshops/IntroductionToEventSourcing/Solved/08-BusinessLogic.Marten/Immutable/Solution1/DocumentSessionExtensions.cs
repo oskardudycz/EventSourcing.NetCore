@@ -1,6 +1,6 @@
 using Marten;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
+namespace IntroductionToEventSourcing.BusinessLogic.Immutable.Solution1;
 
 public static class DocumentSessionExtensions
 {
