@@ -5,9 +5,13 @@ using static ShoppingCartEvent;
 public abstract record ShoppingCartEvent
 {
     public record Opened(ClientId ClientId, DateTimeOffset OpenedAt): ShoppingCartEvent;
+
     public record ProductItemAdded(PricedProductItem ProductItem): ShoppingCartEvent;
+
     public record ProductItemRemoved(PricedProductItem ProductItem): ShoppingCartEvent;
+
     public record Confirmed(DateTimeOffset ConfirmedAt): ShoppingCartEvent;
+
     public record Canceled(DateTimeOffset CanceledAt): ShoppingCartEvent;
 }
 
@@ -21,6 +25,10 @@ public record ShoppingCart
             ProductItems
                 .Where(pi => pi.ProductId == productItem.ProductId)
                 .Sum(pi => pi.Quantity) >= productItem.Quantity.Value;
+
+        public bool HasItems =>
+            ProductItems
+                .Sum(pi => pi.Quantity) <= 0;
     }
 
     public record Closed: ShoppingCart;

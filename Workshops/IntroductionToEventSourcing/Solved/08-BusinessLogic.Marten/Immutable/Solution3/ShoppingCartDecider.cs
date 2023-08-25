@@ -9,9 +9,13 @@ using static ShoppingCartCommand;
 public abstract record ShoppingCartCommand
 {
     public record Open(ShoppingCartId ShoppingCartId, ClientId ClientId, DateTimeOffset Now): ShoppingCartCommand;
+
     public record AddProductItem(ShoppingCartId ShoppingCartId, PricedProductItem ProductItem): ShoppingCartCommand;
+
     public record RemoveProductItem(ShoppingCartId ShoppingCartId, PricedProductItem ProductItem): ShoppingCartCommand;
+
     public record Confirm(ShoppingCartId ShoppingCartId, DateTimeOffset Now): ShoppingCartCommand;
+
     public record Cancel(ShoppingCartId ShoppingCartId, DateTimeOffset Now): ShoppingCartCommand;
 }
 
@@ -44,7 +48,9 @@ public static class ShoppingCartService
             : throw new InvalidOperationException("Not enough product items to remove.");
 
     private static Confirmed Handle(Confirm command, Pending shoppingCart) =>
-        new Confirmed(DateTime.UtcNow);
+        shoppingCart.HasItems
+            ? new Confirmed(DateTime.UtcNow)
+            : throw new InvalidOperationException("Shopping cart is empty!");
 
     private static Canceled Handle(Cancel command, Pending shoppingCart) =>
         new Canceled(DateTime.UtcNow);
