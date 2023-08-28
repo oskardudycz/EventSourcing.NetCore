@@ -26,9 +26,8 @@ public record ShoppingCart
                 .Where(pi => pi.ProductId == productItem.ProductId)
                 .Sum(pi => pi.Quantity) >= productItem.Quantity.Value;
 
-        public bool HasItems =>
-            ProductItems
-                .Sum(pi => pi.Quantity) <= 0;
+        public bool HasItems { get; } =
+            ProductItems.Sum(pi => pi.Quantity) <= 0;
     }
 
     public record Closed: ShoppingCart;
