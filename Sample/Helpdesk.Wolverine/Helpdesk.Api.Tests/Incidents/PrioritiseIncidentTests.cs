@@ -1,25 +1,23 @@
 using Bogus;
-using Bogus.DataSets;
 using Helpdesk.Api.Incidents;
-using Helpdesk.Api.Incidents.GetIncidentDetails;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class RecordAgentResponseToIncidentTests: IClassFixture<ApiWithLoggedIncident>
+public class PrioritiseIncidentTests: IClassFixture<ApiWithLoggedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task RecordAgentResponseCommand_RecordsResponse()
+    public async Task PrioritiseCommand_ChangesIncidentPriority()
     {
         await API
             .Given()
             .When(
                 POST,
-                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/responses"),
-                BODY(new RecordAgentResponseToIncidentRequest(content, visibleToCustomer)),
+                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/priority"),
+                BODY(new PrioritiseIncidentRequest(priority)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
@@ -32,10 +30,7 @@ public class RecordAgentResponseToIncidentTests: IClassFixture<ApiWithLoggedInci
                 RESPONSE_BODY(
                     API.Incident with
                     {
-                        Notes = new[]
-                        {
-                            new IncidentNote(IncidentNoteType.FromAgent, agentId, content, visibleToCustomer)
-                        },
+                        Priority = priority,
                         Version = 2
                     }
                 )
@@ -43,9 +38,9 @@ public class RecordAgentResponseToIncidentTests: IClassFixture<ApiWithLoggedInci
     }
 
     private readonly Guid agentId = Guid.NewGuid();
-    private readonly string content = new Lorem().Sentence();
-    private readonly bool visibleToCustomer = new Faker().Random.Bool();
+    private readonly IncidentPriority priority = new Faker().PickRandom<IncidentPriority>();
     private readonly ApiWithLoggedIncident API;
 
-    public RecordAgentResponseToIncidentTests(ApiWithLoggedIncident api) => API = api;
+    public PrioritiseIncidentTests(ApiWithLoggedIncident api) => API = api;
+
 }
