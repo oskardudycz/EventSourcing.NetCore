@@ -13,19 +13,6 @@ namespace Helpdesk.Api.Incidents;
 
 public static class IncidentsEndpoints
 {
-    [WolverinePost("/api/customers/{customerId:guid}/incidents")]
-    public static (CreationResponse, IStartStream) LogIncident(Guid customerId, LogIncidentRequest body)
-    {
-        var (contact, description) = body;
-        var incidentId = CombGuidIdGeneration.NewGuid();
-
-        var result = Handle(new LogIncident(incidentId, customerId, contact, description, customerId, Now));
-
-        var startStream = MartenOps.StartStream<Incident>(result);
-
-        return (new CreationResponse($"/api/incidents/{startStream.StreamId}"), startStream);
-    }
-
     [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/category")]
     public static async Task<IResult> CategoriseIncident
     (
