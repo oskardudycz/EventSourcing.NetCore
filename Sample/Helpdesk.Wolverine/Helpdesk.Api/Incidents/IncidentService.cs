@@ -62,13 +62,6 @@ public record CloseIncident(
 
 internal static class IncidentService
 {
-    public static IncidentLogged Handle(LogIncident command)
-    {
-        var (incidentId, customerId, contact, description, loggedBy, now) = command;
-
-        return new IncidentLogged(incidentId, customerId, contact, description, loggedBy, now);
-    }
-
     public static IncidentCategorised Handle(Incident current, CategoriseIncident command)
     {
         if (current.Status == IncidentStatus.Closed)
