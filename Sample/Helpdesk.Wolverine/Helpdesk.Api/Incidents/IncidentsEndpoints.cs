@@ -13,23 +13,6 @@ namespace Helpdesk.Api.Incidents;
 
 public static class IncidentsEndpoints
 {
-    [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/category")]
-    public static async Task<IResult> CategoriseIncident
-    (
-        IDocumentSession documentSession,
-        Guid incidentId,
-        Guid agentId,
-        [FromIfMatchHeader] string eTag,
-        CategoriseIncidentRequest body,
-        CancellationToken ct
-    )
-    {
-        await documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new CategoriseIncident(incidentId, body.Category, agentId, Now)), ct);
-
-        return Ok();
-    }
-
     [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/priority")]
     public static async Task<IResult> PrioritiseIncident
     (
@@ -159,6 +142,7 @@ public record LogIncidentRequest(
 );
 
 public record CategoriseIncidentRequest(
+    Guid IncidentId,
     IncidentCategory Category
 );
 
