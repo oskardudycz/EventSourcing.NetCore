@@ -22,7 +22,6 @@ using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()

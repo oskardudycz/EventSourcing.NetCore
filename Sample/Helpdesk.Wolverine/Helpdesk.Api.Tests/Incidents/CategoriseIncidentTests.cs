@@ -17,7 +17,7 @@ public class CategoriseIncidentTests: IClassFixture<ApiWithLoggedIncident>
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/category"),
-                BODY(new CategoriseIncidentRequest(category)),
+                BODY(new CategoriseIncidentRequest(API.Incident.Id, category)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
