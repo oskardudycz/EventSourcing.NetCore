@@ -1,7 +1,8 @@
 using Bogus;
 using Bogus.DataSets;
 using Helpdesk.Api.Incidents;
-using Helpdesk.Api.Incidents.GetIncidentDetails;
+using Helpdesk.Api.Incidents.GettingDetails;
+using Helpdesk.Api.Incidents.RecordingAgentResponse;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;

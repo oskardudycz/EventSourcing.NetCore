@@ -1,7 +1,9 @@
 using Bogus;
 using Bogus.DataSets;
 using Helpdesk.Api.Incidents;
-using Helpdesk.Api.Incidents.GetIncidentDetails;
+using Helpdesk.Api.Incidents.GettingDetails;
+using Helpdesk.Api.Incidents.Logging;
+using Helpdesk.Api.Incidents.Resolving;
 using Ogooreck.API;
 using static Ogooreck.API.ApiSpecification;
 

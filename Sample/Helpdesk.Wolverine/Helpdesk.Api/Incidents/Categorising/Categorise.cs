@@ -3,9 +3,9 @@ using Wolverine.Http;
 using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
 
-namespace Helpdesk.Api.Incidents.Categorise;
+namespace Helpdesk.Api.Incidents.Categorising;
 
-public static class CategoriseIncidentEndpoint
+public static class CategoriseEndpoint
 {
     [AggregateHandler]
     [WolverinePost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/category")]
@@ -24,3 +24,8 @@ public static class CategoriseIncidentEndpoint
         return (Ok(), new Events { new IncidentCategorised(incidentId, request.Category, agentId, now) });
     }
 }
+
+public record CategoriseIncidentRequest(
+    Guid IncidentId,
+    IncidentCategory Category
+);
