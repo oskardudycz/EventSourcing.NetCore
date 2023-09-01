@@ -1,16 +1,18 @@
 using System.Text.Json.Serialization;
+using Helpdesk.Api;
 using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.SignalR;
 using Helpdesk.Api.Incidents;
-using Helpdesk.Api.Incidents.GetCustomerIncidentsSummary;
-using Helpdesk.Api.Incidents.GetIncidentDetails;
-using Helpdesk.Api.Incidents.GetIncidentHistory;
-using Helpdesk.Api.Incidents.GetIncidentShortInfo;
+using Helpdesk.Api.Incidents.GettingCustomerIncidentsSummary;
+using Helpdesk.Api.Incidents.GettingDetails;
+using Helpdesk.Api.Incidents.GettingHistory;
+using Helpdesk.Api.Incidents.GettingShortInfo;
 using JasperFx.CodeGeneration;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Services.Json;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;
 using Oakton;
 using Oakton.Resources;
@@ -18,7 +20,6 @@ using Weasel.Core;
 using Wolverine;
 using Wolverine.Http;
 using Wolverine.Marten;
-using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,10 +102,13 @@ app.MapWolverineEndpoints();
 
 return await app.RunOaktonCommands(args);
 
-public class IncidentsHub: Hub
+namespace Helpdesk.Api
 {
-}
+    public class IncidentsHub: Hub
+    {
+    }
 
-public partial class Program
-{
+    public partial class Program
+    {
+    }
 }

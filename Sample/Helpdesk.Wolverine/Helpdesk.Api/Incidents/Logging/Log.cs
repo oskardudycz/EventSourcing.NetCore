@@ -4,7 +4,7 @@ using Wolverine.Marten;
 
 namespace Helpdesk.Api.Incidents.Logging;
 
-public static class LogIncidentEndpoint
+public static class LogEndpoint
 {
     [WolverinePost("/api/customers/{customerId:guid}/incidents")]
     public static (CreationResponse, IStartStream) LogIncident(
@@ -23,5 +23,9 @@ public static class LogIncidentEndpoint
             new StartStream<Incident>(incidentId, @event)
         );
     }
-
 }
+
+public record LogIncidentRequest(
+    Contact Contact,
+    string Description
+);
