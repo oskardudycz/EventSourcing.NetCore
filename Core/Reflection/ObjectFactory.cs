@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace Core.Reflection;
@@ -17,7 +18,7 @@ public static class ObjectFactory<T>
         if (t.HasDefaultConstructor())
             return Expression.Lambda<Func<T>>(Expression.New(t)).Compile();
 
-        return () => (T)FormatterServices.GetUninitializedObject(t);
+        return () => (T)RuntimeHelpers.GetUninitializedObject(t);
     }
 }
 

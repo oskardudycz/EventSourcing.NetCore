@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten" Version="6.0.5" />
+        <PackageReference Include="Marten" Version="7.0.0-beta.3" />
     </ItemGroup>
 
     <ItemGroup>

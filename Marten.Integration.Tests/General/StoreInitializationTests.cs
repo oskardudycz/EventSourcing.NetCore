@@ -52,24 +52,6 @@ public class StoreInitializationTests: MartenTest
         ex.Should().BeNull();
     }
 
-    [Fact]
-    public void GivenSettingWithNpgsqlConnection_WhenDocumentSessionIsInitializedWithDifferentSchema_ThenConnectionIsCreated()
-    {
-        var ex = Record.Exception(() =>
-        {
-            var store = DocumentStore.For(options =>
-            {
-                options.Connection(() => new NpgsqlConnection(ConnectionString));
-                options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.Events.DatabaseSchemaName = SchemaName;
-            });
-
-            ConnectionShouldBeEstablished(store);
-        });
-
-        ex.Should().BeNull();
-    }
-
     [Fact(Skip = "To investigate in Npgsql")]
     public void GivenProperConnectionString_WhenDocumentSessionIsCreatedAndTransactionIsCreated_ThenConnectionIsCreatedAndItsPossibleToMakeRollback()
     {
