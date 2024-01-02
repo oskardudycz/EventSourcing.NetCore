@@ -8,7 +8,7 @@ jobs:
 
         steps:
             - name: Check Out Repo
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Login to DockerHub
               uses: docker/login-action@v2

@@ -34,8 +34,8 @@ public class RemoveProductFixture: ApiSpecification<Program>, IAsyncLifetime
             )
             .Then(OK)
             .And()
-            .When(GET, URI(ctx=>$"/api/ShoppingCarts/{ctx.GetCreatedId()}"))
-            .Until(RESPONSE_ETAG_IS(1))
+            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.GetCreatedId()}"))
+            .Until(RESPONSE_ETAG_IS(1), maxNumberOfRetries: 10)
             .Then(OK)
             .GetResponseBody<ShoppingCartDetails>();
 
@@ -60,15 +60,14 @@ public class RemoveProductTests: IClassFixture<RemoveProductFixture>
             .Given()
             .When(
                 DELETE,
-                URI($"/api/ShoppingCarts/{API.ShoppingCartId}/products/{API.ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={API.UnitPrice.ToString(CultureInfo.InvariantCulture)}"),
+                URI(
+                    $"/api/ShoppingCarts/{API.ShoppingCartId}/products/{API.ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={API.UnitPrice.ToString(CultureInfo.InvariantCulture)}"),
                 HEADERS(IF_MATCH(1))
             )
             .Then(NO_CONTENT)
-
             .And()
-
             .When(GET, URI($"/api/ShoppingCarts/{API.ShoppingCartId}"))
-            .Until(RESPONSE_ETAG_IS(2))
+            .Until(RESPONSE_ETAG_IS(2), maxNumberOfRetries: 10)
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>
