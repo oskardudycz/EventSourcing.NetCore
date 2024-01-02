@@ -49,7 +49,7 @@ Read also more in my article [Introduction to Event Sourcing - Self Paced Kit](h
 
 1. Install git - https://git-scm.com/downloads.
 2. Clone this repository.
-3. Install .NET 7.0 - https://dotnet.microsoft.com/download/dotnet/7.0.
+3. Install .NET 8.0 - https://dotnet.microsoft.com/download/dotnet/8.0.
 4. Install Visual Studio, Rider or VSCode.
 5. Install docker - https://docs.docker.com/engine/install/.
 6. Open [Exercises.sln](./Exercises.sln) solution.
