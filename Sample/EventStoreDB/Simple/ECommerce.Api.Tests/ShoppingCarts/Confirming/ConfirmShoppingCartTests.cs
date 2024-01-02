@@ -36,7 +36,7 @@ public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task Put_Should_Return_OK_And_Cancel_Shopping_Cart()
+    public async Task Put_Should_Return_OK_And_Confirm_Shopping_Cart()
     {
         await API
             .Given()
@@ -45,12 +45,9 @@ public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
                 URI($"/api/ShoppingCarts/{API.ShoppingCartId}/confirmation"),
                 HEADERS(IF_MATCH(0))
             )
-            .Then(OK);
-
-        await API
-            .Given()
-            .When(GET, URI($"/api/ShoppingCarts/{API.ShoppingCartId}"))
-            .Until(RESPONSE_ETAG_IS(1))
+            .Then(OK)
+            .AndWhen(GET, URI($"/api/ShoppingCarts/{API.ShoppingCartId}"))
+            .Until(RESPONSE_ETAG_IS(1), maxNumberOfRetries: 10)
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>
