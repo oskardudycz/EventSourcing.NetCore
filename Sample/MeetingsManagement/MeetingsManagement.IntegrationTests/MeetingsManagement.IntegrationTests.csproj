@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,10 +13,10 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.11.0" />
-        <PackageReference Include="Marten" Version="6.0.5" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageReference Include="Marten" Version="7.0.0-beta.3" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.0" />
         <PackageReference Include="NSubstitute" Version="5.0.0" />
         <PackageReference Include="xunit" Version="2.5.0" />
@@ -24,7 +24,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>

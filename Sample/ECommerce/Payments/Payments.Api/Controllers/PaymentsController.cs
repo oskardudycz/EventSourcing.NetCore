@@ -65,7 +65,7 @@ public class PaymentsController: Controller
         return Ok();
     }
 
-    [HttpDelete("{id}")]
+    [HttpPost("{id}/Timeout")]
     public async Task<IActionResult> TimeoutPayment(Guid id, [FromBody] TimeOutPaymentRequest? request)
     {
         var command = TimeOutPayment.Create(
