@@ -1,7 +1,6 @@
 module ECommerce.Api.Program
 
 open ECommerce
-open ECommerce.Infrastructure // Args etc
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Serilog
@@ -25,26 +24,26 @@ module Args =
         | [<CliPrefix(CliPrefix.None); Last>] Sss of ParseResults<Args.Sss.Parameters>
         interface IArgParserTemplate with
             member a.Usage = a |> function
-                | Verbose _ ->              "request verbose logging."
+                | Verbose ->                "request verbose logging."
                 | PrometheusPort _ ->       "port from which to expose a Prometheus /metrics endpoint. Default: off (optional if environment variable PROMETHEUS_PORT specified)"
                 | Cosmos _ ->               "specify CosmosDB input parameters"
                 | Dynamo _ ->               "specify DynamoDB input parameters"
                 | Esdb _ ->                 "specify EventStore input parameters"
                 | Sss _ ->                  "specify SqlStreamStore input parameters"
     and [<RequireQualifiedAccess>]
-        Arguments(c : Configuration, a : ParseResults<Parameters>) =
-        member val Verbose =                a.Contains Verbose
-        member val PrometheusPort =         a.TryGetResult PrometheusPort |> Option.orElseWith (fun () -> c.PrometheusPort)
+        Arguments(c : Configuration, p : ParseResults<Parameters>) =
+        member val Verbose =                p.Contains Verbose
+        member val PrometheusPort =         p.TryGetResult PrometheusPort |> Option.orElseWith (fun () -> c.PrometheusPort)
         member val CacheSizeMb =            10
         member val StoreArgs : Args.StoreArgs =
-            match a.TryGetSubCommand() with
+            match p.TryGetSubCommand() with
             | Some (Parameters.Cosmos cosmos) -> Args.StoreArgs.Cosmos (Args.Cosmos.Arguments(c, cosmos))
             | Some (Parameters.Dynamo dynamo) -> Args.StoreArgs.Dynamo (Args.Dynamo.Arguments(c, dynamo))
             | Some (Parameters.Esdb es) ->       Args.StoreArgs.Esdb (Args.Esdb.Arguments(c, es))
             | Some (Parameters.Sss sss) ->       Args.StoreArgs.Sss (Args.Sss.Arguments(c, sss))
-            | _ -> Args.missingArg "Must specify one of cosmos, dynamo, esdb or sss for store"
+            | _ -> p.Raise "Must specify one of cosmos, dynamo, esdb or sss for store"
         member x.VerboseStore =             Args.StoreArgs.verboseRequested x.StoreArgs
-        member x.Connect() : Domain.Config.Store<_> =
+        member x.Connect(): Store.Config =
             let cache = Equinox.Cache (AppName, sizeMb = x.CacheSizeMb)
             Args.StoreArgs.connectTarget x.StoreArgs cache
 
@@ -77,8 +76,7 @@ let main argv =
                 .Sinks(metrics, args.VerboseStore)
                 .CreateLogger()
             try run args; 0
-            with e when not (e :? Args.MissingArg) -> Log.Fatal(e, "Exiting"); 2
+            with e -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()
-    with Args.MissingArg msg -> eprintfn $"%s{msg}"; 1
-        | :? Argu.ArguParseException as e -> eprintfn $"%s{e.Message}"; 1
-        | e -> eprintfn "Exception %s" e.Message; 1
+    with:? Argu.ArguParseException as e -> eprintfn $"%s{e.Message}"; 1
+        | e -> eprintfn $"Exception %s{e.Message}"; 1

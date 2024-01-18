@@ -1,15 +1,14 @@
 ﻿module ECommerce.FeedConsumer.Program
 
-open ECommerce.Infrastructure // ConnectStore etc
-open ECommerce.Domain // Config etc
 open Serilog
 open System
 
 type Configuration(tryGet) =
     inherit Args.Configuration(tryGet)
 
-    member _.BaseUri =                      base.get "API_BASE_URI"
-    member _.Group =                        base.get "API_CONSUMER_GROUP"
+    let get key =                           match tryGet key with Some value -> value | None -> failwith $"Missing Argument/Environment Variable %s{key}"
+    member _.BaseUri =                      get "API_BASE_URI"
+    member _.Group =                        get "API_CONSUMER_GROUP"
 
 let [<Literal>] AppName = "FeedConsumer"
 
@@ -35,7 +34,7 @@ module Args =
         | [<CliPrefix(CliPrefix.None); Unique; Last>] Sss of ParseResults<Args.Sss.Parameters>
         interface IArgParserTemplate with
             member a.Usage = a |> function
-                | Verbose _ ->              "request verbose logging."
+                | Verbose ->                "request verbose logging."
                 | PrometheusPort _ ->       "port from which to expose a Prometheus /metrics endpoint. Default: off (optional if environment variable PROMETHEUS_PORT specified)"
                 | Group _ ->                "specify Api Consumer Group Id. (optional if environment variable API_CONSUMER_GROUP specified)"
                 | BaseUri _ ->              "specify Api endpoint. (optional if environment variable API_BASE_URI specified)"
@@ -66,29 +65,29 @@ module Args =
             | Some (Parameters.Cosmos cosmos) -> Args.StoreArgs.Cosmos (Args.Cosmos.Arguments(c, cosmos))
             | Some (Parameters.Dynamo dynamo) -> Args.StoreArgs.Dynamo (Args.Dynamo.Arguments(c, dynamo))
             | Some (Parameters.Esdb es) ->       Args.StoreArgs.Esdb   (Args.Esdb.Arguments(c, es))
-            | _ -> Args.missingArg "Must specify one of cosmos, dynamo or esdb for store"
+            | _ -> a.Raise "Must specify one of cosmos, dynamo or esdb for store"
         member x.VerboseStore =             Args.StoreArgs.verboseRequested x.StoreArgs
         member x.DumpStoreMetrics =         Args.StoreArgs.dumpMetrics x.StoreArgs
-        member x.Connect() : Config.Store<_> * Propulsion.Feed.IFeedCheckpointStore =
+        member x.Connect() : Store.Config * Propulsion.Feed.IFeedCheckpointStore =
             let cache = Equinox.Cache(AppName, sizeMb = x.CacheSizeMb)
-            let createCheckpoints = Args.Checkpoints.create (x.ConsumerGroupName, x.CheckpointInterval) Config.log
+            let createCheckpoints = Args.Checkpoints.create (x.ConsumerGroupName, x.CheckpointInterval) Store.Metrics.log
             match x.StoreArgs with
             | Args.StoreArgs.Cosmos a ->
-                let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
-                let store = Config.Store.Cosmos (context, cache)
-                store, createCheckpoints (Args.Checkpoints.Store.Cosmos (context, cache))
+                let context = a.Connect() |> Async.RunSynchronously
+                let store = Store.Config.Cosmos (context, cache)
+                store, createCheckpoints (Args.Checkpoints.Config.Cosmos (context, cache))
             | Args.StoreArgs.Dynamo a ->
-                let context = a.Connect() |> DynamoStoreContext.create
-                let store = Config.Store.Dynamo (context, cache)
-                store, createCheckpoints (Args.Checkpoints.Store.Dynamo (context, cache))
+                let context = a.Connect()
+                let store = Store.Config.Dynamo (context, cache)
+                store, createCheckpoints (Args.Checkpoints.Config.Dynamo (context, cache))
             | Args.StoreArgs.Esdb a ->
                 let context = a.Connect(Log.Logger, AppName, EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
-                let store = Config.Store.Esdb (context, cache)
+                let store = Store.Config.Esdb (context, cache)
                 let checkpointStore = a.ConnectCheckpointStore(cache)
                 store, createCheckpoints checkpointStore
             | Args.StoreArgs.Sss a ->
                 let context = a.Connect() |> SqlStreamStoreContext.create
-                let store = Config.Store.Sss (context, cache)
+                let store = Store.Config.Sss (context, cache)
                 let checkpointStore = a.CreateCheckpointStoreSql(x.ConsumerGroupName)
                 store, checkpointStore
 
@@ -105,14 +104,14 @@ let build (args : Args.Arguments) =
     let sink =
         let handle = Ingester.handle args.TicketsDop
         let stats = Ingester.Stats(log, args.StatsInterval, args.StateInterval, logExternalStats = args.DumpStoreMetrics)
-        Propulsion.Streams.StreamsSink.Start(log, args.MaxReadAhead, args.FcsDop, handle, stats, args.StatsInterval, Propulsion.Streams.Default.eventSize)
+        Propulsion.Sinks.Factory.StartConcurrent(log, args.MaxReadAhead, args.FcsDop, handle, stats)
     let pumpSource =
         let feed = ApiClient.TicketsFeed args.BaseUri
         let source =
             Propulsion.Feed.FeedSource(
                 log, args.StatsInterval, args.SourceId, args.TailSleepInterval,
-                checkpoints, sink, feed.Poll)
-        source.Pump feed.ReadTranches
+                checkpoints, sink)
+        source.Start(feed.ReadTranches, fun t p -> feed.Poll(t, p))
     sink, pumpSource
 
 open Propulsion.Internal // AwaitKeyboardInterruptAsTaskCanceledException
@@ -121,7 +120,7 @@ let run args = async {
     let sink, source = build args
     use _ = args.PrometheusPort |> Option.map startMetricsServer |> Option.toObj
     return! [|  Async.AwaitKeyboardInterruptAsTaskCanceledException()
-                source
+                source.AwaitWithStopOnCancellation()
                 sink.AwaitWithStopOnCancellation()
             |] |> Async.Parallel |> Async.Ignore<unit array> }
 
@@ -131,8 +130,7 @@ let main argv =
         try let metrics = Sinks.equinoxAndPropulsionFeedConsumerMetrics (Sinks.tags AppName)
             Log.Logger <- LoggerConfiguration().Configure(args.Verbose).Sinks(metrics, args.VerboseStore).CreateLogger()
             try run args |> Async.RunSynchronously; 0
-            with e when not (e :? Args.MissingArg) && not (e :? System.Threading.Tasks.TaskCanceledException) -> Log.Fatal(e, "Exiting"); 2
+            with e when not (e :? System.Threading.Tasks.TaskCanceledException) -> Log.Fatal(e, "Exiting"); 2
         finally Log.CloseAndFlush()
-    with Args.MissingArg msg -> eprintfn "%s" msg; 1
-        | :? Argu.ArguParseException as e -> eprintfn "%s" e.Message; 1
-        | e -> eprintfn "Exception %s" e.Message; 1
+    with:? Argu.ArguParseException as e -> eprintfn $"%s{e.Message}"; 1
+        | e -> eprintfn $"Exception %s{e.Message}"; 1

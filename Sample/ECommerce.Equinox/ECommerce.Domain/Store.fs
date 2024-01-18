@@ -9,17 +9,16 @@ let createDecider category = Equinox.Decider.forStream Metrics.log category
 module Memory =
 
     let create name codec initial fold store : Equinox.Category<_, _, _> =
-        Equinox.MemoryStore.MemoryStoreCategory(store, name, codec, fold, initial)
+        Equinox.MemoryStore.MemoryStoreCategory(store, name, FsCodec.Compression.EncodeUncompressed codec, fold, initial)
 
-module EventCodec =
+module Codec =
 
     open FsCodec.SystemTextJson
-
     let private defaultOptions = Options.Create(autoTypeSafeEnumToJsonString = true)
-    let genJsonElement<'t when 't :> TypeShape.UnionContract.IUnionContract> =
-        CodecJsonElement.Create<'t>(options = defaultOptions)
     let gen<'t when 't :> TypeShape.UnionContract.IUnionContract> =
         Codec.Create<'t>(options = defaultOptions)
+    let genJsonElement<'t when 't :> TypeShape.UnionContract.IUnionContract> =
+        CodecJsonElement.Create<'t>(options = defaultOptions)
 
 let private defaultCacheDuration = System.TimeSpan.FromMinutes 20.
 
@@ -80,8 +79,8 @@ module Sss =
         createCached name codec initial fold Equinox.SqlStreamStore.AccessStrategy.LatestKnownEvent (context, cache)
 
 [<NoComparison; NoEquality; RequireQualifiedAccess>]
-type Store<'t> =
-    | Memory of Equinox.MemoryStore.VolatileStore<'t>
+type Config =
+    | Memory of Equinox.MemoryStore.VolatileStore<struct (int * System.ReadOnlyMemory<byte>)>
     | Cosmos of Equinox.CosmosStore.CosmosStoreContext * Equinox.Cache
     | Dynamo of Equinox.DynamoStore.DynamoStoreContext * Equinox.Cache
     | Esdb of Equinox.EventStoreDb.EventStoreContext * Equinox.Cache

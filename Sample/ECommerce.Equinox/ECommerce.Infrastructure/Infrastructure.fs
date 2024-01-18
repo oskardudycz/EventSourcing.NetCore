@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module ECommerce.Infrastructure.Helpers
+module Helpers
 
 open Serilog
 open System
@@ -13,42 +13,55 @@ module EnvVar =
 
     let tryGet varName : string option = Environment.GetEnvironmentVariable varName |> Option.ofObj
 
+type Equinox.CosmosStore.CosmosStoreContext with
+
+    member x.LogConfiguration(role, databaseId: string, containerId: string) =
+        Log.Information("CosmosStore {role:l} {db}/{container} Tip maxEvents {maxEvents} maxSize {maxJsonLen} Query maxItems {queryMaxItems}",
+                        role, databaseId, containerId, x.TipOptions.MaxEvents, x.TipOptions.MaxJsonLength, x.QueryOptions.MaxItems)
+
+type Equinox.CosmosStore.CosmosStoreClient with
+
+    member x.CreateContext(role: string, databaseId, containerId, tipMaxEvents, ?queryMaxItems, ?tipMaxJsonLength, ?skipLog) =
+        let c = Equinox.CosmosStore.CosmosStoreContext(x, databaseId, containerId, tipMaxEvents, ?queryMaxItems = queryMaxItems, ?tipMaxJsonLength = tipMaxJsonLength)
+        if skipLog = Some true then () else c.LogConfiguration(role, databaseId, containerId)
+        c
+
+module CosmosStoreConnector =
+
+    let private get (role: string) (client: Microsoft.Azure.Cosmos.CosmosClient) databaseId containerId =
+        Log.Information("CosmosDB {role} Database {database} Container {container}", role, databaseId, containerId)
+        client.GetDatabase(databaseId).GetContainer(containerId)
+    let getSource c = get "Source" c
+    let getLeases c = get "Leases" c
+    let getSourceAndLeases client databaseId containerId auxContainerId =
+        getSource client databaseId containerId, getLeases client databaseId auxContainerId
+
 type Equinox.CosmosStore.CosmosStoreConnector with
 
-    member private x.LogConfiguration(connectionName, databaseId, containerId) =
+    member private x.LogConfiguration(role, databaseId: string, containers: string[]) =
         let o = x.Options
         let timeout, retries429, timeout429 = o.RequestTimeout, o.MaxRetryAttemptsOnRateLimitedRequests, o.MaxRetryWaitTimeOnRateLimitedRequests
-        Log.Information("CosmosDb {name} {mode} {endpointUri} timeout {timeout}s; Throttling retries {retries}, max wait {maxRetryWaitTime}s",
-                        connectionName, o.ConnectionMode, x.Endpoint, timeout.TotalSeconds, retries429, let t = timeout429.Value in t.TotalSeconds)
-        Log.Information("CosmosDb {name} Database {database} Container {container}",
-                        connectionName, databaseId, containerId)
-
-    /// Use sparingly; in general one wants to use CreateAndInitialize to avoid slow first requests
-    member x.CreateUninitialized(databaseId, containerId) =
-        x.CreateUninitialized().GetDatabase(databaseId).GetContainer(containerId)
-
-    /// Connect a CosmosStoreClient, including warming up
-    member x.ConnectStore(connectionName, databaseId, containerId) =
-        x.LogConfiguration(connectionName, databaseId, containerId)
-        Equinox.CosmosStore.CosmosStoreClient.Connect(x.CreateAndInitialize, databaseId, containerId)
-
-    /// Creates a CosmosClient suitable for running a CFP via CosmosStoreSource
-    member x.ConnectMonitored(databaseId, containerId, ?connectionName) =
-        x.LogConfiguration(defaultArg connectionName "Source", databaseId, containerId)
-        x.CreateUninitialized(databaseId, containerId)
-
-    /// Connects to a Store as both a ChangeFeedProcessor Monitored Container and a CosmosStoreClient
-    member x.ConnectStoreAndMonitored(databaseId, containerId) =
-        let monitored = x.ConnectMonitored(databaseId, containerId, "Main")
-        let storeClient = Equinox.CosmosStore.CosmosStoreClient(monitored.Database.Client, databaseId, containerId)
-        storeClient, monitored
-
-module CosmosStoreContext =
-
-    /// Create with default packing and querying policies. Search for other `module CosmosStoreContext` impls for custom variations
-    let create (storeClient : Equinox.CosmosStore.CosmosStoreClient) =
-        let maxEvents = 256
-        Equinox.CosmosStore.CosmosStoreContext(storeClient, tipMaxEvents=maxEvents)
+        Log.Information("CosmosDB {role} {mode} {endpointUri} {db} {containers} timeout {timeout}s Throttling retries {retries}, max wait {maxRetryWaitTime}s",
+                        role, o.ConnectionMode, x.Endpoint, databaseId, containers, timeout.TotalSeconds, retries429, let t = timeout429.Value in t.TotalSeconds)
+    member private x.CreateAndInitialize(role, databaseId, containers) =
+        x.LogConfiguration(role, databaseId, containers)
+        x.CreateAndInitialize(databaseId, containers)
+    // member private x.Connect(role, databaseId, containers) =
+    //     x.LogConfiguration(role, databaseId, containers)
+    //     x.Connect(databaseId, containers)
+    member private x.ConnectContexts(role, databaseId, containerId, ?auxContainerId): Async<_ * Equinox.CosmosStore.CosmosStoreContext> = async {
+        let! cosmosClient = x.CreateAndInitialize(role, databaseId, [| yield containerId; yield! Option.toList auxContainerId |])
+        let client = Equinox.CosmosStore.CosmosStoreClient(cosmosClient)
+        let contexts = client.CreateContext(role, databaseId, containerId, tipMaxEvents = 256, queryMaxItems = 100)
+        return cosmosClient, contexts }
+    /// Connect to the database (including verifying and warming up relevant containers), establish relevant CosmosStoreContexts required by Domain
+    member x.Connect(role, databaseId, containerId: string) = async {
+        let! _client, contexts = x.ConnectContexts(role, databaseId, containerId)
+        return contexts }
+    member x.ConnectWithFeed(databaseId, containerId, auxContainerId) = async {
+        let! client, context = x.ConnectContexts("Main", databaseId, containerId, auxContainerId)
+        let source, leases = CosmosStoreConnector.getSourceAndLeases client databaseId containerId auxContainerId
+        return context, source, leases }
 
 type Equinox.DynamoStore.DynamoStoreConnector with
 
@@ -56,33 +69,24 @@ type Equinox.DynamoStore.DynamoStoreConnector with
         Log.Information("DynamoStore {endpoint} Timeout {timeoutS}s Retries {retries}",
                         x.Endpoint, (let t = x.Timeout in t.TotalSeconds), x.Retries)
 
+    member x.CreateClient() =
+        x.LogConfiguration()
+        x.CreateDynamoStoreClient()
+
 type Equinox.DynamoStore.DynamoStoreClient with
 
-    member internal x.LogConfiguration(role, ?log) =
-        (defaultArg log Log.Logger).Information("DynamoStore {role:l} Table {table} Archive {archive}", role, x.TableName, Option.toObj x.ArchiveTableName)
-    member client.CreateCheckpointService(consumerGroupName, cache, log, ?checkpointInterval) =
-        let checkpointInterval = defaultArg checkpointInterval (TimeSpan.FromHours 1.)
-        let context = Equinox.DynamoStore.DynamoStoreContext(client)
-        Propulsion.Feed.ReaderCheckpoint.DynamoStore.create log (consumerGroupName, checkpointInterval) (context, cache)
+    member x.CreateContext(role, table, ?queryMaxItems, ?maxBytes, ?archiveTableName: string) =
+        let queryMaxItems = defaultArg queryMaxItems 100
+        let c = Equinox.DynamoStore.DynamoStoreContext(x, table, queryMaxItems = queryMaxItems, ?maxBytes = maxBytes, ?archiveTableName = archiveTableName)
+        Log.Information("DynamoStore {role:l} Table {table} Archive {archive} Tip thresholds: {maxTipBytes}b {maxTipEvents}e Query paging {queryMaxItems} items",
+                        role, table, Option.toObj archiveTableName, c.TipOptions.MaxBytes, Option.toNullable c.TipOptions.MaxEvents, c.QueryOptions.MaxItems)
+        c
 
 type Equinox.DynamoStore.DynamoStoreContext with
 
-    member internal x.LogConfiguration(log : ILogger) =
-        log.Information("DynamoStore Tip thresholds: {maxTipBytes}b {maxTipEvents}e Query Paging {queryMaxItems} items",
-                        x.TipOptions.MaxBytes, Option.toNullable x.TipOptions.MaxEvents, x.QueryOptions.MaxItems)
-
-type Amazon.DynamoDBv2.IAmazonDynamoDB with
-
-    member x.ConnectStore(role, table) =
-        let storeClient = Equinox.DynamoStore.DynamoStoreClient(x, table)
-        storeClient.LogConfiguration(role)
-        storeClient
-
-module DynamoStoreContext =
-
-    /// Create with default packing and querying policies. Search for other `module DynamoStoreContext` impls for custom variations
-    let create (storeClient : Equinox.DynamoStore.DynamoStoreClient) =
-        Equinox.DynamoStore.DynamoStoreContext(storeClient, queryMaxItems = 100)
+    member context.CreateCheckpointService(consumerGroupName, cache, log, ?checkpointInterval) =
+        let checkpointInterval = defaultArg checkpointInterval (TimeSpan.FromHours 1.)
+        Propulsion.Feed.ReaderCheckpoint.DynamoStore.create log (consumerGroupName, checkpointInterval) (context, cache)
 
 module EventStoreContext =
 
@@ -109,16 +113,16 @@ module Sinks =
 
     let equinoxAndPropulsionMetrics tags (l : LoggerConfiguration) =
         l |> equinoxMetricsOnly tags
-          |> fun l -> l.WriteTo.Sink(Propulsion.Prometheus.LogSink(tags))
+          |> _.WriteTo.Sink(Propulsion.Prometheus.LogSink(tags))
 
     let equinoxAndPropulsionReactorMetrics tags (l : LoggerConfiguration) =
         l |> equinoxAndPropulsionMetrics tags
-          |> fun l -> l.WriteTo.Sink(Propulsion.CosmosStore.Prometheus.LogSink(tags))
-                       .WriteTo.Sink(Propulsion.Feed.Prometheus.LogSink(tags)) // Esdb and Dynamo indirectly provide metrics via Feed
+          |> _.WriteTo.Sink(Propulsion.CosmosStore.Prometheus.LogSink(tags))
+              .WriteTo.Sink(Propulsion.Feed.Prometheus.LogSink(tags)) // Esdb and Dynamo indirectly provide metrics via Feed
 
     let equinoxAndPropulsionFeedConsumerMetrics tags (l : LoggerConfiguration) =
         l |> equinoxAndPropulsionMetrics tags
-          |> fun l -> l.WriteTo.Sink(Propulsion.Feed.Prometheus.LogSink(tags))
+          |> _.WriteTo.Sink(Propulsion.Feed.Prometheus.LogSink(tags))
 
     let console (configuration : LoggerConfiguration) =
         let t = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {NewLine}{Exception}"

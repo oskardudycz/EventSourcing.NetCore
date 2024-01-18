@@ -1,8 +1,8 @@
 module ECommerce.Domain.ShoppingCartSummary
 
-let [<Literal>] Category = "ShoppingCartSummary"
+let [<Literal>] CategoryName = "ShoppingCartSummary"
 
-let streamId = Equinox.StreamId.gen CartId.toString
+let streamId = FsCodec.StreamId.gen CartId.toString
 
 module Events =
 
@@ -13,8 +13,8 @@ module Events =
     type Event =
         | Ingested of Ingested
         interface TypeShape.UnionContract.IUnionContract
-    let codec = Config.EventCodec.gen<Event>
-    let codecJsonElement = Config.EventCodec.genJsonElement<Event>
+    let codec = Store.Codec.gen<Event>
+    let codecJsonElement = Store.Codec.genJsonElement<Event>
 
 module Fold =
 
@@ -46,10 +46,10 @@ module Ingest =
         {   clientId = view.clientId; status = mapStatus view.status
             items = [| for i in view.items -> { productId = i.productId; unitPrice = i.unitPrice; quantity = i.quantity } |] }
 
-    let decide (version : int64, value : Events.Summary) : Fold.State -> bool * Events.Event list = function
-        | Some { version = v } when v >= version -> false, []
-        | None -> false, []
-        | _ -> true, [ Events.Ingested { version = version; value = value } ]
+    let decide (version : int64, value : Events.Summary): Fold.State -> bool * Events.Event[] = function
+        | Some { version = v } when v >= version -> false, [||]
+        | None -> false, [||]
+        | _ -> true, [| Events.Ingested { version = version; value = value } |]
 
 type Service internal (resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>) =
 
@@ -64,8 +64,8 @@ type Service internal (resolve : CartId -> Equinox.Decider<Events.Event, Fold.St
 module Config =
 
     let private (|Category|) = function
-        | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
-        | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createRollingState Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
-        | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createRollingState Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
-        | Config.Store.Esdb _ | Config.Store.Sss _ ->  failwith "Not implemented: For EventStore/Sss its suggested to do a cached read from the write side"
-    let create (Category cat) = Service(streamId >> Config.createDecider cat Category)
+        | Store.Config.Memory store ->            Store.Memory.create CategoryName Events.codec Fold.initial Fold.fold store
+        | Store.Config.Cosmos (context, cache) -> Store.Cosmos.createRollingState CategoryName Events.codecJsonElement Fold.initial Fold.fold Fold.toSnapshot (context, cache)
+        | Store.Config.Dynamo (context, cache) -> Store.Dynamo.createRollingState CategoryName Events.codec Fold.initial Fold.fold Fold.toSnapshot (context, cache)
+        | Store.Config.Esdb _ | Store.Config.Sss _ -> failwith "Not implemented: For EventStore/Sss its suggested to do a cached read from the write side"
+    let create (Category cat) = Service(streamId >> Store.createDecider cat)
