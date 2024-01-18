@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="ExactlyOnceIngester.fs" />
+        <Compile Include="Store.fs" />
+        <Compile Include="Streams.fs" />
+        <Compile Include="Types.fs" />
+        <Compile Include="RandomProductPriceCalculator.fs" />
+        <Compile Include="ShoppingCart.fs" />
+        <Compile Include="ShoppingCartSummary.fs" />
+        <Compile Include="ConfirmedEpoch.fs" />
+        <Compile Include="ConfirmedSeries.fs" />
+        <Compile Include="ConfirmedIngester.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Equinox.Core" Version="4.0.0-rc.16" />
+        <PackageReference Include="Equinox.CosmosStore" Version="4.0.0-rc.16" />
+        <PackageReference Include="Equinox.DynamoStore" Version="4.0.0-rc.16" />
+        <PackageReference Include="Equinox.EventStoreDb" Version="4.0.0-rc.16" />
+        <PackageReference Include="Equinox.SqlStreamStore" Version="4.0.0-rc.16" />
+        <PackageReference Include="Equinox.MemoryStore" Version="4.0.0-rc.16" />
+        <PackageReference Include="FsCodec.SystemTextJson" Version="3.0.0-rc.15" />
+        <PackageReference Include="Propulsion" Version="3.0.0-rc.10" />
+    </ItemGroup>
+
+</Project>
