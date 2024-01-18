@@ -2,10 +2,9 @@ module ECommerce.Domain.ShoppingCart
 
 open Propulsion.Internal
 
-let [<Literal>] Category = "ShoppingCart"
-
-let streamId = Equinox.StreamId.gen CartId.toString
-let [<return: Struct>] (|StreamName|_|) = function FsCodec.StreamName.CategoryAndId (Category, CartId.Parse cartId) -> ValueSome cartId | _ -> ValueNone
+let [<Literal>] CategoryName = "ShoppingCart"
+let streamId = FsCodec.StreamId.gen CartId.toString
+let private catId = CategoryId(CategoryName, streamId, FsCodec.StreamId.dec CartId.(|Parse|))
 
 module Events =
 
@@ -16,15 +15,16 @@ module Events =
         | Confirmed of {| confirmedAt : System.DateTimeOffset |}
         | Registering of {| originEpoch : ConfirmedEpochId |}
         interface TypeShape.UnionContract.IUnionContract
-    let codec = Config.EventCodec.gen<Event>
-    let codecJsonElement = Config.EventCodec.genJsonElement<Event>
+    let codec = Store.Codec.gen<Event>
+    let codecJsonElement = Store.Codec.genJsonElement<Event>
 
 module Reactions =
 
-    let private codec = Events.codec
-    let (|Decode|) span = span |> Seq.chooseV codec.TryDecode |> Array.ofSeq
-    let [<return: Struct>] (|Parse|_|) = function
-        | StreamName cartId, Decode events -> ValueSome (cartId, events)
+    let [<return: Struct>] (|For|_|) = catId.TryDecode
+    let dec = Streams.Codec.dec<Events.Event>
+    let config = catId.StreamName, dec
+    let [<return: Struct>] (|Decode|_|) = function
+        | struct (For id, _) & Streams.Decode dec events -> ValueSome struct (id, events)
         | _ -> ValueNone
     let chooseConfirmed = function
         | Events.Confirmed _ -> ValueSome ()
@@ -71,25 +71,25 @@ module Fold =
         | Events.Registering e ->   { s with confirmedOriginEpoch = Some e.originEpoch }
     let fold = Seq.fold evolve
 
-let decideInitialize clientId (s : Fold.State) =
-    if s.clientId <> None then []
-    else [ Events.Initialized {| clientId = clientId |}]
+let decideInitialize clientId (s : Fold.State) = [|
+    if Option.isNone s.clientId then
+        Events.Initialized {| clientId = clientId |} |]
 
 let decideAdd calculatePrice productId quantity state = async {
     match state with
     | s when Fold.isClosed s -> return invalidOp $"Adding product item for cart in '%A{s.status}' status is not allowed."
     | _ ->
         let! price = calculatePrice (productId, quantity)
-        return (), [ Events.ItemAdded {| productId = productId; unitPrice = price; quantity = quantity |} ] }
+        return (), [| Events.ItemAdded {| productId = productId; unitPrice = price; quantity = quantity |} |] }
 
 let decideRemove (productId, price) = function
     | s when Fold.isClosed s -> invalidOp $"Removing product item for cart in '%A{s.status}' status is not allowed."
     | _ ->
-        [ Events.ItemRemoved {| productId = productId; unitPrice = price |} ]
+        [| Events.ItemRemoved {| productId = productId; unitPrice = price |} |]
 
 let decideConfirm at = function
-    | s when Fold.isClosed s -> []
-    | _ -> [ Events.Confirmed {| confirmedAt = at |} ]
+    | s when Fold.isClosed s -> [||]
+    | _ -> [| Events.Confirmed {| confirmedAt = at |} |]
 
 module Details =
 
@@ -107,10 +107,10 @@ let summarizeWithOriginEpoch getActiveEpochId state = async {
     match state with
     | s when not (Fold.isClosed s) -> return failwith "Unexpected"
     | { confirmedOriginEpoch = Some originEpoch } as s ->
-        return (Details.render s |> Option.get, originEpoch), []
+        return (Details.render s |> Option.get, originEpoch), [||]
     | { confirmedOriginEpoch = None } as s ->
         let! originEpoch = getActiveEpochId ()
-        return (Details.render s |> Option.get, originEpoch), [ Events.Registering {| originEpoch = originEpoch |} ] }
+        return (Details.render s |> Option.get, originEpoch), [| Events.Registering {| originEpoch = originEpoch |} |] }
 
 type Service internal (resolve : CartId -> Equinox.Decider<Events.Event, Fold.State>, calculatePrice : ProductId * int -> Async<decimal>) =
 
@@ -120,7 +120,7 @@ type Service internal (resolve : CartId -> Equinox.Decider<Events.Event, Fold.St
 
     member _.Add(cartId, productId, quantity) =
         let decider = resolve cartId
-        decider.TransactAsync(decideAdd calculatePrice productId quantity)
+        decider.Transact(decideAdd calculatePrice productId quantity)
 
     member _.Remove(cartId, productId, price) =
         let decider = resolve cartId
@@ -144,7 +144,7 @@ type Service internal (resolve : CartId -> Equinox.Decider<Events.Event, Fold.St
     /// Decides the tranche from where the insertion into the PoolTranches is to commence
     member _.SummarizeWithOriginEpoch(cartId, getActiveEpochId) : Async<Details.View * ConfirmedEpochId> =
         let decider = resolve cartId
-        decider.TransactAsync(summarizeWithOriginEpoch getActiveEpochId)
+        decider.Transact(summarizeWithOriginEpoch getActiveEpochId)
 
     /// Render view (and emit version on which it was based) for Denormalizer to store
     member _.SummarizeWithVersion(cartId) : Async<Details.View option * int64> =
@@ -158,12 +158,12 @@ module Config =
         pricer productId
 
     let private (|Category|) = function
-        | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
-        | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createUnoptimized Events.codecJsonElement Fold.initial Fold.fold (context, cache)
-        | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-        | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-        | Config.Store.Sss (context, cache) ->    Config.Sss.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-    let create_ pricer (Category cat) = Service(streamId >> Config.createDecider cat Category, calculatePrice pricer)
+        | Store.Config.Memory store ->            Store.Memory.create CategoryName Events.codec Fold.initial Fold.fold store
+        | Store.Config.Cosmos (context, cache) -> Store.Cosmos.createUnoptimized CategoryName Events.codecJsonElement Fold.initial Fold.fold (context, cache)
+        | Store.Config.Dynamo (context, cache) -> Store.Dynamo.createUnoptimized CategoryName Events.codec Fold.initial Fold.fold (context, cache)
+        | Store.Config.Esdb (context, cache) ->   Store.Esdb.createUnoptimized CategoryName Events.codec Fold.initial Fold.fold (context, cache)
+        | Store.Config.Sss (context, cache) ->    Store.Sss.createUnoptimized CategoryName Events.codec Fold.initial Fold.fold (context, cache)
+    let create_ pricer (Category cat) = Service(streamId >> Store.createDecider cat, calculatePrice pricer)
     let create =
         let defaultCalculator = RandomProductPriceCalculator()
         create_ defaultCalculator.Calculate
