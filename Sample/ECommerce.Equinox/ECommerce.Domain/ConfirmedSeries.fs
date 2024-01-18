@@ -3,10 +3,10 @@
 /// As an Epoch is marked `Closed`, the Ingester will mark a new Epoch `Started` on this aggregate via MarkIngestionEpochId
 module ECommerce.Domain.ConfirmedSeries
 
-let [<Literal>] Category = "ConfirmedSeries"
+let [<Literal>] CategoryName = "ConfirmedSeries"
 // TOCONSIDER: if you need multiple lists series/epochs in a single system, the Series and Epoch streams should have a SeriesId in the stream name
 // See also the implementation in the feedSource template, where the Series aggregate also functions as an index of series held in the system
-let streamId () = Equinox.StreamId.gen ConfirmedSeriesId.toString ConfirmedSeriesId.wellKnownId
+let streamId () = FsCodec.StreamId.gen ConfirmedSeriesId.toString ConfirmedSeriesId.wellKnownId
 
 // NB - these types and the union case names reflect the actual storage formats and hence need to be versioned with care
 [<RequireQualifiedAccess>]
@@ -16,8 +16,8 @@ module Events =
         | Started of            {| epochId : ConfirmedEpochId |}
         | Snapshotted of        {| active : ConfirmedEpochId |}
         interface TypeShape.UnionContract.IUnionContract
-    let codec = Config.EventCodec.gen<Event>
-    let codecJsonElement = Config.EventCodec.genJsonElement<Event>
+    let codec = Store.Codec.gen<Event>
+    let codecJsonElement = Store.Codec.genJsonElement<Event>
 
 module Fold =
 
@@ -31,9 +31,9 @@ module Fold =
     let isOrigin = function Events.Snapshotted _ -> true | _ -> false
     let toSnapshot s = Events.Snapshotted {| active = Option.get s |}
 
-let interpret epochId (state : Fold.State) =
-    [if state |> Option.forall (fun cur -> cur < epochId) && epochId >= ConfirmedEpochId.initial then
-        yield Events.Started {| epochId = epochId |}]
+let interpret epochId (state : Fold.State) = [|
+    if state |> Option.forall (fun cur -> cur < epochId) && epochId >= ConfirmedEpochId.initial then
+        yield Events.Started {| epochId = epochId |}|]
 
 type Service internal (resolve : unit -> Equinox.Decider<Events.Event, Fold.State>) =
 
@@ -46,15 +46,15 @@ type Service internal (resolve : unit -> Equinox.Decider<Events.Event, Fold.Stat
     /// Mark specified `epochId` as live for the purposes of ingesting
     /// Writers are expected to react to having writes to an epoch denied (due to it being Closed) by anointing a successor via this
     member _.MarkIngestionEpochId epochId : Async<unit> =
-        let decider = resolve()
-        decider.Transact(interpret epochId, load = Equinox.AllowStale)
+        let decider = resolve ()
+        decider.Transact(interpret epochId, load = Equinox.LoadOption.AnyCachedValue)
 
 module Config =
 
     let private (|Category|) = function
-        | Config.Store.Memory store ->            Config.Memory.create Events.codec Fold.initial Fold.fold store
-        | Config.Store.Cosmos (context, cache) -> Config.Cosmos.createSnapshotted Events.codecJsonElement Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
-        | Config.Store.Dynamo (context, cache) -> Config.Dynamo.createSnapshotted Events.codec Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
-        | Config.Store.Esdb (context, cache) ->   Config.Esdb.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-        | Config.Store.Sss (context, cache) ->    Config.Sss.createUnoptimized Events.codec Fold.initial Fold.fold (context, cache)
-    let create (Category cat) = Service(streamId >> Config.createDecider cat Category)
+        | Store.Config.Memory store ->            Store.Memory.create CategoryName Events.codec Fold.initial Fold.fold store
+        | Store.Config.Cosmos (context, cache) -> Store.Cosmos.createSnapshotted CategoryName Events.codecJsonElement Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
+        | Store.Config.Dynamo (context, cache) -> Store.Dynamo.createSnapshotted CategoryName Events.codec Fold.initial Fold.fold (Fold.isOrigin, Fold.toSnapshot) (context, cache)
+        | Store.Config.Esdb (context, cache) ->   Store.Esdb.createUnoptimized CategoryName Events.codec Fold.initial Fold.fold (context, cache)
+        | Store.Config.Sss (context, cache) ->    Store.Sss.createUnoptimized CategoryName Events.codec Fold.initial Fold.fold (context, cache)
+    let create (Category cat) = Service(streamId >> Store.createDecider cat)

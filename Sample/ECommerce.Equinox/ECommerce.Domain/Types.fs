@@ -71,3 +71,8 @@ module ConfirmedCheckpoint =
     let toEpochAndOffset (value : ConfirmedCheckpoint) : ConfirmedEpochId * int =
         let d, r = Math.DivRem(%value, factor)
         (ConfirmedEpochId.parse (int d)), int r
+
+/// Handles symmetric generation and decoding of StreamNames composed of a series of elements via the FsCodec.StreamId helpers
+type internal CategoryId<'elements>(name, gen: 'elements -> FsCodec.StreamId, dec: FsCodec.StreamId -> 'elements) =
+    member _.StreamName = gen >> FsCodec.StreamName.create name
+    member _.TryDecode = FsCodec.StreamName.tryFind name >> ValueOption.map dec

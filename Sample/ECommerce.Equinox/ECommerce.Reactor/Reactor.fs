@@ -1,7 +1,6 @@
 module ECommerce.Reactor.Reactor
 
 open ECommerce.Domain
-open ECommerce.Infrastructure // Exception
 open Metrics
 
 /// Gathers stats based on the outcome of each Span processed for emission, at intervals controlled by `StreamsConsumer`
@@ -26,16 +25,14 @@ type Stats(log, statsInterval, stateInterval, verboseStore, ?logExternalStats) =
         match logExternalStats with None -> () | Some f -> f Serilog.Log.Logger
         base.DumpStats()
 
-let isReactionStream = function
-    | ShoppingCart.Category -> true
-    | _ -> false
+let reactionCategories = [| ShoppingCart.CategoryName |]
 
 let handle
         (cartSummary : ShoppingCartSummaryHandler.Service)
         (confirmedCarts : ConfirmedHandler.Service)
-        struct (stream, span) : Async<struct (Propulsion.Streams.SpanResult * Outcome)> = async {
-    match stream, span with
-    | ShoppingCart.Reactions.Parse (cartId, events) ->
+        stream span : Async<Propulsion.Sinks.StreamResult * Outcome> = async {
+    match struct (stream, span) with
+    | ShoppingCart.Reactions.Decode (cartId, events) ->
         match events with
         | ShoppingCart.Reactions.Confirmed ->
             let! _done = confirmedCarts.TrySummarizeConfirmed(cartId) in ()
@@ -44,8 +41,8 @@ let handle
         | ShoppingCart.Reactions.StateChanged ->
             let! worked, version' = cartSummary.TryIngestSummary(cartId)
             let outcome = if worked then Outcome.Ok (1, Array.length span - 1) else Outcome.Skipped span.Length
-            return Propulsion.Streams.SpanResult.OverrideWritePosition version', outcome
-        | _ -> return Propulsion.Streams.SpanResult.AllProcessed, Outcome.NotApplicable span.Length
+            return Propulsion.Sinks.StreamResult.OverrideNextIndex version', outcome
+        | _ -> return Propulsion.Sinks.StreamResult.AllProcessed, Outcome.NotApplicable span.Length
     | x -> return failwith $"Invalid event %A{x}" } // should be filtered by isReactionStream
 
 module Config =
@@ -53,16 +50,16 @@ module Config =
     let create (sourceStore, targetStore) =
         let cartSummary = ShoppingCartSummaryHandler.Config.create (sourceStore, targetStore)
         let confirmedCarts = ConfirmedHandler.Config.create (sourceStore, targetStore)
-        isReactionStream, handle cartSummary confirmedCarts
+        handle cartSummary confirmedCarts
 
 type Config private () =
 
     static member StartSink(log : Serilog.ILogger, stats : Stats,
-                            handle : struct (FsCodec.StreamName * Propulsion.Streams.Default.StreamSpan) ->
-                                     Async<struct (Propulsion.Streams.SpanResult * Outcome)>,
+                            handle,// : (FsCodec.StreamName * Propulsion.Sinks.Event[]) ->
+                                     // Async<(Propulsion.Sinks.StreamResult * Outcome)>,
                             maxReadAhead : int, maxConcurrentStreams : int, ?wakeForResults, ?idleDelay, ?purgeInterval) =
-        Propulsion.Streams.Default.Config.Start(log, maxReadAhead, maxConcurrentStreams, handle, stats, stats.StatsInterval.Period,
+        Propulsion.Sinks.Factory.StartConcurrent(log, maxReadAhead, maxConcurrentStreams, handle, stats,
                                                 ?wakeForResults = wakeForResults, ?idleDelay = idleDelay, ?purgeInterval = purgeInterval)
 
-    static member StartSource(log, sink, sourceConfig, filter) =
-        SourceConfig.start (log, Config.log) sink filter sourceConfig
+    static member StartSource(log, sink, sourceConfig) =
+        SourceConfig.start (log, Store.Metrics.log) sink reactionCategories sourceConfig

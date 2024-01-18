@@ -1,11 +1,7 @@
 /// Commandline arguments and/or secrets loading specifications
-module ECommerce.Infrastructure.Args
+module Args
 
-module Config = ECommerce.Domain.Config
 open System
-
-exception MissingArg of message : string with override this.Message = this.message
-let missingArg msg = raise (MissingArg msg)
 
 let [<Literal>] REGION =                    "EQUINOX_DYNAMO_REGION"
 let [<Literal>] SERVICE_URL =               "EQUINOX_DYNAMO_SERVICE_URL"
@@ -16,29 +12,29 @@ let [<Literal>] INDEX_TABLE =               "EQUINOX_DYNAMO_TABLE_INDEX"
 
 type Configuration(tryGet : string -> string option) =
 
+    let get key =                           match tryGet key with Some value -> value | None -> failwith $"Missing Argument/Environment Variable %s{key}"
     member val tryGet =                     tryGet
-    member _.get key =                      match tryGet key with Some value -> value | None -> missingArg $"Missing Argument/Environment Variable %s{key}"
 
-    member x.CosmosConnection =             x.get "EQUINOX_COSMOS_CONNECTION"
-    member x.CosmosDatabase =               x.get "EQUINOX_COSMOS_DATABASE"
-    member x.CosmosContainer =              x.get "EQUINOX_COSMOS_CONTAINER"
+    member _.CosmosConnection =             get "EQUINOX_COSMOS_CONNECTION"
+    member _.CosmosDatabase =               get "EQUINOX_COSMOS_DATABASE"
+    member _.CosmosContainer =              get "EQUINOX_COSMOS_CONTAINER"
 
-    member x.DynamoServiceUrl =             x.get SERVICE_URL
-    member x.DynamoAccessKey =              x.get ACCESS_KEY
-    member x.DynamoSecretKey =              x.get SECRET_KEY
-    member x.DynamoTable =                  x.get TABLE
-    member x.DynamoRegion =                 x.tryGet REGION
+    member _.DynamoServiceUrl =             get SERVICE_URL
+    member _.DynamoAccessKey =              get ACCESS_KEY
+    member _.DynamoSecretKey =              get SECRET_KEY
+    member _.DynamoTable =                  get TABLE
+    member _.DynamoRegion =                 tryGet REGION
 
-    member x.EventStoreConnection =         x.get "EQUINOX_ES_CONNECTION"
-    member x.EventStoreCredentials =        x.get "EQUINOX_ES_CREDENTIALS"
+    member _.EventStoreConnection =         get "EQUINOX_ES_CONNECTION"
+    // member _.EventStoreCredentials =        get "EQUINOX_ES_CREDENTIALS"
     member _.MaybeEventStoreConnection =    tryGet "EQUINOX_ES_CONNECTION"
     member _.MaybeEventStoreCredentials =   tryGet "EQUINOX_ES_CREDENTIALS"
 
-    member x.SqlStreamStoreConnection =     x.get "SQLSTREAMSTORE_CONNECTION"
-    member x.SqlStreamStoreCredentials =    tryGet "SQLSTREAMSTORE_CREDENTIALS"
-    member x.SqlStreamStoreCredentialsCheckpoints = tryGet "SQLSTREAMSTORE_CREDENTIALS_CHECKPOINTS"
-    member x.SqlStreamStoreDatabase =       x.get "SQLSTREAMSTORE_DATABASE"
-    member x.SqlStreamStoreContainer =      x.get "SQLSTREAMSTORE_CONTAINER"
+    member _.SqlStreamStoreConnection =     get "SQLSTREAMSTORE_CONNECTION"
+    member _.SqlStreamStoreCredentials =    tryGet "SQLSTREAMSTORE_CREDENTIALS"
+    member _.SqlStreamStoreCredentialsCheckpoints = tryGet "SQLSTREAMSTORE_CREDENTIALS_CHECKPOINTS"
+    member _.SqlStreamStoreDatabase =       get "SQLSTREAMSTORE_DATABASE"
+    member _.SqlStreamStoreContainer =      get "SQLSTREAMSTORE_CONTAINER"
 
     member x.PrometheusPort =               tryGet "PROMETHEUS_PORT" |> Option.map int
 
@@ -47,9 +43,9 @@ type Configuration(tryGet : string -> string option) =
 module Checkpoints =
 
     [<RequireQualifiedAccess; NoComparison; NoEquality>]
-    type Store =
-        | Cosmos of Equinox.CosmosStore.CosmosStoreContext * Equinox.Core.ICache
-        | Dynamo of Equinox.DynamoStore.DynamoStoreContext * Equinox.Core.ICache
+    type Config =
+        | Cosmos of Equinox.CosmosStore.CosmosStoreContext * Equinox.Cache
+        | Dynamo of Equinox.DynamoStore.DynamoStoreContext * Equinox.Cache
         (*  Propulsion.EventStoreDb does not implement a native checkpoint storage mechanism,
             perhaps port https://github.com/absolutejam/Propulsion.EventStoreDB ?
             or fork/finish https://github.com/jet/dotnet-templates/pull/81
@@ -57,20 +53,20 @@ module Checkpoints =
 
             For now, we store the Checkpoints in one of the above stores as this sample uses one for the read models anyway *)
 
-    let create (consumerGroup, checkpointInterval) storeLog : Store  -> Propulsion.Feed.IFeedCheckpointStore = function
-        | Store.Cosmos (context, cache) ->
+    let create (consumerGroup, checkpointInterval) storeLog: Config -> Propulsion.Feed.IFeedCheckpointStore = function
+        | Config.Cosmos (context, cache) ->
             Propulsion.Feed.ReaderCheckpoint.CosmosStore.create storeLog (consumerGroup, checkpointInterval) (context, cache)
-        | Store.Dynamo (context, cache) ->
+        | Config.Dynamo (context, cache) ->
             Propulsion.Feed.ReaderCheckpoint.DynamoStore.create storeLog (consumerGroup, checkpointInterval) (context, cache)
     let createCheckpointStore (group, checkpointInterval, store) : Propulsion.Feed.IFeedCheckpointStore =
         let checkpointStore =
             match store with
-            | Config.Store.Cosmos (context, cache) -> Store.Cosmos (context, cache)
-            | Config.Store.Dynamo (context, cache) -> Store.Dynamo (context, cache)
-            | Config.Store.Esdb _
-            | Config.Store.Memory _
-            | Config.Store.Sss _ -> failwith "unexpected"
-        create (group, checkpointInterval) Config.log checkpointStore
+            | Store.Config.Cosmos (context, cache) -> Config.Cosmos (context, cache)
+            | Store.Config.Dynamo (context, cache) -> Config.Dynamo (context, cache)
+            | Store.Config.Esdb _
+            | Store.Config.Memory _
+            | Store.Config.Sss _ -> failwith "unexpected"
+        create (group, checkpointInterval) Store.Metrics.log checkpointStore
 
 open Argu
 
@@ -96,17 +92,17 @@ module Cosmos =
                 | Retries _ ->              "specify operation retries (default: 1)."
                 | RetriesWaitTime _ ->      "specify max wait-time for retry when being throttled by Cosmos in seconds (default: 5)"
     type Arguments(c : Configuration, p : ParseResults<Parameters>) =
-        let connection =                    p.TryGetResult Connection |> Option.defaultWith (fun () -> c.CosmosConnection)
+        let connection =                    p.GetResult(Connection, fun () -> c.CosmosConnection)
         let discovery =                     Equinox.CosmosStore.Discovery.ConnectionString connection
         let mode =                          p.TryGetResult ConnectionMode
         let timeout =                       p.GetResult(Timeout, 5.) |> TimeSpan.FromSeconds
         let retries =                       p.GetResult(Retries, 1)
         let maxRetryWaitTime =              p.GetResult(RetriesWaitTime, 5.) |> TimeSpan.FromSeconds
         let connector =                     Equinox.CosmosStore.CosmosStoreConnector(discovery, timeout, retries, maxRetryWaitTime, ?mode = mode)
-        let database =                      p.TryGetResult Database |> Option.defaultWith (fun () -> c.CosmosDatabase)
-        let container =                     p.TryGetResult Container |> Option.defaultWith (fun () -> c.CosmosContainer)
+        let database =                      p.GetResult(Database, fun () -> c.CosmosDatabase)
+        let container =                     p.GetResult(Container, fun () -> c.CosmosContainer)
         member val Verbose =                p.Contains Verbose
-        member _.Connect() =                connector.ConnectStore("Target", database, container)
+        member _.Connect() =                connector.Connect("Target", database, container)
 
 module Dynamo =
 
@@ -150,9 +146,7 @@ module Dynamo =
                                                 Equinox.DynamoStore.DynamoStoreConnector(serviceUrl, accessKey, secretKey, timeout, retries)
         let table =                         p.TryGetResult Table      |> Option.defaultWith (fun () -> c.DynamoTable)
         member val Verbose =                p.Contains Verbose
-        member _.Connect() =                connector.LogConfiguration()
-                                            let client = connector.CreateClient()
-                                            client.ConnectStore("Main", table)
+        member _.Connect() =                connector.CreateClient().CreateContext("Main", table)
 
 module Esdb =
 
@@ -198,16 +192,16 @@ module Esdb =
             match a.GetSubCommand() with
             | Cosmos cosmos -> SecondaryStoreArgs.Cosmos (Cosmos.Arguments(c, cosmos))
             | Dynamo dynamo -> SecondaryStoreArgs.Dynamo (Dynamo.Arguments(c, dynamo))
-            | _ -> missingArg "Must specify `cosmos` or `dynamo` target store when source is `esdb`"
+            | _ -> a.Raise "Must specify `cosmos` or `dynamo` target store when source is `esdb`"
 
         member x.ConnectCheckpointStore(cache) =
             match x.SecondaryStoreArgs with
             | SecondaryStoreArgs.Cosmos a ->
-                let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
-                Checkpoints.Store.Cosmos (context, cache)
+                let context = a.Connect() |> Async.RunSynchronously
+                Checkpoints.Config.Cosmos (context, cache)
             | SecondaryStoreArgs.Dynamo a ->
-                let context = a.Connect() |> DynamoStoreContext.create
-                Checkpoints.Store.Dynamo (context, cache)
+                let context = a.Connect()
+                Checkpoints.Config.Dynamo (context, cache)
 
     and [<RequireQualifiedAccess; NoComparison; NoEquality>]
         SecondaryStoreArgs =
@@ -238,7 +232,6 @@ module Sss =
         let connection =                    p.TryGetResult Connection |> Option.defaultWith (fun () -> c.SqlStreamStoreConnection)
         let credentials =                   p.TryGetResult Credentials |> Option.orElseWith (fun () -> c.SqlStreamStoreCredentials) |> Option.toObj
         let schema =                        p.GetResult(Schema, null)
-        let checkpointEventInterval =       TimeSpan.FromHours 1. // Ignored when storing to Propulsion.SqlStreamStore.ReaderCheckpoint
 
         member x.Connect() =
             let conn, creds, schema, autoCreate = connection, credentials, schema, false
@@ -258,7 +251,7 @@ module Sss =
             cs
         member x.CreateCheckpointStoreSql(groupName) : Propulsion.Feed.IFeedCheckpointStore =
             let connectionString = x.BuildCheckpointsConnectionString()
-            Propulsion.SqlStreamStore.ReaderCheckpoint.Service(connectionString, groupName, checkpointEventInterval)
+            Propulsion.SqlStreamStore.ReaderCheckpoint.Service(connectionString, groupName)
 
 type [<RequireQualifiedAccess; NoComparison; NoEquality>]
     StoreArgs =
@@ -272,17 +265,17 @@ module StoreArgs =
     let connectTarget targetStore cache =
         match targetStore with
         | StoreArgs.Cosmos a ->
-            let context = a.Connect() |> Async.RunSynchronously |> CosmosStoreContext.create
-            Config.Store.Cosmos (context, cache)
+            let context = a.Connect() |> Async.RunSynchronously
+            Store.Config.Cosmos (context, cache)
         | StoreArgs.Dynamo a ->
-            let context = a.Connect() |> DynamoStoreContext.create
-            Config.Store.Dynamo (context, cache)
+            let context = a.Connect()
+            Store.Config.Dynamo (context, cache)
         | StoreArgs.Esdb a ->
             let context = a.Connect(Serilog.Log.Logger, "Main", EventStore.Client.NodePreference.Leader) |> EventStoreContext.create
-            Config.Store.Esdb (context, cache)
+            Store.Config.Esdb (context, cache)
         | StoreArgs.Sss a ->
             let context = a.Connect() |> SqlStreamStoreContext.create
-            Config.Store.Sss (context, cache)
+            Store.Config.Sss (context, cache)
     let verboseRequested = function
         | StoreArgs.Cosmos a -> a.Verbose
         | StoreArgs.Dynamo a -> a.Verbose
