@@ -16,6 +16,7 @@ public class ConfirmCartTests
         var cart = CartBuilder
             .Create()
             .Opened()
+            .WithProduct()
             .Build();
 
         // When
@@ -23,12 +24,27 @@ public class ConfirmCartTests
 
         // Then
         cart.Status.Should().Be(ShoppingCartStatus.Confirmed);
-        cart.Version.Should().Be(2);
 
         var @event = cart.PublishedEvent<ShoppingCartConfirmed>();
 
         @event.Should().NotBeNull();
         @event.Should().BeOfType<ShoppingCartConfirmed>();
         @event!.CartId.Should().Be(cart.Id);
+    }
+
+    [Fact]
+    public void ForEmptyCart_ShouldFail()
+    {
+        // Given
+        var emptyCart = CartBuilder
+            .Create()
+            .Opened()
+            .Build();
+
+        // When
+        Action confirmAction = () => emptyCart.Confirm();
+
+        // Then
+        confirmAction.Should().Throw<InvalidOperationException>();
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Data;
+using Marten.Integration.Tests.TestsInfrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -72,10 +73,15 @@ public record TestDocumentForTenancy(
     string Name
 );
 
-public class TenancyPerSchema
+public class TenancyPerSchema: MartenTest
 {
     private const string FirstTenant = "Tenant1";
     private const string SecondTenant = "Tenant2";
+
+    public TenancyPerSchema(MartenFixture fixture): base(fixture.PostgreSqlContainer, false)
+    {
+
+    }
 
     [Fact]
     public void GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
@@ -84,35 +90,33 @@ public class TenancyPerSchema
 
         AddMarten(services);
 
-        using (var sp = services.BuildServiceProvider())
+        using var sp = services.BuildServiceProvider();
+        // simulate scope per HTTP request with different tenant
+        using (var firstScope = sp.CreateScope())
         {
-            // simulate scope per HTTP request with different tenant
-            using (var firstScope = sp.CreateScope())
-            {
-                firstScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = FirstTenant;
+            firstScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = FirstTenant;
 
-                using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
-                {
-                    session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), FirstTenant));
-                    session.SaveChanges();
-                }
+            using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
+            {
+                session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), FirstTenant));
+                session.SaveChanges();
             }
+        }
 
-            // simulate scope per HTTP request with different tenant
-            using (var secondScope = sp.CreateScope())
+        // simulate scope per HTTP request with different tenant
+        using (var secondScope = sp.CreateScope())
+        {
+            secondScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = SecondTenant;
+
+            using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
             {
-                secondScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = SecondTenant;
-
-                using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
-                {
-                    session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), SecondTenant));
-                    session.SaveChanges();
-                }
+                session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), SecondTenant));
+                session.SaveChanges();
             }
         }
     }
 
-    private static void AddMarten(IServiceCollection services)
+    private void AddMarten(IServiceCollection services)
     {
         // simulate http context
         services.AddScoped<DummyTenancyContext>();
@@ -123,7 +127,7 @@ public class TenancyPerSchema
         services.AddSingleton<Action<string, StoreOptions>>((tenantId, options) =>
         {
             options.DatabaseSchemaName = tenantId;
-            options.Connection(Settings.ConnectionString);
+            options.Connection(ConnectionString);
         });
 
         services.AddScoped<ISessionFactory, TenancyPerSchemaSessionFactory>();

@@ -100,4 +100,9 @@ public class EventsAggregation: MartenTest
             .Should()
             .BeEquivalentTo("Description2", "Description3");
     }
+
+    public EventsAggregation(MartenFixture fixture): base(fixture.PostgreSqlContainer)
+    {
+
+    }
 }

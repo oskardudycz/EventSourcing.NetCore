@@ -1,81 +1,47 @@
-using System.Net;
-using Carts.Api.Requests.Carts;
+using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
-using Core.Api.Testing;
-using Core.Testing;
 using FluentAssertions;
+using Ogooreck.API;
 using Xunit;
+using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.AddingProduct;
 
-public class AddProductFixture: ApiWithEventsFixture<Startup>
+using static ShoppingCartsApi;
+
+public class AddProductTests: IClassFixture<ApiSpecification<Program>>
 {
-    protected override string ApiUrl => "/api/ShoppingCarts";
+    private readonly ApiSpecification<Program> API;
 
-    public Guid ShoppingCartId { get; private set; }
+    public AddProductTests(ApiSpecification<Program> api) => API = api;
 
-    public readonly Guid ClientId = Guid.NewGuid();
-
-    public readonly ProductItemRequest ProductItem = new(Guid.NewGuid(), 1);
-
-    public HttpResponseMessage CommandResponse = default!;
-
-    public override async Task InitializeAsync()
-    {
-        var openResponse = await Post(new OpenShoppingCartRequest(ClientId));
-        openResponse.EnsureSuccessStatusCode();
-
-        ShoppingCartId = await openResponse.GetResultFromJson<Guid>();
-
-        CommandResponse = await Post(
-            $"{ShoppingCartId}/products",
-            new AddProductRequest(ProductItem),
-            new RequestOptions { IfMatch = 1.ToString() }
-        );
-    }
-}
-
-public class AddProductTests: IClassFixture<AddProductFixture>
-{
-    private readonly AddProductFixture fixture;
-
-    public AddProductTests(AddProductFixture fixture)
-    {
-        this.fixture = fixture;
-    }
+    private readonly ProductItemRequest product = new(Guid.NewGuid(), 1);
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public void Put_Should_Return_OK()
-    {
-        var commandResponse = fixture.CommandResponse.EnsureSuccessStatusCode();
-        commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task Put_Should_AddProductTo_ShoppingCart()
-    {
-        // prepare query
-        var query = $"{fixture.ShoppingCartId}";
-
-        //send query
-        var queryResponse = await fixture.Get(query, 30,
-            check: async response => (await response.GetResultFromJson<ShoppingCartDetails>()).Version == 2);
-
-        queryResponse.EnsureSuccessStatusCode();
-
-        var cartDetails = await queryResponse.GetResultFromJson<ShoppingCartDetails>();
-        cartDetails.Should().NotBeNull();
-        cartDetails.Version.Should().Be(2);
-        cartDetails.Id.Should().Be(fixture.ShoppingCartId);
-        cartDetails.Status.Should().Be(ShoppingCartStatus.Pending);
-        cartDetails.ClientId.Should().Be(fixture.ClientId);
-        cartDetails.ProductItems.Should().HaveCount(1);
-
-        var productItem = cartDetails.ProductItems.Single();
-        productItem.ProductId.Should().Be(fixture.ProductItem.ProductId!.Value);
-        productItem.Quantity.Should().Be(fixture.ProductItem.Quantity);
-    }
+    public Task Post_Should_AddProductItem_To_ShoppingCart() =>
+        API
+            .Given("Opened Shopping Cart", OpenShoppingCart())
+            .When(
+                "Add new product",
+                POST,
+                URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}/products"),
+                BODY(new AddProductRequest(product)),
+                HEADERS(IF_MATCH(1))
+            )
+            .Then(OK)
+            .And()
+            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
+            .Then(
+                RESPONSE_BODY<ShoppingCartDetails>((details, ctx) =>
+                {
+                    details.Id.Should().Be(ctx.OpenedShoppingCartId());
+                    details.Status.Should().Be(ShoppingCartStatus.Pending);
+                    var productItem = details.ProductItems.Single();
+                    productItem.Quantity.Should().Be(product.Quantity);
+                    productItem.ProductId.Should().Be(product.ProductId!.Value);
+                    details.Version.Should().Be(2);
+                })
+            );
 }

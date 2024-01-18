@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Xunit;
 
@@ -58,7 +59,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
     public class Reaggregation: MartenTest
     {
-        public Reaggregation() : base(false)
+        public Reaggregation(MartenFixture fixture) : base(fixture.PostgreSqlContainer, false)
         {
         }
 
@@ -68,7 +69,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             {
                 options.Events.AddEventTypes(new[] { typeof(IssueCreated), typeof(IssueUpdated) });
                 //It's needed to manualy set that inline aggegation should be applied
-                options.Projections.SelfAggregate<TIssue>();
+                options.Projections.Snapshot<TIssue>(SnapshotLifecycle.Inline);
             });
         }
 

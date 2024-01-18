@@ -2,6 +2,7 @@ using Core.Commands;
 using Core.Marten.Repository;
 using Core.Queries;
 using Marten;
+using Marten.Events.Projections;
 using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.GettingMeeting;
 using MeetingsManagement.Meetings.SchedulingMeeting;
@@ -13,14 +14,14 @@ public static class Config
 {
     public static IServiceCollection AddMeeting(this IServiceCollection services) =>
         services
-            .AddScoped<IMartenRepository<Meeting>, MartenRepository<Meeting>>()
+            .AddMartenRepository<Meeting>()
             .AddCommandHandler<CreateMeeting, HandleCreateMeeting>()
             .AddCommandHandler<ScheduleMeeting, HandleScheduleMeeting>()
             .AddQueryHandler<GetMeeting, MeetingView?, HandleGetMeeting>();
 
     public static void ConfigureMarten(StoreOptions options)
     {
-        options.Projections.SelfAggregate<Meeting>();
-        options.Projections.Add(new MeetingViewProjection());
+        options.Projections.Snapshot<Meeting>(SnapshotLifecycle.Inline);
+        options.Projections.Add(new MeetingViewProjection(), ProjectionLifecycle.Inline);
     }
 }

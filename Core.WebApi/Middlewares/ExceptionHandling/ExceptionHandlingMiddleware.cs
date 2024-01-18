@@ -25,11 +25,11 @@ public class ExceptionHandlingMiddleware
     {
         try
         {
-            await next(context);
+            await next(context).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            await HandleExceptionAsync(context, ex);
+            await HandleExceptionAsync(context, ex).ConfigureAwait(false);
         }
     }
 

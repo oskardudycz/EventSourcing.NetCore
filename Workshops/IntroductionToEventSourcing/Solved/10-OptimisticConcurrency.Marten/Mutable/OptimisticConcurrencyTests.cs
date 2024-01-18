@@ -112,6 +112,7 @@ public class OptimisticConcurrencyTests: MartenTest
             }
         );
         exception.Should().BeOfType<EventStreamUnexpectedMaxEventIdException>();
+        ReOpenSession();
 
         var shoppingCart = await DocumentSession.Get<ShoppingCart>(shoppingCartId, CancellationToken.None);
 

@@ -1,21 +1,13 @@
 using Core.Commands;
 using Core.Requests;
-using MediatR;
 
 namespace Orders.Payments.RequestingPayment;
 
-public class RequestPayment: ICommand
+public record RequestPayment(
+    Guid OrderId,
+    decimal Amount
+)
 {
-    public Guid OrderId { get; }
-
-    public decimal Amount { get; }
-
-    private RequestPayment(Guid orderId, decimal amount)
-    {
-        OrderId = orderId;
-        Amount = amount;
-    }
-
     public static RequestPayment Create(Guid orderId, decimal amount)
     {
         if (orderId == Guid.Empty)
@@ -40,14 +32,13 @@ public class HandleRequestPayment:
         this.externalCommandBus = externalCommandBus;
     }
 
-    public async Task<Unit> Handle(RequestPayment command, CancellationToken cancellationToken)
+    public async Task Handle(RequestPayment command, CancellationToken ct)
     {
         await externalCommandBus.Post(
             externalServicesConfig.PaymentsUrl!,
             "payments",
             command,
-            cancellationToken);
-
-        return Unit.Value;
+            ct
+        );
     }
 }

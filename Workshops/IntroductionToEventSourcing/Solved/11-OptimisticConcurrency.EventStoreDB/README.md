@@ -23,4 +23,8 @@ Select your preferred approach (or all) to solve this use case using EventStoreD
 
 _**Note**: If needed update entities, events or test setup structure_
 
+## Solutions
 
+Read more in my articles:
+- [Optimistic concurrency for pessimistic times](https://event-driven.io/en/optimistic_concurrency_for_pessimistic_times/?utm_source=event_sourcing_net_workshop)
+- [How to use ETag header for optimistic concurrency](https://event-driven.io/en/how_to_use_etag_header_for_optimistic_concurrency/?utm_source=event_sourcing_net_workshop)

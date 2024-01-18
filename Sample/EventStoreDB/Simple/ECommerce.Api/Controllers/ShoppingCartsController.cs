@@ -35,7 +35,7 @@ public class ShoppingCartsController: Controller
 
         await handle(command, ct);
 
-        return Created("api/ShoppingCarts", cartId);
+        return Created($"/api/ShoppingCarts/{cartId}", cartId);
     }
 
     [HttpPost("{id}/products")]
@@ -128,7 +128,7 @@ public class ShoppingCartsController: Controller
         if (result == null)
             return NotFound();
 
-        Response.TrySetETagResponseHeader(result.Version.ToString());
+        Response.TrySetETagResponseHeader(result.Version);
         return Ok(result);
     }
 

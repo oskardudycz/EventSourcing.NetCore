@@ -1,15 +1,13 @@
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.RemovingProduct;
 
 public record RemoveProduct(
     Guid CartId,
     PricedProductItem ProductItem
-): ICommand
+)
 {
     public static RemoveProduct Create(Guid cartId, PricedProductItem productItem)
     {
@@ -24,30 +22,18 @@ internal class HandleRemoveProduct:
     ICommandHandler<RemoveProduct>
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleRemoveProduct(
-        IMartenRepository<ShoppingCart> cartRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleRemoveProduct(IMartenRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(RemoveProduct command, CancellationToken cancellationToken)
+    public Task Handle(RemoveProduct command, CancellationToken ct)
     {
         var (cartId, productItem) = command;
 
-        await scope.Do((expectedVersion, traceMetadata) =>
-            cartRepository.GetAndUpdate(
-                cartId,
-                cart => cart.RemoveProduct(productItem),
-                expectedVersion,
-                traceMetadata,
-                cancellationToken
-            )
+        return cartRepository.GetAndUpdate(
+            cartId,
+            cart => cart.RemoveProduct(productItem),
+            ct: ct
         );
-        return Unit.Value;
     }
 }

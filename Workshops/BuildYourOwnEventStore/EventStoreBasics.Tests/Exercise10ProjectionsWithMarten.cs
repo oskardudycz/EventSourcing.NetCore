@@ -115,7 +115,7 @@ public class UserDashboard
     public decimal TotalAmount { get; set; }
 }
 
-public class UserDashboardProjection: ViewProjection<UserDashboard, Guid>
+public class UserDashboardProjection: MultiStreamProjection<UserDashboard, Guid>
 {
     public UserDashboardProjection()
     {
@@ -173,15 +173,15 @@ public class Exercise10ProjectionsWithMarten
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.DatabaseSchemaName =
                 options.Events.DatabaseSchemaName = nameof(Exercise10ProjectionsWithMarten);
-            options.Projections.SelfAggregate<User>();
-            options.Projections.SelfAggregate<Order>();
-            options.Projections.Add<UserDashboardProjection>();
+            options.Projections.Snapshot<User>(SnapshotLifecycle.Inline);
+            options.Projections.Snapshot<Order>(SnapshotLifecycle.Inline);
+            options.Projections.Add<UserDashboardProjection>(ProjectionLifecycle.Async);
 
             // options.Events.AddEventTypes(new[] {typeof(UserCreated)});
             // options.Projections.Add(new UserDashboardProjection());
         });
 
-        documentSession = store.OpenSession();
+        documentSession = store.LightweightSession();
 
         userRepository = new MartenRepository<User>(documentSession);
         orderRepository = new MartenRepository<Order>(documentSession);

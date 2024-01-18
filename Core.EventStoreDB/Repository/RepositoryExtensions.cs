@@ -1,6 +1,5 @@
 using Core.Aggregates;
 using Core.Exceptions;
-using Core.Tracing;
 
 namespace Core.EventStoreDB.Repository;
 
@@ -12,7 +11,7 @@ public static class RepositoryExtensions
         CancellationToken ct
     ) where T : class, IAggregate
     {
-        var entity = await repository.Find(id, ct);
+        var entity = await repository.Find(id, ct).ConfigureAwait(false);
 
         return entity ?? throw AggregateNotFoundException.For<T>(id);
     }
@@ -22,14 +21,13 @@ public static class RepositoryExtensions
         Guid id,
         Action<T> action,
         ulong? expectedVersion = null,
-        TraceMetadata? traceMetadata = null,
         CancellationToken ct = default
     ) where T : class, IAggregate
     {
-        var entity = await repository.Get(id, ct);
+        var entity = await repository.Get(id, ct).ConfigureAwait(false);
 
         action(entity);
 
-        return await repository.Update(entity, expectedVersion, traceMetadata, ct);
+        return await repository.Update(entity, expectedVersion, ct).ConfigureAwait(false);
     }
 }

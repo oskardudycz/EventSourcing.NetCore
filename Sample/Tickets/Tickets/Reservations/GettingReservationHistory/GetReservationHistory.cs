@@ -8,7 +8,7 @@ public record GetReservationHistory(
     Guid ReservationId,
     int PageNumber,
     int PageSize
-): IQuery<IPagedList<ReservationHistory>>
+)
 {
     public static GetReservationHistory Create(Guid reservationId, int pageNumber = 1, int pageSize = 20)
     {

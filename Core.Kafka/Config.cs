@@ -3,6 +3,7 @@ using Core.Events;
 using Core.Events.External;
 using Core.Kafka.Consumers;
 using Core.Kafka.Producers;
+using Core.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -33,6 +34,8 @@ public static class Config
 
                 var consumer =
                     serviceProvider.GetRequiredService<IExternalEventConsumer>();
+
+                TelemetryPropagator.UseDefaultCompositeTextMapPropagator();
 
                 return new BackgroundWorker(
                     logger,

@@ -5,7 +5,7 @@ namespace MeetingsManagement.Meetings.GettingMeeting;
 
 public record GetMeeting(
     Guid Id
-): IQuery<MeetingView>;
+);
 
 
 internal class HandleGetMeeting: IQueryHandler<GetMeeting, MeetingView?>

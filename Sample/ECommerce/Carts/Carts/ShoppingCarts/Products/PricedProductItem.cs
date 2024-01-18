@@ -1,6 +1,6 @@
 namespace Carts.ShoppingCarts.Products;
 
-public class PricedProductItem
+public record PricedProductItem
 {
     public Guid ProductId => ProductItem.ProductId;
 
@@ -20,7 +20,7 @@ public class PricedProductItem
     public static PricedProductItem Create(Guid? productId, int? quantity, decimal? unitPrice)
     {
         return Create(
-            ProductItem.Create(productId, quantity),
+            ProductItem.From(productId, quantity),
             unitPrice
         );
     }

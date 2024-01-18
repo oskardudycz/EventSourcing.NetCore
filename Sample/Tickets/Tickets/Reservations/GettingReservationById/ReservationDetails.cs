@@ -24,29 +24,25 @@ public class ReservationDetails
         SeatId = @event.SeatId;
         Number = @event.Number;
         Status = ReservationStatus.Tentative;
-        Version++;
     }
 
     public void Apply(ReservationSeatChanged @event)
     {
         SeatId = @event.SeatId;
-        Version++;
     }
 
     public void Apply(ReservationConfirmed @event)
     {
         Status = ReservationStatus.Confirmed;
-        Version++;
     }
 
     public void Apply(ReservationCancelled @event)
     {
         Status = ReservationStatus.Cancelled;
-        Version++;
     }
 }
 
-public class ReservationDetailsProjection: AggregateProjection<ReservationDetails>
+public class ReservationDetailsProjection: SingleStreamProjection<ReservationDetails>
 {
     public ReservationDetailsProjection()
     {

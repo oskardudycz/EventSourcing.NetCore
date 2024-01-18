@@ -25,7 +25,7 @@ public class MartenExternalProjection<TEvent, TView>: IEventHandler<EventEnvelop
     {
         var (@event, eventMetadata) = eventEnvelope;
 
-        var entity = await session.LoadAsync<TView>(getId(@event), ct) ??
+        var entity = await session.LoadAsync<TView>(getId(@event), ct).ConfigureAwait(false) ??
                      (TView)Activator.CreateInstance(typeof(TView), true)!;
 
         var eventLogPosition = eventMetadata.LogPosition;
@@ -39,7 +39,7 @@ public class MartenExternalProjection<TEvent, TView>: IEventHandler<EventEnvelop
 
         session.Store(entity);
 
-        await session.SaveChangesAsync(ct);
+        await session.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 }
 

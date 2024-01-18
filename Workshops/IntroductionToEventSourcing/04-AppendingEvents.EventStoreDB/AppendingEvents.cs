@@ -1,4 +1,3 @@
-using System.Text.Json;
 using EventStore.Client;
 using FluentAssertions;
 using Xunit;
@@ -59,7 +58,7 @@ public class GettingStateFromEventsTests
 
     [Fact]
     [Trait("Category", "SkipCI")]
-    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task AppendingEvents_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();

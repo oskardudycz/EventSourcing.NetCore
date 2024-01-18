@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Core.Tracing;
+﻿using OpenTelemetry.Context.Propagation;
 
 namespace Core.Events;
 
@@ -7,7 +6,7 @@ public record EventMetadata(
     string EventId,
     ulong StreamPosition,
     ulong LogPosition,
-    TraceMetadata? Trace
+    PropagationContext? PropagationContext
 );
 
 public interface IEventEnvelope
@@ -24,7 +23,7 @@ public record EventEnvelope<T>(
     object IEventEnvelope.Data => Data;
 }
 
-public static class EventEnvelopeFactory
+public static class EventEnvelope
 {
     public static IEventEnvelope From(object data, EventMetadata metadata)
     {
@@ -32,4 +31,7 @@ public static class EventEnvelopeFactory
         var type = typeof(EventEnvelope<>).MakeGenericType(data.GetType());
         return (IEventEnvelope)Activator.CreateInstance(type, data, metadata)!;
     }
+
+    public static EventEnvelope<T> From<T>(T data) where T : notnull =>
+        new(data, new EventMetadata(Guid.NewGuid().ToString(), 0, 0, null));
 }

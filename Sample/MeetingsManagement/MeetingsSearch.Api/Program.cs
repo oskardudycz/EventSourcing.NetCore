@@ -1,21 +1,48 @@
-using Microsoft.AspNetCore;
+using Core;
+using Core.Kafka;
+using Core.OpenTelemetry;
+using Core.WebApi.Middlewares.ExceptionHandling;
+using Core.WebApi.Swagger;
+using MeetingsSearch;
+using Microsoft.OpenApi.Models;
+using OpenTelemetry.Trace;
 
-namespace MeetingsSearch.Api;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
-{
-    public static void Main(string[] args)
+builder.Services
+    .AddSwaggerGen(c =>
     {
-        CreateWebHostBuilder(args).Build().Run();
-    }
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Meeting Search", Version = "v1" });
+        c.OperationFilter<MetadataOperationFilter>();
+    })
+    .AddKafkaConsumer()
+    .AddCoreServices()
+    .AddMeetingsSearch(builder.Configuration)
+    .AddOpenTelemetry("MeetingsSearch", OpenTelemetryOptions.Build(options =>
+        options.Configure(t =>
+            t.AddJaegerExporter()
+        ).DisableConsoleExporter(true)
+    ))
+    .AddControllers();
 
-    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        WebHost.CreateDefaultBuilder(args)
-            .UseStartup<Startup>()
-            .ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-                logging.AddConsole();
-            })
-            .UseUrls("http://localhost:5010/");
+var app = builder.Build();
+
+app.UseExceptionHandlingMiddleware()
+    .UseRouting()
+    .UseAuthorization()
+    .UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    })
+    .UseSwagger()
+    .UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meeting Search V1");
+        c.RoutePrefix = string.Empty;
+    });
+
+app.Run();
+
+public partial class Program
+{
 }

@@ -1,11 +1,12 @@
 using FluentAssertions;
+using Marten.Integration.Tests.TestsInfrastructure;
 using Npgsql;
 using Weasel.Core;
 using Xunit;
 
 namespace Marten.Integration.Tests.General;
 
-public class StoreInitializationTests
+public class StoreInitializationTests: MartenTest
 {
     [Fact]
     public void GivenWrongConnectionString_WhenDocumentSessionIsInitialized_ThenConnectionIsCreated()
@@ -25,7 +26,7 @@ public class StoreInitializationTests
     {
         var ex = Record.Exception(() =>
         {
-            var store = DocumentStore.For(Settings.ConnectionString);
+            var store = DocumentStore.For(ConnectionString);
 
             ConnectionShouldBeEstablished(store);
         });
@@ -40,27 +41,9 @@ public class StoreInitializationTests
         {
             var store = DocumentStore.For(options =>
             {
-                options.Connection(Settings.ConnectionString);
+                options.Connection(ConnectionString);
                 options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.Events.DatabaseSchemaName = Settings.SchemaName;
-            });
-
-            ConnectionShouldBeEstablished(store);
-        });
-
-        ex.Should().BeNull();
-    }
-
-    [Fact]
-    public void GivenSettingWithNpgsqlConnection_WhenDocumentSessionIsInitializedWithDifferentSchema_ThenConnectionIsCreated()
-    {
-        var ex = Record.Exception(() =>
-        {
-            var store = DocumentStore.For(options =>
-            {
-                options.Connection(() => new NpgsqlConnection(Settings.ConnectionString));
-                options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.Events.DatabaseSchemaName = Settings.SchemaName;
+                options.Events.DatabaseSchemaName = SchemaName;
             });
 
             ConnectionShouldBeEstablished(store);
@@ -76,12 +59,12 @@ public class StoreInitializationTests
         {
             var store = DocumentStore.For(options =>
             {
-                options.Connection(Settings.ConnectionString);
+                options.Connection(ConnectionString);
                 options.AutoCreateSchemaObjects = AutoCreate.All;
-                options.Events.DatabaseSchemaName = Settings.SchemaName;
+                options.Events.DatabaseSchemaName = SchemaName;
             });
 
-            using var session = store.OpenSession();
+            using var session = store.LightweightSession();
             using var transaction = session.Connection!.BeginTransaction();
             ConnectionShouldBeEstablished(store);
 
@@ -93,11 +76,14 @@ public class StoreInitializationTests
 
     private static void ConnectionShouldBeEstablished(IDocumentStore store)
     {
-        using (var session = store.OpenSession())
-        {
-            var result = session.Query<int>("SELECT 1");
+        using var session = store.LightweightSession();
+        var result = session.Query<int>("SELECT 1");
 
-            result.Should().NotBeNull();
-        }
+        result.Should().NotBeNull();
+    }
+
+    public StoreInitializationTests(MartenFixture fixture) : base(fixture.PostgreSqlContainer, false, false)
+    {
+
     }
 }

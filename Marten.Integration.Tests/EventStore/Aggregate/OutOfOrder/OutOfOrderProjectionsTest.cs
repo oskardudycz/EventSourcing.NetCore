@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Weasel.Core;
 using Xunit;
@@ -49,16 +50,16 @@ public class OutOfOrderProjectionsTest: MartenTest
     {
         var store = DocumentStore.For(options =>
         {
-            options.Connection(Settings.ConnectionString);
+            options.Connection(ConnectionString);
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.DatabaseSchemaName = SchemaName;
             options.Events.DatabaseSchemaName = SchemaName;
 
             //It's needed to manually set that inline aggregation should be applied
-            options.Projections.SelfAggregate<IssuesList>();
+            options.Projections.Snapshot<IssuesList>(SnapshotLifecycle.Inline);
         });
 
-        return store.OpenSession();
+        return store.LightweightSession();
     }
 
     [Fact]
@@ -93,4 +94,6 @@ public class OutOfOrderProjectionsTest: MartenTest
         issuesListFromLiveAggregation!.Issues.Count.Should().Be(2);
         issuesListFromLiveAggregation!.Issues.Count.Should().Be(issuesListFromInlineAggregation!.Issues.Count);
     }
+
+    public OutOfOrderProjectionsTest(MartenFixture fixture) : base(fixture.PostgreSqlContainer){}
 }

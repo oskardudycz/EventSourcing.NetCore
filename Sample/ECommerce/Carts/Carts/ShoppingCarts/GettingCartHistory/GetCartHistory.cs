@@ -8,7 +8,7 @@ public record GetCartHistory(
     Guid CartId,
     int PageNumber,
     int PageSize
-): IQuery<IPagedList<ShoppingCartHistory>>
+)
 {
     public static GetCartHistory Create(Guid cartId, int pageNumber = 1, int pageSize = 20)
     {
@@ -24,12 +24,10 @@ public record GetCartHistory(
 internal class HandleGetCartHistory:
     IQueryHandler<GetCartHistory, IPagedList<ShoppingCartHistory>>
 {
-    private readonly IDocumentSession querySession;
+    private readonly IQuerySession querySession;
 
-    public HandleGetCartHistory(IDocumentSession querySession)
-    {
+    public HandleGetCartHistory(IQuerySession querySession) =>
         this.querySession = querySession;
-    }
 
     public Task<IPagedList<ShoppingCartHistory>> Handle(GetCartHistory query, CancellationToken cancellationToken)
     {

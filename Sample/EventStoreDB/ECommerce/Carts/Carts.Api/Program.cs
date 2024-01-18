@@ -1,21 +1,59 @@
-namespace Carts.Api;
+using System.Net;
+using Carts;
+using Core;
+using Core.EventStoreDB;
+using Core.Exceptions;
+using Core.OpenTelemetry;
+using Core.WebApi.Middlewares.ExceptionHandling;
+using Core.WebApi.OptimisticConcurrency;
+using Core.WebApi.Swagger;
+using EventStore.Client;
+using Microsoft.OpenApi.Models;
+using OpenTelemetry.Trace;
 
-public class Program
-{
-    public static void Main(string[] args)
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+    .AddSwaggerGen(c =>
     {
-        CreateHostBuilder(args).Build().Run();
-    }
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Carts", Version = "v1" });
+        c.OperationFilter<MetadataOperationFilter>();
+    })
+    .AddCoreServices()
+    .AddEventStoreDBSubscriptionToAll()
+    .AddCartsModule(builder.Configuration)
+    .AddOptimisticConcurrencyMiddleware()
+    .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
+        options.Configure(t =>
+            t.AddJaegerExporter()
+        ).DisableConsoleExporter(true)
+    ))
+    .AddControllers();
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            })
-            .ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-                logging.AddConsole();
-            });
+var app = builder.Build();
+
+app.UseExceptionHandlingMiddleware(exception => exception switch
+    {
+        AggregateNotFoundException _ => HttpStatusCode.NotFound,
+        WrongExpectedVersionException => HttpStatusCode.PreconditionFailed,
+        _ => HttpStatusCode.InternalServerError
+    })
+    .UseOptimisticConcurrencyMiddleware()
+    .UseRouting()
+    .UseAuthorization()
+    .UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    })
+    .UseSwagger()
+    .UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Carts V1");
+        c.RoutePrefix = string.Empty;
+    });
+
+app.Run();
+
+public partial class Program
+{
 }

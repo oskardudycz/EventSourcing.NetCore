@@ -1,14 +1,12 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Payments.Payments.DiscardingPayment;
 
 public record DiscardPayment(
     Guid PaymentId,
     DiscardReason DiscardReason
-): ICommand
+)
 {
     public static DiscardPayment Create(Guid? paymentId, DiscardReason? discardReason)
     {
@@ -25,30 +23,18 @@ public class HandleDiscardPayment:
     ICommandHandler<DiscardPayment>
 {
     private readonly IMartenRepository<Payment> paymentRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleDiscardPayment(
-        IMartenRepository<Payment> paymentRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleDiscardPayment(IMartenRepository<Payment> paymentRepository) =>
         this.paymentRepository = paymentRepository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(DiscardPayment command, CancellationToken cancellationToken)
+    public Task Handle(DiscardPayment command, CancellationToken ct)
     {
         var (paymentId, _) = command;
 
-        await scope.Do((expectedVersion, traceMetadata) =>
-            paymentRepository.GetAndUpdate(
-                paymentId,
-                payment => payment.TimeOut(),
-                expectedVersion,
-                traceMetadata,
-                cancellationToken
-            )
+        return paymentRepository.GetAndUpdate(
+            paymentId,
+            payment => payment.TimeOut(),
+            ct: ct
         );
-        return Unit.Value;
     }
 }

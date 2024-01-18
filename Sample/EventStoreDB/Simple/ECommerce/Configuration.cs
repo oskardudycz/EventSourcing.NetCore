@@ -27,6 +27,11 @@ public static class Configuration
 
     public static void UseECommerceModule(this IServiceProvider serviceProvider)
     {
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
+        if (environment != "Development")
+            return;
+
         using var scope = serviceProvider.CreateScope();
         using var dbContext = scope.ServiceProvider.GetRequiredService<ECommerceDbContext>();
         dbContext.Database.Migrate();

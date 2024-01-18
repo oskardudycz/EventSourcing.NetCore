@@ -2,7 +2,6 @@ using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.Products;
 using Core.Events;
 using Core.Exceptions;
-using Core.Tracing;
 using Marten;
 
 namespace Carts.ShoppingCarts.FinalizingCart;

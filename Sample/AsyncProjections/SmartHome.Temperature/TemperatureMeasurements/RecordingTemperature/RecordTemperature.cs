@@ -1,14 +1,12 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace SmartHome.Temperature.TemperatureMeasurements.RecordingTemperature;
 
 public record RecordTemperature(
     Guid MeasurementId,
     decimal Temperature
-): ICommand
+)
 {
     public static RecordTemperature Create(Guid measurementId, decimal temperature)
     {
@@ -25,30 +23,18 @@ public class HandleRecordTemperature:
     ICommandHandler<RecordTemperature>
 {
     private readonly IMartenRepository<TemperatureMeasurement> repository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleRecordTemperature(
-        IMartenRepository<TemperatureMeasurement> repository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleRecordTemperature(IMartenRepository<TemperatureMeasurement> repository) =>
         this.repository = repository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(RecordTemperature command, CancellationToken cancellationToken)
+    public Task Handle(RecordTemperature command, CancellationToken ct)
     {
         var (measurementId, temperature) = command;
 
-        await scope.Do((expectedVersion, traceMetadata) =>
-            repository.GetAndUpdate(
-                measurementId,
-                reservation => reservation.Record(temperature),
-                expectedVersion,
-                traceMetadata,
-                cancellationToken
-            )
+        return repository.GetAndUpdate(
+            measurementId,
+            reservation => reservation.Record(temperature),
+            ct: ct
         );
-        return Unit.Value;
     }
 }

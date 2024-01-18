@@ -14,6 +14,7 @@ using Core.Events;
 using Core.Marten.Repository;
 using Core.Queries;
 using Marten;
+using Marten.Events.Projections;
 using Marten.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,7 +24,7 @@ internal static class CartsConfig
 {
     internal static IServiceCollection AddCarts(this IServiceCollection services) =>
         services.AddScoped<IProductPriceCalculator, RandomProductPriceCalculator>()
-            .AddScoped<IMartenRepository<ShoppingCart>, MartenRepository<ShoppingCart>>()
+            .AddMartenRepository<ShoppingCart>()
             .AddCommandHandlers()
             .AddQueryHandlers()
             .AddEventHandlers();
@@ -47,12 +48,12 @@ internal static class CartsConfig
     internal static void ConfigureCarts(this StoreOptions options)
     {
         // Snapshots
-        options.Projections.SelfAggregate<ShoppingCart>();
+        options.Projections.Snapshot<ShoppingCart>(SnapshotLifecycle.Inline);
         // // projections
-        options.Projections.Add<CartShortInfoProjection>();
-        options.Projections.Add<CartDetailsProjection>();
+        options.Projections.Add<CartShortInfoProjection>(ProjectionLifecycle.Inline);
+        options.Projections.Add<CartDetailsProjection>(ProjectionLifecycle.Inline);
         //
         // // transformation
-        options.Projections.Add<CartHistoryTransformation>();
+        options.Projections.Add<CartHistoryTransformation>(ProjectionLifecycle.Inline);
     }
 }

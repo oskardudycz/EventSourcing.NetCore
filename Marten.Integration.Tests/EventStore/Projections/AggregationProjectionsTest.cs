@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Marten.Events.Aggregation;
+using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Weasel.Core;
 using Xunit;
@@ -37,14 +38,17 @@ public class AggregationProjectionsTest: MartenTest
         public void Apply(IssueUpdated @event)
         {
             Issues[@event.IssueId] = Issues[@event.IssueId]
-                with {Description = @event.Description};
+                with
+                {
+                    Description = @event.Description
+                };
         }
     }
 
     public class IssueDescriptions
     {
         public Guid Id { get; set; }
-        public Dictionary<Guid, string> Descriptions { get; } = new ();
+        public Dictionary<Guid, string> Descriptions { get; } = new();
 
         public void Apply(IssueCreated @event)
         {
@@ -57,7 +61,7 @@ public class AggregationProjectionsTest: MartenTest
         }
     }
 
-    public class IssueDescriptionsProjection: AggregateProjection<IssueDescriptions>
+    public class IssueDescriptionsProjection: SingleStreamProjection<IssueDescriptions>
     {
         public void Apply(IssueCreated @event, IssueDescriptions item)
         {
@@ -74,17 +78,17 @@ public class AggregationProjectionsTest: MartenTest
     {
         var store = DocumentStore.For(options =>
         {
-            options.Connection(Settings.ConnectionString);
+            options.Connection(ConnectionString);
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.DatabaseSchemaName = SchemaName;
             options.Events.DatabaseSchemaName = SchemaName;
 
             //It's needed to manually set that inline aggregation should be applied
-            options.Projections.SelfAggregate<IssuesList>();
-            options.Projections.Add(new IssueDescriptionsProjection());
+            options.Projections.Snapshot<IssuesList>(SnapshotLifecycle.Inline);
+            options.Projections.Add(new IssueDescriptionsProjection(), ProjectionLifecycle.Inline);
         });
 
-        return store.OpenSession();
+        return store.LightweightSession();
     }
 
     [Fact]
@@ -95,10 +99,8 @@ public class AggregationProjectionsTest: MartenTest
 
         var events = new object[]
         {
-            new IssueCreated(issue1Id, "Description 1"),
-            new IssueUpdated(issue1Id, "Description 1 New"),
-            new IssueCreated(issue2Id, "Description 2"),
-            new IssueUpdated(issue1Id, "Description 1 Super New"),
+            new IssueCreated(issue1Id, "Description 1"), new IssueUpdated(issue1Id, "Description 1 New"),
+            new IssueCreated(issue2Id, "Description 2"), new IssueUpdated(issue1Id, "Description 1 Super New"),
             new IssueUpdated(issue2Id, "Description 2 New"),
         };
 
@@ -122,6 +124,7 @@ public class AggregationProjectionsTest: MartenTest
         issuesListFromLiveAggregation!.Issues.Count.Should().Be(2);
         issuesListFromInlineAggregation!.Issues.Count.Should().Be(2);
         projection!.Descriptions.Count.Should().Be(2);
-
     }
+
+    public AggregationProjectionsTest(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

@@ -44,8 +44,6 @@ public class ShoppingCart: Aggregate
 
     public void Apply(ShoppingCartOpened @event)
     {
-        Version++;
-
         Id = @event.CartId;
         ClientId = @event.ClientId;
         ProductItems = new List<PricedProductItem>();
@@ -69,8 +67,6 @@ public class ShoppingCart: Aggregate
 
     public void Apply(ProductAdded @event)
     {
-        Version++;
-
         var newProductItem = @event.ProductItem;
 
         var existingProductItem = FindProductItemMatchingWith(newProductItem);
@@ -109,8 +105,6 @@ public class ShoppingCart: Aggregate
 
     public void Apply(ProductRemoved @event)
     {
-        Version++;
-
         var productItemToBeRemoved = @event.ProductItem;
 
         var existingProductItem = FindProductItemMatchingWith(@event.ProductItem);
@@ -135,6 +129,9 @@ public class ShoppingCart: Aggregate
         if(Status != ShoppingCartStatus.Pending)
             throw new InvalidOperationException($"Confirming cart in '{Status}' status is not allowed.");
 
+        if (ProductItems.Count == 0)
+            throw new InvalidOperationException($"Confirming empty cart is not allowed.");
+
         var @event = ShoppingCartConfirmed.Create(Id, DateTime.UtcNow);
 
         Enqueue(@event);
@@ -143,8 +140,6 @@ public class ShoppingCart: Aggregate
 
     public void Apply(ShoppingCartConfirmed @event)
     {
-        Version++;
-
         Status = ShoppingCartStatus.Confirmed;
     }
 
@@ -161,8 +156,6 @@ public class ShoppingCart: Aggregate
 
     public void Apply(ShoppingCartCanceled @event)
     {
-        Version++;
-
         Status = ShoppingCartStatus.Canceled;
     }
 

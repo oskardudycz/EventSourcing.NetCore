@@ -1,43 +1,83 @@
 ﻿using Core.Events;
-using Core.Tracing;
-using Core.Tracing.Causation;
-using Core.Tracing.Correlation;
+using Core.OpenTelemetry;
 using Marten;
 using Marten.Events;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Marten.Subscriptions;
 
 public class MartenEventPublisher: IMartenEventsConsumer
 {
     private readonly IServiceProvider serviceProvider;
+    private readonly IActivityScope activityScope;
+    private readonly ILogger<MartenEventPublisher> logger;
 
     public MartenEventPublisher(
-        IServiceProvider serviceProvider
+        IServiceProvider serviceProvider,
+        IActivityScope activityScope,
+        ILogger<MartenEventPublisher> logger
     )
     {
         this.serviceProvider = serviceProvider;
+        this.activityScope = activityScope;
+        this.logger = logger;
     }
 
-    public async Task ConsumeAsync(IDocumentOperations documentOperations, IReadOnlyList<StreamAction> streamActions,
-        CancellationToken ct)
+    public async Task ConsumeAsync(
+        IDocumentOperations documentOperations,
+        IReadOnlyList<StreamAction> streamActions,
+        CancellationToken cancellationToken
+    )
     {
         foreach (var @event in streamActions.SelectMany(streamAction => streamAction.Events))
         {
-            using var scope = serviceProvider.CreateScope();
-            var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
+            var parentContext =
+                TelemetryPropagator.Extract(@event.Headers, ExtractTraceContextFromEventMetadata);
 
-            var eventMetadata = new EventMetadata(
-                @event.Id.ToString(),
-                (ulong)@event.Version,
-                (ulong)@event.Sequence,
-                new TraceMetadata(
-                    @event.CorrelationId != null ? new CorrelationId(@event.CorrelationId) : null,
-                    @event.CausationId != null ? new CausationId(@event.CausationId) : null
-                )
-            );
+            await activityScope.Run($"{nameof(MartenEventPublisher)}/{nameof(ConsumeAsync)}",
+                async (_, ct) =>
+                {
+                    using var scope = serviceProvider.CreateScope();
+                    var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
 
-            await eventBus.Publish(EventEnvelopeFactory.From(@event.Data, eventMetadata), ct);
+                    var eventMetadata = new EventMetadata(
+                        @event.Id.ToString(),
+                        (ulong)@event.Version,
+                        (ulong)@event.Sequence,
+                        parentContext
+                    );
+
+                    await eventBus.Publish(EventEnvelope.From(@event.Data, eventMetadata), ct)
+                        .ConfigureAwait(false);
+                },
+                new StartActivityOptions
+                {
+                    Tags = { { TelemetryTags.EventHandling.Event, @event.Data.GetType() } },
+                    Parent = parentContext.ActivityContext
+                },
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+    }
+
+    private IEnumerable<string> ExtractTraceContextFromEventMetadata(Dictionary<string, object>? headers, string key)
+    {
+        try
+        {
+            if (headers!.TryGetValue(key, out var value) != true)
+                return Enumerable.Empty<string>();
+
+            var stringValue = value.ToString();
+
+            return stringValue != null
+                ? new[] { stringValue }
+                : Enumerable.Empty<string>();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Failed to extract trace context: {ex}", ex);
+            return Enumerable.Empty<string>();
         }
     }
 }

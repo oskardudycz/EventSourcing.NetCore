@@ -2,6 +2,7 @@ using Core.ElasticSearch;
 using MeetingsSearch.Meetings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using static Core.ElasticSearch.Indices.IndexNameMapper;
 
 namespace MeetingsSearch;
 
@@ -13,8 +14,8 @@ public static class Config
             {
                 settings
                     .DefaultMappingFor<Meeting>(m => m
-                        .PropertyName(p => p.Id, "id")
-                        .PropertyName(p => p.Name, "name")
+                        .IdProperty(p => p.Id)
+                        .IndexName(ToIndexName<Meeting>())
                     );
             })
             .AddMeeting();

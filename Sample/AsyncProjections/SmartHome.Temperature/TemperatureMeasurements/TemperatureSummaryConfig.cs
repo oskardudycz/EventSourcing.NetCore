@@ -14,7 +14,7 @@ public static class TemperatureSummaryConfig
 {
     internal static IServiceCollection AddTemperatureMeasurements(this IServiceCollection services) =>
         services
-            .AddScoped<IMartenRepository<TemperatureMeasurement>, MartenRepository<TemperatureMeasurement>>()
+            .AddMartenRepository<TemperatureMeasurement>()
             .AddCommandHandlers()
             .AddQueryHandlers();
 
@@ -30,6 +30,6 @@ public static class TemperatureSummaryConfig
     internal static void ConfigureTemperatureMeasurements(this StoreOptions options)
     {
         // Snapshots
-        options.Projections.SelfAggregate<TemperatureMeasurement>(ProjectionLifecycle.Async);
+        options.Projections.Snapshot<TemperatureMeasurement>(SnapshotLifecycle.Async);
     }
 }

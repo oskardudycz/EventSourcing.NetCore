@@ -2,43 +2,32 @@
 using Core.Events;
 using Core.EventStoreDB.Events;
 using Core.EventStoreDB.Serialization;
-using Core.Tracing;
+using Core.OpenTelemetry;
 using EventStore.Client;
+using OpenTelemetry.Context.Propagation;
 
 namespace Core.EventStoreDB.Repository;
 
 public interface IEventStoreDBRepository<T> where T : class, IAggregate
 {
     Task<T?> Find(Guid id, CancellationToken cancellationToken);
-
-    Task<ulong> Add(
-        T aggregate,
-        TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default
-    );
-
-    Task<ulong> Update(
-        T aggregate,
-        ulong? expectedRevision = null,
-        TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default
-    );
-
-    Task<ulong> Delete(
-        T aggregate,
-        ulong? expectedRevision = null,
-        TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default
-    );
+    Task<ulong> Add(T aggregate, CancellationToken ct = default);
+    Task<ulong> Update(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default);
+    Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default);
 }
 
 public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : class, IAggregate
 {
     private readonly EventStoreClient eventStore;
+    private readonly IActivityScope activityScope;
 
-    public EventStoreDBRepository(EventStoreClient eventStore)
+    public EventStoreDBRepository(
+        EventStoreClient eventStore,
+        IActivityScope activityScope
+    )
     {
-        this.eventStore = eventStore ?? throw new ArgumentNullException(nameof(eventStore));
+        this.eventStore = eventStore;
+        this.activityScope = activityScope;
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
@@ -47,22 +36,21 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
             cancellationToken
         );
 
-    public async Task<ulong> Add(T aggregate, TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default)
+    public async Task<ulong> Add(T aggregate, CancellationToken ct = default)
     {
         var result = await eventStore.AppendToStreamAsync(
             StreamNameMapper.ToStreamId<T>(aggregate.Id),
             StreamState.NoStream,
-            GetEventsToStore(aggregate, traceMetadata),
+            GetEventsToStore(aggregate),
             cancellationToken: ct
-        );
-        return result.NextExpectedStreamRevision;
+        ).ConfigureAwait(false);
+
+        return result.NextExpectedStreamRevision.ToUInt64();
     }
 
-    public async Task<ulong> Update(T aggregate, ulong? expectedRevision = null, TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default)
+    public async Task<ulong> Update(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default)
     {
-        var eventsToAppend = GetEventsToStore(aggregate, traceMetadata);
+        var eventsToAppend = GetEventsToStore(aggregate);
         var nextVersion = expectedRevision ?? (ulong)(aggregate.Version - eventsToAppend.Count);
 
         var result = await eventStore.AppendToStreamAsync(
@@ -70,20 +58,20 @@ public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : cla
             nextVersion,
             eventsToAppend,
             cancellationToken: ct
-        );
-        return result.NextExpectedStreamRevision;
+        ).ConfigureAwait(false);
+
+        return result.NextExpectedStreamRevision.ToUInt64();
     }
 
-    public Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, TraceMetadata? traceMetadata = null,
-        CancellationToken ct = default) =>
-        Update(aggregate, expectedRevision, traceMetadata, ct);
+    public Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default) =>
+        Update(aggregate, expectedRevision, ct);
 
-    private static List<EventData> GetEventsToStore(T aggregate, TraceMetadata? traceMetadata)
+    private static List<EventData> GetEventsToStore(T aggregate)
     {
         var events = aggregate.DequeueUncommittedEvents();
 
         return events
-            .Select(@event => @event.ToJsonEventData(traceMetadata))
+            .Select(@event => @event.ToJsonEventData(TelemetryPropagator.GetPropagationContext()))
             .ToList();
     }
 }

@@ -1,8 +1,7 @@
-using MediatR;
-
 namespace Core.Queries;
 
-public interface IQueryHandler<in TQuery, TResponse>: IRequestHandler<TQuery, TResponse>
-    where TQuery : IQuery<TResponse>
+public interface IQueryHandler<in TQuery, TResponse>
+    where TQuery : notnull
 {
+    Task<TResponse> Handle(TQuery request, CancellationToken cancellationToken);
 }

@@ -1,27 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="6.6.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-        <PackageReference Include="NSubstitute" Version="4.3.0" />
-        <PackageReference Include="xunit" Version="2.4.1" />
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.5" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="FluentAssertions" Version="6.11.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.0" />
+        <PackageReference Include="NSubstitute" Version="5.0.0" />
+        <PackageReference Include="xunit" Version="2.5.0" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\Core.Testing\Core.Testing.csproj" />
-      <ProjectReference Include="..\Payments.Api\Payments.Api.csproj" />
+        <ProjectReference Include="..\..\..\..\Core.Testing\Core.Testing.csproj" />
+        <ProjectReference Include="..\Payments.Api\Payments.Api.csproj" />
     </ItemGroup>
+
+    <Import Project="..\..\..\..\Tests.Build.props" />
 
 </Project>

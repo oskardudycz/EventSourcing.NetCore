@@ -1,14 +1,12 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.OpeningCart;
 
 public record OpenShoppingCart(
     Guid CartId,
     Guid ClientId
-): ICommand
+)
 {
     public static OpenShoppingCart Create(Guid? cartId, Guid? clientId)
     {
@@ -25,28 +23,17 @@ internal class HandleOpenShoppingCart:
     ICommandHandler<OpenShoppingCart>
 {
     private readonly IMartenRepository<ShoppingCart> cartRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleOpenShoppingCart(
-        IMartenRepository<ShoppingCart> cartRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleOpenShoppingCart(IMartenRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(OpenShoppingCart command, CancellationToken cancellationToken)
+    public Task Handle(OpenShoppingCart command, CancellationToken ct)
     {
         var (cartId, clientId) = command;
 
-        await scope.Do((_, eventMetadata) =>
-            cartRepository.Add(
-                ShoppingCart.Open(cartId, clientId),
-                eventMetadata,
-                cancellationToken
-            )
+        return cartRepository.Add(
+            ShoppingCart.Open(cartId, clientId),
+            ct
         );
-        return Unit.Value;
     }
 }

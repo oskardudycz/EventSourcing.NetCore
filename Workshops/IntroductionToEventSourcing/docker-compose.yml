@@ -28,9 +28,9 @@ services:
     #  EventStoreDB
     #######################################################
     eventstore.db:
-        image: eventstore/eventstore:21.10.1-buster-slim
+        image: eventstore/eventstore:23.10.0-bookworm-slim
         # use this image if you're running ARM-based proc like Apple M1
-        # image: ghcr.io/eventstore/eventstore:21.10.0-alpha-arm64v8
+        # image: eventstore/eventstore:23.10.0-alpha-arm64v8
         environment:
             - EVENTSTORE_CLUSTER_SIZE=1
             - EVENTSTORE_RUN_PROJECTIONS=All
@@ -52,39 +52,6 @@ services:
                 target: /var/log/eventstore
         networks:
             - esdb_network
-
-    #######################################################
-    #  Elastic Search
-    #######################################################
-    elasticsearch:
-        container_name: elastic_search
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.13.3
-        environment:
-            - discovery.type=single-node
-            - bootstrap.memory_lock=true
-            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-        ulimits:
-            memlock:
-                soft: -1
-                hard: -1
-        volumes:
-            - elastic-data:/usr/share/elasticsearch/data
-        ports:
-            - "9200:9200"
-            - "9300:9300"
-        networks:
-            - es_network
-
-    kibana:
-        image: docker.elastic.co/kibana/kibana:7.13.3
-        environment:
-            - ELASTICSEARCH_HOSTS=http://elastic_search:9200
-        ports:
-            - "5601:5601"
-        networks:
-            - es_network
-        depends_on:
-            - elasticsearch
 
 networks:
     es_network:

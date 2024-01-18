@@ -14,7 +14,7 @@ How will the solution change when we add requirements:
 
 ![events](./assets/events.jpg)
 
-There are two variations:
+There are three variations:
 1. Immutable, with functional command handlers composition and entities as anemic data model: [Immutable/OptimisticConcurrencyTests](./Immutable/OptimisticConcurrencyTests.cs).
 2. Classical, mutable aggregates (rich domain model): [Mutable/OptimisticConcurrencyTests](./Mutable/OptimisticConcurrencyTests.cs).
 3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/OptimisticConcurrencyTests](./Mixed/OptimisticConcurrencyTests.cs).
@@ -22,5 +22,3 @@ There are two variations:
 Select your preferred approach (or all) to solve this use case using EventStoreDB. Fill appropriate `EventStoreClientExtensions`
 
 _**Note**: If needed update entities, events or test setup structure_
-
-

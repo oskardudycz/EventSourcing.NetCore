@@ -5,7 +5,7 @@ namespace Carts.ShoppingCarts.GettingCartById;
 
 public record GetCartById(
     Guid CartId
-): IQuery<ShoppingCartDetails>
+)
 {
     public static GetCartById Create(Guid cartId)
     {
@@ -21,13 +21,9 @@ internal class HandleGetCartById:
 {
     private readonly IQuerySession querySession;
 
-    public HandleGetCartById(IQuerySession querySession)
-    {
+    public HandleGetCartById(IQuerySession querySession) =>
         this.querySession = querySession;
-    }
 
-    public Task<ShoppingCartDetails?> Handle(GetCartById query, CancellationToken cancellationToken)
-    {
-        return querySession.LoadAsync<ShoppingCartDetails>(query.CartId, cancellationToken);
-    }
+    public Task<ShoppingCartDetails?> Handle(GetCartById query, CancellationToken cancellationToken) =>
+        querySession.LoadAsync<ShoppingCartDetails>(query.CartId, cancellationToken);
 }

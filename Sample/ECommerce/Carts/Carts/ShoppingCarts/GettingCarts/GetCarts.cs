@@ -7,7 +7,7 @@ namespace Carts.ShoppingCarts.GettingCarts;
 public record GetCarts(
     int PageNumber,
     int PageSize
-): IQuery<IPagedList<ShoppingCartShortInfo>>
+)
 {
     public static GetCarts Create(int? pageNumber = 1, int? pageSize = 20)
     {
@@ -23,12 +23,10 @@ public record GetCarts(
 internal class HandleGetCarts:
     IQueryHandler<GetCarts, IPagedList<ShoppingCartShortInfo>>
 {
-    private readonly IDocumentSession querySession;
+    private readonly IQuerySession querySession;
 
-    public HandleGetCarts(IDocumentSession querySession)
-    {
+    public HandleGetCarts(IQuerySession querySession) =>
         this.querySession = querySession;
-    }
 
     public Task<IPagedList<ShoppingCartShortInfo>> Handle(GetCarts query, CancellationToken cancellationToken)
     {

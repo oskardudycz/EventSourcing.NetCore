@@ -1,13 +1,11 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 
 public record InstallMotionSensor(
     Guid MotionSensorId
-) : ICommand
+)
 {
     public static InstallMotionSensor Create(
         Guid motionSensorId
@@ -20,32 +18,19 @@ public record InstallMotionSensor(
     }
 }
 
-public class HandleInstallMotionSensor :
+public class HandleInstallMotionSensor:
     ICommandHandler<InstallMotionSensor>
 {
     private readonly IMartenRepository<MotionSensor> repository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleInstallMotionSensor(
-        IMartenRepository<MotionSensor> repository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleInstallMotionSensor(IMartenRepository<MotionSensor> repository) =>
         this.repository = repository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(InstallMotionSensor command, CancellationToken cancellationToken)
-    {
-        await scope.Do((_, eventMetadata) =>
-            repository.Add(
-                MotionSensor.Install(
-                    command.MotionSensorId
-                ),
-                eventMetadata,
-                cancellationToken
-            )
+    public Task Handle(InstallMotionSensor command, CancellationToken ct) =>
+        repository.Add(
+            MotionSensor.Install(
+                command.MotionSensorId
+            ),
+            ct
         );
-        return Unit.Value;
-    }
 }

@@ -255,3 +255,4 @@ paket-files/
 
 # MACOS
 .DS_STORE
+**/Internal/Generated/**

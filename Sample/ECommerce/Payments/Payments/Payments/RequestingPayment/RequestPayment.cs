@@ -1,7 +1,5 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace Payments.Payments.RequestingPayment;
 
@@ -9,7 +7,7 @@ public record RequestPayment(
     Guid PaymentId,
     Guid OrderId,
     decimal Amount
-): ICommand
+)
 {
     public static RequestPayment Create(
         Guid? paymentId,
@@ -32,28 +30,17 @@ public class HandleRequestPayment:
     ICommandHandler<RequestPayment>
 {
     private readonly IMartenRepository<Payment> paymentRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleRequestPayment(
-        IMartenRepository<Payment> paymentRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleRequestPayment(IMartenRepository<Payment> paymentRepository) =>
         this.paymentRepository = paymentRepository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(RequestPayment command, CancellationToken cancellationToken)
+    public Task Handle(RequestPayment command, CancellationToken ct)
     {
         var (paymentId, orderId, amount) = command;
 
-        await scope.Do((_, eventMetadata) =>
-            paymentRepository.Add(
-                Payment.Initialize(paymentId, orderId, amount),
-                eventMetadata,
-                cancellationToken
-            )
+        return paymentRepository.Add(
+            Payment.Initialize(paymentId, orderId, amount),
+            ct
         );
-        return Unit.Value;
     }
 }

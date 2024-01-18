@@ -22,10 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "..\..\Core\Core.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Marten", "..\..\Core.Marten\Core.Marten.csproj", "{31ABC8F7-C632-4D32-9586-65F18EDA1916}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Streaming.Kafka", "..\..\Core.Streaming.Kafka\Core.Streaming.Kafka.csproj", "{1F206BA4-8E67-48B0-8E47-5246DA6EFB7D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Streaming", "..\..\Core.Streaming\Core.Streaming.csproj", "{E936B698-88EF-42D4-A51B-F7FE3E36A1DF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Testing", "..\..\Core.Testing\Core.Testing.csproj", "{4773E9E2-0F69-48DD-89A1-DFF525507FF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetingsManagement", "MeetingsManagement\MeetingsManagement.csproj", "{D6E09C85-AF7F-43B4-B8C8-F5D0612A78DA}"
@@ -39,6 +35,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetingsSearch.Api", "MeetingsSearch.Api\MeetingsSearch.Api.csproj", "{E1BF8101-C2C7-464A-A464-0840CC787188}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetingsSearch.IntegrationTests", "MeetingsSearch.IntegrationTests\MeetingsSearch.IntegrationTests.csproj", "{224CAF4C-10EB-4AF7-8949-F7EE475E3B43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Kafka", "..\..\Core.Kafka\Core.Kafka.csproj", "{8E93A9DC-AD14-475F-8C08-9CEBE7322C5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,14 +52,6 @@ Global
 		{31ABC8F7-C632-4D32-9586-65F18EDA1916}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31ABC8F7-C632-4D32-9586-65F18EDA1916}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31ABC8F7-C632-4D32-9586-65F18EDA1916}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1F206BA4-8E67-48B0-8E47-5246DA6EFB7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F206BA4-8E67-48B0-8E47-5246DA6EFB7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F206BA4-8E67-48B0-8E47-5246DA6EFB7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F206BA4-8E67-48B0-8E47-5246DA6EFB7D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E936B698-88EF-42D4-A51B-F7FE3E36A1DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E936B698-88EF-42D4-A51B-F7FE3E36A1DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E936B698-88EF-42D4-A51B-F7FE3E36A1DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E936B698-88EF-42D4-A51B-F7FE3E36A1DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4773E9E2-0F69-48DD-89A1-DFF525507FF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4773E9E2-0F69-48DD-89A1-DFF525507FF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4773E9E2-0F69-48DD-89A1-DFF525507FF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -90,6 +80,10 @@ Global
 		{224CAF4C-10EB-4AF7-8949-F7EE475E3B43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{224CAF4C-10EB-4AF7-8949-F7EE475E3B43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{224CAF4C-10EB-4AF7-8949-F7EE475E3B43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E93A9DC-AD14-475F-8C08-9CEBE7322C5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E93A9DC-AD14-475F-8C08-9CEBE7322C5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E93A9DC-AD14-475F-8C08-9CEBE7322C5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E93A9DC-AD14-475F-8C08-9CEBE7322C5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

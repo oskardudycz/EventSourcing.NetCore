@@ -2,9 +2,9 @@
 using Core.Events;
 using Core.EventStoreDB.Events;
 using Core.Serialization.Newtonsoft;
-using Core.Tracing;
 using EventStore.Client;
 using Newtonsoft.Json;
+using OpenTelemetry.Context.Propagation;
 
 namespace Core.EventStoreDB.Serialization;
 
@@ -26,7 +26,7 @@ public static class EventStoreDBSerializer
     public static object? Deserialize(this ResolvedEvent resolvedEvent)
     {
         // get type
-        var eventType = EventTypeMapper.ToType(resolvedEvent.Event.EventType);
+        var eventType = EventTypeMapper.Instance.ToType(resolvedEvent.Event.EventType);
 
         if (eventType == null)
             return null;
@@ -39,16 +39,16 @@ public static class EventStoreDBSerializer
         )!;
     }
 
-    public static TraceMetadata? DeserializeMetadata(this ResolvedEvent resolvedEvent)
+    public static PropagationContext? DeserializePropagationContext(this ResolvedEvent resolvedEvent)
     {
         // get type
-        var eventType = EventTypeMapper.ToType(resolvedEvent.Event.EventType);
+        var eventType = EventTypeMapper.Instance.ToType(resolvedEvent.Event.EventType);
 
         if (eventType == null)
             return null;
 
         // deserialize event
-        return JsonConvert.DeserializeObject<TraceMetadata>(
+        return JsonConvert.DeserializeObject<PropagationContext>(
             Encoding.UTF8.GetString(resolvedEvent.Event.Metadata.Span),
             SerializerSettings
         )!;
@@ -57,7 +57,7 @@ public static class EventStoreDBSerializer
     public static EventData ToJsonEventData(this object @event, object? metadata = null) =>
         new(
             Uuid.NewUuid(),
-            EventTypeMapper.ToName(@event.GetType()),
+            EventTypeMapper.Instance.ToName(@event.GetType()),
             Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@event, SerializerSettings)),
             Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(metadata ?? new { }, SerializerSettings))
         );

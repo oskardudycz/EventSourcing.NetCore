@@ -1,85 +1,52 @@
-using System.Net;
-using Core.Api.Testing;
 using FluentAssertions;
-using MeetingsManagement.Api;
 using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.GettingMeeting;
 using MeetingsManagement.Meetings.ValueObjects;
 using Xunit;
+using Ogooreck.API;
+using static Ogooreck.API.ApiSpecification;
 
 namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings;
 
-public class ScheduleMeetingFixture: ApiFixture<Startup>
+public class ScheduleMeetingTests: IClassFixture<ApiSpecification<Program>>
 {
-    protected override string ApiUrl => MeetingsManagementApi.MeetingsUrl;
+
+    private readonly ApiSpecification<Program> API;
+
+    public ScheduleMeetingTests(ApiSpecification<Program> api) => API = api;
+
+    [Fact]
+    [Trait("Category", "Acceptance")]
+    public async Task UpdateCommand_Should_Succeed()
+    {
+        await API
+            .Given(
+                "Created Meeting",
+                SEND(POST, URI(MeetingsManagementApi.MeetingsUrl), BODY(new CreateMeeting(MeetingId, MeetingName)))
+            )
+            .When(
+                POST,
+                URI(ctx => $"{MeetingsManagementApi.MeetingsUrl}/{ctx.GetCreatedId()}/schedule"),
+                BODY(DateRange.Create(Start, End)),
+                HEADERS(IF_MATCH(1))
+            )
+            .Then(OK)
+            .AndWhen(GET, URI(ctx => $"{MeetingsManagementApi.MeetingsUrl}/{ctx.GetCreatedId()}"))
+            .Until(RESPONSE_ETAG_IS(2))
+            .Then(
+                OK,
+                RESPONSE_BODY<MeetingView>(meeting =>
+                {
+                    meeting.Id.Should().Be(MeetingId);
+                    meeting.Name.Should().Be(MeetingName);
+                    meeting.Start.Should().Be(Start);
+                    meeting.End.Should().Be(End);
+                }));
+    }
+
+    private readonly DateTime Start = DateTime.UtcNow;
+    private readonly DateTime End = DateTime.UtcNow;
 
     public readonly Guid MeetingId = Guid.NewGuid();
     public readonly string MeetingName = "Event Sourcing Workshop";
-    public readonly DateTime Start = DateTime.UtcNow;
-    public readonly DateTime End = DateTime.UtcNow;
-
-    public HttpResponseMessage CreateMeetingCommandResponse = default!;
-    public HttpResponseMessage ScheduleMeetingCommandResponse = default!;
-
-    public override async Task InitializeAsync()
-    {
-        // prepare command
-        var createCommand = new CreateMeeting(
-            MeetingId,
-            MeetingName
-        );
-
-        // send create command
-        CreateMeetingCommandResponse = await Post(createCommand);
-
-        var occurs = DateRange.Create(Start, End);
-
-        // send schedule meeting request
-        ScheduleMeetingCommandResponse =
-            await Post($"{MeetingId}/schedule", occurs, new RequestOptions { IfMatch = 1.ToString() });
-    }
-}
-
-public class ScheduleMeetingTests: IClassFixture<ScheduleMeetingFixture>
-{
-    private readonly ScheduleMeetingFixture fixture;
-
-    public ScheduleMeetingTests(ScheduleMeetingFixture fixture)
-    {
-        this.fixture = fixture;
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task CreateMeeting_ShouldReturn_CreatedStatus_With_MeetingId()
-    {
-        var commandResponse = fixture.CreateMeetingCommandResponse.EnsureSuccessStatusCode();
-        commandResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var createdId = await commandResponse.GetResultFromJson<Guid>();
-        createdId.Should().NotBeEmpty();
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public void ScheduleMeeting_ShouldSucceed()
-    {
-        var commandResponse = fixture.ScheduleMeetingCommandResponse.EnsureSuccessStatusCode();
-        commandResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    [Fact]
-    [Trait("Category", "Acceptance")]
-    public async Task ScheduleMeeting_ShouldUpdateReadModel()
-    {
-        //send query
-        var queryResponse = await fixture.Get($"{fixture.MeetingId}");
-        queryResponse.EnsureSuccessStatusCode();
-
-        var meeting = await queryResponse.GetResultFromJson<MeetingView>();
-        meeting.Id.Should().Be(fixture.MeetingId);
-        meeting.Name.Should().Be(fixture.MeetingName);
-        meeting.Start.Should().Be(fixture.Start);
-        meeting.End.Should().Be(fixture.End);
-    }
 }

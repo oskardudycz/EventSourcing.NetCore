@@ -41,7 +41,7 @@ public class OrdersController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/Orders", orderId);
+        return Created($"/api/Orders/{orderId}", orderId);
     }
 
     [HttpPost("{id}/products")]

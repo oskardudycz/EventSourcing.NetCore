@@ -67,7 +67,7 @@ public class GettingStateFromEventsTests
     }
 
     [Fact]
-    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task AppendingEvents_ForSequenceOfEvents_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();

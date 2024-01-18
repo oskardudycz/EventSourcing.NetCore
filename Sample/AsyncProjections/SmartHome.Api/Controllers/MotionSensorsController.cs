@@ -29,7 +29,7 @@ public class MotionSensorsController: Controller
     [HttpGet]
     public Task<IReadOnlyList<MotionSensor>> Get()
     {
-        return queryBus.Send<GetMotionSensors, IReadOnlyList<MotionSensor>>(GetMotionSensors.Create());
+        return queryBus.Query<GetMotionSensors, IReadOnlyList<MotionSensor>>(GetMotionSensors.Create());
     }
 
     [HttpPost]
@@ -43,7 +43,7 @@ public class MotionSensorsController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/MotionSensors", measurementId);
+        return Created($"/api/MotionSensors/{measurementId}", measurementId);
     }
 
     [HttpPost("rebuild")]

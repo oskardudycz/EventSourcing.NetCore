@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Warehouse.Api.Core.Commands;
+﻿using Warehouse.Api.Core.Commands;
 
 namespace Warehouse.Api.Products;
 
@@ -19,7 +16,7 @@ internal class HandleRegisterProduct : ICommandHandler<RegisterProduct>
         this.productWithSKUExists = productWithSKUExists;
     }
 
-    public async ValueTask Handle(RegisterProduct command, CancellationToken ct)
+    public async Task Handle(RegisterProduct command, CancellationToken ct)
     {
         var product = new Product(
             command.ProductId,

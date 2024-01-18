@@ -2,9 +2,9 @@ namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution2;
 
 public interface IAggregate
 {
-    public Guid Id { get; }
+    Guid Id { get; }
 
-    public virtual void When(object @event) { }
+    void When(object @event) { }
 }
 
 public class ShoppingCart: IAggregate
@@ -48,8 +48,6 @@ public class ShoppingCart: IAggregate
             cartId,
             clientId
         );
-
-
 
         return (@event, new ShoppingCart(@event));
     }

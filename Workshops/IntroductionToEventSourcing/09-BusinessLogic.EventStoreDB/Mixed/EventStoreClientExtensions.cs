@@ -1,4 +1,3 @@
-using System.Text.Json;
 using EventStore.Client;
 
 namespace IntroductionToEventSourcing.BusinessLogic.Mixed;

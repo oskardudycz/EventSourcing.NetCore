@@ -37,7 +37,7 @@ public class PaymentsController: Controller
 
         await commandBus.Send(command);
 
-        return Created("api/Payments", paymentId);
+        return Created($"/api/Payments/{paymentId}", paymentId);
     }
 
     [HttpPut("{id}/complete")]
@@ -65,7 +65,7 @@ public class PaymentsController: Controller
         return Ok();
     }
 
-    [HttpDelete("{id}")]
+    [HttpPost("{id}/Timeout")]
     public async Task<IActionResult> TimeoutPayment(Guid id, [FromBody] TimeOutPaymentRequest? request)
     {
         var command = TimeOutPayment.Create(

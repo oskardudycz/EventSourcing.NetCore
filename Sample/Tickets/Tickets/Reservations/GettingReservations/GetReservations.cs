@@ -7,7 +7,7 @@ namespace Tickets.Reservations.GettingReservations;
 public record GetReservations(
     int PageNumber,
     int PageSize
-): IQuery<IPagedList<ReservationShortInfo>>
+)
 {
     public static GetReservations Create(int pageNumber = 1, int pageSize = 20)
     {

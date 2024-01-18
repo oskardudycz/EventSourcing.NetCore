@@ -1,6 +1,9 @@
 using Core.BackgroundWorkers;
-using Core.EventStoreDB.OptimisticConcurrency;
+using Core.Configuration;
+using Core.Events;
+using Core.EventStoreDB.Repository;
 using Core.EventStoreDB.Subscriptions;
+using Core.OpenTelemetry;
 using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -21,13 +24,25 @@ public static class EventStoreDBConfigExtensions
 {
     private const string DefaultConfigKey = "EventStore";
 
-    public static IServiceCollection AddEventStoreDB(this IServiceCollection services, IConfiguration config, EventStoreDBOptions? options = null)
-    {
-        var eventStoreDBConfig = config.GetSection(DefaultConfigKey).Get<EventStoreDBConfig>();
+    public static IServiceCollection AddEventStoreDB(
+        this IServiceCollection services,
+        IConfiguration config,
+        EventStoreDBOptions? options = null
+    ) =>
+        services.AddEventStoreDB(
+            config.GetRequiredConfig<EventStoreDBConfig>(DefaultConfigKey),
+            options
+        );
 
+    public static IServiceCollection AddEventStoreDB(
+        this IServiceCollection services,
+        EventStoreDBConfig eventStoreDBConfig,
+        EventStoreDBOptions? options = null
+    )
+    {
         services
+            .AddSingleton(EventTypeMapper.Instance)
             .AddSingleton(new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
-            .AddEventStoreDBAppendScope()
             .AddTransient<EventStoreDBSubscriptionToAll, EventStoreDBSubscriptionToAll>();
 
         if (options?.UseInternalCheckpointing != false)
@@ -57,6 +72,8 @@ public static class EventStoreDBConfigExtensions
 
                 var eventStoreDBSubscriptionToAll =
                     serviceProvider.GetRequiredService<EventStoreDBSubscriptionToAll>();
+
+                TelemetryPropagator.UseDefaultCompositeTextMapPropagator();
 
                 return new BackgroundWorker(
                     logger,

@@ -1,41 +1,28 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 
 namespace MeetingsManagement.Meetings.CreatingMeeting;
 
 public record CreateMeeting(
     Guid Id,
     string Name
-): ICommand;
+);
 
 internal class HandleCreateMeeting:
     ICommandHandler<CreateMeeting>
 {
     private readonly IMartenRepository<Meeting> repository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleCreateMeeting(
-        IMartenRepository<Meeting> repository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleCreateMeeting(IMartenRepository<Meeting> repository) =>
         this.repository = repository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(CreateMeeting command, CancellationToken cancellationToken)
+    public Task Handle(CreateMeeting command, CancellationToken ct)
     {
         var (id, name) = command;
 
-        await scope.Do((_, eventMetadata) =>
-            repository.Add(
-                Meeting.New(id, name),
-                eventMetadata,
-                cancellationToken
-            )
+        return repository.Add(
+            Meeting.New(id, name),
+            ct
         );
-        return Unit.Value;
     }
 }

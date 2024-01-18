@@ -1,7 +1,6 @@
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.OpeningCart;
 using Carts.Tests.Extensions.Reservations;
-using Carts.Tests.Stubs.Events;
 using Carts.Tests.Stubs.Repositories;
 using FluentAssertions;
 using Xunit;
@@ -15,12 +14,8 @@ public class OpenCartCommandHandlerTests
     {
         // Given
         var repository = new FakeRepository<ShoppingCart>();
-        var scope = new DummyEventStoreDBAppendScope();
 
-        var commandHandler = new HandleOpenCart(
-            repository,
-            scope
-        );
+        var commandHandler = new HandleOpenCart(repository);
 
         var command = OpenShoppingCart.Create(Guid.NewGuid(), Guid.NewGuid());
 

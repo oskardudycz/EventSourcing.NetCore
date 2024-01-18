@@ -8,7 +8,7 @@ namespace Carts.ShoppingCarts.GettingCartAtVersion;
 public record GetCartAtVersion(
     Guid CartId,
     long Version
-) : IQuery<ShoppingCartDetails>
+)
 {
     public static GetCartAtVersion Create(Guid? cartId, long? version)
     {
@@ -24,12 +24,10 @@ public record GetCartAtVersion(
 internal class HandleGetCartAtVersion :
     IQueryHandler<GetCartAtVersion, ShoppingCartDetails>
 {
-    private readonly IDocumentSession querySession;
+    private readonly IQuerySession querySession;
 
-    public HandleGetCartAtVersion(IDocumentSession querySession)
-    {
+    public HandleGetCartAtVersion(IQuerySession querySession) =>
         this.querySession = querySession;
-    }
 
     public async Task<ShoppingCartDetails> Handle(GetCartAtVersion query, CancellationToken cancellationToken)
     {

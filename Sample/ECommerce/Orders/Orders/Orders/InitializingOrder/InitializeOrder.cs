@@ -1,7 +1,5 @@
 using Core.Commands;
-using Core.Marten.Events;
 using Core.Marten.Repository;
-using MediatR;
 using Orders.Products;
 
 namespace Orders.Orders.InitializingOrder;
@@ -11,7 +9,7 @@ public record InitializeOrder(
     Guid ClientId,
     IReadOnlyList<PricedProductItem> ProductItems,
     decimal TotalPrice
-): ICommand
+)
 {
     public static InitializeOrder Create(
         Guid? orderId,
@@ -37,28 +35,17 @@ public class HandleInitializeOrder:
     ICommandHandler<InitializeOrder>
 {
     private readonly IMartenRepository<Order> orderRepository;
-    private readonly IMartenAppendScope scope;
 
-    public HandleInitializeOrder(
-        IMartenRepository<Order> orderRepository,
-        IMartenAppendScope scope
-    )
-    {
+    public HandleInitializeOrder(IMartenRepository<Order> orderRepository) =>
         this.orderRepository = orderRepository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(InitializeOrder command, CancellationToken cancellationToken)
+    public Task Handle(InitializeOrder command, CancellationToken ct)
     {
         var (orderId, clientId, productItems, totalPrice) = command;
 
-        await scope.Do((_, eventMetadata) =>
-            orderRepository.Add(
-                Order.Initialize(orderId, clientId, productItems, totalPrice),
-                eventMetadata,
-                cancellationToken
-            )
+        return orderRepository.Add(
+            Order.Initialize(orderId, clientId, productItems, totalPrice),
+            ct
         );
-        return Unit.Value;
     }
 }

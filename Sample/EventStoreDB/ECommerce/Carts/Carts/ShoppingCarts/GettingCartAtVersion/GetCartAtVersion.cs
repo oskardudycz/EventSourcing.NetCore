@@ -9,7 +9,7 @@ namespace Carts.ShoppingCarts.GettingCartAtVersion;
 public record GetCartAtVersion(
     Guid CartId,
     ulong Version
-): IQuery<ShoppingCartDetails>
+)
 {
     public static GetCartAtVersion Create(Guid? cartId, ulong? version)
     {

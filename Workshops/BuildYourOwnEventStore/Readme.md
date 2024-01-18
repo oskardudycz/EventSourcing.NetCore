@@ -1,4 +1,29 @@
+[![Twitter Follow](https://img.shields.io/twitter/follow/oskar_at_net?style=social)](https://twitter.com/oskar_at_net) [![Github Sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&link=https://github.com/sponsors/oskardudycz/)](https://github.com/sponsors/oskardudycz/) [![blog](https://img.shields.io/badge/blog-event--driven.io-brightgreen)](https://event-driven.io/?utm_source=event_sourcing_jvm) [![blog](https://img.shields.io/badge/%F0%9F%9A%80-Architecture%20Weekly-important)](https://www.architecture-weekly.com/?utm_source=event_sourcing_net) 
+
 # Build Your Own Event Store Self-Paced Kit
+
+You can watch:
+
+<a href="https://www.youtube.com/watch?v=gaoZdtQSOTo&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=2" target="_blank"><img src="https://img.youtube.com/vi/gaoZdtQSOTo/0.jpg" alt="Let's build event store in one hour!" width="640" height="480" border="10" /></a>
+
+and read:
+- 📝 [Let's build event store in one hour!](https://event-driven.io/en/lets_build_event_store_in_one_hour/?utm_source=event_sourcing_net)
+
+## Description
+
+**Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics. See more in [here](./01-EventStoreBasics/).
+
+1. [Streams Table](./01-CreateStreamsTable)
+2. [Events Table](./02-CreateEventsTable)
+3. [Appending Events](./03-CreateAppendEventFunction)
+4. [Optimistic Concurrency Handling](./03-OptimisticConcurrency)
+5. [Event Store Methods](./04-EventStoreMethods)
+6. [Stream Aggregation](./05-StreamAggregation)
+7. [Time Travelling](./06-TimeTraveling)
+8. [Aggregate and Repositories](./07-AggregateAndRepository)
+9. [Snapshots](./08-Snapshots)
+10. [Projections](./09-Projections)
+11. [Projections With Marten](./10-ProjectionsWithMarten)
 
 ## Prerequisites
 
@@ -28,19 +53,3 @@
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `admin@pgadmin.org`, Password: `admin`
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
-
-## Description
-
-**Event Sourcing basics** - it teaches the event store basics by showing how to build your own Event Store on Relational Database. It starts with the tables setup, goes through appending events, aggregations, projectsions, snapshots and finishes with the `Marten` basics. See more in [here](./01-EventStoreBasics/).
-
-1. [Streams Table](./01-CreateStreamsTable)
-2. [Events Table](./02-CreateEventsTable)
-3. [Appending Events](./03-CreateAppendEventFunction)
-4. [Optimistic Concurrency Handling](./03-OptimisticConcurrency)
-5. [Event Store Methods](./04-EventStoreMethods)
-6. [Stream Aggregation](./05-StreamAggregation)
-7. [Time Travelling](./06-TimeTraveling)
-8. [Aggregate and Repositories](./07-AggregateAndRepository)
-9. [Snapshots](./08-Snapshots)
-10. [Projections](./09-Projections)
-11. [Projections With Marten](./10-ProjectionsWithMarten)

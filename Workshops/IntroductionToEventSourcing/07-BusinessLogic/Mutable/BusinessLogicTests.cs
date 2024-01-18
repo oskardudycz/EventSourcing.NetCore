@@ -148,10 +148,9 @@ public static class ShoppingCartExtensions
 
 public class BusinessLogicTests
 {
-
     [Fact]
     [Trait("Category", "SkipCI")]
-    public void GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public void RunningSequenceOfBusinessLogic_ShouldGenerateSequenceOfEvents()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
@@ -172,7 +171,6 @@ public class BusinessLogicTests
             {
                 ProductId = tShirtId, Quantity = 1, UnitPrice = 50
             };
-
 
         // TODO: Fill the events object with results of your business logic
         // to be the same as events below

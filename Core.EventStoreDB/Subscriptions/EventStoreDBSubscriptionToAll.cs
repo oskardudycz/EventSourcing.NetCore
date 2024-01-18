@@ -1,9 +1,12 @@
+using System.Diagnostics;
 using Core.Events;
 using Core.EventStoreDB.Events;
+using Core.OpenTelemetry;
 using Core.Threading;
 using EventStore.Client;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using EventTypeFilter = EventStore.Client.EventTypeFilter;
 
 namespace Core.EventStoreDB.Subscriptions;
 
@@ -24,7 +27,9 @@ public class EventStoreDBSubscriptionToAll
 {
     private readonly IEventBus eventBus;
     private readonly EventStoreClient eventStoreClient;
+    private readonly EventTypeMapper eventTypeMapper;
     private readonly ISubscriptionCheckpointRepository checkpointRepository;
+    private readonly IActivityScope activityScope;
     private readonly ILogger<EventStoreDBSubscriptionToAll> logger;
     private EventStoreDBSubscriptionToAllOptions subscriptionOptions = default!;
     private string SubscriptionId => subscriptionOptions.SubscriptionId;
@@ -33,16 +38,19 @@ public class EventStoreDBSubscriptionToAll
 
     public EventStoreDBSubscriptionToAll(
         EventStoreClient eventStoreClient,
+        EventTypeMapper eventTypeMapper,
         IEventBus eventBus,
         ISubscriptionCheckpointRepository checkpointRepository,
+        IActivityScope activityScope,
         ILogger<EventStoreDBSubscriptionToAll> logger
     )
     {
-        this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        this.eventStoreClient = eventStoreClient ?? throw new ArgumentNullException(nameof(eventStoreClient));
-        this.checkpointRepository =
-            checkpointRepository ?? throw new ArgumentNullException(nameof(checkpointRepository));
-        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        this.eventBus = eventBus;
+        this.eventStoreClient = eventStoreClient;
+        this.eventTypeMapper = eventTypeMapper;
+        this.checkpointRepository = checkpointRepository;
+        this.activityScope = activityScope;
+        this.logger = logger;
     }
 
     public async Task SubscribeToAll(EventStoreDBSubscriptionToAllOptions subscriptionOptions, CancellationToken ct)
@@ -55,23 +63,26 @@ public class EventStoreDBSubscriptionToAll
 
         logger.LogInformation("Subscription to all '{SubscriptionId}'", subscriptionOptions.SubscriptionId);
 
-        var checkpoint = await checkpointRepository.Load(SubscriptionId, ct);
+        var checkpoint = await checkpointRepository.Load(SubscriptionId, ct).ConfigureAwait(false);
 
         await eventStoreClient.SubscribeToAllAsync(
-            checkpoint == null? FromAll.Start : FromAll.After(new Position(checkpoint.Value, checkpoint.Value)),
+            checkpoint == null ? FromAll.Start : FromAll.After(new Position(checkpoint.Value, checkpoint.Value)),
             HandleEvent,
             subscriptionOptions.ResolveLinkTos,
             HandleDrop,
             subscriptionOptions.FilterOptions,
             subscriptionOptions.Credentials,
             ct
-        );
+        ).ConfigureAwait(false);
 
         logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
     }
 
-    private async Task HandleEvent(StreamSubscription subscription, ResolvedEvent resolvedEvent,
-        CancellationToken ct)
+    private async Task HandleEvent(
+        StreamSubscription subscription,
+        ResolvedEvent resolvedEvent,
+        CancellationToken token
+    )
     {
         try
         {
@@ -96,10 +107,23 @@ public class EventStoreDBSubscriptionToAll
                 return;
             }
 
-            // publish event to internal event bus
-            await eventBus.Publish(eventEnvelope, ct);
+            await activityScope.Run($"{nameof(EventStoreDBSubscriptionToAll)}/{nameof(HandleEvent)}",
+                async (_, ct) =>
+                {
+                    // publish event to internal event bus
+                    await eventBus.Publish(eventEnvelope, ct).ConfigureAwait(false);
 
-            await checkpointRepository.Store(SubscriptionId, resolvedEvent.Event.Position.CommitPosition, ct);
+                    await checkpointRepository.Store(SubscriptionId, resolvedEvent.Event.Position.CommitPosition, ct)
+                        .ConfigureAwait(false);
+                },
+                new StartActivityOptions
+                {
+                    Tags = { { TelemetryTags.EventHandling.Event, eventEnvelope.Data.GetType() } },
+                    Parent = eventEnvelope.Metadata.PropagationContext?.ActivityContext,
+                    Kind = ActivityKind.Consumer
+                },
+                token
+            ).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -113,15 +137,24 @@ public class EventStoreDBSubscriptionToAll
 
     private void HandleDrop(StreamSubscription _, SubscriptionDroppedReason reason, Exception? exception)
     {
+        if (exception is RpcException { StatusCode: StatusCode.Cancelled })
+        {
+            logger.LogWarning(
+                "Subscription to all '{SubscriptionId}' dropped by client",
+                SubscriptionId
+            );
+
+            return;
+        }
+
         logger.LogError(
             exception,
-            "Subscription to all '{SubscriptionId}' dropped with '{Reason}'",
+            "Subscription to all '{SubscriptionId}' dropped with '{StatusCode}' and '{Reason}'",
             SubscriptionId,
+            (exception as RpcException)?.StatusCode ?? StatusCode.Unknown,
             reason
         );
 
-        if (exception is RpcException { StatusCode: StatusCode.Cancelled })
-            return;
 
         Resubscribe();
     }
@@ -142,7 +175,9 @@ public class EventStoreDBSubscriptionToAll
                 // As this is a background process then we don't need to have async context here.
                 using (NoSynchronizationContextScope.Enter())
                 {
+#pragma warning disable VSTHRD002
                     SubscribeToAll(subscriptionOptions, cancellationToken).Wait(cancellationToken);
+#pragma warning restore VSTHRD002
                 }
 
                 resubscribed = true;
@@ -177,7 +212,7 @@ public class EventStoreDBSubscriptionToAll
 
     private bool IsCheckpointEvent(ResolvedEvent resolvedEvent)
     {
-        if (resolvedEvent.Event.EventType != EventTypeMapper.ToName<CheckpointStored>()) return false;
+        if (resolvedEvent.Event.EventType != eventTypeMapper.ToName<CheckpointStored>()) return false;
 
         logger.LogInformation("Checkpoint event - ignoring");
         return true;

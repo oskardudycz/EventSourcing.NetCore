@@ -97,7 +97,6 @@ public class ClassesWithMediatRTest
             .AddEventBus()
             .RouteEventsFromMediatR()
             .AddScoped<IMediator, Mediator>()
-            .AddTransient<ServiceFactory>(s => t => s.GetService(t)!)
             .AddEventHandler<IsAdmin>()
             .AddEventHandler<ToAdminAdded>()
             .AddEventHandler<HandleAdminAdded>()

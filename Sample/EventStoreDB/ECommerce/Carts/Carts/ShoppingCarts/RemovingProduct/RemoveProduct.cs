@@ -1,15 +1,13 @@
 using Carts.ShoppingCarts.Products;
 using Core.Commands;
-using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.RemovingProduct;
 
 public record RemoveProduct(
     Guid CartId,
     PricedProductItem ProductItem
-): ICommand
+)
 {
     public static RemoveProduct Create(Guid? cartId, PricedProductItem? productItem)
     {
@@ -26,31 +24,18 @@ internal class HandleRemoveProduct:
     ICommandHandler<RemoveProduct>
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
-    private readonly IEventStoreDBAppendScope scope;
 
-    public HandleRemoveProduct(
-        IEventStoreDBRepository<ShoppingCart> cartRepository,
-        IEventStoreDBAppendScope scope
-    )
-    {
+    public HandleRemoveProduct(IEventStoreDBRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(RemoveProduct command, CancellationToken cancellationToken)
+    public Task Handle(RemoveProduct command, CancellationToken ct)
     {
         var (cartId, pricedProductItem) = command;
 
-        await scope.Do((expectedRevision, eventMetadata) =>
-            cartRepository.GetAndUpdate(
-                cartId,
-                cart => cart.RemoveProduct(pricedProductItem),
-                expectedRevision,
-                eventMetadata,
-                cancellationToken
-            )
+        return cartRepository.GetAndUpdate(
+            cartId,
+            cart => cart.RemoveProduct(pricedProductItem),
+            ct: ct
         );
-
-        return Unit.Value;
     }
 }

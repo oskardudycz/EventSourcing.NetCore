@@ -1,13 +1,11 @@
 using Core.Commands;
-using Core.EventStoreDB.OptimisticConcurrency;
 using Core.EventStoreDB.Repository;
-using MediatR;
 
 namespace Carts.ShoppingCarts.CancelingCart;
 
 public record CancelShoppingCart(
     Guid CartId
-): ICommand
+)
 {
     public static CancelShoppingCart Create(Guid? cartId)
     {
@@ -22,29 +20,14 @@ internal class HandleCancelCart:
     ICommandHandler<CancelShoppingCart>
 {
     private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
-    private readonly IEventStoreDBAppendScope scope;
 
-    public HandleCancelCart(
-        IEventStoreDBRepository<ShoppingCart> cartRepository,
-        IEventStoreDBAppendScope scope
-    )
-    {
+    public HandleCancelCart(IEventStoreDBRepository<ShoppingCart> cartRepository) =>
         this.cartRepository = cartRepository;
-        this.scope = scope;
-    }
 
-    public async Task<Unit> Handle(CancelShoppingCart command, CancellationToken cancellationToken)
-    {
-        await scope.Do((expectedRevision, eventMetadata) =>
-            cartRepository.GetAndUpdate(
-                command.CartId,
-                cart => cart.Cancel(),
-                expectedRevision,
-                eventMetadata,
-                cancellationToken
-            )
+    public Task Handle(CancelShoppingCart command, CancellationToken ct) =>
+        cartRepository.GetAndUpdate(
+            command.CartId,
+            cart => cart.Cancel(),
+            ct: ct
         );
-
-        return Unit.Value;
-    }
 }

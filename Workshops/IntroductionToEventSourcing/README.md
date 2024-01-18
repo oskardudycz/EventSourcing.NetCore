@@ -1,3 +1,5 @@
+[![Twitter Follow](https://img.shields.io/twitter/follow/oskar_at_net?style=social)](https://twitter.com/oskar_at_net) [![Github Sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&link=https://github.com/sponsors/oskardudycz/)](https://github.com/sponsors/oskardudycz/) [![blog](https://img.shields.io/badge/blog-event--driven.io-brightgreen)](https://event-driven.io/?utm_source=event_sourcing_jvm) [![blog](https://img.shields.io/badge/%F0%9F%9A%80-Architecture%20Weekly-important)](https://www.architecture-weekly.com/?utm_source=event_sourcing_net) 
+
 # Introduction to Event Sourcing Workshop
 
 Event Sourcing is perceived as a complex pattern. Some believe that it's like Nessie, everyone's heard about it, but rarely seen it. In fact, Event Sourcing is a pretty practical and straightforward concept. It helps build predictable applications closer to business. Nowadays, storage is cheap, and information is priceless. In Event Sourcing, no data is lost. 
@@ -47,8 +49,8 @@ Read also more in my article [Introduction to Event Sourcing - Self Paced Kit](h
 
 1. Install git - https://git-scm.com/downloads.
 2. Clone this repository.
-3. Install .NET 6.0 - https://dotnet.microsoft.com/download/dotnet/6.0.
-4. Install Visual Studio 2022, Rider or VSCode.
+3. Install .NET 8.0 - https://dotnet.microsoft.com/download/dotnet/8.0.
+4. Install Visual Studio, Rider or VSCode.
 5. Install docker - https://docs.docker.com/engine/install/.
 6. Open [Exercises.sln](./Exercises.sln) solution.
 

@@ -1,0 +1,36 @@
+name: Build and Test with TestContainers
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check Out Repo
+              uses: actions/checkout@v4
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: "8.0.x"
+
+            - name: Restore NuGet packages
+              run: dotnet restore
+
+            - name: Build
+              run: dotnet build --configuration Release --no-restore
+
+            - name: Run tests
+              run: dotnet test --configuration Release --no-build --filter Category!=SkipCI --logger "trx;LogFileName=test-results.trx" ./Marten.Integration.Tests/Marten.Integration.Tests.csproj
+
+            - name: Upload test results
+              uses: actions/upload-artifact@v3
+              if: success() || failure()
+              with:
+                name: test-results
+                path: '**/test-results.trx'

@@ -1,6 +1,6 @@
 # Exercise 06 - Getting the current entity state from events using EventStoreDB
 
-Having a defined structure of events and an entity representing the shopping cart from the [previous exercise](../01-EventsDefinition), fill a `GetShoppingCart` function that will rebuild the current state from events.
+Having a defined structure of events and an entity representing the shopping cart from the [first exercise](../01-EventsDefinition), fill a `GetShoppingCart` function that will rebuild the current state from events.
 
 If needed you can modify the events or entity structure.
 

@@ -1,5 +1,6 @@
 using Core.Events;
 using Core.Kafka.Producers;
+using Core.OpenTelemetry;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,7 @@ public class KafkaProducerTests
 {
     private readonly IConfiguration kafkaConfig = new ConfigurationBuilder()
         .AddInMemoryCollection(
-            new Dictionary<string, string>
+            new Dictionary<string, string?>
             {
                 { "KafkaProducer:ProducerConfig:BootstrapServers", "localhost:9092" },
                 { "KafkaProducer:Topic", "MeetingsManagement" },
@@ -28,7 +29,7 @@ public class KafkaProducerTests
     [Trait("Category", "SkipCI")]
     public async Task TaskShouldProduceMessage()
     {
-        var kafkaProducer = new KafkaProducer(kafkaConfig, new Logger<KafkaProducer>(LoggerFactory.Create(_ => { })));
+        var kafkaProducer = new KafkaProducer(kafkaConfig, new ActivityScope(), new Logger<KafkaProducer>(LoggerFactory.Create(_ => { })));
 
         var exception = await Record.ExceptionAsync(async () =>
             await kafkaProducer.Publish(eventEnvelope, CancellationToken.None)

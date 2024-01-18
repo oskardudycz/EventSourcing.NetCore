@@ -61,7 +61,6 @@ public class PureFunctionsWithMediatRTest
             .AddEventBus()
             .RouteEventsFromMediatR()
             .AddScoped<IMediator, Mediator>()
-            .AddTransient<ServiceFactory>(s => t => s.GetService(t)!)
             .Filter<UserAdded>(AdminPipeline.IsAdmin)
             .Transform<UserAdded, AdminAdded>(AdminPipeline.ToAdminAdded)
             .Handle<AdminAdded>(AdminPipeline.Handle)

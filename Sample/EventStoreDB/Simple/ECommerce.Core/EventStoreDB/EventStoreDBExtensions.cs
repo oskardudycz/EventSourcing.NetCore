@@ -1,6 +1,6 @@
 using Core.EventStoreDB.Serialization;
 using Core.Exceptions;
-using Core.Tracing;
+using Core.OpenTelemetry;
 using EventStore.Client;
 
 namespace ECommerce.Core.EventStoreDB;
@@ -33,11 +33,30 @@ public static class EventStoreDBExtensions
             );
     }
 
+    public static async Task<List<object>> ReadStream(
+        this EventStoreClient eventStore,
+        string id,
+        CancellationToken cancellationToken)
+    {
+        var readResult = eventStore.ReadStreamAsync(
+            Direction.Forwards,
+            id,
+            StreamPosition.Start,
+            cancellationToken: cancellationToken
+        );
+
+        if (await readResult.ReadState == ReadState.StreamNotFound)
+            return new List<object>();
+
+        return await readResult
+            .Select(@event => @event.Deserialize()!)
+            .ToListAsync(cancellationToken: cancellationToken);
+    }
+
     public static async Task<ulong> Append(
         this EventStoreClient eventStore,
         string id,
         object @event,
-        TraceMetadata traceMetadata,
         CancellationToken cancellationToken
     )
 
@@ -45,7 +64,7 @@ public static class EventStoreDBExtensions
         var result = await eventStore.AppendToStreamAsync(
             id,
             StreamState.NoStream,
-            new[] { @event.ToJsonEventData(traceMetadata) },
+            new[] { @event.ToJsonEventData(TelemetryPropagator.GetPropagationContext()) },
             cancellationToken: cancellationToken
         );
         return result.NextExpectedStreamRevision;
@@ -57,14 +76,13 @@ public static class EventStoreDBExtensions
         string id,
         object @event,
         ulong expectedRevision,
-        TraceMetadata traceMetadata,
         CancellationToken cancellationToken
     )
     {
         var result = await eventStore.AppendToStreamAsync(
             id,
             expectedRevision,
-            new[] { @event.ToJsonEventData(traceMetadata) },
+            new[] { @event.ToJsonEventData(TelemetryPropagator.GetPropagationContext()) },
             cancellationToken: cancellationToken
         );
 

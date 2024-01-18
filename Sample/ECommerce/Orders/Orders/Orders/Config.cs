@@ -2,6 +2,7 @@ using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;
 using Marten;
+using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Orders.Orders.CancellingOrder;
 using Orders.Orders.CompletingOrder;
@@ -18,7 +19,8 @@ internal static class OrdersConfig
 {
     internal static IServiceCollection AddOrders(this IServiceCollection services)
     {
-        return services.AddScoped<IMartenRepository<Order>, MartenRepository<Order>>()
+        return services
+            .AddMartenRepository<Order>()
             .AddCommandHandlers()
             .AddEventHandlers();
     }
@@ -45,6 +47,6 @@ internal static class OrdersConfig
     internal static void ConfigureOrders(this StoreOptions options)
     {
         // Snapshots
-        options.Projections.SelfAggregate<Order>();
+        options.Projections.Snapshot<Order>(SnapshotLifecycle.Inline);
     }
 }

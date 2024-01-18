@@ -3,7 +3,7 @@ using Marten;
 
 namespace SmartHome.Temperature.TemperatureMeasurements.GettingTemperatureMeasurements;
 
-public record GetTemperatureMeasurements: IQuery<IReadOnlyList<TemperatureMeasurement>>;
+public record GetTemperatureMeasurements;
 
 public class HandleGetTemperatureMeasurements: IQueryHandler<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>
 {

@@ -3,12 +3,14 @@
 ########################################
 #  Use Build image with label `builder
 ########################################
-FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS builder
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS builder
 
 # Setup working directory for project
 WORKDIR /app
 
+COPY ./.editorconfig ./
 COPY ./Directory.Build.props ./
+COPY ./Core.Build.props ./
 COPY ./Core/Core.csproj ./Core/
 COPY ./Core.Serialization/Core.Serialization.csproj ./Core.Serialization/
 COPY ./Core.Marten/Core.Marten.csproj ./Core.Marten/
@@ -48,7 +50,7 @@ RUN dotnet publish -c Release --no-build -o out
 #  Use other build image as the final one
 #    that won't have source codes
 ########################################
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 
 # Setup working directory for project
 WORKDIR /app

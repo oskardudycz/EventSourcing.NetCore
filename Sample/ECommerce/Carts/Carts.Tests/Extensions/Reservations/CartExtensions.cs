@@ -12,13 +12,11 @@ internal static class CartExtensions
         Guid id,
         Guid clientId)
     {
-
         shoppingCart.Id.Should().Be(id);
         shoppingCart.ClientId.Should().Be(clientId);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Pending);
         shoppingCart.ProductItems.Should().BeEmpty();
         shoppingCart.TotalPrice.Should().Be(0);
-        shoppingCart.Version.Should().Be(1);
 
         return shoppingCart;
     }

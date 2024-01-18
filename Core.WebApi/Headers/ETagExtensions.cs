@@ -9,10 +9,10 @@ public static class ETagExtensions
     public static EntityTagHeaderValue? GetIfMatchRequestHeader(this HttpContext context) =>
         context.Request.GetTypedHeaders().IfMatch.FirstOrDefault();
 
-    public static void TrySetETagResponseHeader(this HttpContext context, string etag) =>
+    public static void TrySetETagResponseHeader(this HttpContext context, object etag) =>
         context.Response.TrySetETagResponseHeader(etag);
 
-    public static void TrySetETagResponseHeader(this HttpResponse response, string etag)
+    public static void TrySetETagResponseHeader(this HttpResponse response, object etag)
     {
         if (!response.IsSuccessful()) return;
 
@@ -22,6 +22,9 @@ public static class ETagExtensions
     public static string GetSanitizedValue(this EntityTagHeaderValue eTag)
     {
         var value = eTag.Tag.Value;
+
+        if (value is null)
+            throw new ArgumentNullException(nameof(eTag));
         // trim first and last quote characters
         return value.Substring(1, value.Length - 2);
     }

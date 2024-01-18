@@ -1,6 +1,5 @@
 using Core.Aggregates;
 using Core.Exceptions;
-using Core.Tracing;
 
 namespace Core.Marten.Repository;
 
@@ -12,7 +11,7 @@ public static class RepositoryExtensions
         CancellationToken cancellationToken = default
     ) where T : class, IAggregate
     {
-        var entity = await repository.Find(id, cancellationToken);
+        var entity = await repository.Find(id, cancellationToken).ConfigureAwait(false);
 
         return entity ?? throw AggregateNotFoundException.For<T>(id);
     }
@@ -22,14 +21,13 @@ public static class RepositoryExtensions
         Guid id,
         Action<T> action,
         long? expectedVersion = null,
-        TraceMetadata? traceMetadata = null,
-        CancellationToken cancellationToken = default
+        CancellationToken ct = default
     ) where T : class, IAggregate
     {
-        var entity = await repository.Get(id, cancellationToken);
+        var entity = await repository.Get(id, ct).ConfigureAwait(false);
 
         action(entity);
 
-        return await repository.Update(entity, expectedVersion, traceMetadata, cancellationToken);
+        return await repository.Update(entity, expectedVersion, ct).ConfigureAwait(false);
     }
 }
