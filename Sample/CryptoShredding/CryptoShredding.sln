@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{53B51C6D-8443-4EFC-BD9B-F7310F317D50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoShredding", "src\CryptoShredding\CryptoShredding.csproj", "{9C35F2D6-5E9A-4A8C-8F5C-0EF0B165221D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{70E20215-387D-455E-9C6E-28166F7A4EC0}"
+ProjectSection(SolutionItems) = preProject
+	docker-compose.yml = docker-compose.yml
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{7E02C6B3-2B38-4A1F-99AC-B8FBD6973A96}"
+ProjectSection(SolutionItems) = preProject
+	README.md = README.md
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoShredding.IntegrationTests", "src\CryptoShredding.IntegrationTests\CryptoShredding.IntegrationTests.csproj", "{FA1C5197-1F19-4EB6-825C-08BB380283AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{A6E8B7C5-D5F7-4F9E-8EDD-020FEF6D18CD}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.github\workflows\build.crypto_shredding.dotnet.yml = ..\..\.github\workflows\build.crypto_shredding.dotnet.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9C35F2D6-5E9A-4A8C-8F5C-0EF0B165221D} = {53B51C6D-8443-4EFC-BD9B-F7310F317D50}
+		{FA1C5197-1F19-4EB6-825C-08BB380283AB} = {53B51C6D-8443-4EFC-BD9B-F7310F317D50}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C35F2D6-5E9A-4A8C-8F5C-0EF0B165221D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C35F2D6-5E9A-4A8C-8F5C-0EF0B165221D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C35F2D6-5E9A-4A8C-8F5C-0EF0B165221D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C35F2D6-5E9A-4A8C-8F5C-0EF0B165221D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA1C5197-1F19-4EB6-825C-08BB380283AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA1C5197-1F19-4EB6-825C-08BB380283AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA1C5197-1F19-4EB6-825C-08BB380283AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA1C5197-1F19-4EB6-825C-08BB380283AB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

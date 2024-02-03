@@ -1,0 +1,57 @@
+version: "3"
+services:
+    #######################################################
+    #  Postgres
+    #######################################################
+    postgres:
+        image: clkao/postgres-plv8
+        container_name: postgres
+        environment:
+            POSTGRES_PASSWORD: Password12!
+        ports:
+            - "5432:5432"
+        networks:
+            - pg_network
+
+    #######################################################
+    #  EventStoreDB
+    #######################################################
+    eventstore.db:
+        image: eventstore/eventstore:23.10.0-bookworm-slim
+        # use this image if you're running ARM-based proc like Apple M1
+        # image: eventstore/eventstore:23.10.0-alpha-arm64v8
+        environment:
+            - EVENTSTORE_CLUSTER_SIZE=1
+            - EVENTSTORE_RUN_PROJECTIONS=All
+            - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+            - EVENTSTORE_EXT_TCP_PORT=1113
+            - EVENTSTORE_HTTP_PORT=2113
+            - EVENTSTORE_INSECURE=true
+            - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+            - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+        ports:
+            - '1113:1113'
+            - '2113:2113'
+        volumes:
+            -   type: volume
+                source: eventstore-volume-data
+                target: /var/lib/eventstore
+            -   type: volume
+                source: eventstore-volume-logs
+                target: /var/log/eventstore
+        networks:
+            - esdb_network
+
+networks:
+    es_network:
+        driver: bridge
+    pg_network:
+        driver: bridge
+    esdb_network:
+        driver: bridge
+
+volumes:
+    postgres:
+    eventstore-volume-data:
+    eventstore-volume-logs:
+    elastic-data:
