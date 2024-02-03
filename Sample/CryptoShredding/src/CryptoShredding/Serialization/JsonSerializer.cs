@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using CryptoShredding.Attributes;
-using CryptoShredding.Contracts;
 using Newtonsoft.Json;
 
 namespace CryptoShredding.Serialization;
@@ -23,7 +19,7 @@ public class JsonSerializer
         _supportedEvents = supportedEvents;
     }
 
-    public SerializedEvent Serialize(IEvent @event)
+    public SerializedEvent Serialize(object @event)
     {
         var dataSubjectId = GetDataSubjectId(@event);
         var metadataValues =
@@ -48,7 +44,7 @@ public class JsonSerializer
         return serializedEvent;
     }
 
-    public IEvent? Deserialize(ReadOnlyMemory<byte> data, ReadOnlyMemory<byte> metadata, string eventName)
+    public object? Deserialize(ReadOnlyMemory<byte> data, ReadOnlyMemory<byte> metadata, string eventName)
     {
         var metadataJson = Encoding.UTF8.GetString(metadata.Span);
         var defaultJsonSettings = _jsonSerializerSettingsFactory.CreateDefault();
@@ -70,10 +66,10 @@ public class JsonSerializer
         var dataJson = Encoding.UTF8.GetString(data.Span);
         var persistableEvent =
             JsonConvert.DeserializeObject(dataJson, eventType, dataJsonDeserializerSettings);
-        return persistableEvent as IEvent;
+        return persistableEvent;
     }
 
-    private string? GetDataSubjectId(IEvent @event)
+    private string? GetDataSubjectId(object @event)
     {
         var eventType = @event.GetType();
         var properties = eventType.GetProperties();

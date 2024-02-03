@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace CryptoShredding.IntegrationTests.TestSupport;
 
 public abstract class Given_WhenAsync_Then_Test

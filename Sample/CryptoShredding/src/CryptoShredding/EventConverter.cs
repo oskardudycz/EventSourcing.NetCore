@@ -1,4 +1,3 @@
-using CryptoShredding.Contracts;
 using CryptoShredding.Serialization;
 using EventStore.Client;
 
@@ -13,7 +12,7 @@ public class EventConverter
         _jsonSerializer = jsonSerializer;
     }
 
-    public IEvent? ToEvent(ResolvedEvent resolvedEvent)
+    public object? ToEvent(ResolvedEvent resolvedEvent)
     {
         var data = resolvedEvent.Event.Data;
         var metadata = resolvedEvent.Event.Metadata;
@@ -22,7 +21,7 @@ public class EventConverter
         return persistableEvent;
     }
 
-    public EventData ToEventData(IEvent @event)
+    public EventData ToEventData(object @event)
     {
         var eventTypeName = @event.GetType().Name;
         var id = Uuid.NewUuid();

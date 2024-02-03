@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CryptoShredding.Contracts;
-using EventStore.Client;
+﻿using EventStore.Client;
 
 namespace CryptoShredding;
 
@@ -19,7 +15,7 @@ public class EventStore
         _eventConverter = eventConverter;
     }
 
-    public async Task PersistEvents(string streamName, int aggregateVersion, IEnumerable<IEvent> eventsToPersist)
+    public async Task PersistEvents(string streamName, int aggregateVersion, IEnumerable<object> eventsToPersist)
     {
         var events = eventsToPersist.ToList();
         var count = events.Count;
@@ -37,7 +33,7 @@ public class EventStore
             await _eventStoreClient.AppendToStreamAsync(streamName, expectedRevision.Value, eventsData);
     }
 
-    public async Task<IEnumerable<IEvent>> GetEvents(string streamName)
+    public async Task<IEnumerable<object>> GetEvents(string streamName)
     {
         const int start = 0;
         const int count = 4096;
@@ -46,7 +42,7 @@ public class EventStore
             _eventStoreClient.ReadStreamAsync(Direction.Forwards, streamName, start, count, resolveLinkTos: resolveLinkTos);
         var resolvedEvents = await sliceEvents.ToListAsync();
         var events =
-            resolvedEvents.Select(x => _eventConverter.ToEvent(x)).Where(e => e is not null).Cast<IEvent>();
+            resolvedEvents.Select(x => _eventConverter.ToEvent(x)).Where(e => e is not null).Cast<object>();
         return events;
     }
 

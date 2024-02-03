@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using CryptoShredding.Serialization.JsonConverters;
 using Newtonsoft.Json;

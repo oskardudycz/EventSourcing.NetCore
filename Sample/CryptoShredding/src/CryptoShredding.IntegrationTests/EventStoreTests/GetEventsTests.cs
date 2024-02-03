@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CryptoShredding.Attributes;
-using CryptoShredding.Contracts;
 using CryptoShredding.IntegrationTests.TestSupport;
 using CryptoShredding.Repository;
 using CryptoShredding.Serialization;
@@ -15,7 +10,7 @@ namespace CryptoShredding.IntegrationTests.EventStoreTests;
 
 public static class GetEventsTests
 {
-    public class ContactAdded: IEvent
+    public class ContactAdded
     {
         public Guid AggregateId { get; set; }
 
@@ -41,7 +36,7 @@ public static class GetEventsTests
         public string CountryCode { get; set; } = default!;
     }
 
-    public class ContactBookCreated: IEvent
+    public class ContactBookCreated
     {
         public Guid AggregateId { get; set; }
     }
@@ -56,7 +51,7 @@ public static class GetEventsTests
         private Guid _janeId;
         private ContactAdded _expectedContactAddedOne = default!;
         private ContactAdded _expectedContactAddedTwo = default!;
-        private IEnumerable<IEvent> _result = default!;
+        private IEnumerable<object> _result = default!;
 
         protected override async Task Given()
         {
@@ -122,7 +117,7 @@ public static class GetEventsTests
                 };
 
             var eventsToPersist =
-                new List<IEvent>
+                new List<object>
                 {
                     contactBookCreated,
                     contactAddedOne,
@@ -176,7 +171,7 @@ public static class GetEventsTests
         private Guid _janeId;
         private ContactAdded _expectedContactAddedOne = default!;
         private ContactAdded _expectedContactAddedTwo = default!;
-        private IEnumerable<IEvent> _result = default!;
+        private IEnumerable<object> _result = default!;
 
         protected override async Task Given()
         {
@@ -242,7 +237,7 @@ public static class GetEventsTests
                 };
 
             var eventsToPersist =
-                new List<IEvent>
+                new List<object>
                 {
                     contactBookCreated,
                     contactAddedOne,
