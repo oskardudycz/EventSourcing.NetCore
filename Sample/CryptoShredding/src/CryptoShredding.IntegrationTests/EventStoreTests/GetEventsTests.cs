@@ -36,10 +36,7 @@ public static class GetEventsTests
         public string CountryCode { get; set; } = default!;
     }
 
-    public class ContactBookCreated
-    {
-        public Guid AggregateId { get; set; }
-    }
+    public record ContactBookCreated(Guid AggregateId);
 
     public class Given_A_ContactBookCreated_And_Two_Events_With_Personal_Data_Stored_When_Getting_Events
         : Given_WhenAsync_Then_Test
@@ -77,10 +74,7 @@ public static class GetEventsTests
             _sut = new EventStore(_eventStoreClient, eventConverter);
 
             var contactBookCreated =
-                new ContactBookCreated
-                {
-                    AggregateId = aggregateId
-                };
+                new ContactBookCreated(aggregateId);
 
             _joeId = Guid.NewGuid();
             var contactAddedOne =
@@ -197,10 +191,7 @@ public static class GetEventsTests
             _sut = new EventStore(_eventStoreClient, eventConverter);
 
             var contactBookCreated =
-                new ContactBookCreated
-                {
-                    AggregateId = aggregateId
-                };
+                new ContactBookCreated(aggregateId);
 
             _joeId = Guid.NewGuid();
             var contactAddedOne =
