@@ -30,5 +30,6 @@ public static class CloseEndpoint
 }
 
 public record CloseIncident(
-    Guid IncidentId
+    Guid IncidentId,
+    int Version
 );

@@ -11,7 +11,6 @@ public static class PrioritiseEndpoint
     public static (IResult, Events) Prioritise(
         PrioritiseIncident command,
         Incident incident,
-
         DateTimeOffset now
     )
     {
@@ -23,7 +22,8 @@ public static class PrioritiseEndpoint
 }
 
 public record PrioritiseIncident(
-    Guid IncidentId, // TODO: meh
+    Guid IncidentId,
     Guid AgentId,
-    IncidentPriority Priority
+    IncidentPriority Priority,
+    int Version
 );

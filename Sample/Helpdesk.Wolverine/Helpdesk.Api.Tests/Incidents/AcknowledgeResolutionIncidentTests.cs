@@ -1,38 +1,28 @@
+using Alba;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.AcknowledgingResolution;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
 using Xunit;
-using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class AcknowledgeResolutionIncidentTests(ApiWithResolvedIncident API):
-    IClassFixture<ApiWithResolvedIncident>
+public class AcknowledgeResolutionIncidentTests(AppFixture fixture): ApiWithResolvedIncident(fixture)
 {
     [Fact]
     [Trait("Category", "Acceptance")]
-    public  Task ResolveCommand_Succeeds() =>
-        API
-            .Given()
-            .When(
-                POST,
-                URI($"/api/customers/{API.Incident.CustomerId}/incidents/{API.Incident.Id}/acknowledge"),
-                BODY(new AcknowledgeResolution(API.Incident.Id)),
-                HEADERS(IF_MATCH(2))
-            )
-            .Then(OK)
+    public async Task ResolveCommand_Succeeds()
+    {
+        await Host.Scenario(x =>
+        {
+            x.Post.Json(new AcknowledgeResolution(Incident.Id, Incident.CustomerId, Incident.Version))
+                .ToUrl($"/api/customers/{Incident.CustomerId}/incidents/{Incident.Id}/acknowledge");
 
-            .And()
+            x.StatusCodeShouldBeOk();
+        });
 
-            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
-            .Then(
-                OK,
-                RESPONSE_BODY(
-                    API.Incident with
-                    {
-                        Status = IncidentStatus.ResolutionAcknowledgedByCustomer,
-                        Version = 3
-                    }
-                )
-            );
+        await Host.IncidentDetailsShouldBe(Incident with
+        {
+            Status = IncidentStatus.ResolutionAcknowledgedByCustomer, Version = 3
+        });
+    }
 }

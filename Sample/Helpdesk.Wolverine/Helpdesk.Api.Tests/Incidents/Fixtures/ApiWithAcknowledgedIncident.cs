@@ -1,18 +1,13 @@
 using Helpdesk.Api.Incidents.GettingDetails;
-using Ogooreck.API;
 using Xunit;
 
 namespace Helpdesk.Api.Tests.Incidents.Fixtures;
 
-public class ApiWithAcknowledgedIncident: ApiSpecification<Program>, IAsyncLifetime
+public class ApiWithAcknowledgedIncident(AppFixture fixture): IntegrationContext(fixture), IAsyncLifetime
 {
-    public async Task InitializeAsync()
-    {
-        Incident = await this.AcknowledgedIncident();
-    }
+    public override async Task InitializeAsync() =>
+        Incident = await Host.AcknowledgedIncident();
 
     public IncidentDetails Incident { get; set; } = default!;
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 

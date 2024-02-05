@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Wolverine.Http;
 using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
@@ -22,14 +21,13 @@ public static class ResolveEndpoint
         if (incident.HasOutstandingResponseToCustomer)
             throw new InvalidOperationException("Cannot resolve incident that has outstanding responses to customer");
 
-        var (_, agentId, resolution) = command;
-
-        return (Ok(), [new IncidentResolved(incident.Id, resolution, agentId, now)]);
+        return (Ok(), [new IncidentResolved(incident.Id, command.Resolution, command.AgentId, now)]);
     }
 }
 
 public record ResolveIncident(
     Guid IncidentId,
     Guid AgentId,
-    ResolutionType Resolution
+    ResolutionType Resolution,
+    int Version
 );

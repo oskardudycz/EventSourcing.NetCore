@@ -1,9 +1,7 @@
 using Alba;
 using Alba.Security;
 using FluentAssertions;
-using JasperFx.Core;
 using Marten;
-using Marten.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using Oakton;
 using Wolverine;
@@ -83,7 +81,7 @@ public abstract class IntegrationContext(AppFixture fixture): IAsyncLifetime
 
     public IDocumentStore Store => fixture.Host.Services.GetRequiredService<IDocumentStore>();
 
-    async Task IAsyncLifetime.InitializeAsync()
+    public virtual async Task InitializeAsync()
     {
         // Using Marten, wipe out all data and reset the state
         // back to exactly what we described in InitialAccountData

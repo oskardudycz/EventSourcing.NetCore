@@ -25,5 +25,6 @@ public static class AssignAgentEndpoint
 }
 
 public record AssignAgentToIncident(
-    Guid IncidentId // TODO: meh
+    Guid IncidentId,
+    int Version
 );

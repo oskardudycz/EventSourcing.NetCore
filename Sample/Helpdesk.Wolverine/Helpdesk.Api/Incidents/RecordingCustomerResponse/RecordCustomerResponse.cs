@@ -18,10 +18,8 @@ public static class RecordCustomerResponseEndpoint
         if (incident.Status == IncidentStatus.Closed)
             throw new InvalidOperationException("Incident is already closed");
 
-        var (_, customerId, content) = command;
-
         var response = new IncidentResponse.FromCustomer(
-            customerId, content
+            command.CustomerId, command.Content
         );
 
         return (Ok(), [new CustomerRespondedToIncident(incident.Id, response, now)]);
@@ -31,5 +29,6 @@ public static class RecordCustomerResponseEndpoint
 public record RecordCustomerResponseToIncident(
     Guid IncidentId,
     Guid CustomerId,
-    string Content
+    string Content,
+    int Version
 );
