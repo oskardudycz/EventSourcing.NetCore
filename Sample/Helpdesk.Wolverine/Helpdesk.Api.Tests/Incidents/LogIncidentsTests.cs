@@ -1,43 +1,53 @@
+using Alba;
 using Bogus;
 using Bogus.DataSets;
+using FluentAssertions;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.GettingDetails;
 using Helpdesk.Api.Incidents.Logging;
 using Xunit;
 using Ogooreck.API;
+using Wolverine.Http;
 using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class LogIncidentsTests(ApiSpecification<Program> API):
-    IClassFixture<ApiSpecification<Program>>
+public class LogIncidentsTests(AppFixture fixture): IntegrationContext(fixture)
 {
     [Fact]
-    public Task LogIncident_ShouldSucceed() =>
-        API.Given()
-            .When(
-                POST,
-                URI($"api/customers/{CustomerId}/incidents/"),
-                BODY(new LogIncident(CustomerId, Contact, IncidentDescription))
-            )
-            .Then(CREATED_WITH_DEFAULT_HEADERS(locationHeaderPrefix: "/api/incidents/"))
-            .And()
-            .When(GET, URI(ctx => $"/api/incidents/{ctx.GetCreatedId()}"))
-            .Then(
-                OK,
-                RESPONSE_BODY(ctx =>
-                    new IncidentDetails(
-                        ctx.GetCreatedId<Guid>(),
-                        CustomerId,
-                        IncidentStatus.Pending,
-                        Array.Empty<IncidentNote>(),
-                        null,
-                        null,
-                        null,
-                        1
-                    )
-                )
-            );
+    public async Task LogIncident_ShouldSucceed()
+    {
+        // POST a CategoriseIncident to the HTTP endpoint, wait until all
+        // cascading Wolverine processing is complete
+        var result = await  Host.Scenario(x =>
+        {
+            x.Post.Json(new LogIncident(CustomerId, Contact, IncidentDescription))
+                .ToUrl($"/api/customers/{CustomerId}/incidents/");
+
+            x.StatusCodeShouldBe(201);
+        });
+
+        var response = await result.ReadAsJsonAsync<CreationResponse>();
+        response.Should().NotBeNull();
+        response!.Url.Should().StartWith("/api/incidents/");
+
+        result = await Host.Scenario(x =>
+        {
+            x.Get.Url(response.Url);
+
+            x.StatusCodeShouldBeOk();
+        });
+
+        var incident = await result.ReadAsJsonAsync<IncidentDetails>();
+        incident.Should().NotBeNull();
+        incident!.CustomerId.Should().Be(CustomerId);
+        incident.Status.Should().Be(IncidentStatus.Pending);
+        incident.Notes.Should().BeEmpty();
+        incident.Category.Should().BeNull();
+        incident.Priority.Should().BeNull();
+        incident.AgentId.Should().BeNull();
+        incident.Version.Should().Be(1);
+    }
 
     private readonly Guid CustomerId = Guid.NewGuid();
 
