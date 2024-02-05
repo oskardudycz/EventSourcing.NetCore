@@ -1,6 +1,7 @@
 using Bogus;
 using Bogus.DataSets;
 using Helpdesk.Api.Incidents;
+using Helpdesk.Api.Incidents.AcknowledgingResolution;
 using Helpdesk.Api.Incidents.GettingDetails;
 using Helpdesk.Api.Incidents.Logging;
 using Helpdesk.Api.Incidents.Resolving;
@@ -83,7 +84,7 @@ public static class Scenarios
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{incidentId}/resolve"),
-                BODY(new ResolveIncidentRequest(resolutionType)),
+                BODY(new ResolveIncidentRequest(incidentId, resolutionType)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
@@ -97,6 +98,7 @@ public static class Scenarios
             .When(
                 POST,
                 URI($"/api/customers/{customerId}/incidents/{incidentId}/acknowledge"),
+                BODY(new AcknowledgeResolutionRequest(incidentId)),
                 HEADERS(IF_MATCH(2))
              )
             .Then(OK);

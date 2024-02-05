@@ -1,47 +1,31 @@
-using Helpdesk.Api.Core.Http;
-using Helpdesk.Api.Core.Marten;
-using Marten;
+using Microsoft.AspNetCore.Mvc;
 using Wolverine.Http;
+using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
-using static Helpdesk.Api.Core.Http.ETagExtensions;
-using static System.DateTimeOffset;
 
 namespace Helpdesk.Api.Incidents.AcknowledgingResolution;
 
 public static class AcknowledgeResolutionEndpoint
 {
+    [AggregateHandler]
     [WolverinePost("/api/customers/{customerId:guid}/incidents/{incidentId:guid}/acknowledge")]
-    public static async Task<IResult> AcknowledgeResolution
+    public static (IResult, Events) AcknowledgeResolution
     (
-        IDocumentSession documentSession,
-        Guid incidentId,
-        Guid customerId,
-        [FromIfMatchHeader] string eTag,
-        CancellationToken ct
+        AcknowledgeResolutionRequest request,
+        Incident incident,
+        [FromRoute] Guid agentId,
+        [FromRoute] Guid incidentId,
+        //TODO: [FromIfMatchHeader] string eTag,
+        DateTimeOffset now
     )
     {
-        await documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new AcknowledgeResolution(incidentId, customerId, Now)), ct);
-
-        return Ok();
-    }
-
-    public static ResolutionAcknowledgedByCustomer Handle(
-        Incident current,
-        AcknowledgeResolution command
-    )
-    {
-        if (current.Status is not IncidentStatus.Resolved)
+        if (incident.Status is not IncidentStatus.Resolved)
             throw new InvalidOperationException("Only resolved incident can be acknowledged");
 
-        var (incidentId, acknowledgedBy, now) = command;
-
-        return new ResolutionAcknowledgedByCustomer(incidentId, acknowledgedBy, now);
+        return (Ok(), [new ResolutionAcknowledgedByCustomer(incidentId, agentId, now)]);
     }
 }
 
-public record AcknowledgeResolution(
-    Guid IncidentId,
-    Guid AcknowledgedBy,
-    DateTimeOffset Now
+public record AcknowledgeResolutionRequest(
+    Guid IncidentId // TODO: meh
 );

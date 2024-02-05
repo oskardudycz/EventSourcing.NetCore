@@ -1,5 +1,4 @@
 using Bogus.DataSets;
-using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.GettingDetails;
 using Helpdesk.Api.Incidents.RecordingCustomerResponse;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
@@ -8,7 +7,8 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedIncident>
+public class RecordCustomerResponseToIncidentTests(ApiWithLoggedIncident API):
+    IClassFixture<ApiWithLoggedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -19,7 +19,7 @@ public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedI
             .When(
                 POST,
                 URI($"/api/customers/{customerId}/incidents/{API.Incident.Id}/responses"),
-                BODY(new RecordCustomerResponseToIncidentRequest(content)),
+                BODY(new RecordCustomerResponseToIncidentRequest(API.Incident.Id, content)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
@@ -33,7 +33,7 @@ public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedI
                     API.Incident with
                     {
                         Notes =
-                        new[] { new IncidentNote(IncidentNoteType.FromCustomer, customerId, content, true) },
+                        [new IncidentNote(IncidentNoteType.FromCustomer, customerId, content, true)],
                         Version = 2
                     }
                 )
@@ -42,7 +42,4 @@ public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedI
 
     private readonly Guid customerId = Guid.NewGuid();
     private readonly string content = new Lorem().Sentence();
-    private readonly ApiWithLoggedIncident API;
-
-    public RecordCustomerResponseToIncidentTests(ApiWithLoggedIncident api) => API = api;
 }
