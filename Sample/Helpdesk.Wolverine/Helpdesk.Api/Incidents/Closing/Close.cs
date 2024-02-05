@@ -1,12 +1,7 @@
-using Helpdesk.Api.Core.Http;
-using Helpdesk.Api.Core.Marten;
-using Marten;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine.Http;
 using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
-using static Helpdesk.Api.Core.Http.ETagExtensions;
-using static System.DateTimeOffset;
 
 namespace Helpdesk.Api.Incidents.Closing;
 
@@ -16,11 +11,11 @@ public static class CloseEndpoint
     [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/close")]
     public static (IResult, Events) Close
     (
-        CloseIncidentRequest request,
+        CloseIncident request,
         Incident incident,
         [FromRoute] Guid agentId,
         [FromRoute] Guid incidentId,
-        //TODO: [FromIfMatchHeader] string eTag,
+
         DateTimeOffset now
     )
     {
@@ -34,6 +29,6 @@ public static class CloseEndpoint
     }
 }
 
-public record CloseIncidentRequest(
+public record CloseIncident(
     Guid IncidentId
 );

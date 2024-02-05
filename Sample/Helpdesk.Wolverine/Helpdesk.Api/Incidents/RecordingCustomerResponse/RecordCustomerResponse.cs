@@ -1,5 +1,3 @@
-using Helpdesk.Api.Incidents.RecordingAgentResponse;
-using Microsoft.AspNetCore.Mvc;
 using Wolverine.Http;
 using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
@@ -12,27 +10,26 @@ public static class RecordCustomerResponseEndpoint
     [WolverinePost("/api/customers/{customerId:guid}/incidents/{incidentId:guid}/responses/")]
     public static (IResult, Events) RecordCustomerResponse
     (
-        RecordAgentResponseToIncidentRequest request,
+        RecordCustomerResponseToIncident command,
         Incident incident,
-        [FromRoute] Guid customerId,
-        [FromRoute] Guid incidentId,
-        //TODO: [FromIfMatchHeader] string eTag,
         DateTimeOffset now
     )
     {
         if (incident.Status == IncidentStatus.Closed)
             throw new InvalidOperationException("Incident is already closed");
 
+        var (_, customerId, content) = command;
+
         var response = new IncidentResponse.FromCustomer(
-            customerId, request.Content
+            customerId, content
         );
 
-        return (Ok(), [new CustomerRespondedToIncident(incidentId, response, now)]);
+        return (Ok(), [new CustomerRespondedToIncident(incident.Id, response, now)]);
     }
 }
 
-public record RecordCustomerResponseToIncidentRequest(
+public record RecordCustomerResponseToIncident(
     Guid IncidentId,
+    Guid CustomerId,
     string Content
 );
-
