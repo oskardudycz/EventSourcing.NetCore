@@ -6,16 +6,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus" Version="35.3.0" />
+        <PackageReference Include="Bogus" Version="35.4.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Open.ChannelExtensions" Version="6.2.2" />
-        <PackageReference Include="xunit" Version="2.5.0" />
-        <PackageReference Include="FluentAssertions" Version="6.11.0" />
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
+        <PackageReference Include="Open.ChannelExtensions" Version="8.0.2" />
+        <PackageReference Include="xunit" Version="2.6.6" />
+        <PackageReference Include="FluentAssertions" Version="6.12.0" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.1" />
         <PackageReference Include="Ogooreck" Version="0.8.0" />
     </ItemGroup>
 

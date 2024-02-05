@@ -5,10 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten" Version="7.0.0-beta.3" />
+        <PackageReference Include="Marten" Version="7.0.0-beta.5" />
         <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.5.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.1" />
     </ItemGroup>
 
     <ItemGroup>

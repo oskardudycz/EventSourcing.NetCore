@@ -11,11 +11,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="6.11.0" />
-        <PackageReference Include="Marten" Version="7.0.0-beta.3" />
+        <PackageReference Include="FluentAssertions" Version="6.12.0" />
+        <PackageReference Include="Marten" Version="7.0.0-beta.5" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.0" />
-        <PackageReference Include="xunit" Version="2.5.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+        <PackageReference Include="xunit" Version="2.6.6" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
