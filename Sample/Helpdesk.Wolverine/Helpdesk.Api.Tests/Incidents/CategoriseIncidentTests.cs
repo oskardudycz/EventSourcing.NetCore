@@ -7,7 +7,8 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class CategoriseIncidentTests: IClassFixture<ApiWithLoggedIncident>
+public class CategoriseIncidentTests(ApiWithLoggedIncident API):
+    IClassFixture<ApiWithLoggedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -36,7 +37,4 @@ public class CategoriseIncidentTests: IClassFixture<ApiWithLoggedIncident>
 
     private readonly Guid agentId = Guid.NewGuid();
     private readonly IncidentCategory category = new Faker().PickRandom<IncidentCategory>();
-    private readonly ApiWithLoggedIncident API;
-
-    public CategoriseIncidentTests(ApiWithLoggedIncident api) => API = api;
 }

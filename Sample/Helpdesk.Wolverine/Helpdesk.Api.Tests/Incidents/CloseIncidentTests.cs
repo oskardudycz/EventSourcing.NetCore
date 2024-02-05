@@ -1,11 +1,13 @@
 using Helpdesk.Api.Incidents;
+using Helpdesk.Api.Incidents.Closing;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class CloseIncidentTests: IClassFixture<ApiWithAcknowledgedIncident>
+public class CloseIncidentTests(ApiWithAcknowledgedIncident API):
+    IClassFixture<ApiWithAcknowledgedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -16,6 +18,7 @@ public class CloseIncidentTests: IClassFixture<ApiWithAcknowledgedIncident>
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/close"),
+                BODY(new CloseIncidentRequest(API.Incident.Id)),
                 HEADERS(IF_MATCH(3))
             )
             .Then(OK);
@@ -31,8 +34,5 @@ public class CloseIncidentTests: IClassFixture<ApiWithAcknowledgedIncident>
             );
     }
 
-    private readonly ApiWithAcknowledgedIncident API;
     private Guid agentId = Guid.NewGuid();
-
-    public CloseIncidentTests(ApiWithAcknowledgedIncident api) => API = api;
 }

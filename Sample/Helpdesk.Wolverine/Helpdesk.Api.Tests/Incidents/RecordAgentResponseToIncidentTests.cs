@@ -1,6 +1,5 @@
 using Bogus;
 using Bogus.DataSets;
-using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.GettingDetails;
 using Helpdesk.Api.Incidents.RecordingAgentResponse;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
@@ -9,29 +8,30 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class RecordAgentResponseToIncidentTests: IClassFixture<ApiWithLoggedIncident>
+public class RecordAgentResponseToIncidentTests(ApiWithLoggedIncident api):
+    IClassFixture<ApiWithLoggedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
     public async Task RecordAgentResponseCommand_RecordsResponse()
     {
-        await API
+        await api
             .Given()
             .When(
                 POST,
-                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/responses"),
-                BODY(new RecordAgentResponseToIncidentRequest(content, visibleToCustomer)),
+                URI($"/api/agents/{agentId}/incidents/{api.Incident.Id}/responses"),
+                BODY(new RecordAgentResponseToIncidentRequest(api.Incident.Id, content, visibleToCustomer)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
 
-        await API
+        await api
             .Given()
-            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
+            .When(GET, URI($"/api/incidents/{api.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Incident with
+                    api.Incident with
                     {
                         Notes = new[]
                         {
@@ -46,7 +46,4 @@ public class RecordAgentResponseToIncidentTests: IClassFixture<ApiWithLoggedInci
     private readonly Guid agentId = Guid.NewGuid();
     private readonly string content = new Lorem().Sentence();
     private readonly bool visibleToCustomer = new Faker().Random.Bool();
-    private readonly ApiWithLoggedIncident API;
-
-    public RecordAgentResponseToIncidentTests(ApiWithLoggedIncident api) => API = api;
 }

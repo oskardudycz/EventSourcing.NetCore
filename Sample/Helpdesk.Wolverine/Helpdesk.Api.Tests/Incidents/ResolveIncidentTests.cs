@@ -7,7 +7,8 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class ResolveIncidentTests: IClassFixture<ApiWithLoggedIncident>
+public class ResolveIncidentTests(ApiWithLoggedIncident API):
+    IClassFixture<ApiWithLoggedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -18,7 +19,7 @@ public class ResolveIncidentTests: IClassFixture<ApiWithLoggedIncident>
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/resolve"),
-                BODY(new ResolveIncidentRequest(resolutionType)),
+                BODY(new ResolveIncidentRequest(API.Incident.Id, resolutionType)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
@@ -39,7 +40,4 @@ public class ResolveIncidentTests: IClassFixture<ApiWithLoggedIncident>
 
     private readonly Guid agentId = Guid.NewGuid();
     private readonly ResolutionType resolutionType = new Faker().PickRandom<ResolutionType>();
-    private readonly ApiWithLoggedIncident API;
-
-    public ResolveIncidentTests(ApiWithLoggedIncident api) => API = api;
 }

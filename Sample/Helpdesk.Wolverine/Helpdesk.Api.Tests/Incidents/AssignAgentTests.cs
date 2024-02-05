@@ -1,10 +1,12 @@
+using Helpdesk.Api.Incidents.AssigningAgent;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class AssignAgentToIncidentTests: IClassFixture<ApiWithLoggedIncident>
+public class AssignAgentToIncidentTests(ApiWithLoggedIncident API):
+    IClassFixture<ApiWithLoggedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -15,7 +17,8 @@ public class AssignAgentToIncidentTests: IClassFixture<ApiWithLoggedIncident>
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/assign"),
-                HEADERS(IF_MATCH(1))
+                HEADERS(IF_MATCH(1)),
+                BODY(new AssignAgentToIncidentRequest(API.Incident.Id))
             )
             .Then(OK)
             .And()
@@ -29,7 +32,4 @@ public class AssignAgentToIncidentTests: IClassFixture<ApiWithLoggedIncident>
     }
 
     private readonly Guid agentId = Guid.NewGuid();
-    private readonly ApiWithLoggedIncident API;
-
-    public AssignAgentToIncidentTests(ApiWithLoggedIncident api) => API = api;
 }

@@ -1,56 +1,35 @@
-using Helpdesk.Api.Core.Http;
-using Helpdesk.Api.Core.Marten;
-using Marten;
+using Microsoft.AspNetCore.Mvc;
 using Wolverine.Http;
+using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
-using static Helpdesk.Api.Core.Http.ETagExtensions;
-using static System.DateTimeOffset;
 
 namespace Helpdesk.Api.Incidents.Resolving;
 
 public static class ResolveEndpoint
 {
+    [AggregateHandler]
     [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/resolve")]
-    public static async Task<IResult> ResolveIncident
+    public static (IResult, Events) Resolve
     (
-        IDocumentSession documentSession,
-        Guid incidentId,
-        Guid agentId,
-        [FromIfMatchHeader] string eTag,
-        ResolveIncidentRequest body,
-        CancellationToken ct
+        ResolveIncidentRequest request,
+        Incident incident,
+        [FromRoute] Guid agentId,
+        [FromRoute] Guid incidentId,
+        //TODO: [FromIfMatchHeader] string eTag,
+        DateTimeOffset now
     )
     {
-        await documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new ResolveIncident(incidentId, body.Resolution, agentId, Now)), ct);
-
-        return Ok();
-    }
-
-    public static IncidentResolved Handle(
-        Incident current,
-        ResolveIncident command
-    )
-    {
-        if (current.Status is IncidentStatus.Resolved or IncidentStatus.Closed)
+        if (incident.Status is IncidentStatus.Resolved or IncidentStatus.Closed)
             throw new InvalidOperationException("Cannot resolve already resolved or closed incident");
 
-        if (current.HasOutstandingResponseToCustomer)
+        if (incident.HasOutstandingResponseToCustomer)
             throw new InvalidOperationException("Cannot resolve incident that has outstanding responses to customer");
 
-        var (incidentId, resolution, resolvedBy, now) = command;
-
-        return new IncidentResolved(incidentId, resolution, resolvedBy, now);
+        return (Ok(), [new IncidentResolved(incidentId, request.Resolution, agentId, now)]);
     }
 }
 
 public record ResolveIncidentRequest(
-    ResolutionType Resolution
-);
-
-public record ResolveIncident(
     Guid IncidentId,
-    ResolutionType Resolution,
-    Guid ResolvedBy,
-    DateTimeOffset Now
+    ResolutionType Resolution
 );

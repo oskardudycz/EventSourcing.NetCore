@@ -9,23 +9,24 @@ public static class CategoriseEndpoint
 {
     [AggregateHandler]
     [WolverinePost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/category")]
-    public static (IResult, Events) Post(
+    public static (IResult, Events) Categorise
+    (
         CategoriseIncidentRequest request,
         Incident incident,
         [FromRoute] Guid agentId,
         [FromRoute] Guid incidentId,
-        DateTimeOffset now)
+        //TODO: [FromIfMatchHeader] string eTag,
+        DateTimeOffset now
+    )
     {
         if (incident.Status == IncidentStatus.Closed)
-        {
             throw new InvalidOperationException("Incident is already closed");
-        }
 
-        return (Ok(), new Events { new IncidentCategorised(incidentId, request.Category, agentId, now) });
+        return (Ok(), [new IncidentCategorised(incidentId, request.Category, agentId, now)]);
     }
 }
 
 public record CategoriseIncidentRequest(
-    Guid IncidentId,
+    Guid IncidentId, // TODO: meh
     IncidentCategory Category
 );

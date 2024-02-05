@@ -1,57 +1,37 @@
-using Helpdesk.Api.Core.Http;
-using Helpdesk.Api.Core.Marten;
-using Marten;
+using Microsoft.AspNetCore.Mvc;
 using Wolverine.Http;
+using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
-using static Helpdesk.Api.Core.Http.ETagExtensions;
-using static System.DateTimeOffset;
 
 namespace Helpdesk.Api.Incidents.RecordingAgentResponse;
 
 public static class RecordAgentResponseEndpoint
 {
+    [AggregateHandler]
     [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/responses/")]
-    public static async Task<IResult> RecordAgentResponseToIncident
+    public static (IResult, Events) RecordAgentResponse
     (
-        IDocumentSession documentSession,
-        [FromIfMatchHeader] string eTag,
-        Guid incidentId,
-        Guid agentId,
-        RecordAgentResponseToIncidentRequest body,
-        CancellationToken ct
+        RecordAgentResponseToIncidentRequest request,
+        Incident incident,
+        [FromRoute] Guid agentId,
+        [FromRoute] Guid incidentId,
+        //TODO: [FromIfMatchHeader] string eTag,
+        DateTimeOffset now
     )
     {
-        var (content, visibleToCustomer) = body;
-
-        await documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state,
-                new RecordAgentResponseToIncident(incidentId,
-                    new IncidentResponse.FromAgent(agentId, content, visibleToCustomer), Now)), ct);
-
-        return Ok();
-    }
-
-    public static AgentRespondedToIncident Handle(
-        Incident current,
-        RecordAgentResponseToIncident command
-    )
-    {
-        if (current.Status == IncidentStatus.Closed)
+        if (incident.Status == IncidentStatus.Closed)
             throw new InvalidOperationException("Incident is already closed");
 
-        var (incidentId, response, now) = command;
+        var response = new IncidentResponse.FromAgent(
+            agentId, request.Content, request.VisibleToCustomer
+        );
 
-        return new AgentRespondedToIncident(incidentId, response, now);
+        return (Ok(), [new AgentRespondedToIncident(incidentId, response, now)]);
     }
 }
 
-public record RecordAgentResponseToIncident(
-    Guid IncidentId,
-    IncidentResponse.FromAgent Response,
-    DateTimeOffset Now
-);
-
 public record RecordAgentResponseToIncidentRequest(
+    Guid IncidentId,
     string Content,
     bool VisibleToCustomer
 );

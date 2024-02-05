@@ -7,7 +7,8 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class PrioritiseIncidentTests: IClassFixture<ApiWithLoggedIncident>
+public class PrioritiseIncidentTests(ApiWithLoggedIncident API):
+    IClassFixture<ApiWithLoggedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -18,7 +19,7 @@ public class PrioritiseIncidentTests: IClassFixture<ApiWithLoggedIncident>
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/priority"),
-                BODY(new PrioritiseIncidentRequest(priority)),
+                BODY(new PrioritiseIncidentRequest(API.Incident.Id, priority)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
@@ -40,8 +41,4 @@ public class PrioritiseIncidentTests: IClassFixture<ApiWithLoggedIncident>
 
     private readonly Guid agentId = Guid.NewGuid();
     private readonly IncidentPriority priority = new Faker().PickRandom<IncidentPriority>();
-    private readonly ApiWithLoggedIncident API;
-
-    public PrioritiseIncidentTests(ApiWithLoggedIncident api) => API = api;
-
 }

@@ -1,11 +1,13 @@
 using Helpdesk.Api.Incidents;
+using Helpdesk.Api.Incidents.AcknowledgingResolution;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class AcknowledgeResolutionIncidentTests: IClassFixture<ApiWithResolvedIncident>
+public class AcknowledgeResolutionIncidentTests(ApiWithResolvedIncident API):
+    IClassFixture<ApiWithResolvedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -15,6 +17,7 @@ public class AcknowledgeResolutionIncidentTests: IClassFixture<ApiWithResolvedIn
             .When(
                 POST,
                 URI($"/api/customers/{API.Incident.CustomerId}/incidents/{API.Incident.Id}/acknowledge"),
+                BODY(new AcknowledgeResolutionRequest(API.Incident.Id)),
                 HEADERS(IF_MATCH(2))
             )
             .Then(OK)
@@ -32,8 +35,4 @@ public class AcknowledgeResolutionIncidentTests: IClassFixture<ApiWithResolvedIn
                     }
                 )
             );
-
-    private readonly ApiWithResolvedIncident API;
-
-    public AcknowledgeResolutionIncidentTests(ApiWithResolvedIncident api) => API = api;
 }
