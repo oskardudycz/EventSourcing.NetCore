@@ -102,6 +102,8 @@ public class MeetsElasticTest: MartenMeetsElasticTest
     [Fact]
     public async Task ShouldProjectEvents_ToElasticsearch()
     {
+        await DocumentSession.DocumentStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
+
         await AppendEvents("order1", new OrderInitiated("order1", "ORD/123", new UserInfo("user1", "user1")));
 
         await StartDaemon();
