@@ -28,11 +28,6 @@ public abstract class MartenMeetsElasticTest: IDisposable
 
         documentStore = new DocumentStore(options);
         ReOpenSession();
-
-        // recreate schema to have it fresh for tests. Kids do not try that on production.
-        var command = DocumentSession.Connection!.CreateCommand();
-        command.CommandText = "DROP SCHEMA IF EXISTS MartenMeetsElastic CASCADE; CREATE SCHEMA MartenMeetsElastic;";
-        command.ExecuteNonQuery();
     }
 
     protected virtual void Options(StoreOptions options) { }
