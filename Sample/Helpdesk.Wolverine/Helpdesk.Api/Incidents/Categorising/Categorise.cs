@@ -27,6 +27,7 @@ public static class CategoriseEndpoint
 }
 
 public record CategoriseIncident(
-    Guid IncidentId, // TODO: meh
-    IncidentCategory Category
+    Guid IncidentId,
+    IncidentCategory Category,
+    int Version
 );

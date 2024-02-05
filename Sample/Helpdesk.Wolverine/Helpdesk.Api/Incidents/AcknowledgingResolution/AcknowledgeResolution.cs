@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Wolverine.Http;
 using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
@@ -11,21 +10,20 @@ public static class AcknowledgeResolutionEndpoint
     [WolverinePost("/api/customers/{customerId:guid}/incidents/{incidentId:guid}/acknowledge")]
     public static (IResult, Events) AcknowledgeResolution
     (
-        AcknowledgeResolution request,
+        AcknowledgeResolution command,
         Incident incident,
-        [FromRoute] Guid agentId,
-        [FromRoute] Guid incidentId,
-
         DateTimeOffset now
     )
     {
         if (incident.Status is not IncidentStatus.Resolved)
             throw new InvalidOperationException("Only resolved incident can be acknowledged");
 
-        return (Ok(), [new ResolutionAcknowledgedByCustomer(incidentId, agentId, now)]);
+        return (Ok(), [new ResolutionAcknowledgedByCustomer(incident.Id, command.CustomerId, now)]);
     }
 }
 
 public record AcknowledgeResolution(
-    Guid IncidentId // TODO: meh
+    Guid IncidentId,
+    Guid CustomerId,
+    int Version
 );

@@ -30,5 +30,6 @@ public record RecordAgentResponseToIncident(
     Guid IncidentId,
     Guid AgentId,
     string Content,
-    bool VisibleToCustomer
+    bool VisibleToCustomer,
+    int Version
 );

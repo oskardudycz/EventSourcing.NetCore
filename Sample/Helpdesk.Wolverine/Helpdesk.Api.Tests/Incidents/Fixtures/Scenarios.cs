@@ -1,12 +1,14 @@
+using Alba;
 using Bogus;
 using Bogus.DataSets;
+using FluentAssertions;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.AcknowledgingResolution;
 using Helpdesk.Api.Incidents.GettingDetails;
 using Helpdesk.Api.Incidents.Logging;
 using Helpdesk.Api.Incidents.Resolving;
-using Ogooreck.API;
-using static Ogooreck.API.ApiSpecification;
+using Wolverine.Http;
+using Xunit;
 
 namespace Helpdesk.Api.Tests.Incidents.Fixtures;
 
@@ -16,7 +18,7 @@ public static class Scenarios
     private static readonly Lorem loremIpsum = new();
 
     public static async Task<IncidentDetails> LoggedIncident(
-        this ApiSpecification<Program> api
+        this IAlbaHost api
     )
     {
         var customerId = Guid.NewGuid();
@@ -30,84 +32,131 @@ public static class Scenarios
         );
         var incidentDescription = loremIpsum.Sentence();
 
-        var response = await api.Scenario(
-            api.LogIncident(customerId, contact, incidentDescription),
-            r => api.GetIncidentDetails(r.GetCreatedId<Guid>())
-        );
+        var result = await api.LogIncident(customerId, contact, incidentDescription);
 
-        return await response.GetResultFromJson<IncidentDetails>();
+        result = await api.GetIncidentDetails(await result.GetCreatedId());
+        var incident = await result.ReadAsJsonAsync<IncidentDetails>();
+        incident.Should().NotBeNull();
+        return incident!;
     }
 
     public static async Task<IncidentDetails> ResolvedIncident(
-        this ApiSpecification<Program> api
+        this IAlbaHost api
     )
     {
         var agentId = Guid.NewGuid();
         var resolvedType = faker.PickRandom<ResolutionType>();
         var incident = await api.LoggedIncident();
 
-        return await api.Scenario(
-            api.ResolveIncident(incident.Id, agentId, resolvedType),
-            _ => api.GetIncidentDetails(incident.Id)
-        ).GetResponseBody<IncidentDetails>();
+        await api.ResolveIncident(incident.Id, agentId, resolvedType, incident.Version);
+
+        var result = await api.GetIncidentDetails(incident.Id);
+        incident = await result.ReadAsJsonAsync<IncidentDetails>();
+        incident.Should().NotBeNull();
+        return incident!;
     }
 
     public static async Task<IncidentDetails> AcknowledgedIncident(
-        this ApiSpecification<Program> api
+        this IAlbaHost api
     )
     {
         var incident = await api.ResolvedIncident();
 
-        return await api.Scenario(
-            api.AcknowledgeIncident(incident.Id, incident.CustomerId),
-            _ => api.GetIncidentDetails(incident.Id)
-        ).GetResponseBody<IncidentDetails>();
+        await api.AcknowledgeIncident(incident.Id, incident.CustomerId, incident.Version);
+
+        var result = await api.GetIncidentDetails(incident.Id);
+        incident = await result.ReadAsJsonAsync<IncidentDetails>();
+        incident.Should().NotBeNull();
+        return incident!;
     }
 
-    private static Task<Result> LogIncident(
-        this ApiSpecification<Program> api,
+    private static Task<IScenarioResult> LogIncident(
+        this IAlbaHost api,
         Guid customerId,
         Contact contact,
         string incidentDescription
     ) =>
-        api.Given()
-            .When(POST, URI($"api/customers/{customerId}/incidents/"), BODY(new LogIncident(customerId, contact, incidentDescription)))
-            .Then(CREATED_WITH_DEFAULT_HEADERS(locationHeaderPrefix: "/api/incidents/"));
+        api.Scenario(x =>
+        {
+            x.Post.Url($"/api/customers/{customerId}/incidents/");
+            x.Post.Json(new LogIncident(customerId, contact, incidentDescription));
 
-    private static Task<Result> ResolveIncident<T>(
-        this ApiSpecification<T> api,
+            x.StatusCodeShouldBe(201);
+        });
+
+    private static Task<IScenarioResult> ResolveIncident(
+        this IAlbaHost api,
         Guid incidentId,
         Guid agentId,
-        ResolutionType resolutionType
-    ) where T : class =>
-        api.Given()
-            .When(
-                POST,
-                URI($"/api/agents/{agentId}/incidents/{incidentId}/resolve"),
-                BODY(new ResolveIncident(incidentId, agentId, resolutionType)),
-                HEADERS(IF_MATCH(1))
-            )
-            .Then(OK);
+        ResolutionType resolutionType,
+        int expectedVersion
+    ) =>
+        api.Scenario(x =>
+        {
+            x.Post.Url($"/api/agents/{agentId}/incidents/{incidentId}/resolve");
+            x.Post.Json(new ResolveIncident(incidentId, agentId, resolutionType, expectedVersion));
 
-    private static Task<Result> AcknowledgeIncident<T>(
-        this ApiSpecification<T> api,
+            x.StatusCodeShouldBeOk();
+        });
+
+    private static Task<IScenarioResult> AcknowledgeIncident(
+        this IAlbaHost api,
         Guid incidentId,
-        Guid customerId
-    ) where T : class =>
-        api.Given()
-            .When(
-                POST,
-                URI($"/api/customers/{customerId}/incidents/{incidentId}/acknowledge"),
-                BODY(new AcknowledgeResolution(incidentId)),
-                HEADERS(IF_MATCH(2))
-             )
-            .Then(OK);
+        Guid customerId,
+        int expectedVersion
+    ) =>
+        api.Scenario(x =>
+        {
+            x.Post.Url($"/api/customers/{customerId}/incidents/{incidentId}/acknowledge");
+            x.Post.Json(new AcknowledgeResolution(incidentId, customerId, expectedVersion));
 
-    private static Task<Result> GetIncidentDetails(
-        this ApiSpecification<Program> api,
+            x.StatusCodeShouldBeOk();
+        });
+
+    public static Task<IScenarioResult> GetIncidentDetails(
+        this IAlbaHost api,
         Guid incidentId
     ) =>
-        api.Given()
-            .When(GET, URI($"/api/incidents/{incidentId}"))
-            .Then(OK);
+        api.Scenario(x =>
+        {
+            x.Get.Url($"/api/incidents/{incidentId}");
+
+            x.StatusCodeShouldBeOk();
+        });
+
+    public static async Task<IScenarioResult> IncidentDetailsShouldBe(
+        this IAlbaHost api,
+        IncidentDetails incident
+    )
+    {
+        var result = await api.GetIncidentDetails(incident.Id);
+
+        var updated = await result.ReadAsJsonAsync<IncidentDetails>();
+        updated.Should().BeEquivalentTo(incident);
+
+        return result;
+    }
+
+    public static async Task<Guid> GetCreatedId(this IScenarioResult result)
+    {
+        var response = await result.ReadAsJsonAsync<CreationResponse>();
+        response.Should().NotBeNull();
+        response!.Url.Should().StartWith("/api/incidents/");
+
+        return response.GetCreatedId();
+    }
+
+    public static Guid GetCreatedId(this CreationResponse response)
+    {
+        response.Url.Should().StartWith("/api/incidents/");
+
+        var createdId = response.Url["/api/incidents/".Length..];
+
+        if (!Guid.TryParse(createdId, out var guid))
+        {
+            Assert.Fail("Wrong Created Id");
+        }
+
+        return guid;
+    }
 }

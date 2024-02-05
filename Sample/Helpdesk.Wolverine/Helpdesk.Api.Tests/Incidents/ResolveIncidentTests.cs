@@ -1,41 +1,27 @@
+using Alba;
 using Bogus;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.Resolving;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
 using Xunit;
-using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class ResolveIncidentTests(ApiWithLoggedIncident API):
-    IClassFixture<ApiWithLoggedIncident>
+public class ResolveIncidentTests(AppFixture fixture): ApiWithLoggedIncident(fixture)
 {
     [Fact]
     [Trait("Category", "Acceptance")]
     public async Task ResolveCommand_Succeeds()
     {
-        await API
-            .Given()
-            .When(
-                POST,
-                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/resolve"),
-                BODY(new ResolveIncident(API.Incident.Id, agentId, resolutionType)),
-                HEADERS(IF_MATCH(1))
-            )
-            .Then(OK);
+        await Host.Scenario(x =>
+        {
+            x.Post.Json(new ResolveIncident(Incident.Id, agentId, resolutionType, Incident.Version))
+                .ToUrl($"/api/agents/{agentId}/incidents/{Incident.Id}/resolve");
 
-        await API
-            .Given()
-            .When(
-                GET,
-                URI($"/api/incidents/{API.Incident.Id}")
-            )
-            .Then(
-                OK,
-                RESPONSE_BODY(
-                    API.Incident with { Status = IncidentStatus.Resolved, Version = 2 }
-                )
-            );
+            x.StatusCodeShouldBeOk();
+        });
+
+        await Host.IncidentDetailsShouldBe(Incident with { Status = IncidentStatus.Resolved, Version = 2 });
     }
 
     private readonly Guid agentId = Guid.NewGuid();
