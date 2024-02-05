@@ -17,7 +17,7 @@ public class AcknowledgeResolutionIncidentTests(ApiWithResolvedIncident API):
             .When(
                 POST,
                 URI($"/api/customers/{API.Incident.CustomerId}/incidents/{API.Incident.Id}/acknowledge"),
-                BODY(new AcknowledgeResolutionRequest(API.Incident.Id)),
+                BODY(new AcknowledgeResolution(API.Incident.Id)),
                 HEADERS(IF_MATCH(2))
             )
             .Then(OK)

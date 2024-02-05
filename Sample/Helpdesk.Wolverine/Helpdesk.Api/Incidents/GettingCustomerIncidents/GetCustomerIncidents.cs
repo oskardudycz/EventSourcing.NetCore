@@ -1,4 +1,3 @@
-using Helpdesk.Api.Incidents.GettingShortInfo;
 using Marten;
 using Marten.Pagination;
 using Microsoft.AspNetCore.Mvc;

@@ -10,11 +10,11 @@ public static class AssignAgentEndpoint
     [AggregateHandler]
     [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/assign")]
     public static (IResult, Events) AssignAgent(
-        AssignAgentToIncidentRequest toIncidentRequest,
+        AssignAgentToIncident toIncident,
         Incident incident,
         [FromRoute] Guid agentId,
         [FromRoute] Guid incidentId,
-        //TODO: [FromIfMatchHeader] string eTag,
+
         DateTimeOffset now)
     {
         if (incident.Status == IncidentStatus.Closed)
@@ -24,6 +24,6 @@ public static class AssignAgentEndpoint
     }
 }
 
-public record AssignAgentToIncidentRequest(
+public record AssignAgentToIncident(
     Guid IncidentId // TODO: meh
 );

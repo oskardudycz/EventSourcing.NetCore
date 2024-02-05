@@ -20,7 +20,7 @@ public class RecordAgentResponseToIncidentTests(ApiWithLoggedIncident api):
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{api.Incident.Id}/responses"),
-                BODY(new RecordAgentResponseToIncidentRequest(api.Incident.Id, content, visibleToCustomer)),
+                BODY(new RecordAgentResponseToIncident(api.Incident.Id, agentId, content, visibleToCustomer)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);

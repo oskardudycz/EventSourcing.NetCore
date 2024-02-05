@@ -18,7 +18,7 @@ public class AssignAgentToIncidentTests(ApiWithLoggedIncident API):
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/assign"),
                 HEADERS(IF_MATCH(1)),
-                BODY(new AssignAgentToIncidentRequest(API.Incident.Id))
+                BODY(new AssignAgentToIncident(API.Incident.Id))
             )
             .Then(OK)
             .And()

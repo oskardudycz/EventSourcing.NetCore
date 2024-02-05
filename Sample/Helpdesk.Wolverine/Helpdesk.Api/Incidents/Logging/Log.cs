@@ -8,12 +8,11 @@ public static class LogEndpoint
 {
     [WolverinePost("/api/customers/{customerId:guid}/incidents")]
     public static (CreationResponse, IStartStream) LogIncident(
-        Guid customerId,
-        LogIncidentRequest request,
+        LogIncident command,
         DateTimeOffset now
     )
     {
-        var (contact, description) = request;
+        var (customerId, contact, description) = command;
         var incidentId = CombGuidIdGeneration.NewGuid();
 
         var @event = new IncidentLogged(incidentId, customerId, contact, description, customerId, now);
@@ -25,7 +24,8 @@ public static class LogEndpoint
     }
 }
 
-public record LogIncidentRequest(
+public record LogIncident(
+    Guid CustomerId,
     Contact Contact,
     string Description
 );

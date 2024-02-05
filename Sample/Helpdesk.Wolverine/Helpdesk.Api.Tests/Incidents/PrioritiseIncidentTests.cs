@@ -19,7 +19,7 @@ public class PrioritiseIncidentTests(ApiWithLoggedIncident API):
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/priority"),
-                BODY(new PrioritiseIncidentRequest(API.Incident.Id, priority)),
+                BODY(new PrioritiseIncident(API.Incident.Id, agentId, priority)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);

@@ -19,7 +19,7 @@ public class RecordCustomerResponseToIncidentTests(ApiWithLoggedIncident API):
             .When(
                 POST,
                 URI($"/api/customers/{customerId}/incidents/{API.Incident.Id}/responses"),
-                BODY(new RecordCustomerResponseToIncidentRequest(API.Incident.Id, content)),
+                BODY(new RecordCustomerResponseToIncident(API.Incident.Id, customerId, content)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);

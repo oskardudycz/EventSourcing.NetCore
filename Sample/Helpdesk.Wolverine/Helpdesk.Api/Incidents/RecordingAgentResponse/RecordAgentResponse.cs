@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Wolverine.Http;
 using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
@@ -11,11 +10,8 @@ public static class RecordAgentResponseEndpoint
     [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/responses/")]
     public static (IResult, Events) RecordAgentResponse
     (
-        RecordAgentResponseToIncidentRequest request,
+        RecordAgentResponseToIncident command,
         Incident incident,
-        [FromRoute] Guid agentId,
-        [FromRoute] Guid incidentId,
-        //TODO: [FromIfMatchHeader] string eTag,
         DateTimeOffset now
     )
     {
@@ -23,15 +19,16 @@ public static class RecordAgentResponseEndpoint
             throw new InvalidOperationException("Incident is already closed");
 
         var response = new IncidentResponse.FromAgent(
-            agentId, request.Content, request.VisibleToCustomer
+            command.AgentId, command.Content, command.VisibleToCustomer
         );
 
-        return (Ok(), [new AgentRespondedToIncident(incidentId, response, now)]);
+        return (Ok(), [new AgentRespondedToIncident(incident.Id, response, now)]);
     }
 }
 
-public record RecordAgentResponseToIncidentRequest(
+public record RecordAgentResponseToIncident(
     Guid IncidentId,
+    Guid AgentId,
     string Content,
     bool VisibleToCustomer
 );

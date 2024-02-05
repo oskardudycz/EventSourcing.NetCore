@@ -11,11 +11,8 @@ public static class ResolveEndpoint
     [WolverinePost("/api/agents/{agentId:guid}/incidents/{incidentId:guid}/resolve")]
     public static (IResult, Events) Resolve
     (
-        ResolveIncidentRequest request,
+        ResolveIncident command,
         Incident incident,
-        [FromRoute] Guid agentId,
-        [FromRoute] Guid incidentId,
-        //TODO: [FromIfMatchHeader] string eTag,
         DateTimeOffset now
     )
     {
@@ -25,11 +22,14 @@ public static class ResolveEndpoint
         if (incident.HasOutstandingResponseToCustomer)
             throw new InvalidOperationException("Cannot resolve incident that has outstanding responses to customer");
 
-        return (Ok(), [new IncidentResolved(incidentId, request.Resolution, agentId, now)]);
+        var (_, agentId, resolution) = command;
+
+        return (Ok(), [new IncidentResolved(incident.Id, resolution, agentId, now)]);
     }
 }
 
-public record ResolveIncidentRequest(
+public record ResolveIncident(
     Guid IncidentId,
+    Guid AgentId,
     ResolutionType Resolution
 );

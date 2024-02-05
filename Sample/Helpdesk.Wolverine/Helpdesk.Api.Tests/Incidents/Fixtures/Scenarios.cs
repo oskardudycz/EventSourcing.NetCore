@@ -71,7 +71,7 @@ public static class Scenarios
         string incidentDescription
     ) =>
         api.Given()
-            .When(POST, URI($"api/customers/{customerId}/incidents/"), BODY(new LogIncidentRequest(contact, incidentDescription)))
+            .When(POST, URI($"api/customers/{customerId}/incidents/"), BODY(new LogIncident(customerId, contact, incidentDescription)))
             .Then(CREATED_WITH_DEFAULT_HEADERS(locationHeaderPrefix: "/api/incidents/"));
 
     private static Task<Result> ResolveIncident<T>(
@@ -84,7 +84,7 @@ public static class Scenarios
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{incidentId}/resolve"),
-                BODY(new ResolveIncidentRequest(incidentId, resolutionType)),
+                BODY(new ResolveIncident(incidentId, agentId, resolutionType)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
@@ -98,7 +98,7 @@ public static class Scenarios
             .When(
                 POST,
                 URI($"/api/customers/{customerId}/incidents/{incidentId}/acknowledge"),
-                BODY(new AcknowledgeResolutionRequest(incidentId)),
+                BODY(new AcknowledgeResolution(incidentId)),
                 HEADERS(IF_MATCH(2))
              )
             .Then(OK);

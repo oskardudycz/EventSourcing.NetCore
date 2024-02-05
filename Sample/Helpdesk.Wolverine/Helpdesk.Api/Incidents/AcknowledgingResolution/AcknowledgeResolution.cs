@@ -11,11 +11,11 @@ public static class AcknowledgeResolutionEndpoint
     [WolverinePost("/api/customers/{customerId:guid}/incidents/{incidentId:guid}/acknowledge")]
     public static (IResult, Events) AcknowledgeResolution
     (
-        AcknowledgeResolutionRequest request,
+        AcknowledgeResolution request,
         Incident incident,
         [FromRoute] Guid agentId,
         [FromRoute] Guid incidentId,
-        //TODO: [FromIfMatchHeader] string eTag,
+
         DateTimeOffset now
     )
     {
@@ -26,6 +26,6 @@ public static class AcknowledgeResolutionEndpoint
     }
 }
 
-public record AcknowledgeResolutionRequest(
+public record AcknowledgeResolution(
     Guid IncidentId // TODO: meh
 );

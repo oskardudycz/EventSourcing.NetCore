@@ -18,7 +18,7 @@ public class CloseIncidentTests(ApiWithAcknowledgedIncident API):
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/close"),
-                BODY(new CloseIncidentRequest(API.Incident.Id)),
+                BODY(new CloseIncident(API.Incident.Id)),
                 HEADERS(IF_MATCH(3))
             )
             .Then(OK);

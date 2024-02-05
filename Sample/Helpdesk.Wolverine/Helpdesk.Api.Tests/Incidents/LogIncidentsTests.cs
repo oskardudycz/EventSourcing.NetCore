@@ -18,7 +18,7 @@ public class LogIncidentsTests(ApiSpecification<Program> API):
             .When(
                 POST,
                 URI($"api/customers/{CustomerId}/incidents/"),
-                BODY(new LogIncidentRequest(Contact, IncidentDescription))
+                BODY(new LogIncident(CustomerId, Contact, IncidentDescription))
             )
             .Then(CREATED_WITH_DEFAULT_HEADERS(locationHeaderPrefix: "/api/incidents/"))
             .And()

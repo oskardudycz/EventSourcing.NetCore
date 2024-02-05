@@ -11,11 +11,11 @@ public static class CategoriseEndpoint
     [WolverinePost("api/agents/{agentId:guid}/incidents/{incidentId:guid}/category")]
     public static (IResult, Events) Categorise
     (
-        CategoriseIncidentRequest request,
+        CategoriseIncident request,
         Incident incident,
         [FromRoute] Guid agentId,
         [FromRoute] Guid incidentId,
-        //TODO: [FromIfMatchHeader] string eTag,
+
         DateTimeOffset now
     )
     {
@@ -26,7 +26,7 @@ public static class CategoriseEndpoint
     }
 }
 
-public record CategoriseIncidentRequest(
+public record CategoriseIncident(
     Guid IncidentId, // TODO: meh
     IncidentCategory Category
 );

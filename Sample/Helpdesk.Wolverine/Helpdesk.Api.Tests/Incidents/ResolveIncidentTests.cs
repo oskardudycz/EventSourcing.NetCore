@@ -19,7 +19,7 @@ public class ResolveIncidentTests(ApiWithLoggedIncident API):
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/resolve"),
-                BODY(new ResolveIncidentRequest(API.Incident.Id, resolutionType)),
+                BODY(new ResolveIncident(API.Incident.Id, agentId, resolutionType)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);

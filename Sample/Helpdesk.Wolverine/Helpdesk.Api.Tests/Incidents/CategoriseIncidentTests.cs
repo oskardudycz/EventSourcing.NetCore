@@ -19,7 +19,7 @@ public class CategoriseIncidentTests(ApiWithLoggedIncident API):
             .When(
                 POST,
                 URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/category"),
-                BODY(new CategoriseIncidentRequest(API.Incident.Id, category)),
+                BODY(new CategoriseIncident(API.Incident.Id, category)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
