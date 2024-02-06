@@ -15,8 +15,13 @@ public static class ResolveEndpoint
         DateTimeOffset now
     )
     {
-        if (incident.Status is IncidentStatus.Resolved or IncidentStatus.Closed)
-            throw new InvalidOperationException("Cannot resolve already resolved or closed incident");
+        switch (incident.Status)
+        {
+            case IncidentStatus.Resolved or IncidentStatus.ResolutionAcknowledgedByCustomer:
+                return (Ok(), []);
+            case IncidentStatus.Closed:
+                throw new InvalidOperationException("Cannot resolve already resolved or closed incident");
+        }
 
         if (incident.HasOutstandingResponseToCustomer)
             throw new InvalidOperationException("Cannot resolve incident that has outstanding responses to customer");
