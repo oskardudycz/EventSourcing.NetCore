@@ -431,6 +431,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reservations", "Sample\HotelManagement\Reservations\Reservations.csproj", "{92DC3F6A-BB06-4E33-A9C7-8262CC68F93C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpdesk.Wolverine", "Helpdesk.Wolverine", "{FF4C07DA-9E1F-4FC6-8772-AB82795A3951}"
+	ProjectSection(SolutionItems) = preProject
+		Sample\Helpdesk.Wolverine\docker-compose.yml = Sample\Helpdesk.Wolverine\docker-compose.yml
+		Sample\Helpdesk.Wolverine\README.md = Sample\Helpdesk.Wolverine\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Api", "Sample\Helpdesk.Wolverine\Helpdesk.Api\Helpdesk.Api.csproj", "{D2080C98-8F26-4727-9D49-B68915A4C715}"
 EndProject
