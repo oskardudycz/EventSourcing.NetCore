@@ -8,25 +8,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Marten.AspNetCore" Version="7.0.0-beta.5" />
-        <PackageReference Include="Marten" Version="7.0.0-beta.5" />
-        <PackageReference Include="Confluent.Kafka" Version="2.3.0" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
-        <PackageReference Include="WolverineFx.Marten" Version="2.0.0-alpha.1" />
-        <PackageReference Include="WolverineFx.Http" Version="2.0.0-alpha.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
+        <PackageReference Include="Marten.AspNetCore" Version="7.0.0-beta.5"/>
+        <PackageReference Include="Marten" Version="7.0.0-beta.5"/>
+        <PackageReference Include="Confluent.Kafka" Version="2.3.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0"/>
+        <PackageReference Include="WolverineFx.Marten" Version="2.0.0-alpha.1"/>
+        <PackageReference Include="WolverineFx.Http" Version="2.0.0-alpha.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Internal\Generated\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\Core.WebApi\Core.WebApi.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\Core.WebApi\Core.WebApi.csproj" />
+        <Folder Include="Internal\Generated\"/>
     </ItemGroup>
 </Project>

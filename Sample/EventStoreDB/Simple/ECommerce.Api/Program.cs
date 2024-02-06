@@ -20,6 +20,13 @@ builder.Services
         c.OperationFilter<MetadataOperationFilter>();
     })
     .AddCoreServices(builder.Configuration)
+    .AddDefaultExceptionHandler(
+        (exception, _) => exception switch
+        {
+            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
+            WrongExpectedVersionException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            _ => null
+        })
     .AddEventStoreDBSubscriptionToAll()
     .AddECommerceModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
@@ -32,13 +39,7 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware(
-        (exception, _) => exception switch
-        {
-            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
-            WrongExpectedVersionException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-            _ => null
-        })
+app.UseExceptionHandler()
     .UseOptimisticConcurrencyMiddleware()
     .UseHttpsRedirection()
     .UseRouting()

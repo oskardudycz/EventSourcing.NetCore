@@ -1,6 +1,7 @@
 ﻿using Core;
 using Core.ElasticSearch;
 using Core.EventStoreDB;
+using Core.WebApi.Middlewares.ExceptionHandling;
 using Microsoft.OpenApi.Models;
 
 namespace MarketBasketAnalytics.Api
@@ -23,6 +24,7 @@ namespace MarketBasketAnalytics.Api
                 {
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ECommerce.Api", Version = "v1" });
                 })
+                .AddDefaultExceptionHandler()
                 .AddEventStoreDB(Configuration)
                 .AddElasticsearch(Configuration)
                 .AddCoreServices()
@@ -37,7 +39,8 @@ namespace MarketBasketAnalytics.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSwagger()
+            app.UseExceptionHandler()
+                .UseSwagger()
                 .UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce.Api v1"))
                 // .UseMiddleware(typeof(ExceptionHandlingMiddleware))
                 .UseHttpsRedirection()

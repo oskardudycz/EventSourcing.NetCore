@@ -1,4 +1,5 @@
-﻿using Ogooreck.API;
+﻿using System.Net;
+using Ogooreck.API;
 using static Ogooreck.API.ApiSpecification;
 using Warehouse.Products.RegisteringProduct;
 using Xunit;
@@ -56,7 +57,7 @@ public class RegisterProductTests: IClassFixture<WarehouseTestWebApplicationFact
                 URI("/api/products/"),
                 BODY(request)
             )
-            .Then(CONFLICT);
+            .Then(HTTP_STATUS(HttpStatusCode.Forbidden));
     }
 
     private const string ValidName = "VALID_NAME";

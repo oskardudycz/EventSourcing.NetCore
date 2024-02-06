@@ -17,18 +17,19 @@ builder.Services
         c.OperationFilter<MetadataOperationFilter>();
     })
     .AddCoreServices()
-    .AddTemperaturesModule(builder.Configuration)
-    .AddOptimisticConcurrencyMiddleware();
-
-var app = builder.Build();
-
-app.UseExceptionHandlingMiddleware(
+    .AddDefaultExceptionHandler(
         (exception, _) => exception switch
         {
             AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
             ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
             _ => null,
         })
+    .AddTemperaturesModule(builder.Configuration)
+    .AddOptimisticConcurrencyMiddleware();
+
+var app = builder.Build();
+
+app.UseExceptionHandler()
     .UseOptimisticConcurrencyMiddleware()
     .UseRouting()
     .UseAuthorization()

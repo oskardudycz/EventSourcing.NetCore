@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
-using Core.WebApi.Middlewares.ExceptionHandling;
 using Helpdesk.Api;
+using Helpdesk.Api.Core.Http.Middlewares.ExceptionHandling;
 using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.SignalR;
 using Helpdesk.Api.Incidents;
@@ -26,6 +26,12 @@ using Wolverine.Marten;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
+    .AddDefaultExceptionHandler(
+        (exception, _) => exception switch
+        {
+            ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            _ => null
+        })
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddMarten(sp =>
@@ -95,13 +101,9 @@ if (app.Environment.IsDevelopment())
         .UseSwaggerUI();
 }
 
-app.UseExceptionHandlingMiddleware(
-    (exception, _) => exception switch
-    {
-        ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-        _ => null
-    });
-app.UseCors("ClientPermission");
+app.UseExceptionHandler()
+    .UseCors("ClientPermission");
+
 app.MapHub<IncidentsHub>("/hubs/incidents");
 
 // Let's add in Wolverine HTTP endpoints to the routing tree

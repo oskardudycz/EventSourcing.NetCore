@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Core.WebApi\Core.WebApi.csproj" />
         <ProjectReference Include="..\MarketBasketAnalytics\MarketBasketAnalytics.csproj" />
     </ItemGroup>
 

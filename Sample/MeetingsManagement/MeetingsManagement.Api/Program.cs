@@ -22,6 +22,13 @@ builder.Services
     .AddKafkaProducerAndConsumer()
     .AddCoreServices()
     .AddMeetingsManagement(builder.Configuration)
+    .AddDefaultExceptionHandler(
+        (exception, _) => exception switch
+        {
+            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
+            ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            _ => null
+        })
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("MeetingsManagement", OpenTelemetryOptions.Build(options =>
         options.Configure(t =>
@@ -32,13 +39,7 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware(
-        (exception, _) => exception switch
-        {
-            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
-            ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-            _ => null
-        })
+app.UseExceptionHandler()
     .UseOptimisticConcurrencyMiddleware()
     .UseRouting()
     .UseAuthorization()

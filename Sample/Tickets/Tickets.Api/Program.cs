@@ -21,6 +21,13 @@ builder.Services
         c.OperationFilter<MetadataOperationFilter>();
     })
     .AddCoreServices()
+    .AddDefaultExceptionHandler(
+        (exception, _) => exception switch
+        {
+            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
+            ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            _ => null
+        })
     .AddTicketsModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Tickets", OpenTelemetryOptions.Build(options =>
@@ -34,13 +41,7 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware(
-        (exception, _) => exception switch
-        {
-            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
-            ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-            _ => null
-        })
+app.UseExceptionHandler()
     .UseOptimisticConcurrencyMiddleware()
     .UseRouting()
     .UseAuthorization()
