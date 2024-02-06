@@ -106,7 +106,7 @@ public abstract class IntegrationContext(AppFixture fixture): IAsyncLifetime
     // for message tracking to both record outgoing messages and to ensure
     // that any cascaded work spawned by the initial command is completed
     // before passing control back to the calling test
-    protected async Task<(ITrackedSession, IScenarioResult)> TrackedHttpCall(Action<Scenario> configuration)
+    protected async Task<(ITrackedSession, IScenarioResult)> TrackedHttpCall(Action<Scenario> configuration, int timeout = 5000)
     {
         IScenarioResult? result = null;
 
@@ -117,7 +117,7 @@ public abstract class IntegrationContext(AppFixture fixture): IAsyncLifetime
             // The inner part here is actually making an HTTP request
             // to the system under test with Alba
             result = await Host.Scenario(configuration);
-        });
+        }, timeout);
 
         result.Should().NotBeNull();
 

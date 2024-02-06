@@ -143,14 +143,15 @@ public static class Scenarios
         response.Should().NotBeNull();
         response!.Url.Should().StartWith("/api/incidents/");
 
-        return response.GetCreatedId();
+        return response.GetCreatedId("/api/incidents/");
     }
 
-    public static Guid GetCreatedId(this CreationResponse response)
+    public static Guid GetCreatedId(this CreationResponse response, string urlPrefix)
     {
-        response.Url.Should().StartWith("/api/incidents/");
+        response.Url.Should().StartWith(urlPrefix);
 
-        var createdId = response.Url["/api/incidents/".Length..];
+        var uri = new Uri(response.Url.Split("?")[0]);
+        var createdId = uri.Segments.Last();
 
         if (!Guid.TryParse(createdId, out var guid))
         {

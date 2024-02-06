@@ -30,7 +30,7 @@ public class LogIncidentsTests(AppFixture fixture): IntegrationContext(fixture)
 
         await Host.IncidentDetailsShouldBe(
             new IncidentDetails(
-                response.GetCreatedId(),
+                response.GetCreatedId("/api/incidents/"),
                 CustomerId,
                 IncidentStatus.Pending,
                 [],

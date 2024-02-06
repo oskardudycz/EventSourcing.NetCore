@@ -52,17 +52,13 @@ builder.Services
             casing: Casing.CamelCase
         );
 
-        options.Projections.LiveStreamAggregation<Incident>();
-        options.Projections.LiveStreamAggregation<IncidentsBatchResolution>();
-        options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
-        options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
-        options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
-        options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
         options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
         options.Projections.Add(
             new SignalRProducer((IHubContext)sp.GetRequiredService<IHubContext<IncidentsHub>>()),
             ProjectionLifecycle.Async
         );
+
+        options.ConfigureIncidents();
 
         return options;
     })
@@ -70,7 +66,10 @@ builder.Services
     .UseLightweightSessions()
     .AddAsyncDaemon(DaemonMode.Solo)
     // Add Marten/PostgreSQL integration with Wolverine's outbox
-    .IntegrateWithWolverine();
+    .IntegrateWithWolverine()
+    // I also added this to opt into events being forward to
+    // the Wolverine outbox during SaveChangesAsync()
+    .EventForwardingToWolverine();
 
 builder.Services.AddResourceSetupOnStartup();
 
@@ -92,6 +91,7 @@ builder.Host.ApplyOaktonExtensions();
 // Configure Wolverine
 builder.Host.UseWolverine(opts =>
 {
+    opts.ConfigureIncidents();
     opts.Policies.AutoApplyTransactions();
 });
 

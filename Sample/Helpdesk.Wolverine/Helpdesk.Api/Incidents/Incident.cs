@@ -45,7 +45,8 @@ public record IncidentResolved(
     Guid IncidentId,
     ResolutionType Resolution,
     Guid ResolvedBy,
-    DateTimeOffset ResolvedAt
+    DateTimeOffset ResolvedAt,
+    Guid IncidentsBatchResolutionId
 );
 
 public record IncidentUnresolved(
