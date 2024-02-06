@@ -5,13 +5,14 @@ namespace Helpdesk.Api.Incidents.ResolutionBatch;
 public record IncidentsBatchResolution(
     Guid Id,
     ImmutableDictionary<Guid, ResolutionStatus> Incidents,
-    ResolutionStatus Status
+    ResolutionStatus Status,
+    int Version = 0
 )
 {
-    public static IncidentsBatchResolution Create(IncidentsBatchResolutionInitiated initiated) =>
+    public static IncidentsBatchResolution Create(IncidentsBatchResolutionResolutionInitiated resolutionInitiated) =>
         new(
-            initiated.BatchId,
-            initiated.Incidents.ToImmutableDictionary(ks => ks, vs => ResolutionStatus.Pending),
+            resolutionInitiated.BatchId,
+            resolutionInitiated.Incidents.ToImmutableDictionary(ks => ks, vs => ResolutionStatus.Pending),
             ResolutionStatus.Pending
         );
 
@@ -21,13 +22,13 @@ public record IncidentsBatchResolution(
     public IncidentsBatchResolution Apply(IncidentResolutionFailureRecorded resolutionFailed) =>
         this with { Incidents = Incidents.SetItem(resolutionFailed.IncidentId, ResolutionStatus.Failed) };
 
-    public IncidentsBatchResolution Apply(IncidentsBatchResolutionCompleted completed) =>
+    public IncidentsBatchResolution Apply(IncidentsBatchResolutionResolutionCompleted resolutionCompleted) =>
         this with { Status = ResolutionStatus.Resolved };
 
-    public IncidentsBatchResolution Apply(IncidentsBatchResolutionFailed failed) =>
+    public IncidentsBatchResolution Apply(IncidentsBatchResolutionResolutionFailed resolutionFailed) =>
         this with { Status = ResolutionStatus.Failed };
 
-    public IncidentsBatchResolution Apply(IncidentsBatchResolutionTimedOut timedOut) =>
+    public IncidentsBatchResolution Apply(IncidentsBatchResolutionResolutionTimedOut resolutionTimedOut) =>
         this with { Status = ResolutionStatus.Failed };
 }
 
@@ -38,39 +39,41 @@ public enum ResolutionStatus
     Failed
 }
 
-public record IncidentsBatchResolutionInitiated(
+public interface IncidentsBatchResolutionEvent;
+
+public record IncidentsBatchResolutionResolutionInitiated(
     Guid BatchId,
     List<Guid> Incidents,
     Guid InitiatedBy,
     DateTimeOffset InitiatedAt
-);
+): IncidentsBatchResolutionEvent;
 
 public record IncidentResolutionRecorded(
     Guid IncidentId,
     Guid BatchId,
     DateTimeOffset ResolvedAt
-);
+): IncidentsBatchResolutionEvent;
 
 public record IncidentResolutionFailureRecorded(
     Guid IncidentId,
     Guid BatchId,
     DateTimeOffset FailedAt
-);
+): IncidentsBatchResolutionEvent;
 
-public record IncidentsBatchResolutionCompleted(
+public record IncidentsBatchResolutionResolutionCompleted(
     Guid BatchId,
-    List<Guid> Incidents,
+    IReadOnlyList<Guid> Incidents,
     DateTimeOffset CompletedAt
-);
+): IncidentsBatchResolutionEvent;
 
-public record IncidentsBatchResolutionFailed(
+public record IncidentsBatchResolutionResolutionFailed(
     Guid BatchId,
-    Dictionary<Guid, ResolutionStatus> Incidents,
+    ImmutableDictionary<Guid, ResolutionStatus> Incidents,
     DateTimeOffset FailedAt
-);
+): IncidentsBatchResolutionEvent;
 
-public record IncidentsBatchResolutionTimedOut(
+public record IncidentsBatchResolutionResolutionTimedOut(
     Guid BatchId,
-    Dictionary<Guid, ResolutionStatus> Incidents,
+    ImmutableDictionary<Guid, ResolutionStatus> Incidents,
     DateTimeOffset TimedOutAt
-);
+): IncidentsBatchResolutionEvent;

@@ -82,7 +82,7 @@ public class IncidentHistoryTransformation: EventProjection
 
     public IncidentHistory Transform(IEvent<IncidentResolved> input)
     {
-        var (incidentId, resolution, resolvedBy, resolvedAt) = input.Data;
+        var (incidentId, resolution, resolvedBy, resolvedAt, _) = input.Data;
 
         return new IncidentHistory(
             CombGuidIdGeneration.NewGuid(),
