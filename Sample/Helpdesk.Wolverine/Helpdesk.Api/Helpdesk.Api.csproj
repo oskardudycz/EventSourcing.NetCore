@@ -19,7 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Incidents\ResolvingBatch\" />
         <Folder Include="Internal\Generated\"/>
     </ItemGroup>
 </Project>
