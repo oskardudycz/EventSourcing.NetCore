@@ -20,6 +20,14 @@ builder.Services
     })
     .AddKafkaProducer()
     .AddCoreServices()
+    .AddDefaultExceptionHandler(
+        (exception, _) => exception switch
+        {
+            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
+            // TODO: Add here EF concurrency exception
+            // ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            _ => null
+        })
     .AddShipmentsModule(builder.Configuration)
     .AddOpenTelemetry("Shipments", OpenTelemetryOptions.Build(options =>
         options.Configure(t =>
@@ -33,14 +41,7 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware(
-        (exception, _) => exception switch
-        {
-            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
-            // TODO: Add here EF concurrency exception
-            // ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-            _ => null
-        })
+app.UseExceptionHandler()
     // TODO: Add optimistic concurrency here
     // .UseOptimisticConcurrencyMiddleware()
     .UseRouting()

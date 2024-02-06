@@ -10,6 +10,7 @@ using Warehouse.Api.Storage;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
+    .AddDefaultExceptionHandler()
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddDbContext<WarehouseDBContext>(
@@ -18,7 +19,7 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware();
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {

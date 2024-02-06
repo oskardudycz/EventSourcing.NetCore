@@ -17,6 +17,7 @@ builder.Services
     })
     .AddKafkaConsumer()
     .AddCoreServices()
+    .AddDefaultExceptionHandler()
     .AddMeetingsSearch(builder.Configuration)
     .AddOpenTelemetry("MeetingsSearch", OpenTelemetryOptions.Build(options =>
         options.Configure(t =>
@@ -27,7 +28,7 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware()
+app.UseExceptionHandler()
     .UseRouting()
     .UseAuthorization()
     .UseEndpoints(endpoints =>

@@ -22,6 +22,13 @@ builder.Services
     })
     .AddKafkaProducerAndConsumer()
     .AddCoreServices()
+    .AddDefaultExceptionHandler(
+        (exception, _) => exception switch
+        {
+            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
+            ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            _ => null
+        })
     .AddOrdersModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Orders", OpenTelemetryOptions.Build(options =>
@@ -34,13 +41,7 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware(
-        (exception, _) => exception switch
-        {
-            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
-            ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-            _ => null
-        })
+app.UseExceptionHandler()
     .UseOptimisticConcurrencyMiddleware()
     .UseRouting()
     .UseAuthorization()

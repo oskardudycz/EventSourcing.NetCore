@@ -7,11 +7,12 @@ builder.Services
     .AddRouting()
     .AddWarehouseServices()
     .AddEndpointsApiExplorer()
-    .AddSwaggerGen();
+    .AddSwaggerGen()
+    .AddDefaultExceptionHandler();
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware()
+app.UseExceptionHandler()
     .UseRouting()
     .UseEndpoints(endpoints =>
     {
