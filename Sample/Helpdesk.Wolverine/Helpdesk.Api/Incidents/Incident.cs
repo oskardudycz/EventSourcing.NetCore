@@ -48,6 +48,13 @@ public record IncidentResolved(
     DateTimeOffset ResolvedAt
 );
 
+public record IncidentUnresolved(
+    Guid IncidentId,
+    string Reason,
+    Guid UnresolvedBy,
+    DateTimeOffset UnresolvedAt
+);
+
 public record ResolutionAcknowledgedByCustomer(
     Guid IncidentId,
     Guid AcknowledgedBy,
@@ -85,6 +92,9 @@ public record Incident(
 
     public Incident Apply(IncidentResolved resolved) =>
         this with { Status = IncidentStatus.Resolved };
+
+    public Incident Apply(IncidentUnresolved unresolved) =>
+        this with { Status = IncidentStatus.Pending };
 
     public Incident Apply(ResolutionAcknowledgedByCustomer acknowledged) =>
         this with { Status = IncidentStatus.ResolutionAcknowledgedByCustomer };

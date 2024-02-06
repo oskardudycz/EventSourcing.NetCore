@@ -31,6 +31,9 @@ public class IncidentShortInfoProjection: SingleStreamProjection<IncidentShortIn
     public IncidentShortInfo Apply(IncidentResolved resolved, IncidentShortInfo current) =>
         current with { Status = IncidentStatus.Resolved };
 
+    public IncidentShortInfo Apply(IncidentUnresolved unresolved, IncidentShortInfo current) =>
+        current with { Status = IncidentStatus.Pending, NotesCount = current.NotesCount + 1 };
+
     public IncidentShortInfo Apply(ResolutionAcknowledgedByCustomer acknowledged, IncidentShortInfo current) =>
         current with { Status = IncidentStatus.ResolutionAcknowledgedByCustomer };
 
