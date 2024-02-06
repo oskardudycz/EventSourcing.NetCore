@@ -23,6 +23,7 @@ public static class IncidentsBatchResolutionHandler
         commands.AddRange(incidents.Select(incidentId =>
             new ResolveIncidentFromBatch(incidentId, agentId, resolutionType, batchId))
         );
+        commands.Add(new TimeoutIncidentsBatchResolution(batchId).DelayedFor(1.Minutes()));
 
         return (
             new CreationResponse($"/api/incidents/resolution/{batchId}?version=1"),
@@ -43,12 +44,22 @@ public static class IncidentsBatchResolutionHandler
             ? Handle(batch, @event.IncidentId, ResolutionStatus.Failed, now)
             : [];
 
+    [AggregateHandler]
+    public static Events Handle(TimeoutIncidentsBatchResolution command, IncidentsBatchResolution batch,
+        DateTimeOffset now) =>
+        batch.Status != ResolutionStatus.Pending
+            ? [new IncidentsBatchResolutionResolutionTimedOut(command.IncidentsBatchResolutionId, batch.Incidents, now)]
+            : [];
+
     private static Events Handle(
         IncidentsBatchResolution batch,
         Guid incidentId,
         ResolutionStatus status,
         DateTimeOffset now)
     {
+        if (batch.Status != ResolutionStatus.Pending || batch.Incidents[incidentId] != ResolutionStatus.Pending)
+            return [];
+
         object recorded = status == ResolutionStatus.Resolved
             ? new IncidentResolutionRecorded(incidentId, batch.Id, now)
             : new IncidentResolutionFailureRecorded(incidentId, batch.Id, now);
@@ -76,4 +87,8 @@ public record InitiateIncidentsBatchResolution(
     List<Guid> Incidents,
     Guid AgentId,
     ResolutionType ResolutionType
+);
+
+public record TimeoutIncidentsBatchResolution(
+    Guid IncidentsBatchResolutionId
 );
