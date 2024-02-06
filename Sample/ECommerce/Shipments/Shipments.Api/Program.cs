@@ -28,18 +28,19 @@ builder.Services
         ).DisableConsoleExporter(true)
     ))
     .AddControllers();
-    // TODO: Add optimistic concurrency here
-    // .AddOptimisticConcurrencyMiddleware();
+// TODO: Add optimistic concurrency here
+// .AddOptimisticConcurrencyMiddleware();
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware(exception => exception switch
-    {
-        AggregateNotFoundException _ => HttpStatusCode.NotFound,
-        // TODO: Add here EF concurrency exception
-        // ConcurrencyException => HttpStatusCode.PreconditionFailed,
-        _ => HttpStatusCode.InternalServerError
-    })
+app.UseExceptionHandlingMiddleware(
+        (exception, _) => exception switch
+        {
+            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
+            // TODO: Add here EF concurrency exception
+            // ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            _ => null
+        })
     // TODO: Add optimistic concurrency here
     // .UseOptimisticConcurrencyMiddleware()
     .UseRouting()

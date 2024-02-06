@@ -1,76 +1,67 @@
-using System.Net;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.WebApi.Middlewares.ExceptionHandling;
 
-public class ExceptionHandlingMiddleware
-{
-    private readonly RequestDelegate next;
-
-    private readonly ILogger logger;
-
-    public ExceptionHandlingMiddleware(
-        RequestDelegate next,
-        ILoggerFactory loggerFactory
-    )
-    {
-        this.next = next;
-        logger = loggerFactory.CreateLogger<ExceptionHandlingMiddleware>();
-    }
-
-    public async Task Invoke(HttpContext context /* other scoped dependencies */)
-    {
-        try
-        {
-            await next(context).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            await HandleExceptionAsync(context, ex).ConfigureAwait(false);
-        }
-    }
-
-    private Task HandleExceptionAsync(HttpContext context, Exception exception)
-    {
-        logger.LogError(exception, exception.Message);
-        Console.WriteLine("ERROR:" + exception.Message + exception.StackTrace);
-
-        if(exception.InnerException != null)
-            Console.WriteLine("INNER DETAILS:" + exception.InnerException.Message + exception.InnerException.StackTrace);
-
-        var codeInfo = ExceptionToHttpStatusMapper.Map(exception);
-
-        var result = JsonConvert.SerializeObject(new HttpExceptionWrapper((int)codeInfo.Code, codeInfo.Message));
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)codeInfo.Code;
-        return context.Response.WriteAsync(result);
-    }
-}
-
-public class HttpExceptionWrapper
-{
-    public int StatusCode { get; }
-
-    public string Error { get; }
-
-    public HttpExceptionWrapper(int statusCode, string error)
-    {
-        StatusCode = statusCode;
-        Error = error;
-    }
-}
-
-public static class ExceptionHandlingMiddlewareExtensions
+public static class ExceptionHandlingMiddleware
 {
     public static IApplicationBuilder UseExceptionHandlingMiddleware(
         this IApplicationBuilder app,
-        Func<Exception, HttpStatusCode>? customMap = null
-    )
+        Func<Exception, HttpContext, ProblemDetails?>? customExceptionMap = null
+    ) =>
+        app.UseExceptionHandler(exceptionHandlerApp =>
+        {
+            exceptionHandlerApp.Run(async context =>
+            {
+                context.Response.ContentType = "application/problem+json";
+
+                if (context.RequestServices.GetService<IProblemDetailsService>() is not { } problemDetailsService)
+                    return;
+
+                var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+                var exception = exceptionHandlerFeature?.Error;
+
+                if (exception is null)
+                    return;
+                
+                var details = customExceptionMap?.Invoke(exception, context) ??
+                              MapExceptionUsingDefaults(exception);
+
+                var problem = new ProblemDetailsContext { HttpContext = context, ProblemDetails = details };
+
+                problem.ProblemDetails.Extensions.Add("exception", exceptionHandlerFeature?.Error.ToString());
+
+                await problemDetailsService.WriteAsync(problem).ConfigureAwait(false);
+            });
+        });
+
+    private static ProblemDetails MapExceptionUsingDefaults(Exception exception)
     {
-        ExceptionToHttpStatusMapper.CustomMap = customMap;
-        return app.UseMiddleware<ExceptionHandlingMiddleware>();
+        var statusCode = exception switch
+        {
+            ArgumentException _ => StatusCodes.Status400BadRequest,
+            ValidationException _ => StatusCodes.Status400BadRequest,
+            UnauthorizedAccessException _ => StatusCodes.Status401Unauthorized,
+            InvalidOperationException _ => StatusCodes.Status403Forbidden,
+            NotImplementedException _ => StatusCodes.Status501NotImplemented,
+            _ => StatusCodes.Status500InternalServerError
+        };
+
+        return exception.MapToProblemDetails(statusCode);
     }
+}
+
+public static class ProblemDetailsExtensions
+{
+    public static ProblemDetails MapToProblemDetails(
+        this Exception exception,
+        int statusCode,
+        string? title = null,
+        string? detail = null
+    ) =>
+        new() { Title = title ?? exception.GetType().Name, Detail = detail ?? exception.Message, Status = statusCode };
 }

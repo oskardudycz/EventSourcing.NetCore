@@ -32,12 +32,13 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandlingMiddleware(exception => exception switch
-    {
-        AggregateNotFoundException _ => HttpStatusCode.NotFound,
-        WrongExpectedVersionException => HttpStatusCode.PreconditionFailed,
-        _ => HttpStatusCode.InternalServerError
-    })
+app.UseExceptionHandlingMiddleware(
+        (exception, _) => exception switch
+        {
+            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
+            WrongExpectedVersionException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            _ => null
+        })
     .UseOptimisticConcurrencyMiddleware()
     .UseHttpsRedirection()
     .UseRouting()
