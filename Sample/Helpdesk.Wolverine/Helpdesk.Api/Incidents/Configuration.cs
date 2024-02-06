@@ -40,6 +40,8 @@ public static class Configuration
 
             rule.MessagesImplementing<IncidentsBatchResolutionEvent>();
 
+            rule.Message<TimeoutIncidentsBatchResolution>();
+
             rule
                 .ToLocalQueue("incidents_batch_resolution")
                 .UseDurableInbox();
