@@ -1,3 +1,4 @@
+using Wolverine;
 using Wolverine.Http;
 using Wolverine.Marten;
 using static Microsoft.AspNetCore.Http.TypedResults;
@@ -28,6 +29,34 @@ public static class ResolveEndpoint
 
         return (Ok(), [new IncidentResolved(incident.Id, command.Resolution, command.AgentId, now)]);
     }
+
+    [AggregateHandler]
+    public static (Events, OutgoingMessages) ResolveFromBatch
+    (
+        ResolveIncidentFromBatch command,
+        Incident incident,
+        DateTimeOffset now
+    )
+    {
+        if (incident.Status is IncidentStatus.Resolved
+            or IncidentStatus.ResolutionAcknowledgedByCustomer
+            or IncidentStatus.Closed
+           )
+            return ([],
+            [
+                new IncidentResolutionFailed(incident.Id, command.BatchId,
+                    IncidentResolutionFailed.Reason.AlreadyResolved)
+            ]);
+
+        if (incident.HasOutstandingResponseToCustomer)
+            return ([],
+            [
+                new IncidentResolutionFailed(incident.Id, command.BatchId,
+                    IncidentResolutionFailed.Reason.HasOutstandingResponseToCustomer)
+            ]);
+
+        return ([new IncidentResolved(incident.Id, command.Resolution, command.AgentId, now)], []);
+    }
 }
 
 public record ResolveIncident(
@@ -36,3 +65,23 @@ public record ResolveIncident(
     ResolutionType Resolution,
     int Version
 );
+
+public record ResolveIncidentFromBatch(
+    Guid IncidentId,
+    Guid AgentId,
+    ResolutionType Resolution,
+    Guid BatchId
+);
+
+public record IncidentResolutionFailed(
+    Guid IncidentId,
+    Guid BatchId,
+    IncidentResolutionFailed.Reason FailureReason
+)
+{
+    public enum Reason
+    {
+        AlreadyResolved,
+        HasOutstandingResponseToCustomer
+    }
+}

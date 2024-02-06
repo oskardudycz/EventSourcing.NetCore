@@ -8,6 +8,7 @@ using Helpdesk.Api.Incidents.GettingCustomerIncidents;
 using Helpdesk.Api.Incidents.GettingCustomerIncidentsSummary;
 using Helpdesk.Api.Incidents.GettingDetails;
 using Helpdesk.Api.Incidents.GettingHistory;
+using Helpdesk.Api.Incidents.ResolutionBatch;
 using JasperFx.CodeGeneration;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
@@ -52,6 +53,7 @@ builder.Services
         );
 
         options.Projections.LiveStreamAggregation<Incident>();
+        options.Projections.LiveStreamAggregation<IncidentsBatchResolution>();
         options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
         options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
