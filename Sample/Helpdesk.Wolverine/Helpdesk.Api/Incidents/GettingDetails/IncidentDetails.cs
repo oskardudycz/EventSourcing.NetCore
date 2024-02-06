@@ -73,6 +73,22 @@ public class IncidentDetailsProjection: SingleStreamProjection<IncidentDetails>
     public IncidentDetails Apply(IncidentResolved resolved, IncidentDetails current) =>
         current with { Status = IncidentStatus.Resolved };
 
+    public IncidentDetails Apply(IncidentUnresolved unresolved, IncidentDetails current) =>
+        current with
+        {
+            Status = IncidentStatus.Pending,
+            Notes = current.Notes.Union(
+                new[]
+                {
+                    new IncidentNote(
+                        IncidentNoteType.FromCustomer,
+                        unresolved.UnresolvedBy,
+                        unresolved.Reason,
+                        true
+                    )
+                }).ToArray()
+        };
+
     public IncidentDetails Apply(ResolutionAcknowledgedByCustomer acknowledged, IncidentDetails current) =>
         current with { Status = IncidentStatus.ResolutionAcknowledgedByCustomer };
 

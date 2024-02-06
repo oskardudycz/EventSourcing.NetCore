@@ -91,6 +91,17 @@ public class IncidentHistoryTransformation: EventProjection
         );
     }
 
+    public IncidentHistory Transform(IEvent<IncidentUnresolved> input)
+    {
+        var (incidentId, reason, unresolvedBy, resolvedAt) = input.Data;
+
+        return new IncidentHistory(
+            CombGuidIdGeneration.NewGuid(),
+            incidentId,
+            $"[{resolvedAt}] Unresolved Incident with id: '{incidentId}' with reason `{reason} by '{unresolvedBy}'"
+        );
+    }
+
     public IncidentHistory Transform(IEvent<ResolutionAcknowledgedByCustomer> input)
     {
         var (incidentId, acknowledgedBy, acknowledgedAt) = input.Data;
