@@ -1080,6 +1080,7 @@ See more in:
 -   🎞 [Chris Condron - Process Managers Made Simple](https://www.youtube.com/watch?v=8dRwF_MbEMs)
 -   🎞 [Martin Schimak - Know the Flow! Events, Commands & Long-Running Services](https://www.youtube.com/watch?v=uSF5hyfez60)
 -   📝 [Martin Schimak - Aggregates and Sagas are Processes](https://medium.com/plexiti/aggregates-and-sagas-are-process-owners-e8c8ba973da7)
+-   📝 [Martin Schimak - Tackling Complex Event Flows](https://www.youtube.com/watch?v=_pJGwvVRwpg)
 -   📝 [Jean-Philippe Dutrève - Messaging Patterns : Flow, SAGA, Messaging Gateway and Observability With RabbitMQ Exchange to Exchange Bindings](https://jdutreve.medium.com/a-java-implementation-of-integrated-microservices-aka-the-ambassador-architecture-3999fa313318)
 -   🎞 [Udi Dahan - If (domain logic) then CQRS or Saga?](https://www.youtube.com/watch?v=fWU8ZK0Dmxs&app=desktop)
 -   🎞 [Gregor Hohpe - Starbucks Does Not Use Two-Phase Commit](https://www.enterpriseintegrationpatterns.com/ramblings/18_starbucks.html)
