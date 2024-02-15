@@ -15,9 +15,9 @@ public static class LastCashierShiftLocator
         if (tracker is null)
             throw new InvalidOperationException("Unknown cash register!");
 
-        var lastClosedShiftEvent = tracker.LastShiftClosedEventId.HasValue
+        var lastClosedShiftEvent = tracker.LastShiftClosedSequence.HasValue
             ? (await documentSession.Events.QueryAllRawEvents()
-                .SingleAsync(e => e.Id == tracker.LastShiftClosedEventId.Value)).Data
+                .SingleAsync(e => e.Sequence == tracker.LastShiftClosedSequence.Value)).Data
             : null;
 
         return lastClosedShiftEvent is ShiftClosed closed
