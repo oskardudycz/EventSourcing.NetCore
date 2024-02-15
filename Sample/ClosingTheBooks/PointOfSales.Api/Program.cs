@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Helpdesk.Api.Core.Http.Middlewares.ExceptionHandling;
 using Helpdesk.Api.Core.Marten;
 using JasperFx.CodeGeneration;
 using Marten;
@@ -6,6 +7,7 @@ using Marten.AspNetCore;
 using Marten.Events;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
+using Marten.Exceptions;
 using Marten.Schema.Identity;
 using Marten.Services.Json;
 using Oakton;
@@ -28,6 +30,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
+    .AddDefaultExceptionHandler(
+        (exception, _) => exception switch
+        {
+            ConcurrencyException =>
+                exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            ExistingStreamIdCollisionException =>
+                exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+            _ => null,
+        })
     .AddMarten(options =>
     {
         var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "PointOfSales";
@@ -47,7 +58,8 @@ builder.Services
 
         options.Projections.LiveStreamAggregation<CashierShift>();
         options.Projections.LiveStreamAggregation<CashRegister>();
-        options.Projections.Add<CashierShiftTrackerProjection>(ProjectionLifecycle.Async);
+        // Added as inline for now to make tests easier, should be async in the end
+        options.Projections.Add<CashierShiftTrackerProjection>(ProjectionLifecycle.Inline);
     })
     .OptimizeArtifactWorkflow(TypeLoadMode.Static)
     .UseLightweightSessions()
@@ -62,6 +74,8 @@ builder.Host.ApplyOaktonExtensions();
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
+
 app.MapPost("/api/cash-registers/{cashRegisterId}",
     async (
         IDocumentSession documentSession,
@@ -75,7 +89,7 @@ app.MapPost("/api/cash-registers/{cashRegisterId}",
     }
 );
 
-app.MapPost("/api/cash-registers/{cashRegisterId}/cashier-shifts/open",
+app.MapPost("/api/cash-registers/{cashRegisterId}/cashier-shifts",
     async (
         IDocumentSession documentSession,
         string cashRegisterId,

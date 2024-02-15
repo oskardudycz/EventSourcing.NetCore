@@ -6,7 +6,7 @@ namespace PointOfSales.CashierShifts;
 
 public record CashierShiftTracker(
     string Id,
-    Guid? LastShiftClosedEventId
+    long? LastShiftClosedSequence
 );
 
 public class CashierShiftTrackerProjection: MultiStreamProjection<CashierShiftTracker, string>
@@ -21,5 +21,5 @@ public class CashierShiftTrackerProjection: MultiStreamProjection<CashierShiftTr
         new(logged.CashRegisterId, null);
 
     public CashierShiftTracker Apply(IEvent<CashierShiftEvent.ShiftClosed> closed, CashierShiftTracker current) =>
-        current with { LastShiftClosedEventId = closed.Id };
+        current with { LastShiftClosedSequence = closed.Sequence };
 }

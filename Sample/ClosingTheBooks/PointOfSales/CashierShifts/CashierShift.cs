@@ -23,7 +23,7 @@ public record CashierShift
     public CashierShift Apply(CashierShiftEvent @event) =>
         (this, @event) switch
         {
-            (NonExisting or Closed , ShiftOpened shiftOpened) =>
+            (_, ShiftOpened shiftOpened) =>
                 new Opened(shiftOpened.CashierShiftId, shiftOpened.Float),
 
             (Opened state, TransactionRegistered transactionRegistered) =>

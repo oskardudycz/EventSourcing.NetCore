@@ -34,7 +34,7 @@ public static class CashierShiftDecider
             (OpenShift open, NonExisting) =>
             [
                 new ShiftOpened(
-                    new CashierShiftId(open.CashRegisterId, 0),
+                    new CashierShiftId(open.CashRegisterId, 1),
                     open.CashierId,
                     0,
                     open.Now
