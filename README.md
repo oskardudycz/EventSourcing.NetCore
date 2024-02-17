@@ -1,4 +1,4 @@
-![Github Actions](https://github.com/oskardudycz/EventSourcing.NetCore/actions/workflows/build.dotnet.yml/badge.svg?branch=main) [![Github Sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&link=https://github.com/sponsors/oskardudycz/)](https://github.com/sponsors/oskardudycz/) [![blog](https://img.shields.io/badge/blog-event--driven.io-brightgreen)](https://event-driven.io/?utm_source=event_sourcing_net) [![blog](https://img.shields.io/badge/%F0%9F%9A%80-Architecture%20Weekly-important)](https://www.architecture-weekly.com/?utm_source=event_sourcing_net)  [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/oskardudycz/) 
+[<img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="20px" />](https://www.linkedin.com/in/oskardudycz/) ![Github Actions](https://github.com/oskardudycz/EventSourcing.NetCore/actions/workflows/build.dotnet.yml/badge.svg?branch=main) [![Github Sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&link=https://github.com/sponsors/oskardudycz/)](https://github.com/sponsors/oskardudycz/) [![blog](https://img.shields.io/badge/blog-event--driven.io-brightgreen)](https://event-driven.io/?utm_source=event_sourcing_net) [![blog](https://img.shields.io/badge/%F0%9F%9A%80-Architecture%20Weekly-important)](https://www.architecture-weekly.com/?utm_source=event_sourcing_net)
 
 # EventSourcing .NET
 
@@ -567,43 +567,47 @@ Read more in the article:
 
 ### 2.1. Practical Event Sourcing with Marten
 
-<a href="https://www.youtube.com/watch?v=Lc2zV8KA16A&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=11" target="_blank"><img src="https://img.youtube.com/vi/Lc2zV8KA16A/0.jpg" alt="Pragmatic Event Sourcing with Marten" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=jnDchr5eabI&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=1" target="_blank"><img src="https://img.youtube.com/vi/jnDchr5eabI/0.jpg" alt="Pragmatic Event Sourcing with Marten" width="640" height="480" border="10" /></a>
 
-### 2.2. Let's build event store in one hour!
+### 2.2. Keep your streams short! Or how to model event-sourced systems efficiently
 
-<a href="https://www.youtube.com/watch?v=gaoZdtQSOTo&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=2" target="_blank"><img src="https://img.youtube.com/vi/gaoZdtQSOTo/0.jpg" alt="Let's build event store in one hour!" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=gG6DGmYKk4I&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=2" target="_blank"><img src="https://img.youtube.com/vi/gG6DGmYKk4I/0.jpg" alt="Keep your streams short! Or how to model event-sourced systems efficiently" width="640" height="480" border="10" /></a>
 
-### 2.3. CQRS is Simpler than you think with C#11 & NET7
+### 2.3. Let's build event store in one hour!
 
-<a href="https://www.youtube.com/watch?v=iY7LO289qnQ" target="_blank"><img src="https://img.youtube.com/vi/iY7LO289qnQ/0.jpg" alt="CQRS is Simpler than you think with C#11 & NET7" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=gaoZdtQSOTo&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=2" target="_blank"><img src="https://img.youtube.com/vi/gaoZdtQSOTo/0.jpg" alt="Let's build event store in one hour!" width="640" height="480" border="10" /></a>
 
-### 2.4. Practical Introduction to Event Sourcing with EventStoreDB
+### 2.4. CQRS is Simpler than you think with C#11 & NET7
 
-<a href="https://www.youtube.com/watch?v=rqYPVzjoxqI" target="_blank"><img src="https://img.youtube.com/vi/rqYPVzjoxqI/0.jpg" alt="Practical introduction to Event Sourcing with EventStoreDB" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=iY7LO289qnQ" target="_blank"><img src="https://img.youtube.com/vi/iY7LO289qnQ/0.jpg" alt="CQRS is Simpler than you think with C#11 & NET7" width="640" height="480" border="10" /></a>
 
-### 2.5 Let's build the worst Event Sourcing system!
+### 2.5. Practical Introduction to Event Sourcing with EventStoreDB
 
-<a href="https://www.youtube.com/watch?v=Lu-skMQ-vAw" target="_blank"><img src="https://img.youtube.com/vi/Lu-skMQ-vAw/0.jpg" alt="Let's build the worst Event Sourcing system!" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=rqYPVzjoxqI" target="_blank"><img src="https://img.youtube.com/vi/rqYPVzjoxqI/0.jpg" alt="Practical introduction to Event Sourcing with EventStoreDB" width="640" height="480" border="10" /></a>
 
-### 2.6 The Light and The Dark Side of the Event-Driven Design
+### 2.6. How to deal with privacy and GDPR in Event-Sourced systems
 
-<a href="https://www.youtube.com/watch?v=ZGugOiYcq8k" target="_blank"><img src="https://img.youtube.com/vi/ZGugOiYcq8k/0.jpg" alt="The Light and The Dark Side of the Event-Driven Design" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=CI7JPFLlpBw" target="_blank"><img src="https://img.youtube.com/vi/CI7JPFLlpBw/0.jpg" alt="How to deal with privacy and GDPR in Event-Sourced systems" width="640" height="480" border="10" /></a>
 
-### 2.7 Implementing Distributed Processes
+### 2.7 Let's build the worst Event Sourcing system!
+
+<a href="https://www.youtube.com/watch?v=Lu-skMQ-vAw" target="_blank"><img src="https://img.youtube.com/vi/Lu-skMQ-vAw/0.jpg" alt="Let's build the worst Event Sourcing system!" width="640" height="480" border="10" /></a>
+
+### 2.8 The Light and The Dark Side of the Event-Driven Design
+
+<a href="https://www.youtube.com/watch?v=ZGugOiYcq8k" target="_blank"><img src="https://img.youtube.com/vi/ZGugOiYcq8k/0.jpg" alt="The Light and The Dark Side of the Event-Driven Design" width="640" height="480" border="10" /></a>
+
+### 2.9 Implementing Distributed Processes
 
 <a href="https://www.architecture-weekly.com/p/webinar-3-implementing-distributed" target="_blank"><img src="https://substackcdn.com/image/fetch/w_1920,h_1080,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-video.s3.amazonaws.com%2Fvideo_upload%2Fpost%2F69413446%2F526b9100-7271-4482-99e7-9559416e9848%2Ftranscoded-00624.png" alt="Implementing Distributed Processes" width="320" border="10" /></a>
 
-### 2.8 Conversation with [Yves Lorphelin](https://github.com/ylorph/) about CQRS
+### 2.10 Conversation with [Yves Lorphelin](https://github.com/ylorph/) about CQRS
 
-<a href="https://www.youtube.com/watch?v=D-3N2vQ7ADE" target="_blank"><img src="https://img.youtube.com/vi/D-3N2vQ7ADE/0.jpg" alt="Event Store Conversations: Yves Lorphelin talks to Oskar Dudycz about CQRS (EN)" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=D-3N2vQ7ADE" target="_blank"><img src="https://img.youtube.com/vi/D-3N2vQ7ADE/0.jpg" alt="Event Store Conversations: Yves Lorphelin talks to Oskar Dudycz about CQRS (EN)" width="640" height="480" border="10" /></a>
 
-### 2.9. Never Lose Data Again - Event Sourcing to the Rescue!
+### 2.11. Never Lose Data Again - Event Sourcing to the Rescue!
 
-<a href="https://www.youtube.com/watch?v=fDC465jJoDk" target="_blank"><img src="https://img.youtube.com/vi/fDC465jJoDk/0.jpg" alt="Never Lose Data Again - Event Sourcing to the Rescue!" width="320" height="240" border="10" /></a>
-
-### 2.10. How to deal with privacy and GDPR in Event-Sourced systems
-
-<a href="https://www.youtube.com/watch?v=CI7JPFLlpBw" target="_blank"><img src="https://img.youtube.com/vi/CI7JPFLlpBw/0.jpg" alt="How to deal with privacy and GDPR in Event-Sourced systems" width="320" height="240" border="10" /></a>
+<a href="https://www.youtube.com/watch?v=fDC465jJoDk" target="_blank"><img src="https://img.youtube.com/vi/fDC465jJoDk/0.jpg" alt="Never Lose Data Again - Event Sourcing to the Rescue!" width="640" height="480" border="10" /></a>
 
 ## 3. Support
 

@@ -441,6 +441,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Api.Tests", "Sample\Helpdesk.Wolverine\Helpdesk.Api.Tests\Helpdesk.Api.Tests.csproj", "{F88E97D2-729B-45E0-A27E-20700FA2AEF0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClosingTheBooks", "ClosingTheBooks", "{C8F02DB9-5FEA-46C8-95E3-BB4255CB0667}"
+	ProjectSection(SolutionItems) = preProject
+		Sample\ClosingTheBooks\README.md = Sample\ClosingTheBooks\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PointOfSales", "Sample\ClosingTheBooks\PointOfSales\PointOfSales.csproj", "{F40DF11A-354C-4438-B674-B95B9A401C33}"
 EndProject
