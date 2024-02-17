@@ -24,32 +24,21 @@ public abstract record CashierShiftCommand
         decimal DeclaredTender,
         DateTimeOffset Now
     ): CashierShiftCommand;
+
+    private CashierShiftCommand() { }
 }
 
 public static class CashierShiftDecider
 {
-    public static object[] Decide(CashierShiftCommand command, CashierShift state) =>
+    public static CashierShiftEvent[] Decide(CashierShiftCommand command, CashierShift state) =>
         (command, state) switch
         {
             (OpenShift open, NonExisting) =>
-            [
-                new ShiftOpened(
-                    new CashierShiftId(open.CashRegisterId, 1),
-                    open.CashierId,
-                    0,
-                    open.Now
-                )
-            ],
+                [Open(open.CashierId, open.CashRegisterId, 1, 0, open.Now)],
 
             (OpenShift open, Closed closed) =>
             [
-
-                new ShiftOpened(
-                    new CashierShiftId(open.CashRegisterId, closed.ShiftId.ShiftNumber + 1),
-                    open.CashierId,
-                    closed.FinalFloat,
-                    open.Now
-                )
+                Open(open.CashierId, open.CashRegisterId, closed.ShiftId.ShiftNumber + 1, closed.FinalFloat, open.Now)
             ],
 
             (OpenShift, Opened) => [],
@@ -79,4 +68,20 @@ public static class CashierShiftDecider
 
             _ => throw new InvalidOperationException($"Cannot run {command.GetType().Name} on {state.GetType().Name}")
         };
+
+    private static ShiftOpened Open(
+        string cashierId,
+        string cashRegisterId,
+        int shiftNumber,
+        decimal @float,
+        DateTimeOffset now) =>
+        new(
+            new CashierShiftId(cashRegisterId, shiftNumber),
+            cashierId,
+            @float,
+            now
+        );
 }
+
+
+

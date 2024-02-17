@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace PointOfSales.CashierShifts;
 
 using System;
@@ -47,21 +45,21 @@ public record CashierShiftId(string CashRegisterId, int ShiftNumber)
     public override string ToString() => $"urn:cashier_shift:{CashRegisterId}:{ShiftNumber}";
 }
 
-public abstract record CashierShiftEvent(CashierShiftId CashierShiftId)
+public abstract record CashierShiftEvent
 {
     public record ShiftOpened(
         CashierShiftId CashierShiftId,
         string CashierId,
         decimal Float,
         DateTimeOffset StartedAt
-    ): CashierShiftEvent(CashierShiftId);
+    ): CashierShiftEvent;
 
     public record TransactionRegistered(
         CashierShiftId CashierShiftId,
         string TransactionId,
         decimal Amount,
         DateTimeOffset RegisteredAt
-    ): CashierShiftEvent(CashierShiftId);
+    ): CashierShiftEvent;
 
     public record ShiftClosed(
         CashierShiftId CashierShiftId,
@@ -70,5 +68,7 @@ public abstract record CashierShiftEvent(CashierShiftId CashierShiftId)
         decimal ShortageAmount,
         decimal FinalFloat,
         DateTimeOffset ClosedAt
-    ): CashierShiftEvent(CashierShiftId);
+    ): CashierShiftEvent;
+
+    private CashierShiftEvent(){}
 }

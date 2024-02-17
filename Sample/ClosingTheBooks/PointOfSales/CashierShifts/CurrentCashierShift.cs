@@ -4,7 +4,7 @@ namespace PointOfSales.CashierShifts;
 
 using static CashierShiftEvent;
 
-public record CashierShiftDetails(
+public record CurrentCashierShift(
     string Id,
     string CashierRegisterId,
     int ShiftNumber,
@@ -13,7 +13,10 @@ public record CashierShiftDetails(
     int TransactionsCount,
     DateTimeOffset StartedAt,
     ClosingDetails? ClosingDetails = null
-);
+)
+{
+    public int Version { get; set; }
+}
 
 public record ClosingDetails(
     decimal? DeclaredTender = null,
@@ -23,9 +26,9 @@ public record ClosingDetails(
     DateTimeOffset? ClosedAt = null
 );
 
-public class CashierShiftDetailsProjection: SingleStreamProjection<CashierShiftDetails>
+public class CurrentCashierShiftProjection: SingleStreamProjection<CurrentCashierShift>
 {
-    public static CashierShiftDetails Create(ShiftOpened @event) =>
+    public static CurrentCashierShift Create(ShiftOpened @event) =>
         new(
             @event.CashierShiftId,
             @event.CashierShiftId.CashRegisterId,
@@ -36,10 +39,10 @@ public class CashierShiftDetailsProjection: SingleStreamProjection<CashierShiftD
             @event.StartedAt
         );
 
-    public CashierShiftDetails Apply(TransactionRegistered @event, CashierShiftDetails details) =>
+    public CurrentCashierShift Apply(TransactionRegistered @event, CurrentCashierShift details) =>
         details with { Float = details.Float + @event.Amount, TransactionsCount = details.TransactionsCount + 1 };
 
-    public CashierShiftDetails Apply(ShiftClosed @event, CashierShiftDetails details) =>
+    public CurrentCashierShift Apply(ShiftClosed @event, CurrentCashierShift details) =>
         details with
         {
             ClosingDetails = new ClosingDetails(

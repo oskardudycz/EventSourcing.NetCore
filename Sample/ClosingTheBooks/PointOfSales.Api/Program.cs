@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Helpdesk.Api.Core.Http.Middlewares.ExceptionHandling;
-using Helpdesk.Api.Core.Marten;
 using JasperFx.CodeGeneration;
 using Marten;
 using Marten.AspNetCore;
@@ -12,6 +11,7 @@ using Marten.Schema.Identity;
 using Marten.Services.Json;
 using Oakton;
 using PointOfSales.Api.Core;
+using PointOfSales.Api.Core.Marten;
 using PointOfSales.CashierShifts;
 using PointOfSales.CashRegister;
 using Weasel.Core;
@@ -22,6 +22,7 @@ using static PointOfSales.CashierShifts.CashierShiftCommand;
 using static PointOfSales.CashierShifts.CashierShiftEvent;
 using static PointOfSales.Api.Core.ETagExtensions;
 using static System.DateTimeOffset;
+using static PointOfSales.CashierShifts.CloseAndOpenShift;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -100,10 +101,12 @@ app.MapPost("/api/cash-registers/{cashRegisterId}/cashier-shifts",
         var lastClosedShift = await documentSession.GetLastCashierShift(cashRegisterId);
         var result = Decide(new OpenShift(cashRegisterId, body.CashierId, Now), lastClosedShift);
 
-        if (result.Length == 0 || result[0] is not ShiftOpened opened)
+        var opened = result.OfType<ShiftOpened>().SingleOrDefault();
+
+        if (opened == null)
             throw new InvalidOperationException("Cannot Open Shift");
 
-        await documentSession.Add<CashierShift>(opened.CashierShiftId, result, ct);
+        await documentSession.Add<CashierShift, CashierShiftEvent>(opened.CashierShiftId, result, ct);
 
         return Created(
             $"/api/cash-registers/{cashRegisterId}/cashier-shifts/{opened.CashierShiftId.ShiftNumber}",
@@ -125,7 +128,7 @@ app.MapPost("/api/cash-registers/{cashRegisterId}/cashier-shifts/{shiftNumber:in
         var cashierShiftId = new CashierShiftId(cashRegisterId, shiftNumber);
         var transactionId = CombGuidIdGeneration.NewGuid().ToString();
 
-        return documentSession.GetAndUpdate<CashierShift>(cashierShiftId, ToExpectedVersion(eTag),
+        return documentSession.GetAndUpdate<CashierShift, CashierShiftEvent>(cashierShiftId, ToExpectedVersion(eTag),
             state => Decide(new RegisterTransaction(cashierShiftId, transactionId, body.Amount, Now), state), ct);
     }
 );
@@ -142,14 +145,43 @@ app.MapPost("/api/cash-registers/{cashRegisterId}/cashier-shifts/{shiftNumber:in
     {
         var cashierShiftId = new CashierShiftId(cashRegisterId, shiftNumber);
 
-        return documentSession.GetAndUpdate<CashierShift>(cashierShiftId, ToExpectedVersion(eTag),
+        return documentSession.GetAndUpdate<CashierShift, CashierShiftEvent>(cashierShiftId, ToExpectedVersion(eTag),
             state => Decide(new CloseShift(cashierShiftId, body.DeclaredTender, Now), state), ct);
+    }
+);
+
+
+// alternative showing how you could handle closing and opening in the same method
+// that require tho that shifts are continuous
+app.MapPost("/api/cash-registers/{cashRegisterId}/cashier-shifts/{shiftNumber:int}/close-and-open",
+    async (
+        IDocumentSession documentSession,
+        string cashRegisterId,
+        int shiftNumber,
+        CloseAndOpenShiftRequest body,
+        [FromIfMatchHeader] string eTag,
+        CancellationToken ct
+    ) =>
+    {
+        var command = new CloseAndOpenCommand(
+            new CashierShiftId(cashRegisterId, shiftNumber),
+            body.CashierId,
+            body.DeclaredTender,
+            Now
+        );
+
+        var openedCashierId = await documentSession.CloseAndOpenCashierShift(command, ToExpectedVersion(eTag), ct);
+
+        return Created(
+            $"/api/cash-registers/{cashRegisterId}/cashier-shifts/{openedCashierId.ShiftNumber}",
+            cashRegisterId
+        );
     }
 );
 
 app.MapGet("/api/cash-registers/{cashRegisterId}/cashier-shifts/{shiftNumber:int}",
     (HttpContext context, IQuerySession querySession, string cashRegisterId, int shiftNumber) =>
-        querySession.Json.WriteById<CashierShiftDetails>(new CashierShiftId(cashRegisterId, shiftNumber), context)
+        querySession.Json.WriteById<CurrentCashierShift>(new CashierShiftId(cashRegisterId, shiftNumber), context)
 );
 
 
@@ -172,6 +204,11 @@ public record RegisterTransactionRequest(
 
 public record CloseShiftRequest(
     decimal DeclaredTender
+);
+
+public record CloseAndOpenShiftRequest(
+    decimal DeclaredTender,
+    string CashierId
 );
 
 
