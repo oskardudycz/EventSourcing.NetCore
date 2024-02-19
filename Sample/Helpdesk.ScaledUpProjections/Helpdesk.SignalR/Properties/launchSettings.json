@@ -1,0 +1,14 @@
+﻿{
+    "profiles": {
+        "Helpdesk.SignalR": {
+            "commandName": "Project",
+            "dotnetRunMessages": true,
+            "launchBrowser": true,
+            "launchUrl": "swagger/index.html",
+            "applicationUrl": "http://localhost:5249",
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        }
+    }
+}
