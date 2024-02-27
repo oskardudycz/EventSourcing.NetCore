@@ -1064,7 +1064,7 @@ See more in:
 ### 12.14 Tools
 -   🛠️ [Marten - .NET Transactional Document DB and Event Store on PostgreSQL](https://eventuous.dev/)
 -   🛠️ [EventStoreDB - The stream database built for Event Sourcing ](https://developers.eventstore.com/)
--   🛠️ [GoldenEye - The CQRS flavoured framework that will speed up your WebAPI and Microservices development ](https://eventuous.dev/)
+-   🛠️ [GoldenEye - The CQRS flavoured framework that will speed up your WebAPI and Microservices development ](https://github.com/oskardudycz/GoldenEye)
 -   🛠️ [Eventuous - Event Sourcing for .NET](https://eventuous.dev/)
 -   🛠️ [SQLStreamStore - Stream Store library targeting RDBMS based implementations for .NET ](https://github.com/SQLStreamStore/SQLStreamStore)
 -   🛠️ [Equinox - .NET Event Sourcing library with CosmosDB, EventStoreDB, SqlStreamStore and integration test backends](https://github.com/jet/equinox)
