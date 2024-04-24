@@ -39,10 +39,10 @@ builder.Services
     {
         var options = new StoreOptions();
 
-        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Helpdesk";
+        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "WolverineHelpdesk";
         options.Events.DatabaseSchemaName = schemaName;
         options.DatabaseSchemaName = schemaName;
-        options.Connection(builder.Configuration.GetConnectionString("Incidents") ??
+        options.Connection(builder.Configuration.GetConnectionString("WolverineIncidents") ??
                            throw new InvalidOperationException());
 
         options.UseSystemTextJsonForSerialization(
