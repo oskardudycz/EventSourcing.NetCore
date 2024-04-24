@@ -65,21 +65,33 @@ public class EventStoreDBSubscriptionToAll
 
         var checkpoint = await checkpointRepository.Load(SubscriptionId, ct).ConfigureAwait(false);
 
-        await eventStoreClient.SubscribeToAllAsync(
-            checkpoint == null ? FromAll.Start : FromAll.After(new Position(checkpoint.Value, checkpoint.Value)),
-            HandleEvent,
+        var subscription = eventStoreClient.SubscribeToAll(
+            checkpoint == null
+                ? FromAll.Start
+                : FromAll.After(new Position(checkpoint.Value, checkpoint.Value)),
             subscriptionOptions.ResolveLinkTos,
-            HandleDrop,
             subscriptionOptions.FilterOptions,
             subscriptionOptions.Credentials,
             ct
-        ).ConfigureAwait(false);
+        );
 
         logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
+
+        try
+        {
+            await foreach (var @event in subscription)
+            {
+                await HandleEvent(@event, ct).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            HandleDrop(ex);
+        }
+
     }
 
     private async Task HandleEvent(
-        StreamSubscription subscription,
         ResolvedEvent resolvedEvent,
         CancellationToken token
     )
@@ -135,7 +147,7 @@ public class EventStoreDBSubscriptionToAll
         }
     }
 
-    private void HandleDrop(StreamSubscription _, SubscriptionDroppedReason reason, Exception? exception)
+    private void HandleDrop(Exception? exception)
     {
         if (exception is RpcException { StatusCode: StatusCode.Cancelled })
         {
@@ -149,10 +161,9 @@ public class EventStoreDBSubscriptionToAll
 
         logger.LogError(
             exception,
-            "Subscription to all '{SubscriptionId}' dropped with '{StatusCode}' and '{Reason}'",
+            "Subscription to all '{SubscriptionId}' dropped with '{StatusCode}'",
             SubscriptionId,
-            (exception as RpcException)?.StatusCode ?? StatusCode.Unknown,
-            reason
+            (exception as RpcException)?.StatusCode ?? StatusCode.Unknown
         );
 
 

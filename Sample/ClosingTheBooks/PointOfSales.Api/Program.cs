@@ -48,11 +48,7 @@ builder.Services
         options.Connection(builder.Configuration.GetConnectionString("PointOfSales") ??
                            throw new InvalidOperationException());
 
-        options.UseDefaultSerialization(
-            EnumStorage.AsString,
-            nonPublicMembersStorage: NonPublicMembersStorage.All,
-            serializerType: SerializerType.SystemTextJson
-        );
+        options.UseSystemTextJsonForSerialization(EnumStorage.AsString);
 
         // THIS IS IMPORTANT!
         options.Events.StreamIdentity = StreamIdentity.AsString;

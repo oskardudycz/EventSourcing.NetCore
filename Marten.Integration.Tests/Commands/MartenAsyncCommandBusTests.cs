@@ -7,6 +7,7 @@ using Core.OpenTelemetry;
 using Core.Testing;
 using FluentAssertions;
 using Marten.Events.Daemon;
+using Marten.Events.Daemon.Coordination;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -79,7 +80,7 @@ public class MartenAsyncCommandBusTests: MartenTest
         var serviceProvider = services.BuildServiceProvider();
         var session = serviceProvider.GetRequiredService<IDocumentSession>();
 
-        asyncDaemon = (AsyncProjectionHostedService)serviceProvider.GetRequiredService<IHostedService>();
+        asyncDaemon = serviceProvider.GetRequiredService<ProjectionCoordinator>();
 
         martenAsyncCommandBus = new MartenAsyncCommandBus(session);
     }
@@ -87,7 +88,7 @@ public class MartenAsyncCommandBusTests: MartenTest
     private MartenAsyncCommandBus martenAsyncCommandBus = default!;
     private readonly List<Guid> userIds = new();
     private readonly EventListener eventListener = new();
-    private AsyncProjectionHostedService asyncDaemon = default!;
+    private ProjectionCoordinator asyncDaemon = default!;
     private readonly CancellationToken ct = new CancellationTokenSource().Token;
 
     public MartenAsyncCommandBusTests(MartenFixture fixture) : base(fixture.PostgreSqlContainer, true)

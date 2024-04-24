@@ -13,14 +13,9 @@ public record DailyOverbookingDetected
     int OverBookedOverTheLimitCount
 );
 
-public class DailyOverbookingDetector: IChangeListener
+public class DailyOverbookingDetector(IEventBus eventBus): IChangeListener
 {
-    private readonly IEventBus eventBus;
-
-    public DailyOverbookingDetector(IEventBus eventBus) =>
-        this.eventBus = eventBus;
-
-    public async Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
+    public async Task BeforeCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
     {
         var events = commit.Inserted.OfType<DailyRoomTypeAvailability>()
             .Union(commit.Updated.OfType<DailyRoomTypeAvailability>())
@@ -39,4 +34,7 @@ public class DailyOverbookingDetector: IChangeListener
             await eventBus.Publish(EventEnvelope.From(@event), token);
         }
     }
+
+    public Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token) =>
+        Task.CompletedTask;
 }

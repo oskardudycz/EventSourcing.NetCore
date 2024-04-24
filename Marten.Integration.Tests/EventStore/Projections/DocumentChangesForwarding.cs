@@ -71,20 +71,11 @@ public enum ChangeType
 
 public record DocumentChanged(ChangeType ChangeType, object Data);
 
-public class AsyncListenerWrapper: IChangeListener
+public class AsyncListenerWrapper(EventListener eventListener, IChangeListener inner): IChangeListener
 {
-    private readonly EventListener eventListener;
-    private readonly IChangeListener inner;
-
-    public AsyncListenerWrapper(EventListener eventListener, IChangeListener inner)
+    public async Task BeforeCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
     {
-        this.eventListener = eventListener;
-        this.inner = inner;
-    }
-
-    public async Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
-    {
-        await inner.AfterCommitAsync(session, commit, token);
+        await inner.BeforeCommitAsync(session, commit, token);
 
         foreach (var @event in commit.Inserted.Select(doc => new DocumentChanged(ChangeType.Insert, doc))
                      .Union(commit.Updated.Select(doc => new DocumentChanged(ChangeType.Update, doc)))
@@ -93,16 +84,14 @@ public class AsyncListenerWrapper: IChangeListener
             await eventListener.Handle(@event, token);
         }
     }
+
+    public Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token) =>
+        Task.CompletedTask;
 }
 
-public class AsyncDocumentChangesForwarder: IChangeListener
+public class AsyncDocumentChangesForwarder(IMessagingSystem messagingSystem): IChangeListener
 {
-    private readonly IMessagingSystem messagingSystem;
-
-    public AsyncDocumentChangesForwarder(IMessagingSystem messagingSystem) =>
-        this.messagingSystem = messagingSystem;
-
-    public Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
+    public Task BeforeCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
     {
         var changes = commit.Inserted.Select(doc => new DocumentChanged(ChangeType.Insert, doc))
             .Union(commit.Updated.Select(doc => new DocumentChanged(ChangeType.Update, doc)))
@@ -111,9 +100,12 @@ public class AsyncDocumentChangesForwarder: IChangeListener
 
         return messagingSystem.Publish(changes.Cast<object>().ToArray(), token);
     }
+
+    public Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token) =>
+        Task.CompletedTask;
 }
 
-public class DocumentChangesForwarding: MartenTest
+public class DocumentChangesForwarding(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, false, false)
 {
     [Fact(Skip = "Some weird is happening in System channels")]
     public async Task GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
@@ -154,9 +146,6 @@ public class DocumentChangesForwarding: MartenTest
                         new AsyncDocumentChangesForwarder(messagingSystemStub)
                     )
                 );
-
-                options.Projections.OnException<InvalidOperationException>()
-                    .RetryLater(50.Milliseconds(), 250.Milliseconds(), 500.Milliseconds());
             }).AddAsyncDaemon(DaemonMode.Solo)
             .UseLightweightSessions();
 
@@ -178,10 +167,5 @@ public class DocumentChangesForwarding: MartenTest
         serviceScope.Dispose();
 
         await base.DisposeAsync();
-    }
-
-    public DocumentChangesForwarding(MartenFixture fixture) : base(fixture.PostgreSqlContainer, false, false)
-    {
-
     }
 }

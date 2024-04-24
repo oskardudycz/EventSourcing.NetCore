@@ -86,18 +86,9 @@ public enum ChangeType
 
 public record DocumentChanged(ChangeType ChangeType, object Data);
 
-public class AsyncListenerWrapper: IChangeListener
+public class AsyncListenerWrapper(EventListener eventListener, IChangeListener inner): IChangeListener
 {
-    private readonly EventListener eventListener;
-    private readonly IChangeListener inner;
-
-    public AsyncListenerWrapper(EventListener eventListener, IChangeListener inner)
-    {
-        this.eventListener = eventListener;
-        this.inner = inner;
-    }
-
-    public async Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
+    public async Task BeforeCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
     {
         await inner.AfterCommitAsync(session, commit, token);
 
@@ -108,16 +99,14 @@ public class AsyncListenerWrapper: IChangeListener
             await eventListener.Handle(@event, token);
         }
     }
+
+    public Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token) =>
+        Task.CompletedTask;
 }
 
-public class AsyncDocumentChangesForwarder: IChangeListener
+public class AsyncDocumentChangesForwarder(IMessagingSystem messagingSystem): IChangeListener
 {
-    private readonly IMessagingSystem messagingSystem;
-
-    public AsyncDocumentChangesForwarder(IMessagingSystem messagingSystem) =>
-        this.messagingSystem = messagingSystem;
-
-    public Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
+    public Task BeforeCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
     {
         var changes = commit.Inserted.Select(doc => new DocumentChanged(ChangeType.Insert, doc))
             .Union(commit.Updated.Select(doc => new DocumentChanged(ChangeType.Update, doc)))
@@ -126,6 +115,9 @@ public class AsyncDocumentChangesForwarder: IChangeListener
 
         return messagingSystem.Publish(changes.Cast<object>().ToArray(), token);
     }
+
+    public Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token) =>
+        Task.CompletedTask;
 }
 
 public class EventTransformationsWithForwarding: MartenTest
@@ -169,8 +161,6 @@ public class EventTransformationsWithForwarding: MartenTest
                 );
 
                 options.Events.StreamIdentity = StreamIdentity.AsString;
-                options.Projections.OnException<InvalidOperationException>()
-                    .RetryLater(50.Milliseconds(), 250.Milliseconds(), 500.Milliseconds());
             }).AddAsyncDaemon(DaemonMode.Solo)
             .UseLightweightSessions();
 

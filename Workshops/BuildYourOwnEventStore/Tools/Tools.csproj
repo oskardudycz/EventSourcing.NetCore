@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.1.28" />
+        <PackageReference Include="Dapper" Version="2.1.35" />
         <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-        <PackageReference Include="Marten" Version="7.0.0-beta.5" />
+        <PackageReference Include="Marten" Version="7.8.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Simple.Migrations" Version="0.9.21" />
-        <PackageReference Include="xunit" Version="2.6.6" />
+        <PackageReference Include="xunit" Version="2.7.1" />
     </ItemGroup>
 </Project>

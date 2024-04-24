@@ -42,11 +42,7 @@ builder.Services
         options.Connection(builder.Configuration.GetConnectionString("Incidents") ??
                            throw new InvalidOperationException());
 
-        options.UseDefaultSerialization(
-            EnumStorage.AsString,
-            nonPublicMembersStorage: NonPublicMembersStorage.All,
-            serializerType: SerializerType.SystemTextJson
-        );
+        options.UseSystemTextJsonForSerialization(EnumStorage.AsString);
 
         options.Projections.LiveStreamAggregation<Incident>();
         options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
