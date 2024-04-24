@@ -88,6 +88,10 @@ public static class MartenConfigExtensions
             nonPublicMembersStorage: NonPublicMembersStorage.All
         );
 
+        options.Projections.Errors.SkipApplyErrors = false;
+        options.Projections.Errors.SkipSerializationErrors = false;
+        options.Projections.Errors.SkipUnknownEvents = false;
+
         options.Projections.Add(
             new MartenSubscription(
                 new[]

@@ -68,13 +68,13 @@ public class EventStoreDBSubscriptionToAll(
                 await HandleEvent(@event, ct).ConfigureAwait(false);
             }
         }
-        catch (OperationCanceledException)
+        catch (RpcException rpcException) when (rpcException is { StatusCode: StatusCode.Cancelled } ||
+                                                rpcException.InnerException is ObjectDisposedException)
         {
-            logger.LogWarning("Subscription was canceled.");
-        }
-        catch (ObjectDisposedException)
-        {
-            logger.LogWarning("Subscription was canceled by the user.");
+            logger.LogWarning(
+                "Subscription to all '{SubscriptionId}' dropped by client",
+                SubscriptionId
+            );
         }
         catch (Exception ex)
         {

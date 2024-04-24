@@ -11,23 +11,15 @@ using static Core.Extensions.DictionaryExtensions;
 
 namespace Core.Kafka.Producers;
 
-public class KafkaProducer: IExternalEventProducer
+public class KafkaProducer(
+    IConfiguration configuration,
+    IActivityScope activityScope,
+    ILogger<KafkaProducer> logger
+): IExternalEventProducer
 {
-    private readonly IActivityScope activityScope;
-    private readonly ILogger<KafkaProducer> logger;
-    private readonly KafkaProducerConfig config;
+    private readonly KafkaProducerConfig config = configuration.GetKafkaProducerConfig();
 
-    public KafkaProducer(
-        IConfiguration configuration,
-        IActivityScope activityScope,
-        ILogger<KafkaProducer> logger
-    )
-    {
-        this.activityScope = activityScope;
-        this.logger = logger;
-        // get configuration from appsettings.json
-        config = configuration.GetKafkaProducerConfig();
-    }
+    // get configuration from appsettings.json
 
     public async Task Publish(IEventEnvelope @event, CancellationToken token)
     {
@@ -39,6 +31,9 @@ public class KafkaProducer: IExternalEventProducer
                     using var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build();
                     // publish event to kafka topic taken from config
 
+                    using var cts =
+                        new CancellationTokenSource(TimeSpan.FromMilliseconds(config.ProducerTimeoutInMs ?? 1000));
+
                     await p.ProduceAsync(config.Topic,
                         new Message<string, string>
                         {
@@ -46,7 +41,7 @@ public class KafkaProducer: IExternalEventProducer
                             Key = @event.Data.GetType().Name,
                             // serialize event to message Value
                             Value = @event.ToJson(new PropagationContextJsonConverter())
-                        }, ct).ConfigureAwait(false);
+                        }, cts.Token).ConfigureAwait(false);
                 },
                 new StartActivityOptions
                 {

@@ -45,9 +45,9 @@ public static class IncidentsBatchResolutionHandler
             : [];
 
     [AggregateHandler]
-    public static Events Handle(TimeoutIncidentsBatchResolution command, IncidentsBatchResolution batch,
+    public static Events Handle(TimeoutIncidentsBatchResolution command, IncidentsBatchResolution? batch,
         DateTimeOffset now) =>
-        batch.Status != ResolutionStatus.Pending
+        batch != null && batch.Status != ResolutionStatus.Pending
             ? [new IncidentsBatchResolutionResolutionTimedOut(command.IncidentsBatchResolutionId, batch.Incidents, now)]
             : [];
 

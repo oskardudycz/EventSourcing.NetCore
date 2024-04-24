@@ -8,6 +8,7 @@ public class KafkaProducerConfig
 {
     public ProducerConfig? ProducerConfig { get; set; }
     public string Topic { get; set; } = default!;
+    public int? ProducerTimeoutInMs { get; set; }
 }
 
 public static class KafkaProducerConfigExtensions

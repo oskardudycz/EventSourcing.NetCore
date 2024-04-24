@@ -44,6 +44,10 @@ builder.Services
 
         options.UseSystemTextJsonForSerialization(EnumStorage.AsString);
 
+        options.Projections.Errors.SkipApplyErrors = false;
+        options.Projections.Errors.SkipSerializationErrors = false;
+        options.Projections.Errors.SkipUnknownEvents = false;
+
         options.Projections.LiveStreamAggregation<Incident>();
         options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
         options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
