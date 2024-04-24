@@ -83,7 +83,10 @@ public static class MartenConfigExtensions
         options.Events.DatabaseSchemaName = schemaName ?? martenConfig.WriteModelSchema;
         options.DatabaseSchemaName = schemaName ?? martenConfig.ReadModelSchema;
 
-        options.UseSystemTextJsonForSerialization(EnumStorage.AsString);
+        options.UseNewtonsoftForSerialization(
+            EnumStorage.AsString,
+            nonPublicMembersStorage: NonPublicMembersStorage.All
+        );
 
         options.Projections.Add(
             new MartenSubscription(

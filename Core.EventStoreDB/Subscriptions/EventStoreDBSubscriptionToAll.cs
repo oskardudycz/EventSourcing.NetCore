@@ -23,35 +23,19 @@ public class EventStoreDBSubscriptionToAllOptions
     public bool IgnoreDeserializationErrors { get; set; } = true;
 }
 
-public class EventStoreDBSubscriptionToAll
+public class EventStoreDBSubscriptionToAll(
+    EventStoreClient eventStoreClient,
+    EventTypeMapper eventTypeMapper,
+    IEventBus eventBus,
+    ISubscriptionCheckpointRepository checkpointRepository,
+    IActivityScope activityScope,
+    ILogger<EventStoreDBSubscriptionToAll> logger
+)
 {
-    private readonly IEventBus eventBus;
-    private readonly EventStoreClient eventStoreClient;
-    private readonly EventTypeMapper eventTypeMapper;
-    private readonly ISubscriptionCheckpointRepository checkpointRepository;
-    private readonly IActivityScope activityScope;
-    private readonly ILogger<EventStoreDBSubscriptionToAll> logger;
     private EventStoreDBSubscriptionToAllOptions subscriptionOptions = default!;
     private string SubscriptionId => subscriptionOptions.SubscriptionId;
     private readonly object resubscribeLock = new();
     private CancellationToken cancellationToken;
-
-    public EventStoreDBSubscriptionToAll(
-        EventStoreClient eventStoreClient,
-        EventTypeMapper eventTypeMapper,
-        IEventBus eventBus,
-        ISubscriptionCheckpointRepository checkpointRepository,
-        IActivityScope activityScope,
-        ILogger<EventStoreDBSubscriptionToAll> logger
-    )
-    {
-        this.eventBus = eventBus;
-        this.eventStoreClient = eventStoreClient;
-        this.eventTypeMapper = eventTypeMapper;
-        this.checkpointRepository = checkpointRepository;
-        this.activityScope = activityScope;
-        this.logger = logger;
-    }
 
     public async Task SubscribeToAll(EventStoreDBSubscriptionToAllOptions subscriptionOptions, CancellationToken ct)
     {
@@ -84,11 +68,24 @@ public class EventStoreDBSubscriptionToAll
                 await HandleEvent(@event, ct).ConfigureAwait(false);
             }
         }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("Subscription was canceled.");
+        }
+        catch (ObjectDisposedException)
+        {
+            logger.LogWarning("Subscription was canceled by the user.");
+        }
         catch (Exception ex)
         {
-            HandleDrop(ex);
-        }
+            logger.LogWarning("Subscription was dropped: {ex}", ex);
 
+            // Sleep between reconnections to not flood the database or not kill the CPU with infinite loop
+            // Randomness added to reduce the chance of multiple subscriptions trying to reconnect at the same time
+            Thread.Sleep(1000 + new Random((int)DateTime.UtcNow.Ticks).Next(1000));
+
+            await SubscribeToAll(this.subscriptionOptions, ct).ConfigureAwait(false);
+        }
     }
 
     private async Task HandleEvent(
@@ -144,72 +141,6 @@ public class EventStoreDBSubscriptionToAll
             // if you're fine with dropping some events instead of stopping subscription
             // then you can add some logic if error should be ignored
             throw;
-        }
-    }
-
-    private void HandleDrop(Exception? exception)
-    {
-        if (exception is RpcException { StatusCode: StatusCode.Cancelled })
-        {
-            logger.LogWarning(
-                "Subscription to all '{SubscriptionId}' dropped by client",
-                SubscriptionId
-            );
-
-            return;
-        }
-
-        logger.LogError(
-            exception,
-            "Subscription to all '{SubscriptionId}' dropped with '{StatusCode}'",
-            SubscriptionId,
-            (exception as RpcException)?.StatusCode ?? StatusCode.Unknown
-        );
-
-
-        Resubscribe();
-    }
-
-    private void Resubscribe()
-    {
-        // You may consider adding a max resubscribe count if you want to fail process
-        // instead of retrying until database is up
-        while (true)
-        {
-            var resubscribed = false;
-            try
-            {
-                Monitor.Enter(resubscribeLock);
-
-                // No synchronization context is needed to disable synchronization context.
-                // That enables running asynchronous method not causing deadlocks.
-                // As this is a background process then we don't need to have async context here.
-                using (NoSynchronizationContextScope.Enter())
-                {
-#pragma warning disable VSTHRD002
-                    SubscribeToAll(subscriptionOptions, cancellationToken).Wait(cancellationToken);
-#pragma warning restore VSTHRD002
-                }
-
-                resubscribed = true;
-            }
-            catch (Exception exception)
-            {
-                logger.LogWarning(exception,
-                    "Failed to resubscribe to all '{SubscriptionId}' dropped with '{ExceptionMessage}{ExceptionStackTrace}'",
-                    SubscriptionId, exception.Message, exception.StackTrace);
-            }
-            finally
-            {
-                Monitor.Exit(resubscribeLock);
-            }
-
-            if (resubscribed)
-                break;
-
-            // Sleep between reconnections to not flood the database or not kill the CPU with infinite loop
-            // Randomness added to reduce the chance of multiple subscriptions trying to reconnect at the same time
-            Thread.Sleep(1000 + new Random((int)DateTime.UtcNow.Ticks).Next(1000));
         }
     }
 
