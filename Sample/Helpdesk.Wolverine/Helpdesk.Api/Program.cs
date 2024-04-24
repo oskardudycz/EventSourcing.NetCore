@@ -45,10 +45,8 @@ builder.Services
         options.Connection(builder.Configuration.GetConnectionString("Incidents") ??
                            throw new InvalidOperationException());
 
-        options.UseDefaultSerialization(
+        options.UseSystemTextJsonForSerialization(
             EnumStorage.AsString,
-            nonPublicMembersStorage: NonPublicMembersStorage.All,
-            serializerType: SerializerType.SystemTextJson,
             casing: Casing.CamelCase
         );
 

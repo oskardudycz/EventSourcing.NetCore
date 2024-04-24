@@ -20,6 +20,6 @@ public class HandleRebuildMotionSensorsViews :
     public async Task Handle(RebuildMotionSensorsViews command, CancellationToken ct)
     {
         using var daemon = await session.DocumentStore.BuildProjectionDaemonAsync();
-        await daemon.RebuildProjection<MotionSensor>(ct);
+        await daemon.RebuildProjectionAsync<MotionSensor>(ct);
     }
 }

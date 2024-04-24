@@ -46,7 +46,7 @@ public class UniqueContstraintTests: MartenTest
         var store = DocumentStore.For(options =>
         {
             options.Connection(ConnectionString);
-            options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.All);
+            options.UseNewtonsoftForSerialization(nonPublicMembersStorage: NonPublicMembersStorage.All);
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.DatabaseSchemaName = SchemaName;
             options.Events.DatabaseSchemaName = SchemaName;

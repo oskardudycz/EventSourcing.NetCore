@@ -118,7 +118,7 @@ protected virtual void SetBulkOptions(BulkAllRequestDescriptor<TDocument> option
     options.Index(IndexName);
 
     protected override Task SetupMapping(ElasticsearchClient client) =>
-        client.Indices.CreateAsync<TDocument>(opt => opt.Index(IndexName));
+        client.Indices.CreateAsync<TDocument>(IndexName);
 
     private string GetDocumentId(object @event) =>
         projectors[@event.GetType()].GetId(@event);

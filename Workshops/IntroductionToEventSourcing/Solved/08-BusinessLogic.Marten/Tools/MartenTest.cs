@@ -12,7 +12,7 @@ public abstract class MartenTest: IDisposable
         var options = new StoreOptions();
         options.Connection(
             "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'");
-        options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.All);
+        options.UseSystemTextJsonForSerialization();
         options.DatabaseSchemaName = options.Events.DatabaseSchemaName = "IntroductionToEventSourcing";
 
         documentStore = new DocumentStore(options);

@@ -20,7 +20,7 @@ public abstract class MartenMeetsElasticTest: IDisposable
         var options = new StoreOptions();
         options.Connection(
             "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'");
-        options.UseDefaultSerialization(nonPublicMembersStorage: NonPublicMembersStorage.All);
+        options.UseNewtonsoftForSerialization(nonPublicMembersStorage: NonPublicMembersStorage.All);
         options.DatabaseSchemaName = options.Events.DatabaseSchemaName = "MartenMeetsElastic";
         options.Events.StreamIdentity = StreamIdentity.AsString;
 
@@ -41,7 +41,7 @@ public abstract class MartenMeetsElasticTest: IDisposable
     {
         daemon = await documentStore.BuildProjectionDaemonAsync();
 
-        await daemon.StartAllShards();
+        await daemon.StartAllAsync();
 
         return daemon;
     }
