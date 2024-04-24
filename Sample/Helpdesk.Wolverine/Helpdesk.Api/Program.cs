@@ -50,6 +50,14 @@ builder.Services
             casing: Casing.CamelCase
         );
 
+        options.Projections.Errors.SkipApplyErrors = false;
+        options.Projections.Errors.SkipSerializationErrors = false;
+        options.Projections.Errors.SkipUnknownEvents = false;
+
+        options.Projections.RebuildErrors.SkipApplyErrors = false;
+        options.Projections.RebuildErrors.SkipSerializationErrors = false;
+        options.Projections.RebuildErrors.SkipUnknownEvents = false;
+
         options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
         options.Projections.Add(
             new SignalRProducer((IHubContext)sp.GetRequiredService<IHubContext<IncidentsHub>>()),
@@ -58,6 +66,7 @@ builder.Services
 
         options.ConfigureIncidents();
 
+        options.DisableNpgsqlLogging = true;
         return options;
     })
     .OptimizeArtifactWorkflow(TypeLoadMode.Static)

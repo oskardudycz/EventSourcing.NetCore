@@ -6,17 +6,13 @@ using Marten.Events.Projections;
 
 namespace Helpdesk.Api.Core.Kafka;
 
-public class KafkaProducer: IProjection
+public class KafkaProducer(IConfiguration configuration): IProjection
 {
     private const string DefaultConfigKey = "KafkaProducer";
 
-    private readonly KafkaProducerConfig config;
-
-    public KafkaProducer(IConfiguration configuration)
-    {
-        config = configuration.GetRequiredSection(DefaultConfigKey).Get<KafkaProducerConfig>() ??
-                 throw new InvalidOperationException();
-    }
+    private readonly KafkaProducerConfig config =
+        configuration.GetRequiredSection(DefaultConfigKey).Get<KafkaProducerConfig>() ??
+        throw new InvalidOperationException();
 
     public async Task ApplyAsync(IDocumentOperations operations, IReadOnlyList<StreamAction> streamsActions,
         CancellationToken ct)
@@ -36,6 +32,8 @@ public class KafkaProducer: IProjection
         {
             using var producer = new ProducerBuilder<string, string>(config.ProducerConfig).Build();
 
+            using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(config.ProducerTimeoutInMs ?? 1000));
+
             await producer.ProduceAsync(config.Topic,
                 new Message<string, string>
                 {
@@ -43,7 +41,7 @@ public class KafkaProducer: IProjection
                     Key = @event.GetType().Name,
                     // serialize event to message Value
                     Value = JsonSerializer.Serialize(@event)
-                }, ct).ConfigureAwait(false);
+                }, cts.Token).ConfigureAwait(false);
         }
         catch (Exception exc)
         {
@@ -57,4 +55,6 @@ public class KafkaProducerConfig
 {
     public ProducerConfig? ProducerConfig { get; set; }
     public string? Topic { get; set; }
+
+    public int? ProducerTimeoutInMs { get; set; }
 }

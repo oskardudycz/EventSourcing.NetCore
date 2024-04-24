@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.Commands;
 
-public class MartenAsyncCommandBusTests: MartenTest
+public class MartenAsyncCommandBusTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, true)
 {
     [Fact]
     public async Task CommandIsStoredInMartenAndForwardedToCommandHandler()
@@ -80,7 +80,7 @@ public class MartenAsyncCommandBusTests: MartenTest
         var serviceProvider = services.BuildServiceProvider();
         var session = serviceProvider.GetRequiredService<IDocumentSession>();
 
-        asyncDaemon = serviceProvider.GetRequiredService<ProjectionCoordinator>();
+        asyncDaemon = serviceProvider.GetRequiredService<IProjectionCoordinator>();
 
         martenAsyncCommandBus = new MartenAsyncCommandBus(session);
     }
@@ -88,12 +88,8 @@ public class MartenAsyncCommandBusTests: MartenTest
     private MartenAsyncCommandBus martenAsyncCommandBus = default!;
     private readonly List<Guid> userIds = new();
     private readonly EventListener eventListener = new();
-    private ProjectionCoordinator asyncDaemon = default!;
+    private IProjectionCoordinator asyncDaemon = default!;
     private readonly CancellationToken ct = new CancellationTokenSource().Token;
-
-    public MartenAsyncCommandBusTests(MartenFixture fixture) : base(fixture.PostgreSqlContainer, true)
-    {
-    }
 }
 
 public record AddUser(Guid UserId, string? Sth = default);
