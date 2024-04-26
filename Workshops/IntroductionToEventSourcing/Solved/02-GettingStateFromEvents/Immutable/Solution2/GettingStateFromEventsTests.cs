@@ -2,32 +2,39 @@ using FluentAssertions;
 using Xunit;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable.Solution2;
+using static ShoppingCartEvent;
 
 // EVENTS
-public record ShoppingCartOpened(
-    Guid ShoppingCartId,
-    Guid ClientId
-);
+public abstract record ShoppingCartEvent
+{
+    public record ShoppingCartOpened(
+        Guid ShoppingCartId,
+        Guid ClientId
+    ): ShoppingCartEvent;
 
-public record ProductItemAddedToShoppingCart(
-    Guid ShoppingCartId,
-    PricedProductItem ProductItem
-);
+    public record ProductItemAddedToShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-public record ProductItemRemovedFromShoppingCart(
-    Guid ShoppingCartId,
-    PricedProductItem ProductItem
-);
+    public record ProductItemRemovedFromShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-public record ShoppingCartConfirmed(
-    Guid ShoppingCartId,
-    DateTime ConfirmedAt
-);
+    public record ShoppingCartConfirmed(
+        Guid ShoppingCartId,
+        DateTime ConfirmedAt
+    ): ShoppingCartEvent;
 
-public record ShoppingCartCanceled(
-    Guid ShoppingCartId,
-    DateTime CanceledAt
-);
+    public record ShoppingCartCanceled(
+        Guid ShoppingCartId,
+        DateTime CanceledAt
+    ): ShoppingCartEvent;
+
+    // This won't allow
+    private ShoppingCartEvent(){}
+}
 
 // VALUE OBJECTS
 public record PricedProductItem(
@@ -46,10 +53,10 @@ public record ShoppingCart(
     DateTime? CanceledAt = null
 )
 {
-    public static ShoppingCart Default() =>
-        new (default, default, default, Array.Empty<PricedProductItem>());
+    public static ShoppingCart Initial() =>
+        new (default, default, default, []);
 
-    public static ShoppingCart When(ShoppingCart shoppingCart, object @event)
+    public static ShoppingCart Evolve(ShoppingCart shoppingCart, ShoppingCartEvent @event)
     {
         return @event switch
         {
@@ -81,11 +88,7 @@ public record ShoppingCart(
                 {
                     ProductItems = shoppingCart.ProductItems
                         .Select(pi => pi.ProductId == pricedProductItem.ProductId?
-                            new PricedProductItem(
-                                pi.ProductId,
-                                pi.Quantity - pricedProductItem.Quantity,
-                                pi.UnitPrice
-                            )
+                            pi with { Quantity = pi.Quantity - pricedProductItem.Quantity }
                             :pi
                         )
                         .Where(pi => pi.Quantity > 0)
@@ -122,8 +125,8 @@ public class GettingStateFromEventsTests
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    private static ShoppingCart GetShoppingCart(IEnumerable<object> events) =>
-        events.Aggregate(ShoppingCart.Default(), ShoppingCart.When);
+    private static ShoppingCart GetShoppingCart(IEnumerable<ShoppingCartEvent> events) =>
+        events.Aggregate(ShoppingCart.Initial(), ShoppingCart.Evolve);
 
     [Fact]
     public void GettingState_ForSequenceOfEvents_ShouldSucceed()
@@ -136,7 +139,7 @@ public class GettingStateFromEventsTests
         var pairOfShoes = new PricedProductItem(shoesId, 1, 100);
         var tShirt = new PricedProductItem(tShirtId, 1, 50);
 
-        var events = new object[]
+        var events = new ShoppingCartEvent[]
         {
             new ShoppingCartOpened(shoppingCartId, clientId),
             new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
