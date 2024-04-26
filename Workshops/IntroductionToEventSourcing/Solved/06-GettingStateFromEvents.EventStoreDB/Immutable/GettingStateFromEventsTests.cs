@@ -5,32 +5,39 @@ using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 using Xunit;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable;
+using static ShoppingCartEvent;
 
 // EVENTS
-public record ShoppingCartOpened(
-    Guid ShoppingCartId,
-    Guid ClientId
-);
+public abstract record ShoppingCartEvent
+{
+    public record ShoppingCartOpened(
+        Guid ShoppingCartId,
+        Guid ClientId
+    ): ShoppingCartEvent;
 
-public record ProductItemAddedToShoppingCart(
-    Guid ShoppingCartId,
-    PricedProductItem ProductItem
-);
+    public record ProductItemAddedToShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-public record ProductItemRemovedFromShoppingCart(
-    Guid ShoppingCartId,
-    PricedProductItem ProductItem
-);
+    public record ProductItemRemovedFromShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-public record ShoppingCartConfirmed(
-    Guid ShoppingCartId,
-    DateTime ConfirmedAt
-);
+    public record ShoppingCartConfirmed(
+        Guid ShoppingCartId,
+        DateTime ConfirmedAt
+    ): ShoppingCartEvent;
 
-public record ShoppingCartCanceled(
-    Guid ShoppingCartId,
-    DateTime CanceledAt
-);
+    public record ShoppingCartCanceled(
+        Guid ShoppingCartId,
+        DateTime CanceledAt
+    ): ShoppingCartEvent;
+
+    // This won't allow
+    private ShoppingCartEvent(){}
+}
 
 // VALUE OBJECTS
 public record PricedProductItem(

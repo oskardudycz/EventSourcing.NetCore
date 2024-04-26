@@ -33,7 +33,7 @@ public class MartenExternalProjection<TEvent, TView>: IEventHandler<EventEnvelop
         if (entity.LastProcessedPosition >= eventLogPosition)
             return;
 
-        entity.When(@event);
+        entity.Evolve(@event);
 
         entity.LastProcessedPosition = eventLogPosition;
 

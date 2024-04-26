@@ -30,7 +30,7 @@ public static class AggregateStreamExtensions
         {
             var eventData = @event.Deserialize();
 
-            aggregate.When(eventData!);
+            aggregate.Evolve(eventData!);
         }
 
         return aggregate;

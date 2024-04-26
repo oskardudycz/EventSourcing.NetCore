@@ -1,4 +1,5 @@
 namespace IntroductionToEventSourcing.OptimisticConcurrency.Mutable;
+using static ShoppingCartEvent;
 
 public abstract class Aggregate
 {

@@ -28,6 +28,9 @@ public abstract record ShoppingCartEvent
         Guid ShoppingCartId,
         DateTime CanceledAt
     ): ShoppingCartEvent;
+
+    // This won't allow
+    private ShoppingCartEvent(){}
 }
 
 // ENTITY

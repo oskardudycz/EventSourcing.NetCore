@@ -1,4 +1,5 @@
 namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution2;
+using static ShoppingCartEvent;
 
 public interface IAggregate
 {

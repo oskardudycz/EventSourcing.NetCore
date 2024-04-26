@@ -1,4 +1,5 @@
 namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
+using static ShoppingCartEvent;
 
 public abstract class Aggregate
 {

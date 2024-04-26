@@ -29,7 +29,7 @@ public class ShoppingCart: Aggregate
 
     private ShoppingCart(){}
 
-    public override void When(object @event)
+    public override void Evolve(object @event)
     {
         switch (@event)
         {

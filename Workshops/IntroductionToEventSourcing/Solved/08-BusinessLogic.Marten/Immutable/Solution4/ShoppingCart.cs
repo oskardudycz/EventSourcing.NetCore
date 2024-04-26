@@ -13,6 +13,9 @@ public abstract record ShoppingCartEvent
     public record Confirmed(DateTimeOffset ConfirmedAt): ShoppingCartEvent;
 
     public record Canceled(DateTimeOffset CanceledAt): ShoppingCartEvent;
+
+    // This won't allow
+    private ShoppingCartEvent(){}
 }
 
 public record ShoppingCart

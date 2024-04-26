@@ -23,7 +23,7 @@ public class ShoppingCartDetails: IVersionedProjection
     public long Version { get; set; }
 
 
-    public void When(object @event)
+    public void Evolve(object @event)
     {
         switch (@event)
         {
