@@ -16,3 +16,6 @@ Create sample events that represent a specific shopping cart. You can do that in
 Events model:
 
 ![events](./assets/events.jpg)
+
+1. Simple events structure [Solution1/EventsDefinitionTests.cs](./Solution1/EventsDefinitionTests.cs).
+2. Events structure with union type to give option to tell that Shopping Cart event is one of the defined types [Solution2/EventsDefinitionTests.cs](./Solution2/EventsDefinitionTests.cs). Read more in [Union types in C#](https://event-driven.io/en/union_types_in_csharp/).

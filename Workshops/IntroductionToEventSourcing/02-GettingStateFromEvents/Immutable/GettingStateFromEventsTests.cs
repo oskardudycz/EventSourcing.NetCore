@@ -2,32 +2,39 @@ using FluentAssertions;
 using Xunit;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable;
+using static ShoppingCartEvent;
 
 // EVENTS
-public record ShoppingCartOpened(
-    Guid ShoppingCartId,
-    Guid ClientId
-);
+public abstract record ShoppingCartEvent
+{
+    public record ShoppingCartOpened(
+        Guid ShoppingCartId,
+        Guid ClientId
+    ): ShoppingCartEvent;
 
-public record ProductItemAddedToShoppingCart(
-    Guid ShoppingCartId,
-    PricedProductItem ProductItem
-);
+    public record ProductItemAddedToShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-public record ProductItemRemovedFromShoppingCart(
-    Guid ShoppingCartId,
-    PricedProductItem ProductItem
-);
+    public record ProductItemRemovedFromShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-public record ShoppingCartConfirmed(
-    Guid ShoppingCartId,
-    DateTime ConfirmedAt
-);
+    public record ShoppingCartConfirmed(
+        Guid ShoppingCartId,
+        DateTime ConfirmedAt
+    ): ShoppingCartEvent;
 
-public record ShoppingCartCanceled(
-    Guid ShoppingCartId,
-    DateTime CanceledAt
-);
+    public record ShoppingCartCanceled(
+        Guid ShoppingCartId,
+        DateTime CanceledAt
+    ): ShoppingCartEvent;
+
+    // This won't allow
+    private ShoppingCartEvent(){}
+}
 
 // VALUE OBJECTS
 public record PricedProductItem(
@@ -55,7 +62,7 @@ public enum ShoppingCartStatus
 
 public class GettingStateFromEventsTests
 {
-    private static ShoppingCart GetShoppingCart(IEnumerable<object> events)
+    private static ShoppingCart GetShoppingCart(IEnumerable<ShoppingCartEvent> events)
     {
         // 1. Add logic here
         throw new NotImplementedException();
@@ -73,7 +80,7 @@ public class GettingStateFromEventsTests
         var pairOfShoes = new PricedProductItem(shoesId, 1, 100);
         var tShirt = new PricedProductItem(tShirtId, 1, 50);
 
-        var events = new object[]
+        var events = new ShoppingCartEvent[]
         {
             new ShoppingCartOpened(shoppingCartId, clientId),
             new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),

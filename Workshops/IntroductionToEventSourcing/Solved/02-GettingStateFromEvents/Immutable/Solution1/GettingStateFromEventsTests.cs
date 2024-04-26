@@ -2,32 +2,39 @@ using FluentAssertions;
 using Xunit;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable.Solution1;
+using static ShoppingCartEvent;
 
 // EVENTS
-public record ShoppingCartOpened(
-    Guid ShoppingCartId,
-    Guid ClientId
-);
+public abstract record ShoppingCartEvent
+{
+    public record ShoppingCartOpened(
+        Guid ShoppingCartId,
+        Guid ClientId
+    ): ShoppingCartEvent;
 
-public record ProductItemAddedToShoppingCart(
-    Guid ShoppingCartId,
-    PricedProductItem ProductItem
-);
+    public record ProductItemAddedToShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-public record ProductItemRemovedFromShoppingCart(
-    Guid ShoppingCartId,
-    PricedProductItem ProductItem
-);
+    public record ProductItemRemovedFromShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-public record ShoppingCartConfirmed(
-    Guid ShoppingCartId,
-    DateTime ConfirmedAt
-);
+    public record ShoppingCartConfirmed(
+        Guid ShoppingCartId,
+        DateTime ConfirmedAt
+    ): ShoppingCartEvent;
 
-public record ShoppingCartCanceled(
-    Guid ShoppingCartId,
-    DateTime CanceledAt
-);
+    public record ShoppingCartCanceled(
+        Guid ShoppingCartId,
+        DateTime CanceledAt
+    ): ShoppingCartEvent;
+
+    // This won't allow
+    private ShoppingCartEvent(){}
+}
 
 // VALUE OBJECTS
 public record PricedProductItem(
@@ -60,7 +67,7 @@ public class GettingStateFromEventsTests
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    private static ShoppingCart GetShoppingCart(IEnumerable<object> events)
+    private static ShoppingCart GetShoppingCart(IEnumerable<ShoppingCartEvent> events)
     {
         ShoppingCart shoppingCart = null!;
 
@@ -73,7 +80,7 @@ public class GettingStateFromEventsTests
                         opened.ShoppingCartId,
                         opened.ClientId,
                         ShoppingCartStatus.Pending,
-                        Array.Empty<PricedProductItem>()
+                        []
                     );
                     break;
                 case ProductItemAddedToShoppingCart productItemAdded:
@@ -98,11 +105,7 @@ public class GettingStateFromEventsTests
                     {
                         ProductItems = shoppingCart.ProductItems
                             .Select(pi => pi.ProductId == productItemRemoved.ProductItem.ProductId?
-                                new PricedProductItem(
-                                    pi.ProductId,
-                                    pi.Quantity - productItemRemoved.ProductItem.Quantity,
-                                    pi.UnitPrice
-                                )
+                                pi with { Quantity = pi.Quantity - productItemRemoved.ProductItem.Quantity }
                                 :pi
                             )
                             .Where(pi => pi.Quantity > 0)
@@ -140,7 +143,7 @@ public class GettingStateFromEventsTests
         var pairOfShoes = new PricedProductItem(shoesId, 1, 100);
         var tShirt = new PricedProductItem(tShirtId, 1, 50);
 
-        var events = new object[]
+        var events = new ShoppingCartEvent[]
         {
             new ShoppingCartOpened(shoppingCartId, clientId),
             new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
