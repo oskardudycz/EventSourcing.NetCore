@@ -55,7 +55,7 @@ public class Invoice: Aggregate<string>
     public InvoiceSendMethod SentVia { get; private set; }
     public DateTime SentAt { get; private set; }
 
-    public override void When(object @event)
+    public override void Evolve(object @event)
     {
         switch (@event)
         {
@@ -125,7 +125,7 @@ public class AggregateWithWhenTests
         // 3. Apply each event on the entity.
         foreach (var @event in events)
         {
-            invoice.When(@event);
+            invoice.Evolve(@event);
         }
 
         invoice.Id.Should().Be(invoiceInitiated.Number);

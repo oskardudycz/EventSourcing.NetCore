@@ -17,7 +17,7 @@ public class ShoppingCartShortInfo: IVersionedProjection
 
     public ulong LastProcessedPosition { get; set; }
 
-    public void When(object @event)
+    public void Evolve(object @event)
     {
         switch (@event)
         {

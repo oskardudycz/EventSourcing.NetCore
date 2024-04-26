@@ -2,7 +2,7 @@
 
 public interface IProjection
 {
-    void When(object @event);
+    void Evolve(object @event);
 }
 
 public interface IVersionedProjection: IProjection

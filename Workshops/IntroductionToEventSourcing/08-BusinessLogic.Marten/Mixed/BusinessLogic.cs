@@ -1,4 +1,5 @@
 namespace IntroductionToEventSourcing.BusinessLogic.Mixed;
+using static ShoppingCartEvent;
 
 public interface IAggregate
 {

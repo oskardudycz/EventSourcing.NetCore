@@ -12,7 +12,7 @@ public abstract class Aggregate<T>: IAggregate<T> where T : notnull
 
     [NonSerialized] private readonly Queue<object> uncommittedEvents = new();
 
-    public virtual void When(object @event) { }
+    public virtual void Evolve(object @event) { }
 
     public object[] DequeueUncommittedEvents()
     {

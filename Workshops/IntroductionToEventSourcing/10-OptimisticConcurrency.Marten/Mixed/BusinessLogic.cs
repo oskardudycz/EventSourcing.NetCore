@@ -1,4 +1,5 @@
 namespace IntroductionToEventSourcing.OptimisticConcurrency.Mixed;
+using static ShoppingCartEvent;
 
 public interface IAggregate
 {

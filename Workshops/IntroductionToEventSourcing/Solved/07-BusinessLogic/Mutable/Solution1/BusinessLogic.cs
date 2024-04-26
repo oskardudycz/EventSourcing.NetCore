@@ -1,4 +1,5 @@
 namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution1;
+using static ShoppingCartEvent;
 
 public abstract class Aggregate
 {
@@ -6,7 +7,7 @@ public abstract class Aggregate
 
     private readonly Queue<object> uncommittedEvents = new();
 
-    public virtual void When(object @event) { }
+    public virtual void Evolve(object @event) { }
 
     public object[] DequeueUncommittedEvents()
     {
@@ -34,7 +35,7 @@ public class ShoppingCart: Aggregate
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    public override void When(object @event)
+    public override void Evolve(object @event)
     {
         switch (@event)
         {
