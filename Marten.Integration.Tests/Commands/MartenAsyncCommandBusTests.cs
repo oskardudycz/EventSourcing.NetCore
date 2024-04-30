@@ -86,7 +86,7 @@ public class MartenAsyncCommandBusTests(MartenFixture fixture): MartenTest(fixtu
     }
 
     private MartenAsyncCommandBus martenAsyncCommandBus = default!;
-    private readonly List<Guid> userIds = new();
+    private readonly List<Guid> userIds = [];
     private readonly EventListener eventListener = new();
     private IProjectionCoordinator asyncDaemon = default!;
     private readonly CancellationToken ct = new CancellationTokenSource().Token;

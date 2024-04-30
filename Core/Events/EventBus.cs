@@ -75,7 +75,7 @@ public class EventBus: IEventBus
     public Task Publish(IEventEnvelope eventEnvelope, CancellationToken ct)
     {
         return (Task)GetGenericPublishFor(eventEnvelope)
-            .Invoke(this, new object[] { eventEnvelope, ct })!;
+            .Invoke(this, [eventEnvelope, ct])!;
     }
 
     private static MethodInfo GetGenericPublishFor(IEventEnvelope @event) =>

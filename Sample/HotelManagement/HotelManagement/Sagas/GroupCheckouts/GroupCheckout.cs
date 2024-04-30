@@ -77,7 +77,7 @@ public record GroupCheckout(
                 var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Completed);
 
                 return AreAnyOngoingCheckouts(guestStayCheckouts)
-                    ? new object[] { guestCheckoutCompleted }
+                    ? [guestCheckoutCompleted]
                     : new[] { guestCheckoutCompleted, Finalize(guestStayCheckouts, now) };
             });
 
@@ -94,7 +94,7 @@ public record GroupCheckout(
                 var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Failed);
 
                 return AreAnyOngoingCheckouts(guestStayCheckouts)
-                    ? new object[] { guestCheckoutFailed }
+                    ? [guestCheckoutFailed]
                     : new[] { guestCheckoutFailed, Finalize(guestStayCheckouts, now) };
             });
 

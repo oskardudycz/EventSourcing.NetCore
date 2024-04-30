@@ -31,7 +31,7 @@ public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedI
                     API.Incident with
                     {
                         Notes =
-                        new[] { new IncidentNote(IncidentNoteType.FromCustomer, customerId, content, true) },
+                        [new IncidentNote(IncidentNoteType.FromCustomer, customerId, content, true)],
                         Version = 2
                     }
                 )

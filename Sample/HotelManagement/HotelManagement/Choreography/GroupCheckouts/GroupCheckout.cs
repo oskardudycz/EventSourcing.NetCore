@@ -79,8 +79,8 @@ public record GroupCheckout(
         var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Completed);
 
         return AreAnyOngoingCheckouts(guestStayCheckouts)
-            ? new object[] { guestCheckoutCompleted }
-            : new[] { guestCheckoutCompleted, Finalize(guestStayCheckouts, now) };
+            ? [guestCheckoutCompleted]
+            : [guestCheckoutCompleted, Finalize(guestStayCheckouts, now)];
     }
 
     public object[] RecordGuestCheckoutFailure(
@@ -96,8 +96,8 @@ public record GroupCheckout(
         var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Failed);
 
         return AreAnyOngoingCheckouts(guestStayCheckouts)
-            ? new object[] { guestCheckoutFailed }
-            : new[] { guestCheckoutFailed, Finalize(guestStayCheckouts, now) };
+            ? [guestCheckoutFailed]
+            : [guestCheckoutFailed, Finalize(guestStayCheckouts, now)];
     }
 
     private object Finalize(Dictionary<Guid, CheckoutStatus> guestStayCheckouts, DateTimeOffset now) =>

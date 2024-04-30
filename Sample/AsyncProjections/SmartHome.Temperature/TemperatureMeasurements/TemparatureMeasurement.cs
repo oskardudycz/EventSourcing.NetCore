@@ -54,7 +54,7 @@ public class TemperatureMeasurement: Aggregate
     {
         Id = @event.MeasurementId;
         Started = @event.StartedAt;
-        Mesurements = new List<decimal>();
+        Mesurements = [];
     }
 
 

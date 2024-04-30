@@ -33,7 +33,7 @@ public class MergeEvents
                 .CorrelationId;
 
         var i = 1;
-        List<EventData> productItemsAdded = new();
+        List<EventData> productItemsAdded = [];
 
         while (i < events.Count)
         {
@@ -58,9 +58,10 @@ public class MergeEvents
             productItemsAdded
         );
 
-        return new List<EventData>(
-            new[] { mergedEvent }.Union(events.Skip(i))
-        );
+        return
+        [
+            ..new[] { mergedEvent }.Union(events.Skip(i))
+        ];
     }
 
     private EventData ToShoppingCartInitializedWithProducts(
@@ -72,8 +73,9 @@ public class MergeEvents
 
         var newEvent = new ShoppingCartInitializedWithProducts(
             shoppingCartInitializedJson.GetProperty("ShoppingCartId").GetGuid(),
-            shoppingCartInitializedJson.GetProperty("ClientId").GetGuid(), new List<V1.PricedProductItem>(
-                productItemsAdded.Select(pi =>
+            shoppingCartInitializedJson.GetProperty("ClientId").GetGuid(), [
+
+                ..productItemsAdded.Select(pi =>
                 {
                     var pricedProductItem = JsonDocument.Parse(pi.Data).RootElement.GetProperty("ProductItem");
                     var productItem = pricedProductItem.GetProperty("ProductItem");
@@ -83,7 +85,8 @@ public class MergeEvents
                             productItem.GetProperty("Quantity").GetInt32()),
                         pricedProductItem.GetProperty("UnitPrice").GetDecimal());
                 })
-            )
+
+            ]
         );
 
         return new EventData("shopping_cart_initialized_v2", JsonSerializer.Serialize(newEvent),
@@ -92,7 +95,7 @@ public class MergeEvents
 
     public class StreamTransformations
     {
-        private readonly List<Func<List<EventData>, List<EventData>>> jsonTransformations = new();
+        private readonly List<Func<List<EventData>, List<EventData>>> jsonTransformations = [];
 
         public List<EventData> Transform(List<EventData> events)
         {

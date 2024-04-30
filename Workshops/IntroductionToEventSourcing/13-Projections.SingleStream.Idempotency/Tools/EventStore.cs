@@ -13,10 +13,10 @@ public class EventStore
 
         void WrappedHandler(object @event) => handler((EventEnvelope<TEvent>)@event);
 
-        if (handlers.ContainsKey(eventType))
-            handlers[eventType].Add(WrappedHandler);
+        if (handlers.TryGetValue(eventType, out var handler1))
+            handler1.Add(WrappedHandler);
         else
-            handlers.Add(eventType, new List<Action<EventEnvelope>> { WrappedHandler });
+            handlers.Add(eventType, [WrappedHandler]);
     }
 
     public void Append(EventEnvelope eventEnvelope)
@@ -37,7 +37,7 @@ public class EventStore
     public void Append<TEvent>(Guid streamId, TEvent @event) where TEvent : notnull
     {
         if (!events.ContainsKey(streamId))
-            events[streamId] = new List<EventEnvelope>();
+            events[streamId] = [];
 
         var eventEnvelope = new EventEnvelope<TEvent>(@event,
             EventMetadata.For(

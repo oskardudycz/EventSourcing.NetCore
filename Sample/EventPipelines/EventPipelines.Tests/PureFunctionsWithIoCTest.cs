@@ -25,10 +25,10 @@ public class PureFunctionsWithIoCTest
 
     public static class AdminPipeline
     {
-        public static readonly string[] TenantNames = { "FB", "Google", "Twitter" };
+        public static readonly string[] TenantNames = ["FB", "Google", "Twitter"];
 
-        public static List<AdminGrantedInTenant> AdminsInTenants = new();
-        public static List<AdminAdded> GlobalAdmins = new();
+        public static List<AdminGrantedInTenant> AdminsInTenants = [];
+        public static List<AdminAdded> GlobalAdmins = [];
 
         public static bool IsAdmin(UserAdded @event) =>
             @event.IsAdmin;

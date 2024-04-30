@@ -64,7 +64,7 @@ public class GetProductsTests: IClassFixture<GetProductsFixture>
 
 public class GetProductsFixture: ApiSpecification<Program>, IAsyncLifetime
 {
-    public List<ProductListItem> RegisteredProducts { get; } = new();
+    public List<ProductListItem> RegisteredProducts { get; } = [];
 
     public GetProductsFixture(): base(new WarehouseTestWebApplicationFactory()) { }
 

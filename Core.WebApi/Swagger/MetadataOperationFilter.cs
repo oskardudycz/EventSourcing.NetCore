@@ -6,9 +6,9 @@ namespace Core.WebApi.Swagger;
 public class MetadataOperationFilter: IOperationFilter
 {
     private static readonly string[] StateChangeMethods =
-    {
+    [
         HttpMethod.Post.Method, HttpMethod.Put.Method, HttpMethod.Delete.Method
-    };
+    ];
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {

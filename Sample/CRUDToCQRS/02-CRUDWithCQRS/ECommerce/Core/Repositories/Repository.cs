@@ -39,7 +39,7 @@ public abstract class Repository<TEntity>: IRepository<TEntity>
     public ValueTask<TEntity?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return dbContext.Set<TEntity>().FindAsync(
-            new object?[] { id },
+            [id],
             cancellationToken: cancellationToken
         );
     }

@@ -83,8 +83,8 @@ public partial class GroupCheckoutTests
                 new GuestCheckoutFailed(groupCheckoutId, guestStaysIds[2], now),
                 new GroupCheckoutFailed(
                     groupCheckoutId,
-                    new[] { guestStaysIds[0] },
-                    new[] { guestStaysIds[1], guestStaysIds[2] },
+                    [guestStaysIds[0]],
+                    [guestStaysIds[1], guestStaysIds[2]],
                     now
                 )
             );
@@ -103,8 +103,8 @@ public partial class GroupCheckoutTests
                 new GuestCheckoutFailed(groupCheckoutId, guestStaysIds[2], now),
                 new GroupCheckoutFailed(
                     groupCheckoutId,
-                    new[] { guestStaysIds[0], guestStaysIds[1] },
-                    new[] { guestStaysIds[2] },
+                    [guestStaysIds[0], guestStaysIds[1]],
+                    [guestStaysIds[2]],
                     now
                 )
             )
@@ -125,8 +125,8 @@ public partial class GroupCheckoutTests
                 new GuestCheckoutCompleted(groupCheckoutId, guestStaysIds[2], now),
                 new GroupCheckoutFailed(
                     groupCheckoutId,
-                    new[] { guestStaysIds[0], guestStaysIds[2] },
-                    new[] { guestStaysIds[1] },
+                    [guestStaysIds[0], guestStaysIds[2]],
+                    [guestStaysIds[1]],
                     now
                 )
             )

@@ -12,7 +12,7 @@ public class Database
     public void Store<T>(Guid id, T obj) where T : class
     {
         if(!storage.ContainsKey(GetId<T>(id)))
-            storage[GetId<T>(id)] =  new List<DataWrapper>();
+            storage[GetId<T>(id)] = [];
 
         var validFrom = DateTime.UtcNow.AddMilliseconds(random.Next(50, 100));
 

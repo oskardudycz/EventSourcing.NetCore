@@ -69,7 +69,7 @@ public static class ShoppingCartDocumentSessionExtensions
         CancellationToken ct = default
     ) =>
         session.Decide<ShoppingCart, ShoppingCartCommand, ShoppingCartEvent>(
-            (c, s) => new[] { ShoppingCartService.Decide(c, s) },
+            (c, s) => [ShoppingCartService.Decide(c, s)],
             () => new Empty(),
             streamId.Value,
             command,

@@ -34,11 +34,11 @@ public class InitializeOrderTests: IClassFixture<TestWebApplicationFactory<Progr
 
     private readonly Guid ClientId = Guid.NewGuid();
 
-    private readonly List<PricedProductItemRequest> ProductItems = new()
-    {
+    private readonly List<PricedProductItemRequest> ProductItems =
+    [
         new PricedProductItemRequest { ProductId = Guid.NewGuid(), Quantity = 10, UnitPrice = 3 },
         new PricedProductItemRequest { ProductId = Guid.NewGuid(), Quantity = 3, UnitPrice = 7 }
-    };
+    ];
 
     private decimal TotalPrice => ProductItems.Sum(pi => pi.Quantity!.Value * pi.UnitPrice!.Value);
 }

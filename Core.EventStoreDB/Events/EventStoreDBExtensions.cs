@@ -73,7 +73,7 @@ public static class EventStoreDBExtensions
         );
 
         if (await readResult.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
-            return new List<object>();
+            return [];
 
         return await readResult
             .Select(@event => @event.Deserialize()!)
