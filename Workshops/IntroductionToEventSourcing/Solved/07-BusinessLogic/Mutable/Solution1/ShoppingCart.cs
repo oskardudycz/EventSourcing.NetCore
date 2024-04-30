@@ -1,30 +1,55 @@
 namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution1;
+
 using static ShoppingCartEvent;
 
-public abstract class Aggregate
+// EVENTS
+public abstract record ShoppingCartEvent
 {
-    public Guid Id { get; protected set; } = default!;
+    public record ShoppingCartOpened(
+        Guid ShoppingCartId,
+        Guid ClientId
+    ): ShoppingCartEvent;
 
-    private readonly Queue<object> uncommittedEvents = new();
+    public record ProductItemAddedToShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-    public virtual void Evolve(object @event) { }
+    public record ProductItemRemovedFromShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
 
-    public object[] DequeueUncommittedEvents()
-    {
-        var dequeuedEvents = uncommittedEvents.ToArray();
+    public record ShoppingCartConfirmed(
+        Guid ShoppingCartId,
+        DateTime ConfirmedAt
+    ): ShoppingCartEvent;
 
-        uncommittedEvents.Clear();
+    public record ShoppingCartCanceled(
+        Guid ShoppingCartId,
+        DateTime CanceledAt
+    ): ShoppingCartEvent;
 
-        return dequeuedEvents;
-    }
-
-    protected void Enqueue(object @event)
-    {
-        uncommittedEvents.Enqueue(@event);
-    }
+    // This won't allow external inheritance
+    private ShoppingCartEvent() { }
 }
 
+// VALUE OBJECTS
+public class PricedProductItem
+{
+    public Guid ProductId { get; set; }
+    public decimal UnitPrice { get; set; }
+    public int Quantity { get; set; }
+    public decimal TotalPrice => Quantity * UnitPrice;
+}
 
+public class ProductItem
+{
+    public Guid ProductId { get; set; }
+    public int Quantity { get; set; }
+}
+
+// ENTITY
 public class ShoppingCart: Aggregate
 {
     public Guid ClientId { get; private set; }
@@ -63,6 +88,8 @@ public class ShoppingCart: Aggregate
     {
         return new ShoppingCart(cartId, clientId);
     }
+
+    public static ShoppingCart Initial() => new();
 
     private ShoppingCart(
         Guid id,
@@ -203,31 +230,4 @@ public enum ShoppingCartStatus
     Canceled = 4,
 
     Closed = Confirmed | Canceled
-}
-
-public interface IProductPriceCalculator
-{
-    PricedProductItem Calculate(ProductItem productItems);
-}
-
-public class FakeProductPriceCalculator: IProductPriceCalculator
-{
-    private readonly int value;
-
-    private FakeProductPriceCalculator(int value)
-    {
-        this.value = value;
-    }
-
-    public static FakeProductPriceCalculator Returning(int value) => new(value);
-
-    public PricedProductItem Calculate(ProductItem productItem)
-    {
-        return new PricedProductItem
-            {
-                ProductId = productItem.ProductId,
-                Quantity = productItem.Quantity,
-                UnitPrice = value
-            };
-    }
 }

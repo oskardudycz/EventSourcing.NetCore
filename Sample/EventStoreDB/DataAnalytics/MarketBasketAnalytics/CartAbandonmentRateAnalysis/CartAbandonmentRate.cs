@@ -24,9 +24,9 @@ namespace MarketBasketAnalytics.CartAbandonmentRateAnalysis
             ShoppingCartAbandoned @event,
             CancellationToken ct
         ) =>
-            aggregateStream(When, ShoppingCart.ToStreamId(@event.ShoppingCartId), ct)!;
+            aggregateStream(Evolve, ShoppingCart.ToStreamId(@event.ShoppingCartId), ct)!;
 
-        public static CartAbandonmentRateCalculated When(CartAbandonmentRateCalculated? lastEvent, object @event) =>
+        public static CartAbandonmentRateCalculated Evolve(CartAbandonmentRateCalculated? lastEvent, object @event) =>
             @event switch
             {
                 ShoppingCartInitialized (var cartId, var clientId, var initializedAt) =>

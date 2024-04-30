@@ -17,9 +17,8 @@ public record ShoppingCart(
 
     public static string StreamName(Guid id) => $"shopping_cart-{id}";
 
-    public static ShoppingCart When(ShoppingCart shoppingCart, object @event)
-    {
-        return @event switch
+    public static ShoppingCart Evolve(ShoppingCart shoppingCart, object @event) =>
+        @event switch
         {
             ShoppingCartOpened(var shoppingCartId, var clientId) =>
                 shoppingCart with
@@ -49,11 +48,7 @@ public record ShoppingCart(
                 {
                     ProductItems = shoppingCart.ProductItems
                         .Select(pi => pi.ProductId == pricedProductItem.ProductId?
-                            new PricedProductItem(
-                                pi.ProductId,
-                                pi.Quantity - pricedProductItem.Quantity,
-                                pi.UnitPrice
-                            )
+                            pi with { Quantity = pi.Quantity - pricedProductItem.Quantity }
                             :pi
                         )
                         .Where(pi => pi.Quantity > 0)
@@ -73,7 +68,6 @@ public record ShoppingCart(
                 },
             _ => shoppingCart
         };
-    }
 
     public bool HasEnough(PricedProductItem productItem)
     {

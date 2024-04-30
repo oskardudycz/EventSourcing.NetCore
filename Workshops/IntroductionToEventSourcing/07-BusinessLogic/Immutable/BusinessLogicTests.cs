@@ -1,131 +1,16 @@
 using FluentAssertions;
+using IntroductionToEventSourcing.BusinessLogic.Tools;
 using Xunit;
 
 namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
+
 using static ShoppingCartEvent;
-
-// EVENTS
-public abstract record ShoppingCartEvent
-{
-    public record ShoppingCartOpened(
-        Guid ShoppingCartId,
-        Guid ClientId
-    ): ShoppingCartEvent;
-
-    public record ProductItemAddedToShoppingCart(
-        Guid ShoppingCartId,
-        PricedProductItem ProductItem
-    ): ShoppingCartEvent;
-
-    public record ProductItemRemovedFromShoppingCart(
-        Guid ShoppingCartId,
-        PricedProductItem ProductItem
-    ): ShoppingCartEvent;
-
-    public record ShoppingCartConfirmed(
-        Guid ShoppingCartId,
-        DateTime ConfirmedAt
-    ): ShoppingCartEvent;
-
-    public record ShoppingCartCanceled(
-        Guid ShoppingCartId,
-        DateTime CanceledAt
-    ): ShoppingCartEvent;
-
-    // This won't allow external inheritance
-    private ShoppingCartEvent(){}
-}
-
-// VALUE OBJECTS
-public record PricedProductItem(
-    Guid ProductId,
-    int Quantity,
-    decimal UnitPrice
-);
-
-// ENTITY
-public record ShoppingCart(
-    Guid Id,
-    Guid ClientId,
-    ShoppingCartStatus Status,
-    PricedProductItem[] ProductItems,
-    DateTime? ConfirmedAt = null,
-    DateTime? CanceledAt = null
-)
-{
-    public static ShoppingCart Default() =>
-        new (default, default, default, []);
-
-    public static ShoppingCart When(ShoppingCart shoppingCart, object @event)
-    {
-        return @event switch
-        {
-            ShoppingCartOpened(var shoppingCartId, var clientId) =>
-                shoppingCart with
-                {
-                    Id = shoppingCartId,
-                    ClientId = clientId,
-                    Status = ShoppingCartStatus.Pending
-                },
-            ProductItemAddedToShoppingCart(_, var pricedProductItem) =>
-                shoppingCart with
-                {
-                    ProductItems = shoppingCart.ProductItems
-                        .Concat(new [] { pricedProductItem })
-                        .GroupBy(pi => pi.ProductId)
-                        .Select(group => group.Count() == 1?
-                            group.First()
-                            : new PricedProductItem(
-                                group.Key,
-                                group.Sum(pi => pi.Quantity),
-                                group.First().UnitPrice
-                            )
-                        )
-                        .ToArray()
-                },
-            ProductItemRemovedFromShoppingCart(_, var pricedProductItem) =>
-                shoppingCart with
-                {
-                    ProductItems = shoppingCart.ProductItems
-                        .Select(pi => pi.ProductId == pricedProductItem.ProductId?
-                            new PricedProductItem(
-                                pi.ProductId,
-                                pi.Quantity - pricedProductItem.Quantity,
-                                pi.UnitPrice
-                            )
-                            :pi
-                        )
-                        .Where(pi => pi.Quantity > 0)
-                        .ToArray()
-                },
-            ShoppingCartConfirmed(_, var confirmedAt) =>
-                shoppingCart with
-                {
-                    Status = ShoppingCartStatus.Confirmed,
-                    ConfirmedAt = confirmedAt
-                },
-            ShoppingCartCanceled(_, var canceledAt) =>
-                shoppingCart with
-                {
-                    Status = ShoppingCartStatus.Canceled,
-                    CanceledAt = canceledAt
-                },
-            _ => shoppingCart
-        };
-    }
-}
-
-public enum ShoppingCartStatus
-{
-    Pending = 1,
-    Confirmed = 2,
-    Canceled = 4
-}
+using static ShoppingCartCommand;
 
 public static class ShoppingCartExtensions
 {
-    public static ShoppingCart GetShoppingCart(this IEnumerable<object> events) =>
-        events.Aggregate(ShoppingCart.Default(), ShoppingCart.When);
+    public static ShoppingCart GetShoppingCart(this EventStore eventStore, Guid shoppingCartId) =>
+        eventStore.ReadStream<ShoppingCartEvent>(shoppingCartId).Aggregate(ShoppingCart.Default(), ShoppingCart.Evolve);
 }
 
 public class BusinessLogicTests
@@ -138,30 +23,87 @@ public class BusinessLogicTests
         var clientId = Guid.NewGuid();
         var shoesId = Guid.NewGuid();
         var tShirtId = Guid.NewGuid();
-        var twoPairsOfShoes = new PricedProductItem(shoesId, 2, 100);
-        var pairOfShoes = new PricedProductItem(shoesId, 1, 100);
-        var tShirt = new PricedProductItem(tShirtId, 1, 50);
+        var twoPairsOfShoes = new ProductItem(shoesId, 2);
+        var pairOfShoes = new ProductItem(shoesId, 1);
+        var tShirt = new ProductItem(tShirtId, 1);
 
-        // TODO: Fill the events object with results of your business logic
-        // to be the same as events below
-        var events = new List<object>
+        var shoesPrice = 100;
+        var tShirtPrice = 50;
+
+        var pricedPairOfShoes = new PricedProductItem(shoesId, 1, shoesPrice);
+        var pricedTShirt = new PricedProductItem(tShirtId, 1, tShirtPrice);
+
+        var eventStore = new EventStore();
+
+        // Open
+        ShoppingCartEvent result =
+            ShoppingCartService.Handle(
+                new OpenShoppingCart(shoppingCartId, clientId)
+            );
+        eventStore.AppendToStream(shoppingCartId, [result]);
+
+        // Add Two Pair of Shoes
+        var shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
+        result = ShoppingCartService.Handle(
+            FakeProductPriceCalculator.Returning(shoesPrice),
+            new AddProductItemToShoppingCart(shoppingCartId, twoPairsOfShoes),
+            shoppingCart
+        );
+        eventStore.AppendToStream(shoppingCartId, [result]);
+
+        // Add T-Shirt
+        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
+        result = ShoppingCartService.Handle(
+            FakeProductPriceCalculator.Returning(tShirtPrice),
+            new AddProductItemToShoppingCart(shoppingCartId, tShirt),
+            shoppingCart
+        );
+        eventStore.AppendToStream(shoppingCartId, [result]);
+
+        // Remove a pair of shoes
+        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
+        result = ShoppingCartService.Handle(
+            new RemoveProductItemFromShoppingCart(shoppingCartId, pricedPairOfShoes),
+            shoppingCart
+        );
+        eventStore.AppendToStream(shoppingCartId, [result]);
+
+        // Confirm
+        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
+        result = ShoppingCartService.Handle(
+            new ConfirmShoppingCart(shoppingCartId),
+            shoppingCart
+        );
+        eventStore.AppendToStream(shoppingCartId, [result]);
+
+        // Try Cancel
+        var exception = Record.Exception(() =>
         {
-            // new ShoppingCartOpened(shoppingCartId, clientId),
-            // new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
-            // new ProductItemAddedToShoppingCart(shoppingCartId, tShirt),
-            // new ProductItemRemovedFromShoppingCart(shoppingCartId, pairOfShoes),
-            // new ShoppingCartConfirmed(shoppingCartId, DateTime.UtcNow),
-            // new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
-        };
+            shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
+            result = ShoppingCartService.Handle(
+                new CancelShoppingCart(shoppingCartId),
+                shoppingCart
+            );
+            eventStore.AppendToStream(shoppingCartId, [result]);
+        });
+        exception.Should().BeOfType<InvalidOperationException>();
 
-        var shoppingCart = events.GetShoppingCart();
+        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
         shoppingCart.ProductItems.Should().HaveCount(2);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
 
-        shoppingCart.ProductItems[0].Should().Be(pairOfShoes);
-        shoppingCart.ProductItems[1].Should().Be(tShirt);
+        shoppingCart.ProductItems[0].Should().Be(pricedPairOfShoes);
+        shoppingCart.ProductItems[1].Should().Be(pricedTShirt);
+
+        var events = eventStore.ReadStream<ShoppingCartEvent>(shoppingCartId);
+        events.Should().HaveCount(5);
+        events[0].Should().BeOfType<ShoppingCartOpened>();
+        events[1].Should().BeOfType<ProductItemAddedToShoppingCart>();
+        events[2].Should().BeOfType<ProductItemAddedToShoppingCart>();
+        events[3].Should().BeOfType<ProductItemRemovedFromShoppingCart>();
+        events[4].Should().BeOfType<ShoppingCartConfirmed>();
     }
 }

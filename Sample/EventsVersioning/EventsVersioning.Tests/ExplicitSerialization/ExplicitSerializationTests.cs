@@ -95,7 +95,7 @@ public class ExplicitSerializationTests
             )
         };
 
-        var shoppingCart = events.Aggregate(ShoppingCart.Default, ShoppingCart.When);
+        var shoppingCart = events.Aggregate(ShoppingCart.Default, ShoppingCart.Evolve);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);

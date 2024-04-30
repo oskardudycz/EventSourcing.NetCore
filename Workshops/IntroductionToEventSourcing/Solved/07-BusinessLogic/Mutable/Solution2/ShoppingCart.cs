@@ -1,13 +1,55 @@
 namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution2;
+
 using static ShoppingCartEvent;
 
-public interface IAggregate
+// EVENTS
+public abstract record ShoppingCartEvent
 {
-    Guid Id { get; }
+    public record ShoppingCartOpened(
+        Guid ShoppingCartId,
+        Guid ClientId
+    ): ShoppingCartEvent;
 
-    void Evolve(object @event) { }
+    public record ProductItemAddedToShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
+
+    public record ProductItemRemovedFromShoppingCart(
+        Guid ShoppingCartId,
+        PricedProductItem ProductItem
+    ): ShoppingCartEvent;
+
+    public record ShoppingCartConfirmed(
+        Guid ShoppingCartId,
+        DateTime ConfirmedAt
+    ): ShoppingCartEvent;
+
+    public record ShoppingCartCanceled(
+        Guid ShoppingCartId,
+        DateTime CanceledAt
+    ): ShoppingCartEvent;
+
+    // This won't allow external inheritance
+    private ShoppingCartEvent() { }
 }
 
+// VALUE OBJECTS
+public class PricedProductItem
+{
+    public Guid ProductId { get; set; }
+    public decimal UnitPrice { get; set; }
+    public int Quantity { get; set; }
+    public decimal TotalPrice => Quantity * UnitPrice;
+}
+
+public class ProductItem
+{
+    public Guid ProductId { get; set; }
+    public int Quantity { get; set; }
+}
+
+// ENTITY
 public class ShoppingCart: IAggregate
 {
     public Guid Id { get; private set;  }
@@ -53,6 +95,8 @@ public class ShoppingCart: IAggregate
         return (@event, new ShoppingCart(@event));
     }
 
+    public static ShoppingCart Initial() => new();
+
     private ShoppingCart(ShoppingCartOpened @event) =>
         Apply(@event);
 
@@ -96,8 +140,7 @@ public class ShoppingCart: IAggregate
         if (current == null)
             ProductItems.Add(pricedProductItem);
         else
-            ProductItems[ProductItems.IndexOf(current)] =
-                new PricedProductItem(current.ProductId, current.Quantity + quantityToAdd, current.UnitPrice);
+            ProductItems[ProductItems.IndexOf(current)].Quantity += quantityToAdd;
     }
 
     public ProductItemRemovedFromShoppingCart RemoveProduct(PricedProductItem productItemToBeRemoved)
@@ -138,8 +181,7 @@ public class ShoppingCart: IAggregate
         if (current.Quantity == quantityToRemove)
             ProductItems.Remove(current);
         else
-            ProductItems[ProductItems.IndexOf(current)] =
-                new PricedProductItem(current.ProductId, current.Quantity - quantityToRemove, current.UnitPrice);
+            ProductItems[ProductItems.IndexOf(current)].Quantity -= quantityToRemove;
     }
 
     public ShoppingCartConfirmed Confirm()
@@ -188,27 +230,4 @@ public enum ShoppingCartStatus
     Canceled = 4,
 
     Closed = Confirmed | Canceled
-}
-
-public interface IProductPriceCalculator
-{
-    PricedProductItem Calculate(ProductItem productItems);
-}
-
-public class FakeProductPriceCalculator: IProductPriceCalculator
-{
-    private readonly int value;
-
-    private FakeProductPriceCalculator(int value)
-    {
-        this.value = value;
-    }
-
-    public static FakeProductPriceCalculator Returning(int value) => new(value);
-
-    public PricedProductItem Calculate(ProductItem productItem)
-    {
-        var (productId, quantity) = productItem;
-        return new PricedProductItem(productId, quantity, value);
-    }
 }

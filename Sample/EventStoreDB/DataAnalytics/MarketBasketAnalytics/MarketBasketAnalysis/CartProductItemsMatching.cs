@@ -22,7 +22,7 @@ namespace MarketBasketAnalytics.MarketBasketAnalysis
         )
         {
             var productItems = await aggregateStream(
-                When,
+                Evolve,
                 ShoppingCart.ToStreamId(@event.ShoppingCartId),
                 ct
             );
@@ -39,7 +39,7 @@ namespace MarketBasketAnalytics.MarketBasketAnalysis
                 .ToList();
         }
 
-        public static Dictionary<Guid, int> When(Dictionary<Guid, int>? productItems, object @event) =>
+        public static Dictionary<Guid, int> Evolve(Dictionary<Guid, int>? productItems, object @event) =>
             @event switch
             {
                 ShoppingCartInitialized =>

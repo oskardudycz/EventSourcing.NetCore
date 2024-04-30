@@ -80,7 +80,7 @@ public class BusinessLogicTests: EventStoreDBTest
 
         // Add two pairs of shoes
         await EventStore.GetAndUpdate(
-            ShoppingCart.When,
+            ShoppingCart.Evolve,
             ShoppingCart.Default(),
             command => ShoppingCart.StreamName(command.ShoppingCartId),
             (command, shoppingCart) =>
@@ -91,7 +91,7 @@ public class BusinessLogicTests: EventStoreDBTest
 
         // Add T-Shirt
         await EventStore.GetAndUpdate(
-            ShoppingCart.When,
+            ShoppingCart.Evolve,
             ShoppingCart.Default(),
             command => ShoppingCart.StreamName(command.ShoppingCartId),
             (command, shoppingCart) =>
@@ -102,7 +102,7 @@ public class BusinessLogicTests: EventStoreDBTest
 
         // Remove pair of shoes
         await EventStore.GetAndUpdate(
-            ShoppingCart.When,
+            ShoppingCart.Evolve,
             ShoppingCart.Default(),
             command => ShoppingCart.StreamName(command.ShoppingCartId),
             RemoveProductItemFromShoppingCart.Handle,
@@ -112,7 +112,7 @@ public class BusinessLogicTests: EventStoreDBTest
 
         // Confirm
         await EventStore.GetAndUpdate(
-            ShoppingCart.When,
+            ShoppingCart.Evolve,
             ShoppingCart.Default(),
             command => ShoppingCart.StreamName(command.ShoppingCartId),
             ConfirmShoppingCart.Handle,
@@ -124,7 +124,7 @@ public class BusinessLogicTests: EventStoreDBTest
         var exception = await Record.ExceptionAsync(async () =>
             {
                 await EventStore.GetAndUpdate(
-                    ShoppingCart.When,
+                    ShoppingCart.Evolve,
                     ShoppingCart.Default(),
                     command => ShoppingCart.StreamName(command.ShoppingCartId),
                     CancelShoppingCart.Handle,
@@ -136,7 +136,7 @@ public class BusinessLogicTests: EventStoreDBTest
         exception.Should().BeOfType<InvalidOperationException>();
 
         var shoppingCart = await EventStore.Get(
-            ShoppingCart.When,
+            ShoppingCart.Evolve,
             ShoppingCart.Default(),
             ShoppingCart.StreamName(shoppingCartId),
             CancellationToken.None
