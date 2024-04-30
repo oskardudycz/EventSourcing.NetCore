@@ -28,7 +28,7 @@ public class LogIncidentsTests: IClassFixture<ApiSpecification<Program>>
                         ctx.GetCreatedId<Guid>(),
                         CustomerId,
                         IncidentStatus.Pending,
-                        Array.Empty<IncidentNote>(),
+                        [],
                         null,
                         null,
                         null,

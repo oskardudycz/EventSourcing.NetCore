@@ -34,7 +34,7 @@ public abstract record ShoppingCartEvent
         DateTime CanceledAt
     ): ShoppingCartEvent;
 
-    // This won't allow
+    // This won't allow external inheritance
     private ShoppingCartEvent(){}
 }
 
@@ -60,7 +60,7 @@ public record ShoppingCart(
             opened.ShoppingCartId,
             opened.ClientId,
             ShoppingCartStatus.Pending,
-            Array.Empty<PricedProductItem>()
+            []
         );
 
     public ShoppingCart Apply(ProductItemAddedToShoppingCart productItemAdded) =>
