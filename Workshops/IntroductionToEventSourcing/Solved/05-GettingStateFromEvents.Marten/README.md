@@ -29,4 +29,6 @@ Read also my articles:
 - and [Marten documentation on live aggregation](https://martendb.io/events/projections/live-aggregates.html)
 
 1. Mutable: [Mutable/GettingStateFromEventsTests.cs](./Mutable/GettingStateFromEventsTests.cs).
-2. Immutable: [Immutable/GettingStateFromEventsTests.cs](./Immutable/GettingStateFromEventsTests.cs).
+2. Immutable:
+ - with default Marten convention having Apply method per event type: [Immutable/DefaultConvention/GettingStateFromEventsTests.cs](./Immutable/DefaultConvention/GettingStateFromEventsTests.cs).
+ - with a single Apply method using Shopping Cart Event union type: [Immutable/SingleApply/GettingStateFromEventsTests.cs](./Immutable/SingleApply/GettingStateFromEventsTests.cs).

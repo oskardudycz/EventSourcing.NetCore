@@ -5,7 +5,7 @@ public interface IAggregate
 {
     public Guid Id { get; }
 
-    public virtual void When(object @event) { }
+    public void Evolve(object @event) { }
 }
 
 
@@ -97,7 +97,7 @@ public class ShoppingCart: IAggregate
 
     public static string StreamName(Guid id) => $"shopping_cart-{id}";
 
-    public void When(object @event)
+    public void Evolve(object @event)
     {
         switch (@event)
         {

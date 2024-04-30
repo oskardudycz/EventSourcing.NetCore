@@ -7,7 +7,7 @@ public abstract class Aggregate
 
     private readonly Queue<object> uncommittedEvents = new();
 
-    public virtual void When(object @event) { }
+    public virtual void Evolve(object @event) { }
 
     public object[] DequeueUncommittedEvents()
     {
@@ -111,7 +111,7 @@ public class ShoppingCart: Aggregate
 
     public static string StreamName(Guid id) => $"shopping_cart-{id}";
 
-    public override void When(object @event)
+    public override void Evolve(object @event)
     {
         switch (@event)
         {

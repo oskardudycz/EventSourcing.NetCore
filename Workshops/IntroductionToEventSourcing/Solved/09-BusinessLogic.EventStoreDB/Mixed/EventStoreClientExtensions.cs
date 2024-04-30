@@ -34,7 +34,7 @@ public static class EventStoreClientExtensions
                 empty,
                 ((aggregate, @event) =>
                 {
-                    aggregate.When(@event!);
+                    aggregate.Evolve(@event!);
                     return aggregate;
                 }),
                 cancellationToken

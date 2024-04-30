@@ -60,7 +60,7 @@ public class ShoppingCart
     public DateTime? ConfirmedAt { get; private set; }
     public DateTime? CanceledAt { get; private set; }
 
-    public void When(object @event)
+    public void Evolve(object @event)
     {
         switch (@event)
         {
@@ -171,14 +171,14 @@ public class GettingStateFromEventsTests: EventStoreDBTest
                 Type.GetType(@event.Event.EventType)!
             );
 
-            shoppingCart.When(eventData!);
+            shoppingCart.Evolve(eventData!);
         }
 
         return shoppingCart;
     }
 
     [Fact]
-    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task GettingState_FromEventStoreDB_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();

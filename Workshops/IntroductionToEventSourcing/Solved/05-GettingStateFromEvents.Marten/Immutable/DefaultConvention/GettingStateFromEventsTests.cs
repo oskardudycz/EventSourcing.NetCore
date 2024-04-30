@@ -1,9 +1,9 @@
-using EventStore.Client;
 using FluentAssertions;
 using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
+using Marten;
 using Xunit;
 
-namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable;
+namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable.DefaultConvention;
 using static ShoppingCartEvent;
 
 // EVENTS
@@ -53,7 +53,59 @@ public record ShoppingCart(
     PricedProductItem[] ProductItems,
     DateTime? ConfirmedAt = null,
     DateTime? CanceledAt = null
-);
+){
+
+    public static ShoppingCart Create(ShoppingCartOpened opened) =>
+        new ShoppingCart(
+            opened.ShoppingCartId,
+            opened.ClientId,
+            ShoppingCartStatus.Pending,
+            []
+        );
+
+    public ShoppingCart Apply(ProductItemAddedToShoppingCart productItemAdded) =>
+        this with
+        {
+            ProductItems = ProductItems
+                .Concat(new[] { productItemAdded.ProductItem })
+                .GroupBy(pi => pi.ProductId)
+                .Select(group => group.Count() == 1
+                    ? group.First()
+                    : new PricedProductItem(
+                        group.Key,
+                        group.Sum(pi => pi.Quantity),
+                        group.First().UnitPrice
+                    )
+                )
+                .ToArray()
+        };
+
+    public ShoppingCart Apply(ProductItemRemovedFromShoppingCart productItemRemoved) =>
+        this with
+        {
+            ProductItems = ProductItems
+                .Select(pi => pi.ProductId == productItemRemoved.ProductItem.ProductId
+                    ? pi with { Quantity = pi.Quantity - productItemRemoved.ProductItem.Quantity }
+                    : pi
+                )
+                .Where(pi => pi.Quantity > 0)
+                .ToArray()
+        };
+
+    public ShoppingCart Apply(ShoppingCartConfirmed confirmed) =>
+        this with
+        {
+            Status = ShoppingCartStatus.Confirmed,
+            ConfirmedAt = confirmed.ConfirmedAt
+        };
+
+    public ShoppingCart Apply(ShoppingCartCanceled canceled) =>
+        this with
+        {
+            Status = ShoppingCartStatus.Canceled,
+            CanceledAt = canceled.CanceledAt
+        };
+}
 
 public enum ShoppingCartStatus
 {
@@ -62,21 +114,25 @@ public enum ShoppingCartStatus
     Canceled = 4
 }
 
-public class GettingStateFromEventsTests: EventStoreDBTest
+public class GettingStateFromEventsTests: MartenTest
 {
     /// <summary>
-    /// Solution - Mutable entity with When method
+    /// Solution - Immutable entity
     /// </summary>
+    /// <param name="documentSession"></param>
+    /// <param name="shoppingCartId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private static Task<ShoppingCart> GetShoppingCart(EventStoreClient eventStore, string streamName, CancellationToken ct)
+    private static async Task<ShoppingCart> GetShoppingCart(IDocumentSession documentSession, Guid shoppingCartId,
+        CancellationToken cancellationToken)
     {
-        // 1. Add logic here
-        throw new NotImplementedException();
+        var shoppingCart = await documentSession.Events.AggregateStreamAsync<ShoppingCart>(shoppingCartId, token: cancellationToken);
+
+        return shoppingCart ?? throw new InvalidOperationException("Shopping Cart was not found!");
     }
 
     [Fact]
-    [Trait("Category", "SkipCI")]
-    public async Task GettingState_FromEventStoreDB_ShouldSucceed()
+    public async Task GettingState_FromMarten_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
@@ -86,7 +142,7 @@ public class GettingStateFromEventsTests: EventStoreDBTest
         var pairOfShoes = new PricedProductItem(shoesId, 1, 100);
         var tShirt = new PricedProductItem(tShirtId, 1, 50);
 
-        var events = new ShoppingCartEvent[]
+        var events = new object[]
         {
             new ShoppingCartOpened(shoppingCartId, clientId),
             new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),
@@ -96,11 +152,9 @@ public class GettingStateFromEventsTests: EventStoreDBTest
             new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        var streamName = $"shopping_cart-{shoppingCartId}";
+        await AppendEvents(shoppingCartId, events, CancellationToken.None);
 
-        await AppendEvents(streamName, events, CancellationToken.None);
-
-        var shoppingCart = await GetShoppingCart(EventStore, streamName, CancellationToken.None);
+        var shoppingCart = await GetShoppingCart(DocumentSession, shoppingCartId, CancellationToken.None);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);

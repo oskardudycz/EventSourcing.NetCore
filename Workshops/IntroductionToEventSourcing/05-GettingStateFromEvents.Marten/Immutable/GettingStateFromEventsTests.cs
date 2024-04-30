@@ -71,7 +71,9 @@ public class GettingStateFromEventsTests: MartenTest
     /// <param name="shoppingCartId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private static Task<ShoppingCart> GetShoppingCart(IDocumentSession documentSession, Guid shoppingCartId,
+    private static Task<ShoppingCart> GetShoppingCart(
+        IDocumentSession documentSession,
+        Guid shoppingCartId,
         CancellationToken cancellationToken)
     {
         // 1. Add logic here
@@ -80,7 +82,7 @@ public class GettingStateFromEventsTests: MartenTest
 
     [Fact]
     [Trait("Category", "SkipCI")]
-    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task GettingState_FromMarten_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();

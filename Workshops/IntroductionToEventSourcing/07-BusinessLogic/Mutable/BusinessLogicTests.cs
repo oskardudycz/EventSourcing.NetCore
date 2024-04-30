@@ -57,7 +57,7 @@ public class ShoppingCart
     public DateTime? ConfirmedAt { get; private set; }
     public DateTime? CanceledAt { get; private set; }
 
-    public void When(object @event)
+    public void Evolve(object @event)
     {
         switch (@event)
         {
@@ -146,7 +146,7 @@ public static class ShoppingCartExtensions
 
         foreach (var @event in events)
         {
-            shoppingCart.When(@event);
+            shoppingCart.Evolve(@event);
         }
 
         return shoppingCart;

@@ -57,7 +57,7 @@ public static class ShoppingCartExtensions
 
         foreach (var @event in events)
         {
-            shoppingCart.When(@event);
+            shoppingCart.Evolve(@event);
         }
 
         return shoppingCart;

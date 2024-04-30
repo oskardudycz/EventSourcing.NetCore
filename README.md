@@ -286,7 +286,7 @@ public class Invoice
     public InvoiceSendMethod SentVia { get; private set; }
     public DateTime SentAt { get; private set; }
 
-    public void When(object @event)
+    public void Evolve(object @event)
     {
         switch (@event)
         {
@@ -354,7 +354,7 @@ var invoice = new Invoice();
 // 4. Apply each event on the entity.
 foreach (var @event in events)
 {
-    invoice.When(@event);
+    invoice.Evolve(@event);
 }
 ```
 
@@ -367,13 +367,13 @@ public abstract class Aggregate<T>
 
     protected Aggregate() { }
 
-    public virtual void When(object @event) { }
+    public virtual void Evolve(object @event) { }
 }
 ```
 
 The biggest advantage of _"online"_ stream aggregation is that it always uses the most recent business logic. So after the change in the apply method, it's automatically reflected on the next run. If events data is fine, then it's not needed to do any migration or updates.
 
-In Marten `When` method is not needed. Marten uses naming convention and call the `Apply` method internally. It has to:
+In Marten `Evolve` method is not needed. Marten uses naming convention and call the `Apply` method internally. It has to:
 - have single parameter with event object,
 - have `void` type as the result.
 
