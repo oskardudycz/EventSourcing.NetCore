@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Ogooreck.API;
 using static Ogooreck.API.ApiSpecification;
 using Warehouse.Products.RegisteringProduct;
@@ -64,11 +64,11 @@ public class RegisterProductTests: IClassFixture<WarehouseTestWebApplicationFact
     private static string ValidSKU => $"CC{DateTime.Now.Ticks}";
     private const string ValidDescription = "VALID_DESCRIPTION";
 
-    public static TheoryData<RegisterProductRequest> ValidRequests = new()
-    {
+    public static TheoryData<RegisterProductRequest> ValidRequests =
+    [
         new RegisterProductRequest(ValidSKU, ValidName, ValidDescription),
         new RegisterProductRequest(ValidSKU, ValidName, null)
-    };
+    ];
 
     public static TheoryData<RegisterProductRequest> InvalidRequests =new()
     {
