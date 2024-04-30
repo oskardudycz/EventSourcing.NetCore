@@ -104,7 +104,7 @@ public record ShoppingCart(
                     Status = ShoppingCartStatus.Canceled,
                     CanceledAt = canceled.CanceledAt
                 },
-            _ => throw new ArgumentOutOfRangeException(nameof(@event))
+            _ => this
         };
 
     private ShoppingCart(): this(Guid.Empty, Guid.Empty, ShoppingCartStatus.Pending, []) {} // Let's make Marten happy

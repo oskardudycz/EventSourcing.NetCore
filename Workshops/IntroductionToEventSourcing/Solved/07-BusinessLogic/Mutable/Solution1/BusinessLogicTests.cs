@@ -1,68 +1,20 @@
 using FluentAssertions;
+using IntroductionToEventSourcing.BusinessLogic.Tools;
 using Xunit;
 
 namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution1;
 
-// EVENTS
-public abstract record ShoppingCartEvent
-{
-    public record ShoppingCartOpened(
-        Guid ShoppingCartId,
-        Guid ClientId
-    ): ShoppingCartEvent;
-
-    public record ProductItemAddedToShoppingCart(
-        Guid ShoppingCartId,
-        PricedProductItem ProductItem
-    ): ShoppingCartEvent;
-
-    public record ProductItemRemovedFromShoppingCart(
-        Guid ShoppingCartId,
-        PricedProductItem ProductItem
-    ): ShoppingCartEvent;
-
-    public record ShoppingCartConfirmed(
-        Guid ShoppingCartId,
-        DateTime ConfirmedAt
-    ): ShoppingCartEvent;
-
-    public record ShoppingCartCanceled(
-        Guid ShoppingCartId,
-        DateTime CanceledAt
-    ): ShoppingCartEvent;
-
-    // This won't allow external inheritance
-    private ShoppingCartEvent(){}
-}
-
-// VALUE OBJECTS
-public class PricedProductItem
-{
-    public Guid ProductId { get; set; }
-    public decimal UnitPrice { get; set; }
-    public int Quantity { get; set; }
-    public decimal TotalPrice => Quantity * UnitPrice;
-}
-
-public class ProductItem
-{
-    public Guid ProductId { get; set; }
-    public int Quantity { get; set; }
-}
+using static ShoppingCartEvent;
 
 public static class ShoppingCartExtensions
 {
-    public static ShoppingCart GetShoppingCart(this IEnumerable<object> events)
-    {
-        var shoppingCart = (ShoppingCart)Activator.CreateInstance(typeof(ShoppingCart), true)!;
-
-        foreach (var @event in events)
-        {
-            shoppingCart.Evolve(@event);
-        }
-
-        return shoppingCart;
-    }
+    public static ShoppingCart GetShoppingCart(this EventStore eventStore, Guid shoppingCartId) =>
+        eventStore.ReadStream<ShoppingCartEvent>(shoppingCartId)
+            .Aggregate(ShoppingCart.Initial(), (shoppingCart, @event) =>
+            {
+                shoppingCart.Evolve(@event);
+                return shoppingCart;
+            });
 }
 
 public class BusinessLogicTests
@@ -74,7 +26,6 @@ public class BusinessLogicTests
         var clientId = Guid.NewGuid();
         var shoesId = Guid.NewGuid();
         var tShirtId = Guid.NewGuid();
-
         var twoPairsOfShoes = new ProductItem { ProductId = shoesId, Quantity = 2 };
         var pairOfShoes = new ProductItem { ProductId = shoesId, Quantity = 1 };
         var tShirt = new ProductItem { ProductId = tShirtId, Quantity = 1 };
@@ -83,70 +34,65 @@ public class BusinessLogicTests
         var tShirtPrice = 50;
 
         var pricedPairOfShoes = new PricedProductItem { ProductId = shoesId, Quantity = 1, UnitPrice = shoesPrice };
-        var pricedTShirt = new PricedProductItem{ ProductId = tShirtId, Quantity = 1, UnitPrice = tShirtPrice };
+        var pricedTShirt = new PricedProductItem { ProductId = tShirtId, Quantity = 1, UnitPrice = tShirtPrice };
 
-        var events = new List<object>();
+        var eventStore = new EventStore();
 
         // Open
         var shoppingCart = ShoppingCart.Open(shoppingCartId, clientId);
-        events.AddRange(shoppingCart.DequeueUncommittedEvents());
+        eventStore.AppendToStream(shoppingCartId, shoppingCart.DequeueUncommittedEvents());
 
-        // Add two pairs of shoes
-        shoppingCart = events.GetShoppingCart();
-        shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(shoesPrice), twoPairsOfShoes);
-        events.AddRange(shoppingCart.DequeueUncommittedEvents());
+        // Add Two Pair of Shoes
+        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
+        shoppingCart.AddProduct(
+            FakeProductPriceCalculator.Returning(shoesPrice),
+            twoPairsOfShoes
+        );
+        eventStore.AppendToStream(shoppingCartId, shoppingCart.DequeueUncommittedEvents());
 
         // Add T-Shirt
-        shoppingCart = events.GetShoppingCart();
-        shoppingCart.AddProduct(FakeProductPriceCalculator.Returning(tShirtPrice), tShirt);
-        events.AddRange(shoppingCart.DequeueUncommittedEvents());
+        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
+        shoppingCart.AddProduct(
+            FakeProductPriceCalculator.Returning(tShirtPrice),
+            tShirt
+        );
+        eventStore.AppendToStream(shoppingCartId, shoppingCart.DequeueUncommittedEvents());
 
-        // Remove pair of shoes
-        // Hack alert!
-        //
-        // See that's why immutability is so cool, as it's predictable
-        // As we're sharing objects (e.g. in PricedProductItem in events)
-        // then adding them into list and changing it while appending/removing
-        // then we can have unpleasant surprises.
-        //
-        // This will not likely happen if all objects are recreated (e.g. in the web requests)
-        // However when it happens then it's tricky to diagnose.
-        // Uncomment lines below and debug to find more.
-        // shoppingCart = events.GetShoppingCart();
+        // Remove a pair of shoes
+        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
         shoppingCart.RemoveProduct(pricedPairOfShoes);
-        events.AddRange(shoppingCart.DequeueUncommittedEvents());
+        eventStore.AppendToStream(shoppingCartId, shoppingCart.DequeueUncommittedEvents());
 
         // Confirm
-        // Uncomment line below and debug to find bug.
-        // shoppingCart = events.GetShoppingCart();
+        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
         shoppingCart.Confirm();
-        events.AddRange(shoppingCart.DequeueUncommittedEvents());
+        eventStore.AppendToStream(shoppingCartId, shoppingCart.DequeueUncommittedEvents());
 
-        // Cancel
+        // Try Cancel
         var exception = Record.Exception(() =>
-            {
-                // Uncomment line below and debug to find bug.
-                // shoppingCart = events.GetShoppingCart();
-                shoppingCart.Cancel();
-                events.AddRange(shoppingCart.DequeueUncommittedEvents());
-            }
-        );
+        {
+            shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
+            shoppingCart.Cancel();
+            eventStore.AppendToStream(shoppingCartId, shoppingCart.DequeueUncommittedEvents());
+        });
         exception.Should().BeOfType<InvalidOperationException>();
 
-        // Uncomment line below and debug to find bug.
-        // shoppingCart = events.GetShoppingCart();
+        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
 
         shoppingCart.Id.Should().Be(shoppingCartId);
         shoppingCart.ClientId.Should().Be(clientId);
         shoppingCart.ProductItems.Should().HaveCount(2);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
 
-        shoppingCart.ProductItems[0].ProductId.Should().Be(shoesId);
-        shoppingCart.ProductItems[0].Quantity.Should().Be(pricedPairOfShoes.Quantity);
-        shoppingCart.ProductItems[0].UnitPrice.Should().Be(pricedPairOfShoes.UnitPrice);
+        shoppingCart.ProductItems[0].Should().BeEquivalentTo(pricedPairOfShoes);
+        shoppingCart.ProductItems[1].Should().BeEquivalentTo(pricedTShirt);
 
-        shoppingCart.ProductItems[1].ProductId.Should().Be(tShirtId);
-        shoppingCart.ProductItems[1].Quantity.Should().Be(pricedTShirt.Quantity);
-        shoppingCart.ProductItems[1].UnitPrice.Should().Be(pricedTShirt.UnitPrice);
+        var events = eventStore.ReadStream<ShoppingCartEvent>(shoppingCartId);
+        events.Should().HaveCount(5);
+        events[0].Should().BeOfType<ShoppingCartOpened>();
+        events[1].Should().BeOfType<ProductItemAddedToShoppingCart>();
+        events[2].Should().BeOfType<ProductItemAddedToShoppingCart>();
+        events[3].Should().BeOfType<ProductItemRemovedFromShoppingCart>();
+        events[4].Should().BeOfType<ShoppingCartConfirmed>();
     }
 }

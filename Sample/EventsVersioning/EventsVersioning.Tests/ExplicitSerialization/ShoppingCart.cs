@@ -220,18 +220,12 @@ public record ShoppingCart(
     Dictionary<ProductId, Quantity> ProductItems
 )
 {
-    public static ShoppingCart When(ShoppingCart entity, object @event)
+    public static ShoppingCart Evolve(ShoppingCart entity, object @event)
     {
         return @event switch
         {
             ShoppingCartOpened (var cartId, var clientId) =>
-                entity with
-                {
-                    Id = cartId,
-                    ClientId = clientId,
-                    Status = ShoppingCartStatus.Pending,
-                    ProductItems = new Dictionary<ProductId, Quantity>()
-                },
+                new ShoppingCart(cartId, clientId, ShoppingCartStatus.Pending, new Dictionary<ProductId, Quantity>()),
 
             ProductItemAddedToShoppingCart (_, var productItem) =>
                 entity with { ProductItems = entity.ProductItems.Add(productItem) },

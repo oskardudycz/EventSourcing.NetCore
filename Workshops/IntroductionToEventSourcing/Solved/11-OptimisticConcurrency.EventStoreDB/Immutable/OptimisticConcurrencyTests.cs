@@ -54,7 +54,7 @@ public record PricedProductItem(
 public static class ShoppingCartExtensions
 {
     public static ShoppingCart GetShoppingCart(this IEnumerable<object> events) =>
-        events.Aggregate(ShoppingCart.Default(), ShoppingCart.When);
+        events.Aggregate(ShoppingCart.Default(), ShoppingCart.Evolve);
 }
 
 // Business logic
@@ -98,7 +98,7 @@ public class OptimisticConcurrencyTests: EventStoreDBTest
 
         // Add two pairs of shoes
         await EventStore.GetAndUpdate(
-            ShoppingCart.When,
+            ShoppingCart.Evolve,
             ShoppingCart.Default(),
             command => ShoppingCart.StreamName(command.ShoppingCartId),
             (command, shoppingCart) =>
@@ -113,7 +113,7 @@ public class OptimisticConcurrencyTests: EventStoreDBTest
         exception = await Record.ExceptionAsync(async () =>
             {
                 await EventStore.GetAndUpdate(
-                    ShoppingCart.When,
+                    ShoppingCart.Evolve,
                     ShoppingCart.Default(),
                     command => ShoppingCart.StreamName(command.ShoppingCartId),
                     (command, shoppingCart) =>
@@ -127,7 +127,7 @@ public class OptimisticConcurrencyTests: EventStoreDBTest
         exception.Should().BeOfType<WrongExpectedVersionException>();
 
         var shoppingCart = await EventStore.Get(
-            ShoppingCart.When,
+            ShoppingCart.Evolve,
             ShoppingCart.Default(),
             ShoppingCart.StreamName(shoppingCartId)
         );

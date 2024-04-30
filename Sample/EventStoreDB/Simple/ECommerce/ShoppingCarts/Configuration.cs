@@ -20,7 +20,7 @@ public static class Configuration
         services
             .For<ShoppingCart>(
                 ShoppingCart.Default,
-                ShoppingCart.When,
+                ShoppingCart.Evolve,
                 builder => builder
                     .AddOn<OpenShoppingCart>(
                         OpenShoppingCart.Handle,
