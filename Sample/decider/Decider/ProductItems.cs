@@ -13,7 +13,7 @@ public record PricedProductItem(
 
 public class ProductItems
 {
-    public static ProductItems Empty = new(Array.Empty<PricedProductItem>());
+    public static ProductItems Empty = new([]);
 
     public PricedProductItem[] Values { get; }
 

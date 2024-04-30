@@ -59,7 +59,7 @@ public partial class GroupCheckoutTests
                 new GuestCheckoutFailed(groupCheckoutId, guestStaysIds[2], now),
                 new GroupCheckoutFailed(
                     groupCheckoutId,
-                    Array.Empty<Guid>(),
+                    [],
                     guestStaysIds,
                     now
                 )

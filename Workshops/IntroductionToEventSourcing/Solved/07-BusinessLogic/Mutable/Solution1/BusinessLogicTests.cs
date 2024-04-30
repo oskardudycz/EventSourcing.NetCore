@@ -31,7 +31,7 @@ public abstract record ShoppingCartEvent
         DateTime CanceledAt
     ): ShoppingCartEvent;
 
-    // This won't allow
+    // This won't allow external inheritance
     private ShoppingCartEvent(){}
 }
 

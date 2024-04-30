@@ -14,7 +14,7 @@ public abstract record ShoppingCartEvent
 
     public record Canceled(DateTimeOffset CanceledAt): ShoppingCartEvent;
 
-    // This won't allow
+    // This won't allow external inheritance
     private ShoppingCartEvent(){}
 }
 
@@ -39,7 +39,7 @@ public record ShoppingCart
         @event switch
         {
             Opened =>
-                new Pending(Array.Empty<(ProductId ProductId, int Quantity)>()),
+                new Pending([]),
 
             ProductItemAdded (var (productId, quantity, _)) =>
                 this is Pending pending

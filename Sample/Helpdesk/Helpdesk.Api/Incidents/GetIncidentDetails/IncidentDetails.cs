@@ -29,7 +29,7 @@ public enum IncidentNoteType
 public class IncidentDetailsProjection: SingleStreamProjection<IncidentDetails>
 {
     public static IncidentDetails Create(IncidentLogged logged) =>
-        new(logged.IncidentId, logged.CustomerId, IncidentStatus.Pending, Array.Empty<IncidentNote>());
+        new(logged.IncidentId, logged.CustomerId, IncidentStatus.Pending, []);
 
     public IncidentDetails Apply(IncidentCategorised categorised, IncidentDetails current) =>
         current with { Category = categorised.Category };

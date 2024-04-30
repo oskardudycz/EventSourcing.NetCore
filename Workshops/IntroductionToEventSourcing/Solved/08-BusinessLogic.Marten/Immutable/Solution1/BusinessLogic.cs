@@ -17,7 +17,7 @@ public record ShoppingCart(
             opened.ShoppingCartId,
             opened.ClientId,
             ShoppingCartStatus.Pending,
-            Array.Empty<PricedProductItem>()
+            []
         );
 
     public ShoppingCart Apply(ProductItemAddedToShoppingCart productItemAdded) =>

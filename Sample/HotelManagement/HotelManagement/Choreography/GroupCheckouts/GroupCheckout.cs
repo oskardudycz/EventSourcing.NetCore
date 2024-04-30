@@ -72,7 +72,7 @@ public record GroupCheckout(
     )
     {
         if (Status == CheckoutStatus.Initiated && GuestStayCheckouts[guestStayId] != CheckoutStatus.Completed)
-            return Array.Empty<object>();
+            return [];
 
         var guestCheckoutCompleted = new GuestCheckoutCompleted(Id, guestStayId, now);
 
@@ -89,7 +89,7 @@ public record GroupCheckout(
     )
     {
         if(Status == CheckoutStatus.Initiated && GuestStayCheckouts[guestStayId] != CheckoutStatus.Failed)
-            return Array.Empty<object>();
+            return [];
 
         var guestCheckoutFailed = new GuestCheckoutFailed(Id, guestStayId, now);
 
