@@ -3,7 +3,7 @@ using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 using Marten;
 using Xunit;
 
-namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable;
+namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable.SingleApply;
 using static ShoppingCartEvent;
 
 // EVENTS
@@ -53,62 +53,61 @@ public record ShoppingCart(
     PricedProductItem[] ProductItems,
     DateTime? ConfirmedAt = null,
     DateTime? CanceledAt = null
-){
-
-    public static ShoppingCart Create(ShoppingCartOpened opened) =>
-        new ShoppingCart(
-            opened.ShoppingCartId,
-            opened.ClientId,
-            ShoppingCartStatus.Pending,
-            []
-        );
-
-    public ShoppingCart Apply(ProductItemAddedToShoppingCart productItemAdded) =>
-        this with
+)
+{
+    public ShoppingCart Apply(ShoppingCartEvent @event) =>
+        @event switch
         {
-            ProductItems = ProductItems
-                .Concat(new[] { productItemAdded.ProductItem })
-                .GroupBy(pi => pi.ProductId)
-                .Select(group => group.Count() == 1
-                    ? group.First()
-                    : new PricedProductItem(
-                        group.Key,
-                        group.Sum(pi => pi.Quantity),
-                        group.First().UnitPrice
-                    )
-                )
-                .ToArray()
+            ShoppingCartOpened opened =>
+                new ShoppingCart(
+                    opened.ShoppingCartId,
+                    opened.ClientId,
+                    ShoppingCartStatus.Pending,
+                    []
+                ),
+            ProductItemAddedToShoppingCart productItemAdded =>
+                this with
+                {
+                    ProductItems = ProductItems
+                        .Concat(new[] { productItemAdded.ProductItem })
+                        .GroupBy(pi => pi.ProductId)
+                        .Select(group => group.Count() == 1
+                            ? group.First()
+                            : new PricedProductItem(
+                                group.Key,
+                                group.Sum(pi => pi.Quantity),
+                                group.First().UnitPrice
+                            )
+                        )
+                        .ToArray()
+                },
+            ProductItemRemovedFromShoppingCart productItemRemoved =>
+                this with
+                {
+                    ProductItems = ProductItems
+                        .Select(pi => pi.ProductId == productItemRemoved.ProductItem.ProductId
+                            ? pi with { Quantity = pi.Quantity - productItemRemoved.ProductItem.Quantity }
+                            : pi
+                        )
+                        .Where(pi => pi.Quantity > 0)
+                        .ToArray()
+                },
+            ShoppingCartConfirmed confirmed =>
+                this with
+                {
+                    Status = ShoppingCartStatus.Confirmed,
+                    ConfirmedAt = confirmed.ConfirmedAt
+                },
+            ShoppingCartCanceled canceled =>
+                this with
+                {
+                    Status = ShoppingCartStatus.Canceled,
+                    CanceledAt = canceled.CanceledAt
+                },
+            _ => throw new ArgumentOutOfRangeException(nameof(@event))
         };
 
-    public ShoppingCart Apply(ProductItemRemovedFromShoppingCart productItemRemoved) =>
-        this with
-        {
-            ProductItems = ProductItems
-                .Select(pi => pi.ProductId == productItemRemoved.ProductItem.ProductId
-                    ? new PricedProductItem(
-                        pi.ProductId,
-                        pi.Quantity - productItemRemoved.ProductItem.Quantity,
-                        pi.UnitPrice
-                    )
-                    : pi
-                )
-                .Where(pi => pi.Quantity > 0)
-                .ToArray()
-        };
-
-    public ShoppingCart Apply(ShoppingCartConfirmed confirmed) =>
-        this with
-        {
-            Status = ShoppingCartStatus.Confirmed,
-            ConfirmedAt = confirmed.ConfirmedAt
-        };
-
-    public ShoppingCart Apply(ShoppingCartCanceled canceled) =>
-        this with
-        {
-            Status = ShoppingCartStatus.Canceled,
-            CanceledAt = canceled.CanceledAt
-        };
+    private ShoppingCart(): this(Guid.Empty, Guid.Empty, ShoppingCartStatus.Pending, []) {} // Let's make Marten happy
 }
 
 public enum ShoppingCartStatus
@@ -136,7 +135,7 @@ public class GettingStateFromEventsTests: MartenTest
     }
 
     [Fact]
-    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task GettingState_FromMarten_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();

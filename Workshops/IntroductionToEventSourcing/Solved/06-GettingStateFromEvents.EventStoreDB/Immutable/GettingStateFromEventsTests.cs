@@ -91,11 +91,7 @@ public record ShoppingCart(
                 {
                     ProductItems = shoppingCart.ProductItems
                         .Select(pi => pi.ProductId == pricedProductItem.ProductId?
-                            new PricedProductItem(
-                                pi.ProductId,
-                                pi.Quantity - pricedProductItem.Quantity,
-                                pi.UnitPrice
-                            )
+                            pi with { Quantity = pi.Quantity - pricedProductItem.Quantity }
                             :pi
                         )
                         .Where(pi => pi.Quantity > 0)
@@ -158,7 +154,7 @@ public class GettingStateFromEventsTests: EventStoreDBTest
     }
 
     [Fact]
-    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task GettingState_FromEventStoreDB_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();

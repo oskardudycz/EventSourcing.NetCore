@@ -59,7 +59,7 @@ public class ShoppingCart
     public DateTime? ConfirmedAt { get; private set; }
     public DateTime? CanceledAt { get; private set; }
 
-    public void When(object @event)
+    public void Evolve(ShoppingCartEvent @event)
     {
         switch (@event)
         {
@@ -157,7 +157,7 @@ public class GettingStateFromEventsTests: EventStoreDBTest
 
     [Fact]
     [Trait("Category", "SkipCI")]
-    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task GettingState_FromEventStoreDB_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
@@ -170,7 +170,7 @@ public class GettingStateFromEventsTests: EventStoreDBTest
         var tShirt =
             new PricedProductItem { ProductId = tShirtId, Quantity = 1, UnitPrice = 50 };
 
-        var events = new object[]
+        var events = new ShoppingCartEvent[]
         {
             new ShoppingCartOpened(shoppingCartId, clientId),
             new ProductItemAddedToShoppingCart(shoppingCartId, twoPairsOfShoes),

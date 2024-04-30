@@ -5,7 +5,7 @@ public interface IAggregate
 {
     Guid Id { get; }
 
-    void When(object @event) { }
+    void Evolve(object @event) { }
 }
 
 public class ShoppingCart: IAggregate
@@ -19,7 +19,7 @@ public class ShoppingCart: IAggregate
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    public void When(object @event)
+    public void Evolve(object @event)
     {
         switch (@event)
         {

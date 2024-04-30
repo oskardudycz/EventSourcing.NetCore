@@ -134,7 +134,7 @@ public class GettingStateFromEventsTests: MartenTest
     }
 
     [Fact]
-    public async Task GettingState_ForSequenceOfEvents_ShouldSucceed()
+    public async Task GettingState_FromMarten_ShouldSucceed()
     {
         var shoppingCartId = Guid.NewGuid();
         var clientId = Guid.NewGuid();
