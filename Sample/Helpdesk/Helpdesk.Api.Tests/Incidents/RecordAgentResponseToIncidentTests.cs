@@ -31,10 +31,10 @@ public class RecordAgentResponseToIncidentTests: IClassFixture<ApiWithLoggedInci
                 RESPONSE_BODY(
                     API.Incident with
                     {
-                        Notes = new[]
-                        {
+                        Notes =
+                        [
                             new IncidentNote(IncidentNoteType.FromAgent, agentId, content, visibleToCustomer)
-                        },
+                        ],
                         Version = 2
                     }
                 )

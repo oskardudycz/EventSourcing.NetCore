@@ -13,9 +13,9 @@ public class OptimisticConcurrencyMiddleware
     private readonly RequestDelegate next;
 
     private readonly string[] SupportedMethods =
-    {
+    [
         HttpMethod.Post.Method, HttpMethod.Put.Method, HttpMethod.Delete.Method
-    };
+    ];
 
     public OptimisticConcurrencyMiddleware(
         RequestDelegate next

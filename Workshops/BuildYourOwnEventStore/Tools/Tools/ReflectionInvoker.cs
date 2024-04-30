@@ -18,7 +18,7 @@ public static class ReflectionInvoker
             })
             .SingleOrDefault();
 
-        method?.Invoke(item, new [] { param });
+        method?.Invoke(item, [param]);
     }
 
     public static void SetIfExists<T>(this T item, string propertyName, object value) where T: notnull

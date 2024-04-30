@@ -176,7 +176,7 @@ public static class ShoppingCartDocumentCommandHandler
         CancellationToken ct = default
     ) =>
         session.Decide<ShoppingCart, ShoppingCartCommand, ShoppingCartEvent>(
-            (c, s) => new[] { ShoppingCartService.Decide(c, s) },
+            (c, s) => [ShoppingCartService.Decide(c, s)],
             streamId,
             command,
             ct

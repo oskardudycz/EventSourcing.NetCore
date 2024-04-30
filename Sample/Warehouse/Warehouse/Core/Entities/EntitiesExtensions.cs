@@ -13,5 +13,5 @@ public static class EntitiesExtensions
 
     public static ValueTask<T?> Find<T, TId>(this DbContext dbContext, TId id, CancellationToken ct)
         where T : class where TId : notnull
-        => dbContext.FindAsync<T>(new object[] {id}, ct);
+        => dbContext.FindAsync<T>([id], ct);
 }

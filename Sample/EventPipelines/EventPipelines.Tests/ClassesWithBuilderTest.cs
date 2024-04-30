@@ -24,10 +24,10 @@ public class ClassesWithBuilderTest
 
     public class AdminStorage
     {
-        public static readonly string[] TenantNames = { "FB", "Google", "Twitter" };
+        public static readonly string[] TenantNames = ["FB", "Google", "Twitter"];
 
-        public List<AdminGrantedInTenant> AdminsInTenants = new();
-        public List<AdminAdded> GlobalAdmins = new();
+        public List<AdminGrantedInTenant> AdminsInTenants = [];
+        public List<AdminAdded> GlobalAdmins = [];
     }
 
     public class IsAdmin: IEventFilter<UserAdded>

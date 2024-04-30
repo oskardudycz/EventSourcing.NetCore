@@ -2,7 +2,7 @@
 
 public class EventHandlersBuilder
 {
-    private readonly List<IEventHandler> eventHandlers = new();
+    private readonly List<IEventHandler> eventHandlers = [];
 
     private EventHandlersBuilder()
     {

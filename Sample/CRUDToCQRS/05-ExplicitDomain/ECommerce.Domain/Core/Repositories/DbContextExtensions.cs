@@ -7,7 +7,7 @@ public static class DbContextExtensions
     public static ValueTask<TEntity?> FindById<TEntity>(this DbContext dbContext, Guid id, CancellationToken ct)
         where TEntity : class =>
         dbContext.Set<TEntity>().FindAsync(
-            new object?[] { id },
+            [id],
             cancellationToken: ct
         );
 

@@ -44,9 +44,9 @@ public class SendPackageTests: IClassFixture<TestWebApplicationFactory<Program>>
 
     private readonly DateTime TimeBeforeSending = DateTime.UtcNow;
 
-    private readonly List<ProductItem> ProductItems = new()
-    {
+    private readonly List<ProductItem> ProductItems =
+    [
         new ProductItem { ProductId = Guid.NewGuid(), Quantity = 10 },
         new ProductItem { ProductId = Guid.NewGuid(), Quantity = 3 }
-    };
+    ];
 }

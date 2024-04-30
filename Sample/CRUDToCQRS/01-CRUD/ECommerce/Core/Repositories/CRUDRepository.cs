@@ -45,7 +45,7 @@ public class CRUDRepository<TEntity>: ICRUDRepository<TEntity>
 
     public ValueTask<TEntity?> FindByIdAsync(Guid id, CancellationToken ct)
     {
-        return dbContext.Set<TEntity>().FindAsync(new object?[] { id }, ct);
+        return dbContext.Set<TEntity>().FindAsync([id], ct);
     }
 
     public Task SaveChangesAsync(CancellationToken ct)

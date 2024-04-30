@@ -13,7 +13,7 @@ public abstract class ElasticsearchProjection: IProjection
     protected abstract string IndexName { get; }
     public ElasticsearchClient ElasticsearchClient { private get; init; } = default!;
 
-    private readonly HashSet<Type> handledEventTypes = new();
+    private readonly HashSet<Type> handledEventTypes = [];
 
     protected void Projects<TEvent>() =>
         handledEventTypes.Add(typeof(TEvent));

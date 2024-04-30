@@ -9,7 +9,7 @@ public class Aggregate: IAggregate
     public int Version { get; protected set; }
 
     [JsonIgnore]
-    private readonly List<object> uncommittedEvents = new List<object>();
+    private readonly List<object> uncommittedEvents = [];
 
     //for serialization purposes
     protected Aggregate() { }

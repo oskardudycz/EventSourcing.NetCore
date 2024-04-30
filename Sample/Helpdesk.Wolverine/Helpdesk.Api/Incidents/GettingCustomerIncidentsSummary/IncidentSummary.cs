@@ -49,10 +49,10 @@ public class CustomerIncidentsSummaryProjection: MultiStreamProjection<CustomerI
 public class CustomerIncidentsSummaryGrouper: IAggregateGrouper<Guid>
 {
     private readonly Type[] eventTypes =
-    {
+    [
         typeof(IncidentResolved), typeof(ResolutionAcknowledgedByCustomer),
         typeof(IncidentClosed)
-    };
+    ];
 
     public async Task Group(IQuerySession session, IEnumerable<IEvent> events, ITenantSliceGroup<Guid> grouping)
     {

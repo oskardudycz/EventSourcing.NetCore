@@ -43,7 +43,7 @@ public class ProductItemsList
         );
 
     public static ProductItemsList Empty() =>
-        new(new List<PricedProductItem>());
+        new([]);
 
     public override string ToString() =>
         $"[{string.Join(", ", items.Select(pi => pi.ToString()))}]";

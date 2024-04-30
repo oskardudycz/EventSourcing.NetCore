@@ -107,7 +107,7 @@ public class GroupCheckoutSagaTests
 
 internal class AsyncCommandBusStub: IAsyncCommandBus
 {
-    private readonly List<object> commands = new();
+    private readonly List<object> commands = [];
 
     public Task Schedule<TCommand>(TCommand command, CancellationToken ct = default) where TCommand : notnull
     {

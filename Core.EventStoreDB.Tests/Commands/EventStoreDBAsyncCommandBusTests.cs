@@ -19,7 +19,7 @@ namespace EventStoreDB.Integration.Tests.Commands;
 public class EventStoreDBAsyncCommandBusTests
 {
     private readonly EventStoreDBAsyncCommandBus martenAsyncCommandBus;
-    private readonly List<Guid> userIds = new();
+    private readonly List<Guid> userIds = [];
     private readonly EventListener eventListener = new();
     private readonly CancellationToken ct = new CancellationTokenSource().Token;
     private readonly EventStoreClient eventStoreClient;

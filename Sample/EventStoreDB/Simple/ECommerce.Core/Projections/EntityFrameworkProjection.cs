@@ -127,7 +127,7 @@ public class UpdateProjection<TView, TEvent, TDbContext>: IEventHandler<EventEnv
     public async Task Handle(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct)
     {
         var viewId = getViewId(eventEnvelope.Data);
-        var view = await dbContext.FindAsync<TView>(new [] {viewId}, ct);
+        var view = await dbContext.FindAsync<TView>([viewId], ct);
 
         if (view == null)
             throw new InvalidOperationException($"{typeof(TView).Name} with id {viewId} wasn't found");
