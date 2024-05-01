@@ -3,9 +3,9 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-[assembly: TestFramework("ApplicationLogic.Marten.Tests.AssemblyFixture", "ApplicationLogic.Marten.Tests")]
+[assembly: TestFramework("OptimisticConcurrency.Marten.Tests.AssemblyFixture", "OptimisticConcurrency.Marten.Tests")]
 
-namespace ApplicationLogic.Marten.Tests;
+namespace OptimisticConcurrency.Marten.Tests;
 
 public sealed class AssemblyFixture : XunitTestFramework
 {

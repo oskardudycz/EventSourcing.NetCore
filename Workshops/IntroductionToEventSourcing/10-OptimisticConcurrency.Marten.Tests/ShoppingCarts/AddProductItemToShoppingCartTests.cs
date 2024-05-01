@@ -34,9 +34,10 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
             .When(
                 POST,
                 URI(ctx => ShoppingCartProductItemsUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
-                BODY(new AddProductRequest(ProductItem))
+                BODY(new AddProductRequest(ProductItem)),
+                HEADERS(IF_MATCH(1))
             )
-            .Then(NO_CONTENT);
+            .Then(NO_CONTENT, RESPONSE_ETAG_HEADER(2));
 
     [Theory]
     [InlineData("immutable")]
@@ -50,7 +51,8 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
             .When(
                 POST,
                 URI(ctx => ShoppingCartProductItemsUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
-                BODY(new AddProductRequest(ProductItem))
+                BODY(new AddProductRequest(ProductItem)),
+                HEADERS(IF_MATCH(2))
             )
             .Then(NO_CONTENT);
 
@@ -67,7 +69,8 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
             .When(
                 POST,
                 URI(ctx => ShoppingCartProductItemsUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
-                BODY(new AddProductRequest(ProductItem))
+                BODY(new AddProductRequest(ProductItem)),
+                HEADERS(IF_MATCH(3))
             )
             .Then(CONFLICT);
 
@@ -84,7 +87,8 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
             .When(
                 POST,
                 URI(ctx => ShoppingCartProductItemsUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
-                BODY(new AddProductRequest(ProductItem))
+                BODY(new AddProductRequest(ProductItem)),
+                HEADERS(IF_MATCH(3))
             )
             .Then(CONFLICT);
 
@@ -98,7 +102,7 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
                 WithProductItem(apiPrefix, ClientId, ProductItem)
             )
             .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
-            .Then(OK);
+            .Then(OK, RESPONSE_ETAG_HEADER(2));
 
     private static readonly Faker Faker = new();
     private readonly Guid NotExistingShoppingCartId = Guid.NewGuid();
