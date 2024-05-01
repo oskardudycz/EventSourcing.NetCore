@@ -1,11 +1,12 @@
 using System.Net;
-using ApplicationLogic.Marten.Immutable.ShoppingCarts;
 using Bogus;
 using Ogooreck.API;
+using OptimisticConcurrency;
+using OptimisticConcurrency.Immutable.ShoppingCarts;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
-using static ApplicationLogic.Marten.Tests.Incidents.Scenarios;
-using static ApplicationLogic.Marten.Tests.Incidents.Fixtures;
+using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Scenarios;
+using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Fixtures;
 
 namespace ApplicationLogic.Marten.Tests.Incidents;
 
@@ -20,7 +21,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
         api.Given()
             .When(
                 POST,
-                URI(ConfirmShoppingCart(apiPrefix, ClientId, NotExistingShoppingCartId))
+                URI(ConfirmShoppingCartUrl(apiPrefix, ClientId, NotExistingShoppingCartId))
             )
             .Then(NOT_FOUND);
 
@@ -32,7 +33,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
         api.Given(OpenedShoppingCart(apiPrefix, ClientId))
             .When(
                 POST,
-                URI(ctx => ConfirmShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
+                URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
             )
             .Then(CONFLICT);
 
@@ -47,7 +48,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             )
             .When(
                 POST,
-                URI(ctx => ConfirmShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
+                URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
             )
             .Then(NO_CONTENT);
 
@@ -63,7 +64,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             )
             .When(
                 POST,
-                URI(ctx => ConfirmShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
+                URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
             )
             .Then(CONFLICT);
 
@@ -79,7 +80,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             )
             .When(
                 POST,
-                URI(ctx => ConfirmShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
+                URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
             )
             .Then(CONFLICT);
 
@@ -93,7 +94,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
                 WithProductItem(apiPrefix, ClientId, ProductItem),
                 ThenConfirmed(apiPrefix, ClientId)
             )
-            .When(GET, URI(ctx => ShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
+            .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
             .Then(OK);
 
     private static readonly Faker Faker = new();

@@ -1,6 +1,6 @@
 using Marten;
 
-namespace ApplicationLogic.Marten.Core.Marten;
+namespace OptimisticConcurrency.Core.Marten;
 
 public static class EventMappings
 {

@@ -1,4 +1,4 @@
-namespace ApplicationLogic.Marten.Immutable.Pricing;
+namespace OptimisticConcurrency.Immutable.Pricing;
 
 public record PricedProductItem(
     Guid ProductId,

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
-namespace ApplicationLogic.Marten.Core.Http;
+namespace OptimisticConcurrency.Core.Http;
 
 public static class ETagExtensions
 {

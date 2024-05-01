@@ -1,4 +1,4 @@
-namespace ApplicationLogic.Marten.Mutable.Pricing;
+namespace OptimisticConcurrency.Mutable.Pricing;
 
 public class PricedProductItem
 {

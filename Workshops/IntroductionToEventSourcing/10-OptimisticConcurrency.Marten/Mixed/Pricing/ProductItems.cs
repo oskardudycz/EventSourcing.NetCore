@@ -1,4 +1,4 @@
-namespace ApplicationLogic.Marten.Mixed.Pricing;
+namespace OptimisticConcurrency.Mixed.Pricing;
 
 public class PricedProductItem
 {

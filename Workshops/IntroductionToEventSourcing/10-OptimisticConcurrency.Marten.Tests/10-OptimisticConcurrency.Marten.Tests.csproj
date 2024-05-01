@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <RootNamespace>ApplicationLogic.Marten.Tests</RootNamespace>
-        <AssemblyName>ApplicationLogic.Marten.Tests</AssemblyName>
+        <RootNamespace>OptimisticConcurrency.Marten.Tests</RootNamespace>
+        <AssemblyName>OptimisticConcurrency.Marten.Tests</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\08-ApplicationLogic.Marten\08-ApplicationLogic.Marten.csproj" />
+      <ProjectReference Include="..\10-OptimisticConcurrency.Marten\10-OptimisticConcurrency.Marten.csproj" />
     </ItemGroup>
 
     <Import Project="..\..\..\Tests.Build.props" />

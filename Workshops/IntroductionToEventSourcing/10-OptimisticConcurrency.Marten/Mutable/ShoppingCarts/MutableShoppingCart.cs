@@ -1,7 +1,7 @@
-using ApplicationLogic.Marten.Core.Entities;
-using ApplicationLogic.Marten.Mutable.Pricing;
+using OptimisticConcurrency.Core.Entities;
+using OptimisticConcurrency.Mutable.Pricing;
 
-namespace ApplicationLogic.Marten.Mutable.ShoppingCarts;
+namespace OptimisticConcurrency.Mutable.ShoppingCarts;
 
 using static ShoppingCartEvent;
 
