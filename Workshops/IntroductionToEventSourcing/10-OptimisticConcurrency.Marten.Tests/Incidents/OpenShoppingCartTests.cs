@@ -9,9 +9,7 @@ namespace ApplicationLogic.Marten.Tests.Incidents;
 public class OpenShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>
 {
-
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -20,9 +18,7 @@ public class OpenShoppingCartTests(ApiSpecification<Program> api):
             .When(POST, URI(ShoppingCarts(apiPrefix, ClientId)))
             .Then(CREATED_WITH_DEFAULT_HEADERS(locationHeaderPrefix: ShoppingCarts(apiPrefix, ClientId)));
 
-
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]

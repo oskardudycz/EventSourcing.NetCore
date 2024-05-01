@@ -12,9 +12,7 @@ namespace ApplicationLogic.Marten.Tests.Incidents;
 public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>
 {
-
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -26,9 +24,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .Then(NOT_FOUND);
 
-
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -40,9 +36,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .Then(CONFLICT);
 
-
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -57,9 +51,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .Then(NO_CONTENT);
 
-
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -74,9 +66,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .Then(CONFLICT);
 
-
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -92,9 +82,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .Then(CONFLICT);
 
-
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -110,9 +98,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .Then(CONFLICT);
 
-
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
