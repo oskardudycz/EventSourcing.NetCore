@@ -27,6 +27,7 @@ builder.Services
             .ConfigureMutableShoppingCarts()
             .ConfigureMixedShoppingCarts();
     })
+    .ApplyAllDatabaseChangesOnStartup()
     .OptimizeArtifactWorkflow()
     .UseLightweightSessions();
 

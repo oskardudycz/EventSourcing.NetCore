@@ -12,7 +12,6 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
     IClassFixture<ApiSpecification<Program>>
 {
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -26,7 +25,6 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .Then(NOT_FOUND);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -40,7 +38,6 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .Then(CONFLICT);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -57,7 +54,6 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .Then(NO_CONTENT, RESPONSE_ETAG_HEADER(3));
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -75,7 +71,6 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .Then(PRECONDITION_FAILED);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -92,7 +87,6 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .Then(PRECONDITION_FAILED);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -109,7 +103,6 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .Then(CONFLICT);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -127,7 +120,6 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .Then(CONFLICT);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -145,7 +137,6 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .Then(CONFLICT);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]

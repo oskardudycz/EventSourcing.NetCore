@@ -10,7 +10,6 @@ public class OpenShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>
 {
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -23,7 +22,6 @@ public class OpenShoppingCartTests(ApiSpecification<Program> api):
             );
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]

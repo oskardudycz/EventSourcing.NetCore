@@ -1,10 +1,11 @@
-using ApplicationLogic.Marten.Core.Exceptions;
-using ApplicationLogic.Marten.Immutable.ShoppingCarts;
-using ApplicationLogic.Marten.Mixed.ShoppingCarts;
-using ApplicationLogic.Marten.Mutable.ShoppingCarts;
 using Marten;
+using Marten.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Oakton;
+using OptimisticConcurrency.Core.Exceptions;
+using OptimisticConcurrency.Immutable.ShoppingCarts;
+using OptimisticConcurrency.Mixed.ShoppingCarts;
+using OptimisticConcurrency.Mutable.ShoppingCarts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ builder.Services
     .AddImmutableShoppingCarts()
     .AddMarten(options =>
     {
-        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Workshop_Application_ShoppingCarts_Solved";
+        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Workshop_Optimistic_ShoppingCarts_Solved";
         options.Events.DatabaseSchemaName = schemaName;
         options.DatabaseSchemaName = schemaName;
         options.Connection(builder.Configuration.GetConnectionString("ShoppingCarts") ??
@@ -49,6 +50,11 @@ app.UseExceptionHandler(new ExceptionHandlerOptions
                 ArgumentException => StatusCodes.Status400BadRequest,
                 NotFoundException => StatusCodes.Status404NotFound,
                 InvalidOperationException => StatusCodes.Status409Conflict,
+                BadHttpRequestException
+                {
+                    Message: "Required parameter \"string eTag\" was not provided from header."
+                } => StatusCodes.Status412PreconditionFailed,
+                ConcurrencyException=> StatusCodes.Status412PreconditionFailed,
                 _ => StatusCodes.Status500InternalServerError,
             };
 
@@ -69,6 +75,9 @@ if (app.Environment.IsDevelopment())
 
 return await app.RunOaktonCommands(args);
 
-public partial class Program
+namespace OptimisticConcurrency
 {
+    public partial class Program
+    {
+    }
 }
