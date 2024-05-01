@@ -12,7 +12,9 @@ namespace ApplicationLogic.Marten.Tests.Incidents;
 public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>
 {
+
     [Theory]
+    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -24,7 +26,9 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             )
             .Then(NOT_FOUND);
 
+
     [Theory]
+    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -36,7 +40,9 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             )
             .Then(CONFLICT);
 
+
     [Theory]
+    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -51,7 +57,9 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             )
             .Then(NO_CONTENT);
 
+
     [Theory]
+    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -67,7 +75,9 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             )
             .Then(CONFLICT);
 
+
     [Theory]
+    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -83,7 +93,9 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             )
             .Then(CONFLICT);
 
+
     [Theory]
+    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]

@@ -17,7 +17,7 @@ builder.Services
     .AddImmutableShoppingCarts()
     .AddMarten(options =>
     {
-        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Workshop_ShoppingCarts";
+        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Workshop_Application_ShoppingCarts";
         options.Events.DatabaseSchemaName = schemaName;
         options.DatabaseSchemaName = schemaName;
         options.Connection(builder.Configuration.GetConnectionString("ShoppingCarts") ??
