@@ -1,14 +1,12 @@
-using System.Net;
 using Bogus;
 using Ogooreck.API;
-using OptimisticConcurrency;
 using OptimisticConcurrency.Immutable.ShoppingCarts;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Scenarios;
 using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Fixtures;
 
-namespace ApplicationLogic.Marten.Tests.Incidents;
+namespace OptimisticConcurrency.Marten.Tests.ShoppingCarts;
 
 public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>
@@ -33,7 +31,8 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
         api.Given(OpenedShoppingCart(apiPrefix, ClientId))
             .When(
                 DELETE,
-                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value))
+                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value)),
+                HEADERS(IF_MATCH(1))
             )
             .Then(CONFLICT);
 
@@ -48,9 +47,43 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .When(
                 DELETE,
-                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value))
+                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value)),
+                HEADERS(IF_MATCH(2))
             )
-            .Then(NO_CONTENT);
+            .Then(NO_CONTENT, RESPONSE_ETAG_HEADER(3));
+
+    [Theory]
+    [InlineData("immutable")]
+    [InlineData("mutable")]
+    [InlineData("mixed")]
+    public Task CantRemoveExistingProductItemFromShoppingCartWithWrongETag(string apiPrefix) =>
+        api.Given(
+                OpenedShoppingCart(apiPrefix, ClientId),
+                WithProductItem(apiPrefix, ClientId, ProductItem)
+            )
+            .When(
+                DELETE,
+                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(),
+                    ProductItem.ProductId!.Value)),
+                HEADERS(IF_MATCH(1))
+            )
+            .Then(PRECONDITION_FAILED);
+
+    [Theory]
+    [InlineData("immutable")]
+    [InlineData("mutable")]
+    [InlineData("mixed")]
+    public Task CantRemoveExistingProductItemFromShoppingCartWithoutETag(string apiPrefix) =>
+        api.Given(
+                OpenedShoppingCart(apiPrefix, ClientId),
+                WithProductItem(apiPrefix, ClientId, ProductItem)
+            )
+            .When(
+                DELETE,
+                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(),
+                    ProductItem.ProductId!.Value))
+            )
+            .Then(PRECONDITION_FAILED);
 
     [Theory]
     [InlineData("immutable")]
@@ -63,7 +96,8 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .When(
                 DELETE,
-                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), NotExistingProductItem.ProductId!.Value))
+                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), NotExistingProductItem.ProductId!.Value)),
+                HEADERS(IF_MATCH(2))
             )
             .Then(CONFLICT);
 
@@ -79,7 +113,8 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .When(
                 DELETE,
-                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value))
+                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value)),
+                HEADERS(IF_MATCH(3))
             )
             .Then(CONFLICT);
 
@@ -95,7 +130,8 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             )
             .When(
                 DELETE,
-                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value))
+                URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value)),
+                HEADERS(IF_MATCH(3))
             )
             .Then(CONFLICT);
 
@@ -109,7 +145,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
                 WithProductItem(apiPrefix, ClientId, ProductItem)
             )
             .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
-            .Then(OK);
+            .Then(OK, RESPONSE_ETAG_HEADER(2));
 
     private static readonly Faker Faker = new();
     private readonly Guid NotExistingShoppingCartId = Guid.NewGuid();

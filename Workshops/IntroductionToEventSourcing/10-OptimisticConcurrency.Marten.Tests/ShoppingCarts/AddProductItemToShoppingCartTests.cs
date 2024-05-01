@@ -1,13 +1,12 @@
 using Bogus;
 using Ogooreck.API;
-using OptimisticConcurrency;
 using OptimisticConcurrency.Immutable.ShoppingCarts;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
 using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Scenarios;
 using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Fixtures;
 
-namespace ApplicationLogic.Marten.Tests.ShoppingCarts;
+namespace OptimisticConcurrency.Marten.Tests.ShoppingCarts;
 
 public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>
@@ -54,7 +53,7 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
                 BODY(new AddProductRequest(ProductItem)),
                 HEADERS(IF_MATCH(2))
             )
-            .Then(NO_CONTENT);
+            .Then(NO_CONTENT, RESPONSE_ETAG_HEADER(3));
 
     [Theory]
     [InlineData("immutable")]
