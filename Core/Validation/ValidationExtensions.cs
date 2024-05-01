@@ -1,29 +1,44 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Core.Validation;
 
 public static class ValidationExtensions
 {
-    public static T AssertNotNull<T>(this T? value, [CallerArgumentExpression("value")] string? paramName = null)
+    public static T NotNull<T>(this T? value, [CallerArgumentExpression("value")] string? paramName = null)
         where T : struct
     {
         if (value == null)
             throw new ArgumentNullException(paramName);
 
-        return (T)value;
+        return value.Value;
     }
 
-    public static string AssertNotEmpty(this string? value, [CallerArgumentExpression("value")] string? paramName = null)
+    public static T NotNull<T>(this T? value, [CallerArgumentExpression("value")] string? paramName = null)
+        where T : class
+    {
+        if (value == null)
+            throw new ArgumentNullException(paramName);
+
+        return value;
+    }
+
+    public static string NotEmpty(this string? value, [CallerArgumentExpression("value")] string? paramName = null)
         => !string.IsNullOrWhiteSpace(value) ? value : throw new ArgumentOutOfRangeException(paramName);
 
-    public static T AssertNotEmpty<T>(this T value, [CallerArgumentExpression("value")] string? paramName = null)
-        where T : struct
-        => AssertNotEmpty((T?)value, paramName);
+    public static Guid NotEmpty(this Guid? value, [CallerArgumentExpression("value")] string? paramName = null)
+        => value!= null && value != Guid.Empty ? value.Value : throw new ArgumentOutOfRangeException(paramName);
 
-    public static T AssertNotEmpty<T>(this T? value, [CallerArgumentExpression("value")] string? paramName = null)
+
+    public static T NotEmpty<T>(this T value, [CallerArgumentExpression("value")] string? paramName = null)
+        where T : struct
+        => NotEmpty((T?)value, paramName);
+
+    public static T NotEmpty<T>(this T? value, [CallerArgumentExpression("value")] string? paramName = null)
         where T : struct
     {
-        var notNullValue = value.AssertNotNull(paramName);
+        var notNullValue = value.NotNull(paramName);
 
         if (Equals(notNullValue, default(T)))
             throw new ArgumentOutOfRangeException(paramName);
@@ -31,10 +46,20 @@ public static class ValidationExtensions
         return notNullValue;
     }
 
-    public static T AssertGreaterOrEqualThan<T>(this T value, T valueToCompare, [CallerArgumentExpression("value")] string? paramName = null)
+    public static T GreaterOrEqualThan<T>(this T value, T valueToCompare, [CallerArgumentExpression("value")] string? paramName = null)
         where T : IComparable<T>
     {
         if (value.CompareTo(valueToCompare) < 0)
+            throw new ArgumentOutOfRangeException(paramName);
+
+        return value;
+
+    }
+
+    public static T Positive<T>(this T value, [CallerArgumentExpression("value")] string? paramName = null)
+        where T : INumber<T>
+    {
+        if (value == null || value.CompareTo(Convert.ChangeType(0, typeof(T))) <= 0)
             throw new ArgumentOutOfRangeException(paramName);
 
         return value;

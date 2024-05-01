@@ -190,6 +190,9 @@ public class ShoppingCart: IAggregate
             throw new InvalidOperationException(
                 $"Confirming cart in '{Status}' status is not allowed.");
 
+        if(ProductItems.Count == 0)
+            throw new InvalidOperationException($"Cannot confirm empty shopping cart");
+
         var @event = new ShoppingCartConfirmed(Id, DateTime.UtcNow);
 
         Apply(@event);

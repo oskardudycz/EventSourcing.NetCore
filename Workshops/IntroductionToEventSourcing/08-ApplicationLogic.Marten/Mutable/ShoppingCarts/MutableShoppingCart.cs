@@ -1,4 +1,7 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution1;
+using ApplicationLogic.Marten.Core.Entities;
+using ApplicationLogic.Marten.Mutable.Pricing;
+
+namespace ApplicationLogic.Marten.Mutable.ShoppingCarts;
 
 using static ShoppingCartEvent;
 
@@ -7,60 +10,49 @@ public abstract record ShoppingCartEvent
 {
     public record ShoppingCartOpened(
         Guid ShoppingCartId,
-        Guid ClientId
+        Guid ClientId,
+        DateTimeOffset OpenedAt
     ): ShoppingCartEvent;
 
     public record ProductItemAddedToShoppingCart(
         Guid ShoppingCartId,
-        PricedProductItem ProductItem
+        PricedProductItem ProductItem,
+        DateTimeOffset AddedAt
     ): ShoppingCartEvent;
 
     public record ProductItemRemovedFromShoppingCart(
         Guid ShoppingCartId,
-        PricedProductItem ProductItem
+        PricedProductItem ProductItem,
+        DateTimeOffset RemovedAt
     ): ShoppingCartEvent;
 
     public record ShoppingCartConfirmed(
         Guid ShoppingCartId,
-        DateTime ConfirmedAt
+        DateTimeOffset ConfirmedAt
     ): ShoppingCartEvent;
 
     public record ShoppingCartCanceled(
         Guid ShoppingCartId,
-        DateTime CanceledAt
+        DateTimeOffset CanceledAt
     ): ShoppingCartEvent;
 
     // This won't allow external inheritance
     private ShoppingCartEvent() { }
 }
 
-// VALUE OBJECTS
-public class PricedProductItem
-{
-    public Guid ProductId { get; set; }
-    public decimal UnitPrice { get; set; }
-    public int Quantity { get; set; }
-    public decimal TotalPrice => Quantity * UnitPrice;
-}
-
-public class ProductItem
-{
-    public Guid ProductId { get; set; }
-    public int Quantity { get; set; }
-}
-
 // ENTITY
-public class ShoppingCart: Aggregate
+// Note: We need to have prefix to be able to register multiple streams with the same name
+public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
 {
     public Guid ClientId { get; private set; }
     public ShoppingCartStatus Status { get; private set; }
     public IList<PricedProductItem> ProductItems { get; } = new List<PricedProductItem>();
-    public DateTime? ConfirmedAt { get; private set; }
-    public DateTime? CanceledAt { get; private set; }
+    public DateTimeOffset? ConfirmedAt { get; private set; }
+    public DateTimeOffset? CanceledAt { get; private set; }
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    public override void Evolve(object @event)
+    protected override void Apply(ShoppingCartEvent @event)
     {
         switch (@event)
         {
@@ -82,22 +74,27 @@ public class ShoppingCart: Aggregate
         }
     }
 
-    public static ShoppingCart Open(
+    public static MutableShoppingCart Open(
         Guid cartId,
-        Guid clientId)
+        Guid clientId,
+        DateTimeOffset now
+    )
     {
-        return new ShoppingCart(cartId, clientId);
+        return new MutableShoppingCart(cartId, clientId, now);
     }
 
-    public static ShoppingCart Initial() => new();
+    public static MutableShoppingCart Initial() => new();
 
-    private ShoppingCart(
+    private MutableShoppingCart(
         Guid id,
-        Guid clientId)
+        Guid clientId,
+        DateTimeOffset now
+    )
     {
         var @event = new ShoppingCartOpened(
             id,
-            clientId
+            clientId,
+            now
         );
 
         Enqueue(@event);
@@ -105,7 +102,7 @@ public class ShoppingCart: Aggregate
     }
 
     //just for default creation of empty object
-    private ShoppingCart() { }
+    private MutableShoppingCart() { }
 
     private void Apply(ShoppingCartOpened opened)
     {
@@ -116,7 +113,9 @@ public class ShoppingCart: Aggregate
 
     public void AddProduct(
         IProductPriceCalculator productPriceCalculator,
-        ProductItem productItem)
+        ProductItem productItem,
+        DateTimeOffset now
+    )
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -124,7 +123,7 @@ public class ShoppingCart: Aggregate
 
         var pricedProductItem = productPriceCalculator.Calculate(productItem);
 
-        var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem);
+        var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem, now);
 
         Enqueue(@event);
         Apply(@event);
@@ -132,7 +131,7 @@ public class ShoppingCart: Aggregate
 
     private void Apply(ProductItemAddedToShoppingCart productItemAdded)
     {
-        var (_, pricedProductItem) = productItemAdded;
+        var pricedProductItem = productItemAdded.ProductItem;
         var productId = pricedProductItem.ProductId;
         var quantityToAdd = pricedProductItem.Quantity;
 
@@ -146,7 +145,7 @@ public class ShoppingCart: Aggregate
             current.Quantity += quantityToAdd;
     }
 
-    public void RemoveProduct(PricedProductItem productItemToBeRemoved)
+    public void RemoveProduct(PricedProductItem productItemToBeRemoved, DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -155,7 +154,7 @@ public class ShoppingCart: Aggregate
         if (!HasEnough(productItemToBeRemoved))
             throw new InvalidOperationException("Not enough product items to remove");
 
-        var @event = new ProductItemRemovedFromShoppingCart(Id, productItemToBeRemoved);
+        var @event = new ProductItemRemovedFromShoppingCart(Id, productItemToBeRemoved, now);
 
         Enqueue(@event);
         Apply(@event);
@@ -172,7 +171,7 @@ public class ShoppingCart: Aggregate
 
     private void Apply(ProductItemRemovedFromShoppingCart productItemRemoved)
     {
-        var (_, pricedProductItem) = productItemRemoved;
+        var pricedProductItem = productItemRemoved.ProductItem;
         var productId = pricedProductItem.ProductId;
         var quantityToRemove = pricedProductItem.Quantity;
 
@@ -186,16 +185,16 @@ public class ShoppingCart: Aggregate
             current.Quantity -= quantityToRemove;
     }
 
-    public void Confirm()
+    public void Confirm(DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
                 $"Confirming cart in '{Status}' status is not allowed.");
 
-        if(ProductItems.Count == 0)
+        if (ProductItems.Count == 0)
             throw new InvalidOperationException($"Cannot confirm empty shopping cart");
 
-        var @event = new ShoppingCartConfirmed(Id, DateTime.UtcNow);
+        var @event = new ShoppingCartConfirmed(Id, now);
 
         Enqueue(@event);
         Apply(@event);
@@ -207,13 +206,13 @@ public class ShoppingCart: Aggregate
         ConfirmedAt = confirmed.ConfirmedAt;
     }
 
-    public void Cancel()
+    public void Cancel(DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
                 $"Canceling cart in '{Status}' status is not allowed.");
 
-        var @event = new ShoppingCartCanceled(Id, DateTime.UtcNow);
+        var @event = new ShoppingCartCanceled(Id, now);
 
         Enqueue(@event);
         Apply(@event);

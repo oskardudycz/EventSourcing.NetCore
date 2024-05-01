@@ -50,13 +50,13 @@ public record ReserveRoom
         IReadOnlyList<DailyRoomTypeAvailability> dailyAvailability
     ) =>
         new(
-            id.AssertNotEmpty(),
-            roomType.AssertNotEmpty(),
-            from.AssertNotEmpty(),
-            to.AssertNotEmpty().AssertGreaterOrEqualThan(from),
-            guestId.AssertNotEmpty(),
-            numberOfPeople.AssertNotEmpty(),
-            now.AssertNotEmpty(),
+            id.NotEmpty(),
+            roomType.NotEmpty(),
+            from.NotEmpty(),
+            to.NotEmpty().GreaterOrEqualThan(from),
+            guestId.NotEmpty(),
+            numberOfPeople.NotEmpty(),
+            now.NotEmpty(),
             ReservationSource.Api,
             dailyAvailability,
             null
@@ -73,15 +73,15 @@ public record ReserveRoom
         DateTimeOffset now
     ) =>
         new(
-            id.AssertNotEmpty(),
-            roomType.AssertNotEmpty(),
-            from.AssertNotEmpty(),
-            to.AssertNotEmpty().AssertGreaterOrEqualThan(from),
-            guestId.AssertNotEmpty(),
-            numberOfPeople.AssertNotEmpty(),
-            now.AssertNotEmpty(),
+            id.NotEmpty(),
+            roomType.NotEmpty(),
+            from.NotEmpty(),
+            to.NotEmpty().GreaterOrEqualThan(from),
+            guestId.NotEmpty(),
+            numberOfPeople.NotEmpty(),
+            now.NotEmpty(),
             ReservationSource.External,
             Array.Empty<DailyRoomTypeAvailability>(),
-            externalId.AssertNotEmpty()
+            externalId.NotEmpty()
         );
 }
