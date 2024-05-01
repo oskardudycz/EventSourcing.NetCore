@@ -8,78 +8,86 @@ using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Fixtures;
 
 namespace OptimisticConcurrency.Marten.Tests.ShoppingCarts;
 
-public class CancelShoppingCartTests(ApiSpecification<Program> api):
+public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>
 {
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
-    public Task CantCancelNotExistingShoppingCart(string apiPrefix) =>
+    public Task CantConfirmNotExistingShoppingCart(string apiPrefix) =>
         api.Given()
             .When(
-                DELETE,
-                URI(ShoppingCartUrl(apiPrefix, ClientId, NotExistingShoppingCartId)),
+                POST,
+                URI(ConfirmShoppingCartUrl(apiPrefix, ClientId, NotExistingShoppingCartId)),
                 HEADERS(IF_MATCH(0))
             )
             .Then(NOT_FOUND);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
-    public Task CancelsNonEmptyShoppingCart(string apiPrefix) =>
+    public Task CantConfirmEmptyShoppingCart(string apiPrefix) =>
+        api.Given(OpenedShoppingCart(apiPrefix, ClientId))
+            .When(
+                POST,
+                URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
+                HEADERS(IF_MATCH(1))
+            )
+            .Then(CONFLICT);
+
+    [Theory]
+    [InlineData("immutable")]
+    [InlineData("mutable")]
+    [InlineData("mixed")]
+    public Task ConfirmsNonEmptyShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
                 WithProductItem(apiPrefix, ClientId, ProductItem, 1)
             )
             .When(
-                DELETE,
-                URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
+                POST,
+                URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
                 HEADERS(IF_MATCH(2))
             )
             .Then(NO_CONTENT, RESPONSE_ETAG_HEADER(3));
 
     [Theory]
-    [Trait("Category", "SkipCI")]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
-    public Task CantCancelAlreadyCanceledShoppingCart(string apiPrefix) =>
-        api.Given(
-                OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1),
-                ThenCanceled(apiPrefix, ClientId, 2)
-            )
-            .When(
-                DELETE,
-                URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
-                HEADERS(IF_MATCH(3))
-            )
-            .Then(CONFLICT);
-
-    [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
-    [InlineData("mutable")]
-    [InlineData("mixed")]
-    public Task CantCancelConfirmedShoppingCart(string apiPrefix) =>
+    public Task CantConfirmAlreadyConfirmedShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
                 WithProductItem(apiPrefix, ClientId, ProductItem, 1),
                 ThenConfirmed(apiPrefix, ClientId, 2)
             )
             .When(
-                DELETE,
-                URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
+                POST,
+                URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
                 HEADERS(IF_MATCH(3))
             )
             .Then(CONFLICT);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
+    [InlineData("immutable")]
+    [InlineData("mutable")]
+    [InlineData("mixed")]
+    public Task CantConfirmCanceledShoppingCart(string apiPrefix) =>
+        api.Given(
+                OpenedShoppingCart(apiPrefix, ClientId),
+                WithProductItem(apiPrefix, ClientId, ProductItem, 1),
+                ThenCanceled(apiPrefix, ClientId, 2)
+            )
+            .When(
+                POST,
+                URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
+                HEADERS(IF_MATCH(3))
+            )
+            .Then(CONFLICT);
+
+    [Theory]
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
@@ -87,7 +95,7 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api):
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
                 WithProductItem(apiPrefix, ClientId, ProductItem, 1),
-                ThenCanceled(apiPrefix, ClientId, 2)
+                ThenConfirmed(apiPrefix, ClientId, 2)
             )
             .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
             .Then(OK, RESPONSE_ETAG_HEADER(3));

@@ -41,6 +41,8 @@ app.UseExceptionHandler(new ExceptionHandlerOptions
         {
             var exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
 
+            Console.WriteLine("ERROR: " + exception);
+
             context.Response.StatusCode = exception switch
             {
                 ArgumentException => StatusCodes.Status400BadRequest,
