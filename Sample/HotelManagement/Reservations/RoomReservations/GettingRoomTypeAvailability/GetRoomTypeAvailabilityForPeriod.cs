@@ -15,9 +15,9 @@ public record GetRoomTypeAvailabilityForPeriod(
         DateOnly to
     ) =>
         new(
-            roomType.AssertNotEmpty(),
-            from.AssertNotEmpty(),
-            to.AssertNotEmpty().AssertGreaterOrEqualThan(from)
+            roomType.NotEmpty(),
+            from.NotEmpty(),
+            to.NotEmpty().GreaterOrEqualThan(from)
         );
 }
 

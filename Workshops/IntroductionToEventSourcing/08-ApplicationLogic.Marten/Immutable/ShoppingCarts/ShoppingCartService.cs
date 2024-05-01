@@ -1,4 +1,7 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
+using ApplicationLogic.Marten.Immutable.Pricing;
+using Core.Validation;
+
+namespace ApplicationLogic.Marten.Immutable.ShoppingCarts;
 using static ShoppingCartEvent;
 using static ShoppingCartCommand;
 
@@ -6,25 +9,30 @@ public abstract record ShoppingCartCommand
 {
     public record OpenShoppingCart(
         Guid ShoppingCartId,
-        Guid ClientId
+        Guid ClientId,
+        DateTimeOffset Now
     ): ShoppingCartCommand;
 
     public record AddProductItemToShoppingCart(
         Guid ShoppingCartId,
-        ProductItem ProductItem
+        ProductItem ProductItem,
+        DateTimeOffset Now
     );
 
     public record RemoveProductItemFromShoppingCart(
         Guid ShoppingCartId,
-        PricedProductItem ProductItem
+        PricedProductItem ProductItem,
+        DateTimeOffset Now
     );
 
     public record ConfirmShoppingCart(
-        Guid ShoppingCartId
+        Guid ShoppingCartId,
+        DateTimeOffset Now
     );
 
     public record CancelShoppingCart(
-        Guid ShoppingCartId
+        Guid ShoppingCartId,
+        DateTimeOffset Now
     ): ShoppingCartCommand;
 
     private ShoppingCartCommand() {}
@@ -34,11 +42,12 @@ public static class ShoppingCartService
 {
     public static ShoppingCartOpened Handle(OpenShoppingCart command)
     {
-        var (shoppingCartId, clientId) = command;
+        var (shoppingCartId, clientId, now) = command;
 
         return new ShoppingCartOpened(
             shoppingCartId,
-            clientId
+            clientId,
+            now
         );
     }
 
@@ -48,7 +57,7 @@ public static class ShoppingCartService
         ShoppingCart shoppingCart
     )
     {
-        var (cartId, productItem) = command;
+        var (cartId, productItem, now) = command;
 
         if (shoppingCart.IsClosed)
             throw new InvalidOperationException(
@@ -58,7 +67,8 @@ public static class ShoppingCartService
 
         return new ProductItemAddedToShoppingCart(
             cartId,
-            pricedProductItem
+            pricedProductItem,
+            now
         );
     }
 
@@ -67,7 +77,7 @@ public static class ShoppingCartService
         ShoppingCart shoppingCart
     )
     {
-        var (cartId, productItem) = command;
+        var (cartId, productItem, now) = command;
 
         if (shoppingCart.IsClosed)
             throw new InvalidOperationException(
@@ -78,7 +88,8 @@ public static class ShoppingCartService
 
         return new ProductItemRemovedFromShoppingCart(
             cartId,
-            productItem
+            productItem,
+            now
         );
     }
 
@@ -103,7 +114,7 @@ public static class ShoppingCartService
 
         return new ShoppingCartCanceled(
             shoppingCart.Id,
-            DateTime.UtcNow
+            command.Now
         );
     }
 }
