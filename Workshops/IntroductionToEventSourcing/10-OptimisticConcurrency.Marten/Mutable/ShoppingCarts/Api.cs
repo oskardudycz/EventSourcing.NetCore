@@ -2,6 +2,7 @@ using Core.Validation;
 using Marten;
 using Marten.Schema.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OptimisticConcurrency.Core.Http;
 using OptimisticConcurrency.Core.Marten;
 using OptimisticConcurrency.Mutable.Pricing;
 using static Microsoft.AspNetCore.Http.TypedResults;
@@ -19,7 +20,9 @@ public static class Api
         var productItems = shoppingCart.MapGroup("product-items");
 
         shoppingCarts.MapPost("",
-            async (IDocumentSession session,
+            async (
+                HttpContext context,
+                IDocumentSession session,
                 Guid clientId,
                 CancellationToken ct) =>
             {
@@ -34,10 +37,12 @@ public static class Api
 
         productItems.MapPost("",
             async (
+                HttpContext context,
                 IProductPriceCalculator pricingCalculator,
                 IDocumentSession session,
                 Guid shoppingCartId,
                 AddProductRequest body,
+                [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
                 var productItem = body.ProductItem.NotNull().ToProductItem();
@@ -51,11 +56,13 @@ public static class Api
 
         productItems.MapDelete("{productId:guid}",
             async (
+                HttpContext context,
                 IDocumentSession session,
                 Guid shoppingCartId,
                 [FromRoute] Guid productId,
                 [FromQuery] int? quantity,
                 [FromQuery] decimal? unitPrice,
+                [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
                 var productItem = new PricedProductItem
@@ -74,8 +81,11 @@ public static class Api
         );
 
         shoppingCart.MapPost("confirm",
-            async (IDocumentSession session,
+            async (
+                HttpContext context,
+                IDocumentSession session,
                 Guid shoppingCartId,
+                [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
                 await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId,
@@ -86,8 +96,11 @@ public static class Api
         );
 
         shoppingCart.MapDelete("",
-            async (IDocumentSession session,
+            async (
+                HttpContext context,
+                IDocumentSession session,
                 Guid shoppingCartId,
+                [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
                 await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId,
@@ -99,6 +112,7 @@ public static class Api
 
         shoppingCart.MapGet("",
             async Task<IResult> (
+                HttpContext context,
                 IQuerySession session,
                 Guid shoppingCartId,
                 CancellationToken ct) =>

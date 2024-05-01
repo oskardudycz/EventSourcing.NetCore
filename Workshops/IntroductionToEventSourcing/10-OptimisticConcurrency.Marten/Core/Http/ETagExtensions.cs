@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 
 namespace OptimisticConcurrency.Core.Http;
@@ -17,6 +18,17 @@ public static class ETagExtensions
 
         return int.Parse(value.Substring(1, value.Length - 2));
     }
+
+    public static void SetResponseEtag(this HttpContext httpContext, int? version)
+    {
+        if (!version.HasValue)
+            return;
+
+        httpContext.Response.Headers.ETag = version.Value.ToWeakEtag();
+    }
+
+    public static StringValues ToWeakEtag(this int version) =>
+        $"W/\"{version}\"";
 }
 
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
