@@ -1,6 +1,6 @@
-using ApplicationLogic.Marten.Mixed.Pricing;
+using OptimisticConcurrency.Mixed.Pricing;
 
-namespace ApplicationLogic.Marten.Mixed.ShoppingCarts;
+namespace OptimisticConcurrency.Mixed.ShoppingCarts;
 
 using static ShoppingCartEvent;
 

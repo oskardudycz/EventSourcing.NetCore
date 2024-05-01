@@ -1,8 +1,8 @@
-using ApplicationLogic.Marten.Core.Entities;
-using ApplicationLogic.Marten.Core.Exceptions;
 using Marten;
+using OptimisticConcurrency.Core.Entities;
+using OptimisticConcurrency.Core.Exceptions;
 
-namespace ApplicationLogic.Marten.Core.Marten;
+namespace OptimisticConcurrency.Core.Marten;
 
 public static class DocumentSessionExtensions
 {

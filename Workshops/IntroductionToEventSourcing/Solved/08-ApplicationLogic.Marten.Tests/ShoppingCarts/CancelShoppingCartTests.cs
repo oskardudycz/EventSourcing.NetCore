@@ -1,13 +1,12 @@
-using System.Net;
 using ApplicationLogic.Marten.Immutable.ShoppingCarts;
 using Bogus;
 using Ogooreck.API;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
-using static ApplicationLogic.Marten.Tests.Incidents.Scenarios;
-using static ApplicationLogic.Marten.Tests.Incidents.Fixtures;
+using static ApplicationLogic.Marten.Tests.ShoppingCarts.Scenarios;
+using static ApplicationLogic.Marten.Tests.ShoppingCarts.Fixtures;
 
-namespace ApplicationLogic.Marten.Tests.Incidents;
+namespace ApplicationLogic.Marten.Tests.ShoppingCarts;
 
 public class CancelShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>
@@ -20,7 +19,7 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api):
         api.Given()
             .When(
                 DELETE,
-                URI(ShoppingCart(apiPrefix, ClientId, NotExistingShoppingCartId))
+                URI(ShoppingCartUrl(apiPrefix, ClientId, NotExistingShoppingCartId))
             )
             .Then(NOT_FOUND);
 
@@ -35,7 +34,7 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api):
             )
             .When(
                 DELETE,
-                URI(ctx => ShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
+                URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
             )
             .Then(NO_CONTENT);
 
@@ -51,7 +50,7 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api):
             )
             .When(
                 DELETE,
-                URI(ctx => ShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
+                URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
             )
             .Then(CONFLICT);
 
@@ -67,7 +66,7 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api):
             )
             .When(
                 DELETE,
-                URI(ctx => ShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
+                URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>()))
             )
             .Then(CONFLICT);
 
@@ -81,7 +80,7 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api):
                 WithProductItem(apiPrefix, ClientId, ProductItem),
                 ThenCanceled(apiPrefix, ClientId)
             )
-            .When(GET, URI(ctx => ShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
+            .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
             .Then(OK);
 
     private static readonly Faker Faker = new();

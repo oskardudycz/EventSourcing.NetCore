@@ -1,13 +1,13 @@
-using ApplicationLogic.Marten.Core.Marten;
-using ApplicationLogic.Marten.Mutable.Pricing;
 using Core.Validation;
 using Marten;
 using Marten.Schema.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OptimisticConcurrency.Core.Marten;
+using OptimisticConcurrency.Mutable.Pricing;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static System.DateTimeOffset;
 
-namespace ApplicationLogic.Marten.Mutable.ShoppingCarts;
+namespace OptimisticConcurrency.Mutable.ShoppingCarts;
 
 public static class Api
 {

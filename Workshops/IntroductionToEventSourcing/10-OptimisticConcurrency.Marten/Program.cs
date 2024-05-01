@@ -1,10 +1,10 @@
-using ApplicationLogic.Marten.Core.Exceptions;
-using ApplicationLogic.Marten.Immutable.ShoppingCarts;
-using ApplicationLogic.Marten.Mixed.ShoppingCarts;
-using ApplicationLogic.Marten.Mutable.ShoppingCarts;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics;
 using Oakton;
+using OptimisticConcurrency.Core.Exceptions;
+using OptimisticConcurrency.Immutable.ShoppingCarts;
+using OptimisticConcurrency.Mixed.ShoppingCarts;
+using OptimisticConcurrency.Mutable.ShoppingCarts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +66,9 @@ if (app.Environment.IsDevelopment())
 
 return await app.RunOaktonCommands(args);
 
-public partial class Program
+namespace OptimisticConcurrency
 {
+    public partial class Program
+    {
+    }
 }

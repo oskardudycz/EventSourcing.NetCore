@@ -1,13 +1,12 @@
-using System.Net;
 using ApplicationLogic.Marten.Immutable.ShoppingCarts;
 using Bogus;
 using Ogooreck.API;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
-using static ApplicationLogic.Marten.Tests.Incidents.Scenarios;
-using static ApplicationLogic.Marten.Tests.Incidents.Fixtures;
+using static ApplicationLogic.Marten.Tests.ShoppingCarts.Scenarios;
+using static ApplicationLogic.Marten.Tests.ShoppingCarts.Fixtures;
 
-namespace ApplicationLogic.Marten.Tests.Incidents;
+namespace ApplicationLogic.Marten.Tests.ShoppingCarts;
 
 public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>
@@ -22,7 +21,7 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
         api.Given()
             .When(
                 POST,
-                URI(ShoppingCartProductItems(apiPrefix, ClientId, NotExistingShoppingCartId)),
+                URI(ShoppingCartProductItemsUrl(apiPrefix, ClientId, NotExistingShoppingCartId)),
                 BODY(new AddProductRequest(ProductItem))
             )
             .Then(NOT_FOUND);
@@ -37,7 +36,7 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
         api.Given(OpenedShoppingCart(apiPrefix, ClientId))
             .When(
                 POST,
-                URI(ctx => ShoppingCartProductItems(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
+                URI(ctx => ShoppingCartProductItemsUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
                 BODY(new AddProductRequest(ProductItem))
             )
             .Then(NO_CONTENT);
@@ -55,7 +54,7 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
             )
             .When(
                 POST,
-                URI(ctx => ShoppingCartProductItems(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
+                URI(ctx => ShoppingCartProductItemsUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
                 BODY(new AddProductRequest(ProductItem))
             )
             .Then(NO_CONTENT);
@@ -74,7 +73,7 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
             )
             .When(
                 POST,
-                URI(ctx => ShoppingCartProductItems(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
+                URI(ctx => ShoppingCartProductItemsUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
                 BODY(new AddProductRequest(ProductItem))
             )
             .Then(CONFLICT);
@@ -93,7 +92,7 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
             )
             .When(
                 POST,
-                URI(ctx => ShoppingCartProductItems(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
+                URI(ctx => ShoppingCartProductItemsUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
                 BODY(new AddProductRequest(ProductItem))
             )
             .Then(CONFLICT);
@@ -109,7 +108,7 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
                 OpenedShoppingCart(apiPrefix, ClientId),
                 WithProductItem(apiPrefix, ClientId, ProductItem)
             )
-            .When(GET, URI(ctx => ShoppingCart(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
+            .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
             .Then(OK);
 
     private static readonly Faker Faker = new();

@@ -1,13 +1,13 @@
-using ApplicationLogic.Marten.Core.Marten;
-using ApplicationLogic.Marten.Mixed.Pricing;
 using Core.Validation;
 using Marten;
 using Marten.Schema.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OptimisticConcurrency.Core.Marten;
+using OptimisticConcurrency.Mixed.Pricing;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static System.DateTimeOffset;
 
-namespace ApplicationLogic.Marten.Mixed.ShoppingCarts;
+namespace OptimisticConcurrency.Mixed.ShoppingCarts;
 public static class Api
 {
     public static WebApplication ConfigureMixedShoppingCarts(this WebApplication app)

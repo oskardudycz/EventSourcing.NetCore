@@ -1,4 +1,4 @@
-namespace ApplicationLogic.Marten.Core.Entities;
+namespace OptimisticConcurrency.Core.Entities;
 
 public interface IAggregate
 {
