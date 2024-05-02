@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>OptimisticConcurrency</RootNamespace>
+        <RootNamespace>ApplicationLogic.EventStoreDB</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -16,6 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\Core\Core.csproj" />
+      <ProjectReference Include="..\..\..\Core\Core.csproj" />
     </ItemGroup>
 </Project>

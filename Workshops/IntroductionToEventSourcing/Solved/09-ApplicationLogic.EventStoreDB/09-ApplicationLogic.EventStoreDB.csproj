@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>OptimisticConcurrency</RootNamespace>
+        <RootNamespace>ApplicationLogic.Marten</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

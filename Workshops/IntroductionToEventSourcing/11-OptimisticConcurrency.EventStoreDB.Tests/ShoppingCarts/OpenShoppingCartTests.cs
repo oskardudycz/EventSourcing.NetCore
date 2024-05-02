@@ -1,0 +1,36 @@
+using Ogooreck.API;
+using Xunit;
+using static Ogooreck.API.ApiSpecification;
+using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Scenarios;
+using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Fixtures;
+
+namespace OptimisticConcurrency.Marten.Tests.ShoppingCarts;
+
+public class OpenShoppingCartTests(ApiSpecification<Program> api):
+    IClassFixture<ApiSpecification<Program>>
+{
+    [Theory]
+    [Trait("Category", "SkipCI")]
+    [InlineData("immutable")]
+    [InlineData("mutable")]
+    [InlineData("mixed")]
+    public Task OpensShoppingCart(string apiPrefix) =>
+        api.Given()
+            .When(POST, URI(ShoppingCartsUrl(apiPrefix, ClientId)))
+            .Then(
+                CREATED_WITH_DEFAULT_HEADERS(locationHeaderPrefix: ShoppingCartsUrl(apiPrefix, ClientId)),
+                RESPONSE_ETAG_HEADER(1)
+            );
+
+    [Theory]
+    [Trait("Category", "SkipCI")]
+    [InlineData("immutable")]
+    [InlineData("mutable")]
+    [InlineData("mixed")]
+    public Task ReturnsOpenedShoppingCart(string apiPrefix) =>
+        api.Given(OpenedShoppingCart(apiPrefix, ClientId))
+            .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
+            .Then(OK, RESPONSE_ETAG_HEADER(1));
+
+    private readonly Guid ClientId = Guid.NewGuid();
+}
