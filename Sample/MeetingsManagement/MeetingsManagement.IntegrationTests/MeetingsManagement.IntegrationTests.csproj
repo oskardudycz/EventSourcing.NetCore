@@ -12,26 +12,30 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="6.12.0" />
-        <PackageReference Include="Marten" Version="7.8.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-        <PackageReference Include="NSubstitute" Version="5.1.0" />
-        <PackageReference Include="xunit" Version="2.7.1" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.8">
+        <PackageReference Include="FluentAssertions" Version="6.12.0"/>
+        <PackageReference Include="Marten" Version="7.10.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0"/>
+        <PackageReference Include="NSubstitute" Version="5.1.0"/>
+        <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="xunit" Version="2.8.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.4" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.4"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj" />
-        <ProjectReference Include="..\MeetingsManagement.Api\MeetingsManagement.Api.csproj" />
-        <ProjectReference Include="..\MeetingsManagement\MeetingsManagement.csproj" />
+        <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj"/>
+        <ProjectReference Include="..\MeetingsManagement.Api\MeetingsManagement.Api.csproj"/>
+        <ProjectReference Include="..\MeetingsManagement\MeetingsManagement.csproj"/>
     </ItemGroup>
 
-    <Import Project="..\..\..\Tests.Build.props" />
+
 </Project>

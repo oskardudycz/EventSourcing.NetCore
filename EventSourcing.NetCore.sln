@@ -19,7 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 		Dockerfile = Dockerfile
 		Core.Build.props = Core.Build.props
-		Tests.Build.props = Tests.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{E1B97A7B-97C3-4C14-9BE6-ACE0AF45CE61}"
@@ -204,7 +203,6 @@ ProjectSection(SolutionItems) = preProject
 	.github\workflows\build.dotnet.yml = .github\workflows\build.dotnet.yml
 	.github\workflows\build.dotnet.testcontainers.yml = .github\workflows\build.dotnet.testcontainers.yml
 	.github\workflows\publish.docker.yml = .github\workflows\publish.docker.yml
-	.github\workflows\build.dotnet.testreport.yml = .github\workflows\build.dotnet.testreport.yml
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marten.Integration.Tests", "Marten.Integration.Tests\Marten.Integration.Tests.csproj", "{D9D67A6C-FE95-4864-B8F1-BD2689134590}"

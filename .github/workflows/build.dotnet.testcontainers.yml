@@ -26,11 +26,4 @@ jobs:
               run: dotnet build --configuration Release --no-restore
 
             - name: Run tests
-              run: dotnet test --configuration Release --no-build --filter Category!=SkipCI --logger "trx;LogFileName=test-results.trx" ./Marten.Integration.Tests/Marten.Integration.Tests.csproj
-
-            - name: Upload test results
-              uses: actions/upload-artifact@v3
-              if: success() || failure()
-              with:
-                name: test-results
-                path: '**/test-results.trx'
+              run: dotnet test --configuration Release --no-build --filter Category!=SkipCI --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal" ./Marten.Integration.Tests/Marten.Integration.Tests.csproj

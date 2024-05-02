@@ -9,9 +9,9 @@
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
-        <PackageReference Include="Marten" Version="7.8.0" />
-        <PackageReference Include="Marten.AspNetCore" Version="7.8.0" />
-        <PackageReference Include="Marten.CommandLine" Version="7.8.0" />
+        <PackageReference Include="Marten" Version="7.10.0" />
+        <PackageReference Include="Marten.AspNetCore" Version="7.10.0" />
+        <PackageReference Include="Marten.CommandLine" Version="7.10.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0"/>
     </ItemGroup>
 
