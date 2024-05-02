@@ -20,7 +20,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             .When(
                 POST,
                 URI(ConfirmShoppingCartUrl(apiPrefix, ClientId, NotExistingShoppingCartId)),
-                HEADERS(IF_MATCH(0))
+                HEADERS(IF_MATCH(-1))
             )
             .Then(NOT_FOUND);
 
@@ -33,7 +33,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             .When(
                 POST,
                 URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
-                HEADERS(IF_MATCH(1))
+                HEADERS(IF_MATCH(0))
             )
             .Then(CONFLICT);
 
@@ -44,14 +44,14 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
     public Task ConfirmsNonEmptyShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0)
             )
             .When(
                 POST,
                 URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
-                HEADERS(IF_MATCH(2))
+                HEADERS(IF_MATCH(1))
             )
-            .Then(NO_CONTENT, RESPONSE_ETAG_HEADER(3));
+            .Then(NO_CONTENT, RESPONSE_ETAG_HEADER(2));
 
     [Theory]
     [InlineData("immutable")]
@@ -60,13 +60,13 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
     public Task CantConfirmAlreadyConfirmedShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1),
-                ThenConfirmed(apiPrefix, ClientId, 2)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0),
+                ThenConfirmed(apiPrefix, ClientId, 1)
             )
             .When(
                 POST,
                 URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
-                HEADERS(IF_MATCH(3))
+                HEADERS(IF_MATCH(2))
             )
             .Then(CONFLICT);
 
@@ -77,13 +77,13 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
     public Task CantConfirmCanceledShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1),
-                ThenCanceled(apiPrefix, ClientId, 2)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0),
+                ThenCanceled(apiPrefix, ClientId, 1)
             )
             .When(
                 POST,
                 URI(ctx => ConfirmShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())),
-                HEADERS(IF_MATCH(3))
+                HEADERS(IF_MATCH(2))
             )
             .Then(CONFLICT);
 
@@ -94,11 +94,11 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
     public Task ReturnsNonEmptyShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1),
-                ThenConfirmed(apiPrefix, ClientId, 2)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0),
+                ThenConfirmed(apiPrefix, ClientId, 1)
             )
             .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
-            .Then(OK, RESPONSE_ETAG_HEADER(3));
+            .Then(OK, RESPONSE_ETAG_HEADER(2));
 
     private static readonly Faker Faker = new();
     private readonly Guid NotExistingShoppingCartId = Guid.NewGuid();

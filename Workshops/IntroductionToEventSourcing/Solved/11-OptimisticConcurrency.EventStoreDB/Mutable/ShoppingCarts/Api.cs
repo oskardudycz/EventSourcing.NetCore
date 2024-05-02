@@ -1,9 +1,8 @@
 using Core.Validation;
-using Marten;
-using Marten.Schema.Identity;
+using EventStore.Client;
 using Microsoft.AspNetCore.Mvc;
+using OptimisticConcurrency.Core.EventStoreDB;
 using OptimisticConcurrency.Core.Http;
-using OptimisticConcurrency.Core.Marten;
 using OptimisticConcurrency.Mutable.Pricing;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static System.DateTimeOffset;
@@ -24,16 +23,16 @@ public static class Api
         shoppingCarts.MapPost("",
             async (
                 HttpContext context,
-                IDocumentSession session,
+                EventStoreClient eventStore,
                 Guid clientId,
                 CancellationToken ct) =>
             {
-                var shoppingCartId = CombGuidIdGeneration.NewGuid();
+                var shoppingCartId = Uuid.NewUuid().ToGuid();
 
-                var nextExpectedVersion = await session.Add<MutableShoppingCart>(shoppingCartId,
-                    MutableShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now).DequeueUncommittedEvents(), ct);
+                var nextExpectedRevision = await eventStore.Add<ShoppingCart>(shoppingCartId,
+                    ShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now), ct);
 
-                context.SetResponseEtag(nextExpectedVersion);
+                context.SetResponseEtag(nextExpectedRevision);
 
                 return Created($"/api/mutable/clients/{clientId}/shopping-carts/{shoppingCartId}", shoppingCartId);
             }
@@ -43,7 +42,7 @@ public static class Api
             async (
                 HttpContext context,
                 IProductPriceCalculator pricingCalculator,
-                IDocumentSession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 AddProductRequest body,
                 [FromIfMatchHeader] string eTag,
@@ -51,10 +50,10 @@ public static class Api
             {
                 var productItem = body.ProductItem.NotNull().ToProductItem();
 
-                var nextExpectedVersion = await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId, ToExpectedVersion(eTag),
+                var nextExpectedRevision = await eventStore.GetAndUpdate(shoppingCartId, ToExpectedRevision(eTag),
                     state => state.AddProduct(pricingCalculator, productItem, Now), ct);
 
-                context.SetResponseEtag(nextExpectedVersion);
+                context.SetResponseEtag(nextExpectedRevision);
 
                 return NoContent();
             }
@@ -63,7 +62,7 @@ public static class Api
         productItems.MapDelete("{productId:guid}",
             async (
                 HttpContext context,
-                IDocumentSession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 [FromRoute] Guid productId,
                 [FromQuery] int? quantity,
@@ -78,11 +77,11 @@ public static class Api
                     UnitPrice = unitPrice.NotNull().Positive()
                 };
 
-                var nextExpectedVersion = await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId, ToExpectedVersion(eTag),
+                var nextExpectedRevision = await eventStore.GetAndUpdate(shoppingCartId, ToExpectedRevision(eTag),
                     state => state.RemoveProduct(productItem, Now),
                     ct);
 
-                context.SetResponseEtag(nextExpectedVersion);
+                context.SetResponseEtag(nextExpectedRevision);
 
                 return NoContent();
             }
@@ -91,15 +90,15 @@ public static class Api
         shoppingCart.MapPost("confirm",
             async (
                 HttpContext context,
-                IDocumentSession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
-                var nextExpectedVersion = await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId, ToExpectedVersion(eTag),
+                var nextExpectedRevision = await eventStore.GetAndUpdate(shoppingCartId, ToExpectedRevision(eTag),
                     state => state.Confirm(Now), ct);
 
-                context.SetResponseEtag(nextExpectedVersion);
+                context.SetResponseEtag(nextExpectedRevision);
 
                 return NoContent();
             }
@@ -108,15 +107,15 @@ public static class Api
         shoppingCart.MapDelete("",
             async (
                 HttpContext context,
-                IDocumentSession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
-                var nextExpectedVersion = await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId, ToExpectedVersion(eTag),
+                var nextExpectedRevision = await eventStore.GetAndUpdate(shoppingCartId, ToExpectedRevision(eTag),
                     state => state.Cancel(Now), ct);
 
-                context.SetResponseEtag(nextExpectedVersion);
+                context.SetResponseEtag(nextExpectedRevision);
 
                 return NoContent();
             }
@@ -125,13 +124,13 @@ public static class Api
         shoppingCart.MapGet("",
             async Task<IResult> (
                 HttpContext context,
-                IQuerySession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 CancellationToken ct) =>
             {
-                var result = await session.Events.AggregateStreamAsync<MutableShoppingCart>(shoppingCartId, token: ct);
+                var (result, revision) = await eventStore.GetShoppingCart(shoppingCartId, ct);
 
-                context.SetResponseEtag(result?.Version);
+                context.SetResponseEtag(revision);
 
                 return result is not null ? Ok(result) : NotFound();
             }
