@@ -10,22 +10,12 @@ using SmartHome.Temperature.MotionSensors.RebuildingMotionSensorsViews;
 namespace SmartHome.Api.Controllers;
 
 [Route("api/motion-sensors")]
-public class MotionSensorsController: Controller
+public class MotionSensorsController(
+    ICommandBus commandBus,
+    IQueryBus queryBus,
+    IIdGenerator idGenerator)
+    : Controller
 {
-    private readonly ICommandBus commandBus;
-    private readonly IQueryBus queryBus;
-    private readonly IIdGenerator idGenerator;
-
-    public MotionSensorsController(
-        ICommandBus commandBus,
-        IQueryBus queryBus,
-        IIdGenerator idGenerator)
-    {
-        this.commandBus = commandBus;
-        this.queryBus = queryBus;
-        this.idGenerator = idGenerator;
-    }
-
     [HttpGet]
     public Task<IReadOnlyList<MotionSensor>> Get()
     {

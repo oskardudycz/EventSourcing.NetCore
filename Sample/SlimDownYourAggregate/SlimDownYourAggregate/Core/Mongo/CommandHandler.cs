@@ -29,13 +29,8 @@ public record AddDummy(string Name);
 
 public record UpdateDummyName(string Id, string Name);
 
-public class DummyCommandHandler
+public class DummyCommandHandler(MongoRepository<Dummy> repository)
 {
-    private readonly MongoRepository<Dummy> repository;
-
-    public DummyCommandHandler(MongoRepository<Dummy> repository) =>
-        this.repository = repository;
-
     public Task Handle(AddDummy command, CancellationToken ct) =>
         repository.AddAsync(Dummy.Create(command.Name), ct);
 

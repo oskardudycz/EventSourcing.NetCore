@@ -8,16 +8,10 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Shipments.Api.Tests.Packages;
 
-public class SendPackageTests: IClassFixture<TestWebApplicationFactory<Program>>
+public class SendPackageTests(TestWebApplicationFactory<Program> fixture)
+    : IClassFixture<TestWebApplicationFactory<Program>>
 {
-    private readonly ApiSpecification<Program> API;
-    private readonly TestWebApplicationFactory<Program> fixture;
-
-    public SendPackageTests(TestWebApplicationFactory<Program> fixture)
-    {
-        this.fixture = fixture;
-        API = ApiSpecification<Program>.Setup(fixture);
-    }
+    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(fixture);
 
     [Fact]
     [Trait("Category", "Acceptance")]

@@ -20,16 +20,9 @@ public record GetReservations(
     }
 }
 
-internal class HandleGetReservations:
+internal class HandleGetReservations(IDocumentSession querySession):
     IQueryHandler<GetReservations, IPagedList<ReservationShortInfo>>
 {
-    private readonly IDocumentSession querySession;
-
-    public HandleGetReservations(IDocumentSession querySession)
-    {
-        this.querySession = querySession;
-    }
-
     public Task<IPagedList<ReservationShortInfo>> Handle(
         GetReservations query,
         CancellationToken cancellationToken

@@ -21,16 +21,9 @@ public record GetReservationHistory(
     }
 }
 
-internal class HandleGetReservationHistory:
+internal class HandleGetReservationHistory(IDocumentSession querySession):
     IQueryHandler<GetReservationHistory, IPagedList<ReservationHistory>>
 {
-    private readonly IDocumentSession querySession;
-
-    public HandleGetReservationHistory(IDocumentSession querySession)
-    {
-        this.querySession = querySession;
-    }
-
     public Task<IPagedList<ReservationHistory>> Handle(
         GetReservationHistory query,
         CancellationToken cancellationToken

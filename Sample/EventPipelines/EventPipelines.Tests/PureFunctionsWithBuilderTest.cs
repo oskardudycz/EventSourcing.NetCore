@@ -49,18 +49,13 @@ public class PureFunctionsWithBuilderTest
             AdminsInTenants.Add(@event);
     }
 
-    private readonly EventHandlersBuilder builder;
-
-    public PureFunctionsWithBuilderTest()
-    {
-        builder = EventHandlersBuilder
-            .Setup()
-            .Filter<UserAdded>(AdminPipeline.IsAdmin)
-            .Transform<UserAdded, AdminAdded>(AdminPipeline.ToAdminAdded)
-            .Handle<AdminAdded>(AdminPipeline.Handle)
-            .Transform<UserAdded, List<AdminGrantedInTenant>>(AdminPipeline.SendToTenants)
-            .Handle<AdminGrantedInTenant>(AdminPipeline.Handle);
-    }
+    private readonly EventHandlersBuilder builder = EventHandlersBuilder
+        .Setup()
+        .Filter<UserAdded>(AdminPipeline.IsAdmin)
+        .Transform<UserAdded, AdminAdded>(AdminPipeline.ToAdminAdded)
+        .Handle<AdminAdded>(AdminPipeline.Handle)
+        .Transform<UserAdded, List<AdminGrantedInTenant>>(AdminPipeline.SendToTenants)
+        .Handle<AdminGrantedInTenant>(AdminPipeline.Handle);
 
     [Fact]
     public async Task ShouldWork()

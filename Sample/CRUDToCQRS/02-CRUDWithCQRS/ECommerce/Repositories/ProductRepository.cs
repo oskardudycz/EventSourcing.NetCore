@@ -4,9 +4,4 @@ using ECommerce.Storage;
 
 namespace ECommerce.Repositories;
 
-public class ProductRepository: Repository<Product>
-{
-    public ProductRepository(ECommerceDbContext dbContext) : base(dbContext)
-    {
-    }
-}
+public class ProductRepository(ECommerceDbContext dbContext): Repository<Product>(dbContext);

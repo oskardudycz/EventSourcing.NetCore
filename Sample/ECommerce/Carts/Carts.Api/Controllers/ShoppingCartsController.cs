@@ -19,22 +19,12 @@ using Marten.Pagination;
 namespace Carts.Api.Controllers;
 
 [Route("api/[controller]")]
-public class ShoppingCartsController: Controller
+public class ShoppingCartsController(
+    ICommandBus commandBus,
+    IQueryBus queryBus,
+    IIdGenerator idGenerator)
+    : Controller
 {
-    private readonly ICommandBus commandBus;
-    private readonly IQueryBus queryBus;
-    private readonly IIdGenerator idGenerator;
-
-    public ShoppingCartsController(
-        ICommandBus commandBus,
-        IQueryBus queryBus,
-        IIdGenerator idGenerator)
-    {
-        this.commandBus = commandBus;
-        this.queryBus = queryBus;
-        this.idGenerator = idGenerator;
-    }
-
     [HttpPost]
     public async Task<IActionResult> OpenCart([FromBody] OpenShoppingCartRequest? request)
     {

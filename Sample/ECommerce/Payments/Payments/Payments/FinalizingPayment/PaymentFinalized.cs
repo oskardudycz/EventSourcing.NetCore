@@ -26,21 +26,11 @@ public record PaymentFinalized(
     }
 }
 
-public class TransformIntoPaymentFinalized:
+public class TransformIntoPaymentFinalized(
+    IEventBus eventBus,
+    IQuerySession querySession):
     IEventHandler<EventEnvelope<PaymentCompleted>>
 {
-    private readonly IEventBus eventBus;
-    private readonly IQuerySession querySession;
-
-    public TransformIntoPaymentFinalized(
-        IEventBus eventBus,
-        IQuerySession querySession
-    )
-    {
-        this.eventBus = eventBus;
-        this.querySession = querySession;
-    }
-
     public async Task Handle(EventEnvelope<PaymentCompleted> @event, CancellationToken cancellationToken)
     {
         var (paymentId, completedAt) = @event.Data;

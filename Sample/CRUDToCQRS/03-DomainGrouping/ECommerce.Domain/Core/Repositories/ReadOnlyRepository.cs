@@ -3,16 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Domain.Core.Repositories;
 
-public abstract class ReadOnlyRepository<TEntity>: IReadonlyRepository<TEntity>
+public abstract class ReadOnlyRepository<TEntity>(IQueryable<TEntity> query): IReadonlyRepository<TEntity>
     where TEntity : class, IEntity
 {
-    private readonly IQueryable<TEntity> query;
-
-    protected ReadOnlyRepository(IQueryable<TEntity> query)
-    {
-        this.query = query;
-    }
-
     public Task<TEntity?> FindByIdAsync(Guid id, CancellationToken ct)
     {
         return query.SingleOrDefaultAsync(e => e.Id == id, ct);

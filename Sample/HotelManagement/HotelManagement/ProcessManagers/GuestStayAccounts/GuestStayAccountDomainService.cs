@@ -22,13 +22,8 @@ public record CheckOutGuest(
     Guid? GroupCheckOutId = null
 );
 
-public class GuestStayDomainService
+public class GuestStayDomainService(IDocumentSession documentSession)
 {
-    private readonly IDocumentSession documentSession;
-
-    public GuestStayDomainService(IDocumentSession documentSession) =>
-        this.documentSession = documentSession;
-
     public Task Handle(CheckInGuest command, CancellationToken ct) =>
         documentSession.Add(
             command.GuestStayId.ToString(),

@@ -5,22 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Marten.ExternalProjections;
 
-public class MartenExternalProjection<TEvent, TView>: IEventHandler<EventEnvelope<TEvent>>
+public class MartenExternalProjection<TEvent, TView>(
+    IDocumentSession session,
+    Func<TEvent, Guid> getId): IEventHandler<EventEnvelope<TEvent>>
     where TView : IVersionedProjection
     where TEvent : notnull
 {
-    private readonly IDocumentSession session;
-    private readonly Func<TEvent, Guid> getId;
-
-    public MartenExternalProjection(
-        IDocumentSession session,
-        Func<TEvent, Guid> getId
-    )
-    {
-        this.session = session;
-        this.getId = getId;
-    }
-
     public async Task Handle(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct)
     {
         var (@event, eventMetadata) = eventEnvelope;

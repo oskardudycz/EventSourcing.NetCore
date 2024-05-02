@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Stream;
 
-public class StreamLoadingFromExactState: MartenTest
+public class StreamLoadingFromExactState(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
         Guid IssueId,
@@ -95,6 +95,4 @@ public class StreamLoadingFromExactState: MartenTest
         events = EventStore.FetchStream(streamId, 100);
         events.Count.Should().Be(4);
     }
-
-    public StreamLoadingFromExactState(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

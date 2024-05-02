@@ -8,17 +8,8 @@ public record GetMeeting(
 );
 
 
-internal class HandleGetMeeting: IQueryHandler<GetMeeting, MeetingView?>
+internal class HandleGetMeeting(IQuerySession session): IQueryHandler<GetMeeting, MeetingView?>
 {
-    private readonly IDocumentSession session;
-
-    public HandleGetMeeting(
-        IDocumentSession session
-    )
-    {
-        this.session = session ?? throw new ArgumentNullException(nameof(session));
-    }
-
     public Task<MeetingView?> Handle(GetMeeting request, CancellationToken cancellationToken)
     {
         return session.LoadAsync<MeetingView>(request.Id, cancellationToken);

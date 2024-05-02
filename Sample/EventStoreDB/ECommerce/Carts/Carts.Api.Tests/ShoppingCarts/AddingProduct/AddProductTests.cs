@@ -10,19 +10,15 @@ namespace Carts.Api.Tests.ShoppingCarts.AddingProduct;
 
 using static ShoppingCartsApi;
 
-public class AddProductTests: IClassFixture<ApiSpecification<Program>>
+public class AddProductTests(ApiSpecification<Program> api): IClassFixture<ApiSpecification<Program>>
 {
-    private readonly ApiSpecification<Program> API;
-
-    public AddProductTests(ApiSpecification<Program> api) => API = api;
-
     [Fact]
     [Trait("Category", "Acceptance")]
     public async Task Post_Should_AddProductItem_To_ShoppingCart()
     {
         var product = new ProductItemRequest(Guid.NewGuid(), 1);
 
-        await API
+        await api
             .Given("Opened Shopping Cart", OpenShoppingCart())
             .When(
                 "Add new product",

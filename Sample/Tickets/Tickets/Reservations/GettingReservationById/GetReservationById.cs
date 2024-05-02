@@ -9,16 +9,9 @@ public record GetReservationById(
 );
 
 
-internal class HandleGetReservationById :
+internal class HandleGetReservationById(IDocumentSession querySession):
     IQueryHandler<GetReservationById, ReservationDetails>
 {
-    private readonly IDocumentSession querySession;
-
-    public HandleGetReservationById(IDocumentSession querySession)
-    {
-        this.querySession = querySession;
-    }
-
     public async Task<ReservationDetails> Handle(GetReservationById request, CancellationToken cancellationToken)
     {
         return await querySession.LoadAsync<ReservationDetails>(request.ReservationId, cancellationToken)

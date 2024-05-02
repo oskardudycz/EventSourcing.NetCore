@@ -16,14 +16,9 @@ public record GetCartById(
     }
 }
 
-internal class HandleGetCartById:
+internal class HandleGetCartById(IQuerySession querySession):
     IQueryHandler<GetCartById, ShoppingCartDetails?>
 {
-    private readonly IQuerySession querySession;
-
-    public HandleGetCartById(IQuerySession querySession) =>
-        this.querySession = querySession;
-
     public Task<ShoppingCartDetails?> Handle(GetCartById query, CancellationToken cancellationToken) =>
         querySession.LoadAsync<ShoppingCartDetails>(query.CartId, cancellationToken);
 }

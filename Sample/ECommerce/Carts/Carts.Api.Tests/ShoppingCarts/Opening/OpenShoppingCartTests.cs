@@ -8,14 +8,12 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Carts.Api.Tests.ShoppingCarts.Opening;
 
-public class OpenShoppingCartTests: IClassFixture<ApiSpecification<Program>>
+public class OpenShoppingCartTests(ApiSpecification<Program> api): IClassFixture<ApiSpecification<Program>>
 {
-    private readonly ApiSpecification<Program> API;
-
     [Fact]
     public Task Post_ShouldReturn_CreatedStatus_With_CartId() =>
-        API.Scenario(
-            API.Given()
+        api.Scenario(
+            api.Given()
                 .When(
                     POST,
                     URI("/api/ShoppingCarts/"),
@@ -23,7 +21,7 @@ public class OpenShoppingCartTests: IClassFixture<ApiSpecification<Program>>
                 )
                 .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1)),
             response =>
-                API.Given()
+                api.Given()
                     .When(GET, URI($"/api/ShoppingCarts/{response.GetCreatedId()}"))
                     .Until(RESPONSE_ETAG_IS(1))
                     .Then(
@@ -37,8 +35,6 @@ public class OpenShoppingCartTests: IClassFixture<ApiSpecification<Program>>
                             details.Version.Should().Be(1);
                         }))
         );
-
-    public OpenShoppingCartTests(ApiSpecification<Program> api) => API = api;
 
     public readonly Guid ClientId = Guid.NewGuid();
 }

@@ -18,14 +18,9 @@ public record InstallMotionSensor(
     }
 }
 
-public class HandleInstallMotionSensor:
+public class HandleInstallMotionSensor(IMartenRepository<MotionSensor> repository):
     ICommandHandler<InstallMotionSensor>
 {
-    private readonly IMartenRepository<MotionSensor> repository;
-
-    public HandleInstallMotionSensor(IMartenRepository<MotionSensor> repository) =>
-        this.repository = repository;
-
     public Task Handle(InstallMotionSensor command, CancellationToken ct) =>
         repository.Add(
             MotionSensor.Install(

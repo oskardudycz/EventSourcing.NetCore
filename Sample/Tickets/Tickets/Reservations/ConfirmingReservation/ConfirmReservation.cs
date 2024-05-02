@@ -16,14 +16,9 @@ public record ConfirmReservation(
     }
 }
 
-internal class HandleConfirmReservation:
+internal class HandleConfirmReservation(IMartenRepository<Reservation> repository):
     ICommandHandler<ConfirmReservation>
 {
-    private readonly IMartenRepository<Reservation> repository;
-
-    public HandleConfirmReservation(IMartenRepository<Reservation> repository) =>
-        this.repository = repository;
-
     public Task Handle(ConfirmReservation command, CancellationToken ct) =>
         repository.GetAndUpdate(
             command.ReservationId,

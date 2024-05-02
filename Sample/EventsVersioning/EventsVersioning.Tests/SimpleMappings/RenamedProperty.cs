@@ -8,20 +8,14 @@ namespace EventsVersioning.Tests.SimpleMappings;
 
 public class RenamedProperty
 {
-    public class ShoppingCartOpened
+    public class ShoppingCartOpened(
+        Guid cartId,
+        Guid clientId)
     {
         [JsonPropertyName("ShoppingCartId")]
-        public Guid CartId { get; init; }
-        public Guid ClientId { get; init; }
+        public Guid CartId { get; init; } = cartId;
 
-        public ShoppingCartOpened(
-            Guid cartId,
-            Guid clientId
-        )
-        {
-            CartId = cartId;
-            ClientId = clientId;
-        }
+        public Guid ClientId { get; init; } = clientId;
     }
 
     [Fact]

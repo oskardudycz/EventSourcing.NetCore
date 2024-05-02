@@ -8,15 +8,8 @@ namespace ECommerce.Domain.Products;
 using static CreateProductHandler;
 using static UpdateProductHandler;
 
-public class ProductService
+public class ProductService(ECommerceDbContext dbContext)
 {
-    private readonly ECommerceDbContext dbContext;
-
-    public ProductService(ECommerceDbContext dbContext)
-    {
-        this.dbContext = dbContext;
-    }
-
     public Task CreateAsync(CreateProduct command, CancellationToken ct) =>
         dbContext.AddAndSaveChanges(
             Handle(command),

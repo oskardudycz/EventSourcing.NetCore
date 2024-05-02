@@ -15,7 +15,7 @@ using Orders.ShoppingCarts.FinalizingCart;
 
 namespace Orders.Orders;
 
-public class OrderSaga:
+public class OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus):
     IEventHandler<CartFinalized>,
     IEventHandler<OrderInitialized>,
     IEventHandler<PaymentFinalized>,
@@ -24,15 +24,6 @@ public class OrderSaga:
     IEventHandler<ProductWasOutOfStock>,
     IEventHandler<OrderCancelled>
 {
-    private readonly IIdGenerator idGenerator;
-    private readonly ICommandBus commandBus;
-
-    public OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus)
-    {
-        this.idGenerator = idGenerator;
-        this.commandBus = commandBus;
-    }
-
     // Happy path
     public async Task Handle(CartFinalized @event, CancellationToken ct)
     {

@@ -13,13 +13,8 @@ public class ChemicalReactionDbContext: DbContext
     }
 }
 
-public class ChemicalReactionCommandHandler
+public class ChemicalReactionCommandHandler(EFRepository<ChemicalReactionDbContext, ChemicalReactionModel> repository)
 {
-    private readonly EFRepository<ChemicalReactionDbContext, ChemicalReactionModel> repository;
-
-    public ChemicalReactionCommandHandler(EFRepository<ChemicalReactionDbContext, ChemicalReactionModel> repository) =>
-        this.repository = repository;
-
     public Task Handle(ChemicalReactionCommand command, CancellationToken ct) =>
         repository.GetAndUpdateAsync(
             command.Id,

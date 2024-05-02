@@ -16,14 +16,9 @@ public record CancelShoppingCart(
     }
 }
 
-internal class HandleCancelShoppingCart:
+internal class HandleCancelShoppingCart(IMartenRepository<ShoppingCart> cartRepository):
     ICommandHandler<CancelShoppingCart>
 {
-    private readonly IMartenRepository<ShoppingCart> cartRepository;
-
-    public HandleCancelShoppingCart(IMartenRepository<ShoppingCart> cartRepository) =>
-        this.cartRepository = cartRepository;
-
     public Task Handle(CancelShoppingCart command, CancellationToken ct) =>
         cartRepository.GetAndUpdate(
             command.CartId,

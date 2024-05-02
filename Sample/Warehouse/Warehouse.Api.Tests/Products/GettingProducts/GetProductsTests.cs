@@ -6,26 +6,21 @@ using Xunit;
 
 namespace Warehouse.Api.Tests.Products.GettingProducts;
 
-public class GetProductsTests: IClassFixture<GetProductsFixture>
+public class GetProductsTests(GetProductsFixture api): IClassFixture<GetProductsFixture>
 {
-    private readonly GetProductsFixture API;
-
-    public GetProductsTests(GetProductsFixture api) =>
-        API = api;
-
     [Fact]
     public Task ValidRequest_With_NoParams_ShouldReturn_200() =>
-        API.Given()
+        api.Given()
             .When(GET, URI("/api/products/"))
-            .Then(OK, RESPONSE_BODY(API.RegisteredProducts));
+            .Then(OK, RESPONSE_BODY(api.RegisteredProducts));
 
     [Fact]
     public Task ValidRequest_With_Filter_ShouldReturn_SubsetOfRecords()
     {
-        var registeredProduct = API.RegisteredProducts.First();
+        var registeredProduct = api.RegisteredProducts.First();
         var filter = registeredProduct.Sku[1..];
 
-        return API.Given()
+        return api.Given()
             .When(GET, URI($"/api/products/?filter={filter}"))
             .Then(OK, RESPONSE_BODY(new List<ProductListItem> { registeredProduct }));
     }
@@ -36,19 +31,19 @@ public class GetProductsTests: IClassFixture<GetProductsFixture>
         // Given
         const int page = 2;
         const int pageSize = 1;
-        var pagedRecords = API.RegisteredProducts
+        var pagedRecords = api.RegisteredProducts
             .Skip(page - 1)
             .Take(pageSize)
             .ToList();
 
-        return API.Given()
+        return api.Given()
             .When(GET, URI($"/api/products/?page={page}&pageSize={pageSize}"))
             .Then(OK, RESPONSE_BODY(pagedRecords));
     }
 
     [Fact]
     public Task NegativePage_ShouldReturn_400() =>
-        API.Given()
+        api.Given()
             .When(GET, URI($"/api/products/?page={-20}"))
             .Then(BAD_REQUEST);
 
@@ -56,17 +51,15 @@ public class GetProductsTests: IClassFixture<GetProductsFixture>
     [InlineData(0)]
     [InlineData(-20)]
     public Task NegativeOrZeroPageSize_ShouldReturn_400(int pageSize) =>
-        API.Given()
+        api.Given()
             .When(GET, URI($"/api/products/?pageSize={pageSize}"))
             .Then(BAD_REQUEST);
 }
 
 
-public class GetProductsFixture: ApiSpecification<Program>, IAsyncLifetime
+public class GetProductsFixture(): ApiSpecification<Program>(new WarehouseTestWebApplicationFactory()), IAsyncLifetime
 {
     public List<ProductListItem> RegisteredProducts { get; } = [];
-
-    public GetProductsFixture(): base(new WarehouseTestWebApplicationFactory()) { }
 
     public async Task InitializeAsync()
     {

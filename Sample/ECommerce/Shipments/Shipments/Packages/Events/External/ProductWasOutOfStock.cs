@@ -2,16 +2,9 @@ using Core.Events;
 
 namespace Shipments.Packages.Events.External;
 
-internal class ProductWasOutOfStock: IExternalEvent
+internal class ProductWasOutOfStock(Guid orderId, DateTime availabilityCheckedAt): IExternalEvent
 {
-    public Guid OrderId { get; }
+    public Guid OrderId { get; } = orderId;
 
-    public DateTime AvailabilityCheckedAt { get; }
-
-
-    public ProductWasOutOfStock(Guid orderId, DateTime availabilityCheckedAt)
-    {
-        OrderId = orderId;
-        AvailabilityCheckedAt = availabilityCheckedAt;
-    }
+    public DateTime AvailabilityCheckedAt { get; } = availabilityCheckedAt;
 }

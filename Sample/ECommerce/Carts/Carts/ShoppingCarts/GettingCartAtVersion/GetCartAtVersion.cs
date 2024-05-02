@@ -21,14 +21,9 @@ public record GetCartAtVersion(
     }
 }
 
-internal class HandleGetCartAtVersion :
+internal class HandleGetCartAtVersion(IQuerySession querySession):
     IQueryHandler<GetCartAtVersion, ShoppingCartDetails>
 {
-    private readonly IQuerySession querySession;
-
-    public HandleGetCartAtVersion(IQuerySession querySession) =>
-        this.querySession = querySession;
-
     public async Task<ShoppingCartDetails> Handle(GetCartAtVersion query, CancellationToken cancellationToken)
     {
         var (cartId, version) = query;

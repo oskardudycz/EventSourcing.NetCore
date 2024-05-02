@@ -7,19 +7,12 @@ using Tools.Tools;
 
 namespace EventStoreBasics;
 
-public class EventStore: IDisposable, IEventStore
+public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEventStore
 {
-    private readonly NpgsqlConnection databaseConnection;
-
     private readonly IList<ISnapshot> snapshots = new List<ISnapshot>();
     private readonly IList<IProjection> projections = new List<IProjection>();
 
     private const string Apply = "Apply";
-
-    public EventStore(NpgsqlConnection databaseConnection)
-    {
-        this.databaseConnection = databaseConnection;
-    }
 
     public void Init()
     {

@@ -2,15 +2,9 @@ using Core.Aggregates;
 
 namespace Tickets.Concerts;
 
-public class Concert : Aggregate
+public class Concert(string name, DateTime date): Aggregate
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = name;
 
-    public DateTime Date { get; private set; }
-
-    public Concert(string name, DateTime date)
-    {
-        Name = name;
-        Date = date;
-    }
+    public DateTime Date { get; private set; } = date;
 }

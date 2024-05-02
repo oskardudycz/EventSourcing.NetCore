@@ -2,14 +2,10 @@ using Marten;
 
 namespace EventStoreBasics;
 
-public class MartenRepository<T>: IRepository<T> where T : class, IAggregate, new()
+public class MartenRepository<T>(IDocumentSession documentSession): IRepository<T>
+    where T : class, IAggregate, new()
 {
-    private readonly IDocumentSession documentSession;
-
-    public MartenRepository(IDocumentSession documentSession)
-    {
-        this.documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
-    }
+    private readonly IDocumentSession documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
 
     public T Find(Guid id)
     {

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.General;
 
-public class StoreInitializationTests: MartenTest
+public class StoreInitializationTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, false, false)
 {
     [Fact]
     public void GivenWrongConnectionString_WhenDocumentSessionIsInitialized_ThenConnectionIsCreated()
@@ -80,10 +80,5 @@ public class StoreInitializationTests: MartenTest
         var result = session.Query<int>("SELECT 1");
 
         result.Should().NotBeNull();
-    }
-
-    public StoreInitializationTests(MartenFixture fixture) : base(fixture.PostgreSqlContainer, false, false)
-    {
-
     }
 }

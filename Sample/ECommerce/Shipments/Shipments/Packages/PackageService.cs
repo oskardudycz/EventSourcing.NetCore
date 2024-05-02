@@ -14,25 +14,18 @@ public interface IPackageService
     Task<Package> GetById(Guid id, CancellationToken ct);
 }
 
-internal class PackageService: IPackageService
+internal class PackageService(
+    ShipmentsDbContext dbContext,
+    IEventBus eventBus,
+    IProductAvailabilityService productAvailabilityService)
+    : IPackageService
 {
-    private readonly ShipmentsDbContext dbContext;
-    private readonly IEventBus eventBus;
-    private readonly IProductAvailabilityService productAvailabilityService;
+    private readonly ShipmentsDbContext dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+    private readonly IEventBus eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+    private readonly IProductAvailabilityService productAvailabilityService = productAvailabilityService ??
+                                                                              throw new ArgumentNullException(nameof(productAvailabilityService));
 
     private DbSet<Package> Packages => dbContext.Packages;
-
-    public PackageService(
-        ShipmentsDbContext dbContext,
-        IEventBus eventBus,
-        IProductAvailabilityService productAvailabilityService
-    )
-    {
-        this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        this.productAvailabilityService = productAvailabilityService ??
-                                          throw new ArgumentNullException(nameof(productAvailabilityService));
-    }
 
     public async Task<Package> GetById(Guid id, CancellationToken ct)
     {

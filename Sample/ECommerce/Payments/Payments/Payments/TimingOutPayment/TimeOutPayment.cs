@@ -19,14 +19,9 @@ public record TimeOutPayment(
     }
 }
 
-public class HandleTimeOutPayment:
+public class HandleTimeOutPayment(IMartenRepository<Payment> paymentRepository):
     ICommandHandler<TimeOutPayment>
 {
-    private readonly IMartenRepository<Payment> paymentRepository;
-
-    public HandleTimeOutPayment(IMartenRepository<Payment> paymentRepository) =>
-        this.paymentRepository = paymentRepository;
-
     public Task Handle(TimeOutPayment command, CancellationToken ct)
     {
         var (paymentId, _) = command;

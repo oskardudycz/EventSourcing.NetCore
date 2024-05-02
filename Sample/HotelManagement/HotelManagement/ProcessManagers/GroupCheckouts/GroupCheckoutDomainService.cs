@@ -9,13 +9,8 @@ public record InitiateGroupCheckout(
     Guid[] GuestStayIds
 );
 
-public class GuestStayDomainService
+public class GuestStayDomainService(IDocumentSession documentSession)
 {
-    private readonly IDocumentSession documentSession;
-
-    public GuestStayDomainService(IDocumentSession documentSession) =>
-        this.documentSession = documentSession;
-
     public Task Handle(InitiateGroupCheckout command, CancellationToken ct) =>
         documentSession.Add(
             command.GroupCheckoutId.ToString(),

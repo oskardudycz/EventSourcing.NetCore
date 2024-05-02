@@ -4,15 +4,8 @@ using Warehouse.Api.Core.Queries;
 
 namespace Warehouse.Api.Products;
 
-internal class HandleGetProductDetails: IQueryHandler<GetProductDetails, ProductDetails?>
+internal class HandleGetProductDetails(IQueryable<Product> products): IQueryHandler<GetProductDetails, ProductDetails?>
 {
-    private readonly IQueryable<Product> products;
-
-    public HandleGetProductDetails(IQueryable<Product> products)
-    {
-        this.products = products;
-    }
-
     public async ValueTask<ProductDetails?> Handle(GetProductDetails query, CancellationToken ct)
     {
         var product = await products

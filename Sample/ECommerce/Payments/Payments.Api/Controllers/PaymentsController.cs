@@ -8,21 +8,13 @@ using Payments.Payments.TimingOutPayment;
 namespace Payments.Api.Controllers;
 
 [Route("api/[controller]")]
-public class PaymentsController: Controller
+public class PaymentsController(
+    ICommandBus commandBus,
+    IQueryBus queryBus,
+    IIdGenerator idGenerator)
+    : Controller
 {
-    private readonly ICommandBus commandBus;
-    private readonly IQueryBus queryBus;
-    private readonly IIdGenerator idGenerator;
-
-    public PaymentsController(
-        ICommandBus commandBus,
-        IQueryBus queryBus,
-        IIdGenerator idGenerator)
-    {
-        this.commandBus = commandBus;
-        this.queryBus = queryBus;
-        this.idGenerator = idGenerator;
-    }
+    private readonly IQueryBus queryBus = queryBus;
 
     [HttpPost]
     public async Task<IActionResult> RequestPayment([FromBody] RequestPaymentRequest? request)

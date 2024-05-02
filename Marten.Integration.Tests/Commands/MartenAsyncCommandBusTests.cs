@@ -94,13 +94,8 @@ public class MartenAsyncCommandBusTests(MartenFixture fixture): MartenTest(fixtu
 
 public record AddUser(Guid UserId, string? Sth = default);
 
-internal class AddUserCommandHandler: ICommandHandler<AddUser>
+internal class AddUserCommandHandler(List<Guid> userIds): ICommandHandler<AddUser>
 {
-    private readonly List<Guid> userIds;
-
-    public AddUserCommandHandler(List<Guid> userIds) =>
-        this.userIds = userIds;
-
     public Task Handle(AddUser command, CancellationToken ct)
     {
         userIds.Add(command.UserId);

@@ -18,14 +18,9 @@ public record RemoveProduct(
     }
 }
 
-internal class HandleRemoveProduct:
+internal class HandleRemoveProduct(IMartenRepository<ShoppingCart> cartRepository):
     ICommandHandler<RemoveProduct>
 {
-    private readonly IMartenRepository<ShoppingCart> cartRepository;
-
-    public HandleRemoveProduct(IMartenRepository<ShoppingCart> cartRepository) =>
-        this.cartRepository = cartRepository;
-
     public Task Handle(RemoveProduct command, CancellationToken ct)
     {
         var (cartId, productItem) = command;

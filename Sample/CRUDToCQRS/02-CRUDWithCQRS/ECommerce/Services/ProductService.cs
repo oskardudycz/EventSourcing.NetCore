@@ -5,9 +5,4 @@ using ECommerce.Repositories;
 
 namespace ECommerce.Services;
 
-public class ProductService: Service<Product>
-{
-    public ProductService(ProductRepository repository, IMapper mapper) : base(repository, mapper)
-    {
-    }
-}
+public class ProductService(ProductRepository repository, IMapper mapper): Service<Product>(repository, mapper);

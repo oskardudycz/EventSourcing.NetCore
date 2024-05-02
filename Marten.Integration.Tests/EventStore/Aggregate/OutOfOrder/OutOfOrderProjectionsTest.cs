@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate.OutOfOrder;
 
-public class OutOfOrderProjectionsTest: MartenTest
+public class OutOfOrderProjectionsTest(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
         Guid IssueId,
@@ -94,6 +94,4 @@ public class OutOfOrderProjectionsTest: MartenTest
         issuesListFromLiveAggregation!.Issues.Count.Should().Be(2);
         issuesListFromLiveAggregation!.Issues.Count.Should().Be(issuesListFromInlineAggregation!.Issues.Count);
     }
-
-    public OutOfOrderProjectionsTest(MartenFixture fixture) : base(fixture.PostgreSqlContainer){}
 }

@@ -16,14 +16,9 @@ public record CompleteOrder(
     }
 }
 
-public class HandleCompleteOrder:
+public class HandleCompleteOrder(IMartenRepository<Order> orderRepository):
     ICommandHandler<CompleteOrder>
 {
-    private readonly IMartenRepository<Order> orderRepository;
-
-    public HandleCompleteOrder(IMartenRepository<Order> orderRepository) =>
-        this.orderRepository = orderRepository;
-
     public Task Handle(CompleteOrder command, CancellationToken ct) =>
         orderRepository.GetAndUpdate(
             command.OrderId,

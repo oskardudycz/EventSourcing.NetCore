@@ -5,13 +5,7 @@ namespace IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 
 public abstract class EventStoreDBTest: IDisposable
 {
-    protected readonly EventStoreClient EventStore;
-
-    protected EventStoreDBTest()
-    {
-        EventStore =
-            new EventStoreClient(EventStoreClientSettings.Create("esdb://localhost:2113?tls=false"));
-    }
+    protected readonly EventStoreClient EventStore = new(EventStoreClientSettings.Create("esdb://localhost:2113?tls=false"));
 
     protected Task AppendEvents(string streamName, IEnumerable<object> events, CancellationToken ct)
     {

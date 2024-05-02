@@ -13,16 +13,10 @@ public interface IElasticSearchRepository<T> where T : class, IAggregate
     Task Delete(T aggregate, CancellationToken cancellationToken);
 }
 
-public class ElasticSearchRepository<T>: IElasticSearchRepository<T> where T : class, IAggregate
+public class ElasticSearchRepository<T>(ElasticsearchClient elasticClient): IElasticSearchRepository<T>
+    where T : class, IAggregate
 {
-    private readonly ElasticsearchClient elasticClient;
-
-    public ElasticSearchRepository(
-        ElasticsearchClient elasticClient
-    )
-    {
-        this.elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-    }
+    private readonly ElasticsearchClient elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
 
     public async Task<T?> Find(Guid id, CancellationToken cancellationToken)
     {

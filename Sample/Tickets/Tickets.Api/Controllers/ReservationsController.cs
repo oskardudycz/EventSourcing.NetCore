@@ -17,23 +17,12 @@ using Tickets.Reservations.GettingReservations;
 namespace Tickets.Api.Controllers;
 
 [Route("api/[controller]")]
-public class ReservationsController: Controller
+public class ReservationsController(
+    ICommandBus commandBus,
+    IQueryBus queryBus,
+    IIdGenerator idGenerator)
+    : Controller
 {
-    private readonly ICommandBus commandBus;
-    private readonly IQueryBus queryBus;
-
-    private readonly IIdGenerator idGenerator;
-
-    public ReservationsController(
-        ICommandBus commandBus,
-        IQueryBus queryBus,
-        IIdGenerator idGenerator)
-    {
-        this.commandBus = commandBus;
-        this.queryBus = queryBus;
-        this.idGenerator = idGenerator;
-    }
-
     [HttpGet("{id}")]
     public Task<ReservationDetails> Get(Guid id)
     {

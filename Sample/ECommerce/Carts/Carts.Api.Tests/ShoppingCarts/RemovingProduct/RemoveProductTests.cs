@@ -46,32 +46,28 @@ public class RemoveProductFixture: ApiSpecification<Program>, IAsyncLifetime
     public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class RemoveProductTests: IClassFixture<RemoveProductFixture>
+public class RemoveProductTests(RemoveProductFixture api): IClassFixture<RemoveProductFixture>
 {
-    private readonly RemoveProductFixture API;
-
-    public RemoveProductTests(RemoveProductFixture api) => API = api;
-
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task Delete_Should_Return_OK_And_Cancel_Shopping_Cart() =>
-        API
+        api
             .Given()
             .When(
                 DELETE,
                 URI(
-                    $"/api/ShoppingCarts/{API.ShoppingCartId}/products/{API.ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={API.UnitPrice.ToString(CultureInfo.InvariantCulture)}"),
+                    $"/api/ShoppingCarts/{api.ShoppingCartId}/products/{api.ProductItem.ProductId}?quantity={RemovedCount}&unitPrice={api.UnitPrice.ToString(CultureInfo.InvariantCulture)}"),
                 HEADERS(IF_MATCH(2))
             )
             .Then(NO_CONTENT)
             .And()
-            .When(GET, URI($"/api/ShoppingCarts/{API.ShoppingCartId}"))
+            .When(GET, URI($"/api/ShoppingCarts/{api.ShoppingCartId}"))
             .Until(RESPONSE_ETAG_IS(3))
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>
                 {
-                    details.Id.Should().Be(API.ShoppingCartId);
+                    details.Id.Should().Be(api.ShoppingCartId);
                     details.Status.Should().Be(ShoppingCartStatus.Pending);
                     details.ProductItems.Should().HaveCount(1);
                     var productItem = details.ProductItems.Single();
@@ -79,12 +75,12 @@ public class RemoveProductTests: IClassFixture<RemoveProductFixture>
                         PricedProductItem.Create(
                             ProductItem.From
                             (
-                                API.ProductItem.ProductId!.Value,
-                                API.ProductItem.Quantity!.Value - RemovedCount
+                                api.ProductItem.ProductId!.Value,
+                                api.ProductItem.Quantity!.Value - RemovedCount
                             ),
-                            API.UnitPrice
+                            api.UnitPrice
                         ));
-                    details.ClientId.Should().Be(API.ClientId);
+                    details.ClientId.Should().Be(api.ClientId);
                     details.Version.Should().Be(3);
                 }));
 

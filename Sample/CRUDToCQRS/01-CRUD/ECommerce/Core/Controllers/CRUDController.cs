@@ -5,14 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Core.Controllers;
 
-public abstract class CRUDController: Controller
+public abstract class CRUDController(ICRUDService service): Controller
 {
-    protected readonly ICRUDService service;
-
-    protected CRUDController(ICRUDService service)
-    {
-        this.service = service;
-    }
+    protected readonly ICRUDService service = service;
 
     protected async Task<IActionResult> CreateAsync<TCreateRequest, TCreateResponse>(
         TCreateRequest request,

@@ -14,13 +14,9 @@ public interface IMartenRepository<T> where T : class, IAggregate
     Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default);
 }
 
-public class MartenRepository<T>: IMartenRepository<T> where T : class, IAggregate
+public class MartenRepository<T>(IDocumentSession documentSession): IMartenRepository<T>
+    where T : class, IAggregate
 {
-    private readonly IDocumentSession documentSession;
-
-    public MartenRepository(IDocumentSession documentSession) =>
-        this.documentSession = documentSession;
-
     public Task<T?> Find(Guid id, CancellationToken ct) =>
         documentSession.Events.AggregateStreamAsync<T>(id, token: ct);
 

@@ -19,19 +19,12 @@ public record RequestPayment(
     }
 }
 
-public class HandleRequestPayment:
-    ICommandHandler<RequestPayment>
+public class HandleRequestPayment(
+    ExternalServicesConfig externalServicesConfig,
+    IExternalCommandBus externalCommandBus)
+    :
+        ICommandHandler<RequestPayment>
 {
-    private readonly ExternalServicesConfig externalServicesConfig;
-    private readonly IExternalCommandBus externalCommandBus;
-
-    public HandleRequestPayment(ExternalServicesConfig externalServicesConfig,
-        IExternalCommandBus externalCommandBus)
-    {
-        this.externalServicesConfig = externalServicesConfig;
-        this.externalCommandBus = externalCommandBus;
-    }
-
     public async Task Handle(RequestPayment command, CancellationToken ct)
     {
         await externalCommandBus.Post(

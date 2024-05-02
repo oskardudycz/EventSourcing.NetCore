@@ -10,21 +10,13 @@ using Orders.Products;
 namespace Orders.Api.Controllers;
 
 [Route("api/[controller]")]
-public class OrdersController: Controller
+public class OrdersController(
+    ICommandBus commandBus,
+    IQueryBus queryBus,
+    IIdGenerator idGenerator)
+    : Controller
 {
-    private readonly ICommandBus commandBus;
-    private readonly IQueryBus queryBus;
-    private readonly IIdGenerator idGenerator;
-
-    public OrdersController(
-        ICommandBus commandBus,
-        IQueryBus queryBus,
-        IIdGenerator idGenerator)
-    {
-        this.commandBus = commandBus;
-        this.queryBus = queryBus;
-        this.idGenerator = idGenerator;
-    }
+    private readonly IQueryBus queryBus = queryBus;
 
     [HttpPost]
     public async Task<IActionResult> InitOrder([FromBody] InitOrderRequest? request)

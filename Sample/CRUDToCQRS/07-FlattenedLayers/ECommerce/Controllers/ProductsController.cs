@@ -16,13 +16,8 @@ using static UpdateProductHandler;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController: Controller
+public class ProductsController(ECommerceDbContext dbContext): Controller
 {
-    private readonly ECommerceDbContext dbContext;
-
-    public ProductsController(ECommerceDbContext dbContext) =>
-        this.dbContext = dbContext;
-
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateProductRequest request,

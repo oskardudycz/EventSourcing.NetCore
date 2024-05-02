@@ -5,12 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Domain.Products.Services;
 
-public class ProductReadOnlyService
+public class ProductReadOnlyService(IQueryable<Product> query)
 {
-    private readonly IQueryable<Product> query;
-
-    public ProductReadOnlyService(IQueryable<Product> query) => this.query = query;
-
     public Task<ProductDetailsResponse?> GetByIdAsync(Guid id, CancellationToken ct)
     {
         return query

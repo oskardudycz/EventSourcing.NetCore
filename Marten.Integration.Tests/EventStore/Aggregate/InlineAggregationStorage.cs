@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate;
 
-public class InlineAggregationStorage: MartenTest
+public class InlineAggregationStorage(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
         Guid IssueId,
@@ -82,6 +82,4 @@ public class InlineAggregationStorage: MartenTest
         issuesListFromLiveAggregation.Issues.Count.Should().Be(2);
         issuesListFromLiveAggregation.Issues.Count.Should().Be(issuesListFromInlineAggregation.Issues.Count);
     }
-
-    public InlineAggregationStorage(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

@@ -10,15 +10,9 @@ public class GetMotionSensors
     public static GetMotionSensors Create() => new();
 }
 
-public class HandleGetMotionSensors : IQueryHandler<GetMotionSensors, IReadOnlyList<MotionSensor>>
+public class HandleGetMotionSensors(IDocumentSession querySession)
+    : IQueryHandler<GetMotionSensors, IReadOnlyList<MotionSensor>>
 {
-    private readonly IDocumentSession querySession;
-
-    public HandleGetMotionSensors(IDocumentSession querySession)
-    {
-        this.querySession = querySession;
-    }
-
     public Task<IReadOnlyList<MotionSensor>> Handle(GetMotionSensors request, CancellationToken cancellationToken)
     {
         return querySession.Query<MotionSensor>().ToListAsync(cancellationToken);

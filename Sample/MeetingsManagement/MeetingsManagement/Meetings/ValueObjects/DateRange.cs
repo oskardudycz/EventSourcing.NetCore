@@ -1,15 +1,9 @@
 namespace MeetingsManagement.Meetings.ValueObjects;
 
-public class DateRange
+public class DateRange(DateTime start, DateTime end)
 {
-    public DateTime Start { get; }
-    public DateTime End { get; }
-
-    public DateRange(DateTime start, DateTime end)
-    {
-        Start = start;
-        End = end;
-    }
+    public DateTime Start { get; } = start;
+    public DateTime End { get; } = end;
 
     public static DateRange Create(DateTime start, DateTime end)
     {

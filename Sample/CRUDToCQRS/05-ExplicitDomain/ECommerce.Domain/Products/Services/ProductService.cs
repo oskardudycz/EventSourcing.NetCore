@@ -5,15 +5,8 @@ using ECommerce.Domain.Storage;
 
 namespace ECommerce.Domain.Products.Services;
 
-public class ProductService
+public class ProductService(ECommerceDbContext dbContext)
 {
-    private readonly ECommerceDbContext dbContext;
-
-    public ProductService(ECommerceDbContext dbContext)
-    {
-        this.dbContext = dbContext;
-    }
-
     public Task CreateAsync(
         CreateProductRequest command,
         CancellationToken ct

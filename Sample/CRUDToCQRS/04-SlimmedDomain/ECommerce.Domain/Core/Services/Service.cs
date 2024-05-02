@@ -6,17 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Domain.Core.Services;
 
-public abstract class Service<TEntity>: IService
+public abstract class Service<TEntity>(DbContext dbContext, IMapper mapper): IService
     where TEntity : class, IEntity, new()
 {
-    protected readonly DbContext dbContext;
-    private readonly IMapper mapper;
-
-    protected Service(DbContext dbContext, IMapper mapper)
-    {
-        this.dbContext = dbContext;
-        this.mapper = mapper;
-    }
+    protected readonly DbContext dbContext = dbContext;
 
     public Task CreateAsync<TCreateRequest>(
         TCreateRequest request,

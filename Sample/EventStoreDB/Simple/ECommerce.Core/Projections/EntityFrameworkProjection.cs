@@ -20,16 +20,11 @@ public static class EntityFrameworkProjection
     }
 }
 
-public class EntityFrameworkProjectionBuilder<TView, TDbContext>
+public class EntityFrameworkProjectionBuilder<TView, TDbContext>(IServiceCollection services)
     where TView : class
     where TDbContext : DbContext
 {
-    public readonly IServiceCollection services;
-
-    public EntityFrameworkProjectionBuilder(IServiceCollection services)
-    {
-        this.services = services;
-    }
+    public readonly IServiceCollection services = services;
 
     public EntityFrameworkProjectionBuilder<TView, TDbContext> AddOn<TEvent>(Func<EventEnvelope<TEvent>, TView> handler) where TEvent : notnull
     {
@@ -76,23 +71,14 @@ public class EntityFrameworkProjectionBuilder<TView, TDbContext>
     }
 }
 
-public class AddProjection<TView, TEvent, TDbContext>: IEventHandler<EventEnvelope<TEvent>>
-    where TView: class
-    where TDbContext: DbContext
+public class AddProjection<TView, TEvent, TDbContext>(
+    TDbContext dbContext,
+    Func<EventEnvelope<TEvent>, TView> create)
+    : IEventHandler<EventEnvelope<TEvent>>
+    where TView : class
+    where TDbContext : DbContext
     where TEvent : notnull
 {
-    private readonly TDbContext dbContext;
-    private readonly Func<EventEnvelope<TEvent>, TView> create;
-
-    public AddProjection(
-        TDbContext dbContext,
-        Func<EventEnvelope<TEvent>, TView> create
-    )
-    {
-        this.dbContext = dbContext;
-        this.create = create;
-    }
-
     public async Task Handle(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct)
     {
         var view = create(eventEnvelope);
@@ -102,28 +88,16 @@ public class AddProjection<TView, TEvent, TDbContext>: IEventHandler<EventEnvelo
     }
 }
 
-public class UpdateProjection<TView, TEvent, TDbContext>: IEventHandler<EventEnvelope<TEvent>>
-    where TView: class
-    where TDbContext: DbContext
+public class UpdateProjection<TView, TEvent, TDbContext>(
+    TDbContext dbContext,
+    Func<TEvent, object> getViewId,
+    Action<EventEnvelope<TEvent>, TView> update,
+    Func<EntityEntry<TView>, CancellationToken, Task>? prepare = null)
+    : IEventHandler<EventEnvelope<TEvent>>
+    where TView : class
+    where TDbContext : DbContext
     where TEvent : notnull
 {
-    private readonly TDbContext dbContext;
-    private readonly Func<TEvent, object> getViewId;
-    private readonly Action<EventEnvelope<TEvent>, TView> update;
-    private readonly Func<EntityEntry<TView>, CancellationToken, Task>? prepare;
-
-    public UpdateProjection(
-        TDbContext dbContext,
-        Func<TEvent, object> getViewId,
-        Action<EventEnvelope<TEvent>, TView> update,
-        Func<EntityEntry<TView>, CancellationToken, Task>? prepare = null)
-    {
-        this.dbContext = dbContext;
-        this.getViewId = getViewId;
-        this.update = update;
-        this.prepare = prepare;
-    }
-
     public async Task Handle(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct)
     {
         var viewId = getViewId(eventEnvelope.Data);

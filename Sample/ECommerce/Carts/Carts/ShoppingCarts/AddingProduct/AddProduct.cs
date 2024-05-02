@@ -19,21 +19,12 @@ public record AddProduct(
     }
 }
 
-internal class HandleAddProduct:
-    ICommandHandler<AddProduct>
+internal class HandleAddProduct(
+    IMartenRepository<ShoppingCart> cartRepository,
+    IProductPriceCalculator productPriceCalculator)
+    :
+        ICommandHandler<AddProduct>
 {
-    private readonly IMartenRepository<ShoppingCart> cartRepository;
-    private readonly IProductPriceCalculator productPriceCalculator;
-
-    public HandleAddProduct(
-        IMartenRepository<ShoppingCart> cartRepository,
-        IProductPriceCalculator productPriceCalculator
-    )
-    {
-        this.cartRepository = cartRepository;
-        this.productPriceCalculator = productPriceCalculator;
-    }
-
     public Task Handle(AddProduct command, CancellationToken ct)
     {
         var (cartId, productItem) = command;

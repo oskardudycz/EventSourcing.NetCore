@@ -1,17 +1,10 @@
 namespace EventStoreBasics;
 
-public class StreamState
+public class StreamState(Guid id, Type type, long version)
 {
-    public Guid Id { get; }
+    public Guid Id { get; } = id;
 
-    public Type Type { get; }
+    public Type Type { get; } = type;
 
-    public long Version { get; }
-
-    public StreamState(Guid id, Type type, long version)
-    {
-        Id = id;
-        Type = type;
-        Version = version;
-    }
+    public long Version { get; } = version;
 }

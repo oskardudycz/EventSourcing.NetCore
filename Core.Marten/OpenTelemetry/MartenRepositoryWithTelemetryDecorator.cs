@@ -6,27 +6,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Marten.Repository;
 
-public class MartenRepositoryWithTracingDecorator<T>: IMartenRepository<T>
+public class MartenRepositoryWithTracingDecorator<T>(
+    IMartenRepository<T> inner,
+    IDocumentSession documentSession,
+    IActivityScope activityScope,
+    ILogger<MartenRepositoryWithTracingDecorator<T>> logger)
+    : IMartenRepository<T>
     where T : class, IAggregate
 {
-    private readonly IMartenRepository<T> inner;
-    private readonly IDocumentSession documentSession;
-    private readonly IActivityScope activityScope;
-    private readonly ILogger<MartenRepositoryWithTracingDecorator<T>> logger;
-
-    public MartenRepositoryWithTracingDecorator(
-        IMartenRepository<T> inner,
-        IDocumentSession documentSession,
-        IActivityScope activityScope,
-        ILogger<MartenRepositoryWithTracingDecorator<T>> logger
-    )
-    {
-        this.inner = inner;
-        this.activityScope = activityScope;
-        this.logger = logger;
-        this.documentSession = documentSession;
-    }
-
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         inner.Find(id, cancellationToken);
 

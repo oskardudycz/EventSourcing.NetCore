@@ -3,16 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Domain.Core.Repositories;
 
-public abstract class Repository<TEntity>: IRepository<TEntity>
+public abstract class Repository<TEntity>(DbContext dbContext): IRepository<TEntity>
     where TEntity : class, IEntity
 {
-    private readonly DbContext dbContext;
-
-    protected Repository(DbContext dbContext)
-    {
-        this.dbContext = dbContext;
-    }
-
     public void Add(TEntity entity)
     {
         if (entity == null)

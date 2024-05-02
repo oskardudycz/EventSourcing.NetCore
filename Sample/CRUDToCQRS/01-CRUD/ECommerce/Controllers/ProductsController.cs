@@ -8,12 +8,8 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController: CRUDController
+public class ProductsController(ProductService productService): CRUDController(productService)
 {
-    public ProductsController(ProductService service): base(service)
-    {
-    }
-
     [HttpPost]
     public Task<IActionResult> CreateAsync(
         [FromBody] CreateProductRequest request,

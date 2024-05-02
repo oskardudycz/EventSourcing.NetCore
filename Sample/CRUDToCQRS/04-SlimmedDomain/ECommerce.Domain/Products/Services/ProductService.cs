@@ -5,9 +5,4 @@ using ECommerce.Domain.Storage;
 
 namespace ECommerce.Domain.Products.Services;
 
-public class ProductService: Service<Product>
-{
-    public ProductService(ECommerceDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
-    {
-    }
-}
+public class ProductService(ECommerceDbContext dbContext, IMapper mapper): Service<Product>(dbContext, mapper);

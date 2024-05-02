@@ -47,28 +47,16 @@ public class Exercise08Snapshots
         }
     }
 
-    public class UserCreated
+    public class UserCreated(Guid userId, string userName)
     {
-        public Guid UserId { get; }
-        public string UserName { get; }
-
-        public UserCreated(Guid userId, string userName)
-        {
-            UserId = userId;
-            UserName = userName;
-        }
+        public Guid UserId { get; } = userId;
+        public string UserName { get; } = userName;
     }
 
-    public class UserNameUpdated
+    public class UserNameUpdated(Guid userId, string userName)
     {
-        public Guid UserId { get; }
-        public string UserName { get; }
-
-        public UserNameUpdated(Guid userId, string userName)
-        {
-            UserId = userId;
-            UserName = userName;
-        }
+        public Guid UserId { get; } = userId;
+        public string UserName { get; } = userName;
     }
 
     [Migration(1, "Create Users table")]

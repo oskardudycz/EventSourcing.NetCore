@@ -4,9 +4,5 @@ using ECommerce.Domain.Products.Entity;
 
 namespace ECommerce.Domain.Products.Services;
 
-public class ProductReadOnlyService: ReadOnlyOnlyService<Product>
-{
-    public ProductReadOnlyService(IQueryable<Product> query, IMapper mapper) : base(query, mapper)
-    {
-    }
-}
+public class ProductReadOnlyService(IQueryable<Product> query, IMapper mapper)
+    : ReadOnlyOnlyService<Product>(query, mapper);

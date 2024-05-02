@@ -25,17 +25,12 @@ public record CheckOutGuest(
     Guid? GroupCheckOutId = null
 );
 
-public class GuestStayDomainService:
+public class GuestStayDomainService(IDocumentSession documentSession):
     ICommandHandler<CheckInGuest>,
     ICommandHandler<RecordCharge>,
     ICommandHandler<RecordPayment>,
     ICommandHandler<CheckOutGuest>
 {
-    private readonly IDocumentSession documentSession;
-
-    public GuestStayDomainService(IDocumentSession documentSession) =>
-        this.documentSession = documentSession;
-
     public Task Handle(CheckInGuest command, CancellationToken ct) =>
         documentSession.Add<GuestStayAccount>(
             command.GuestStayId,

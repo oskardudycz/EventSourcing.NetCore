@@ -22,14 +22,9 @@ public record RecordOrderPayment(
     }
 }
 
-public class HandleRecordOrderPayment:
+public class HandleRecordOrderPayment(IMartenRepository<Order> orderRepository):
     ICommandHandler<RecordOrderPayment>
 {
-    private readonly IMartenRepository<Order> orderRepository;
-
-    public HandleRecordOrderPayment(IMartenRepository<Order> orderRepository) =>
-        this.orderRepository = orderRepository;
-
     public Task Handle(RecordOrderPayment command, CancellationToken ct)
     {
         var (orderId, paymentId, recordedAt) = command;

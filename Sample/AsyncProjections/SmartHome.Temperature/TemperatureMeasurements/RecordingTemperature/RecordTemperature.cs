@@ -19,14 +19,9 @@ public record RecordTemperature(
     }
 }
 
-public class HandleRecordTemperature:
+public class HandleRecordTemperature(IMartenRepository<TemperatureMeasurement> repository):
     ICommandHandler<RecordTemperature>
 {
-    private readonly IMartenRepository<TemperatureMeasurement> repository;
-
-    public HandleRecordTemperature(IMartenRepository<TemperatureMeasurement> repository) =>
-        this.repository = repository;
-
     public Task Handle(RecordTemperature command, CancellationToken ct)
     {
         var (measurementId, temperature) = command;

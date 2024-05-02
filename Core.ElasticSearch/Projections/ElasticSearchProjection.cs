@@ -6,21 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.ElasticSearch.Projections;
 
-public class ElasticSearchProjection<TEvent, TView> : IEventHandler<EventEnvelope<TEvent>>
+public class ElasticSearchProjection<TEvent, TView>(
+    ElasticsearchClient elasticClient,
+    Func<TEvent, string> getId)
+    : IEventHandler<EventEnvelope<TEvent>>
     where TView : class, IProjection
     where TEvent : notnull
 {
-    private readonly ElasticsearchClient elasticClient;
-    private readonly Func<TEvent, string> getId;
-
-    public ElasticSearchProjection(
-        ElasticsearchClient elasticClient,
-        Func<TEvent, string> getId
-    )
-    {
-        this.elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-        this.getId = getId ?? throw new ArgumentNullException(nameof(getId));
-    }
+    private readonly ElasticsearchClient elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
+    private readonly Func<TEvent, string> getId = getId ?? throw new ArgumentNullException(nameof(getId));
 
     public async Task Handle(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct)
     {

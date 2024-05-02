@@ -20,7 +20,7 @@ public record Issue(
     string Description
 );
 
-public class StreamStarting: MartenTest
+public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     [Fact(Skip = "Skipped because of https://github.com/JasperFx/marten/issues/1648")]
     public void GivenNoEvents_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
@@ -93,6 +93,4 @@ public class StreamStarting: MartenTest
 
         Session.SaveChanges();
     }
-
-    public StreamStarting(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

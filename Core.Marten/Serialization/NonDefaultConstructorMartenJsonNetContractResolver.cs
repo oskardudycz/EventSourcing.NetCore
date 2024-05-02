@@ -5,17 +5,12 @@ using Newtonsoft.Json.Serialization;
 
 namespace Core.Marten.Serialization;
 
-public class NonDefaultConstructorMartenJsonNetContractResolver: JsonNetContractResolver
+public class NonDefaultConstructorMartenJsonNetContractResolver(
+    Casing casing,
+    CollectionStorage collectionStorage,
+    NonPublicMembersStorage nonPublicMembersStorage = NonPublicMembersStorage.Default)
+    : JsonNetContractResolver(casing, collectionStorage, nonPublicMembersStorage)
 {
-    public NonDefaultConstructorMartenJsonNetContractResolver(
-        Casing casing,
-        CollectionStorage collectionStorage,
-        NonPublicMembersStorage nonPublicMembersStorage = NonPublicMembersStorage.Default):
-        base(casing, collectionStorage, nonPublicMembersStorage)
-    {
-
-    }
-
     protected override JsonObjectContract CreateObjectContract(Type objectType)
     {
         return JsonObjectContractProvider.UsingNonDefaultConstructor(

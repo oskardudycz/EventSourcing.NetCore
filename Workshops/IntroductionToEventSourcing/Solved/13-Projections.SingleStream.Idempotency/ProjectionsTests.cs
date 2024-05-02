@@ -91,11 +91,8 @@ public static class DatabaseExtensions
     }
 }
 
-public class ShoppingCartDetailsProjection
+public class ShoppingCartDetailsProjection(Database database)
 {
-    private readonly Database database;
-    public ShoppingCartDetailsProjection(Database database) => this.database = database;
-
     public void Handle(EventEnvelope<ShoppingCartOpened> @event) =>
         database.Store(
             @event.Data.ShoppingCartId,
@@ -202,12 +199,8 @@ public class ShoppingCartDetailsProjection
             });
 }
 
-public class ShoppingCartShortInfoProjection
+public class ShoppingCartShortInfoProjection(Database database)
 {
-    private readonly Database database;
-
-    public ShoppingCartShortInfoProjection(Database database) => this.database = database;
-
     public void Handle(EventEnvelope<ShoppingCartOpened> @event) =>
         database.Store(
             @event.Data.ShoppingCartId,

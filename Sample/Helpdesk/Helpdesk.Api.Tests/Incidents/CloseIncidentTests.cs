@@ -5,34 +5,31 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class CloseIncidentTests: IClassFixture<ApiWithAcknowledgedIncident>
+public class CloseIncidentTests(ApiWithAcknowledgedIncident api): IClassFixture<ApiWithAcknowledgedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
     public async Task ResolveCommand_Succeeds()
     {
-        await API
+        await api
             .Given()
             .When(
                 POST,
-                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/close"),
+                URI($"/api/agents/{agentId}/incidents/{api.Incident.Id}/close"),
                 HEADERS(IF_MATCH(3))
             )
             .Then(OK);
 
-        await API
+        await api
             .Given()
-            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
+            .When(GET, URI($"/api/incidents/{api.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Incident with { Status = IncidentStatus.Closed, Version = 4 }
+                    api.Incident with { Status = IncidentStatus.Closed, Version = 4 }
                 )
             );
     }
 
-    private readonly ApiWithAcknowledgedIncident API;
     private Guid agentId = Guid.NewGuid();
-
-    public CloseIncidentTests(ApiWithAcknowledgedIncident api) => API = api;
 }

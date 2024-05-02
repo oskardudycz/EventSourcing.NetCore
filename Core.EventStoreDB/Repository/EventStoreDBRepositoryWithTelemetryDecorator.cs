@@ -4,21 +4,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.EventStoreDB.Repository;
 
-public class EventStoreDBRepositoryWithTelemetryDecorator<T>: IEventStoreDBRepository<T>
+public class EventStoreDBRepositoryWithTelemetryDecorator<T>(
+    IEventStoreDBRepository<T> inner,
+    IActivityScope activityScope)
+    : IEventStoreDBRepository<T>
     where T : class, IAggregate
 {
-    private readonly IEventStoreDBRepository<T> inner;
-    private readonly IActivityScope activityScope;
-
-    public EventStoreDBRepositoryWithTelemetryDecorator(
-        IEventStoreDBRepository<T> inner,
-        IActivityScope activityScope
-    )
-    {
-        this.inner = inner;
-        this.activityScope = activityScope;
-    }
-
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         inner.Find(id, cancellationToken);
 

@@ -9,14 +9,10 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController: CRUDController<Product>
+public class ProductsController(ProductService service, ProductReadOnlyService readOnlyService)
+    : CRUDController<Product>(service, readOnlyService)
 {
     protected override Func<object, string> GetEntityByIdUri { get; } = id => $"/api/Products/{id}";
-
-    public ProductsController(ProductService service, ProductReadOnlyService readOnlyService)
-        : base(service, readOnlyService)
-    {
-    }
 
     [HttpPost]
     public Task<IActionResult> CreateAsync(

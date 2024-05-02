@@ -4,20 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Core.Controllers;
 
-public abstract class CRUDController<TEntity>: Controller where TEntity : class, IEntity, new()
+public abstract class CRUDController<TEntity>(
+    IService service,
+    IReadOnlyService<TEntity> readOnlyService)
+    : Controller
+    where TEntity : class, IEntity, new()
 {
-    protected readonly IService Service;
-    protected readonly IReadOnlyService<TEntity> ReadOnlyService;
+    protected readonly IService Service = service;
+    protected readonly IReadOnlyService<TEntity> ReadOnlyService = readOnlyService;
     protected abstract Func<object, string> GetEntityByIdUri { get; }
-
-    protected CRUDController(
-        IService service,
-        IReadOnlyService<TEntity> readOnlyService
-    )
-    {
-        Service = service;
-        ReadOnlyService = readOnlyService;
-    }
 
     protected async Task<IActionResult> CreateAsync<TCreateRequest>(
         TCreateRequest request,

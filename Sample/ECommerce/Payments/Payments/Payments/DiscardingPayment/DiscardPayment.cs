@@ -19,14 +19,9 @@ public record DiscardPayment(
     }
 }
 
-public class HandleDiscardPayment:
+public class HandleDiscardPayment(IMartenRepository<Payment> paymentRepository):
     ICommandHandler<DiscardPayment>
 {
-    private readonly IMartenRepository<Payment> paymentRepository;
-
-    public HandleDiscardPayment(IMartenRepository<Payment> paymentRepository) =>
-        this.paymentRepository = paymentRepository;
-
     public Task Handle(DiscardPayment command, CancellationToken ct)
     {
         var (paymentId, _) = command;

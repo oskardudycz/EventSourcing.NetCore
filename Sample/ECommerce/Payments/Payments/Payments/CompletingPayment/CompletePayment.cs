@@ -17,14 +17,9 @@ public record CompletePayment(
     }
 }
 
-public class HandleCompletePayment:
+public class HandleCompletePayment(IMartenRepository<Payment> paymentRepository):
     ICommandHandler<CompletePayment>
 {
-    private readonly IMartenRepository<Payment> paymentRepository;
-
-    public HandleCompletePayment(IMartenRepository<Payment> paymentRepository) =>
-        this.paymentRepository = paymentRepository;
-
     public async Task Handle(CompletePayment command, CancellationToken ct)
     {
         var paymentId = command.PaymentId;

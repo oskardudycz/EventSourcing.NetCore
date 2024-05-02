@@ -4,24 +4,17 @@ using Elastic.Clients.Elasticsearch;
 
 namespace MeetingsSearch.Meetings.SearchingMeetings;
 
-public class SearchMeetings
+public class SearchMeetings(string filter)
 {
-    public string Filter { get; }
-
-    public SearchMeetings(string filter)
-    {
-        Filter = filter;
-    }
+    public string Filter { get; } = filter;
 }
 
-internal class HandleSearchMeetings: IQueryHandler<SearchMeetings, IReadOnlyCollection<Meeting>>
+internal class HandleSearchMeetings(ElasticsearchClient elasticClient)
+    : IQueryHandler<SearchMeetings, IReadOnlyCollection<Meeting>>
 {
     private const int MaxItemsCount = 1000;
 
-    private readonly ElasticsearchClient elasticClient;
-
-    public HandleSearchMeetings(ElasticsearchClient elasticClient) =>
-        this.elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
+    private readonly ElasticsearchClient elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
 
     public async Task<IReadOnlyCollection<Meeting>> Handle(SearchMeetings query, CancellationToken cancellationToken)
     {

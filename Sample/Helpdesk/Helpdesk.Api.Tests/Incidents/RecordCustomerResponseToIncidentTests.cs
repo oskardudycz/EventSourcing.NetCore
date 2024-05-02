@@ -6,29 +6,29 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedIncident>
+public class RecordCustomerResponseToIncidentTests(ApiWithLoggedIncident api): IClassFixture<ApiWithLoggedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
     public async Task RecordCustomerResponseCommand_RecordsResponse()
     {
-        await API
+        await api
             .Given()
             .When(
                 POST,
-                URI($"/api/customers/{customerId}/incidents/{API.Incident.Id}/responses"),
+                URI($"/api/customers/{customerId}/incidents/{api.Incident.Id}/responses"),
                 BODY(new RecordCustomerResponseToIncidentRequest(content)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
 
-        await API
+        await api
             .Given()
-            .When(GET, URI($"/api/incidents/{API.Incident.Id}"))
+            .When(GET, URI($"/api/incidents/{api.Incident.Id}"))
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Incident with
+                    api.Incident with
                     {
                         Notes =
                         [new IncidentNote(IncidentNoteType.FromCustomer, customerId, content, true)],
@@ -40,7 +40,4 @@ public class RecordCustomerResponseToIncidentTests: IClassFixture<ApiWithLoggedI
 
     private readonly Guid customerId = Guid.NewGuid();
     private readonly string content = new Lorem().Sentence();
-    private readonly ApiWithLoggedIncident API;
-
-    public RecordCustomerResponseToIncidentTests(ApiWithLoggedIncident api) => API = api;
 }

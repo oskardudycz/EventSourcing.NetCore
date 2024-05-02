@@ -5,18 +5,9 @@ using ECommerce.Domain.Core.Requests;
 
 namespace ECommerce.Domain.Core.Services;
 
-public class Service<TEntity>: IService
+public class Service<TEntity>(IRepository<TEntity> repository, IMapper mapper): IService
     where TEntity : class, IEntity, new()
 {
-    private readonly IRepository<TEntity> repository;
-    private readonly IMapper mapper;
-
-    public Service(IRepository<TEntity> repository, IMapper mapper)
-    {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
-
     public Task CreateAsync<TCreateRequest>(TCreateRequest request,
         CancellationToken ct)
     {

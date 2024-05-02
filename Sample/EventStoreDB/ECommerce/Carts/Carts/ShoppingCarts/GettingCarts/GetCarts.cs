@@ -20,14 +20,9 @@ public record GetCarts(
     }
 }
 
-internal class HandleGetCarts:
+internal class HandleGetCarts(IQuerySession querySession):
     IQueryHandler<GetCarts, IPagedList<ShoppingCartShortInfo>>
 {
-    private readonly IQuerySession querySession;
-
-    public HandleGetCarts(IQuerySession querySession) =>
-        this.querySession = querySession;
-
     public Task<IPagedList<ShoppingCartShortInfo>> Handle(GetCarts request, CancellationToken cancellationToken)
     {
         var (pageNumber, pageSize) = request;

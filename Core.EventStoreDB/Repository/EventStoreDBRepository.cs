@@ -16,19 +16,13 @@ public interface IEventStoreDBRepository<T> where T : class, IAggregate
     Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default);
 }
 
-public class EventStoreDBRepository<T>: IEventStoreDBRepository<T> where T : class, IAggregate
+public class EventStoreDBRepository<T>(
+    EventStoreClient eventStore,
+    IActivityScope activityScope)
+    : IEventStoreDBRepository<T>
+    where T : class, IAggregate
 {
-    private readonly EventStoreClient eventStore;
-    private readonly IActivityScope activityScope;
-
-    public EventStoreDBRepository(
-        EventStoreClient eventStore,
-        IActivityScope activityScope
-    )
-    {
-        this.eventStore = eventStore;
-        this.activityScope = activityScope;
-    }
+    private readonly IActivityScope activityScope = activityScope;
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         eventStore.AggregateStream<T>(

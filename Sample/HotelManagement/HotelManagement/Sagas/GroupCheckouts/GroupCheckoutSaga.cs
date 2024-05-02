@@ -4,16 +4,11 @@ using HotelManagement.Sagas.GuestStayAccounts;
 
 namespace HotelManagement.Sagas.GroupCheckouts;
 
-public class GroupCheckoutSaga:
+public class GroupCheckoutSaga(IAsyncCommandBus commandBus):
     IEventHandler<GroupCheckoutInitiated>,
     IEventHandler<GuestStayAccounts.GuestCheckedOut>,
     IEventHandler<GuestStayAccounts.GuestCheckoutFailed>
 {
-    private readonly IAsyncCommandBus commandBus;
-
-    public GroupCheckoutSaga(IAsyncCommandBus commandBus) =>
-        this.commandBus = commandBus;
-
     public async Task Handle(GroupCheckoutInitiated @event, CancellationToken ct)
     {
         foreach (var guestAccountId in @event.GuestStayIds)

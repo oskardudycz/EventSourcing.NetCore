@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Stream;
 
-public class StreamLoading: MartenTest
+public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
         Guid IssueId,
@@ -97,6 +97,4 @@ public class StreamLoading: MartenTest
         lastUpdatedEvent.IssueId.Should().Be(streamId);
         lastUpdatedEvent.Description.Should().Be("The Last One");
     }
-
-    public StreamLoading(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

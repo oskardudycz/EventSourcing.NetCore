@@ -4,14 +4,8 @@ using Warehouse.Api.Products;
 
 namespace Warehouse.Api.Storage;
 
-public class WarehouseDBContext: DbContext
+public class WarehouseDBContext(DbContextOptions<WarehouseDBContext> options): DbContext(options)
 {
-    public WarehouseDBContext(DbContextOptions<WarehouseDBContext> options)
-        : base(options)
-    {
-
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.SetupProductsModel();

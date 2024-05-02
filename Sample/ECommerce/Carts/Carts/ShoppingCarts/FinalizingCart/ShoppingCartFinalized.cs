@@ -25,20 +25,10 @@ public record CartFinalized(
     }
 }
 
-internal class HandleCartFinalized: IEventHandler<EventEnvelope<ShoppingCartConfirmed>>
+internal class HandleCartFinalized(
+    IQuerySession querySession,
+    IEventBus eventBus): IEventHandler<EventEnvelope<ShoppingCartConfirmed>>
 {
-    private readonly IQuerySession querySession;
-    private readonly IEventBus eventBus;
-
-    public HandleCartFinalized(
-        IQuerySession querySession,
-        IEventBus eventBus
-    )
-    {
-        this.querySession = querySession;
-        this.eventBus = eventBus;
-    }
-
     public async Task Handle(EventEnvelope<ShoppingCartConfirmed> @event, CancellationToken cancellationToken)
     {
         var cart = await querySession.LoadAsync<ShoppingCart>(@event.Data.CartId, cancellationToken)

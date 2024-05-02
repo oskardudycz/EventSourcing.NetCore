@@ -46,29 +46,17 @@ public class Exercise09Projections
         }
     }
 
-    class UserCreated
+    class UserCreated(Guid userId, string userName)
     {
-        public Guid UserId { get; }
-        public string UserName { get; }
-
-        public UserCreated(Guid userId, string userName)
-        {
-            UserId = userId;
-            UserName = userName;
-        }
+        public Guid UserId { get; } = userId;
+        public string UserName { get; } = userName;
     }
 
 
-    class UserNameUpdated
+    class UserNameUpdated(Guid userId, string userName)
     {
-        public Guid UserId { get; }
-        public string UserName { get; }
-
-        public UserNameUpdated(Guid userId, string userName)
-        {
-            UserId = userId;
-            UserName = userName;
-        }
+        public Guid UserId { get; } = userId;
+        public string UserName { get; } = userName;
     }
 
     class Order : Aggregate
@@ -96,37 +84,21 @@ public class Exercise09Projections
         }
     }
 
-    public class OrderCreated
+    public class OrderCreated(Guid orderId, Guid userId, string number, decimal amount)
     {
-        public Guid OrderId { get; }
-        public Guid UserId { get; }
-        public string Number { get; }
-        public decimal Amount { get; }
-
-        public OrderCreated(Guid orderId, Guid userId, string number, decimal amount)
-        {
-            OrderId = orderId;
-            UserId = userId;
-            Number = number;
-            Amount = amount;
-        }
+        public Guid OrderId { get; } = orderId;
+        public Guid UserId { get; } = userId;
+        public string Number { get; } = number;
+        public decimal Amount { get; } = amount;
     }
 
-    public class UserDashboard
+    public class UserDashboard(Guid id, string userName, int ordersCount, decimal totalAmount)
     {
 
-        public Guid Id { get; }
-        public string UserName { get; }
-        public int OrdersCount { get; }
-        public decimal TotalAmount { get; }
-
-        public UserDashboard(Guid id, string userName, int ordersCount, decimal totalAmount)
-        {
-            Id = id;
-            UserName = userName;
-            OrdersCount = ordersCount;
-            TotalAmount = totalAmount;
-        }
+        public Guid Id { get; } = id;
+        public string UserName { get; } = userName;
+        public int OrdersCount { get; } = ordersCount;
+        public decimal TotalAmount { get; } = totalAmount;
     }
 
     public class UserDashboardProjection : Projection
