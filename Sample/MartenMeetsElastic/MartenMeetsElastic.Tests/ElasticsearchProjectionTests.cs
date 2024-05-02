@@ -4,6 +4,7 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentAssertions;
 using JasperFx.Core;
 using Marten;
+using Marten.Events;
 using Marten.Events.Daemon;
 using MartenMeetsElastic.Projections;
 using Polly;
@@ -52,8 +53,7 @@ public class OrderProjectionRaw: ElasticsearchProjection
         Projects<OrderCompleted>();
     }
 
-
-    protected override Task ApplyAsync(ElasticsearchClient client, object[] events)
+    protected override Task ApplyAsync(ElasticsearchClient client, object[] events, CancellationToken ct)
     {
         // (...) TODO
         return Task.CompletedTask;
@@ -96,7 +96,7 @@ public class MeetsElasticTest: MartenMeetsElasticTest
 {
     protected override void Options(StoreOptions options)
     {
-        options.Projections.Add<OrderProjection>(elasticClient);
+        options.Events.AddElasticsearchProjection<OrderProjection>(elasticClient);
     }
 
     [Fact]
@@ -104,11 +104,13 @@ public class MeetsElasticTest: MartenMeetsElasticTest
     {
         await DocumentSession.DocumentStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
 
-        await AppendEvents("order1", new OrderInitiated("order1", "ORD/123", new UserInfo("user1", "user1")));
-
         await StartDaemon();
 
-        await daemon.Tracker.WaitForShardState(new ShardState("MartenMeetsElastic.Tests.OrderProjection:All", 1), 15.Seconds());
+        await AppendEvents("order1", new OrderInitiated("order1", "ORD/123", new UserInfo("user1", "user1")));
+
+        //await daemon.Tracker.WaitForShardState(new ShardState("MartenMeetsElastic.Tests.OrderProjection:All", 1), 15.Seconds());
+
+        await DocumentSession.DocumentStore.WaitForNonStaleProjectionDataAsync(20.Seconds());
 
         await Policy
             .Handle<Exception>()

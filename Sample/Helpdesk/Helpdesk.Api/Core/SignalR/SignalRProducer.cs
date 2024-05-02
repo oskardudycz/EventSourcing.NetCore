@@ -1,27 +1,33 @@
 using Marten;
-using Marten.Events;
-using Marten.Events.Projections;
+using Marten.Events.Daemon;
+using Marten.Events.Daemon.Internals;
+using Marten.Subscriptions;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Helpdesk.Api.Core.SignalR;
 
-public class SignalRProducer: IProjection
+public class SignalRProducer<THub>(IHubContext<THub> hubContext): SubscriptionBase where THub : Hub
 {
-    private readonly IHubContext hubContext;
-
-    public SignalRProducer(IHubContext hubContext) =>
-        this.hubContext = hubContext;
-
-    public async Task ApplyAsync(IDocumentOperations operations, IReadOnlyList<StreamAction> streamsActions,
-        CancellationToken ct)
+    public override async Task<IChangeListener> ProcessEventsAsync(
+        EventRange eventRange,
+        ISubscriptionController subscriptionController,
+        IDocumentOperations operations,
+        CancellationToken ct
+    )
     {
-        foreach (var @event in streamsActions.SelectMany(streamAction => streamAction.Events))
+        foreach (var @event in eventRange.Events)
         {
-            await hubContext.Clients.All.SendAsync(@event.EventTypeName, @event.Data, ct);
+            try
+            {
+                await hubContext.Clients.All.SendAsync(@event.EventTypeName, @event.Data, ct);
+            }
+            catch (Exception exc)
+            {
+                // this is fine to put event to dead letter queue, as it's just SignalR notification
+                await subscriptionController.RecordDeadLetterEventAsync(@event, exc);
+            }
         }
+
+        return NullChangeListener.Instance;
     }
-
-    public void Apply(IDocumentOperations operations, IReadOnlyList<StreamAction> streams) =>
-        throw new NotImplementedException("Producer should be only used in the AsyncDaemon");
 }
-

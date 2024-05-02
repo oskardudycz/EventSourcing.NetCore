@@ -52,12 +52,6 @@ builder.Services
         options.Projections.RebuildErrors.SkipSerializationErrors = false;
         options.Projections.RebuildErrors.SkipUnknownEvents = false;
 
-        options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
-        options.Projections.Add(
-            new SignalRProducer((IHubContext)sp.GetRequiredService<IHubContext<IncidentsHub>>()),
-            ProjectionLifecycle.Async
-        );
-
         options.ConfigureIncidents();
 
         options.DisableNpgsqlLogging = true;
@@ -65,6 +59,8 @@ builder.Services
     })
     .OptimizeArtifactWorkflow(TypeLoadMode.Static)
     .UseLightweightSessions()
+    .AddSubscriptionWithServices<KafkaProducer>(ServiceLifetime.Singleton)
+    .AddSubscriptionWithServices<SignalRProducer<IncidentsHub>>(ServiceLifetime.Singleton)
     .AddAsyncDaemon(DaemonMode.Solo)
     // Add Marten/PostgreSQL integration with Wolverine's outbox
     .IntegrateWithWolverine()

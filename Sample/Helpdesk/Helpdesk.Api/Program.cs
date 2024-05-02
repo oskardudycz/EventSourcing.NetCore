@@ -53,17 +53,15 @@ builder.Services
         options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
-        options.Projections.Add(new KafkaProducer(builder.Configuration), ProjectionLifecycle.Async);
-        options.Projections.Add(
-            new SignalRProducer((IHubContext)sp.GetRequiredService<IHubContext<IncidentsHub>>()),
-            ProjectionLifecycle.Async
-        );
 
         return options;
     })
+    .AddSubscriptionWithServices<KafkaProducer>(ServiceLifetime.Singleton)
+    .AddSubscriptionWithServices<SignalRProducer<IncidentsHub>>(ServiceLifetime.Singleton)
     .OptimizeArtifactWorkflow(TypeLoadMode.Static)
     .UseLightweightSessions()
     .AddAsyncDaemon(DaemonMode.Solo);
+
 
 builder.Services
     .AddCors(options =>

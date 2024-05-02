@@ -57,11 +57,12 @@ public static class MartenConfigExtensions
     {
         services
             .AddScoped<IIdGenerator, MartenIdGenerator>()
-            .AddMarten(sp => SetStoreOptions(sp, martenConfig, configureOptions))
+            .AddMarten(options => SetStoreOptions(options, martenConfig, configureOptions))
             .UseLightweightSessions()
             .ApplyAllDatabaseChangesOnStartup()
             //.OptimizeArtifactWorkflow()
-            .AddAsyncDaemon(martenConfig.DaemonMode);
+            .AddAsyncDaemon(martenConfig.DaemonMode)
+            .AddSubscriptionWithServices<MartenEventPublisher>(ServiceLifetime.Scoped);
 
         if (useExternalBus)
             services.AddMartenAsyncCommandBus();
@@ -69,13 +70,12 @@ public static class MartenConfigExtensions
         return services;
     }
 
-    private static StoreOptions SetStoreOptions(
-        IServiceProvider serviceProvider,
+    private static void SetStoreOptions(
+        StoreOptions options,
         MartenConfig martenConfig,
         Action<StoreOptions>? configureOptions = null
     )
     {
-        var options = new StoreOptions();
         options.Connection(martenConfig.ConnectionString);
         options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
 
@@ -92,22 +92,6 @@ public static class MartenConfigExtensions
         options.Projections.Errors.SkipSerializationErrors = false;
         options.Projections.Errors.SkipUnknownEvents = false;
 
-        options.Projections.Add(
-            new MartenSubscription(
-                new[]
-                {
-                    new MartenEventPublisher(
-                        serviceProvider,
-                        serviceProvider.GetRequiredService<IActivityScope>(),
-                        serviceProvider.GetRequiredService<ILogger<MartenEventPublisher>>()
-                    )
-                },
-                serviceProvider.GetRequiredService<ILogger<MartenSubscription>>()
-            ),
-            ProjectionLifecycle.Async,
-            "MartenSubscription"
-        );
-
         if (martenConfig.UseMetadata)
         {
             options.Events.MetadataConfig.CausationIdEnabled = true;
@@ -116,7 +100,5 @@ public static class MartenConfigExtensions
         }
 
         configureOptions?.Invoke(options);
-
-        return options;
     }
 }

@@ -4,55 +4,67 @@ using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Marten;
 using Marten.Events;
+using Marten.Events.Daemon;
+using Marten.Events.Daemon.Internals;
 using Marten.Events.Projections;
+using Marten.Subscriptions;
+using Polly;
 
 namespace MartenMeetsElastic.Projections;
 
-public abstract class ElasticsearchProjection: IProjection
+public abstract class ElasticsearchProjection: SubscriptionBase
 {
     protected abstract string IndexName { get; }
     public ElasticsearchClient ElasticsearchClient { private get; init; } = default!;
+    public IAsyncPolicy RetryPolicy { protected get; init; } = Policy.NoOpAsync();
 
     private readonly HashSet<Type> handledEventTypes = [];
 
     protected void Projects<TEvent>() =>
         handledEventTypes.Add(typeof(TEvent));
 
-    public void Apply(IDocumentOperations operations, IReadOnlyList<StreamAction> streams) =>
-        throw new NotImplementedException("We don't want to do 2PC, aye?");
-
-    public async Task ApplyAsync(
+    public override async Task<IChangeListener> ProcessEventsAsync(
+        EventRange eventRange,
+        ISubscriptionController subscriptionController,
         IDocumentOperations operations,
-        IReadOnlyList<StreamAction> streamActions,
-        CancellationToken cancellation
+        CancellationToken ct
     )
     {
-        var existsResponse = await ElasticsearchClient.Indices.ExistsAsync(IndexName, cancellation);
-        if (!existsResponse.Exists)
-            await SetupMapping(ElasticsearchClient);
+        try
+        {
+            //TODO: Add poly!
+            var existsResponse = await ElasticsearchClient.Indices.ExistsAsync(IndexName, ct);
+            if (!existsResponse.Exists)
+                await SetupMapping(ElasticsearchClient);
 
-        var events = streamActions.SelectMany(streamAction => streamAction.Events)
-            .Where(@event => handledEventTypes.Contains(@event.EventType))
-            .ToArray();
+            var events = eventRange.Events
+                .Where(@event => handledEventTypes.Contains(@event.EventType))
+                .ToArray();
 
-        await ApplyAsync(ElasticsearchClient, events);
+            await ApplyAsync(ElasticsearchClient, events, ct);
+        }
+        catch (Exception exc)
+        {
+            await subscriptionController.ReportCriticalFailureAsync(exc);
+        }
+
+        return NullChangeListener.Instance;
     }
 
-    protected virtual Task ApplyAsync(ElasticsearchClient client, IEvent[] events) =>
+    protected virtual Task ApplyAsync(ElasticsearchClient client, IEvent[] events, CancellationToken ct) =>
         ApplyAsync(
             client,
-            events.Where(@event => handledEventTypes.Contains(@event.EventType)).Select(@event => @event.Data).ToArray()
+            events.Where(@event => handledEventTypes.Contains(@event.EventType)).Select(@event => @event.Data)
+                .ToArray(),
+            ct
         );
 
-    protected virtual Task ApplyAsync(ElasticsearchClient client, object[] events) =>
+    protected virtual Task ApplyAsync(ElasticsearchClient client, object[] events, CancellationToken ct) =>
         Task.CompletedTask;
 
 
     protected virtual Task SetupMapping(ElasticsearchClient client) =>
         client.Indices.CreateAsync(IndexName);
-
-
-    public bool EnableDocumentTrackingDuringRebuilds { get; set; }
 }
 
 public abstract class ElasticsearchProjection<TDocument>:
@@ -89,38 +101,45 @@ public abstract class ElasticsearchProjection<TDocument>:
     protected void DocumentId(Func<TDocument, string> documentId) =>
         getDocumentId = documentId;
 
-protected override async Task ApplyAsync(ElasticsearchClient client, object[] events)
-{
-    var ids = events.Select(GetDocumentId).ToList();
+    protected override Task ApplyAsync(ElasticsearchClient client, object[] events, CancellationToken token) =>
+        RetryPolicy.ExecuteAsync(async ct =>
+        {
+            var ids = events.Select(GetDocumentId).ToList();
 
-    var searchResponse = await client.SearchAsync<TDocument>(s => s
-        .Index(IndexName)
-        .Query(q => q.Ids(new IdsQuery { Values = new Ids(ids) }))
-    );
+            var searchResponse = await client.SearchAsync<TDocument>(s => s
+                .Index(IndexName)
+                .Query(q => q.Ids(new IdsQuery { Values = new Ids(ids) })), ct);
 
-    var existingDocuments = searchResponse.Documents.ToDictionary(ks => getDocumentId(ks), vs => vs);
+            var existingDocuments = searchResponse.Documents.ToDictionary(ks => getDocumentId(ks), vs => vs);
 
-    var updatedDocuments = events.Select((@event, i) =>
-        Apply(existingDocuments.GetValueOrDefault(ids[i], GetDefault(@event)), @event)
-    ).ToList();
+            var updatedDocuments = events.Select((@event, i) =>
+                Apply(existingDocuments.GetValueOrDefault(ids[i], GetDefault(@event)), @event)
+            ).ToList();
 
-    var bulkAll = client.BulkAll(updatedDocuments, SetBulkOptions);
+            var bulkAll = client.BulkAll(updatedDocuments, SetBulkOptions, ct);
 
-    bulkAll.Wait(TimeSpan.FromSeconds(5), _ => Console.WriteLine("Data indexed"));
-}
-protected virtual TDocument GetDefault(object @event) =>
-    ObjectFactory<TDocument>.GetDefaultOrUninitialized();
+            bulkAll.Wait(TimeSpan.FromSeconds(5), _ => Console.WriteLine("Data indexed"));
+        }, token);
 
-private TDocument Apply(TDocument document, object @event) =>
-    projectors[@event.GetType()].Apply(document, @event);
+    protected virtual TDocument GetDefault(object @event) =>
+        ObjectFactory<TDocument>.GetDefaultOrUninitialized();
 
-protected virtual void SetBulkOptions(BulkAllRequestDescriptor<TDocument> options) =>
-    options.Index(IndexName);
+    private TDocument Apply(TDocument document, object @event) =>
+        projectors[@event.GetType()].Apply(document, @event);
+
+    protected virtual void SetBulkOptions(BulkAllRequestDescriptor<TDocument> options) =>
+        options.Index(IndexName)
+            // .ContinueAfterDroppedDocuments()
+            // .DroppedDocumentCallback((r, o) =>
+            // {
+            //     Console.WriteLine($"{r} {o}");
+            // })
+            .BackOffTime(TimeSpan.FromMilliseconds(1))
+            .RefreshOnCompleted();
 
     protected override Task SetupMapping(ElasticsearchClient client) =>
         client.Indices.CreateAsync<TDocument>(IndexName);
 
     private string GetDocumentId(object @event) =>
         projectors[@event.GetType()].GetId(@event);
-
 }

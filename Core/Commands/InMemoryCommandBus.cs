@@ -5,29 +5,18 @@ using Polly;
 
 namespace Core.Commands;
 
-public class InMemoryCommandBus: ICommandBus
+public class InMemoryCommandBus(
+    IServiceProvider serviceProvider,
+    IActivityScope activityScope,
+    IAsyncPolicy retryPolicy
+): ICommandBus
 {
-    private readonly IServiceProvider serviceProvider;
-    private readonly AsyncPolicy retryPolicy;
-    private readonly IActivityScope activityScope;
-
-    public InMemoryCommandBus(
-        IServiceProvider serviceProvider,
-        IActivityScope activityScope,
-        AsyncPolicy retryPolicy
-    )
-    {
-        this.serviceProvider = serviceProvider;
-        this.retryPolicy = retryPolicy;
-        this.activityScope = activityScope;
-    }
-
     public async Task Send<TCommand>(TCommand command, CancellationToken ct = default)
         where TCommand : notnull
     {
         var wasHandled = await TrySend(command, ct).ConfigureAwait(true);
 
-        if(!wasHandled)
+        if (!wasHandled)
             throw new InvalidOperationException($"Unable to find handler for command '{command.GetType().Name}'");
     }
 
