@@ -1,12 +1,16 @@
-using Marten;
+using Core.Configuration;
+using EventStore.Client;
 using Microsoft.AspNetCore.Diagnostics;
-using Oakton;
 using OptimisticConcurrency.Core.Exceptions;
 using OptimisticConcurrency.Immutable.ShoppingCarts;
 using OptimisticConcurrency.Mixed.ShoppingCarts;
 using OptimisticConcurrency.Mutable.ShoppingCarts;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var eventStoreClient = new EventStoreClient(
+    EventStoreClientSettings.Create(builder.Configuration.GetRequiredConnectionString(("ShoppingCarts")))
+);
 
 builder.Services
     .AddRouting()
@@ -15,23 +19,7 @@ builder.Services
     .AddMutableShoppingCarts()
     .AddMixedShoppingCarts()
     .AddImmutableShoppingCarts()
-    .AddMarten(options =>
-    {
-        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Workshop_Optimistic_ShoppingCarts";
-        options.Events.DatabaseSchemaName = schemaName;
-        options.DatabaseSchemaName = schemaName;
-        options.Connection(builder.Configuration.GetConnectionString("ShoppingCarts") ??
-                           throw new InvalidOperationException());
-
-        options.ConfigureImmutableShoppingCarts()
-            .ConfigureMutableShoppingCarts()
-            .ConfigureMixedShoppingCarts();
-    })
-    .ApplyAllDatabaseChangesOnStartup()
-    .OptimizeArtifactWorkflow()
-    .UseLightweightSessions();
-
-builder.Host.ApplyOaktonExtensions();
+    .AddSingleton(eventStoreClient);
 
 var app = builder.Build();
 
@@ -41,6 +29,8 @@ app.UseExceptionHandler(new ExceptionHandlerOptions
         ExceptionHandler = context =>
         {
             var exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
+
+            Console.WriteLine("ERROR: " + exception);
 
             context.Response.StatusCode = exception switch
             {
@@ -65,11 +55,8 @@ if (app.Environment.IsDevelopment())
         .UseSwaggerUI();
 }
 
-return await app.RunOaktonCommands(args);
+await app.RunAsync();
 
-namespace OptimisticConcurrency
+public partial class Program
 {
-    public partial class Program
-    {
-    }
 }

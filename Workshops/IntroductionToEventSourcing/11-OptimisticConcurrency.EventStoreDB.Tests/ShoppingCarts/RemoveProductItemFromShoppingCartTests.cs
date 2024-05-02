@@ -12,8 +12,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
     IClassFixture<ApiSpecification<Program>>
 {
     [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
+    [Trait("Category", "SkipCI")][InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
     public Task CantRemoveProductItemFromNotExistingShoppingCart(string apiPrefix) =>
@@ -21,13 +20,12 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .When(
                 DELETE,
                 URI(ShoppingCartProductItemUrl(apiPrefix, ClientId, NotExistingShoppingCartId, ProductItem.ProductId!.Value)),
-                HEADERS(IF_MATCH(0))
+                HEADERS(IF_MATCH(-1))
             )
             .Then(NOT_FOUND);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
+    [Trait("Category", "SkipCI")][InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
     public Task CantRemoveProductItemFromEmptyShoppingCart(string apiPrefix) =>
@@ -35,54 +33,51 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .When(
                 DELETE,
                 URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value)),
-                HEADERS(IF_MATCH(1))
+                HEADERS(IF_MATCH(0))
             )
             .Then(CONFLICT);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
+    [Trait("Category", "SkipCI")][InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
     public Task CanRemoveExistingProductItemFromShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0)
             )
             .When(
                 DELETE,
                 URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value)),
-                HEADERS(IF_MATCH(2))
+                HEADERS(IF_MATCH(1))
             )
-            .Then(NO_CONTENT, RESPONSE_ETAG_HEADER(3));
+            .Then(NO_CONTENT, RESPONSE_ETAG_HEADER(2));
 
     [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
+    [Trait("Category", "SkipCI")][InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
     public Task CantRemoveExistingProductItemFromShoppingCartWithWrongETag(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0)
             )
             .When(
                 DELETE,
                 URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(),
                     ProductItem.ProductId!.Value)),
-                HEADERS(IF_MATCH(1))
+                HEADERS(IF_MATCH(0))
             )
             .Then(PRECONDITION_FAILED);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
+    [Trait("Category", "SkipCI")][InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
     public Task CantRemoveExistingProductItemFromShoppingCartWithoutETag(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0)
             )
             .When(
                 DELETE,
@@ -92,70 +87,66 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
             .Then(PRECONDITION_FAILED);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
+    [Trait("Category", "SkipCI")][InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
     public Task CantRemoveNonExistingProductItemFromEmptyShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0)
             )
             .When(
                 DELETE,
                 URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), NotExistingProductItem.ProductId!.Value)),
-                HEADERS(IF_MATCH(2))
+                HEADERS(IF_MATCH(1))
             )
             .Then(CONFLICT);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
+    [Trait("Category", "SkipCI")][InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
     public Task CantRemoveExistingProductItemFromCanceledShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1),
-                ThenCanceled(apiPrefix, ClientId, 2)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0),
+                ThenCanceled(apiPrefix, ClientId, 1)
             )
             .When(
                 DELETE,
                 URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value)),
-                HEADERS(IF_MATCH(3))
+                HEADERS(IF_MATCH(2))
             )
             .Then(CONFLICT);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
+    [Trait("Category", "SkipCI")][InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
     public Task CantRemoveExistingProductItemFromConfirmedShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1),
-                ThenConfirmed(apiPrefix, ClientId, 2)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0),
+                ThenConfirmed(apiPrefix, ClientId, 1)
             )
             .When(
                 DELETE,
                 URI(ctx => ShoppingCartProductItemUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>(), ProductItem.ProductId!.Value)),
-                HEADERS(IF_MATCH(3))
+                HEADERS(IF_MATCH(2))
             )
             .Then(CONFLICT);
 
     [Theory]
-    [Trait("Category", "SkipCI")]
-    [InlineData("immutable")]
+    [Trait("Category", "SkipCI")][InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
     public Task ReturnsNonEmptyShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
-                WithProductItem(apiPrefix, ClientId, ProductItem, 1)
+                WithProductItem(apiPrefix, ClientId, ProductItem, 0)
             )
             .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
-            .Then(OK, RESPONSE_ETAG_HEADER(2));
+            .Then(OK, RESPONSE_ETAG_HEADER(1));
 
     private static readonly Faker Faker = new();
     private readonly Guid NotExistingShoppingCartId = Guid.NewGuid();

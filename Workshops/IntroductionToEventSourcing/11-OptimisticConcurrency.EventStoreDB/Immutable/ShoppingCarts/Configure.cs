@@ -1,30 +1,36 @@
-using Marten;
-using OptimisticConcurrency.Core.Marten;
+using EventStore.Client;
+using OptimisticConcurrency.Core.EventStoreDB;
 using OptimisticConcurrency.Immutable.Pricing;
 
 namespace OptimisticConcurrency.Immutable.ShoppingCarts;
-using static ShoppingCartEvent;
 
 public static class Configure
 {
-    private const string ModulePrefix = "immutable";
-    public  static IServiceCollection AddImmutableShoppingCarts(this IServiceCollection services)
-    {
+    public  static IServiceCollection AddImmutableShoppingCarts(this IServiceCollection services) =>
         services.AddSingleton<IProductPriceCalculator>(FakeProductPriceCalculator.Returning(100));
+    public static Task GetAndUpdate(
+        this EventStoreClient eventStore,
+        Guid id,
+        Func<ShoppingCart, ShoppingCartEvent[]> handle,
+        CancellationToken ct
+    ) =>
+        eventStore.GetAndUpdate(
+            ShoppingCart.Evolve,
+            ShoppingCart.Initial,
+            id,
+            handle,
+            ct
+        );
 
-        return services;
-    }
-    public static StoreOptions ConfigureImmutableShoppingCarts(this StoreOptions options)
-    {
-        options.Projections.LiveStreamAggregation<ShoppingCart>();
-
-        // this is needed as we're sharing document store and have event types with the same name
-        options.MapEventWithPrefix<ShoppingCartOpened>(ModulePrefix);
-        options.MapEventWithPrefix<ProductItemAddedToShoppingCart>(ModulePrefix);
-        options.MapEventWithPrefix<ProductItemRemovedFromShoppingCart>(ModulePrefix);
-        options.MapEventWithPrefix<ShoppingCartConfirmed>(ModulePrefix);
-        options.MapEventWithPrefix<ShoppingCartCanceled>(ModulePrefix);
-
-        return options;
-    }
+    public static Task<ShoppingCart?> GetShoppingCart(
+        this EventStoreClient eventStore,
+        Guid id,
+        CancellationToken ct
+    ) =>
+        eventStore.AggregateStream<ShoppingCart, ShoppingCartEvent>(
+            ShoppingCart.Evolve,
+            ShoppingCart.Initial,
+            id,
+            ct
+        );
 }
