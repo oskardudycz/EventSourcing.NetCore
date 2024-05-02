@@ -1,6 +1,7 @@
-using ApplicationLogic.EventStoreDB.Mixed.Pricing;
+using ApplicationLogic.EventStoreDB.Core.Entities;
+using ApplicationLogic.EventStoreDB.Mutable.Pricing;
 
-namespace ApplicationLogic.EventStoreDB.Mixed.ShoppingCarts;
+namespace ApplicationLogic.EventStoreDB.Mutable.ShoppingCarts;
 
 using static ShoppingCartEvent;
 
@@ -41,9 +42,8 @@ public abstract record ShoppingCartEvent
 
 // ENTITY
 // Note: We need to have prefix to be able to register multiple streams with the same name
-public class MixedShoppingCart
+public class ShoppingCart: Aggregate<ShoppingCartEvent>
 {
-    public Guid Id { get; private set; }
     public Guid ClientId { get; private set; }
     public ShoppingCartStatus Status { get; private set; }
     public IList<PricedProductItem> ProductItems { get; } = new List<PricedProductItem>();
@@ -52,7 +52,7 @@ public class MixedShoppingCart
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    public void Apply(ShoppingCartEvent @event)
+    public override void Evolve(ShoppingCartEvent @event)
     {
         switch (@event)
         {
@@ -74,28 +74,35 @@ public class MixedShoppingCart
         }
     }
 
-    public static (ShoppingCartOpened, MixedShoppingCart) Open(
+    public static ShoppingCart Open(
         Guid cartId,
         Guid clientId,
         DateTimeOffset now
     )
     {
+        return new ShoppingCart(cartId, clientId, now);
+    }
+
+    public static ShoppingCart Initial() => new();
+
+    private ShoppingCart(
+        Guid id,
+        Guid clientId,
+        DateTimeOffset now
+    )
+    {
         var @event = new ShoppingCartOpened(
-            cartId,
+            id,
             clientId,
             now
         );
 
-        return (@event, new MixedShoppingCart(@event));
+        Enqueue(@event);
+        Apply(@event);
     }
 
-    public static MixedShoppingCart Initial() => new();
-
-    private MixedShoppingCart(ShoppingCartOpened @event) =>
-        Apply(@event);
-
     //just for default creation of empty object
-    private MixedShoppingCart() { }
+    private ShoppingCart() { }
 
     private void Apply(ShoppingCartOpened opened)
     {
@@ -104,7 +111,7 @@ public class MixedShoppingCart
         Status = ShoppingCartStatus.Pending;
     }
 
-    public ProductItemAddedToShoppingCart AddProduct(
+    public void AddProduct(
         IProductPriceCalculator productPriceCalculator,
         ProductItem productItem,
         DateTimeOffset now
@@ -118,9 +125,8 @@ public class MixedShoppingCart
 
         var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem, now);
 
+        Enqueue(@event);
         Apply(@event);
-
-        return @event;
     }
 
     private void Apply(ProductItemAddedToShoppingCart productItemAdded)
@@ -136,10 +142,10 @@ public class MixedShoppingCart
         if (current == null)
             ProductItems.Add(pricedProductItem);
         else
-            ProductItems[ProductItems.IndexOf(current)].Quantity += quantityToAdd;
+            current.Quantity += quantityToAdd;
     }
 
-    public ProductItemRemovedFromShoppingCart RemoveProduct(PricedProductItem productItemToBeRemoved, DateTimeOffset now)
+    public void RemoveProduct(PricedProductItem productItemToBeRemoved, DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -150,9 +156,8 @@ public class MixedShoppingCart
 
         var @event = new ProductItemRemovedFromShoppingCart(Id, productItemToBeRemoved, now);
 
+        Enqueue(@event);
         Apply(@event);
-
-        return @event;
     }
 
     private bool HasEnough(PricedProductItem productItem)
@@ -177,10 +182,10 @@ public class MixedShoppingCart
         if (current.Quantity == quantityToRemove)
             ProductItems.Remove(current);
         else
-            ProductItems[ProductItems.IndexOf(current)].Quantity -= quantityToRemove;
+            current.Quantity -= quantityToRemove;
     }
 
-    public ShoppingCartConfirmed Confirm(DateTimeOffset now)
+    public void Confirm(DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -191,9 +196,8 @@ public class MixedShoppingCart
 
         var @event = new ShoppingCartConfirmed(Id, now);
 
+        Enqueue(@event);
         Apply(@event);
-
-        return @event;
     }
 
     private void Apply(ShoppingCartConfirmed confirmed)
@@ -202,7 +206,7 @@ public class MixedShoppingCart
         ConfirmedAt = confirmed.ConfirmedAt;
     }
 
-    public ShoppingCartCanceled Cancel(DateTimeOffset now)
+    public void Cancel(DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -210,9 +214,8 @@ public class MixedShoppingCart
 
         var @event = new ShoppingCartCanceled(Id, now);
 
+        Enqueue(@event);
         Apply(@event);
-
-        return @event;
     }
 
     private void Apply(ShoppingCartCanceled canceled)

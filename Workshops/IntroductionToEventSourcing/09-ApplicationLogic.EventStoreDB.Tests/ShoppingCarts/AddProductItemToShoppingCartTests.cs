@@ -26,7 +26,6 @@ public class AddProductItemToShoppingCartTests(ApiSpecification<Program> api):
             )
             .Then(NOT_FOUND);
 
-
     [Theory]
     [Trait("Category", "SkipCI")]
     [InlineData("immutable")]

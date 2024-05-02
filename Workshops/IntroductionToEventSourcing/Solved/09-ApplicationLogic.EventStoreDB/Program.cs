@@ -2,9 +2,15 @@ using ApplicationLogic.EventStoreDB.Core.Exceptions;
 using ApplicationLogic.EventStoreDB.Immutable.ShoppingCarts;
 using ApplicationLogic.EventStoreDB.Mixed.ShoppingCarts;
 using ApplicationLogic.EventStoreDB.Mutable.ShoppingCarts;
+using Core.Configuration;
+using EventStore.Client;
 using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var eventStoreClient = new EventStoreClient(
+    EventStoreClientSettings.Create(builder.Configuration.GetRequiredConnectionString(("ShoppingCarts")))
+);
 
 builder.Services
     .AddRouting()
@@ -13,23 +19,7 @@ builder.Services
     .AddMutableShoppingCarts()
     .AddMixedShoppingCarts()
     .AddImmutableShoppingCarts()
-    .AddMarten(options =>
-    {
-        var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "Workshop_Application_ShoppingCarts_Solved";
-        options.Events.DatabaseSchemaName = schemaName;
-        options.DatabaseSchemaName = schemaName;
-        options.Connection(builder.Configuration.GetConnectionString("ShoppingCarts") ??
-                           throw new InvalidOperationException());
-
-        options.ConfigureImmutableShoppingCarts()
-            .ConfigureMutableShoppingCarts()
-            .ConfigureMixedShoppingCarts();
-    })
-    .ApplyAllDatabaseChangesOnStartup()
-    .OptimizeArtifactWorkflow()
-    .UseLightweightSessions();
-
-builder.Host.ApplyOaktonExtensions();
+    .AddSingleton(eventStoreClient);
 
 var app = builder.Build();
 
@@ -65,11 +55,8 @@ if (app.Environment.IsDevelopment())
         .UseSwaggerUI();
 }
 
-return await app.RunOaktonCommands(args);
+await app.RunAsync();
 
-namespace ApplicationLogic.EventStoreDB
+public partial class Program
 {
-    public partial class Program
-    {
-    }
 }

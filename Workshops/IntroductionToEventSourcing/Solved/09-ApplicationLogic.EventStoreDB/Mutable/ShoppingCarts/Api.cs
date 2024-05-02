@@ -1,8 +1,7 @@
-using ApplicationLogic.EventStoreDB.Core.Marten;
+using ApplicationLogic.EventStoreDB.Core.EventStoreDB;
 using ApplicationLogic.EventStoreDB.Mutable.Pricing;
 using Core.Validation;
-using Marten;
-using Marten.Schema.Identity;
+using EventStore.Client;
 using Microsoft.AspNetCore.Mvc;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static System.DateTimeOffset;
@@ -19,14 +18,14 @@ public static class Api
         var productItems = shoppingCart.MapGroup("product-items");
 
         shoppingCarts.MapPost("",
-            async (IDocumentSession session,
+            async (EventStoreClient eventStore,
                 Guid clientId,
                 CancellationToken ct) =>
             {
-                var shoppingCartId = CombGuidIdGeneration.NewGuid();
+                var shoppingCartId = Uuid.NewUuid().ToGuid();
 
-                await session.Add<MutableShoppingCart>(shoppingCartId,
-                    MutableShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now).DequeueUncommittedEvents(), ct);
+                await eventStore.Add(shoppingCartId,
+                    ShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now), ct);
 
                 return Created($"/api/mutable/clients/{clientId}/shopping-carts/{shoppingCartId}", shoppingCartId);
             }
@@ -35,14 +34,14 @@ public static class Api
         productItems.MapPost("",
             async (
                 IProductPriceCalculator pricingCalculator,
-                IDocumentSession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 AddProductRequest body,
                 CancellationToken ct) =>
             {
                 var productItem = body.ProductItem.NotNull().ToProductItem();
 
-                await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId,
+                await eventStore.GetAndUpdate(shoppingCartId,
                     state => state.AddProduct(pricingCalculator, productItem, Now), ct);
 
                 return NoContent();
@@ -51,7 +50,7 @@ public static class Api
 
         productItems.MapDelete("{productId:guid}",
             async (
-                IDocumentSession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 [FromRoute] Guid productId,
                 [FromQuery] int? quantity,
@@ -65,7 +64,7 @@ public static class Api
                     UnitPrice = unitPrice.NotNull().Positive()
                 };
 
-                await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId,
+                await eventStore.GetAndUpdate(shoppingCartId,
                     state => state.RemoveProduct(productItem, Now),
                     ct);
 
@@ -74,11 +73,11 @@ public static class Api
         );
 
         shoppingCart.MapPost("confirm",
-            async (IDocumentSession session,
+            async (EventStoreClient eventStore,
                 Guid shoppingCartId,
                 CancellationToken ct) =>
             {
-                await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId,
+                await eventStore.GetAndUpdate(shoppingCartId,
                     state => state.Confirm(Now), ct);
 
                 return NoContent();
@@ -86,11 +85,11 @@ public static class Api
         );
 
         shoppingCart.MapDelete("",
-            async (IDocumentSession session,
+            async (EventStoreClient eventStore,
                 Guid shoppingCartId,
                 CancellationToken ct) =>
             {
-                await session.GetAndUpdate<MutableShoppingCart>(shoppingCartId,
+                await eventStore.GetAndUpdate(shoppingCartId,
                     state => state.Cancel(Now), ct);
 
                 return NoContent();
@@ -99,11 +98,11 @@ public static class Api
 
         shoppingCart.MapGet("",
             async Task<IResult> (
-                IQuerySession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 CancellationToken ct) =>
             {
-                var result = await session.Events.AggregateStreamAsync<MutableShoppingCart>(shoppingCartId, token: ct);
+                var result = await eventStore.GetShoppingCart(shoppingCartId, ct);
 
                 return result is not null ? Ok(result) : NotFound();
             }

@@ -10,7 +10,7 @@ public static class ConfigurationExtensions
                    $"{typeof(T).Name} configuration wasn't found for '${configurationKey}' key");
 
     public static string GetRequiredConnectionString(this IConfiguration configuration, string configurationKey) =>
-        configuration.GetConnectionString("Incidents")
+        configuration.GetConnectionString(configurationKey)
         ?? throw new InvalidOperationException(
             $"Configuration string with name '${configurationKey}' was not found");
 }
