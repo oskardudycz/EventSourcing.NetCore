@@ -55,20 +55,12 @@ public enum ReactionState
     Completed
 }
 
-public class ReactionParticipant
+public class ReactionParticipant(Guid id, string chemicalName, double moles, ParticipantType type)
 {
-    public Guid Id { get; private set; }
-    public string ChemicalName { get; private set; }
-    public double Moles { get; private set; }
-    public ParticipantType Type { get; private set; }
-
-    public ReactionParticipant(Guid id, string chemicalName, double moles, ParticipantType type)
-    {
-        Id = id;
-        ChemicalName = chemicalName;
-        Moles = moles;
-        Type = type;
-    }
+    public Guid Id { get; private set; } = id;
+    public string ChemicalName { get; private set; } = chemicalName;
+    public double Moles { get; private set; } = moles;
+    public ParticipantType Type { get; private set; } = type;
 
     public void UpdateMoles(double newMoles)
     {

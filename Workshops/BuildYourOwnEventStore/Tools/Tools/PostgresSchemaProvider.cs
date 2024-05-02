@@ -6,10 +6,8 @@ namespace Tools.Tools;
 /// <summary>
 /// Helper class that returns information about the database schema (Tables and its Columns)
 /// </summary>
-public class PostgresSchemaProvider
+public class PostgresSchemaProvider(NpgsqlConnection databaseConnection)
 {
-    private readonly NpgsqlConnection databaseConnection;
-
     const string GetTableColumnsSql =
         @"SELECT column_name AS name, data_type AS type
               FROM INFORMATION_SCHEMA.COLUMNS
@@ -20,11 +18,6 @@ public class PostgresSchemaProvider
 
     private const string FunctionExistsSql =
         @"select exists(select * from pg_proc where proname = @functionName);";
-
-    public PostgresSchemaProvider(NpgsqlConnection databaseConnection)
-    {
-        this.databaseConnection = databaseConnection;
-    }
 
     /// <summary>
     /// Returns schema information about specific table
@@ -52,22 +45,17 @@ public class PostgresSchemaProvider
 /// <summary>
 /// Describes basic information about database table
 /// </summary>
-public class Table
+public class Table(string name, IEnumerable<Column> columns)
 {
     /// <summary>
     /// Table Name
     /// </summary>
-    public string Name { get; }
+    public string Name { get; } = name;
+
     /// <summary>
     /// Table Columns
     /// </summary>
-    private IEnumerable<Column> Columns { get; }
-
-    public Table(string name, IEnumerable<Column> columns)
-    {
-        Name = name;
-        Columns = columns;
-    }
+    private IEnumerable<Column> Columns { get; } = columns;
 
     public Column? GetColumn(string columnName)
     {
@@ -78,7 +66,7 @@ public class Table
 /// <summary>
 /// Describes basic information about database column
 /// </summary>
-public class Column
+public class Column(string name, string type)
 {
     public const string GuidType = "uuid";
     public const string LongType = "bigint";
@@ -89,16 +77,10 @@ public class Column
     /// <summary>
     /// Column Name
     /// </summary>
-    public string Name { get; }
+    public string Name { get; } = name;
+
     /// <summary>
     /// Column Type
     /// </summary>
-    public string Type { get; }
-
-
-    public Column(string name, string type)
-    {
-        Name = name;
-        Type = type;
-    }
+    public string Type { get; } = type;
 }

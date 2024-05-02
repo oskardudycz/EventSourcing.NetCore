@@ -2,13 +2,8 @@ using MongoDB.Driver;
 
 namespace SlimDownYourAggregate.Core.Mongo;
 
-public class MongoRepository<T>
+public class MongoRepository<T>(IMongoCollection<T> collection)
 {
-    private readonly IMongoCollection<T> collection;
-
-    public MongoRepository(IMongoCollection<T> collection) =>
-        this.collection = collection;
-
     public async Task<T?> FindAsync(string id, CancellationToken ct) =>
         await collection.Find(Builders<T>.Filter.Eq("_id", id)).SingleOrDefaultAsync(ct);
 

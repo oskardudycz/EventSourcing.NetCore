@@ -5,9 +5,5 @@ using ECommerce.Repositories;
 
 namespace ECommerce.Services;
 
-public class ProductReadOnlyService: ReadOnlyOnlyService<Product>
-{
-    public ProductReadOnlyService(ProductReadOnlyRepository repository, IMapper mapper) : base(repository, mapper)
-    {
-    }
-}
+public class ProductReadOnlyService(ProductReadOnlyRepository repository, IMapper mapper)
+    : ReadOnlyOnlyService<Product>(repository, mapper);

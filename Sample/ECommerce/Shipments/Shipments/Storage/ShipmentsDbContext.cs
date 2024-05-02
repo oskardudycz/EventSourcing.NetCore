@@ -3,12 +3,7 @@ using Shipments.Packages;
 
 namespace Shipments.Storage;
 
-internal class ShipmentsDbContext: DbContext
+internal class ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> options): DbContext(options)
 {
-    public ShipmentsDbContext(DbContextOptions<ShipmentsDbContext> options)
-        : base(options)
-    {
-    }
-
     public DbSet<Package> Packages { get; set; } = default!;
 }

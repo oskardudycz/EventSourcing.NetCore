@@ -19,14 +19,9 @@ public record OpenShoppingCart(
     }
 }
 
-internal class HandleOpenShoppingCart:
+internal class HandleOpenShoppingCart(IMartenRepository<ShoppingCart> cartRepository):
     ICommandHandler<OpenShoppingCart>
 {
-    private readonly IMartenRepository<ShoppingCart> cartRepository;
-
-    public HandleOpenShoppingCart(IMartenRepository<ShoppingCart> cartRepository) =>
-        this.cartRepository = cartRepository;
-
     public Task Handle(OpenShoppingCart command, CancellationToken ct)
     {
         var (cartId, clientId) = command;

@@ -4,15 +4,8 @@ using Warehouse.Core.Queries;
 
 namespace Warehouse.Products.GettingProductDetails;
 
-internal class HandleGetProductDetails: IQueryHandler<GetProductDetails, ProductDetails?>
+internal class HandleGetProductDetails(IQueryable<Product> products): IQueryHandler<GetProductDetails, ProductDetails?>
 {
-    private readonly IQueryable<Product> products;
-
-    public HandleGetProductDetails(IQueryable<Product> products)
-    {
-        this.products = products;
-    }
-
     public async ValueTask<ProductDetails?> Handle(GetProductDetails query, CancellationToken ct)
     {
         // await is needed because of https://github.com/dotnet/efcore/issues/21793#issuecomment-667096367

@@ -20,14 +20,9 @@ public record CancelOrder(
     }
 }
 
-public class HandleCancelOrder:
+public class HandleCancelOrder(IMartenRepository<Order> orderRepository):
     ICommandHandler<CancelOrder>
 {
-    private readonly IMartenRepository<Order> orderRepository;
-
-    public HandleCancelOrder(IMartenRepository<Order> orderRepository) =>
-        this.orderRepository = orderRepository;
-
     public Task Handle(CancelOrder command, CancellationToken ct) =>
         orderRepository.GetAndUpdate(
             command.OrderId,

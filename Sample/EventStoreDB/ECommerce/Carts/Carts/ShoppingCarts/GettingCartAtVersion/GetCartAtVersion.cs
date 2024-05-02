@@ -22,16 +22,9 @@ public record GetCartAtVersion(
     }
 }
 
-internal class HandleGetCartAtVersion:
+internal class HandleGetCartAtVersion(EventStoreClient eventStore):
     IQueryHandler<GetCartAtVersion, ShoppingCartDetails>
 {
-    private readonly EventStoreClient eventStore;
-
-    public HandleGetCartAtVersion(EventStoreClient eventStore)
-    {
-        this.eventStore = eventStore;
-    }
-
     public async Task<ShoppingCartDetails> Handle(GetCartAtVersion request, CancellationToken cancellationToken)
     {
         var cart = await eventStore.AggregateStream<ShoppingCartDetails>(

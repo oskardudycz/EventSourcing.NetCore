@@ -2,13 +2,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SlimDownYourAggregate.Core.EF;
 
-public class EFRepository<TDbContext, T> where TDbContext : DbContext where T : class
+public class EFRepository<TDbContext, T>(TDbContext dbContext)
+    where TDbContext : DbContext
+    where T : class
 {
-    private readonly TDbContext dbContext;
-
-    public EFRepository(TDbContext dbContext) =>
-        this.dbContext = dbContext;
-
     public ValueTask<T?> FindAsync(string id, CancellationToken ct) =>
         dbContext.FindAsync<T>(id, ct);
 

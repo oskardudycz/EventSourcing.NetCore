@@ -21,16 +21,9 @@ public record GetReservationAtVersion(
     }
 }
 
-internal class HandleGetReservationAtVersion:
+internal class HandleGetReservationAtVersion(IDocumentSession querySession):
     IQueryHandler<GetReservationAtVersion, ReservationDetails>
 {
-    private readonly IDocumentSession querySession;
-
-    public HandleGetReservationAtVersion(IDocumentSession querySession)
-    {
-        this.querySession = querySession;
-    }
-
     public async Task<ReservationDetails> Handle(GetReservationAtVersion query, CancellationToken cancellationToken)
     {
         var (reservationId, version) = query;

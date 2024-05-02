@@ -162,16 +162,10 @@ public abstract record ChemicalReaction
     public record Completed: ChemicalReaction;
 }
 
-public class ReactionParticipant
+public class ReactionParticipant(double moles, ParticipantType type)
 {
-    public double Moles { get; private set; }
-    public ParticipantType Type { get; private set; }
-
-    public ReactionParticipant(double moles, ParticipantType type)
-    {
-        Moles = moles;
-        Type = type;
-    }
+    public double Moles { get; private set; } = moles;
+    public ParticipantType Type { get; private set; } = type;
 
     public void UpdateMoles(double newMoles)
     {

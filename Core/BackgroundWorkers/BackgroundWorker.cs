@@ -3,20 +3,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.BackgroundWorkers;
 
-public class BackgroundWorker: BackgroundService
+public class BackgroundWorker(
+    ILogger<BackgroundWorker> logger,
+    Func<CancellationToken, Task> perform)
+    : BackgroundService
 {
-    private readonly ILogger<BackgroundWorker> logger;
-    private readonly Func<CancellationToken, Task> perform;
-
-    public BackgroundWorker(
-        ILogger<BackgroundWorker> logger,
-        Func<CancellationToken, Task> perform
-    )
-    {
-        this.logger = logger;
-        this.perform = perform;
-    }
-
     protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
         Task.Run(async () =>
         {

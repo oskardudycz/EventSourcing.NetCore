@@ -5,14 +5,9 @@ using Shipments.Packages.Requests;
 namespace Shipments.Api.Controllers;
 
 [Route("api/[controller]")]
-public class ShipmentsController: Controller
+public class ShipmentsController(IPackageService packageService): Controller
 {
-    private readonly IPackageService packageService;
-
-    public ShipmentsController(IPackageService packageService)
-    {
-        this.packageService = packageService ?? throw new ArgumentNullException(nameof(packageService));
-    }
+    private readonly IPackageService packageService = packageService ?? throw new ArgumentNullException(nameof(packageService));
 
     [HttpPost]
     public async Task<IActionResult> Send([FromBody] SendPackage? request)

@@ -34,16 +34,9 @@ internal class Product
     }
 }
 
-public record SKU
+[method: JsonConstructor]
+public record SKU(string Value)
 {
-    public string Value { get; init; }
-
-    [JsonConstructor]
-    public SKU(string value)
-    {
-        Value = value;
-    }
-
     public static SKU Create(string? value)
     {
         if (value == null)

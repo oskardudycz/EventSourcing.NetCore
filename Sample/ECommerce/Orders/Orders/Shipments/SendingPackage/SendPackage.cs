@@ -23,18 +23,10 @@ public record SendPackage(
     }
 }
 
-public class HandleSendPackage:
-    ICommandHandler<SendPackage>
+public class HandleSendPackage(ExternalServicesConfig externalServicesConfig, IExternalCommandBus externalCommandBus)
+    :
+        ICommandHandler<SendPackage>
 {
-    private readonly ExternalServicesConfig externalServicesConfig;
-    private readonly IExternalCommandBus externalCommandBus;
-
-    public HandleSendPackage(ExternalServicesConfig externalServicesConfig, IExternalCommandBus externalCommandBus)
-    {
-        this.externalServicesConfig = externalServicesConfig;
-        this.externalCommandBus = externalCommandBus;
-    }
-
     public async Task Handle(SendPackage command, CancellationToken ct)
     {
         await externalCommandBus.Post(

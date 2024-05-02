@@ -44,28 +44,16 @@ public class Exercise10ProjectionsWithMarten
         }
     }
 
-    public class UserCreated
+    public class UserCreated(Guid userId, string userName)
     {
-        public Guid UserId { get; }
-        public string UserName { get; }
-
-        public UserCreated(Guid userId, string userName)
-        {
-            UserId = userId;
-            UserName = userName;
-        }
+        public Guid UserId { get; } = userId;
+        public string UserName { get; } = userName;
     }
 
-    public class UserNameUpdated
+    public class UserNameUpdated(Guid userId, string userName)
     {
-        public Guid UserId { get; }
-        public string UserName { get; }
-
-        public UserNameUpdated(Guid userId, string userName)
-        {
-            UserId = userId;
-            UserName = userName;
-        }
+        public Guid UserId { get; } = userId;
+        public string UserName { get; } = userName;
     }
 
     public class Order: Aggregate
@@ -93,20 +81,12 @@ public class Exercise10ProjectionsWithMarten
         }
     }
 
-    public class OrderCreated
+    public class OrderCreated(Guid orderId, Guid userId, string number, decimal amount)
     {
-        public Guid OrderId { get; }
-        public Guid UserId { get; }
-        public string Number { get; }
-        public decimal Amount { get; }
-
-        public OrderCreated(Guid orderId, Guid userId, string number, decimal amount)
-        {
-            OrderId = orderId;
-            UserId = userId;
-            Number = number;
-            Amount = amount;
-        }
+        public Guid OrderId { get; } = orderId;
+        public Guid UserId { get; } = userId;
+        public string Number { get; } = number;
+        public decimal Amount { get; } = amount;
     }
 
     public class UserDashboard

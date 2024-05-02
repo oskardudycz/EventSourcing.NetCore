@@ -8,18 +8,13 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace MeetingsManagement.IntegrationTests.Meetings.SchedulingMeetings;
 
-public class ScheduleMeetingTests: IClassFixture<ApiSpecification<Program>>
+public class ScheduleMeetingTests(ApiSpecification<Program> api): IClassFixture<ApiSpecification<Program>>
 {
-
-    private readonly ApiSpecification<Program> API;
-
-    public ScheduleMeetingTests(ApiSpecification<Program> api) => API = api;
-
     [Fact]
     [Trait("Category", "Acceptance")]
     public async Task UpdateCommand_Should_Succeed()
     {
-        await API
+        await api
             .Given(
                 "Created Meeting",
                 SEND(POST, URI(MeetingsManagementApi.MeetingsUrl), BODY(new CreateMeeting(MeetingId, MeetingName)))

@@ -57,12 +57,8 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
         }
     }
 
-    public class Reaggregation: MartenTest
+    public class Reaggregation(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, false)
     {
-        public Reaggregation(MartenFixture fixture): base(fixture.PostgreSqlContainer, false)
-        {
-        }
-
         public IDocumentSession CreateSessionWithInlineAggregationFor<TIssue>() where TIssue : class, new()
         {
             return base.CreateSession(options =>

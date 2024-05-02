@@ -3,15 +3,9 @@ using Warehouse.Api.Core.Queries;
 
 namespace Warehouse.Api.Products;
 
-internal class HandleGetProducts : IQueryHandler<GetProducts, IReadOnlyList<ProductListItem>>
+internal class HandleGetProducts(IQueryable<Product> products)
+    : IQueryHandler<GetProducts, IReadOnlyList<ProductListItem>>
 {
-    private readonly IQueryable<Product> products;
-
-    public HandleGetProducts(IQueryable<Product> products)
-    {
-        this.products = products;
-    }
-
     public async ValueTask<IReadOnlyList<ProductListItem>> Handle(GetProducts query, CancellationToken ct)
     {
         var (filter, page, pageSize) = query;

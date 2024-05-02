@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.UniqueConstraint;
 
-public class UniqueContstraintTests: MartenTest
+public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record UserCreated(
         Guid UserId,
@@ -95,6 +95,4 @@ public class UniqueContstraintTests: MartenTest
         EventStore.StartStream(new UserCreated(Guid.NewGuid(), "yet.another@email.com"));
         await Session.SaveChangesAsync();
     }
-
-    public UniqueContstraintTests(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

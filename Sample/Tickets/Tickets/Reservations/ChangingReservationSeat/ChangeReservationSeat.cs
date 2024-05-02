@@ -22,14 +22,9 @@ public record ChangeReservationSeat(
     }
 }
 
-internal class HandleChangeReservationSeat:
+internal class HandleChangeReservationSeat(IMartenRepository<Reservation> repository):
     ICommandHandler<ChangeReservationSeat>
 {
-    private readonly IMartenRepository<Reservation> repository;
-
-    public HandleChangeReservationSeat(IMartenRepository<Reservation> repository) =>
-        this.repository = repository;
-
     public Task Handle(ChangeReservationSeat command, CancellationToken ct) =>
         repository.GetAndUpdate(
             command.ReservationId,

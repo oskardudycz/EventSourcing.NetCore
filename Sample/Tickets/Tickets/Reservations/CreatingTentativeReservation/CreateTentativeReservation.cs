@@ -20,21 +20,12 @@ public record CreateTentativeReservation(
     }
 }
 
-internal class HandleCreateTentativeReservation:
-    ICommandHandler<CreateTentativeReservation>
+internal class HandleCreateTentativeReservation(
+    IMartenRepository<Reservation> repository,
+    IReservationNumberGenerator reservationNumberGenerator)
+    :
+        ICommandHandler<CreateTentativeReservation>
 {
-    private readonly IMartenRepository<Reservation> repository;
-    private readonly IReservationNumberGenerator reservationNumberGenerator;
-
-    public HandleCreateTentativeReservation(
-        IMartenRepository<Reservation> repository,
-        IReservationNumberGenerator reservationNumberGenerator
-    )
-    {
-        this.repository = repository;
-        this.reservationNumberGenerator = reservationNumberGenerator;
-    }
-
     public Task Handle(CreateTentativeReservation command, CancellationToken ct)
     {
         var (reservationId, seatId) = command;

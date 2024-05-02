@@ -9,14 +9,9 @@ namespace Core.EventStoreDB.Commands;
 /// Note: This is an example of the outbox pattern for Command Bus using EventStoreDB
 /// For production use mature tooling like Wolverine, MassTransit or NServiceBus
 /// </summary>
-public class EventStoreDBAsyncCommandBus : IAsyncCommandBus
+public class EventStoreDBAsyncCommandBus(EventStoreClient eventStoreClient): IAsyncCommandBus
 {
     public static readonly string CommandsStreamId = "commands-external";
-
-    private readonly EventStoreClient eventStoreClient;
-
-    public EventStoreDBAsyncCommandBus(EventStoreClient eventStoreClient) =>
-        this.eventStoreClient = eventStoreClient;
 
     public Task Schedule<TCommand>(TCommand command, CancellationToken ct = default) where TCommand: notnull
     {

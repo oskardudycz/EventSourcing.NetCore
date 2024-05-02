@@ -23,22 +23,12 @@ public record PaymentFailed(
 }
 
 
-public class TransformIntoPaymentFailed :
+public class TransformIntoPaymentFailed(
+    IEventBus eventBus,
+    IQuerySession querySession):
     IEventHandler<EventEnvelope<PaymentDiscarded>>,
     IEventHandler<EventEnvelope<PaymentTimedOut>>
 {
-    private readonly IEventBus eventBus;
-    private readonly IQuerySession querySession;
-
-    public TransformIntoPaymentFailed(
-        IEventBus eventBus,
-        IQuerySession querySession
-    )
-    {
-        this.eventBus = eventBus;
-        this.querySession = querySession;
-    }
-
     public async Task Handle(EventEnvelope<PaymentDiscarded> @event, CancellationToken cancellationToken)
     {
         var payment = await querySession.LoadAsync<Payment>(@event.Data.PaymentId, cancellationToken);

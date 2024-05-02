@@ -6,16 +6,11 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace MeetingsManagement.IntegrationTests.Meetings.CreatingMeeting;
 
-public class CreateMeetingTests: IClassFixture<TestWebApplicationFactory<Program>>
+public class CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
+    : IClassFixture<TestWebApplicationFactory<Program>>
 {
-    private readonly ApiSpecification<Program> API;
-    private readonly TestWebApplicationFactory<Program> fixture;
-
-    public CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
-    {
-        this.fixture = fixture;
-        API = ApiSpecification<Program>.Setup(fixture);
-    }
+    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(fixture);
+    private readonly TestWebApplicationFactory<Program> fixture = fixture;
 
     [Fact]
     [Trait("Category", "Acceptance")]

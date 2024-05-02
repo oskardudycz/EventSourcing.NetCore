@@ -10,16 +10,12 @@ namespace Carts.Api.Tests.ShoppingCarts.Confirming;
 
 using static ShoppingCartsApi;
 
-public class ConfirmShoppingCartTests: IClassFixture<ApiSpecification<Program>>
+public class ConfirmShoppingCartTests(ApiSpecification<Program> api): IClassFixture<ApiSpecification<Program>>
 {
-    private readonly ApiSpecification<Program> API;
-
-    public ConfirmShoppingCartTests(ApiSpecification<Program> api) => API = api;
-
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task Put_Should_Return_OK_And_Confirm_Shopping_Cart() =>
-        API
+        api
             .Given(
                 "Shopping Cart with Product Item",
                 OpenShoppingCart(ClientId),

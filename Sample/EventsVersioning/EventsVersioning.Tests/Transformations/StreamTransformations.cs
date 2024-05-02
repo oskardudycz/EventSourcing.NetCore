@@ -175,20 +175,11 @@ public class MergeEvents
         public Type Map(string eventType) => mappings[eventType];
     }
 
-    public class EventSerializer
+    public class EventSerializer(
+        EventTypeMapping mapping,
+        StreamTransformations streamTransformations,
+        EventTransformations transformations)
     {
-        private readonly EventTypeMapping mapping;
-        private readonly StreamTransformations streamTransformations;
-        private readonly EventTransformations transformations;
-
-        public EventSerializer(EventTypeMapping mapping, StreamTransformations streamTransformations,
-            EventTransformations transformations)
-        {
-            this.mapping = mapping;
-            this.transformations = transformations;
-            this.streamTransformations = streamTransformations;
-        }
-
         public object? Deserialize(string eventTypeName, string json) =>
             transformations.TryTransform(eventTypeName, json, out var transformed)
                 ? transformed

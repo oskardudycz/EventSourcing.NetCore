@@ -3,24 +3,13 @@ using Core.OptimisticConcurrency;
 
 namespace Core.EventStoreDB.Repository;
 
-public class EventStoreDBRepositoryWithETagDecorator<T>: IEventStoreDBRepository<T>
+public class EventStoreDBRepositoryWithETagDecorator<T>(
+    IEventStoreDBRepository<T> inner,
+    IExpectedResourceVersionProvider expectedResourceVersionProvider,
+    INextResourceVersionProvider nextResourceVersionProvider)
+    : IEventStoreDBRepository<T>
     where T : class, IAggregate
 {
-    private readonly IEventStoreDBRepository<T> inner;
-    private readonly IExpectedResourceVersionProvider expectedResourceVersionProvider;
-    private readonly INextResourceVersionProvider nextResourceVersionProvider;
-
-    public EventStoreDBRepositoryWithETagDecorator(
-        IEventStoreDBRepository<T> inner,
-        IExpectedResourceVersionProvider expectedResourceVersionProvider,
-        INextResourceVersionProvider nextResourceVersionProvider
-    )
-    {
-        this.inner = inner;
-        this.expectedResourceVersionProvider = expectedResourceVersionProvider;
-        this.nextResourceVersionProvider = nextResourceVersionProvider;
-    }
-
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         inner.Find(id, cancellationToken);
 

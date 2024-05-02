@@ -115,17 +115,8 @@ public class MultipleTransformationsWithDifferentEventTypes
         public Type Map(string eventType) => mappings[eventType];
     }
 
-    public class EventSerializer
+    public class EventSerializer(EventTypeMapping mapping, EventTransformations transformations)
     {
-        private readonly EventTypeMapping mapping;
-        private readonly EventTransformations transformations;
-
-        public EventSerializer(EventTypeMapping mapping, EventTransformations transformations)
-        {
-            this.mapping = mapping;
-            this.transformations = transformations;
-        }
-
         public object? Deserialize(string eventTypeName, string json) =>
             transformations.TryTransform(eventTypeName, json, out var transformed)
                 ? transformed

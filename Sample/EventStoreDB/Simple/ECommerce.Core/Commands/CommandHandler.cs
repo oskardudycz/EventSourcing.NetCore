@@ -128,23 +128,13 @@ public static class CommandHandlerExtensions
         return services;
     }
 
-    public class CommandHandlersBuilder<TEntity>
+    public class CommandHandlersBuilder<TEntity>(
+        IServiceCollection services,
+        Func<TEntity> getDefault,
+        Func<TEntity, object, TEntity> when)
         where TEntity : class
     {
-        public readonly IServiceCollection services;
-        private readonly Func<TEntity> getDefault;
-        private readonly Func<TEntity, object, TEntity> when;
-
-        public CommandHandlersBuilder(
-            IServiceCollection services,
-            Func<TEntity> getDefault,
-            Func<TEntity, object, TEntity> when
-        )
-        {
-            this.services = services;
-            this.getDefault = getDefault;
-            this.when = when;
-        }
+        public readonly IServiceCollection services = services;
 
         public CommandHandlersBuilder<TEntity> AddOn<TCommand>(
             Func<TCommand, object> handle,

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate;
 
-public class EventsAggregation: MartenTest
+public class EventsAggregation(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
         Guid IssueId,
@@ -99,10 +99,5 @@ public class EventsAggregation: MartenTest
         issuesList.Issues.Values.Select(t => t.Description)
             .Should()
             .BeEquivalentTo("Description2", "Description3");
-    }
-
-    public EventsAggregation(MartenFixture fixture): base(fixture.PostgreSqlContainer)
-    {
-
     }
 }

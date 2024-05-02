@@ -27,17 +27,12 @@ public record RecordGuestCheckoutFailure(
     DateTimeOffset FailedAt
 );
 
-public class GuestStayDomainService:
+public class GuestStayDomainService(IDocumentSession documentSession):
     ICommandHandler<InitiateGroupCheckout>,
     ICommandHandler<RecordGuestCheckoutsInitiation>,
     ICommandHandler<RecordGuestCheckoutCompletion>,
     ICommandHandler<RecordGuestCheckoutFailure>
 {
-    private readonly IDocumentSession documentSession;
-
-    public GuestStayDomainService(IDocumentSession documentSession) =>
-        this.documentSession = documentSession;
-
     public Task Handle(InitiateGroupCheckout command, CancellationToken ct) =>
         documentSession.Add<GroupCheckout>(
             command.GroupCheckoutId,

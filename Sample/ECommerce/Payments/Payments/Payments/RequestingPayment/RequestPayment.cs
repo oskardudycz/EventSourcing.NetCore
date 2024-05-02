@@ -26,14 +26,9 @@ public record RequestPayment(
     }
 }
 
-public class HandleRequestPayment:
+public class HandleRequestPayment(IMartenRepository<Payment> paymentRepository):
     ICommandHandler<RequestPayment>
 {
-    private readonly IMartenRepository<Payment> paymentRepository;
-
-    public HandleRequestPayment(IMartenRepository<Payment> paymentRepository) =>
-        this.paymentRepository = paymentRepository;
-
     public Task Handle(RequestPayment command, CancellationToken ct)
     {
         var (paymentId, orderId, amount) = command;

@@ -8,14 +8,10 @@ using Xunit;
 
 namespace Marten.Integration.Tests.CompositeIds;
 
-public class StronglyTypedValue<T>: IEquatable<StronglyTypedValue<T>> where T : IComparable<T>
+public class StronglyTypedValue<T>(T value): IEquatable<StronglyTypedValue<T>>
+    where T : IComparable<T>
 {
-    public T Value { get; }
-
-    public StronglyTypedValue(T value)
-    {
-        Value = value;
-    }
+    public T Value { get; } = value;
 
     public bool Equals(StronglyTypedValue<T>? other)
     {
@@ -48,26 +44,11 @@ public class StronglyTypedValue<T>: IEquatable<StronglyTypedValue<T>> where T : 
     }
 }
 
-public class ReservationId: StronglyTypedValue<Guid>
-{
-    public ReservationId(Guid value): base(value)
-    {
-    }
-}
+public class ReservationId(Guid value): StronglyTypedValue<Guid>(value);
 
-public class CustomerId: StronglyTypedValue<Guid>
-{
-    public CustomerId(Guid value): base(value)
-    {
-    }
-}
+public class CustomerId(Guid value): StronglyTypedValue<Guid>(value);
 
-public class SeatId: StronglyTypedValue<Guid>
-{
-    public SeatId(Guid value): base(value)
-    {
-    }
-}
+public class SeatId(Guid value): StronglyTypedValue<Guid>(value);
 
 public class ReservationNumber: StronglyTypedValue<string>
 {
@@ -242,7 +223,7 @@ public class Reservation: Aggregate<ReservationId, Guid>
     }
 }
 
-public class CompositeIdsTests: MartenTest
+public class CompositeIdsTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     private const string FirstTenant = "Tenant1";
     private const string SecondTenant = "Tenant2";
@@ -300,9 +281,5 @@ public class CompositeIdsTests: MartenTest
         issuesListFromLiveAggregation!.AggregateId.Should().Be(reservationId.Value);
         issuesListFromInlineAggregationFromLinq!.AggregateId.Should().Be(reservationId.Value);
         issuesListFromInlineAggregationFromLinqWithAggregateId!.AggregateId.Should().Be(reservationId.Value);
-    }
-
-    public CompositeIdsTests(MartenFixture fixture): base(fixture.PostgreSqlContainer)
-    {
     }
 }

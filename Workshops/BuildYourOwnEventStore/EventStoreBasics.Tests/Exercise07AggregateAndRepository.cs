@@ -43,29 +43,17 @@ public class Exercise07AggregateAndRepository
         }
     }
 
-    class UserCreated
+    class UserCreated(Guid userId, string userName)
     {
-        public Guid UserId { get; }
-        public string UserName { get; }
-
-        public UserCreated(Guid userId, string userName)
-        {
-            UserId = userId;
-            UserName = userName;
-        }
+        public Guid UserId { get; } = userId;
+        public string UserName { get; } = userName;
     }
 
 
-    class UserNameUpdated
+    class UserNameUpdated(Guid userId, string userName)
     {
-        public Guid UserId { get; }
-        public string UserName { get; }
-
-        public UserNameUpdated(Guid userId, string userName)
-        {
-            UserId = userId;
-            UserName = userName;
-        }
+        public Guid UserId { get; } = userId;
+        public string UserName { get; } = userName;
     }
 
     private readonly NpgsqlConnection databaseConnection;

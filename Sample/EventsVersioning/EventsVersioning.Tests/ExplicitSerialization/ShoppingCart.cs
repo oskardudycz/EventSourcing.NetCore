@@ -5,11 +5,10 @@ namespace EventsVersioning.Tests.ExplicitSerialization;
 
 using static ShoppingCartEvent;
 
-public abstract class StronglyTypedValue<T>: IEquatable<StronglyTypedValue<T>> where T : notnull
+public abstract class StronglyTypedValue<T>(T value): IEquatable<StronglyTypedValue<T>>
+    where T : notnull
 {
-    public T Value { get; }
-
-    protected StronglyTypedValue(T value) => Value = value;
+    public T Value { get; } = value;
 
     public override string ToString() => Value.ToString()!;
 
@@ -157,10 +156,8 @@ public record Money(
     Currency Currency
 );
 
-public class Price: StronglyTypedValue<Money>
+public class Price(Money value): StronglyTypedValue<Money>(value)
 {
-    public Price(Money value): base(value) { }
-
     public static Price Parse(Money value)
     {
         if (!value.Amount.IsPositive)

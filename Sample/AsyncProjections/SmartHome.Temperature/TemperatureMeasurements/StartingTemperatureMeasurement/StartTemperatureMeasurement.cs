@@ -16,14 +16,9 @@ public record StartTemperatureMeasurement(
     }
 }
 
-public class HandleStartTemperatureMeasurement:
+public class HandleStartTemperatureMeasurement(IMartenRepository<TemperatureMeasurement> repository):
     ICommandHandler<StartTemperatureMeasurement>
 {
-    private readonly IMartenRepository<TemperatureMeasurement> repository;
-
-    public HandleStartTemperatureMeasurement(IMartenRepository<TemperatureMeasurement> repository) =>
-        this.repository = repository;
-
     public Task Handle(StartTemperatureMeasurement command, CancellationToken ct) =>
         repository.Add(
             TemperatureMeasurement.Start(

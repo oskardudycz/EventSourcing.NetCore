@@ -6,39 +6,36 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Helpdesk.Api.Tests.Incidents;
 
-public class ResolveIncidentTests: IClassFixture<ApiWithLoggedIncident>
+public class ResolveIncidentTests(ApiWithLoggedIncident api): IClassFixture<ApiWithLoggedIncident>
 {
     [Fact]
     [Trait("Category", "Acceptance")]
     public async Task ResolveCommand_Succeeds()
     {
-        await API
+        await api
             .Given()
             .When(
                 POST,
-                URI($"/api/agents/{agentId}/incidents/{API.Incident.Id}/resolve"),
+                URI($"/api/agents/{agentId}/incidents/{api.Incident.Id}/resolve"),
                 BODY(new ResolveIncidentRequest(resolutionType)),
                 HEADERS(IF_MATCH(1))
             )
             .Then(OK);
 
-        await API
+        await api
             .Given()
             .When(
                 GET,
-                URI($"/api/incidents/{API.Incident.Id}")
+                URI($"/api/incidents/{api.Incident.Id}")
             )
             .Then(
                 OK,
                 RESPONSE_BODY(
-                    API.Incident with { Status = IncidentStatus.Resolved, Version = 2 }
+                    api.Incident with { Status = IncidentStatus.Resolved, Version = 2 }
                 )
             );
     }
 
     private readonly Guid agentId = Guid.NewGuid();
     private readonly ResolutionType resolutionType = new Faker().PickRandom<ResolutionType>();
-    private readonly ApiWithLoggedIncident API;
-
-    public ResolveIncidentTests(ApiWithLoggedIncident api) => API = api;
 }

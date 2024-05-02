@@ -45,15 +45,8 @@ public class ClassesWithMediatRTest
             ValueTask.FromResult(new AdminAdded(@event.FirstName, @event.LastName));
     }
 
-    public class HandleAdminAdded: IEventHandler<AdminAdded>
+    public class HandleAdminAdded(AdminStorage adminStorage): IEventHandler<AdminAdded>
     {
-        private readonly AdminStorage adminStorage;
-
-        public HandleAdminAdded(AdminStorage adminStorage)
-        {
-            this.adminStorage = adminStorage;
-        }
-
         public ValueTask Handle(AdminAdded @event, CancellationToken ct)
         {
             adminStorage.GlobalAdmins.Add(@event);
@@ -71,15 +64,8 @@ public class ClassesWithMediatRTest
                 .ToList());
     }
 
-    public class HandleAdminGrantedInTenant: IEventHandler<AdminGrantedInTenant>
+    public class HandleAdminGrantedInTenant(AdminStorage adminStorage): IEventHandler<AdminGrantedInTenant>
     {
-        private readonly AdminStorage adminStorage;
-
-        public HandleAdminGrantedInTenant(AdminStorage adminStorage)
-        {
-            this.adminStorage = adminStorage;
-        }
-
         public ValueTask Handle(AdminGrantedInTenant @event, CancellationToken ct)
         {
             adminStorage.AdminsInTenants.Add(@event);

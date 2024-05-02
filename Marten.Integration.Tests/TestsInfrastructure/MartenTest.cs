@@ -24,9 +24,12 @@ public class MartenCollection : ICollectionFixture<MartenFixture>
 }
 
 [Collection("MartenIntegrationTests")]
-public abstract class MartenTest: IAsyncLifetime
+public abstract class MartenTest(
+    PostgreSqlContainer postgreSqlContainer,
+    bool shouldCreateSession = true,
+    bool useRandomSchema = true)
+    : IAsyncLifetime
 {
-    private PostgreSqlContainer postgreSqlContainer;
     protected IDocumentSession Session => session ?? throw new InvalidOperationException("Session is not initialised!");
 
     private IDocumentSession? session;
@@ -35,16 +38,7 @@ public abstract class MartenTest: IAsyncLifetime
 
     protected IEventStore EventStore => Session.Events;
 
-    protected readonly string SchemaName;
-    private readonly bool shouldCreateSession;
-
-    protected MartenTest(PostgreSqlContainer postgreSqlContainer, bool shouldCreateSession = true, bool useRandomSchema = true)
-    {
-        this.postgreSqlContainer = postgreSqlContainer;
-        this.shouldCreateSession = shouldCreateSession;
-
-        SchemaName = useRandomSchema ? "sch" + Guid.NewGuid().ToString().Replace("-", string.Empty) : "EventStore";
-    }
+    protected readonly string SchemaName = useRandomSchema ? "sch" + Guid.NewGuid().ToString().Replace("-", string.Empty) : "EventStore";
 
     protected virtual IDocumentSession CreateSession(Action<StoreOptions>? storeOptions = null)
     {

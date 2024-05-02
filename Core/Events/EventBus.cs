@@ -12,23 +12,13 @@ public interface IEventBus
     Task Publish(IEventEnvelope @event, CancellationToken ct);
 }
 
-public class EventBus: IEventBus
+public class EventBus(
+    IServiceProvider serviceProvider,
+    IActivityScope activityScope,
+    AsyncPolicy retryPolicy)
+    : IEventBus
 {
-    private readonly IServiceProvider serviceProvider;
-    private readonly IActivityScope activityScope;
-    private readonly AsyncPolicy retryPolicy;
     private static readonly ConcurrentDictionary<Type, MethodInfo> PublishMethods = new();
-
-    public EventBus(
-        IServiceProvider serviceProvider,
-        IActivityScope activityScope,
-        AsyncPolicy retryPolicy
-    )
-    {
-        this.serviceProvider = serviceProvider;
-        this.activityScope = activityScope;
-        this.retryPolicy = retryPolicy;
-    }
 
     private async Task Publish<TEvent>(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct)
         where TEvent : notnull

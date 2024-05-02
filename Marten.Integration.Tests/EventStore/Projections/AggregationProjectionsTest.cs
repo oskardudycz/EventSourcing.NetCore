@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections;
 
-public class AggregationProjectionsTest: MartenTest
+public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
         Guid IssueId,
@@ -125,6 +125,4 @@ public class AggregationProjectionsTest: MartenTest
         issuesListFromInlineAggregation!.Issues.Count.Should().Be(2);
         projection!.Descriptions.Count.Should().Be(2);
     }
-
-    public AggregationProjectionsTest(MartenFixture fixture): base(fixture.PostgreSqlContainer) { }
 }

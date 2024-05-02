@@ -3,27 +3,14 @@ using Core.Events;
 
 namespace MeetingsSearch.Meetings.CreatingMeeting;
 
-internal class MeetingCreated
+internal class MeetingCreated(Guid meetingId, string name)
 {
-    public Guid MeetingId { get; }
-    public string Name { get; }
-
-    public MeetingCreated(Guid meetingId, string name)
-    {
-        MeetingId = meetingId;
-        Name = name;
-    }
+    public Guid MeetingId { get; } = meetingId;
+    public string Name { get; } = name;
 }
 
-internal class HandleMeetingCreated: IEventHandler<MeetingCreated>
+internal class HandleMeetingCreated(IElasticSearchRepository<Meeting> repository): IEventHandler<MeetingCreated>
 {
-    private readonly IElasticSearchRepository<Meeting> repository;
-
-    public HandleMeetingCreated(IElasticSearchRepository<Meeting> repository)
-    {
-        this.repository = repository;
-    }
-
     public Task Handle(MeetingCreated @event, CancellationToken cancellationToken)
     {
         var meeting = new Meeting(@event.MeetingId, @event.Name);

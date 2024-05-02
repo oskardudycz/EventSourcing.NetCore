@@ -17,19 +17,12 @@ public record DiscardPayment(
     }
 }
 
-public class HandleDiscardPayment:
-    ICommandHandler<DiscardPayment>
+public class HandleDiscardPayment(
+    ExternalServicesConfig externalServicesConfig,
+    IExternalCommandBus externalCommandBus)
+    :
+        ICommandHandler<DiscardPayment>
 {
-    private readonly ExternalServicesConfig externalServicesConfig;
-    private readonly IExternalCommandBus externalCommandBus;
-
-    public HandleDiscardPayment(ExternalServicesConfig externalServicesConfig,
-        IExternalCommandBus externalCommandBus)
-    {
-        this.externalServicesConfig = externalServicesConfig;
-        this.externalCommandBus = externalCommandBus;
-    }
-
     public async Task Handle(DiscardPayment command, CancellationToken ct)
     {
         await externalCommandBus.Delete(

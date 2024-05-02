@@ -4,14 +4,8 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace ECommerce.Storage;
 
-public class ECommerceDbContext: DbContext
+public class ECommerceDbContext(DbContextOptions<ECommerceDbContext> options): DbContext(options)
 {
-    public ECommerceDbContext(DbContextOptions<ECommerceDbContext> options)
-        : base(options)
-    {
-
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.SetupShoppingCartsReadModels();

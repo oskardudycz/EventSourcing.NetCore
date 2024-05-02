@@ -8,17 +8,9 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController: Controller
+public class ProductsController(ProductService service, ProductReadOnlyService readOnlyService)
+    : Controller
 {
-    private readonly ProductService service;
-    private readonly ProductReadOnlyService readOnlyService;
-
-    public ProductsController(ProductService service, ProductReadOnlyService readOnlyService)
-    {
-        this.service = service;
-        this.readOnlyService = readOnlyService;
-    }
-
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateProductRequest request,

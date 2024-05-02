@@ -90,14 +90,9 @@ public class Exercise09Projections
         decimal TotalAmount
     );
 
-    public class UserDashboardProjection: Projection
+    public class UserDashboardProjection(NpgsqlConnection databaseConnection): Projection
     {
-        private readonly NpgsqlConnection databaseConnection;
-
-        public UserDashboardProjection(NpgsqlConnection databaseConnection)
-        {
-            this.databaseConnection = databaseConnection;
-        }
+        private readonly NpgsqlConnection databaseConnection = databaseConnection;
 
         public void Apply(UserCreated @event)
         {

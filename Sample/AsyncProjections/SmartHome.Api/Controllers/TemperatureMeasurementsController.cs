@@ -10,22 +10,12 @@ using SmartHome.Temperature.TemperatureMeasurements.StartingTemperatureMeasureme
 namespace SmartHome.Api.Controllers;
 
 [Route("api/temperature-measurements")]
-public class TemperatureMeasurementsController: Controller
+public class TemperatureMeasurementsController(
+    ICommandBus commandBus,
+    IQueryBus queryBus,
+    IIdGenerator idGenerator)
+    : Controller
 {
-    private readonly ICommandBus commandBus;
-    private readonly IQueryBus queryBus;
-    private readonly IIdGenerator idGenerator;
-
-    public TemperatureMeasurementsController(
-        ICommandBus commandBus,
-        IQueryBus queryBus,
-        IIdGenerator idGenerator)
-    {
-        this.commandBus = commandBus;
-        this.queryBus = queryBus;
-        this.idGenerator = idGenerator;
-    }
-
     [HttpGet]
     public Task<IReadOnlyList<TemperatureMeasurement>> Get() =>
         queryBus.Query<GetTemperatureMeasurements, IReadOnlyList<TemperatureMeasurement>>(

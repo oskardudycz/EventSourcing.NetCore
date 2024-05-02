@@ -7,18 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Core.Services;
 
-public abstract class CRUDService<TEntity>: ICRUDService
+public abstract class CRUDService<TEntity>(ICRUDRepository<TEntity> repository, IMapper mapper): ICRUDService
     where TEntity : class, IEntity, new()
 {
-    private readonly ICRUDRepository<TEntity> repository;
-    private readonly IMapper mapper;
-
-    protected CRUDService(ICRUDRepository<TEntity> repository, IMapper mapper)
-    {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
-
     public async Task<TCreateResponse> CreateAsync<TCreateRequest, TCreateResponse>(
         TCreateRequest request,
         CancellationToken ct

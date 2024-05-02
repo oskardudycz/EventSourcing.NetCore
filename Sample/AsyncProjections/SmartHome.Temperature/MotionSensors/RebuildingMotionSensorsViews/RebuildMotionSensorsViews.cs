@@ -5,18 +5,9 @@ namespace SmartHome.Temperature.MotionSensors.RebuildingMotionSensorsViews;
 
 public record RebuildMotionSensorsViews;
 
-public class HandleRebuildMotionSensorsViews :
+public class HandleRebuildMotionSensorsViews(IDocumentSession session):
     ICommandHandler<RebuildMotionSensorsViews>
 {
-    private readonly IDocumentSession session;
-
-    public HandleRebuildMotionSensorsViews(
-        IDocumentSession session
-    )
-    {
-        this.session = session;
-    }
-
     public async Task Handle(RebuildMotionSensorsViews command, CancellationToken ct)
     {
         using var daemon = await session.DocumentStore.BuildProjectionDaemonAsync();

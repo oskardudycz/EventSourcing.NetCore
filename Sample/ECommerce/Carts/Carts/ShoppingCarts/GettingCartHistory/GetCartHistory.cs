@@ -21,14 +21,9 @@ public record GetCartHistory(
     }
 }
 
-internal class HandleGetCartHistory:
+internal class HandleGetCartHistory(IQuerySession querySession):
     IQueryHandler<GetCartHistory, IPagedList<ShoppingCartHistory>>
 {
-    private readonly IQuerySession querySession;
-
-    public HandleGetCartHistory(IQuerySession querySession) =>
-        this.querySession = querySession;
-
     public Task<IPagedList<ShoppingCartHistory>> Handle(GetCartHistory query, CancellationToken cancellationToken)
     {
         var (cartId, pageNumber, pageSize) = query;

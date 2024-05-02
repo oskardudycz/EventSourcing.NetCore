@@ -8,14 +8,9 @@ public record CreateMeeting(
     string Name
 );
 
-internal class HandleCreateMeeting:
+internal class HandleCreateMeeting(IMartenRepository<Meeting> repository):
     ICommandHandler<CreateMeeting>
 {
-    private readonly IMartenRepository<Meeting> repository;
-
-    public HandleCreateMeeting(IMartenRepository<Meeting> repository) =>
-        this.repository = repository;
-
     public Task Handle(CreateMeeting command, CancellationToken ct)
     {
         var (id, name) = command;

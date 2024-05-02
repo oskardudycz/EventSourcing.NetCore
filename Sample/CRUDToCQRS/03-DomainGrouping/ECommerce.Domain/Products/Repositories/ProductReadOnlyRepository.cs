@@ -3,9 +3,4 @@ using ECommerce.Domain.Products.Entity;
 
 namespace ECommerce.Domain.Products.Repositories;
 
-public class ProductReadOnlyRepository: ReadOnlyRepository<Product>
-{
-    public ProductReadOnlyRepository(IQueryable<Product> query) : base(query)
-    {
-    }
-}
+public class ProductReadOnlyRepository(IQueryable<Product> query): ReadOnlyRepository<Product>(query);

@@ -5,15 +5,10 @@ namespace Core.EventStoreDB.Subscriptions;
 
 public record CheckpointStored(string SubscriptionId, ulong? Position, DateTime CheckpointedAt);
 
-public class EventStoreDBSubscriptionCheckpointRepository: ISubscriptionCheckpointRepository
+public class EventStoreDBSubscriptionCheckpointRepository(EventStoreClient eventStoreClient)
+    : ISubscriptionCheckpointRepository
 {
-    private readonly EventStoreClient eventStoreClient;
-
-    public EventStoreDBSubscriptionCheckpointRepository(
-        EventStoreClient eventStoreClient)
-    {
-        this.eventStoreClient = eventStoreClient ?? throw new ArgumentNullException(nameof(eventStoreClient));
-    }
+    private readonly EventStoreClient eventStoreClient = eventStoreClient ?? throw new ArgumentNullException(nameof(eventStoreClient));
 
     public async ValueTask<ulong?> Load(string subscriptionId, CancellationToken ct)
     {

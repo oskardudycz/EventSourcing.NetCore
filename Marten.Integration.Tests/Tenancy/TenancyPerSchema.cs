@@ -11,15 +11,10 @@ public interface ITenancyPerSchemaStoreFactory
     IDocumentStore Get(string? tenantId);
 }
 
-public class TenancyPerSchemaStoreFactory : IDisposable, ITenancyPerSchemaStoreFactory
+public class TenancyPerSchemaStoreFactory(Action<string, StoreOptions> configure)
+    : IDisposable, ITenancyPerSchemaStoreFactory
 {
-    private readonly Action<string, StoreOptions> configure;
     private readonly ConcurrentDictionary<string, DocumentStore> stores = new ();
-
-    public TenancyPerSchemaStoreFactory(Action<string, StoreOptions> configure)
-    {
-        this.configure = configure;
-    }
 
     public IDocumentStore Get(string? tenant)
     {
@@ -46,17 +41,11 @@ public class DummyTenancyContext
     public string? TenantId { get; set; }
 }
 
-public class TenancyPerSchemaSessionFactory: ISessionFactory
+public class TenancyPerSchemaSessionFactory(
+    ITenancyPerSchemaStoreFactory storeFactory,
+    DummyTenancyContext tenancyContext)
+    : ISessionFactory
 {
-    private readonly ITenancyPerSchemaStoreFactory storeFactory;
-    private readonly DummyTenancyContext tenancyContext;
-
-    public TenancyPerSchemaSessionFactory(ITenancyPerSchemaStoreFactory storeFactory, DummyTenancyContext tenancyContext)
-    {
-        this.storeFactory = storeFactory;
-        this.tenancyContext = tenancyContext;
-    }
-
     public IQuerySession QuerySession()
     {
         return storeFactory.Get(tenancyContext.TenantId).QuerySession();
@@ -73,15 +62,10 @@ public record TestDocumentForTenancy(
     string Name
 );
 
-public class TenancyPerSchema: MartenTest
+public class TenancyPerSchema(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, false)
 {
     private const string FirstTenant = "Tenant1";
     private const string SecondTenant = "Tenant2";
-
-    public TenancyPerSchema(MartenFixture fixture): base(fixture.PostgreSqlContainer, false)
-    {
-
-    }
 
     [Fact]
     public void GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()

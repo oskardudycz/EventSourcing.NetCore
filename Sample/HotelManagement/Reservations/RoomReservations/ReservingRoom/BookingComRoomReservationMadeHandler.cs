@@ -22,19 +22,10 @@ public record BookingComRoomReservationMade
 
 public delegate ValueTask<GuestId> GetGuestId(GetGuestIdByExternalId query, CancellationToken ct);
 
-public class BookingComRoomReservationMadeHandler: IEventHandler<BookingComRoomReservationMade>
+public class BookingComRoomReservationMadeHandler(
+    IDocumentSession session,
+    GetGuestId getGuestId): IEventHandler<BookingComRoomReservationMade>
 {
-    private readonly IDocumentSession session;
-    private readonly GetGuestId getGuestId;
-
-    public BookingComRoomReservationMadeHandler(
-        IDocumentSession session,
-        GetGuestId getGuestId)
-    {
-        this.session = session;
-        this.getGuestId = getGuestId;
-    }
-
     public async Task Handle(BookingComRoomReservationMade @event, CancellationToken ct)
     {
         var (bookingComReservationId, roomTypeText, from, to, bookingComGuestId, numberOfPeople, madeAt) = @event;

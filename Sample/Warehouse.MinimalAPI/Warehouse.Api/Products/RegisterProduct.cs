@@ -2,20 +2,11 @@
 
 namespace Warehouse.Api.Products;
 
-internal class HandleRegisterProduct : ICommandHandler<RegisterProduct>
+internal class HandleRegisterProduct(
+    Func<Product, CancellationToken, ValueTask> addProduct,
+    Func<SKU, CancellationToken, ValueTask<bool>> productWithSKUExists)
+    : ICommandHandler<RegisterProduct>
 {
-    private readonly Func<Product, CancellationToken, ValueTask> addProduct;
-    private readonly Func<SKU, CancellationToken, ValueTask<bool>> productWithSKUExists;
-
-    public HandleRegisterProduct(
-        Func<Product, CancellationToken, ValueTask> addProduct,
-        Func<SKU, CancellationToken, ValueTask<bool>> productWithSKUExists
-    )
-    {
-        this.addProduct = addProduct;
-        this.productWithSKUExists = productWithSKUExists;
-    }
-
     public async Task Handle(RegisterProduct command, CancellationToken ct)
     {
         var product = new Product(

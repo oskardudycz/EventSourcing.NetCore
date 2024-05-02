@@ -6,16 +6,8 @@ using Tickets.Maintenance.Commands;
 namespace Tickets.Api.Controllers;
 
 [Route("api/[controller]")]
-public class MaintenanceController: Controller
+public class MaintenanceController(ICommandBus commandBus): Controller
 {
-    private readonly ICommandBus commandBus;
-
-    public MaintenanceController(
-        ICommandBus commandBus)
-    {
-        this.commandBus = commandBus;
-    }
-
     [HttpPost("projections/rebuild")]
     public async Task<IActionResult> Rebuild([FromBody] RebuildProjectionRequest request)
     {

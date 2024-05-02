@@ -6,16 +6,11 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Orders.Api.Tests.Orders.InitializingOrder;
 
-public class InitializeOrderTests: IClassFixture<TestWebApplicationFactory<Program>>
+public class InitializeOrderTests(TestWebApplicationFactory<Program> fixture)
+    : IClassFixture<TestWebApplicationFactory<Program>>
 {
-    private readonly ApiSpecification<Program> API;
-    private readonly TestWebApplicationFactory<Program> fixture;
-
-    public InitializeOrderTests(TestWebApplicationFactory<Program> fixture)
-    {
-        this.fixture = fixture;
-        API = ApiSpecification<Program>.Setup(fixture);
-    }
+    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(fixture);
+    private readonly TestWebApplicationFactory<Program> fixture = fixture;
 
     [Fact]
     [Trait("Category", "Acceptance")]

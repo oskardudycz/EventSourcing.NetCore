@@ -8,21 +8,12 @@ using Microsoft.Net.Http.Headers;
 
 namespace Core.WebApi.OptimisticConcurrency;
 
-public class OptimisticConcurrencyMiddleware
+public class OptimisticConcurrencyMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
     private readonly string[] SupportedMethods =
     [
         HttpMethod.Post.Method, HttpMethod.Put.Method, HttpMethod.Delete.Method
     ];
-
-    public OptimisticConcurrencyMiddleware(
-        RequestDelegate next
-    )
-    {
-        this.next = next;
-    }
 
     public async Task Invoke(
         HttpContext context,

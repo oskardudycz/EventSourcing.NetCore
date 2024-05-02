@@ -3,24 +3,13 @@ using Core.OptimisticConcurrency;
 
 namespace Core.Marten.Repository;
 
-public class MartenRepositoryWithETagDecorator<T>: IMartenRepository<T>
+public class MartenRepositoryWithETagDecorator<T>(
+    IMartenRepository<T> inner,
+    IExpectedResourceVersionProvider expectedResourceVersionProvider,
+    INextResourceVersionProvider nextResourceVersionProvider)
+    : IMartenRepository<T>
     where T : class, IAggregate
 {
-    private readonly IMartenRepository<T> inner;
-    private readonly IExpectedResourceVersionProvider expectedResourceVersionProvider;
-    private readonly INextResourceVersionProvider nextResourceVersionProvider;
-
-    public MartenRepositoryWithETagDecorator(
-        IMartenRepository<T> inner,
-        IExpectedResourceVersionProvider expectedResourceVersionProvider,
-        INextResourceVersionProvider nextResourceVersionProvider
-    )
-    {
-        this.inner = inner;
-        this.expectedResourceVersionProvider = expectedResourceVersionProvider;
-        this.nextResourceVersionProvider = nextResourceVersionProvider;
-    }
-
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         inner.Find(id, cancellationToken);
 

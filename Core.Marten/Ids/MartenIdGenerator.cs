@@ -4,14 +4,9 @@ using Marten.Schema.Identity;
 
 namespace Core.Marten.Ids;
 
-public class MartenIdGenerator : IIdGenerator
+public class MartenIdGenerator(IDocumentSession documentSession): IIdGenerator
 {
-    private readonly IDocumentSession documentSession;
-
-    public MartenIdGenerator(IDocumentSession documentSession)
-    {
-        this.documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
-    }
+    private readonly IDocumentSession documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
 
     public Guid New() => CombGuidIdGeneration.NewGuid();
 }

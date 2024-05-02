@@ -16,14 +16,9 @@ public record ConfirmShoppingCart(
     }
 }
 
-internal class HandleConfirmCart:
+internal class HandleConfirmCart(IEventStoreDBRepository<ShoppingCart> cartRepository):
     ICommandHandler<ConfirmShoppingCart>
 {
-    private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
-
-    public HandleConfirmCart(IEventStoreDBRepository<ShoppingCart> cartRepository) =>
-        this.cartRepository = cartRepository;
-
     public Task Handle(ConfirmShoppingCart command, CancellationToken ct) =>
         cartRepository.GetAndUpdate(
             command.CartId,

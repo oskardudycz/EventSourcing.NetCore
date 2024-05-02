@@ -6,12 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace ECommerce.Controllers;
 
 [ApiController]
-public class ProductsReadOnlyController: Controller
+public class ProductsReadOnlyController(IQueryable<Product> products): Controller
 {
-    private readonly IQueryable<Product> products;
-
-    public ProductsReadOnlyController(IQueryable<Product> products) => this.products = products;
-
     [HttpGet("api/products/{id:guid}")]
     public Task<ProductDetailsResponse?> GetById([FromRoute] Guid id, CancellationToken ct) =>
         products.HandleAsync(new GetProductById(id), ct);

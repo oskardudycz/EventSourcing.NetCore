@@ -10,17 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace MeetingsManagement.Api.Controllers;
 
 [Route("api/[controller]")]
-public class MeetingsController: Controller
+public class MeetingsController(ICommandBus commandBus, IQueryBus queryBus): Controller
 {
-    private readonly ICommandBus commandBus;
-    private readonly IQueryBus queryBus;
-
-    public MeetingsController(ICommandBus commandBus, IQueryBus queryBus)
-    {
-        this.commandBus = commandBus;
-        this.queryBus = queryBus;
-    }
-
     [HttpGet("{id}")]
     public async Task<MeetingView> Get(Guid id)
     {

@@ -5,23 +5,12 @@ using Polly;
 
 namespace Core.Queries;
 
-public class QueryBus: IQueryBus
+public class QueryBus(
+    IServiceProvider serviceProvider,
+    IActivityScope activityScope,
+    AsyncPolicy retryPolicy)
+    : IQueryBus
 {
-    private readonly IServiceProvider serviceProvider;
-    private readonly AsyncPolicy retryPolicy;
-    private readonly IActivityScope activityScope;
-
-    public QueryBus(
-        IServiceProvider serviceProvider,
-        IActivityScope activityScope,
-        AsyncPolicy retryPolicy
-    )
-    {
-        this.serviceProvider = serviceProvider;
-        this.retryPolicy = retryPolicy;
-        this.activityScope = activityScope;
-    }
-
     public Task<TResponse> Query<TQuery, TResponse>(TQuery query, CancellationToken ct = default)
         where TQuery : notnull
     {

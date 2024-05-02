@@ -1,13 +1,9 @@
 namespace EventStoreBasics;
 
-public class Repository<T>: IRepository<T> where T: IAggregate
+public class Repository<T>(IEventStore eventStore): IRepository<T>
+    where T : IAggregate
 {
-    private readonly IEventStore eventStore;
-
-    public Repository(IEventStore eventStore)
-    {
-        this.eventStore = eventStore ?? throw  new ArgumentNullException(nameof(eventStore));
-    }
+    private readonly IEventStore eventStore = eventStore ?? throw  new ArgumentNullException(nameof(eventStore));
 
     public T Find(Guid id)
     {

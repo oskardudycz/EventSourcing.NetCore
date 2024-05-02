@@ -6,20 +6,11 @@ public interface IExternalEventProducer
 }
 
 
-public class EventBusDecoratorWithExternalProducer: IEventBus
+public class EventBusDecoratorWithExternalProducer(
+    IEventBus eventBus,
+    IExternalEventProducer externalEventProducer)
+    : IEventBus
 {
-    private readonly IEventBus eventBus;
-    private readonly IExternalEventProducer externalEventProducer;
-
-    public EventBusDecoratorWithExternalProducer(
-        IEventBus eventBus,
-        IExternalEventProducer externalEventProducer
-    )
-    {
-        this.eventBus = eventBus;
-        this.externalEventProducer = externalEventProducer;
-    }
-
     public async Task Publish(IEventEnvelope eventEnvelope, CancellationToken ct)
     {
         await eventBus.Publish(eventEnvelope, ct).ConfigureAwait(false);

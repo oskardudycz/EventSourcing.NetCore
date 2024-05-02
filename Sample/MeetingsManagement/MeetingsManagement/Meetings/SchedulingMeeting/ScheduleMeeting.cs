@@ -9,14 +9,9 @@ public record ScheduleMeeting(
     DateRange Occurs
 );
 
-internal class HandleScheduleMeeting:
+internal class HandleScheduleMeeting(IMartenRepository<Meeting> repository):
     ICommandHandler<ScheduleMeeting>
 {
-    private readonly IMartenRepository<Meeting> repository;
-
-    public HandleScheduleMeeting(IMartenRepository<Meeting> repository) =>
-        this.repository = repository;
-
     public Task Handle(ScheduleMeeting command, CancellationToken ct)
     {
         var (meetingId, dateRange) = command;

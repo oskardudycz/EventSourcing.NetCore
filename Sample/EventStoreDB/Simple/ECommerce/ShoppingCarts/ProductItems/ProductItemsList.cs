@@ -1,14 +1,7 @@
 ﻿namespace ECommerce.ShoppingCarts.ProductItems;
 
-public class ProductItemsList
+public class ProductItemsList(List<PricedProductItem> items)
 {
-    private readonly List<PricedProductItem> items;
-
-    public ProductItemsList(List<PricedProductItem> items)
-    {
-        this.items = items;
-    }
-
     public ProductItemsList Add(PricedProductItem productItem)
     {
         var clone = new List<PricedProductItem>(items);

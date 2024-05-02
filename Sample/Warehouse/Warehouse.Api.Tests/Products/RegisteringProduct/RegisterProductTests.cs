@@ -6,12 +6,10 @@ using Xunit;
 
 namespace Warehouse.Api.Tests.Products.RegisteringProduct;
 
-public class RegisterProductTests: IClassFixture<WarehouseTestWebApplicationFactory>
+public class RegisterProductTests(WarehouseTestWebApplicationFactory webApplicationFactory)
+    : IClassFixture<WarehouseTestWebApplicationFactory>
 {
-    private readonly ApiSpecification<Program> API;
-
-    public RegisterProductTests(WarehouseTestWebApplicationFactory webApplicationFactory) =>
-        API = ApiSpecification<Program>.Setup(webApplicationFactory);
+    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(webApplicationFactory);
 
     [Theory]
     [MemberData(nameof(ValidRequests))]

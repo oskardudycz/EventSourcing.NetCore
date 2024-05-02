@@ -31,14 +31,9 @@ public record InitializeOrder(
     }
 }
 
-public class HandleInitializeOrder:
+public class HandleInitializeOrder(IMartenRepository<Order> orderRepository):
     ICommandHandler<InitializeOrder>
 {
-    private readonly IMartenRepository<Order> orderRepository;
-
-    public HandleInitializeOrder(IMartenRepository<Order> orderRepository) =>
-        this.orderRepository = orderRepository;
-
     public Task Handle(InitializeOrder command, CancellationToken ct)
     {
         var (orderId, clientId, productItems, totalPrice) = command;

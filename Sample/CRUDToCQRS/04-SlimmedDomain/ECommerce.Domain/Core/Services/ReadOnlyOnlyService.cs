@@ -6,18 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Domain.Core.Services;
 
-public abstract class ReadOnlyOnlyService<TEntity>: IReadOnlyService<TEntity>
+public abstract class ReadOnlyOnlyService<TEntity>(IQueryable<TEntity> query, IMapper mapper): IReadOnlyService<TEntity>
     where TEntity : class, IEntity, new()
 {
-    private readonly IQueryable<TEntity> query;
-    private readonly IMapper mapper;
-
-    protected ReadOnlyOnlyService(IQueryable<TEntity> query, IMapper mapper)
-    {
-        this.query = query;
-        this.mapper = mapper;
-    }
-
     public async Task<TResponse> GetByIdAsync<TResponse>(Guid id, CancellationToken ct)
     {
         return mapper.Map<TResponse>(await GetEntityByIdAsync(id, ct));

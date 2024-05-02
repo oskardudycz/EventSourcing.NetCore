@@ -20,14 +20,9 @@ public record RemoveProduct(
     }
 }
 
-internal class HandleRemoveProduct:
+internal class HandleRemoveProduct(IEventStoreDBRepository<ShoppingCart> cartRepository):
     ICommandHandler<RemoveProduct>
 {
-    private readonly IEventStoreDBRepository<ShoppingCart> cartRepository;
-
-    public HandleRemoveProduct(IEventStoreDBRepository<ShoppingCart> cartRepository) =>
-        this.cartRepository = cartRepository;
-
     public Task Handle(RemoveProduct command, CancellationToken ct)
     {
         var (cartId, pricedProductItem) = command;

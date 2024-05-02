@@ -1,17 +1,10 @@
 namespace Core.Responses;
 
-public class PagedListResponse<T>
+public class PagedListResponse<T>(IEnumerable<T> items, long totalItemCount, bool hasNextPage)
 {
-    public IReadOnlyList<T> Items { get; }
+    public IReadOnlyList<T> Items { get; } = items.ToList();
 
-    public long TotalItemCount { get; }
+    public long TotalItemCount { get; } = totalItemCount;
 
-    public bool HasNextPage { get; }
-
-    public PagedListResponse(IEnumerable<T> items, long totalItemCount, bool hasNextPage)
-    {
-        Items = items.ToList();
-        TotalItemCount = totalItemCount;
-        HasNextPage = hasNextPage;
-    }
+    public bool HasNextPage { get; } = hasNextPage;
 }

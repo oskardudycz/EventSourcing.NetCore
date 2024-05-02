@@ -25,38 +25,33 @@ public class ConfirmShoppingCartFixture: ApiSpecification<Program>, IAsyncLifeti
     public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class ConfirmShoppingCartTests: IClassFixture<ConfirmShoppingCartFixture>
+public class ConfirmShoppingCartTests(ConfirmShoppingCartFixture api): IClassFixture<ConfirmShoppingCartFixture>
 {
-
-    private readonly ConfirmShoppingCartFixture API;
-
-    public ConfirmShoppingCartTests(ConfirmShoppingCartFixture api) => API = api;
-
     [Fact]
     [Trait("Category", "Acceptance")]
     public async Task Put_Should_Return_OK_And_Cancel_Shopping_Cart()
     {
-        await API
+        await api
             .Given()
             .When(
                 PUT,
-                URI($"/api/ShoppingCarts/{API.ShoppingCartId}/confirmation"),
+                URI($"/api/ShoppingCarts/{api.ShoppingCartId}/confirmation"),
                 HEADERS(IF_MATCH(0))
             )
             .Then(OK);
 
-        await API
+        await api
             .Given()
-            .When(GET, URI($"/api/ShoppingCarts/{API.ShoppingCartId}"))
+            .When(GET, URI($"/api/ShoppingCarts/{api.ShoppingCartId}"))
             .Until(RESPONSE_ETAG_IS(1))
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>
                 {
-                    details.Id.Should().Be(API.ShoppingCartId);
+                    details.Id.Should().Be(api.ShoppingCartId);
                     details.Status.Should().Be(ShoppingCartStatus.Confirmed);
                     details.ProductItems.Should().BeEmpty();
-                    details.ClientId.Should().Be(API.ClientId);
+                    details.ClientId.Should().Be(api.ClientId);
                     details.Version.Should().Be(1);
                 }));
 
