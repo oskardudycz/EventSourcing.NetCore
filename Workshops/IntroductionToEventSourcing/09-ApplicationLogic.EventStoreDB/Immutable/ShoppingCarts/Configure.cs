@@ -1,8 +1,8 @@
-using ApplicationLogic.Marten.Core.Marten;
-using ApplicationLogic.Marten.Immutable.Pricing;
+using ApplicationLogic.EventStoreDB.Core.Marten;
+using ApplicationLogic.EventStoreDB.Immutable.Pricing;
 using Marten;
 
-namespace ApplicationLogic.Marten.Immutable.ShoppingCarts;
+namespace ApplicationLogic.EventStoreDB.Immutable.ShoppingCarts;
 using static ShoppingCartEvent;
 
 public static class Configure

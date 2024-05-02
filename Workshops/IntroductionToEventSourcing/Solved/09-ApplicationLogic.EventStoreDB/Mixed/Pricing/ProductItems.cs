@@ -1,4 +1,4 @@
-namespace ApplicationLogic.Marten.Mixed.Pricing;
+namespace ApplicationLogic.EventStoreDB.Mixed.Pricing;
 
 public class PricedProductItem
 {

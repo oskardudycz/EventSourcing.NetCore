@@ -1,7 +1,7 @@
-using ApplicationLogic.Marten.Core.Exceptions;
-using ApplicationLogic.Marten.Immutable.ShoppingCarts;
-using ApplicationLogic.Marten.Mixed.ShoppingCarts;
-using ApplicationLogic.Marten.Mutable.ShoppingCarts;
+using ApplicationLogic.EventStoreDB.Core.Exceptions;
+using ApplicationLogic.EventStoreDB.Immutable.ShoppingCarts;
+using ApplicationLogic.EventStoreDB.Mixed.ShoppingCarts;
+using ApplicationLogic.EventStoreDB.Mutable.ShoppingCarts;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics;
 using Oakton;
@@ -68,6 +68,9 @@ if (app.Environment.IsDevelopment())
 
 return await app.RunOaktonCommands(args);
 
-public partial class Program
+namespace ApplicationLogic.EventStoreDB
 {
+    public partial class Program
+    {
+    }
 }

@@ -1,4 +1,4 @@
-namespace ApplicationLogic.Marten.Core.Exceptions;
+namespace ApplicationLogic.EventStoreDB.Core.Exceptions;
 
 public class NotFoundException: Exception
 {

@@ -6,7 +6,7 @@ using Xunit.Sdk;
 [assembly: TestFramework("OptimisticConcurrency.Marten.Tests.AssemblyFixture", "OptimisticConcurrency.Marten.Tests")]
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
-namespace OptimisticConcurrency.Marten.Tests;
+namespace OptimisticConcurrency.EventStoreDB.Tests;
 
 public sealed class AssemblyFixture : XunitTestFramework
 {

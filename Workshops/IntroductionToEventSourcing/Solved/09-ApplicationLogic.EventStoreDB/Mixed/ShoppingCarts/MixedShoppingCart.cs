@@ -1,6 +1,6 @@
-using ApplicationLogic.Marten.Mixed.Pricing;
+using ApplicationLogic.EventStoreDB.Mixed.Pricing;
 
-namespace ApplicationLogic.Marten.Mixed.ShoppingCarts;
+namespace ApplicationLogic.EventStoreDB.Mixed.ShoppingCarts;
 
 using static ShoppingCartEvent;
 

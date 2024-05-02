@@ -1,7 +1,7 @@
-using ApplicationLogic.Marten.Core.Entities;
+using ApplicationLogic.EventStoreDB.Core.Entities;
 using Marten;
 
-namespace ApplicationLogic.Marten.Core.Marten;
+namespace ApplicationLogic.EventStoreDB.Core.Marten;
 
 public static class DocumentSessionExtensions
 {

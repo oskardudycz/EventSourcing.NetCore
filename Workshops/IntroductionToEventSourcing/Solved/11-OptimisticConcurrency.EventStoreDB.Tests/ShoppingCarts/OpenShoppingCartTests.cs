@@ -1,10 +1,10 @@
 using Ogooreck.API;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
-using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Scenarios;
-using static OptimisticConcurrency.Marten.Tests.ShoppingCarts.Fixtures;
+using static OptimisticConcurrency.EventStoreDB.Tests.ShoppingCarts.Scenarios;
+using static OptimisticConcurrency.EventStoreDB.Tests.ShoppingCarts.Fixtures;
 
-namespace OptimisticConcurrency.Marten.Tests.ShoppingCarts;
+namespace OptimisticConcurrency.EventStoreDB.Tests.ShoppingCarts;
 
 public class OpenShoppingCartTests(ApiSpecification<Program> api):
     IClassFixture<ApiSpecification<Program>>

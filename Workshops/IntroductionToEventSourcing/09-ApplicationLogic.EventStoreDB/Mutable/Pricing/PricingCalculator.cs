@@ -1,4 +1,4 @@
-namespace ApplicationLogic.Marten.Mutable.Pricing;
+namespace ApplicationLogic.EventStoreDB.Mutable.Pricing;
 
 public interface IProductPriceCalculator
 {

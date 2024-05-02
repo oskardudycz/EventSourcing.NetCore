@@ -1,4 +1,4 @@
-namespace ApplicationLogic.Marten.Immutable.Pricing;
+namespace ApplicationLogic.EventStoreDB.Immutable.Pricing;
 
 public record PricedProductItem(
     Guid ProductId,

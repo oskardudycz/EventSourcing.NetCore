@@ -1,8 +1,8 @@
-using ApplicationLogic.Marten.Immutable.ShoppingCarts;
+using ApplicationLogic.EventStoreDB.Immutable.ShoppingCarts;
 using Ogooreck.API;
 using static Ogooreck.API.ApiSpecification;
 
-namespace ApplicationLogic.Marten.Tests.ShoppingCarts;
+namespace ApplicationLogic.EventStoreDB.Tests.ShoppingCarts;
 
 public static class Fixtures
 {

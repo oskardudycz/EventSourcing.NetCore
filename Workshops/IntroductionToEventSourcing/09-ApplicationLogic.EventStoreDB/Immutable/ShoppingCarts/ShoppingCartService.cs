@@ -1,7 +1,6 @@
-using ApplicationLogic.Marten.Immutable.Pricing;
-using Core.Validation;
+using ApplicationLogic.EventStoreDB.Immutable.Pricing;
 
-namespace ApplicationLogic.Marten.Immutable.ShoppingCarts;
+namespace ApplicationLogic.EventStoreDB.Immutable.ShoppingCarts;
 using static ShoppingCartEvent;
 using static ShoppingCartCommand;
 

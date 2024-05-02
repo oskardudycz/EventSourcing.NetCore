@@ -1,4 +1,4 @@
-namespace ApplicationLogic.Marten.Core.Entities;
+namespace ApplicationLogic.EventStoreDB.Core.Entities;
 
 public interface IAggregate
 {

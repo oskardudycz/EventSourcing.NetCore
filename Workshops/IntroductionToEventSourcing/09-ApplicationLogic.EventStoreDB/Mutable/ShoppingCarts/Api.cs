@@ -1,5 +1,5 @@
-using ApplicationLogic.Marten.Core.Marten;
-using ApplicationLogic.Marten.Mutable.Pricing;
+using ApplicationLogic.EventStoreDB.Core.Marten;
+using ApplicationLogic.EventStoreDB.Mutable.Pricing;
 using Core.Validation;
 using Marten;
 using Marten.Schema.Identity;
@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static System.DateTimeOffset;
 
-namespace ApplicationLogic.Marten.Mutable.ShoppingCarts;
+namespace ApplicationLogic.EventStoreDB.Mutable.ShoppingCarts;
 
 public static class Api
 {
