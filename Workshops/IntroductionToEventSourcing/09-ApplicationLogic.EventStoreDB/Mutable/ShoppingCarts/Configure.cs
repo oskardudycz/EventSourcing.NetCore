@@ -1,31 +1,35 @@
-using ApplicationLogic.EventStoreDB.Core.Marten;
 using ApplicationLogic.EventStoreDB.Mutable.Pricing;
-using Marten;
+using EventStore.Client;
+using ApplicationLogic.EventStoreDB.Core.EventStoreDB;
 
 namespace ApplicationLogic.EventStoreDB.Mutable.ShoppingCarts;
-using static ShoppingCartEvent;
 
 public static class Configure
 {
-    private const string ModulePrefix = "mutable";
-
-    public  static IServiceCollection AddMutableShoppingCarts(this IServiceCollection services)
-    {
+    public static IServiceCollection AddMutableShoppingCarts(this IServiceCollection services) =>
         services.AddSingleton<IProductPriceCalculator>(FakeProductPriceCalculator.Returning(100));
 
-        return services;
-    }
-    public static StoreOptions ConfigureMutableShoppingCarts(this StoreOptions options)
-    {
-        options.Projections.LiveStreamAggregation<MutableShoppingCart>();
+    public static Task GetAndUpdate(
+        this EventStoreClient eventStore,
+        Guid id,
+        Action<ShoppingCart> handle,
+        CancellationToken ct
+    ) =>
+        eventStore.GetAndUpdate<ShoppingCart, ShoppingCartEvent>(
+            ShoppingCart.Initial,
+            id,
+            handle,
+            ct
+        );
 
-        // this is needed as we're sharing document store and have event types with the same name
-        options.MapEventWithPrefix<ShoppingCartOpened>(ModulePrefix);
-        options.MapEventWithPrefix<ProductItemAddedToShoppingCart>(ModulePrefix);
-        options.MapEventWithPrefix<ProductItemRemovedFromShoppingCart>(ModulePrefix);
-        options.MapEventWithPrefix<ShoppingCartConfirmed>(ModulePrefix);
-        options.MapEventWithPrefix<ShoppingCartCanceled>(ModulePrefix);
-
-        return options;
-    }
+    public static Task<ShoppingCart?> GetShoppingCart(
+        this EventStoreClient eventStore,
+        Guid id,
+        CancellationToken ct
+    ) =>
+        eventStore.AggregateStream<ShoppingCart, ShoppingCartEvent>(
+            ShoppingCart.Initial,
+            id,
+            ct
+        );
 }

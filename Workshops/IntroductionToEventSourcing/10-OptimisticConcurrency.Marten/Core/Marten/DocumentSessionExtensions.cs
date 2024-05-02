@@ -33,10 +33,9 @@ public static class DocumentSessionExtensions
         Action<T> handle,
         CancellationToken ct
     ) where T : class, IAggregate =>
-        documentSession.Events.WriteToAggregate<T>(id, stream =>
+        documentSession.GetAndUpdate<T>(id, state =>
         {
-            var aggregate = stream.Aggregate ?? throw NotFoundException.For<T>(id);
-            handle(aggregate);
-            stream.AppendMany(aggregate.DequeueUncommittedEvents());
+            handle(state);
+            return state.DequeueUncommittedEvents();
         }, ct);
 }

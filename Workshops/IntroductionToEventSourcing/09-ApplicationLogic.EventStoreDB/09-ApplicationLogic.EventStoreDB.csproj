@@ -9,13 +9,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten.CommandLine" Version="7.8.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Marten.AspNetCore" Version="7.8.0" />
-        <PackageReference Include="Marten" Version="7.8.0" />
+        <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.2.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Core.csproj" />
+        <ProjectReference Include="..\..\..\Core\Core.csproj" />
     </ItemGroup>
 </Project>
