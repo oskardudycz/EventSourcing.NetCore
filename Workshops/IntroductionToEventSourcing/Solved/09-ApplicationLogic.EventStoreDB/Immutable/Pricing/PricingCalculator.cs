@@ -1,6 +1,4 @@
-using ApplicationLogic.Marten.Immutable.ShoppingCarts;
-
-namespace ApplicationLogic.Marten.Immutable.Pricing;
+namespace ApplicationLogic.EventStoreDB.Immutable.Pricing;
 
 public interface IProductPriceCalculator
 {

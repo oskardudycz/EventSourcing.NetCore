@@ -1,5 +1,5 @@
-using ApplicationLogic.Marten.Core.Marten;
-using ApplicationLogic.Marten.Immutable.Pricing;
+using ApplicationLogic.EventStoreDB.Core.Marten;
+using ApplicationLogic.EventStoreDB.Immutable.Pricing;
 using Core.Validation;
 using Marten;
 using Marten.Schema.Identity;
@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static System.DateTimeOffset;
 
-namespace ApplicationLogic.Marten.Immutable.ShoppingCarts;
+namespace ApplicationLogic.EventStoreDB.Immutable.ShoppingCarts;
 
 using static ShoppingCartService;
 using static ShoppingCartCommand;

@@ -2,7 +2,7 @@ using Ogooreck.API;
 using OptimisticConcurrency.Immutable.ShoppingCarts;
 using static Ogooreck.API.ApiSpecification;
 
-namespace OptimisticConcurrency.Marten.Tests.ShoppingCarts;
+namespace OptimisticConcurrency.EventStoreDB.Tests.ShoppingCarts;
 
 public static class Fixtures
 {
