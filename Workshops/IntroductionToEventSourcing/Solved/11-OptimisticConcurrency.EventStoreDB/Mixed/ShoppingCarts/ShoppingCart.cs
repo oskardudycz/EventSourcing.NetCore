@@ -41,7 +41,7 @@ public abstract record ShoppingCartEvent
 
 // ENTITY
 // Note: We need to have prefix to be able to register multiple streams with the same name
-public class MixedShoppingCart
+public class ShoppingCart
 {
     public Guid Id { get; private set; }
     public Guid ClientId { get; private set; }
@@ -49,12 +49,10 @@ public class MixedShoppingCart
     public IList<PricedProductItem> ProductItems { get; } = new List<PricedProductItem>();
     public DateTimeOffset? ConfirmedAt { get; private set; }
     public DateTimeOffset? CanceledAt { get; private set; }
-    // Marten will set it by convention during stream aggregation
-    public int Version { get; set; }
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    public void Apply(ShoppingCartEvent @event)
+    public void Evolve(ShoppingCartEvent @event)
     {
         switch (@event)
         {
@@ -76,7 +74,7 @@ public class MixedShoppingCart
         }
     }
 
-    public static (ShoppingCartOpened, MixedShoppingCart) Open(
+    public static (ShoppingCartOpened, ShoppingCart) Open(
         Guid cartId,
         Guid clientId,
         DateTimeOffset now
@@ -88,16 +86,16 @@ public class MixedShoppingCart
             now
         );
 
-        return (@event, new MixedShoppingCart(@event));
+        return (@event, new ShoppingCart(@event));
     }
 
-    public static MixedShoppingCart Initial() => new();
+    public static ShoppingCart Initial() => new();
 
-    private MixedShoppingCart(ShoppingCartOpened @event) =>
+    private ShoppingCart(ShoppingCartOpened @event) =>
         Apply(@event);
 
     //just for default creation of empty object
-    private MixedShoppingCart() { }
+    private ShoppingCart() { }
 
     private void Apply(ShoppingCartOpened opened)
     {

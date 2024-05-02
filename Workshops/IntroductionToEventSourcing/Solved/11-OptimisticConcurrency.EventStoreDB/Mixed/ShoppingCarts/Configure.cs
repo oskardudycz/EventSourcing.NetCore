@@ -1,31 +1,47 @@
-using Marten;
-using OptimisticConcurrency.Core.Marten;
+using EventStore.Client;
+using OptimisticConcurrency.Core.EventStoreDB;
 using OptimisticConcurrency.Mixed.Pricing;
 
 namespace OptimisticConcurrency.Mixed.ShoppingCarts;
-using static ShoppingCartEvent;
 
 public static class Configure
 {
-    private const string ModulePrefix = "Mixed";
-
-    public  static IServiceCollection AddMixedShoppingCarts(this IServiceCollection services)
-    {
+    public  static IServiceCollection AddMixedShoppingCarts(this IServiceCollection services) =>
         services.AddSingleton<IProductPriceCalculator>(FakeProductPriceCalculator.Returning(100));
 
-        return services;
-    }
-    public static StoreOptions ConfigureMixedShoppingCarts(this StoreOptions options)
-    {
-        options.Projections.LiveStreamAggregation<MixedShoppingCart>();
+    public static Task<StreamRevision> GetAndUpdate(
+        this EventStoreClient eventStore,
+        Guid id,
+        StreamRevision expectedRevision,
+        Func<ShoppingCart, ShoppingCartEvent[]> handle,
+        CancellationToken ct
+    ) =>
+        eventStore.GetAndUpdate(
+            (state, @event) =>
+            {
+                state.Evolve(@event);
+                return state;
+            },
+            ShoppingCart.Initial,
+            id,
+            expectedRevision,
+            handle,
+            ct
+        );
 
-        // this is needed as we're sharing document store and have event types with the same name
-        options.MapEventWithPrefix<ShoppingCartOpened>(ModulePrefix);
-        options.MapEventWithPrefix<ProductItemAddedToShoppingCart>(ModulePrefix);
-        options.MapEventWithPrefix<ProductItemRemovedFromShoppingCart>(ModulePrefix);
-        options.MapEventWithPrefix<ShoppingCartConfirmed>(ModulePrefix);
-        options.MapEventWithPrefix<ShoppingCartCanceled>(ModulePrefix);
-
-        return options;
-    }
+    public static Task<(ShoppingCart?, StreamRevision?)> GetShoppingCart(
+        this EventStoreClient eventStore,
+        Guid id,
+        CancellationToken ct
+    ) =>
+        eventStore.AggregateStream<ShoppingCart, ShoppingCartEvent>(
+            (state, @event) =>
+            {
+                state.Evolve(@event);
+                return state;
+            },
+            ShoppingCart.Initial,
+            id,
+            ct
+        );
 }

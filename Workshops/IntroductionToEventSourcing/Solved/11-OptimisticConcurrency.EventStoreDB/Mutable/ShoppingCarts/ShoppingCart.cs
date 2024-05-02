@@ -42,19 +42,17 @@ public abstract record ShoppingCartEvent
 
 // ENTITY
 // Note: We need to have prefix to be able to register multiple streams with the same name
-public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
+public class ShoppingCart: Aggregate<ShoppingCartEvent>
 {
     public Guid ClientId { get; private set; }
     public ShoppingCartStatus Status { get; private set; }
     public IList<PricedProductItem> ProductItems { get; } = new List<PricedProductItem>();
     public DateTimeOffset? ConfirmedAt { get; private set; }
     public DateTimeOffset? CanceledAt { get; private set; }
-    // Marten will set it by convention during stream aggregation
-    public int Version { get; set; }
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    protected override void Apply(ShoppingCartEvent @event)
+    public override void Evolve(ShoppingCartEvent @event)
     {
         switch (@event)
         {
@@ -76,18 +74,18 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
         }
     }
 
-    public static MutableShoppingCart Open(
+    public static ShoppingCart Open(
         Guid cartId,
         Guid clientId,
         DateTimeOffset now
     )
     {
-        return new MutableShoppingCart(cartId, clientId, now);
+        return new ShoppingCart(cartId, clientId, now);
     }
 
-    public static MutableShoppingCart Initial() => new();
+    public static ShoppingCart Initial() => new();
 
-    private MutableShoppingCart(
+    private ShoppingCart(
         Guid id,
         Guid clientId,
         DateTimeOffset now
@@ -104,7 +102,7 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
     }
 
     //just for default creation of empty object
-    private MutableShoppingCart() { }
+    private ShoppingCart() { }
 
     private void Apply(ShoppingCartOpened opened)
     {

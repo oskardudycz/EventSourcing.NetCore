@@ -18,7 +18,7 @@ public class OpenShoppingCartTests(ApiSpecification<Program> api):
             .When(POST, URI(ShoppingCartsUrl(apiPrefix, ClientId)))
             .Then(
                 CREATED_WITH_DEFAULT_HEADERS(locationHeaderPrefix: ShoppingCartsUrl(apiPrefix, ClientId)),
-                RESPONSE_ETAG_HEADER(1)
+                RESPONSE_ETAG_HEADER(0)
             );
 
     [Theory]
@@ -28,7 +28,7 @@ public class OpenShoppingCartTests(ApiSpecification<Program> api):
     public Task ReturnsOpenedShoppingCart(string apiPrefix) =>
         api.Given(OpenedShoppingCart(apiPrefix, ClientId))
             .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
-            .Then(OK, RESPONSE_ETAG_HEADER(1));
+            .Then(OK, RESPONSE_ETAG_HEADER(0));
 
     private readonly Guid ClientId = Guid.NewGuid();
 }

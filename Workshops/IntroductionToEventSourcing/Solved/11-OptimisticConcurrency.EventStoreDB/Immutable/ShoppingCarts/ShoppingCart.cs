@@ -49,9 +49,6 @@ public record ShoppingCart(
     DateTimeOffset? CanceledAt = null
 )
 {
-    // Marten will set it by convention during stream aggregation
-    public int Version { get; set; }
-
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
     public bool HasEnough(PricedProductItem productItem)
@@ -64,24 +61,23 @@ public record ShoppingCart(
         return currentQuantity >= quantity;
     }
 
-    public static ShoppingCart Default() =>
+    public static ShoppingCart Initial() =>
         new (default, default, default, [], default);
 
-    public ShoppingCart Apply(ShoppingCartEvent @event)
-    {
-        return @event switch
+    public static ShoppingCart Evolve(ShoppingCart state, ShoppingCartEvent @event) =>
+        @event switch
         {
             ShoppingCartOpened(var shoppingCartId, var clientId, _) =>
-                this with
+                state with
                 {
                     Id = shoppingCartId,
                     ClientId = clientId,
                     Status = ShoppingCartStatus.Pending
                 },
             ProductItemAddedToShoppingCart(_, var pricedProductItem, _) =>
-                this with
+                state with
                 {
-                    ProductItems = ProductItems
+                    ProductItems = state.ProductItems
                         .Concat(new [] { pricedProductItem })
                         .GroupBy(pi => pi.ProductId)
                         .Select(group => group.Count() == 1?
@@ -95,9 +91,9 @@ public record ShoppingCart(
                         .ToArray()
                 },
             ProductItemRemovedFromShoppingCart(_, var pricedProductItem, _) =>
-                this with
+                state with
                 {
-                    ProductItems = ProductItems
+                    ProductItems = state.ProductItems
                         .Select(pi => pi.ProductId == pricedProductItem.ProductId?
                             pi with { Quantity = pi.Quantity - pricedProductItem.Quantity }
                             :pi
@@ -106,23 +102,19 @@ public record ShoppingCart(
                         .ToArray()
                 },
             ShoppingCartConfirmed(_, var confirmedAt) =>
-                this with
+                state with
                 {
                     Status = ShoppingCartStatus.Confirmed,
                     ConfirmedAt = confirmedAt
                 },
             ShoppingCartCanceled(_, var canceledAt) =>
-                this with
+                state with
                 {
                     Status = ShoppingCartStatus.Canceled,
                     CanceledAt = canceledAt
                 },
-            _ => this
+            _ => state
         };
-    }
-
-    // let's make Marten happy
-    private ShoppingCart():this(Guid.Empty, Guid.Empty, ShoppingCartStatus.Pending, [], default){}
 }
 
 public enum ShoppingCartStatus

@@ -1,3 +1,4 @@
+using EventStore.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -6,7 +7,7 @@ namespace OptimisticConcurrency.Core.Http;
 
 public static class ETagExtensions
 {
-    public static int ToExpectedVersion(string? eTag)
+    public static StreamRevision ToExpectedRevision(string? eTag)
     {
         if (eTag is null)
             throw new ArgumentNullException(nameof(eTag));
@@ -16,18 +17,18 @@ public static class ETagExtensions
         if (value is null)
             throw new ArgumentNullException(nameof(eTag));
 
-        return int.Parse(value.Substring(1, value.Length - 2));
+        return StreamRevision.FromInt64(long.Parse(value.Substring(1, value.Length - 2)));
     }
 
-    public static void SetResponseEtag(this HttpContext httpContext, int? version)
+    public static void SetResponseEtag(this HttpContext httpContext, StreamRevision? revision)
     {
-        if (!version.HasValue)
+        if (!revision.HasValue)
             return;
 
-        httpContext.Response.Headers.ETag = version.Value.ToWeakEtag();
+        httpContext.Response.Headers.ETag = revision.Value.ToInt64().ToWeakEtag();
     }
 
-    public static StringValues ToWeakEtag(this int version) =>
+    public static StringValues ToWeakEtag(this long version) =>
         $"W/\"{version}\"";
 }
 
