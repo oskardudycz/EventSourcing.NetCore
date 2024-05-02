@@ -28,8 +28,8 @@ public static class Api
             {
                 var shoppingCartId = CombGuidIdGeneration.NewGuid();
 
-                await session.Add<MutableShoppingCart>(shoppingCartId,
-                    MutableShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now).DequeueUncommittedEvents(), ct);
+                await session.Add(shoppingCartId,
+                    MutableShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now), ct);
 
                 return Created($"/api/mutable/clients/{clientId}/shopping-carts/{shoppingCartId}", shoppingCartId);
             }

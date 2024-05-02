@@ -6,9 +6,9 @@ namespace OptimisticConcurrency.Core.Marten;
 
 public static class DocumentSessionExtensions
 {
-    public static Task<int> Add<T>(this IDocumentSession documentSession, Guid id, object @event, CancellationToken ct)
-        where T : class =>
-        documentSession.Add<T>(id, [@event], ct);
+    public static Task<int> Add<T>(this IDocumentSession documentSession, Guid id, T aggregate, CancellationToken ct)
+        where T : class, IAggregate =>
+        documentSession.Add<T>(id, aggregate.DequeueUncommittedEvents(), ct);
 
     public static async Task<int> Add<T>(this IDocumentSession documentSession, Guid id, object[] events, CancellationToken ct)
         where T : class

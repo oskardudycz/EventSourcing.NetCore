@@ -2,9 +2,7 @@ using ApplicationLogic.EventStoreDB.Core.Exceptions;
 using ApplicationLogic.EventStoreDB.Immutable.ShoppingCarts;
 using ApplicationLogic.EventStoreDB.Mixed.ShoppingCarts;
 using ApplicationLogic.EventStoreDB.Mutable.ShoppingCarts;
-using Marten;
 using Microsoft.AspNetCore.Diagnostics;
-using Oakton;
 
 var builder = WebApplication.CreateBuilder(args);
 

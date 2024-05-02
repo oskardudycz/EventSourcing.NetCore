@@ -5,9 +5,9 @@ namespace ApplicationLogic.Marten.Core.Marten;
 
 public static class DocumentSessionExtensions
 {
-    public static Task Add<T>(this IDocumentSession documentSession, Guid id, object @event, CancellationToken ct)
-        where T : class
-        => throw new NotImplementedException("Document Session Extensions not implemented!");
+    public static Task Add<T>(this IDocumentSession documentSession, Guid id, T aggregate, CancellationToken ct)
+        where T : class, IAggregate =>
+        throw new NotImplementedException("Document Session Extensions not implemented!");
 
     public static Task Add<T>(this IDocumentSession documentSession, Guid id, object[] events, CancellationToken ct)
         where T : class

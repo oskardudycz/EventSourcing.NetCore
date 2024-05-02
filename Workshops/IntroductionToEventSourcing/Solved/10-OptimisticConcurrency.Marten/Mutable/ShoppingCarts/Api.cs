@@ -31,7 +31,7 @@ public static class Api
                 var shoppingCartId = CombGuidIdGeneration.NewGuid();
 
                 var nextExpectedVersion = await session.Add<MutableShoppingCart>(shoppingCartId,
-                    MutableShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now).DequeueUncommittedEvents(), ct);
+                    MutableShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now), ct);
 
                 context.SetResponseEtag(nextExpectedVersion);
 
