@@ -62,9 +62,6 @@ if (app.Environment.IsDevelopment())
 
 await app.RunAsync();
 
-namespace OptimisticConcurrency
+public partial class Program
 {
-    public partial class Program
-    {
-    }
 }

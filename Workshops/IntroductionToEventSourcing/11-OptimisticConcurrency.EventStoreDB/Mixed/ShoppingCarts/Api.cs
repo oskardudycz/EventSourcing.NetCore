@@ -1,16 +1,12 @@
 using Core.Validation;
-using Marten;
-using Marten.Schema.Identity;
+using EventStore.Client;
 using Microsoft.AspNetCore.Mvc;
-using OptimisticConcurrency.Core.Http;
-using OptimisticConcurrency.Core.Marten;
+using OptimisticConcurrency.Core.EventStoreDB;
 using OptimisticConcurrency.Mixed.Pricing;
-using Polly;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static System.DateTimeOffset;
 
 namespace OptimisticConcurrency.Mixed.ShoppingCarts;
-
 public static class Api
 {
     public static WebApplication ConfigureMixedShoppingCarts(this WebApplication app)
@@ -21,17 +17,14 @@ public static class Api
         var productItems = shoppingCart.MapGroup("product-items");
 
         shoppingCarts.MapPost("",
-            async (
-                HttpContext context,
-                IDocumentSession session,
+            async (EventStoreClient eventStore,
                 Guid clientId,
-                CancellationToken ct
-            ) =>
+                CancellationToken ct) =>
             {
-                var shoppingCartId = CombGuidIdGeneration.NewGuid();
+                var shoppingCartId = Uuid.NewUuid().ToGuid();
 
-                await session.Add<MixedShoppingCart>(shoppingCartId,
-                    [MixedShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now).Item1], ct);
+                await eventStore.Add<ShoppingCart>(shoppingCartId,
+                    [ShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now).Item1], ct);
 
                 return Created($"/api/mixed/clients/{clientId}/shopping-carts/{shoppingCartId}", shoppingCartId);
             }
@@ -39,17 +32,15 @@ public static class Api
 
         productItems.MapPost("",
             async (
-                HttpContext context,
                 IProductPriceCalculator pricingCalculator,
-                IDocumentSession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 AddProductRequest body,
-                [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
                 var productItem = body.ProductItem.NotNull().ToProductItem();
 
-                await session.GetAndUpdate<MixedShoppingCart>(shoppingCartId,
+                await eventStore.GetAndUpdate(shoppingCartId,
                     state => [state.AddProduct(pricingCalculator, productItem, Now)], ct);
 
                 return NoContent();
@@ -58,13 +49,11 @@ public static class Api
 
         productItems.MapDelete("{productId:guid}",
             async (
-                HttpContext context,
-                IDocumentSession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
                 [FromRoute] Guid productId,
                 [FromQuery] int? quantity,
                 [FromQuery] decimal? unitPrice,
-                [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
                 var productItem = new PricedProductItem
@@ -74,7 +63,7 @@ public static class Api
                     UnitPrice = unitPrice.NotNull().Positive()
                 };
 
-                await session.GetAndUpdate<MixedShoppingCart>(shoppingCartId,
+                await eventStore.GetAndUpdate(shoppingCartId,
                     state => [state.RemoveProduct(productItem, Now)],
                     ct);
 
@@ -83,14 +72,11 @@ public static class Api
         );
 
         shoppingCart.MapPost("confirm",
-            async (
-                HttpContext context,
-                IDocumentSession session,
+            async (EventStoreClient eventStore,
                 Guid shoppingCartId,
-                [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
-                await session.GetAndUpdate<MixedShoppingCart>(shoppingCartId,
+                await eventStore.GetAndUpdate(shoppingCartId,
                     state => [state.Confirm(Now)], ct);
 
                 return NoContent();
@@ -98,14 +84,11 @@ public static class Api
         );
 
         shoppingCart.MapDelete("",
-            async (
-                HttpContext context,
-                IDocumentSession session,
+            async (EventStoreClient eventStore,
                 Guid shoppingCartId,
-                [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
-                await session.GetAndUpdate<MixedShoppingCart>(shoppingCartId,
+                await eventStore.GetAndUpdate(shoppingCartId,
                     state => [state.Cancel(Now)], ct);
 
                 return NoContent();
@@ -114,13 +97,11 @@ public static class Api
 
         shoppingCart.MapGet("",
             async Task<IResult> (
-                HttpContext context,
-                IQuerySession session,
+                EventStoreClient eventStore,
                 Guid shoppingCartId,
-                [FromIfMatchHeader] string eTag,
                 CancellationToken ct) =>
             {
-                var result = await session.Events.AggregateStreamAsync<MixedShoppingCart>(shoppingCartId, token: ct);
+                var result = await eventStore.GetShoppingCart(shoppingCartId, ct);
 
                 return result is not null ? Ok(result) : NotFound();
             }
@@ -135,8 +116,7 @@ public record ProductItemRequest(
     int? Quantity
 )
 {
-    public ProductItem ToProductItem() =>
-        new() { ProductId = ProductId.NotEmpty(), Quantity = Quantity.NotNull().Positive() };
+    public ProductItem ToProductItem() => new() { ProductId = ProductId.NotEmpty(), Quantity = Quantity.NotNull().Positive()};
 }
 
 public record AddProductRequest(

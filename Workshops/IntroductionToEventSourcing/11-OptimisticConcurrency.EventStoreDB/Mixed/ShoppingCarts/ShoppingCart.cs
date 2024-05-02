@@ -1,7 +1,6 @@
-using OptimisticConcurrency.Core.Entities;
-using OptimisticConcurrency.Mutable.Pricing;
+using OptimisticConcurrency.Mixed.Pricing;
 
-namespace OptimisticConcurrency.Mutable.ShoppingCarts;
+namespace OptimisticConcurrency.Mixed.ShoppingCarts;
 
 using static ShoppingCartEvent;
 
@@ -42,8 +41,9 @@ public abstract record ShoppingCartEvent
 
 // ENTITY
 // Note: We need to have prefix to be able to register multiple streams with the same name
-public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
+public class ShoppingCart
 {
+    public Guid Id { get; private set; }
     public Guid ClientId { get; private set; }
     public ShoppingCartStatus Status { get; private set; }
     public IList<PricedProductItem> ProductItems { get; } = new List<PricedProductItem>();
@@ -52,7 +52,7 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    protected override void Apply(ShoppingCartEvent @event)
+    public void Evolve(ShoppingCartEvent @event)
     {
         switch (@event)
         {
@@ -74,35 +74,28 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
         }
     }
 
-    public static MutableShoppingCart Open(
+    public static (ShoppingCartOpened, ShoppingCart) Open(
         Guid cartId,
         Guid clientId,
         DateTimeOffset now
     )
     {
-        return new MutableShoppingCart(cartId, clientId, now);
-    }
-
-    public static MutableShoppingCart Initial() => new();
-
-    private MutableShoppingCart(
-        Guid id,
-        Guid clientId,
-        DateTimeOffset now
-    )
-    {
         var @event = new ShoppingCartOpened(
-            id,
+            cartId,
             clientId,
             now
         );
 
-        Enqueue(@event);
-        Apply(@event);
+        return (@event, new ShoppingCart(@event));
     }
 
+    public static ShoppingCart Initial() => new();
+
+    private ShoppingCart(ShoppingCartOpened @event) =>
+        Apply(@event);
+
     //just for default creation of empty object
-    private MutableShoppingCart() { }
+    private ShoppingCart() { }
 
     private void Apply(ShoppingCartOpened opened)
     {
@@ -111,7 +104,7 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
         Status = ShoppingCartStatus.Pending;
     }
 
-    public void AddProduct(
+    public ProductItemAddedToShoppingCart AddProduct(
         IProductPriceCalculator productPriceCalculator,
         ProductItem productItem,
         DateTimeOffset now
@@ -125,8 +118,9 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
 
         var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem, now);
 
-        Enqueue(@event);
         Apply(@event);
+
+        return @event;
     }
 
     private void Apply(ProductItemAddedToShoppingCart productItemAdded)
@@ -142,10 +136,10 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
         if (current == null)
             ProductItems.Add(pricedProductItem);
         else
-            current.Quantity += quantityToAdd;
+            ProductItems[ProductItems.IndexOf(current)].Quantity += quantityToAdd;
     }
 
-    public void RemoveProduct(PricedProductItem productItemToBeRemoved, DateTimeOffset now)
+    public ProductItemRemovedFromShoppingCart RemoveProduct(PricedProductItem productItemToBeRemoved, DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -156,8 +150,9 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
 
         var @event = new ProductItemRemovedFromShoppingCart(Id, productItemToBeRemoved, now);
 
-        Enqueue(@event);
         Apply(@event);
+
+        return @event;
     }
 
     private bool HasEnough(PricedProductItem productItem)
@@ -182,10 +177,10 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
         if (current.Quantity == quantityToRemove)
             ProductItems.Remove(current);
         else
-            current.Quantity -= quantityToRemove;
+            ProductItems[ProductItems.IndexOf(current)].Quantity -= quantityToRemove;
     }
 
-    public void Confirm(DateTimeOffset now)
+    public ShoppingCartConfirmed Confirm(DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -196,8 +191,9 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
 
         var @event = new ShoppingCartConfirmed(Id, now);
 
-        Enqueue(@event);
         Apply(@event);
+
+        return @event;
     }
 
     private void Apply(ShoppingCartConfirmed confirmed)
@@ -206,7 +202,7 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
         ConfirmedAt = confirmed.ConfirmedAt;
     }
 
-    public void Cancel(DateTimeOffset now)
+    public ShoppingCartCanceled Cancel(DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -214,8 +210,9 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
 
         var @event = new ShoppingCartCanceled(Id, now);
 
-        Enqueue(@event);
         Apply(@event);
+
+        return @event;
     }
 
     private void Apply(ShoppingCartCanceled canceled)
