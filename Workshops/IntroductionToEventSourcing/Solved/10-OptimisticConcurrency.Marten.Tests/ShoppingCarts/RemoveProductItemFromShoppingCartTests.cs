@@ -90,7 +90,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
-    public Task CantRemoveNonExistingProductItemFromEmptyShoppingCart(string apiPrefix) =>
+    public Task CantRemoveNonExistingProductItemFromNonEmptyShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
                 WithProductItem(apiPrefix, ClientId, ProductItem, 1)

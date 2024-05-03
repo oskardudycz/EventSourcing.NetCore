@@ -96,7 +96,7 @@ public static class ShoppingCartService
             throw new InvalidOperationException($"Confirming cart in '{shoppingCart.Status}' status is not allowed.");
 
         if(shoppingCart.ProductItems.Length == 0)
-            throw new InvalidOperationException($"Cannot confirm empty shopping cart");
+            throw new InvalidOperationException("Cannot confirm empty shopping cart");
 
         return new ShoppingCartConfirmed(
             shoppingCart.Id,

@@ -22,8 +22,8 @@ public class BusinessLogicTests
         Spec.Given([])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(price),
-                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
+                    FakeProductPriceCalculator.Returning(Price),
+                    new AddProductItemToShoppingCart(shoppingCartId, ProductItem, now),
                     state
                 )
             )
@@ -36,15 +36,15 @@ public class BusinessLogicTests
             ])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(price),
-                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
+                    FakeProductPriceCalculator.Returning(Price),
+                    new AddProductItemToShoppingCart(shoppingCartId, ProductItem, now),
                     state
                 )
             )
             .Then(
                 new ProductItemAddedToShoppingCart(
                     shoppingCartId,
-                    new PricedProductItem(productItem.ProductId, productItem.Quantity, price),
+                    new PricedProductItem(ProductItem.ProductId, ProductItem.Quantity, Price),
                     now
                 )
             );
@@ -58,15 +58,15 @@ public class BusinessLogicTests
             ])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(otherPrice),
-                    new AddProductItemToShoppingCart(shoppingCartId, otherProductItem, now),
+                    FakeProductPriceCalculator.Returning(OtherPrice),
+                    new AddProductItemToShoppingCart(shoppingCartId, OtherProductItem, now),
                     state
                 )
             )
             .Then(
                 new ProductItemAddedToShoppingCart(
                     shoppingCartId,
-                    new PricedProductItem(otherProductItem.ProductId, otherProductItem.Quantity, otherPrice),
+                    new PricedProductItem(OtherProductItem.ProductId, OtherProductItem.Quantity, OtherPrice),
                     now
                 )
             );
@@ -80,8 +80,8 @@ public class BusinessLogicTests
             ])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(price),
-                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
+                    FakeProductPriceCalculator.Returning(Price),
+                    new AddProductItemToShoppingCart(shoppingCartId, ProductItem, now),
                     state
                 )
             )
@@ -96,8 +96,8 @@ public class BusinessLogicTests
             ])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(price),
-                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
+                    FakeProductPriceCalculator.Returning(Price),
+                    new AddProductItemToShoppingCart(shoppingCartId, ProductItem, now),
                     state
                 )
             )
@@ -136,7 +136,7 @@ public class BusinessLogicTests
             );
 
     [Fact]
-    public void CantRemoveNonExistingProductItemFromEmptyShoppingCart() =>
+    public void CantRemoveNonExistingProductItemFromNonEmptyShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
                 new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
@@ -298,16 +298,16 @@ public class BusinessLogicTests
     private readonly DateTimeOffset now = DateTimeOffset.Now;
     private readonly Guid clientId = Guid.NewGuid();
     private readonly Guid shoppingCartId = Guid.NewGuid();
-    private readonly ProductItem productItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
-    private readonly ProductItem otherProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
-    private static readonly int price = Random.Shared.Next(1, 1000);
-    private static readonly int otherPrice = Random.Shared.Next(1, 1000);
-    private readonly PricedProductItem pricedProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200), price);
-
+    private static readonly ProductItem ProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
+    private static readonly ProductItem OtherProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
+    private static readonly int Price = Random.Shared.Next(1, 1000);
+    private static readonly int OtherPrice = Random.Shared.Next(1, 1000);
+    private readonly PricedProductItem pricedProductItem =
+        new(ProductItem.ProductId, ProductItem.Quantity, Price);
     private readonly PricedProductItem otherPricedProductItem =
-        new(Guid.NewGuid(), Random.Shared.Next(1, 200), otherPrice);
+        new(OtherProductItem.ProductId, OtherProductItem.Quantity, Price);
 
 
     private readonly HandlerSpecification<ShoppingCartEvent, ShoppingCart> Spec =
-        Specification.For<ShoppingCartEvent, ShoppingCart>(ShoppingCart.Evolve, ShoppingCart.Default);
+        Specification.For<ShoppingCartEvent, ShoppingCart>(ShoppingCart.Evolve, ShoppingCart.Initial);
 }

@@ -72,7 +72,7 @@ public record ShoppingCart(
         return currentQuantity >= quantity;
     }
 
-    public static ShoppingCart Default() =>
+    public static ShoppingCart Initial() =>
         new (default, default, default, [], default);
 
     public static ShoppingCart Evolve(ShoppingCart shoppingCart, ShoppingCartEvent @event)

@@ -7,27 +7,30 @@ public abstract record ShoppingCartEvent
 {
     public record ShoppingCartOpened(
         Guid ShoppingCartId,
-        Guid ClientId
+        Guid ClientId,
+        DateTimeOffset OpenedAt
     ): ShoppingCartEvent;
 
     public record ProductItemAddedToShoppingCart(
         Guid ShoppingCartId,
-        PricedProductItem ProductItem
+        PricedProductItem ProductItem,
+        DateTimeOffset AddedAt
     ): ShoppingCartEvent;
 
     public record ProductItemRemovedFromShoppingCart(
         Guid ShoppingCartId,
-        PricedProductItem ProductItem
+        PricedProductItem ProductItem,
+        DateTimeOffset RemovedAt
     ): ShoppingCartEvent;
 
     public record ShoppingCartConfirmed(
         Guid ShoppingCartId,
-        DateTime ConfirmedAt
+        DateTimeOffset ConfirmedAt
     ): ShoppingCartEvent;
 
     public record ShoppingCartCanceled(
         Guid ShoppingCartId,
-        DateTime CanceledAt
+        DateTimeOffset CanceledAt
     ): ShoppingCartEvent;
 
     // This won't allow external inheritance
@@ -52,12 +55,13 @@ public class ProductItem
 // ENTITY
 public class ShoppingCart: IAggregate
 {
-    public Guid Id { get; private set;  }
+    public Guid Id { get; private set; }
     public Guid ClientId { get; private set; }
     public ShoppingCartStatus Status { get; private set; }
     public IList<PricedProductItem> ProductItems { get; } = new List<PricedProductItem>();
-    public DateTime? ConfirmedAt { get; private set; }
-    public DateTime? CanceledAt { get; private set; }
+    public DateTimeOffset OpenedAt { get; private set; }
+    public DateTimeOffset? ConfirmedAt { get; private set; }
+    public DateTimeOffset? CanceledAt { get; private set; }
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
@@ -85,12 +89,11 @@ public class ShoppingCart: IAggregate
 
     public static (ShoppingCartOpened, ShoppingCart) Open(
         Guid cartId,
-        Guid clientId)
+        Guid clientId,
+        DateTimeOffset now
+    )
     {
-        var @event = new ShoppingCartOpened(
-            cartId,
-            clientId
-        );
+        var @event = new ShoppingCartOpened(cartId, clientId, now);
 
         return (@event, new ShoppingCart(@event));
     }
@@ -112,7 +115,9 @@ public class ShoppingCart: IAggregate
 
     public ProductItemAddedToShoppingCart AddProduct(
         IProductPriceCalculator productPriceCalculator,
-        ProductItem productItem)
+        ProductItem productItem,
+        DateTimeOffset now
+    )
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -120,7 +125,7 @@ public class ShoppingCart: IAggregate
 
         var pricedProductItem = productPriceCalculator.Calculate(productItem);
 
-        var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem);
+        var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem, now);
 
         Apply(@event);
 
@@ -129,7 +134,7 @@ public class ShoppingCart: IAggregate
 
     private void Apply(ProductItemAddedToShoppingCart productItemAdded)
     {
-        var (_, pricedProductItem) = productItemAdded;
+        var pricedProductItem = productItemAdded.ProductItem;
         var productId = pricedProductItem.ProductId;
         var quantityToAdd = pricedProductItem.Quantity;
 
@@ -140,10 +145,16 @@ public class ShoppingCart: IAggregate
         if (current == null)
             ProductItems.Add(pricedProductItem);
         else
-            ProductItems[ProductItems.IndexOf(current)].Quantity += quantityToAdd;
+            ProductItems[ProductItems.IndexOf(current)] = new PricedProductItem
+            {
+                Quantity = current.Quantity + quantityToAdd, ProductId = productId, UnitPrice = current.UnitPrice
+            };
     }
 
-    public ProductItemRemovedFromShoppingCart RemoveProduct(PricedProductItem productItemToBeRemoved)
+    public ProductItemRemovedFromShoppingCart RemoveProduct(
+        PricedProductItem productItemToBeRemoved,
+        DateTimeOffset now
+    )
     {
         if (IsClosed)
             throw new InvalidOperationException(
@@ -152,7 +163,7 @@ public class ShoppingCart: IAggregate
         if (!HasEnough(productItemToBeRemoved))
             throw new InvalidOperationException("Not enough product items to remove");
 
-        var @event = new ProductItemRemovedFromShoppingCart(Id, productItemToBeRemoved);
+        var @event = new ProductItemRemovedFromShoppingCart(Id, productItemToBeRemoved, now);
 
         Apply(@event);
 
@@ -170,7 +181,7 @@ public class ShoppingCart: IAggregate
 
     private void Apply(ProductItemRemovedFromShoppingCart productItemRemoved)
     {
-        var (_, pricedProductItem) = productItemRemoved;
+        var pricedProductItem = productItemRemoved.ProductItem;
         var productId = pricedProductItem.ProductId;
         var quantityToRemove = pricedProductItem.Quantity;
 
@@ -181,19 +192,22 @@ public class ShoppingCart: IAggregate
         if (current.Quantity == quantityToRemove)
             ProductItems.Remove(current);
         else
-            ProductItems[ProductItems.IndexOf(current)].Quantity -= quantityToRemove;
+            ProductItems[ProductItems.IndexOf(current)] = new PricedProductItem
+            {
+                Quantity = current.Quantity - quantityToRemove, ProductId = productId, UnitPrice = current.UnitPrice
+            };
     }
 
-    public ShoppingCartConfirmed Confirm()
+    public ShoppingCartConfirmed Confirm(DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
                 $"Confirming cart in '{Status}' status is not allowed.");
 
-        if(ProductItems.Count == 0)
-            throw new InvalidOperationException($"Cannot confirm empty shopping cart");
+        if (ProductItems.Count == 0)
+            throw new InvalidOperationException("Cannot confirm empty shopping cart");
 
-        var @event = new ShoppingCartConfirmed(Id, DateTime.UtcNow);
+        var @event = new ShoppingCartConfirmed(Id, now);
 
         Apply(@event);
 
@@ -206,13 +220,13 @@ public class ShoppingCart: IAggregate
         ConfirmedAt = confirmed.ConfirmedAt;
     }
 
-    public ShoppingCartCanceled Cancel()
+    public ShoppingCartCanceled Cancel(DateTimeOffset now)
     {
         if (IsClosed)
             throw new InvalidOperationException(
                 $"Canceling cart in '{Status}' status is not allowed.");
 
-        var @event = new ShoppingCartCanceled(Id, DateTime.UtcNow);
+        var @event = new ShoppingCartCanceled(Id, now);
 
         Apply(@event);
 
