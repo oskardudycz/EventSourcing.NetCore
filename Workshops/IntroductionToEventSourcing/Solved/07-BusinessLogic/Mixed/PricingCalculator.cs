@@ -1,4 +1,4 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution2;
+namespace IntroductionToEventSourcing.BusinessLogic.Mixed;
 
 public interface IProductPriceCalculator
 {

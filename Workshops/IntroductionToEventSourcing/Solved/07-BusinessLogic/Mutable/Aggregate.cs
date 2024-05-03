@@ -1,4 +1,4 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Mutable;
+namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
 
 public interface IAggregate
 {

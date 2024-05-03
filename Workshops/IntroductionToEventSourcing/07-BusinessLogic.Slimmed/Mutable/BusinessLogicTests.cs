@@ -1,12 +1,9 @@
-using IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable;
 using Ogooreck.BusinessLogic;
 using Xunit;
 
 namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Mutable;
 
-using static Immutable.ShoppingCartEvent;
-using static ShoppingCartCommand;
-using static ShoppingCartService;
+using static ShoppingCartEvent;
 
 public class BusinessLogicTests
 {
@@ -14,7 +11,9 @@ public class BusinessLogicTests
     [Fact]
     public void OpensShoppingCart() =>
         Spec.Given([])
-            .When(() => Handle(new OpenShoppingCart(shoppingCartId, clientId, now)))
+            .When(() =>
+                ShoppingCart.Open(shoppingCartId, clientId, now)
+            )
             .Then(new ShoppingCartOpened(shoppingCartId, clientId, now));
 
     // Add
@@ -22,10 +21,10 @@ public class BusinessLogicTests
     public void CantAddProductItemToNotExistingShoppingCart() =>
         Spec.Given([])
             .When(state =>
-                Handle(
-                    Immutable.FakeProductPriceCalculator.Returning(price),
-                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
-                    state
+                state.AddProduct(
+                    FakeProductPriceCalculator.Returning(Price),
+                    ProductItem(),
+                    now
                 )
             )
             .ThenThrows<InvalidOperationException>();
@@ -36,16 +35,19 @@ public class BusinessLogicTests
                 new ShoppingCartOpened(shoppingCartId, clientId, now)
             ])
             .When(state =>
-                Handle(
-                    Immutable.FakeProductPriceCalculator.Returning(price),
-                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
-                    state
+                state.AddProduct(
+                    FakeProductPriceCalculator.Returning(Price),
+                    ProductItem(),
+                    now
                 )
             )
             .Then(
                 new ProductItemAddedToShoppingCart(
                     shoppingCartId,
-                    new Immutable.PricedProductItem(productItem.ProductId, productItem.Quantity, price),
+                    new PricedProductItem
+                    {
+                        ProductId = ProductItem().ProductId, Quantity = ProductItem().Quantity, UnitPrice = Price
+                    },
                     now
                 )
             );
@@ -55,19 +57,24 @@ public class BusinessLogicTests
     public void AddsProductItemToNonEmptyShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
             ])
             .When(state =>
-                Handle(
-                    Immutable.FakeProductPriceCalculator.Returning(otherPrice),
-                    new AddProductItemToShoppingCart(shoppingCartId, otherProductItem, now),
-                    state
+                state.AddProduct(
+                    FakeProductPriceCalculator.Returning(OtherPrice),
+                    OtherProductItem(),
+                    now
                 )
             )
             .Then(
                 new ProductItemAddedToShoppingCart(
                     shoppingCartId,
-                    new Immutable.PricedProductItem(otherProductItem.ProductId, otherProductItem.Quantity, otherPrice),
+                    new PricedProductItem
+                    {
+                        ProductId = OtherProductItem().ProductId,
+                        Quantity = OtherProductItem().Quantity,
+                        UnitPrice = OtherPrice
+                    },
                     now
                 )
             );
@@ -76,14 +83,14 @@ public class BusinessLogicTests
     public void CantAddProductItemToConfirmedShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
                 new ShoppingCartConfirmed(shoppingCartId, now)
             ])
             .When(state =>
-                Handle(
-                    Immutable.FakeProductPriceCalculator.Returning(price),
-                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
-                    state
+                state.AddProduct(
+                    FakeProductPriceCalculator.Returning(Price),
+                    ProductItem(),
+                    now
                 )
             )
             .ThenThrows<InvalidOperationException>();
@@ -92,14 +99,14 @@ public class BusinessLogicTests
     public void CantAddProductItemToCanceledShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
                 new ShoppingCartCanceled(shoppingCartId, now)
             ])
             .When(state =>
-                Handle(
-                    Immutable.FakeProductPriceCalculator.Returning(price),
-                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
-                    state
+                state.AddProduct(
+                    FakeProductPriceCalculator.Returning(Price),
+                    ProductItem(),
+                    now
                 )
             )
             .ThenThrows<InvalidOperationException>();
@@ -109,10 +116,7 @@ public class BusinessLogicTests
     public void CantRemoveProductItemFromNotExistingShoppingCart() =>
         Spec.Given([])
             .When(state =>
-                Handle(
-                    new RemoveProductItemFromShoppingCart(shoppingCartId, pricedProductItem, now),
-                    state
-                )
+                state.RemoveProduct(PricedProductItem(), now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -120,18 +124,15 @@ public class BusinessLogicTests
     public void RemovesExistingProductItemFromShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
             ])
             .When(state =>
-                Handle(
-                    new RemoveProductItemFromShoppingCart(shoppingCartId, pricedProductItem with { Quantity = 1 }, now),
-                    state
-                )
+                state.RemoveProduct(PricedProductItemWithQuantity(1), now)
             )
             .Then(
                 new ProductItemRemovedFromShoppingCart(
                     shoppingCartId,
-                    pricedProductItem with { Quantity = 1 },
+                    PricedProductItemWithQuantity(1),
                     now
                 )
             );
@@ -140,14 +141,10 @@ public class BusinessLogicTests
     public void CantRemoveNonExistingProductItemFromNonEmptyShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, OtherPricedProductItem(), now),
             ])
             .When(state =>
-                Handle(
-                    new RemoveProductItemFromShoppingCart(shoppingCartId, otherPricedProductItem with { Quantity = 1 },
-                        now),
-                    state
-                )
+                state.RemoveProduct(PricedProductItemWithQuantity(1), now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -155,14 +152,11 @@ public class BusinessLogicTests
     public void CantRemoveExistingProductItemFromCanceledShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
                 new ShoppingCartConfirmed(shoppingCartId, now)
             ])
             .When(state =>
-                Handle(
-                    new RemoveProductItemFromShoppingCart(shoppingCartId, pricedProductItem with { Quantity = 1 }, now),
-                    state
-                )
+                state.RemoveProduct(PricedProductItemWithQuantity(1), now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -170,24 +164,20 @@ public class BusinessLogicTests
     public void CantRemoveExistingProductItemFromConfirmedShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
                 new ShoppingCartCanceled(shoppingCartId, now)
             ])
             .When(state =>
-                Handle(
-                    new RemoveProductItemFromShoppingCart(shoppingCartId, pricedProductItem with { Quantity = 1 }, now),
-                    state
-                )
+                state.RemoveProduct(PricedProductItemWithQuantity(1), now)
             )
             .ThenThrows<InvalidOperationException>();
 
     // Confirm
-
     [Fact]
     public void CantConfirmNotExistingShoppingCart() =>
         Spec.Given([])
             .When(state =>
-                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+                state.Confirm(now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -198,7 +188,7 @@ public class BusinessLogicTests
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
             ])
             .When(state =>
-                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+                state.Confirm(now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -206,10 +196,10 @@ public class BusinessLogicTests
     public void ConfirmsNonEmptyShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
             ])
             .When(state =>
-                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+                state.Confirm(now)
             )
             .Then(
                 new ShoppingCartConfirmed(shoppingCartId, now)
@@ -219,11 +209,11 @@ public class BusinessLogicTests
     public void CantConfirmAlreadyConfirmedShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
                 new ShoppingCartConfirmed(shoppingCartId, now)
             ])
             .When(state =>
-                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+                state.Confirm(now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -231,11 +221,11 @@ public class BusinessLogicTests
     public void CantConfirmCanceledShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
                 new ShoppingCartCanceled(shoppingCartId, now)
             ])
             .When(state =>
-                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+                state.Confirm(now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -245,7 +235,7 @@ public class BusinessLogicTests
     public void CantCancelNotExistingShoppingCart() =>
         Spec.Given([])
             .When(state =>
-                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+                state.Cancel(now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -255,7 +245,7 @@ public class BusinessLogicTests
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
             ])
             .When(state =>
-                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+                state.Cancel(now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -263,10 +253,10 @@ public class BusinessLogicTests
     public void CancelsNonEmptyShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
             ])
             .When(state =>
-                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+                state.Cancel(now)
             )
             .Then(
                 new ShoppingCartCanceled(shoppingCartId, now)
@@ -276,11 +266,11 @@ public class BusinessLogicTests
     public void CantCancelAlreadyCanceledShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
                 new ShoppingCartCanceled(shoppingCartId, now)
             ])
             .When(state =>
-                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+                state.Cancel(now)
             )
             .ThenThrows<InvalidOperationException>();
 
@@ -288,27 +278,74 @@ public class BusinessLogicTests
     public void CantCancelConfirmedShoppingCart() =>
         Spec.Given([
                 new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, PricedProductItem(), now),
                 new ShoppingCartConfirmed(shoppingCartId, now)
             ])
             .When(state =>
-                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+                state.Cancel(now)
             )
             .ThenThrows<InvalidOperationException>();
 
     private readonly DateTimeOffset now = DateTimeOffset.Now;
     private readonly Guid clientId = Guid.NewGuid();
     private readonly Guid shoppingCartId = Guid.NewGuid();
-    private readonly Immutable.ProductItem productItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
-    private readonly Immutable.ProductItem otherProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
-    private static readonly int price = Random.Shared.Next(1, 1000);
-    private static readonly int otherPrice = Random.Shared.Next(1, 1000);
-    private readonly Immutable.PricedProductItem pricedProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200), price);
+    private static readonly Guid ProductId = Guid.NewGuid();
+    private static readonly Guid OtherProductId = Guid.NewGuid();
+    private static readonly int Quantity = Random.Shared.Next(1, 1000);
+    private static readonly int OtherQuantity = Random.Shared.Next(1, 1000);
+    private static readonly int Price = Random.Shared.Next(1, 1000);
+    private static readonly int OtherPrice = Random.Shared.Next(1, 1000);
 
-    private readonly Immutable.PricedProductItem otherPricedProductItem =
-        new(Guid.NewGuid(), Random.Shared.Next(1, 200), otherPrice);
+    private static readonly Func<ProductItem> ProductItem = () =>
+        new ProductItem { ProductId = ProductId, Quantity = Quantity };
 
+    private static readonly Func<ProductItem> OtherProductItem = () =>
+        new ProductItem { ProductId = OtherProductId, Quantity = OtherQuantity };
 
-    private readonly HandlerSpecification<Immutable.ShoppingCartEvent, Immutable.ShoppingCart> Spec =
-        Specification.For<Immutable.ShoppingCartEvent, Immutable.ShoppingCart>(Immutable.ShoppingCart.Evolve, Immutable.ShoppingCart.Initial);
+    private static readonly Func<PricedProductItem> PricedProductItem = () => new PricedProductItem
+    {
+        ProductId = ProductId, Quantity = Quantity, UnitPrice = Price
+    };
+
+    private static readonly Func<int, PricedProductItem> PricedProductItemWithQuantity =
+        quantity => new PricedProductItem { ProductId = ProductId, Quantity = quantity, UnitPrice = Price };
+
+    private static readonly Func<PricedProductItem> OtherPricedProductItem = () => new PricedProductItem
+    {
+        ProductId = OtherProductId, Quantity = OtherQuantity, UnitPrice = Price
+    };
+
+    private readonly HandlerSpecification<ShoppingCartEvent, ShoppingCart> Spec =
+        Specification.For(Evolve, ShoppingCart.Initial);
+
+    private static readonly Func<ShoppingCart, ShoppingCartEvent, ShoppingCart> Evolve = (cart, @event) =>
+    {
+        cart.Evolve(@event);
+        return cart;
+    };
+}
+
+public static class TestsExtensions
+{
+    public static ThenDeciderSpecificationBuilder<TEvent, TState> When<TEvent, TState>(
+        this WhenDeciderSpecificationBuilder<Handler<TEvent, TState>, TEvent, TState> builder,
+        Func<TState> when
+    ) where TState : Aggregate<TEvent> =>
+        builder.When(() =>
+        {
+            var state = when();
+
+            return state.DequeueUncommittedEvents();
+        });
+
+    public static ThenDeciderSpecificationBuilder<TEvent, TState> When<TEvent, TState>(
+        this WhenDeciderSpecificationBuilder<Handler<TEvent, TState>, TEvent, TState> builder,
+        Action<TState> when
+    ) where TState : Aggregate<TEvent> =>
+        builder.When(state =>
+        {
+            when(state);
+
+            return state.DequeueUncommittedEvents();
+        });
 }
