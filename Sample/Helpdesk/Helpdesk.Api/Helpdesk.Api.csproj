@@ -8,10 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten.CommandLine" Version="7.10.0" />
+        <PackageReference Include="Marten.CommandLine" Version="7.10.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Marten.AspNetCore" Version="7.10.0" />
-        <PackageReference Include="Marten" Version="7.10.0" />
+        <PackageReference Include="Marten.AspNetCore" Version="7.10.1" />
+        <PackageReference Include="Marten" Version="7.10.1" />
         <PackageReference Include="Confluent.Kafka" Version="2.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     </ItemGroup>

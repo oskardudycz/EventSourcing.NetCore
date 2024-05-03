@@ -41,7 +41,7 @@ public class RemoveProductItemFromShoppingCartTests(ApiSpecification<Program> ap
     [InlineData("immutable")]
     [InlineData("mutable")]
     [InlineData("mixed")]
-    public Task CanRemoveExistingProductItemFromShoppingCart(string apiPrefix) =>
+    public Task RemovesExistingProductItemFromShoppingCart(string apiPrefix) =>
         api.Given(
                 OpenedShoppingCart(apiPrefix, ClientId),
                 WithProductItem(apiPrefix, ClientId, ProductItem, 1)

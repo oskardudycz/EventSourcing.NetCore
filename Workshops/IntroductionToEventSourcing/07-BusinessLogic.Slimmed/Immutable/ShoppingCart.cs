@@ -6,27 +6,30 @@ public abstract record ShoppingCartEvent
 {
     public record ShoppingCartOpened(
         Guid ShoppingCartId,
-        Guid ClientId
+        Guid ClientId,
+        DateTimeOffset OpenedAt
     ): ShoppingCartEvent;
 
     public record ProductItemAddedToShoppingCart(
         Guid ShoppingCartId,
-        PricedProductItem ProductItem
+        PricedProductItem ProductItem,
+        DateTimeOffset AddedAt
     ): ShoppingCartEvent;
 
     public record ProductItemRemovedFromShoppingCart(
         Guid ShoppingCartId,
-        PricedProductItem ProductItem
+        PricedProductItem ProductItem,
+        DateTimeOffset RemovedAt
     ): ShoppingCartEvent;
 
     public record ShoppingCartConfirmed(
         Guid ShoppingCartId,
-        DateTime ConfirmedAt
+        DateTimeOffset ConfirmedAt
     ): ShoppingCartEvent;
 
     public record ShoppingCartCanceled(
         Guid ShoppingCartId,
-        DateTime CanceledAt
+        DateTimeOffset CanceledAt
     ): ShoppingCartEvent;
 
     // This won't allow external inheritance
@@ -52,8 +55,9 @@ public record ShoppingCart(
     Guid ClientId,
     ShoppingCartStatus Status,
     PricedProductItem[] ProductItems,
-    DateTime? ConfirmedAt = null,
-    DateTime? CanceledAt = null
+    DateTimeOffset OpenedAt,
+    DateTimeOffset? ConfirmedAt = null,
+    DateTimeOffset? CanceledAt = null
 )
 {
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
@@ -69,20 +73,22 @@ public record ShoppingCart(
     }
 
     public static ShoppingCart Default() =>
-        new (default, default, default, []);
+        new (default, default, default, [], default);
 
     public static ShoppingCart Evolve(ShoppingCart shoppingCart, ShoppingCartEvent @event)
     {
         return @event switch
         {
-            ShoppingCartOpened(var shoppingCartId, var clientId) =>
+            ShoppingCartOpened(var shoppingCartId, var clientId, var openedAt) =>
                 shoppingCart with
                 {
                     Id = shoppingCartId,
                     ClientId = clientId,
-                    Status = ShoppingCartStatus.Pending
+                    Status = ShoppingCartStatus.Pending,
+                    ProductItems = [],
+                    OpenedAt = openedAt
                 },
-            ProductItemAddedToShoppingCart(_, var pricedProductItem) =>
+            ProductItemAddedToShoppingCart(_, var pricedProductItem, _) =>
                 shoppingCart with
                 {
                     ProductItems = shoppingCart.ProductItems
@@ -98,7 +104,7 @@ public record ShoppingCart(
                         )
                         .ToArray()
                 },
-            ProductItemRemovedFromShoppingCart(_, var pricedProductItem) =>
+            ProductItemRemovedFromShoppingCart(_, var pricedProductItem, _) =>
                 shoppingCart with
                 {
                     ProductItems = shoppingCart.ProductItems

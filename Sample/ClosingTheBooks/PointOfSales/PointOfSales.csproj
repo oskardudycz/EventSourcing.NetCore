@@ -5,6 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten" Version="7.10.0" />
+        <PackageReference Include="Marten" Version="7.10.1" />
     </ItemGroup>
 </Project>

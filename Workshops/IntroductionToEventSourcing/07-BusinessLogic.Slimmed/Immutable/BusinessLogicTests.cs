@@ -1,108 +1,313 @@
-using FluentAssertions;
-using IntroductionToEventSourcing.BusinessLogic.Slimmed.Tools;
+using Ogooreck.BusinessLogic;
 using Xunit;
 
 namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable;
 
 using static ShoppingCartEvent;
 using static ShoppingCartCommand;
-
-public static class ShoppingCartExtensions
-{
-    public static ShoppingCart GetShoppingCart(this EventStore eventStore, Guid shoppingCartId) =>
-        eventStore.ReadStream<ShoppingCartEvent>(shoppingCartId).Aggregate(ShoppingCart.Default(), ShoppingCart.Evolve);
-}
+using static ShoppingCartService;
 
 public class BusinessLogicTests
 {
+    // Open
     [Fact]
-    public void RunningSequenceOfBusinessLogic_ShouldGenerateSequenceOfEvents()
-    {
-        var shoppingCartId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
-        var shoesId = Guid.NewGuid();
-        var tShirtId = Guid.NewGuid();
-        var twoPairsOfShoes = new ProductItem(shoesId, 2);
-        var pairOfShoes = new ProductItem(shoesId, 1);
-        var tShirt = new ProductItem(tShirtId, 1);
+    public void OpensShoppingCart() =>
+        Spec.Given([])
+            .When(() => Handle(new OpenShoppingCart(shoppingCartId, clientId, now)))
+            .Then(new ShoppingCartOpened(shoppingCartId, clientId, now));
 
-        var shoesPrice = 100;
-        var tShirtPrice = 50;
+    // Add
+    [Fact]
+    public void CantAddProductItemToNotExistingShoppingCart() =>
+        Spec.Given([])
+            .When(state =>
+                Handle(
+                    FakeProductPriceCalculator.Returning(price),
+                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
+                    state
+                )
+            )
+            .ThenThrows<InvalidOperationException>();
 
-        var pricedPairOfShoes = new PricedProductItem(shoesId, 1, shoesPrice);
-        var pricedTShirt = new PricedProductItem(tShirtId, 1, tShirtPrice);
-
-        var eventStore = new EventStore();
-
-        // Open
-        ShoppingCartEvent result =
-            ShoppingCartService.Handle(
-                new OpenShoppingCart(shoppingCartId, clientId)
+    [Fact]
+    public void AddsProductItemToEmptyShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now)
+            ])
+            .When(state =>
+                Handle(
+                    FakeProductPriceCalculator.Returning(price),
+                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
+                    state
+                )
+            )
+            .Then(
+                new ProductItemAddedToShoppingCart(
+                    shoppingCartId,
+                    new PricedProductItem(productItem.ProductId, productItem.Quantity, price),
+                    now
+                )
             );
-        eventStore.AppendToStream(shoppingCartId, (object[])[result]);
 
-        // Add Two Pair of Shoes
-        var shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
-        result = ShoppingCartService.Handle(
-            FakeProductPriceCalculator.Returning(shoesPrice),
-            new AddProductItemToShoppingCart(shoppingCartId, twoPairsOfShoes),
-            shoppingCart
-        );
-        eventStore.AppendToStream(shoppingCartId, (object[])[result]);
 
-        // Add T-Shirt
-        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
-        result = ShoppingCartService.Handle(
-            FakeProductPriceCalculator.Returning(tShirtPrice),
-            new AddProductItemToShoppingCart(shoppingCartId, tShirt),
-            shoppingCart
-        );
-        eventStore.AppendToStream(shoppingCartId, (object[])[result]);
-
-        // Remove a pair of shoes
-        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
-        result = ShoppingCartService.Handle(
-            new RemoveProductItemFromShoppingCart(shoppingCartId, pricedPairOfShoes),
-            shoppingCart
-        );
-        eventStore.AppendToStream(shoppingCartId, (object[])[result]);
-
-        // Confirm
-        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
-        result = ShoppingCartService.Handle(
-            new ConfirmShoppingCart(shoppingCartId),
-            shoppingCart
-        );
-        eventStore.AppendToStream(shoppingCartId, (object[])[result]);
-
-        // Try Cancel
-        var exception = Record.Exception(() =>
-        {
-            shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
-            result = ShoppingCartService.Handle(
-                new CancelShoppingCart(shoppingCartId),
-                shoppingCart
+    [Fact]
+    public void AddsProductItemToNonEmptyShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+            ])
+            .When(state =>
+                Handle(
+                    FakeProductPriceCalculator.Returning(otherPrice),
+                    new AddProductItemToShoppingCart(shoppingCartId, otherProductItem, now),
+                    state
+                )
+            )
+            .Then(
+                new ProductItemAddedToShoppingCart(
+                    shoppingCartId,
+                    new PricedProductItem(otherProductItem.ProductId, otherProductItem.Quantity, otherPrice),
+                    now
+                )
             );
-            eventStore.AppendToStream(shoppingCartId, (object[])[result]);
-        });
-        exception.Should().BeOfType<InvalidOperationException>();
 
-        shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
+    [Fact]
+    public void CantAddProductItemToConfirmedShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ShoppingCartConfirmed(shoppingCartId, now)
+            ])
+            .When(state =>
+                Handle(
+                    FakeProductPriceCalculator.Returning(price),
+                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
+                    state
+                )
+            )
+            .ThenThrows<InvalidOperationException>();
 
-        shoppingCart.Id.Should().Be(shoppingCartId);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(2);
-        shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
+    [Fact]
+    public void CantAddProductItemToCanceledShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ShoppingCartCanceled(shoppingCartId, now)
+            ])
+            .When(state =>
+                Handle(
+                    FakeProductPriceCalculator.Returning(price),
+                    new AddProductItemToShoppingCart(shoppingCartId, productItem, now),
+                    state
+                )
+            )
+            .ThenThrows<InvalidOperationException>();
 
-        shoppingCart.ProductItems[0].Should().Be(pricedPairOfShoes);
-        shoppingCart.ProductItems[1].Should().Be(pricedTShirt);
+    // Remove
+    [Fact]
+    public void CantRemoveProductItemFromNotExistingShoppingCart() =>
+        Spec.Given([])
+            .When(state =>
+                Handle(
+                    new RemoveProductItemFromShoppingCart(shoppingCartId, pricedProductItem, now),
+                    state
+                )
+            )
+            .ThenThrows<InvalidOperationException>();
 
-        var events = eventStore.ReadStream<ShoppingCartEvent>(shoppingCartId);
-        events.Should().HaveCount(5);
-        events[0].Should().BeOfType<ShoppingCartOpened>();
-        events[1].Should().BeOfType<ProductItemAddedToShoppingCart>();
-        events[2].Should().BeOfType<ProductItemAddedToShoppingCart>();
-        events[3].Should().BeOfType<ProductItemRemovedFromShoppingCart>();
-        events[4].Should().BeOfType<ShoppingCartConfirmed>();
-    }
+    [Fact]
+    public void RemovesExistingProductItemFromShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+            ])
+            .When(state =>
+                Handle(
+                    new RemoveProductItemFromShoppingCart(shoppingCartId, pricedProductItem with { Quantity = 1 }, now),
+                    state
+                )
+            )
+            .Then(
+                new ProductItemRemovedFromShoppingCart(
+                    shoppingCartId,
+                    pricedProductItem with { Quantity = 1 },
+                    now
+                )
+            );
+
+    [Fact]
+    public void CantRemoveNonExistingProductItemFromEmptyShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+            ])
+            .When(state =>
+                Handle(
+                    new RemoveProductItemFromShoppingCart(shoppingCartId, otherPricedProductItem with { Quantity = 1 },
+                        now),
+                    state
+                )
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    [Fact]
+    public void CantRemoveExistingProductItemFromCanceledShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ShoppingCartConfirmed(shoppingCartId, now)
+            ])
+            .When(state =>
+                Handle(
+                    new RemoveProductItemFromShoppingCart(shoppingCartId, pricedProductItem with { Quantity = 1 }, now),
+                    state
+                )
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    [Fact]
+    public void CantRemoveExistingProductItemFromConfirmedShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ShoppingCartCanceled(shoppingCartId, now)
+            ])
+            .When(state =>
+                Handle(
+                    new RemoveProductItemFromShoppingCart(shoppingCartId, pricedProductItem with { Quantity = 1 }, now),
+                    state
+                )
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    // Confirm
+
+    [Fact]
+    public void CantConfirmNotExistingShoppingCart() =>
+        Spec.Given([])
+            .When(state =>
+                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    [Fact]
+    [Trait("Category", "SkipCI")]
+    public void CantConfirmEmptyShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+            ])
+            .When(state =>
+                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    [Fact]
+    public void ConfirmsNonEmptyShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+            ])
+            .When(state =>
+                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+            )
+            .Then(
+                new ShoppingCartConfirmed(shoppingCartId, now)
+            );
+
+    [Fact]
+    public void CantConfirmAlreadyConfirmedShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ShoppingCartConfirmed(shoppingCartId, now)
+            ])
+            .When(state =>
+                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    [Fact]
+    public void CantConfirmCanceledShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ShoppingCartCanceled(shoppingCartId, now)
+            ])
+            .When(state =>
+                Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    // Cancel
+    [Fact]
+    [Trait("Category", "SkipCI")]
+    public void CantCancelNotExistingShoppingCart() =>
+        Spec.Given([])
+            .When(state =>
+                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    [Fact]
+    public void CancelsEmptyShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+            ])
+            .When(state =>
+                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    [Fact]
+    public void CancelsNonEmptyShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+            ])
+            .When(state =>
+                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+            )
+            .Then(
+                new ShoppingCartCanceled(shoppingCartId, now)
+            );
+
+    [Fact]
+    public void CantCancelAlreadyCanceledShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ShoppingCartCanceled(shoppingCartId, now)
+            ])
+            .When(state =>
+                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    [Fact]
+    public void CantCancelConfirmedShoppingCart() =>
+        Spec.Given([
+                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new ShoppingCartConfirmed(shoppingCartId, now)
+            ])
+            .When(state =>
+                Handle(new CancelShoppingCart(shoppingCartId, now), state)
+            )
+            .ThenThrows<InvalidOperationException>();
+
+    private readonly DateTimeOffset now = DateTimeOffset.Now;
+    private readonly Guid clientId = Guid.NewGuid();
+    private readonly Guid shoppingCartId = Guid.NewGuid();
+    private readonly ProductItem productItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
+    private readonly ProductItem otherProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
+    private static readonly int price = Random.Shared.Next(1, 1000);
+    private static readonly int otherPrice = Random.Shared.Next(1, 1000);
+    private readonly PricedProductItem pricedProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200), price);
+
+    private readonly PricedProductItem otherPricedProductItem =
+        new(Guid.NewGuid(), Random.Shared.Next(1, 200), otherPrice);
+
+
+    private readonly HandlerSpecification<ShoppingCartEvent, ShoppingCart> Spec =
+        Specification.For<ShoppingCartEvent, ShoppingCart>(ShoppingCart.Evolve, ShoppingCart.Default);
 }
