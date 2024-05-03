@@ -1,11 +1,13 @@
+using IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Products;
 using Ogooreck.BusinessLogic;
 using Xunit;
 
 namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable;
 
-using static ShoppingCartEvent;
+using static ShoppingCart.Event;
 using static ShoppingCartCommand;
 using static ShoppingCartService;
+using static ShoppingCart;
 
 public class BusinessLogicTests
 {
@@ -13,8 +15,8 @@ public class BusinessLogicTests
     [Fact]
     public void OpensShoppingCart() =>
         Spec.Given([])
-            .When(() => Handle(new OpenShoppingCart(shoppingCartId, clientId, now)))
-            .Then(new ShoppingCartOpened(shoppingCartId, clientId, now));
+            .When(() => Handle(new OpenShoppingCart(shoppingCartId, clientId, now), new Initial()))
+            .Then(new Opened(clientId, now));
 
     // Add
     [Fact]
@@ -22,8 +24,11 @@ public class BusinessLogicTests
         Spec.Given([])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(Price),
-                    new AddProductItemToShoppingCart(shoppingCartId, ProductItem, now),
+                    new AddProductItemToShoppingCart(
+                        shoppingCartId,
+                        FakeProductPriceCalculator.Returning(Price).Calculate(ProductItem),
+                        now
+                    ),
                     state
                 )
             )
@@ -32,18 +37,20 @@ public class BusinessLogicTests
     [Fact]
     public void AddsProductItemToEmptyShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now)
+                new Opened(clientId, now)
             ])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(Price),
-                    new AddProductItemToShoppingCart(shoppingCartId, ProductItem, now),
+                    new AddProductItemToShoppingCart(
+                        shoppingCartId,
+                        FakeProductPriceCalculator.Returning(Price).Calculate(ProductItem),
+                        now
+                    ),
                     state
                 )
             )
             .Then(
-                new ProductItemAddedToShoppingCart(
-                    shoppingCartId,
+                new ProductItemAdded(
                     new PricedProductItem(ProductItem.ProductId, ProductItem.Quantity, Price),
                     now
                 )
@@ -53,19 +60,21 @@ public class BusinessLogicTests
     [Fact]
     public void AddsProductItemToNonEmptyShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
             ])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(OtherPrice),
-                    new AddProductItemToShoppingCart(shoppingCartId, OtherProductItem, now),
+                    new AddProductItemToShoppingCart(
+                        shoppingCartId,
+                        FakeProductPriceCalculator.Returning(OtherPrice).Calculate(OtherProductItem),
+                        now
+                    ),
                     state
                 )
             )
             .Then(
-                new ProductItemAddedToShoppingCart(
-                    shoppingCartId,
+                new ProductItemAdded(
                     new PricedProductItem(OtherProductItem.ProductId, OtherProductItem.Quantity, OtherPrice),
                     now
                 )
@@ -74,14 +83,17 @@ public class BusinessLogicTests
     [Fact]
     public void CantAddProductItemToConfirmedShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
-                new ShoppingCartConfirmed(shoppingCartId, now)
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
+                new Confirmed(now)
             ])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(Price),
-                    new AddProductItemToShoppingCart(shoppingCartId, ProductItem, now),
+                    new AddProductItemToShoppingCart(
+                        shoppingCartId,
+                        FakeProductPriceCalculator.Returning(Price).Calculate(ProductItem),
+                        now
+                    ),
                     state
                 )
             )
@@ -90,14 +102,17 @@ public class BusinessLogicTests
     [Fact]
     public void CantAddProductItemToCanceledShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
-                new ShoppingCartCanceled(shoppingCartId, now)
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
+                new Canceled(now)
             ])
             .When(state =>
                 Handle(
-                    FakeProductPriceCalculator.Returning(Price),
-                    new AddProductItemToShoppingCart(shoppingCartId, ProductItem, now),
+                    new AddProductItemToShoppingCart(
+                        shoppingCartId,
+                        FakeProductPriceCalculator.Returning(Price).Calculate(ProductItem),
+                        now
+                    ),
                     state
                 )
             )
@@ -118,8 +133,8 @@ public class BusinessLogicTests
     [Fact]
     public void RemovesExistingProductItemFromShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
             ])
             .When(state =>
                 Handle(
@@ -128,8 +143,7 @@ public class BusinessLogicTests
                 )
             )
             .Then(
-                new ProductItemRemovedFromShoppingCart(
-                    shoppingCartId,
+                new ProductItemRemoved(
                     pricedProductItem with { Quantity = 1 },
                     now
                 )
@@ -138,8 +152,8 @@ public class BusinessLogicTests
     [Fact]
     public void CantRemoveNonExistingProductItemFromNonEmptyShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
             ])
             .When(state =>
                 Handle(
@@ -153,9 +167,9 @@ public class BusinessLogicTests
     [Fact]
     public void CantRemoveExistingProductItemFromCanceledShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
-                new ShoppingCartConfirmed(shoppingCartId, now)
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
+                new Confirmed(now)
             ])
             .When(state =>
                 Handle(
@@ -168,9 +182,9 @@ public class BusinessLogicTests
     [Fact]
     public void CantRemoveExistingProductItemFromConfirmedShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
-                new ShoppingCartCanceled(shoppingCartId, now)
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
+                new Canceled(now)
             ])
             .When(state =>
                 Handle(
@@ -194,7 +208,7 @@ public class BusinessLogicTests
     [Trait("Category", "SkipCI")]
     public void CantConfirmEmptyShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new Opened(clientId, now),
             ])
             .When(state =>
                 Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
@@ -204,22 +218,22 @@ public class BusinessLogicTests
     [Fact]
     public void ConfirmsNonEmptyShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
             ])
             .When(state =>
                 Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
             )
             .Then(
-                new ShoppingCartConfirmed(shoppingCartId, now)
+                new Confirmed(now)
             );
 
     [Fact]
     public void CantConfirmAlreadyConfirmedShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
-                new ShoppingCartConfirmed(shoppingCartId, now)
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
+                new Confirmed(now)
             ])
             .When(state =>
                 Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
@@ -229,9 +243,9 @@ public class BusinessLogicTests
     [Fact]
     public void CantConfirmCanceledShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
-                new ShoppingCartCanceled(shoppingCartId, now)
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
+                new Canceled(now)
             ])
             .When(state =>
                 Handle(new ConfirmShoppingCart(shoppingCartId, now), state)
@@ -251,7 +265,7 @@ public class BusinessLogicTests
     [Fact]
     public void CancelsEmptyShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
+                new Opened(clientId, now),
             ])
             .When(state =>
                 Handle(new CancelShoppingCart(shoppingCartId, now), state)
@@ -261,22 +275,22 @@ public class BusinessLogicTests
     [Fact]
     public void CancelsNonEmptyShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
             ])
             .When(state =>
                 Handle(new CancelShoppingCart(shoppingCartId, now), state)
             )
             .Then(
-                new ShoppingCartCanceled(shoppingCartId, now)
+                new Canceled(now)
             );
 
     [Fact]
     public void CantCancelAlreadyCanceledShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
-                new ShoppingCartCanceled(shoppingCartId, now)
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
+                new Canceled(now)
             ])
             .When(state =>
                 Handle(new CancelShoppingCart(shoppingCartId, now), state)
@@ -286,9 +300,9 @@ public class BusinessLogicTests
     [Fact]
     public void CantCancelConfirmedShoppingCart() =>
         Spec.Given([
-                new ShoppingCartOpened(shoppingCartId, clientId, now),
-                new ProductItemAddedToShoppingCart(shoppingCartId, pricedProductItem, now),
-                new ShoppingCartConfirmed(shoppingCartId, now)
+                new Opened(clientId, now),
+                new ProductItemAdded(pricedProductItem, now),
+                new Confirmed(now)
             ])
             .When(state =>
                 Handle(new CancelShoppingCart(shoppingCartId, now), state)
@@ -302,12 +316,14 @@ public class BusinessLogicTests
     private static readonly ProductItem OtherProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
     private static readonly int Price = Random.Shared.Next(1, 1000);
     private static readonly int OtherPrice = Random.Shared.Next(1, 1000);
+
     private readonly PricedProductItem pricedProductItem =
         new(ProductItem.ProductId, ProductItem.Quantity, Price);
+
     private readonly PricedProductItem otherPricedProductItem =
         new(OtherProductItem.ProductId, OtherProductItem.Quantity, Price);
 
 
-    private readonly HandlerSpecification<ShoppingCartEvent, ShoppingCart> Spec =
-        Specification.For<ShoppingCartEvent, ShoppingCart>(ShoppingCart.Evolve, ShoppingCart.Initial);
+    private readonly HandlerSpecification<Event, ShoppingCart> Spec =
+        Specification.For<ShoppingCart.Event, ShoppingCart>(Evolve, () => new Initial());
 }

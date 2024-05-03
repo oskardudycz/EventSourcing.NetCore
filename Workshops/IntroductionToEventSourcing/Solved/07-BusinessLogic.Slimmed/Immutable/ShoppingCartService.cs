@@ -1,6 +1,10 @@
+using IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Products;
+
 namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable;
-using static ShoppingCartEvent;
+
+using static ShoppingCart.Event;
 using static ShoppingCartCommand;
+using static ShoppingCart;
 
 public abstract record ShoppingCartCommand
 {
@@ -12,106 +16,52 @@ public abstract record ShoppingCartCommand
 
     public record AddProductItemToShoppingCart(
         Guid ShoppingCartId,
-        ProductItem ProductItem,
+        PricedProductItem ProductItem,
         DateTimeOffset Now
-    );
+    ): ShoppingCartCommand;
 
     public record RemoveProductItemFromShoppingCart(
         Guid ShoppingCartId,
         PricedProductItem ProductItem,
         DateTimeOffset Now
-    );
+    ): ShoppingCartCommand;
 
     public record ConfirmShoppingCart(
         Guid ShoppingCartId,
         DateTimeOffset Now
-    );
+    ): ShoppingCartCommand;
 
     public record CancelShoppingCart(
         Guid ShoppingCartId,
         DateTimeOffset Now
     ): ShoppingCartCommand;
 
-    private ShoppingCartCommand() {}
+    private ShoppingCartCommand() { }
 }
 
 public static class ShoppingCartService
 {
-    public static ShoppingCartOpened Handle(OpenShoppingCart command)
-    {
-        var (shoppingCartId, clientId, now) = command;
+    public static Event Handle(ShoppingCartCommand command, ShoppingCart state) =>
+        (state, command) switch
+        {
+            (Initial, OpenShoppingCart(_, var clientId, var now)) =>
+                new Opened(clientId, now),
 
-        return new ShoppingCartOpened(
-            shoppingCartId,
-            clientId,
-            now
-        );
-    }
+            (Pending, AddProductItemToShoppingCart(_, var productItem, var now)) =>
+                new ProductItemAdded(productItem, now),
 
-    public static ProductItemAddedToShoppingCart Handle(
-        IProductPriceCalculator priceCalculator,
-        AddProductItemToShoppingCart command,
-        ShoppingCart shoppingCart
-    )
-    {
-        var (cartId, productItem, now) = command;
+            (Pending(var productItems),
+                RemoveProductItemFromShoppingCart(_, var productItem, var now)) =>
+                productItems.HasEnough(productItem)
+                    ? new ProductItemRemoved(productItem, now)
+                    : throw new InvalidOperationException("Not enough product items to remove"),
 
-        if (shoppingCart.IsClosed)
-            throw new InvalidOperationException(
-                $"Adding product item for cart in '{shoppingCart.Status}' status is not allowed.");
+            (Pending, ConfirmShoppingCart(_, var now)) =>
+                new Confirmed(now),
 
-        var pricedProductItem = priceCalculator.Calculate(productItem);
+            (Pending, CancelShoppingCart(_, var now)) =>
+                new Canceled(now),
 
-        return new ProductItemAddedToShoppingCart(
-            cartId,
-            pricedProductItem,
-            now
-        );
-    }
-
-    public static ProductItemRemovedFromShoppingCart Handle(
-        RemoveProductItemFromShoppingCart command,
-        ShoppingCart shoppingCart
-    )
-    {
-        var (cartId, productItem, now) = command;
-
-        if (shoppingCart.IsClosed)
-            throw new InvalidOperationException(
-                $"Adding product item for cart in '{shoppingCart.Status}' status is not allowed.");
-
-        if (!shoppingCart.HasEnough(productItem))
-            throw new InvalidOperationException("Not enough product items to remove");
-
-        return new ProductItemRemovedFromShoppingCart(
-            cartId,
-            productItem,
-            now
-        );
-    }
-
-    public static ShoppingCartConfirmed Handle(ConfirmShoppingCart command, ShoppingCart shoppingCart)
-    {
-        if (shoppingCart.IsClosed)
-            throw new InvalidOperationException($"Confirming cart in '{shoppingCart.Status}' status is not allowed.");
-
-        if(shoppingCart.ProductItems.Length == 0)
-            throw new InvalidOperationException("Cannot confirm empty shopping cart");
-
-        return new ShoppingCartConfirmed(
-            shoppingCart.Id,
-            command.Now
-        );
-    }
-
-    public static ShoppingCartCanceled Handle(CancelShoppingCart command, ShoppingCart shoppingCart)
-    {
-        if (shoppingCart.IsClosed)
-            throw new InvalidOperationException($"Canceling cart in '{shoppingCart.Status}' status is not allowed.");
-
-        return new ShoppingCartCanceled(
-            shoppingCart.Id,
-            command.Now
-        );
-    }
+            _ => throw new InvalidOperationException($"Cannot {command.GetType().Name} for {state.GetType().Name} shopping cart")
+        };
 }
