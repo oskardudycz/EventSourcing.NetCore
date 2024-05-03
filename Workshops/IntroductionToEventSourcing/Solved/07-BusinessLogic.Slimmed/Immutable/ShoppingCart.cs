@@ -6,7 +6,7 @@ using static ShoppingCart.Event;
 
 // EVENTS
 
-public abstract record ShoppingCart
+public abstract partial record ShoppingCart
 {
     public abstract record Event
     {
