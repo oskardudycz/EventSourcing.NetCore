@@ -14,6 +14,9 @@ public class EventStore
         events[streamId].AddRange(newEvents.Select(e => (e.GetType().FullName!, JsonSerializer.Serialize(e))));
     }
 
+    public void AppendToStream<TEvent>(Guid streamId, IEnumerable<TEvent> newEvents) =>
+        AppendToStream(streamId, newEvents.Cast<object>());
+
     public TEvent[] ReadStream<TEvent>(Guid streamId) where TEvent : notnull =>
         events.TryGetValue(streamId, out var stream)
             ? stream.Select(@event =>

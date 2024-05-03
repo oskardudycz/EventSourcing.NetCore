@@ -1,4 +1,4 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution1;
+namespace IntroductionToEventSourcing.BusinessLogic.Mutable;
 
 using static ShoppingCartEvent;
 
@@ -50,7 +50,7 @@ public class ProductItem
 }
 
 // ENTITY
-public class ShoppingCart: Aggregate
+public class ShoppingCart: Aggregate<ShoppingCartEvent>
 {
     public Guid ClientId { get; private set; }
     public ShoppingCartStatus Status { get; private set; }
@@ -60,7 +60,7 @@ public class ShoppingCart: Aggregate
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    public override void Evolve(object @event)
+    public override void Evolve(ShoppingCartEvent @event)
     {
         switch (@event)
         {

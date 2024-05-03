@@ -2,7 +2,7 @@ using FluentAssertions;
 using IntroductionToEventSourcing.BusinessLogic.Tools;
 using Xunit;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Mutable.Solution2;
+namespace IntroductionToEventSourcing.BusinessLogic.Mixed;
 
 using static ShoppingCartEvent;
 

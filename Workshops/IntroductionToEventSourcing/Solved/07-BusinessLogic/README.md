@@ -23,6 +23,6 @@ _**Note**: If needed update entities, events or test setup structure_
 ## Solution
 
 1. Immutable, with functional command handlers composition and entities as anemic data model: [Immutable/BusinessLogic.cs](./Immutable/BusinessLogic.cs).
-2. Classical, mutable aggregates (rich domain model): [Mutable/Solution1/BusinessLogic.cs](./Mutable/Solution1/BusinessLogic.cs).
-3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mutable/Solution2/BusinessLogic.cs](./Mutable/Solution1/BusinessLogic.cs).
+2. Classical, mutable aggregates (rich domain model): [Mutable/BusinessLogic.cs](./Mutable/Solution1/BusinessLogic.cs).
+3. Mixed approach, mutable aggregates (rich domain model), returning events from methods, using immutable DTOs: [Mixed/BusinessLogic.cs](./Mutable/Solution1/BusinessLogic.cs).
 
