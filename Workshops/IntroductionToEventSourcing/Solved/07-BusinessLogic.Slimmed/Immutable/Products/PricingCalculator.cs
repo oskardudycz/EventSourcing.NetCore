@@ -1,4 +1,4 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable;
+namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Products;
 
 public interface IProductPriceCalculator
 {
