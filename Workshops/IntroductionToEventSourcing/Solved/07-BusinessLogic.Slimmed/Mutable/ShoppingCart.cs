@@ -1,3 +1,5 @@
+using IntroductionToEventSourcing.BusinessLogic.Slimmed.Mutable.Pricing;
+
 namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Mutable;
 
 using static ShoppingCartEvent;
@@ -5,31 +7,26 @@ using static ShoppingCartEvent;
 // EVENTS
 public abstract record ShoppingCartEvent
 {
-    public record ShoppingCartOpened(
-        Guid ShoppingCartId,
+    public record Opened(
         Guid ClientId,
         DateTimeOffset OpenedAt
     ): ShoppingCartEvent;
 
-    public record ProductItemAddedToShoppingCart(
-        Guid ShoppingCartId,
+    public record ProductItemAdded(
         PricedProductItem ProductItem,
         DateTimeOffset AddedAt
     ): ShoppingCartEvent;
 
-    public record ProductItemRemovedFromShoppingCart(
-        Guid ShoppingCartId,
+    public record ProductItemRemoved(
         PricedProductItem ProductItem,
         DateTimeOffset RemovedAt
     ): ShoppingCartEvent;
 
-    public record ShoppingCartConfirmed(
-        Guid ShoppingCartId,
+    public record Confirmed(
         DateTimeOffset ConfirmedAt
     ): ShoppingCartEvent;
 
-    public record ShoppingCartCanceled(
-        Guid ShoppingCartId,
+    public record Canceled(
         DateTimeOffset CanceledAt
     ): ShoppingCartEvent;
 
@@ -68,45 +65,43 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
     {
         switch (@event)
         {
-            case ShoppingCartOpened opened:
+            case Opened opened:
                 Apply(opened);
                 break;
-            case ProductItemAddedToShoppingCart productItemAdded:
+            case ProductItemAdded productItemAdded:
                 Apply(productItemAdded);
                 break;
-            case ProductItemRemovedFromShoppingCart productItemRemoved:
+            case ProductItemRemoved productItemRemoved:
                 Apply(productItemRemoved);
                 break;
-            case ShoppingCartConfirmed confirmed:
+            case Confirmed confirmed:
                 Apply(confirmed);
                 break;
-            case ShoppingCartCanceled canceled:
+            case Canceled canceled:
                 Apply(canceled);
                 break;
         }
     }
 
-    public static ShoppingCart Open(Guid cartId, Guid clientId, DateTimeOffset now)
+    public static ShoppingCart Open(Guid clientId, DateTimeOffset now)
     {
-        return new ShoppingCart(cartId, clientId, now);
+        return new ShoppingCart(clientId, now);
     }
 
     public static ShoppingCart Initial() => new();
 
-    private ShoppingCart(Guid id, Guid clientId, DateTimeOffset now)
+    private ShoppingCart(Guid clientId, DateTimeOffset now)
     {
-        var @event = new ShoppingCartOpened(id, clientId, now);
+        var @event = new Opened(clientId, now);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     //just for default creation of empty object
     private ShoppingCart() { }
 
-    private void Apply(ShoppingCartOpened opened)
+    private void Apply(Opened opened)
     {
-        Id = opened.ShoppingCartId;
         ClientId = opened.ClientId;
         Status = ShoppingCartStatus.Pending;
     }
@@ -123,13 +118,12 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
 
         var pricedProductItem = productPriceCalculator.Calculate(productItem);
 
-        var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem, now);
+        var @event = new ProductItemAdded(pricedProductItem, now);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
-    private void Apply(ProductItemAddedToShoppingCart productItemAdded)
+    private void Apply(ProductItemAdded productItemAdded)
     {
         var pricedProductItem = productItemAdded.ProductItem;
         var productId = pricedProductItem.ProductId;
@@ -157,10 +151,9 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         if (!HasEnough(productItemToBeRemoved))
             throw new InvalidOperationException("Not enough product items to remove");
 
-        var @event = new ProductItemRemovedFromShoppingCart(Id, productItemToBeRemoved, now);
+        var @event = new ProductItemRemoved(productItemToBeRemoved, now);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     private bool HasEnough(PricedProductItem productItem)
@@ -172,7 +165,7 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         return currentQuantity >= productItem.Quantity;
     }
 
-    private void Apply(ProductItemRemovedFromShoppingCart productItemRemoved)
+    private void Apply(ProductItemRemoved productItemRemoved)
     {
         var pricedProductItem = productItemRemoved.ProductItem;
         var productId = pricedProductItem.ProductId;
@@ -199,13 +192,12 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         if (ProductItems.Count == 0)
             throw new InvalidOperationException($"Cannot confirm empty shopping cart");
 
-        var @event = new ShoppingCartConfirmed(Id, now);
+        var @event = new Confirmed(now);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
-    private void Apply(ShoppingCartConfirmed confirmed)
+    private void Apply(Confirmed confirmed)
     {
         Status = ShoppingCartStatus.Confirmed;
         ConfirmedAt = confirmed.ConfirmedAt;
@@ -217,13 +209,12 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
             throw new InvalidOperationException(
                 $"Canceling cart in '{Status}' status is not allowed.");
 
-        var @event = new ShoppingCartCanceled(Id, now);
+        var @event = new Canceled(now);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
-    private void Apply(ShoppingCartCanceled canceled)
+    private void Apply(Canceled canceled)
     {
         Status = ShoppingCartStatus.Canceled;
         CanceledAt = canceled.CanceledAt;

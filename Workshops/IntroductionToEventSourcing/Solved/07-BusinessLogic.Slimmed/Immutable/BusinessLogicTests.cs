@@ -1,4 +1,4 @@
-using IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Products;
+using IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Pricing;
 using Ogooreck.BusinessLogic;
 using Xunit;
 
