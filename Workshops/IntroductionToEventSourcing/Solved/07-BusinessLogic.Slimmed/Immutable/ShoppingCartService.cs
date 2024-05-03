@@ -8,31 +8,26 @@ using static ShoppingCart;
 
 public abstract record ShoppingCartCommand
 {
-    public record OpenShoppingCart(
-        Guid ShoppingCartId,
+    public record Open(
         Guid ClientId,
         DateTimeOffset Now
     ): ShoppingCartCommand;
 
-    public record AddProductItemToShoppingCart(
-        Guid ShoppingCartId,
+    public record AddProductItem(
         PricedProductItem ProductItem,
         DateTimeOffset Now
     ): ShoppingCartCommand;
 
-    public record RemoveProductItemFromShoppingCart(
-        Guid ShoppingCartId,
+    public record RemoveProductItem(
         PricedProductItem ProductItem,
         DateTimeOffset Now
     ): ShoppingCartCommand;
 
-    public record ConfirmShoppingCart(
-        Guid ShoppingCartId,
+    public record Confirm(
         DateTimeOffset Now
     ): ShoppingCartCommand;
 
-    public record CancelShoppingCart(
-        Guid ShoppingCartId,
+    public record Cancel(
         DateTimeOffset Now
     ): ShoppingCartCommand;
 
@@ -41,25 +36,24 @@ public abstract record ShoppingCartCommand
 
 public static class ShoppingCartService
 {
-    public static Event Handle(ShoppingCartCommand command, ShoppingCart state) =>
+    public static Event Decide(ShoppingCartCommand command, ShoppingCart state) =>
         (state, command) switch
         {
-            (Initial, OpenShoppingCart(_, var clientId, var now)) =>
+            (Initial, Open(var clientId, var now)) =>
                 new Opened(clientId, now),
 
-            (Pending, AddProductItemToShoppingCart(_, var productItem, var now)) =>
+            (Pending, AddProductItem(var productItem, var now)) =>
                 new ProductItemAdded(productItem, now),
 
-            (Pending(var productItems),
-                RemoveProductItemFromShoppingCart(_, var productItem, var now)) =>
+            (Pending(var productItems), RemoveProductItem(var productItem, var now)) =>
                 productItems.HasEnough(productItem)
                     ? new ProductItemRemoved(productItem, now)
                     : throw new InvalidOperationException("Not enough product items to remove"),
 
-            (Pending, ConfirmShoppingCart(_, var now)) =>
+            (Pending, Confirm(var now)) =>
                 new Confirmed(now),
 
-            (Pending, CancelShoppingCart(_, var now)) =>
+            (Pending, Cancel(var now)) =>
                 new Canceled(now),
 
             _ => throw new InvalidOperationException($"Cannot {command.GetType().Name} for {state.GetType().Name} shopping cart")
