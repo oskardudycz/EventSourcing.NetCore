@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using IntroductionToEventSourcing.BusinessLogic.Slimmed.Tools;
 
-namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Products;
+namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Pricing;
 
 using ProductId = Guid;
 using ProductIdWithPrice = string;

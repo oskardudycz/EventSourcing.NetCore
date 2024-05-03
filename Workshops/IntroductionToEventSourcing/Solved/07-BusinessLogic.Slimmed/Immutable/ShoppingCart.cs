@@ -1,4 +1,4 @@
-using IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Products;
+using IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Pricing;
 
 namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable;
 

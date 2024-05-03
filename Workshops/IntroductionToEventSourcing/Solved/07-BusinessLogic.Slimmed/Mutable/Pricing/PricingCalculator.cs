@@ -1,4 +1,4 @@
-namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Immutable.Products;
+namespace IntroductionToEventSourcing.BusinessLogic.Slimmed.Mutable.Pricing;
 
 public interface IProductPriceCalculator
 {
@@ -16,9 +16,6 @@ public class FakeProductPriceCalculator: IProductPriceCalculator
 
     public static FakeProductPriceCalculator Returning(int value) => new(value);
 
-    public PricedProductItem Calculate(ProductItem productItem)
-    {
-        var (productId, quantity) = productItem;
-        return new PricedProductItem(productId, quantity, value);
-    }
+    public PricedProductItem Calculate(ProductItem productItem) =>
+        new() { ProductId = productItem.ProductId, Quantity = productItem.Quantity, UnitPrice = value };
 }
