@@ -13,7 +13,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.12.0"/>
-        <PackageReference Include="Marten" Version="7.10.0" />
+        <PackageReference Include="Marten" Version="7.10.1" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>

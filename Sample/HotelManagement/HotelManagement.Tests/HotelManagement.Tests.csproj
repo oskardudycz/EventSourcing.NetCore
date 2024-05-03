@@ -12,7 +12,7 @@
         <PackageReference Include="Bogus" Version="35.5.1" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-        <PackageReference Include="Ogooreck" Version="0.8.0" />
+        <PackageReference Include="Ogooreck" Version="0.8.1" />
         <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
