@@ -14,10 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "06-GettingStateFromEvents.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "07-BusinessLogic", "07-BusinessLogic\07-BusinessLogic.csproj", "{72CA8C3A-512F-4128-A65F-EEE4B0831D6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "08-BusinessLogic.Marten", "08-BusinessLogic.Marten\08-BusinessLogic.Marten.csproj", "{F8CBBFE9-C757-4605-9721-9C3B99E43B58}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "09-BusinessLogic.EventStoreDB", "09-BusinessLogic.EventStoreDB\09-BusinessLogic.EventStoreDB.csproj", "{565DA7F7-9530-43AC-B589-79909C929166}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "10-OptimisticConcurrency.Marten", "10-OptimisticConcurrency.Marten\10-OptimisticConcurrency.Marten.csproj", "{84C818FE-C9AF-4A99-AACC-6F549552EDFA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "11-OptimisticConcurrency.EventStoreDB", "11-OptimisticConcurrency.EventStoreDB\11-OptimisticConcurrency.EventStoreDB.csproj", "{BFD5FB88-431B-4759-87CB-C982CB81197A}"
@@ -37,6 +33,20 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "13-Projections.SingleStream.Idempotency", "13-Projections.SingleStream.Idempotency\13-Projections.SingleStream.Idempotency.csproj", "{74319775-B137-42AC-9705-7D3F0B08EB5C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "14-Projections.SingleStream.EventualConsistency", "14-Projections.SingleStream.EventualConsistency\14-Projections.SingleStream.EventualConsistency.csproj", "{4F4B6653-10F2-4D96-8465-AD39F54EE597}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "07-BusinessLogic.Slimmed", "07-BusinessLogic.Slimmed\07-BusinessLogic.Slimmed.csproj", "{2BB349DA-D394-43CF-9515-F7D49F59A49D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "08-ApplicationLogic.Marten", "08-ApplicationLogic.Marten\08-ApplicationLogic.Marten.csproj", "{3722FF43-B508-4974-87D6-ED1C06B7E912}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "08-ApplicationLogic.Marten.Tests", "08-ApplicationLogic.Marten.Tests\08-ApplicationLogic.Marten.Tests.csproj", "{E18205F5-19F4-46D8-8ED8-FC84B44327BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "09-ApplicationLogic.EventStoreDB", "09-ApplicationLogic.EventStoreDB\09-ApplicationLogic.EventStoreDB.csproj", "{B6B116B5-723F-4507-AE7F-3E98281F6FE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "09-ApplicationLogic.EventStoreDB.Tests", "09-ApplicationLogic.EventStoreDB.Tests\09-ApplicationLogic.EventStoreDB.Tests.csproj", "{B762CFD6-7ECF-408D-A696-CDE29419B18F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "10-OptimisticConcurrency.Marten.Tests", "10-OptimisticConcurrency.Marten.Tests\10-OptimisticConcurrency.Marten.Tests.csproj", "{6E27F746-612D-4FFF-ACF8-3CE7D88F588C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "11-OptimisticConcurrency.EventStoreDB.Tests", "11-OptimisticConcurrency.EventStoreDB.Tests\11-OptimisticConcurrency.EventStoreDB.Tests.csproj", "{B5FE59B6-E649-4D63-A3D4-E307ADF6CBA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,14 +82,6 @@ Global
 		{72CA8C3A-512F-4128-A65F-EEE4B0831D6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72CA8C3A-512F-4128-A65F-EEE4B0831D6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72CA8C3A-512F-4128-A65F-EEE4B0831D6D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8CBBFE9-C757-4605-9721-9C3B99E43B58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8CBBFE9-C757-4605-9721-9C3B99E43B58}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8CBBFE9-C757-4605-9721-9C3B99E43B58}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8CBBFE9-C757-4605-9721-9C3B99E43B58}.Release|Any CPU.Build.0 = Release|Any CPU
-		{565DA7F7-9530-43AC-B589-79909C929166}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{565DA7F7-9530-43AC-B589-79909C929166}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{565DA7F7-9530-43AC-B589-79909C929166}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{565DA7F7-9530-43AC-B589-79909C929166}.Release|Any CPU.Build.0 = Release|Any CPU
 		{84C818FE-C9AF-4A99-AACC-6F549552EDFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{84C818FE-C9AF-4A99-AACC-6F549552EDFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84C818FE-C9AF-4A99-AACC-6F549552EDFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -100,5 +102,33 @@ Global
 		{4F4B6653-10F2-4D96-8465-AD39F54EE597}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F4B6653-10F2-4D96-8465-AD39F54EE597}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F4B6653-10F2-4D96-8465-AD39F54EE597}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BB349DA-D394-43CF-9515-F7D49F59A49D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BB349DA-D394-43CF-9515-F7D49F59A49D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BB349DA-D394-43CF-9515-F7D49F59A49D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BB349DA-D394-43CF-9515-F7D49F59A49D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3722FF43-B508-4974-87D6-ED1C06B7E912}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3722FF43-B508-4974-87D6-ED1C06B7E912}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3722FF43-B508-4974-87D6-ED1C06B7E912}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3722FF43-B508-4974-87D6-ED1C06B7E912}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E18205F5-19F4-46D8-8ED8-FC84B44327BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E18205F5-19F4-46D8-8ED8-FC84B44327BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E18205F5-19F4-46D8-8ED8-FC84B44327BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E18205F5-19F4-46D8-8ED8-FC84B44327BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6B116B5-723F-4507-AE7F-3E98281F6FE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6B116B5-723F-4507-AE7F-3E98281F6FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6B116B5-723F-4507-AE7F-3E98281F6FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6B116B5-723F-4507-AE7F-3E98281F6FE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B762CFD6-7ECF-408D-A696-CDE29419B18F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B762CFD6-7ECF-408D-A696-CDE29419B18F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B762CFD6-7ECF-408D-A696-CDE29419B18F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B762CFD6-7ECF-408D-A696-CDE29419B18F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E27F746-612D-4FFF-ACF8-3CE7D88F588C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E27F746-612D-4FFF-ACF8-3CE7D88F588C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E27F746-612D-4FFF-ACF8-3CE7D88F588C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E27F746-612D-4FFF-ACF8-3CE7D88F588C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5FE59B6-E649-4D63-A3D4-E307ADF6CBA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5FE59B6-E649-4D63-A3D4-E307ADF6CBA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5FE59B6-E649-4D63-A3D4-E307ADF6CBA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5FE59B6-E649-4D63-A3D4-E307ADF6CBA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

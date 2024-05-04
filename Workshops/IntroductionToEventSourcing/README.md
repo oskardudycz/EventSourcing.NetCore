@@ -28,22 +28,24 @@ Read also more in my article [Introduction to Event Sourcing - Self Paced Kit](h
 1. [Events definition](./01-EventsDefinition).
 2. [Getting State from events](./02-GettingStateFromEvents).
 3. Appending Events:
-   * [Marten](./03-AppendingEvents.Marten)
-   * [EventStoreDB](./04-AppendingEvents.EventStoreDB)
+    * [Marten](./03-AppendingEvents.Marten)
+    * [EventStoreDB](./04-AppendingEvents.EventStoreDB)
 4. Getting State from events
-   * [Marten](./05-GettingStateFromEvents.Marten)
-   * [EventStoreDB](./06-GettingStateFromEvents.EventStoreDB)
+    * [Marten](./05-GettingStateFromEvents.Marten)
+    * [EventStoreDB](./06-GettingStateFromEvents.EventStoreDB)
 5. Business logic:
-   * [General](./07-BusinessLogic)
-   * [Marten](./08-BusinessLogic.Marten)
-   * [EventStoreDB](./09-BusinessLogic.EventStoreDB)
-6. Optimistic Concurrency:
-   * [Marten](./10-OptimisticConcurrency.Marten)
-   * [EventStoreDB](./11-OptimisticConcurrency.EventStoreDB)
-7. Projections:
-   * [General](./12-Projections)
-   * [Idempotency](./13-Projections.Idempotency)
-   * [Eventual Consistency](./14-Projections.EventualConsistency)
+    * [General](./07-BusinessLogic)
+    * [Slimmed](./07-BusinessLogic.Slimmed)
+6. Application Logic:
+    * [Marten](./08-ApplicationLogic.Marten)
+    * [EventStoreDB](./09-ApplicationLogic.EventStoreDB)
+7. Optimistic Concurrency:
+    * [Marten](./10-OptimisticConcurrency.Marten)
+    * [EventStoreDB](./11-OptimisticConcurrency.EventStoreDB)
+8. Projections:
+    * [General](./12-Projections)
+    * [Idempotency](./13-Projections.Idempotency)
+    * [Eventual Consistency](./14-Projections.EventualConsistency)
 
 ## Prerequisites
 
