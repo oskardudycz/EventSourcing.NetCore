@@ -4,6 +4,7 @@ using Marten;
 using Xunit;
 
 namespace IntroductionToEventSourcing.AppendingEvents;
+
 using static ShoppingCartEvent;
 
 // EVENTS
@@ -35,7 +36,7 @@ public abstract record ShoppingCartEvent
     ): ShoppingCartEvent;
 
     // This won't allow external inheritance
-    private ShoppingCartEvent(){}
+    private ShoppingCartEvent() { }
 }
 
 // VALUE OBJECTS
@@ -88,10 +89,13 @@ public class GettingStateFromEventsTests
             new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        const string connectionString =
-            "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'";
+        await using var server = new MysticMind.PostgresEmbed.PgServer("15.3.0");
 
-        using var documentStore = DocumentStore.For(options =>
+        await server.StartAsync();
+        // using Npgsql to connect the server
+        var connectionString = $"Server=localhost;Port={server.PgPort};User Id=postgres;Password=test;Database=postgres";
+
+        await using var documentStore = DocumentStore.For(options =>
         {
             options.Connection(connectionString);
             options.DatabaseSchemaName = options.Events.DatabaseSchemaName = "IntroductionToEventSourcing";

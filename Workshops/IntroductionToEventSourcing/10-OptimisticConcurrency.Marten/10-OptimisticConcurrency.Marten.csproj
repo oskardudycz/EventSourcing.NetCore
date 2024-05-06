@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Marten.CommandLine" Version="7.10.1" />
+        <PackageReference Include="MysticMind.PostgresEmbed" Version="4.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Marten.AspNetCore" Version="7.10.1" />
         <PackageReference Include="Marten" Version="7.10.1" />

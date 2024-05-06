@@ -79,8 +79,12 @@ public class GettingStateFromEventsTests
             new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        const string connectionString =
-            "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'";
+        await using var server = new MysticMind.PostgresEmbed.PgServer("15.3.0");
+
+        await server.StartAsync();
+        // using Npgsql to connect the server
+        var connectionString =
+            $"Server=localhost;Port={server.PgPort};User Id=postgres;Password=test;Database=postgres";
 
         using var documentStore = DocumentStore.For(options =>
         {
