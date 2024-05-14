@@ -35,12 +35,13 @@ builder
         })
     .AddCartsModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
-    .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
-        options.Configure(t =>
-            t.AddJaegerExporter()
-                .AddNpgsql()
-        ).DisableConsoleExporter(true)
-    ))
+    .AddOpenTelemetry("Carts")
+    // .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
+    //     options.Configure(t =>
+    //         t.AddJaegerExporter()
+    //             .AddNpgsql()
+    //     ).DisableConsoleExporter(true)
+    // ))
     .AddControllers()
     .AddNewtonsoftJson(opt => opt.SerializerSettings.WithDefaults());
 
