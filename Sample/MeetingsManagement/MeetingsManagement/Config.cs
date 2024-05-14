@@ -10,6 +10,7 @@ public static class Config
 {
     public static IServiceCollection AddMeetingsManagement(this IServiceCollection services, IConfiguration config) =>
         services.AddMarten(config, Meetings.Config.ConfigureMarten)
+            .Services
             .AddMeeting()
             .AddNotifications();
 }

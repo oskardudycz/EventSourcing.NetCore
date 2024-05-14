@@ -14,6 +14,7 @@ public static class Config
             {
                 options.ConfigureReservations();
             })
+            .Services
             .AddReservations()
             .AddMaintainance();
 }

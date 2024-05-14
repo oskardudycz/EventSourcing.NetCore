@@ -12,6 +12,7 @@ public static class Config
             .AddMarten(config, options =>
             {
                 options.ConfigureCarts();
-            })
+            }).UseNpgsqlDataSource()
+            .Services
             .AddCarts();
 }

@@ -66,6 +66,7 @@ public class MartenAsyncCommandBusTests(MartenFixture fixture): MartenTest(fixtu
                 WriteModelSchema = SchemaName,
                 ReadModelSchema = SchemaName
             })
+            .Services
             .AddCommandHandler<AddUser, AddUserCommandHandler>(
                 _ => new AddUserCommandHandler(userIds)
             )

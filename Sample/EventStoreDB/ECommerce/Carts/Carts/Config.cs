@@ -12,6 +12,7 @@ public static class Config
         services
             // Document Part used for projections
             .AddMarten(config, configKey: "ReadModel_Marten")
+            .Services
             .AddCarts()
             .AddEventStoreDB(config);
 }

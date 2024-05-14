@@ -1,6 +1,6 @@
-using System.Net;
 using Carts;
 using Core;
+using Core.Configuration;
 using Core.Exceptions;
 using Core.Kafka;
 using Core.OpenTelemetry;
@@ -15,7 +15,10 @@ using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
+builder
+    .AddServiceDefaults()
+    .Services
+    .AddNpgsqlDataSource(builder.Configuration.GetRequiredConnectionString("carts"))
     .AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "Carts", Version = "v1" });
@@ -59,7 +62,7 @@ app.UseExceptionHandler()
         c.RoutePrefix = string.Empty;
     });
 
-app.Run();
+    app.Run();
 
 public partial class Program
 {
