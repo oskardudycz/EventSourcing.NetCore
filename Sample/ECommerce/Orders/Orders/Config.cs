@@ -20,6 +20,7 @@ public static class Config
             {
                 options.ConfigureOrders();
             })
+            .Services
             .AddOrders()
             .AddPayments()
             .AddShipments();

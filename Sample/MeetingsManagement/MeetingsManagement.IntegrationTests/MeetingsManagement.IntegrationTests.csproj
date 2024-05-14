@@ -36,6 +36,4 @@
         <ProjectReference Include="..\MeetingsManagement.Api\MeetingsManagement.Api.csproj"/>
         <ProjectReference Include="..\MeetingsManagement\MeetingsManagement.csproj"/>
     </ItemGroup>
-
-
 </Project>

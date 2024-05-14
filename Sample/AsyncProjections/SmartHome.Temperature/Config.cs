@@ -14,7 +14,7 @@ public static class Config
             {
                 options.ConfigureTemperatureMeasurements();
                 options.ConfigureMotionSensors();
-            })
+            }).Services
             .AddTemperatureMeasurements()
             .AddMotionSensors();
 }

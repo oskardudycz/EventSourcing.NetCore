@@ -11,6 +11,7 @@ using Marten.Events.Projections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using Weasel.Core;
 
 namespace Core.Marten;
@@ -35,7 +36,7 @@ public static class MartenConfigExtensions
 {
     private const string DefaultConfigKey = "EventStore";
 
-    public static IServiceCollection AddMarten(
+    public static MartenServiceCollectionExtensions.MartenConfigurationExpression AddMarten(
         this IServiceCollection services,
         IConfiguration configuration,
         Action<StoreOptions>? configureOptions = null,
@@ -48,16 +49,26 @@ public static class MartenConfigExtensions
             useExternalBus
         );
 
-    public static IServiceCollection AddMarten(
+    public static MartenServiceCollectionExtensions.MartenConfigurationExpression AddMarten(
         this IServiceCollection services,
         MartenConfig martenConfig,
         Action<StoreOptions>? configureOptions = null,
         bool useExternalBus = false
     )
     {
-        services
+        var config = services
             .AddScoped<IIdGenerator, MartenIdGenerator>()
-            .AddMarten(options => SetStoreOptions(options, martenConfig, configureOptions))
+            .AddMarten(sp =>
+            {
+                var dataSource = sp.GetService<NpgsqlDataSource>();
+                if (dataSource != null)
+                {
+                    martenConfig.ConnectionString = dataSource.ConnectionString;
+                    Console.WriteLine(dataSource.ConnectionString);
+                }
+
+                return SetStoreOptions(martenConfig, configureOptions);
+            })
             .UseLightweightSessions()
             .ApplyAllDatabaseChangesOnStartup()
             //.OptimizeArtifactWorkflow()
@@ -67,15 +78,16 @@ public static class MartenConfigExtensions
         if (useExternalBus)
             services.AddMartenAsyncCommandBus();
 
-        return services;
+
+        return config;
     }
 
-    private static void SetStoreOptions(
-        StoreOptions options,
+    private static StoreOptions SetStoreOptions(
         MartenConfig martenConfig,
         Action<StoreOptions>? configureOptions = null
     )
     {
+        var options = new StoreOptions();
         options.Connection(martenConfig.ConnectionString);
         options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
 
@@ -100,5 +112,7 @@ public static class MartenConfigExtensions
         }
 
         configureOptions?.Invoke(options);
+
+        return options;
     }
 }
