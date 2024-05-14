@@ -19,6 +19,9 @@ jobs:
               with:
                   dotnet-version: "8.0.x"
 
+            - name: Install .NET Aspire workload
+              run: dotnet workload install aspire
+
             - name: Restore NuGet packages
               run: dotnet restore
 
