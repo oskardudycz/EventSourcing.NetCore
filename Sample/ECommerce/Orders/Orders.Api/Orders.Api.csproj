@@ -19,6 +19,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\..\Core.Kafka\Core.Kafka.csproj" />
       <ProjectReference Include="..\..\..\..\Core.WebApi\Core.WebApi.csproj" />
+      <ProjectReference Include="..\..\ECommerce.ServiceDefaults\ECommerce.ServiceDefaults.csproj" />
       <ProjectReference Include="..\Orders\Orders.csproj" />
     </ItemGroup>
 
