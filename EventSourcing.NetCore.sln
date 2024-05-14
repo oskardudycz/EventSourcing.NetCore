@@ -475,6 +475,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.ServiceDefaults",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetingsManagement.IntegrationTests", "Sample\MeetingsManagement\MeetingsManagement.IntegrationTests\MeetingsManagement.IntegrationTests.csproj", "{D4CD0C59-65CC-4051-A77E-2C944F3C27C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaggerUi.Aspire.Hosting", "SwaggerUi.Aspire.Hosting\SwaggerUi.Aspire.Hosting.csproj", "{CCFE487A-A5C5-4DAC-8815-AC486B9625BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1073,6 +1075,10 @@ Global
 		{D4CD0C59-65CC-4051-A77E-2C944F3C27C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4CD0C59-65CC-4051-A77E-2C944F3C27C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4CD0C59-65CC-4051-A77E-2C944F3C27C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCFE487A-A5C5-4DAC-8815-AC486B9625BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCFE487A-A5C5-4DAC-8815-AC486B9625BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCFE487A-A5C5-4DAC-8815-AC486B9625BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCFE487A-A5C5-4DAC-8815-AC486B9625BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1269,6 +1275,7 @@ Global
 		{5FD086AD-CBFC-4D8D-A586-316EB56560E8} = {58104871-E205-45F1-9E24-BED4967E602B}
 		{651DE4BD-282A-4244-B08D-D4A87CE07111} = {58104871-E205-45F1-9E24-BED4967E602B}
 		{D4CD0C59-65CC-4051-A77E-2C944F3C27C0} = {A8E25331-55E9-4D1A-87A4-136EC4D2A4B5}
+		{CCFE487A-A5C5-4DAC-8815-AC486B9625BC} = {0570E45A-2EB6-4C4C-84E4-2C80E1FECEB5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A5F55604-2FF3-43B7-B657-4F18E6E95D3B}
