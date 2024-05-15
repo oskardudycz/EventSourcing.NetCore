@@ -19,7 +19,9 @@ public static class Config
             .AddMarten(config, options =>
             {
                 options.ConfigureOrders();
+                options.DisableNpgsqlLogging = true;
             })
+            .UseNpgsqlDataSource()
             .Services
             .AddOrders()
             .AddPayments()
