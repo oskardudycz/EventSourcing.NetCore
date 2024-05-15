@@ -1,5 +1,6 @@
 using System.Net;
 using Core;
+using Core.Configuration;
 using Core.Exceptions;
 using Core.Kafka;
 using Core.OpenTelemetry;
@@ -14,7 +15,10 @@ using Orders;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
+builder
+    .AddServiceDefaults()
+    .Services
+    .AddNpgsqlDataSource(builder.Configuration.GetRequiredConnectionString("orders"))
     .AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "Orders", Version = "v1" });
@@ -31,12 +35,7 @@ builder.Services
         })
     .AddOrdersModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
-    .AddOpenTelemetry("Orders", OpenTelemetryOptions.Build(options =>
-        options.Configure(t =>
-            t.AddJaegerExporter()
-                .AddNpgsql()
-        ).DisableConsoleExporter(true)
-    ))
+    .AddOpenTelemetry("Orders")
     .AddControllers();
 
 var app = builder.Build();

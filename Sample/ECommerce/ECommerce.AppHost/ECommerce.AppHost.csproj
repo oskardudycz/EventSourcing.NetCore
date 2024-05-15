@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\..\SwaggerUi.Aspire.Hosting\SwaggerUi.Aspire.Hosting.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\ECommerce.ApiService\ECommerce.ApiService.csproj" />
     <ProjectReference Include="..\Carts\Carts.Api\Carts.Api.csproj" />
+      <ProjectReference Include="..\Orders\Orders.Api\Orders.Api.csproj"/>
     <PackageReference Include="Aspire.Npgsql" Version="8.0.0-preview.7.24251.11" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.0.0-preview.7.24251.11" />
   </ItemGroup>
