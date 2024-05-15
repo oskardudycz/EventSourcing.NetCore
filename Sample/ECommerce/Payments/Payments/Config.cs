@@ -9,10 +9,13 @@ public static class Config
 {
     public static IServiceCollection AddPaymentsModule(this IServiceCollection services, IConfiguration config)
     {
-        services.AddMarten(config, options =>
+        return services.AddMarten(config, options =>
         {
             options.ConfigurePayments();
-        });
-        return services.AddPayments();
+            options.DisableNpgsqlLogging = true;
+        })
+        .UseNpgsqlDataSource()
+        .Services
+        .AddPayments();
     }
 }

@@ -10,12 +10,9 @@ namespace Payments.Api.Controllers;
 [Route("api/[controller]")]
 public class PaymentsController(
     ICommandBus commandBus,
-    IQueryBus queryBus,
     IIdGenerator idGenerator)
     : Controller
 {
-    private readonly IQueryBus queryBus = queryBus;
-
     [HttpPost]
     public async Task<IActionResult> RequestPayment([FromBody] RequestPaymentRequest? request)
     {

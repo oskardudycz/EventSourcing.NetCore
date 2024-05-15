@@ -1,26 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <IsAspireHost>true</IsAspireHost>
-    <UserSecretsId>58a6cde9-adce-40d0-80f0-6abd989c9402</UserSecretsId>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsAspireHost>true</IsAspireHost>
+        <UserSecretsId>58a6cde9-adce-40d0-80f0-6abd989c9402</UserSecretsId>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\SwaggerUi.Aspire.Hosting\SwaggerUi.Aspire.Hosting.csproj" IsAspireProjectResource="false" />
-    <ProjectReference Include="..\ECommerce.ApiService\ECommerce.ApiService.csproj" />
-    <ProjectReference Include="..\Carts\Carts.Api\Carts.Api.csproj" />
-    <ProjectReference Include="..\Orders\Orders.Api\Orders.Api.csproj"/>
-    <PackageReference Include="Aspire.Npgsql" Version="8.0.0-preview.7.24251.11" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.0.0-preview.7.24251.11" />
-    <PackageReference Include="Aspire.Hosting.Kafka" Version="8.0.0-preview.7.24251.11"/>
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\SwaggerUi.Aspire.Hosting\SwaggerUi.Aspire.Hosting.csproj" IsAspireProjectResource="false"/>
+        <ProjectReference Include="..\ECommerce.ApiService\ECommerce.ApiService.csproj"/>
+        <ProjectReference Include="..\Carts\Carts.Api\Carts.Api.csproj"/>
+        <ProjectReference Include="..\Orders\Orders.Api\Orders.Api.csproj"/>
+        <ProjectReference Include="..\Payments\Payments.Api\Payments.Api.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.0-preview.7.24251.11" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="8.0.1"/>
+        <PackageReference Include="Aspire.Npgsql" Version="8.0.0-preview.7.24251.11"/>
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.0.0-preview.7.24251.11"/>
+        <PackageReference Include="Aspire.Hosting.Kafka" Version="8.0.0-preview.7.24251.11"/>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.0-preview.7.24251.11"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="HealthChecks.Kafka">
+            <HintPath>..\..\..\..\..\.nuget\packages\aspnetcore.healthchecks.kafka\8.0.1\lib\net6.0\HealthChecks.Kafka.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 
 </Project>
