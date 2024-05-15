@@ -47,7 +47,12 @@ builder
         })
     .AddOrdersModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
-    .AddOpenTelemetry("Orders")
+    .AddOpenTelemetry("Orders", OpenTelemetryOptions.Build(options =>
+        options
+            .WithTracing(t => t.AddSource("Marten"))
+            .WithMetrics(m => m.AddMeter("Marten"))
+            .DisableConsoleExporter(true)
+    ))
     .AddControllers();
 
 var app = builder.Build();

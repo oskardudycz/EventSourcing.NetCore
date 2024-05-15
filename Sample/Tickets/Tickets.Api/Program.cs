@@ -31,7 +31,7 @@ builder.Services
     .AddTicketsModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Tickets", OpenTelemetryOptions.Build(options =>
-        options.Configure(t =>
+        options.WithTracing(t =>
             t.AddJaegerExporter()
                 .AddNpgsql()
         ).DisableConsoleExporter(true)

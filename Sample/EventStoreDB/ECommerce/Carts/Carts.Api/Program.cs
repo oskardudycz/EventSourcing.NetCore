@@ -31,7 +31,7 @@ builder.Services
     .AddCartsModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
-        options.Configure(t =>
+        options.WithTracing(t =>
             t.AddJaegerExporter()
         ).DisableConsoleExporter(true)
     ))

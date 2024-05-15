@@ -12,7 +12,7 @@ public static class Config
             .AddMarten(config, options =>
             {
                 options.ConfigureCarts();
-                options.DisableNpgsqlLogging = true;
+                //options.DisableNpgsqlLogging = true;
             }).UseNpgsqlDataSource()
             .Services
             .AddCarts();
