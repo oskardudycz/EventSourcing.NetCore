@@ -16,21 +16,45 @@ public class EventStoreDBRepositoryWithTelemetryDecorator<T>(
     public Task<ulong> Add(T aggregate, CancellationToken cancellationToken = default) =>
         activityScope.Run($"EventStoreDBRepository/{nameof(Add)}",
             (_, ct) => inner.Add(aggregate, ct),
-            new StartActivityOptions { Tags = { { TelemetryTags.Logic.Entity, typeof(T).Name } } },
+            new StartActivityOptions
+            {
+                Tags =
+                {
+                    { TelemetryTags.Logic.Entities.EntityType, typeof(T).Name },
+                    { TelemetryTags.Logic.Entities.EntityId, aggregate.Id },
+                    { TelemetryTags.Logic.Entities.EntityVersion, aggregate.Version }
+                }
+            },
             cancellationToken
         );
 
     public Task<ulong> Update(T aggregate, ulong? expectedVersion = null, CancellationToken token = default) =>
         activityScope.Run($"EventStoreDBRepository/{nameof(Update)}",
             (_, ct) => inner.Update(aggregate, expectedVersion, ct),
-            new StartActivityOptions { Tags = { { TelemetryTags.Logic.Entity, typeof(T).Name } } },
+            new StartActivityOptions
+            {
+                Tags =
+                {
+                    { TelemetryTags.Logic.Entities.EntityType, typeof(T).Name },
+                    { TelemetryTags.Logic.Entities.EntityId, aggregate.Id },
+                    { TelemetryTags.Logic.Entities.EntityVersion, aggregate.Version }
+                }
+            },
             token
         );
 
     public Task<ulong> Delete(T aggregate, ulong? expectedVersion = null, CancellationToken token = default) =>
         activityScope.Run($"EventStoreDBRepository/{nameof(Delete)}",
             (_, ct) => inner.Delete(aggregate, expectedVersion, ct),
-            new StartActivityOptions { Tags = { { TelemetryTags.Logic.Entity, typeof(T).Name } } },
+            new StartActivityOptions
+            {
+                Tags =
+                {
+                    { TelemetryTags.Logic.Entities.EntityType, typeof(T).Name },
+                    { TelemetryTags.Logic.Entities.EntityId, aggregate.Id },
+                    { TelemetryTags.Logic.Entities.EntityVersion, aggregate.Version }
+                }
+            },
             token
         );
 }
