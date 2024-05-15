@@ -11,13 +11,23 @@ using static Core.Extensions.DictionaryExtensions;
 
 namespace Core.Kafka.Producers;
 
-public class KafkaProducer(
-    IConfiguration configuration,
-    IActivityScope activityScope,
-    ILogger<KafkaProducer> logger
-): IExternalEventProducer
+public class KafkaProducer: IExternalEventProducer
 {
-    private readonly KafkaProducerConfig config = configuration.GetKafkaProducerConfig();
+    private readonly KafkaProducerConfig config;
+    private readonly IActivityScope activityScope1;
+    private readonly ILogger<KafkaProducer> logger1;
+    private readonly IProducer<string, string> producer;
+
+    public KafkaProducer(IConfiguration configuration,
+        IActivityScope activityScope,
+        IProducer<string, string>? producer,
+        ILogger<KafkaProducer> logger)
+    {
+        activityScope1 = activityScope;
+        logger1 = logger;
+        config = configuration.GetKafkaProducerConfig();
+        this.producer = producer ?? new ProducerBuilder<string, string>(config.ProducerConfig).Build();
+    }
 
     // get configuration from appsettings.json
 
@@ -25,16 +35,13 @@ public class KafkaProducer(
     {
         try
         {
-            await activityScope.Run($"{nameof(KafkaProducer)}/{nameof(Publish)}",
+            await activityScope1.Run($"{nameof(KafkaProducer)}/{nameof(Publish)}",
                 async (_, ct) =>
                 {
-                    using var p = new ProducerBuilder<string, string>(config.ProducerConfig).Build();
-                    // publish event to kafka topic taken from config
-
                     using var cts =
-                        new CancellationTokenSource(TimeSpan.FromMilliseconds(config.ProducerTimeoutInMs ?? 1000));
+                        new CancellationTokenSource(TimeSpan.FromMilliseconds(config.ProducerTimeoutInMs ?? 10000));
 
-                    await p.ProduceAsync(config.Topic,
+                    await producer.ProduceAsync(config.Topic,
                         new Message<string, string>
                         {
                             // store event type name in message Key
@@ -62,7 +69,7 @@ public class KafkaProducer(
         }
         catch (Exception e)
         {
-            logger.LogError("Error producing Kafka message: {Message} {StackTrace}", e.Message, e.StackTrace);
+            logger1.LogError("Error producing Kafka message: {Message} {StackTrace}", e.Message, e.StackTrace);
             throw;
         }
     }

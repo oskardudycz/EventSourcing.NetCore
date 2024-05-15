@@ -16,11 +16,13 @@ public class KafkaConsumer: IExternalEventConsumer
     private readonly IEventBus eventBus;
     private readonly IActivityScope activityScope;
     private readonly ILogger<KafkaConsumer> logger;
+    private readonly IConsumer<string, string> consumer;
 
     public KafkaConsumer(
         IConfiguration configuration,
         IEventBus eventBus,
         IActivityScope activityScope,
+        IConsumer<string, string>? consumer,
         ILogger<KafkaConsumer> logger
     )
     {
@@ -34,14 +36,13 @@ public class KafkaConsumer: IExternalEventConsumer
 
         // get configuration from appsettings.json
         config = configuration.GetKafkaConsumerConfig();
+        this.consumer = consumer ?? new ConsumerBuilder<string, string>(config.ConsumerConfig).Build();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("Kafka consumer started");
 
-        // create consumer
-        using var consumer = new ConsumerBuilder<string, string>(config.ConsumerConfig).Build();
         // subscribe to Kafka topics (taken from config)
         consumer.Subscribe(config.Topics);
         try
@@ -121,7 +122,7 @@ public class KafkaConsumer: IExternalEventConsumer
         }
         catch (Exception e)
         {
-            logger.LogError("Error producing Kafka message: {Message} {StackTrace}",e.Message, e.StackTrace);
+            logger.LogError("Error consuming Kafka message: {Message} {StackTrace}",e.Message, e.StackTrace);
         }
     }
 }

@@ -18,6 +18,19 @@ public static class KafkaConsumerConfigExtensions
 
     public static KafkaConsumerConfig GetKafkaConsumerConfig(this IConfiguration configuration)
     {
-        return configuration.GetRequiredConfig<KafkaConsumerConfig>(DefaultConfigKey);
+        // Manually bind the ConsumerConfig until https://github.com/dotnet/runtime/issues/96652 is fixed
+        var config = configuration.GetSection("kafka").GetSection("Config").Get<KafkaConsumerConfig>();
+
+        var connectionString = configuration.GetConnectionString("kafka");
+        var kafkaProducerConfig = configuration.GetRequiredConfig<KafkaConsumerConfig>(DefaultConfigKey);
+
+        if (connectionString == null) return kafkaProducerConfig;
+
+        kafkaProducerConfig.ConsumerConfig.BootstrapServers = connectionString;
+        kafkaProducerConfig.ConsumerConfig.AllowAutoCreateTopics = true; //TODO: fix that!
+        kafkaProducerConfig.ConsumerConfig.SecurityProtocol = SecurityProtocol.Plaintext;
+        kafkaProducerConfig.ConsumerConfig.SaslMechanism = SaslMechanism.Plain;
+
+        return kafkaProducerConfig;
     }
 }

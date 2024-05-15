@@ -15,6 +15,16 @@ public static class KafkaProducerConfigExtensions
 {
     private const string DefaultConfigKey = "KafkaProducer";
 
-    public static KafkaProducerConfig GetKafkaProducerConfig(this IConfiguration configuration) =>
-        configuration.GetRequiredConfig<KafkaProducerConfig>(DefaultConfigKey);
+    public static KafkaProducerConfig GetKafkaProducerConfig(this IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("kafka");
+        var kafkaProducerConfig = configuration.GetRequiredConfig<KafkaProducerConfig>(DefaultConfigKey);
+
+        if (connectionString == null) return kafkaProducerConfig;
+
+        kafkaProducerConfig.ProducerConfig ??= new ProducerConfig();
+        kafkaProducerConfig.ProducerConfig.BootstrapServers = connectionString;
+
+        return kafkaProducerConfig;
+    }
 }

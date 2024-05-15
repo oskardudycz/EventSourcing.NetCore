@@ -70,7 +70,7 @@ public static class MartenConfigExtensions
                 return SetStoreOptions(martenConfig, configureOptions);
             })
             .UseLightweightSessions()
-            .ApplyAllDatabaseChangesOnStartup()
+            //.ApplyAllDatabaseChangesOnStartup()
             //.OptimizeArtifactWorkflow()
             .AddAsyncDaemon(martenConfig.DaemonMode)
             .AddSubscriptionWithServices<MartenEventPublisher>(ServiceLifetime.Scoped);

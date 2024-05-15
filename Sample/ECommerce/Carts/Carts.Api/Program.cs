@@ -15,6 +15,11 @@ using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddKafkaProducer<string, string>("kafka", settings =>
+{
+    settings.Config.AllowAutoCreateTopics = true;
+} );
+
 builder
     .AddServiceDefaults()
     .Services

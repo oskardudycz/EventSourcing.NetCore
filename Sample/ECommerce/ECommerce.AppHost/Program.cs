@@ -17,13 +17,22 @@ var shipmentsDB = builder.AddPostgres("shipments-db")
     .WithPgAdmin()
     .AddDatabase("shipments");
 
+var kafka = builder.AddKafka("kafka")
+    .WithEnvironment("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "true")
+    .WithEnvironment("AUTO_CREATE_TOPICS_ENABLE", "true")
+    .WithEnvironment("KAFKA_TOPIC_CREATE_BACKOFF_MS", "10000")
+    .WithEnvironment("TOPIC_CREATE_BACKOFF_MS", "10000");
+
 var shoppingCarts = builder.AddProject<Projects.Carts_Api>("api-shopping-carts")
     .WithSwaggerUI()
-    .WithReference(cartsDB);
+    .WithReference(cartsDB)
+    .WithReference(kafka);
 
 var orders = builder.AddProject<Projects.Orders_Api>("api-orders")
     .WithSwaggerUI()
-    .WithReference(ordersDB);
+    .WithEnvironment("kafka_topics", "['Carts', 'Payments', 'Shipments']")
+    .WithReference(ordersDB)
+    .WithReference(kafka);
 
 // builder.AddProject<Projects.ECommerce_Web>("webfrontend")
 //     .WithExternalHttpEndpoints()
