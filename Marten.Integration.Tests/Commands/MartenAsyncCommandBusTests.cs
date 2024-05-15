@@ -1,3 +1,4 @@
+using System.Diagnostics.Metrics;
 using Core;
 using Core.Commands;
 using Core.Events;
@@ -12,6 +13,7 @@ using Marten.Integration.Tests.TestsInfrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Time.Testing;
 using Polly;
 using Xunit;
 
@@ -72,6 +74,7 @@ public class MartenAsyncCommandBusTests(MartenFixture fixture): MartenTest(fixtu
             )
             .AddScoped(sp => new InMemoryCommandBus(
                 sp,
+                new CommandHandlerActivity(new CommandHandlerMetrics(new DummyMeterFactory(), new FakeTimeProvider())),
                 new ActivityScope(),
                 Policy.NoOpAsync()
             ))
@@ -103,4 +106,11 @@ internal class AddUserCommandHandler(List<Guid> userIds): ICommandHandler<AddUse
 
         return Task.CompletedTask;
     }
+}
+
+internal sealed class DummyMeterFactory: IMeterFactory
+{
+    public Meter Create(MeterOptions options) => new(options);
+
+    public void Dispose() { }
 }

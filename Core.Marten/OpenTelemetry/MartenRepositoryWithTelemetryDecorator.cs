@@ -25,7 +25,15 @@ public class MartenRepositoryWithTracingDecorator<T>(
 
                 return inner.Add(aggregate, ct);
             },
-            new StartActivityOptions { Tags = { { TelemetryTags.Logic.Entity, typeof(T).Name } } },
+            new StartActivityOptions
+            {
+                Tags =
+                {
+                    { TelemetryTags.Logic.Entities.EntityType, typeof(T).Name },
+                    { TelemetryTags.Logic.Entities.EntityId, aggregate.Id },
+                    { TelemetryTags.Logic.Entities.EntityVersion, aggregate.Version }
+                }
+            },
             cancellationToken
         );
 
@@ -37,7 +45,15 @@ public class MartenRepositoryWithTracingDecorator<T>(
 
                 return inner.Update(aggregate, expectedVersion, ct);
             },
-            new StartActivityOptions { Tags = { { TelemetryTags.Logic.Entity, typeof(T).Name } } },
+            new StartActivityOptions
+            {
+                Tags =
+                {
+                    { TelemetryTags.Logic.Entities.EntityType, typeof(T).Name },
+                    { TelemetryTags.Logic.Entities.EntityId, aggregate.Id },
+                    { TelemetryTags.Logic.Entities.EntityVersion, aggregate.Version }
+                }
+            },
             token
         );
 
@@ -49,7 +65,15 @@ public class MartenRepositoryWithTracingDecorator<T>(
 
                 return inner.Delete(aggregate, expectedVersion, ct);
             },
-            new StartActivityOptions { Tags = { { TelemetryTags.Logic.Entity, typeof(T).Name } } },
+            new StartActivityOptions
+            {
+                Tags =
+                {
+                    { TelemetryTags.Logic.Entities.EntityType, typeof(T).Name },
+                    { TelemetryTags.Logic.Entities.EntityId, aggregate.Id },
+                    { TelemetryTags.Logic.Entities.EntityVersion, aggregate.Version }
+                }
+            },
             token
         );
 }

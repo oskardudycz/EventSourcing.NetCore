@@ -41,13 +41,13 @@ public class ActivityScope: IActivityScope
 {
     public static readonly IActivityScope Instance = new ActivityScope();
 
-    private const string GeneralPrefix = "event_driven_io";
+    // private const string GeneralPrefix = "event_driven_io";
 
     public Activity? Start(string name, StartActivityOptions options) =>
         options.Parent.HasValue
             ? ActivitySourceProvider.Instance
                 .CreateActivity(
-                    $"{GeneralPrefix}.{name}",
+                    $"{ActivitySourceProvider.DefaultSourceName}.{name}",
                     options.Kind,
                     parentContext: options.Parent.Value,
                     idFormat: ActivityIdFormat.W3C,
@@ -55,9 +55,9 @@ public class ActivityScope: IActivityScope
                 )?.Start()
             : ActivitySourceProvider.Instance
                 .CreateActivity(
-                    $"{GeneralPrefix}.{name}",
+                    $"{ActivitySourceProvider.DefaultSourceName}.{name}",
                     options.Kind,
-                    parentId: options.ParentId,
+                    parentId: options.ParentId ?? Activity.Current?.ParentId,
                     idFormat: ActivityIdFormat.W3C,
                     tags: options.Tags
                 )?.Start();

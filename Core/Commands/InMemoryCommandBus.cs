@@ -7,6 +7,7 @@ namespace Core.Commands;
 
 public class InMemoryCommandBus(
     IServiceProvider serviceProvider,
+    CommandHandlerActivity commandHandlerActivity,
     IActivityScope activityScope,
     IAsyncPolicy retryPolicy
 ): ICommandBus
@@ -28,15 +29,10 @@ public class InMemoryCommandBus(
         if (commandHandler == null)
             return false;
 
-        var commandName = typeof(TCommand).Name;
-        var activityName = $"{commandHandler.GetType().Name}/{commandName}";
-
-        await activityScope.Run(
-            activityName,
-            (_, token) => retryPolicy.ExecuteAsync(c => commandHandler.Handle(command, c), token),
-            new StartActivityOptions { Tags = { { TelemetryTags.CommandHandling.Command, commandName } } },
-            ct
-        ).ConfigureAwait(false);
+        await retryPolicy.ExecuteAsync((token) =>
+                commandHandlerActivity.TrySend<TCommand>(activityScope, commandHandler.GetType().Name,
+                    (_, c) => commandHandler.Handle(command, c), token),
+            ct).ConfigureAwait(false);
 
         return true;
     }
@@ -47,10 +43,13 @@ public static class EventBusExtensions
     public static IServiceCollection AddInMemoryCommandBus(this IServiceCollection services,
         AsyncPolicy? asyncPolicy = null)
     {
+        services.AddSingleton<CommandHandlerMetrics>();
+        services.AddSingleton<CommandHandlerActivity>();
         services
             .AddScoped(sp =>
                 new InMemoryCommandBus(
                     sp,
+                    sp.GetRequiredService<CommandHandlerActivity>(),
                     sp.GetRequiredService<IActivityScope>(),
                     asyncPolicy ?? Policy.NoOpAsync()
                 ))

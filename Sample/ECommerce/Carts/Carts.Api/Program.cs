@@ -28,7 +28,7 @@ builder
                             .AddSource(ActivitySourceProvider.DefaultSourceName)
                     //.AddNpgsql()
                 )
-                .WithMetrics(t => t.AddMeter("Marten"))
+                .WithMetrics(t => t.AddMeter("Marten", ActivitySourceProvider.DefaultSourceName))
                 .DisableConsoleExporter(true)
         ))
     .Services
