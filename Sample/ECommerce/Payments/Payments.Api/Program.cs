@@ -1,11 +1,13 @@
 using System.Net;
 using Core;
+using Core.Configuration;
 using Core.Exceptions;
 using Core.Kafka;
 using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
+using Marten.Events.Daemon;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
 using Npgsql;
@@ -14,7 +16,13 @@ using Payments;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddKafkaProducer<string, string>("kafka", settings =>
+{
+    settings.Config.AllowAutoCreateTopics = true;
+});
+
 builder.Services
+    .AddNpgsqlDataSource(builder.Configuration.GetRequiredConnectionString("payments"))
     .AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "Payments", Version = "v1" });
@@ -38,6 +46,10 @@ builder.Services
         ).DisableConsoleExporter(true)
     ))
     .AddControllers();
+
+builder.Services
+    .AddHealthChecks()
+    .AddMartenAsyncDaemonHealthCheck(maxEventLag: 500);
 
 var app = builder.Build();
 

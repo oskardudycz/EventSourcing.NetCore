@@ -20,18 +20,16 @@ public record RequestPayment(
 }
 
 public class HandleRequestPayment(
-    ExternalServicesConfig externalServicesConfig,
-    IExternalCommandBus externalCommandBus)
+    //ExternalServicesConfig externalServicesConfig,
+    //IExternalCommandBus externalCommandBus)
+    PaymentsApiClient client)
     :
         ICommandHandler<RequestPayment>
 {
     public async Task Handle(RequestPayment command, CancellationToken ct)
     {
-        await externalCommandBus.Post(
-            externalServicesConfig.PaymentsUrl!,
-            "payments",
-            command,
-            ct
-        );
+       var result =  await client.Request(command, ct);
+
+       result.EnsureSuccessStatusCode();
     }
 }
