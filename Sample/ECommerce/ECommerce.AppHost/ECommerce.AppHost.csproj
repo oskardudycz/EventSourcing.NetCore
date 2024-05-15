@@ -11,7 +11,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\SwaggerUi.Aspire.Hosting\SwaggerUi.Aspire.Hosting.csproj" IsAspireProjectResource="false"/>
-        <ProjectReference Include="..\ECommerce.ApiService\ECommerce.ApiService.csproj"/>
         <ProjectReference Include="..\Carts\Carts.Api\Carts.Api.csproj"/>
         <ProjectReference Include="..\Orders\Orders.Api\Orders.Api.csproj"/>
         <ProjectReference Include="..\Payments\Payments.Api\Payments.Api.csproj"/>
