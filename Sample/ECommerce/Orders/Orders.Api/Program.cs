@@ -1,4 +1,5 @@
 using System.Net;
+using Confluent.Kafka;
 using Core;
 using Core.Configuration;
 using Core.Exceptions;
@@ -9,11 +10,22 @@ using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
-using Npgsql;
-using OpenTelemetry.Trace;
 using Orders;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddKafkaConsumer<string, string>("kafka", settings =>
+{
+    settings.Config.GroupId = "Orders";
+    settings.Config.AutoOffsetReset = AutoOffsetReset.Earliest;
+    settings.Config.EnableAutoCommit = false;
+    settings.Config.AllowAutoCreateTopics = true;
+});
+
+builder.AddKafkaProducer<string, string>("kafka", settings =>
+{
+    settings.Config.AllowAutoCreateTopics = true;
+});
 
 builder
     .AddServiceDefaults()
