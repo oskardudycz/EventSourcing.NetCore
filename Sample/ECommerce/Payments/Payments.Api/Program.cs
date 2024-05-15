@@ -1,4 +1,3 @@
-using System.Net;
 using Core;
 using Core.Configuration;
 using Core.Exceptions;
@@ -40,10 +39,10 @@ builder.Services
     .AddPaymentsModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Payments", OpenTelemetryOptions.Build(options =>
-        options.Configure(t =>
-            t.AddJaegerExporter()
-                .AddNpgsql()
-        ).DisableConsoleExporter(true)
+        options
+            .WithTracing(t => t.AddSource("Marten"))
+            .WithMetrics(m => m.AddMeter("Marten"))
+            .DisableConsoleExporter(true)
     ))
     .AddControllers();
 

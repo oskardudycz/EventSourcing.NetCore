@@ -30,7 +30,7 @@ builder.Services
         })
     .AddShipmentsModule(builder.Configuration)
     .AddOpenTelemetry("Shipments", OpenTelemetryOptions.Build(options =>
-        options.Configure(t =>
+        options.WithTracing(t =>
             t.AddJaegerExporter()
                 .AddNpgsql()
         ).DisableConsoleExporter(true)

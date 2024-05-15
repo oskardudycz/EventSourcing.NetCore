@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using OpenTelemetry.Trace;
 
 namespace Core.OpenTelemetry;
 
@@ -76,9 +77,10 @@ public class ActivityScope: IActivityScope
 
             activity?.SetStatus(ActivityStatusCode.Ok);
         }
-        catch
+        catch(Exception ex)
         {
             activity?.SetStatus(ActivityStatusCode.Error);
+            activity?.RecordException(ex);
             throw;
         }
     }
@@ -100,8 +102,9 @@ public class ActivityScope: IActivityScope
 
             return result;
         }
-        catch
+        catch(Exception ex)
         {
+            activity?.RecordException(ex);
             activity?.SetStatus(ActivityStatusCode.Error);
             throw;
         }

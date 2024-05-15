@@ -20,7 +20,7 @@ builder.Services
     .AddDefaultExceptionHandler()
     .AddMeetingsSearch(builder.Configuration)
     .AddOpenTelemetry("MeetingsSearch", OpenTelemetryOptions.Build(options =>
-        options.Configure(t =>
+        options.WithTracing(t =>
             t.AddJaegerExporter()
         ).DisableConsoleExporter(true)
     ))

@@ -31,7 +31,7 @@ builder.Services
         })
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("MeetingsManagement", OpenTelemetryOptions.Build(options =>
-        options.Configure(t =>
+        options.WithTracing(t =>
             t.AddJaegerExporter()
         ).DisableConsoleExporter(true)
     ))

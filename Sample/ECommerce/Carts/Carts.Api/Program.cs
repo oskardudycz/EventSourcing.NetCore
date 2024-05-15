@@ -11,17 +11,26 @@ using Core.WebApi.Swagger;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
 using Npgsql;
-using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddKafkaProducer<string, string>("kafka", settings =>
 {
     settings.Config.AllowAutoCreateTopics = true;
-} );
+});
 
 builder
-    .AddServiceDefaults()
+    .AddServiceDefaults(
+        OpenTelemetryOptions.Build(options =>
+            options
+                .WithTracing(t =>
+                        t.AddSource("Marten")
+                            .AddSource(ActivitySourceProvider.DefaultSourceName)
+                    //.AddNpgsql()
+                )
+                .WithMetrics(t => t.AddMeter("Marten"))
+                .DisableConsoleExporter(true)
+        ))
     .Services
     .AddNpgsqlDataSource(builder.Configuration.GetRequiredConnectionString("carts"))
     .AddSwaggerGen(c =>
@@ -40,13 +49,6 @@ builder
         })
     .AddCartsModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
-    .AddOpenTelemetry("Carts")
-    // .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
-    //     options.Configure(t =>
-    //         t.AddJaegerExporter()
-    //             .AddNpgsql()
-    //     ).DisableConsoleExporter(true)
-    // ))
     .AddControllers()
     .AddNewtonsoftJson(opt => opt.SerializerSettings.WithDefaults());
 
@@ -68,7 +70,7 @@ app.UseExceptionHandler()
         c.RoutePrefix = string.Empty;
     });
 
-    app.Run();
+app.Run();
 
 public partial class Program
 {

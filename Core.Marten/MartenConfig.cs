@@ -8,6 +8,7 @@ using Core.OpenTelemetry;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
+using Marten.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -70,7 +71,7 @@ public static class MartenConfigExtensions
                 return SetStoreOptions(martenConfig, configureOptions);
             })
             .UseLightweightSessions()
-            //.ApplyAllDatabaseChangesOnStartup()
+            .ApplyAllDatabaseChangesOnStartup()
             //.OptimizeArtifactWorkflow()
             .AddAsyncDaemon(martenConfig.DaemonMode)
             .AddSubscriptionWithServices<MartenEventPublisher>(ServiceLifetime.Scoped);
@@ -110,6 +111,15 @@ public static class MartenConfigExtensions
             options.Events.MetadataConfig.CorrelationIdEnabled = true;
             options.Events.MetadataConfig.HeadersEnabled = true;
         }
+
+        // Turn on Otel tracing for connection activity, and
+        // also tag events to each span for all the Marten "write"
+        // operations
+        options.OpenTelemetry.TrackConnections = TrackLevel.Normal;
+
+        // This opts into exporting a counter just on the number
+        // of events being appended. Kinda a duplication
+        options.OpenTelemetry.TrackEventCounters();
 
         configureOptions?.Invoke(options);
 
