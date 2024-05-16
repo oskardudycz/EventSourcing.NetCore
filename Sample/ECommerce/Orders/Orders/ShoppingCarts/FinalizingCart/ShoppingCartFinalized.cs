@@ -8,5 +8,5 @@ public record CartFinalized(
     Guid ClientId,
     IReadOnlyList<PricedProductItem> ProductItems,
     decimal TotalPrice,
-    DateTime FinalizedAt
+    DateTimeOffset FinalizedAt
 ): IExternalEvent;

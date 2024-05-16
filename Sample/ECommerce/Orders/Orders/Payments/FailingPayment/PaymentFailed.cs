@@ -6,5 +6,5 @@ public record PaymentFailed(
     Guid OrderId,
     Guid PaymentId,
     decimal Amount,
-    DateTime FailedAt
+    DateTimeOffset FailedAt
 ): IExternalEvent;

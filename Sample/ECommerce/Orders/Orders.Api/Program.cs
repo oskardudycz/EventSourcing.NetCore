@@ -5,12 +5,15 @@ using Core.Configuration;
 using Core.Exceptions;
 using Core.Kafka;
 using Core.OpenTelemetry;
+using Core.Scheduling;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Trace;
 using Orders;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +56,7 @@ builder
             .WithMetrics(m => m.AddMeter("Marten"))
             .DisableConsoleExporter(true)
     ))
+    .AddQuartzDefaults()
     .AddControllers();
 
 var app = builder.Build();

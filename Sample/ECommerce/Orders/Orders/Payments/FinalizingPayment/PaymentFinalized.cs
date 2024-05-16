@@ -6,5 +6,5 @@ public record PaymentFinalized(
     Guid OrderId,
     Guid PaymentId,
     decimal Amount,
-    DateTime FinalizedAt
+    DateTimeOffset FinalizedAt
 ): IExternalEvent;

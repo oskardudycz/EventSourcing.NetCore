@@ -5,5 +5,5 @@ namespace Orders.Shipments.OutOfStockProduct;
 public record ProductWasOutOfStock(
     Guid OrderId,
     IReadOnlyList<ProductItem> AvailableProductItems,
-    DateTime AvailabilityCheckedAt
+    DateTimeOffset AvailabilityCheckedAt
 );

@@ -35,6 +35,12 @@ public static class ValidationExtensions
         where T : struct
         => NotEmpty((T?)value, paramName);
 
+    public static T Has<T>(this T value, Action<T> assert)
+    {
+        assert(value);
+        return value;
+    }
+
     public static T NotEmpty<T>(this T? value, [CallerArgumentExpression("value")] string? paramName = null)
         where T : struct
     {

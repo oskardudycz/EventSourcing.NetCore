@@ -17,7 +17,7 @@ namespace Orders.Orders;
 
 public class OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus):
     IEventHandler<CartFinalized>,
-    IEventHandler<OrderInitialized>,
+    IEventHandler<OrderInitiated>,
     IEventHandler<PaymentFinalized>,
     IEventHandler<OrderPaymentRecorded>,
     IEventHandler<PackageWasSent>,
@@ -35,7 +35,7 @@ public class OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus):
         );
     }
 
-    public async Task Handle(OrderInitialized @event, CancellationToken ct)
+    public async Task Handle(OrderInitiated @event, CancellationToken ct)
     {
         await commandBus.Send(
             RequestPayment.Create(@event.OrderId, @event.TotalPrice),
@@ -65,7 +65,7 @@ public class OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus):
     public async Task Handle(PackageWasSent @event, CancellationToken ct)
     {
         await commandBus.Send(
-            CompleteOrder.Create(@event.OrderId),
+            CompleteOrder.For(@event.OrderId),
             ct
         );
     }

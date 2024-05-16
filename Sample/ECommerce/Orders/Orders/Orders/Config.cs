@@ -1,11 +1,13 @@
 using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;
+using Core.Queries;
 using Marten;
 using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Orders.Orders.CancellingOrder;
 using Orders.Orders.CompletingOrder;
+using Orders.Orders.GettingOrderStatus;
 using Orders.Orders.InitializingOrder;
 using Orders.Orders.RecordingOrderPayment;
 using Orders.Payments.FinalizingPayment;
@@ -17,36 +19,37 @@ namespace Orders.Orders;
 
 internal static class OrdersConfig
 {
-    internal static IServiceCollection AddOrders(this IServiceCollection services)
-    {
-        return services
+    internal static IServiceCollection AddOrders(this IServiceCollection services) =>
+        services
             .AddMartenRepository<Order>()
             .AddCommandHandlers()
+            .AddQueryHandlers()
             .AddEventHandlers();
-    }
 
-    private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
-    {
-        return services.AddCommandHandler<InitializeOrder, HandleInitializeOrder>()
+    private static IServiceCollection AddCommandHandlers(this IServiceCollection services) =>
+        services.AddCommandHandler<InitializeOrder, HandleInitializeOrder>()
             .AddCommandHandler<RecordOrderPayment, HandleRecordOrderPayment>()
             .AddCommandHandler<CompleteOrder, HandleCompleteOrder>()
             .AddCommandHandler<CancelOrder, HandleCancelOrder>();
-    }
 
-    private static IServiceCollection AddEventHandlers(this IServiceCollection services)
-    {
-        return services.AddEventHandler<CartFinalized, OrderSaga>()
-            .AddEventHandler<OrderInitialized, OrderSaga>()
+    private static IServiceCollection AddQueryHandlers(this IServiceCollection services) =>
+        services.AddQueryHandler<GetOrderStatus, OrderDetails?, HandleGetOrderStatus>();
+
+    private static IServiceCollection AddEventHandlers(this IServiceCollection services) =>
+        services.AddEventHandler<CartFinalized, OrderSaga>()
+            .AddEventHandler<OrderInitiated, OrderSaga>()
             .AddEventHandler<PaymentFinalized, OrderSaga>()
             .AddEventHandler<PackageWasSent, OrderSaga>()
             .AddEventHandler<ProductWasOutOfStock, OrderSaga>()
             .AddEventHandler<OrderCancelled, OrderSaga>()
-            .AddEventHandler<OrderPaymentRecorded, OrderSaga>();
-    }
+            .AddEventHandler<OrderPaymentRecorded, OrderSaga>()
+            .AddEventHandler<TimeHasPassed, HandleCancelOrder>();
 
     internal static void ConfigureOrders(this StoreOptions options)
     {
         // Snapshots
-        options.Projections.Snapshot<Order>(SnapshotLifecycle.Inline);
+        options.Projections.LiveStreamAggregation<Order>();
+        options.Projections.Add<OrderDetailsProjection>(ProjectionLifecycle.Inline);
+        options.Projections.Add<PendingOrdersProjection>(ProjectionLifecycle.Inline);
     }
 }
