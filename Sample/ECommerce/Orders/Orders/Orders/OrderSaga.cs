@@ -15,6 +15,8 @@ using Orders.ShoppingCarts.FinalizingCart;
 
 namespace Orders.Orders;
 
+using static OrderEvent;
+
 public class OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus):
     IEventHandler<CartFinalized>,
     IEventHandler<OrderInitiated>,

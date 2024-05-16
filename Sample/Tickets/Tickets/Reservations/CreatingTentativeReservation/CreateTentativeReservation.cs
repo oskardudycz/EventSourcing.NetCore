@@ -31,6 +31,7 @@ internal class HandleCreateTentativeReservation(
         var (reservationId, seatId) = command;
 
         return repository.Add(
+            reservationId,
             Reservation.CreateTentative(
                 reservationId,
                 reservationNumberGenerator,

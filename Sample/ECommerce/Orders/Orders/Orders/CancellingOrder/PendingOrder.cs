@@ -3,6 +3,7 @@ using Orders.Orders.CompletingOrder;
 using Orders.Orders.InitializingOrder;
 
 namespace Orders.Orders.CancellingOrder;
+using static OrderEvent;
 
 public class PendingOrder
 {

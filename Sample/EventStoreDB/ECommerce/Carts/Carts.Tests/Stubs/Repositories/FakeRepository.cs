@@ -7,9 +7,9 @@ public class FakeRepository<T> : IEventStoreDBRepository<T> where T : class, IAg
 {
     public Dictionary<Guid, T> Aggregates { get; private set; }
 
-    public FakeRepository(params T[] aggregates)
+    public FakeRepository(params (Guid, T)[] aggregates)
     {
-        Aggregates = aggregates.ToDictionary(ks=> ks.Id, vs => vs);
+        Aggregates = aggregates.ToDictionary(ks=> ks.Item1, vs => vs.Item2);
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken)
@@ -17,21 +17,21 @@ public class FakeRepository<T> : IEventStoreDBRepository<T> where T : class, IAg
         return Task.FromResult(Aggregates.GetValueOrDefault(id));
     }
 
-    public async Task<ulong> Add(T aggregate, CancellationToken cancellationToken = default)
+    public async Task<ulong> Add(Guid id, T aggregate, CancellationToken cancellationToken = default)
     {
-        Aggregates.Add(aggregate.Id, aggregate);
+        Aggregates.Add(id, aggregate);
         return await Task.FromResult((ulong)aggregate.Version);
     }
 
-    public async Task<ulong> Update(T aggregate, ulong? expectedVersion = null, CancellationToken cancellationToken = default)
+    public async Task<ulong> Update(Guid id, T aggregate, ulong? expectedVersion = null, CancellationToken cancellationToken = default)
     {
-        Aggregates[aggregate.Id] = aggregate;
+        Aggregates[id] = aggregate;
         return await Task.FromResult((ulong)aggregate.Version);
     }
 
-    public async Task<ulong> Delete(T aggregate, ulong? expectedVersion = null, CancellationToken cancellationToken = default)
+    public async Task<ulong> Delete(Guid id, T aggregate, ulong? expectedVersion = null, CancellationToken cancellationToken = default)
     {
-        Aggregates.Remove(aggregate.Id);
+        Aggregates.Remove(id);
         return await Task.FromResult((ulong)aggregate.Version);
     }
 }

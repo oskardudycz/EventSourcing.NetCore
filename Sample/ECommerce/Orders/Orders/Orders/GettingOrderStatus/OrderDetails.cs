@@ -1,12 +1,10 @@
 using Marten.Events;
 using Marten.Events.Aggregation;
-using Orders.Orders.CancellingOrder;
-using Orders.Orders.CompletingOrder;
-using Orders.Orders.InitializingOrder;
-using Orders.Orders.RecordingOrderPayment;
 using Orders.Products;
 
 namespace Orders.Orders.GettingOrderStatus;
+
+using static OrderEvent;
 
 public class OrderDetails
 {

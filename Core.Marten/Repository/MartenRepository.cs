@@ -6,26 +6,26 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Marten.Repository;
 
-public interface IMartenRepository<T> where T : class, IAggregate
+public interface IMartenRepository<T> where T : class
 {
     Task<T?> Find(Guid id, CancellationToken cancellationToken);
-    Task<long> Add(T aggregate, CancellationToken cancellationToken = default);
-    Task<long> Update(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default);
-    Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default);
+    Task<long> Add(Guid id, T aggregate, CancellationToken cancellationToken = default);
+    Task<long> Update(Guid id, T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default);
+    Task<long> Delete(Guid id, T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default);
 }
 
-public class MartenRepository<T>(IDocumentSession documentSession): IMartenRepository<T>
-    where T : class, IAggregate
+public class MartenRepository<TAggregate>(IDocumentSession documentSession): IMartenRepository<TAggregate>
+    where TAggregate : class, IAggregate
 {
-    public Task<T?> Find(Guid id, CancellationToken ct) =>
-        documentSession.Events.AggregateStreamAsync<T>(id, token: ct);
+    public Task<TAggregate?> Find(Guid id, CancellationToken ct) =>
+        documentSession.Events.AggregateStreamAsync<TAggregate>(id, token: ct);
 
-    public async Task<long> Add(T aggregate, CancellationToken ct = default)
+    public async Task<long> Add(Guid id, TAggregate aggregate, CancellationToken ct = default)
     {
         var events = aggregate.DequeueUncommittedEvents();
 
         documentSession.Events.StartStream<Aggregate>(
-            aggregate.Id,
+            id,
             events
         );
 
@@ -34,14 +34,14 @@ public class MartenRepository<T>(IDocumentSession documentSession): IMartenRepos
         return events.Length;
     }
 
-    public async Task<long> Update(T aggregate, long? expectedVersion = null, CancellationToken ct = default)
+    public async Task<long> Update(Guid id, TAggregate aggregate, long? expectedVersion = null, CancellationToken ct = default)
     {
         var events = aggregate.DequeueUncommittedEvents();
 
         var nextVersion = (expectedVersion ?? aggregate.Version) + events.Length;
 
         documentSession.Events.Append(
-            aggregate.Id,
+            id,
             nextVersion,
             events
         );
@@ -51,6 +51,6 @@ public class MartenRepository<T>(IDocumentSession documentSession): IMartenRepos
         return nextVersion;
     }
 
-    public Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken ct = default) =>
-        Update(aggregate, expectedVersion, ct);
+    public Task<long> Delete(Guid id, TAggregate aggregate, long? expectedVersion = null, CancellationToken ct = default) =>
+        Update(id, aggregate, expectedVersion, ct);
 }

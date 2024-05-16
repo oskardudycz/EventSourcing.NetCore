@@ -24,7 +24,7 @@ public class ElasticSearchProjection<TEvent, TView>(
         var entity = (await elasticClient.GetAsync<TView>(id, i => i.Index(indexName), ct).ConfigureAwait(false))?.Source ??
                      (TView) Activator.CreateInstance(typeof(TView), true)!;
 
-        entity.Evolve(eventEnvelope);
+        entity.Apply(eventEnvelope);
 
         await elasticClient.IndexAsync(
             entity,

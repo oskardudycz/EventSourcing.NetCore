@@ -1,5 +1,6 @@
 using Core.Commands;
 using Core.Marten.Repository;
+using Core.Validation;
 using Orders.Products;
 
 namespace Orders.Orders.InitializingOrder;
@@ -16,19 +17,12 @@ public record InitializeOrder(
         Guid? clientId,
         IReadOnlyList<PricedProductItem>? productItems,
         decimal? totalPrice
-    )
-    {
-        if (!orderId.HasValue)
-            throw new ArgumentNullException(nameof(orderId));
-        if (!clientId.HasValue)
-            throw new ArgumentNullException(nameof(clientId));
-        if (productItems == null)
-            throw new ArgumentNullException(nameof(productItems));
-        if (!totalPrice.HasValue)
-            throw new ArgumentNullException(nameof(totalPrice));
-
-        return new InitializeOrder(orderId.Value, clientId.Value, productItems, totalPrice.Value);
-    }
+    ) =>
+        new(orderId.NotEmpty(),
+            clientId.NotEmpty(),
+            productItems.NotNull().Has(p => p.Count.Positive()),
+            totalPrice.NotEmpty().Positive()
+        );
 }
 
 public class HandleInitializeOrder(IMartenRepository<Order> orderRepository, TimeProvider timeProvider):
@@ -39,6 +33,7 @@ public class HandleInitializeOrder(IMartenRepository<Order> orderRepository, Tim
         var (orderId, clientId, productItems, totalPrice) = command;
 
         return orderRepository.Add(
+            orderId,
             Order.Initialize(orderId, clientId, productItems, totalPrice, timeProvider.GetUtcNow()),
             ct
         );

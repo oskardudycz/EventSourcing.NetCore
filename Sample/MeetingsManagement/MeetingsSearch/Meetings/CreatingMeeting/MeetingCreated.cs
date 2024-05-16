@@ -15,6 +15,6 @@ internal class HandleMeetingCreated(IElasticSearchRepository<Meeting> repository
     {
         var meeting = new Meeting(@event.MeetingId, @event.Name);
 
-        return repository.Add(meeting, cancellationToken);
+        return repository.Add(@event.MeetingId, meeting, cancellationToken);
     }
 }

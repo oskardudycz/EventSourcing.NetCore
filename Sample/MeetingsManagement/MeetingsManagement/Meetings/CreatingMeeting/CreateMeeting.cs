@@ -16,6 +16,7 @@ internal class HandleCreateMeeting(IMartenRepository<Meeting> repository):
         var (id, name) = command;
 
         return repository.Add(
+            id,
             Meeting.New(id, name),
             ct
         );

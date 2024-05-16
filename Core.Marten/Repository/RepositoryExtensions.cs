@@ -9,7 +9,7 @@ public static class RepositoryExtensions
         this IMartenRepository<T> repository,
         Guid id,
         CancellationToken cancellationToken = default
-    ) where T : class, IAggregate
+    ) where T : class
     {
         var entity = await repository.Find(id, cancellationToken).ConfigureAwait(false);
 
@@ -22,12 +22,12 @@ public static class RepositoryExtensions
         Action<T> action,
         long? expectedVersion = null,
         CancellationToken ct = default
-    ) where T : class, IAggregate
+    ) where T : class
     {
         var entity = await repository.Get(id, ct).ConfigureAwait(false);
 
         action(entity);
 
-        return await repository.Update(entity, expectedVersion, ct).ConfigureAwait(false);
+        return await repository.Update(id, entity, expectedVersion, ct).ConfigureAwait(false);
     }
 }

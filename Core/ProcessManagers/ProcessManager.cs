@@ -29,7 +29,7 @@ public abstract class ProcessManager<T>: IProcessManager<T> where T : notnull
     protected void ScheduleCommand(object @event) =>
         scheduledCommands.Enqueue(EventOrCommand.Command(@event));
 
-    public virtual void Evolve(object @event)
+    public virtual void Apply(object @event)
     {
     }
 }

@@ -28,6 +28,6 @@ public static class RepositoryExtensions
 
         action(entity);
 
-        return await repository.Update(entity, expectedVersion, ct).ConfigureAwait(false);
+        return await repository.Update(id, entity, expectedVersion, ct).ConfigureAwait(false);
     }
 }

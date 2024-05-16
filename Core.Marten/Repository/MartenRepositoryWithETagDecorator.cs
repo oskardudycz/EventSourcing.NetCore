@@ -13,9 +13,10 @@ public class MartenRepositoryWithETagDecorator<T>(
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         inner.Find(id, cancellationToken);
 
-    public async Task<long> Add(T aggregate, CancellationToken cancellationToken = default)
+    public async Task<long> Add(Guid id, T aggregate, CancellationToken cancellationToken = default)
     {
         var nextExpectedVersion = await inner.Add(
+            id,
             aggregate,
             cancellationToken
         ).ConfigureAwait(true);
@@ -25,10 +26,11 @@ public class MartenRepositoryWithETagDecorator<T>(
         return nextExpectedVersion;
     }
 
-    public async Task<long> Update(T aggregate, long? expectedVersion = null,
+    public async Task<long> Update(Guid id, T aggregate, long? expectedVersion = null,
         CancellationToken cancellationToken = default)
     {
         var nextExpectedVersion = await inner.Update(
+            id,
             aggregate,
             expectedVersion ?? GetExpectedVersion(),
             cancellationToken
@@ -39,9 +41,10 @@ public class MartenRepositoryWithETagDecorator<T>(
         return nextExpectedVersion;
     }
 
-    public async Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
+    public async Task<long> Delete(Guid id, T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
     {
         var nextExpectedVersion = await inner.Delete(
+            id,
             aggregate,
             expectedVersion ?? GetExpectedVersion(),
             cancellationToken

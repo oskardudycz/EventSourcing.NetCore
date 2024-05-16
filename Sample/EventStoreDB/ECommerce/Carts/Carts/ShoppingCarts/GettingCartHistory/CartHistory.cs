@@ -14,7 +14,7 @@ public class CartHistory: IVersionedProjection
     public string Description { get; set; } = default!;
     public ulong LastProcessedPosition { get; set; }
 
-    public void Evolve(object @event)
+    public void Apply(object @event)
     {
         switch (@event)
         {
