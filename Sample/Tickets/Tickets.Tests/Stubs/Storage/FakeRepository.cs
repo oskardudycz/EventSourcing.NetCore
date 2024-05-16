@@ -7,9 +7,9 @@ public class FakeRepository<T> : IMartenRepository<T> where T : class, IAggregat
 {
     public Dictionary<Guid, T> Aggregates { get; private set; }
 
-    public FakeRepository(params T[] aggregates)
+    public FakeRepository(params (Guid, T)[] aggregates)
     {
-        Aggregates = aggregates.ToDictionary(ks=> ks.Id, vs => vs);
+        Aggregates = aggregates.ToDictionary(ks=> ks.Item1, vs => vs.Item2);
     }
 
     public Task<T?> Find(Guid id, CancellationToken cancellationToken)
@@ -17,21 +17,21 @@ public class FakeRepository<T> : IMartenRepository<T> where T : class, IAggregat
         return Task.FromResult(Aggregates.GetValueOrDefault(id));
     }
 
-    public async Task<long> Add(T aggregate, CancellationToken cancellationToken = default)
+    public async Task<long> Add(Guid id, T aggregate, CancellationToken cancellationToken = default)
     {
-        Aggregates.Add(aggregate.Id, aggregate);
+        Aggregates.Add(id, aggregate);
         return await Task.FromResult(aggregate.Version);
     }
 
-    public async Task<long> Update(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
+    public async Task<long> Update(Guid id, T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
     {
-        Aggregates[aggregate.Id] = aggregate;
+        Aggregates[id] = aggregate;
         return await Task.FromResult(aggregate.Version);
     }
 
-    public async Task<long> Delete(T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
+    public async Task<long> Delete(Guid id, T aggregate, long? expectedVersion = null, CancellationToken cancellationToken = default)
     {
-        Aggregates.Remove(aggregate.Id);
+        Aggregates.Remove(id);
         return await Task.FromResult(aggregate.Version);
     }
 }

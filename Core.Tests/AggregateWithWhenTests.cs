@@ -39,7 +39,7 @@ public enum InvoiceStatus
     Sent = 3
 }
 
-public class Invoice: Aggregate<string>
+public class Invoice: Aggregate<object, string>
 {
     public double Amount { get; private set; }
     public string Number { get; private set; } = default!;
@@ -55,7 +55,7 @@ public class Invoice: Aggregate<string>
     public InvoiceSendMethod SentVia { get; private set; }
     public DateTime SentAt { get; private set; }
 
-    public override void Evolve(object @event)
+    public override void Apply(object @event)
     {
         switch (@event)
         {
@@ -125,7 +125,7 @@ public class AggregateWithWhenTests
         // 3. Apply each event on the entity.
         foreach (var @event in events)
         {
-            invoice.Evolve(@event);
+            invoice.Apply(@event);
         }
 
         invoice.Id.Should().Be(invoiceInitiated.Number);

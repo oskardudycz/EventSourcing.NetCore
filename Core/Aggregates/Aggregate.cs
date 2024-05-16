@@ -1,18 +1,20 @@
 namespace Core.Aggregates;
 
-public abstract class Aggregate: Aggregate<Guid>, IAggregate
-{
-}
+public abstract class Aggregate: Aggregate<object, Guid>;
 
-public abstract class Aggregate<T>: IAggregate<T> where T : notnull
+public abstract class Aggregate<TEvent>: Aggregate<TEvent, Guid> where TEvent : class;
+
+public abstract class Aggregate<TEvent, TId>: IAggregate<TEvent>
+    where TEvent : class
+    where TId : notnull
 {
-    public T Id { get; protected set; } = default!;
+    public TId Id { get; protected set; } = default!;
 
     public int Version { get; protected set; }
 
-    [NonSerialized] private readonly Queue<object> uncommittedEvents = new();
+    [NonSerialized] private readonly Queue<TEvent> uncommittedEvents = new();
 
-    public virtual void Evolve(object @event) { }
+    public virtual void Apply(TEvent @event) { }
 
     public object[] DequeueUncommittedEvents()
     {
@@ -20,11 +22,12 @@ public abstract class Aggregate<T>: IAggregate<T> where T : notnull
 
         uncommittedEvents.Clear();
 
-        return dequeuedEvents;
+        return dequeuedEvents.Cast<object>().ToArray();
     }
 
-    protected void Enqueue(object @event)
+    protected void Enqueue(TEvent @event)
     {
         uncommittedEvents.Enqueue(@event);
+        Apply(@event);
     }
 }

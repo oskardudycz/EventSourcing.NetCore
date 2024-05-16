@@ -25,7 +25,8 @@ public record CancelOrder(
 
 public class HandleCancelOrder(
     IMartenRepository<Order> orderRepository,
-    IQuerySession querySession
+    IQuerySession querySession,
+    TimeProvider timeProvider
 ):
     ICommandHandler<CancelOrder>,
     IEventHandler<TimeHasPassed>
@@ -33,7 +34,7 @@ public class HandleCancelOrder(
     public Task Handle(CancelOrder command, CancellationToken ct) =>
         orderRepository.GetAndUpdate(
             command.OrderId,
-            order => order.Cancel(command.CancellationReason),
+            order => order.Cancel(command.CancellationReason, timeProvider.GetUtcNow()),
             ct: ct
         );
 
@@ -44,11 +45,13 @@ public class HandleCancelOrder(
             .Select(o => o.Id)
             .ToListAsync(token: ct);
 
+        var now = timeProvider.GetUtcNow();
+
         foreach (var orderId in orderIds)
         {
             await orderRepository.GetAndUpdate(
                 orderId,
-                order => order.Cancel(OrderCancellationReason.TimedOut),
+                order => order.Cancel(OrderCancellationReason.TimedOut, now),
                 ct: ct
             );
         }

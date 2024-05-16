@@ -13,9 +13,10 @@ public class EventStoreDBRepositoryWithETagDecorator<T>(
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         inner.Find(id, cancellationToken);
 
-    public async Task<ulong> Add(T aggregate, CancellationToken cancellationToken = default)
+    public async Task<ulong> Add(Guid id, T aggregate, CancellationToken cancellationToken = default)
     {
         var nextExpectedVersion = await inner.Add(
+            id,
             aggregate,
             cancellationToken
         ).ConfigureAwait(true);
@@ -25,10 +26,11 @@ public class EventStoreDBRepositoryWithETagDecorator<T>(
         return nextExpectedVersion;
     }
 
-    public async Task<ulong> Update(T aggregate, ulong? expectedVersion = null,
+    public async Task<ulong> Update(Guid id, T aggregate, ulong? expectedVersion = null,
         CancellationToken cancellationToken = default)
     {
         var nextExpectedVersion = await inner.Update(
+            id,
             aggregate,
             expectedVersion ?? GetExpectedVersion(),
             cancellationToken
@@ -39,9 +41,10 @@ public class EventStoreDBRepositoryWithETagDecorator<T>(
         return nextExpectedVersion;
     }
 
-    public async Task<ulong> Delete(T aggregate, ulong? expectedVersion = null, CancellationToken cancellationToken = default)
+    public async Task<ulong> Delete(Guid id, T aggregate, ulong? expectedVersion = null, CancellationToken cancellationToken = default)
     {
         var nextExpectedVersion = await inner.Delete(
+            id,
             aggregate,
             expectedVersion ?? GetExpectedVersion(),
             cancellationToken

@@ -21,6 +21,7 @@ public class HandleStartTemperatureMeasurement(IMartenRepository<TemperatureMeas
 {
     public Task Handle(StartTemperatureMeasurement command, CancellationToken ct) =>
         repository.Add(
+            command.MeasurementId,
             TemperatureMeasurement.Start(
                 command.MeasurementId
             ),

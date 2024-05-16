@@ -16,6 +16,7 @@ using Orders.Shipments.SendingPackage;
 using Orders.ShoppingCarts.FinalizingCart;
 
 namespace Orders.Orders;
+using static OrderEvent;
 
 internal static class OrdersConfig
 {

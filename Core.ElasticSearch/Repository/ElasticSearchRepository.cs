@@ -8,9 +8,9 @@ namespace Core.ElasticSearch.Repository;
 public interface IElasticSearchRepository<T> where T : class, IAggregate
 {
     Task<T?> Find(Guid id, CancellationToken cancellationToken);
-    Task Add(T aggregate, CancellationToken cancellationToken);
-    Task Update(T aggregate, CancellationToken cancellationToken);
-    Task Delete(T aggregate, CancellationToken cancellationToken);
+    Task Add(Guid id, T aggregate, CancellationToken cancellationToken);
+    Task Update(Guid id, T aggregate, CancellationToken cancellationToken);
+    Task Delete(Guid id, T aggregate, CancellationToken cancellationToken);
 }
 
 public class ElasticSearchRepository<T>(ElasticsearchClient elasticClient): IElasticSearchRepository<T>
@@ -24,18 +24,18 @@ public class ElasticSearchRepository<T>(ElasticsearchClient elasticClient): IEla
         return response?.Source;
     }
 
-    public Task Add(T aggregate, CancellationToken cancellationToken)
+    public Task Add(Guid id, T aggregate, CancellationToken cancellationToken)
     {
-        return elasticClient.IndexAsync(aggregate, i => i.Id(aggregate.Id).Index(IndexNameMapper.ToIndexName<T>()), cancellationToken);
+        return elasticClient.IndexAsync(aggregate, i => i.Id(id).Index(IndexNameMapper.ToIndexName<T>()), cancellationToken);
     }
 
-    public Task Update(T aggregate, CancellationToken cancellationToken)
+    public Task Update(Guid id, T aggregate, CancellationToken cancellationToken)
     {
-        return elasticClient.UpdateAsync<T, object>(IndexNameMapper.ToIndexName<T>(), aggregate.Id, i => i.Doc(aggregate), cancellationToken);
+        return elasticClient.UpdateAsync<T, object>(IndexNameMapper.ToIndexName<T>(), id, i => i.Doc(aggregate), cancellationToken);
     }
 
-    public Task Delete(T aggregate, CancellationToken cancellationToken)
+    public Task Delete(Guid id, T aggregate, CancellationToken cancellationToken)
     {
-        return elasticClient.DeleteAsync<T>(aggregate.Id, cancellationToken);
+        return elasticClient.DeleteAsync<T>(id, cancellationToken);
     }
 }

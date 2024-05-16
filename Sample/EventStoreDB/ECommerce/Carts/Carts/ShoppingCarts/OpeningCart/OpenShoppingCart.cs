@@ -27,6 +27,7 @@ internal class HandleOpenCart(IEventStoreDBRepository<ShoppingCart> cartReposito
         var (cartId, clientId) = command;
 
         return cartRepository.Add(
+            cartId,
             ShoppingCart.Open(cartId, clientId),
             ct
         );

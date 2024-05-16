@@ -27,6 +27,7 @@ internal class HandleOpenShoppingCart(IMartenRepository<ShoppingCart> cartReposi
         var (cartId, clientId) = command;
 
         return cartRepository.Add(
+            cartId,
             ShoppingCart.Open(cartId, clientId),
             ct
         );

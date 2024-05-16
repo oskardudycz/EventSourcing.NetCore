@@ -34,6 +34,7 @@ public class HandleRequestPayment(IMartenRepository<Payment> paymentRepository):
         var (paymentId, orderId, amount) = command;
 
         return paymentRepository.Add(
+            paymentId,
             Payment.Initialize(paymentId, orderId, amount),
             ct
         );

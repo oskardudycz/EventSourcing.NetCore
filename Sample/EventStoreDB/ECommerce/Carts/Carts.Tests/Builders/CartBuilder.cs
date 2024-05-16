@@ -25,7 +25,7 @@ internal class CartBuilder
 
         foreach (var @event in eventsToApply)
         {
-            cart.Evolve(@event);
+            cart.Apply(@event);
         }
 
         return cart;

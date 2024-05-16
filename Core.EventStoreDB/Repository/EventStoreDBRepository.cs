@@ -11,29 +11,24 @@ namespace Core.EventStoreDB.Repository;
 public interface IEventStoreDBRepository<T> where T : class, IAggregate
 {
     Task<T?> Find(Guid id, CancellationToken cancellationToken);
-    Task<ulong> Add(T aggregate, CancellationToken ct = default);
-    Task<ulong> Update(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default);
-    Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default);
+    Task<ulong> Add(Guid id, T aggregate, CancellationToken ct = default);
+    Task<ulong> Update(Guid id, T aggregate, ulong? expectedRevision = null, CancellationToken ct = default);
+    Task<ulong> Delete(Guid id, T aggregate, ulong? expectedRevision = null, CancellationToken ct = default);
 }
 
-public class EventStoreDBRepository<T>(
-    EventStoreClient eventStore,
-    IActivityScope activityScope)
-    : IEventStoreDBRepository<T>
+public class EventStoreDBRepository<T>(EventStoreClient eventStore): IEventStoreDBRepository<T>
     where T : class, IAggregate
 {
-    private readonly IActivityScope activityScope = activityScope;
-
     public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
         eventStore.AggregateStream<T>(
             id,
             cancellationToken
         );
 
-    public async Task<ulong> Add(T aggregate, CancellationToken ct = default)
+    public async Task<ulong> Add(Guid id, T aggregate, CancellationToken ct = default)
     {
         var result = await eventStore.AppendToStreamAsync(
-            StreamNameMapper.ToStreamId<T>(aggregate.Id),
+            StreamNameMapper.ToStreamId<T>(id),
             StreamState.NoStream,
             GetEventsToStore(aggregate),
             cancellationToken: ct
@@ -42,13 +37,13 @@ public class EventStoreDBRepository<T>(
         return result.NextExpectedStreamRevision.ToUInt64();
     }
 
-    public async Task<ulong> Update(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default)
+    public async Task<ulong> Update(Guid id, T aggregate, ulong? expectedRevision = null, CancellationToken ct = default)
     {
         var eventsToAppend = GetEventsToStore(aggregate);
         var nextVersion = expectedRevision ?? (ulong)(aggregate.Version - eventsToAppend.Count);
 
         var result = await eventStore.AppendToStreamAsync(
-            StreamNameMapper.ToStreamId<T>(aggregate.Id),
+            StreamNameMapper.ToStreamId<T>(id),
             nextVersion,
             eventsToAppend,
             cancellationToken: ct
@@ -57,8 +52,8 @@ public class EventStoreDBRepository<T>(
         return result.NextExpectedStreamRevision.ToUInt64();
     }
 
-    public Task<ulong> Delete(T aggregate, ulong? expectedRevision = null, CancellationToken ct = default) =>
-        Update(aggregate, expectedRevision, ct);
+    public Task<ulong> Delete(Guid id, T aggregate, ulong? expectedRevision = null, CancellationToken ct = default) =>
+        Update(id, aggregate, expectedRevision, ct);
 
     private static List<EventData> GetEventsToStore(T aggregate)
     {

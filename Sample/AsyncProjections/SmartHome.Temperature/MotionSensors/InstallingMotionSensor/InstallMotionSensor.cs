@@ -23,6 +23,7 @@ public class HandleInstallMotionSensor(IMartenRepository<MotionSensor> repositor
 {
     public Task Handle(InstallMotionSensor command, CancellationToken ct) =>
         repository.Add(
+            command.MotionSensorId,
             MotionSensor.Install(
                 command.MotionSensorId
             ),
