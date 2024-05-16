@@ -87,7 +87,6 @@ public class ShoppingCart: Aggregate
         var @event = ProductAdded.Create(Id, pricedProductItem);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     private void Apply(ProductAdded @event)
@@ -127,7 +126,6 @@ public class ShoppingCart: Aggregate
         var @event = ProductRemoved.Create(Id, productItemToBeRemoved);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     private void Apply(ProductRemoved @event)
@@ -161,7 +159,6 @@ public class ShoppingCart: Aggregate
         var @event = ShoppingCartConfirmed.Create(Id, DateTime.UtcNow);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     private void Apply(ShoppingCartConfirmed @event)
@@ -179,7 +176,6 @@ public class ShoppingCart: Aggregate
         var @event = ShoppingCartCanceled.Create(Id, DateTime.UtcNow);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     private void Apply(ShoppingCartCanceled @event)
