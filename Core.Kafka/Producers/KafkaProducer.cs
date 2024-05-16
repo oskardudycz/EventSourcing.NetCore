@@ -18,10 +18,12 @@ public class KafkaProducer: IExternalEventProducer
     private readonly ILogger<KafkaProducer> logger1;
     private readonly IProducer<string, string> producer;
 
-    public KafkaProducer(IConfiguration configuration,
+    public KafkaProducer(
+        IConfiguration configuration,
         IActivityScope activityScope,
-        IProducer<string, string>? producer,
-        ILogger<KafkaProducer> logger)
+        ILogger<KafkaProducer> logger,
+        IProducer<string, string>? producer = null
+    )
     {
         activityScope1 = activityScope;
         logger1 = logger;

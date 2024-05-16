@@ -3,6 +3,7 @@ using Core.Commands;
 using Core.Ids;
 using Core.Queries;
 using Payments.Api.Requests.Carts;
+using Payments.Payments.DiscardingPayment;
 using Payments.Payments.TimingOutPayment;
 
 namespace Payments.Api.Controllers;
@@ -42,12 +43,9 @@ public class PaymentsController(
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DiscardPayment(Guid id, [FromBody] DiscardPaymentRequest? request)
+    public async Task<IActionResult> DiscardPayment(Guid id, [FromQuery] DiscardReason? reason)
     {
-        var command = Payments.DiscardingPayment.DiscardPayment.Create(
-            id,
-            request?.DiscardReason
-        );
+        var command = Payments.DiscardingPayment.DiscardPayment.Create(id, reason);
 
         await commandBus.Send(command);
 

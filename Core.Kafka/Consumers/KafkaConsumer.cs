@@ -22,14 +22,10 @@ public class KafkaConsumer: IExternalEventConsumer
         IConfiguration configuration,
         IEventBus eventBus,
         IActivityScope activityScope,
-        IConsumer<string, string>? consumer,
-        ILogger<KafkaConsumer> logger
+        ILogger<KafkaConsumer> logger,
+        IConsumer<string, string>? consumer = null
     )
     {
-
-        if (configuration == null)
-            throw new ArgumentNullException(nameof(configuration));
-
         this.eventBus = eventBus;
         this.activityScope = activityScope;
         this.logger = logger;
@@ -56,7 +52,7 @@ public class KafkaConsumer: IExternalEventConsumer
         }
         catch (Exception e)
         {
-            logger.LogError("Error consuming Kafka message: {Message} {StackTrace}",e.Message, e.StackTrace);
+            logger.LogError("Error consuming Kafka message: {Message} {StackTrace}", e.Message, e.StackTrace);
 
             // Ensure the consumer leaves the group cleanly and final offsets are committed.
             consumer.Close();
@@ -122,7 +118,7 @@ public class KafkaConsumer: IExternalEventConsumer
         }
         catch (Exception e)
         {
-            logger.LogError("Error consuming Kafka message: {Message} {StackTrace}",e.Message, e.StackTrace);
+            logger.LogError("Error consuming Kafka message: {Message} {StackTrace}", e.Message, e.StackTrace);
         }
     }
 }

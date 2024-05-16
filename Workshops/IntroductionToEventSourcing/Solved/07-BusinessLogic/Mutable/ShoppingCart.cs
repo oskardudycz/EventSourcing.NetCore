@@ -101,7 +101,6 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         );
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     //just for default creation of empty object
@@ -127,7 +126,6 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     private void Apply(ProductItemAddedToShoppingCart productItemAdded)
@@ -158,7 +156,6 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         var @event = new ProductItemRemovedFromShoppingCart(Id, productItemToBeRemoved);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     private bool HasEnough(PricedProductItem productItem)
@@ -198,7 +195,6 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         var @event = new ShoppingCartConfirmed(Id, DateTime.UtcNow);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     private void Apply(ShoppingCartConfirmed confirmed)
@@ -216,7 +212,6 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         var @event = new ShoppingCartCanceled(Id, DateTime.UtcNow);
 
         Enqueue(@event);
-        Apply(@event);
     }
 
     private void Apply(ShoppingCartCanceled canceled)

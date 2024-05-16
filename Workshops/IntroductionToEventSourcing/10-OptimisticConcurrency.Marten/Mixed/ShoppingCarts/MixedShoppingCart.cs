@@ -118,6 +118,8 @@ public class MixedShoppingCart
 
         var @event = new ProductItemAddedToShoppingCart(Id, pricedProductItem, now);
 
+        Apply(@event);
+
         return @event;
     }
 

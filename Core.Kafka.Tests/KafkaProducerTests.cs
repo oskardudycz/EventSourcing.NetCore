@@ -29,7 +29,7 @@ public class KafkaProducerTests
     [Trait("Category", "SkipCI")]
     public async Task TaskShouldProduceMessage()
     {
-        var kafkaProducer = new KafkaProducer(kafkaConfig, new ActivityScope(), null, new Logger<KafkaProducer>(LoggerFactory.Create(_ => { })));
+        var kafkaProducer = new KafkaProducer(kafkaConfig, new ActivityScope(), new Logger<KafkaProducer>(LoggerFactory.Create(_ => { })));
 
         var exception = await Record.ExceptionAsync(async () =>
             await kafkaProducer.Publish(eventEnvelope, CancellationToken.None)

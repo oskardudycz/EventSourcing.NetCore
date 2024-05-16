@@ -19,12 +19,7 @@ public record RequestPayment(
     }
 }
 
-public class HandleRequestPayment(
-    //ExternalServicesConfig externalServicesConfig,
-    //IExternalCommandBus externalCommandBus)
-    PaymentsApiClient client)
-    :
-        ICommandHandler<RequestPayment>
+public class HandleRequestPayment(PaymentsApiClient client): ICommandHandler<RequestPayment>
 {
     public async Task Handle(RequestPayment command, CancellationToken ct)
     {
