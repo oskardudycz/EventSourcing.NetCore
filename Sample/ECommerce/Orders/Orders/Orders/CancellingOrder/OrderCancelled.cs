@@ -4,13 +4,13 @@ public record OrderCancelled(
     Guid OrderId,
     Guid? PaymentId,
     OrderCancellationReason OrderCancellationReason,
-    DateTime CancelledAt
+    DateTimeOffset CancelledAt
 )
 {
     public static OrderCancelled Create(Guid orderId,
         Guid? paymentId,
         OrderCancellationReason orderCancellationReason,
-        DateTime cancelledAt)
+        DateTimeOffset cancelledAt)
     {
         if (orderId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(orderId));

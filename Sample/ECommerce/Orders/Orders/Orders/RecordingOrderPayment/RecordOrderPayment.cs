@@ -6,16 +6,16 @@ namespace Orders.Orders.RecordingOrderPayment;
 public record RecordOrderPayment(
     Guid OrderId,
     Guid PaymentId,
-    DateTime PaymentRecordedAt
+    DateTimeOffset PaymentRecordedAt
 )
 {
-    public static RecordOrderPayment Create(Guid? orderId, Guid? paymentId, DateTime? paymentRecordedAt)
+    public static RecordOrderPayment Create(Guid? orderId, Guid? paymentId, DateTimeOffset? paymentRecordedAt)
     {
         if (orderId == null || orderId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(orderId));
         if (paymentId == null || paymentId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(paymentId));
-        if (paymentRecordedAt == null || paymentRecordedAt == default(DateTime))
+        if (paymentRecordedAt == null || paymentRecordedAt == default(DateTimeOffset))
             throw new ArgumentOutOfRangeException(nameof(paymentRecordedAt));
 
         return new RecordOrderPayment(orderId.Value, paymentId.Value, paymentRecordedAt.Value);

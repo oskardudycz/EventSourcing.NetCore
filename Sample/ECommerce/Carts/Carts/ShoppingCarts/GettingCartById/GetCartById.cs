@@ -3,11 +3,9 @@ using Marten;
 
 namespace Carts.ShoppingCarts.GettingCartById;
 
-public record GetCartById(
-    Guid CartId
-)
+public record GetCartById(Guid CartId)
 {
-    public static GetCartById Create(Guid cartId)
+    public static GetCartById For(Guid cartId)
     {
         if (cartId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(cartId));
@@ -16,8 +14,7 @@ public record GetCartById(
     }
 }
 
-internal class HandleGetCartById(IQuerySession querySession):
-    IQueryHandler<GetCartById, ShoppingCartDetails?>
+internal class HandleGetCartById(IQuerySession querySession): IQueryHandler<GetCartById, ShoppingCartDetails?>
 {
     public Task<ShoppingCartDetails?> Handle(GetCartById query, CancellationToken cancellationToken) =>
         querySession.LoadAsync<ShoppingCartDetails>(query.CartId, cancellationToken);

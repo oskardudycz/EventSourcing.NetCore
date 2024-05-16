@@ -110,7 +110,7 @@ public class ShoppingCartsController(
     [HttpGet("{id}")]
     public async Task<ShoppingCartDetails> Get(Guid id)
     {
-        var result = await queryBus.Query<GetCartById, ShoppingCartDetails>(GetCartById.Create(id));
+        var result = await queryBus.Query<GetCartById, ShoppingCartDetails>(GetCartById.For(id));
 
         Response.TrySetETagResponseHeader(result.Version);
 

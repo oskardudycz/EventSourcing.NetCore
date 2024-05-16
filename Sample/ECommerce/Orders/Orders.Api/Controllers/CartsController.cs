@@ -4,6 +4,7 @@ using Core.Ids;
 using Core.Queries;
 using Orders.Api.Requests.Carts;
 using Orders.Orders.CompletingOrder;
+using Orders.Orders.GettingOrderStatus;
 using Orders.Orders.InitializingOrder;
 using Orders.Products;
 
@@ -66,12 +67,21 @@ public class OrdersController(
     [HttpPut("{id}/confirmation")]
     public async Task<IActionResult> ConfirmOrder(Guid id)
     {
-        var command = CompleteOrder.Create(
+        var command = CompleteOrder.For(
             id
         );
 
         await commandBus.Send(command);
 
         return Ok();
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetStatus(Guid id)
+    {
+        var query = GetOrderStatus.For(id);
+
+        return await queryBus.Query<GetOrderStatus, OrderDetails?>(query) is {} details ?
+                Ok(details) : NotFound();
     }
 }

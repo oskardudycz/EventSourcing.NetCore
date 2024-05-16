@@ -31,7 +31,7 @@ public record InitializeOrder(
     }
 }
 
-public class HandleInitializeOrder(IMartenRepository<Order> orderRepository):
+public class HandleInitializeOrder(IMartenRepository<Order> orderRepository, TimeProvider timeProvider):
     ICommandHandler<InitializeOrder>
 {
     public Task Handle(InitializeOrder command, CancellationToken ct)
@@ -39,7 +39,7 @@ public class HandleInitializeOrder(IMartenRepository<Order> orderRepository):
         var (orderId, clientId, productItems, totalPrice) = command;
 
         return orderRepository.Add(
-            Order.Initialize(orderId, clientId, productItems, totalPrice),
+            Order.Initialize(orderId, clientId, productItems, totalPrice, timeProvider.GetUtcNow()),
             ct
         );
     }

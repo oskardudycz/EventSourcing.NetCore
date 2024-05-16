@@ -9,6 +9,7 @@ namespace Orders.Orders;
 
 public class Order: Aggregate
 {
+    public readonly TimeSpan DefaultTimeOut = TimeSpan.FromMinutes(5);
     public Guid? ClientId { get; private set; }
 
     public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = default!;
@@ -23,33 +24,42 @@ public class Order: Aggregate
         Guid orderId,
         Guid clientId,
         IReadOnlyList<PricedProductItem> productItems,
-        decimal totalPrice)
-    {
-        return new Order(
+        decimal totalPrice,
+        DateTimeOffset now
+    ) =>
+        new(
             orderId,
             clientId,
             productItems,
-            totalPrice
+            totalPrice,
+            now
         );
-    }
 
-    public Order(){}
+    public Order() { }
 
-    private Order(Guid id, Guid clientId, IReadOnlyList<PricedProductItem> productItems, decimal totalPrice)
+    private Order(
+        Guid id,
+        Guid clientId,
+        IReadOnlyList<PricedProductItem> productItems,
+        decimal totalPrice,
+        DateTimeOffset now,
+        TimeSpan? timeout = null
+    )
     {
-        var @event = OrderInitialized.Create(
+        var @event = OrderInitiated.From(
             id,
             clientId,
             productItems,
             totalPrice,
-            DateTime.UtcNow
+            now,
+            now.Add(timeout ?? DefaultTimeOut)
         );
 
         Enqueue(@event);
         Apply(@event);
     }
 
-    public void Apply(OrderInitialized @event)
+    public void Apply(OrderInitiated @event)
     {
         Id = @event.OrderId;
         ClientId = @event.ClientId;
@@ -57,7 +67,7 @@ public class Order: Aggregate
         Status = OrderStatus.Opened;
     }
 
-    public void RecordPayment(Guid paymentId, DateTime recordedAt)
+    public void RecordPayment(Guid paymentId, DateTimeOffset recordedAt)
     {
         var @event = OrderPaymentRecorded.Create(
             Id,
@@ -77,12 +87,12 @@ public class Order: Aggregate
         Status = OrderStatus.Paid;
     }
 
-    public void Complete()
+    public void Complete(DateTimeOffset now)
     {
-        if(Status != OrderStatus.Paid)
+        if (Status != OrderStatus.Paid)
             throw new InvalidOperationException($"Cannot complete a not paid order.");
 
-        var @event = OrderCompleted.Create(Id, DateTime.UtcNow);
+        var @event = OrderCompleted.Create(Id, now);
 
         Enqueue(@event);
         Apply(@event);
@@ -95,10 +105,10 @@ public class Order: Aggregate
 
     public void Cancel(OrderCancellationReason cancellationReason)
     {
-        if(OrderStatus.Closed.HasFlag(Status))
+        if (OrderStatus.Closed.HasFlag(Status))
             throw new InvalidOperationException($"Cannot cancel a closed order.");
 
-        var @event = OrderCancelled.Create(Id, PaymentId, cancellationReason, DateTime.UtcNow);
+        var @event = OrderCancelled.Create(Id, PaymentId, cancellationReason, DateTimeOffset.UtcNow);
 
         Enqueue(@event);
         Apply(@event);

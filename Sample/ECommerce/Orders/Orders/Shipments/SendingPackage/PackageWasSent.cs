@@ -7,5 +7,5 @@ public record PackageWasSent(
     Guid PackageId,
     Guid OrderId,
     IReadOnlyList<ProductItem> ProductItems,
-    DateTime SentAt
+    DateTimeOffset SentAt
 ): IExternalEvent;

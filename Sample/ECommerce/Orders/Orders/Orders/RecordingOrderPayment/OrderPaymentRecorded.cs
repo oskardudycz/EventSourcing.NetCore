@@ -7,7 +7,7 @@ public record OrderPaymentRecorded(
     Guid PaymentId,
     IReadOnlyList<PricedProductItem> ProductItems,
     decimal Amount,
-    DateTime PaymentRecordedAt
+    DateTimeOffset PaymentRecordedAt
 )
 {
     public static OrderPaymentRecorded Create(
@@ -15,7 +15,7 @@ public record OrderPaymentRecorded(
         Guid paymentId,
         IReadOnlyList<PricedProductItem> productItems,
         decimal amount,
-        DateTime recordedAt)
+        DateTimeOffset recordedAt)
     {
         if (orderId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(orderId));

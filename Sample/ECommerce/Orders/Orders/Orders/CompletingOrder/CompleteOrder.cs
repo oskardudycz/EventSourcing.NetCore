@@ -1,28 +1,21 @@
 using Core.Commands;
 using Core.Marten.Repository;
+using Core.Validation;
 
 namespace Orders.Orders.CompletingOrder;
 
-public record CompleteOrder(
-    Guid OrderId
-)
+public record CompleteOrder(Guid OrderId)
 {
-    public static CompleteOrder Create(Guid? orderId)
-    {
-        if (orderId == null || orderId == Guid.Empty)
-            throw new ArgumentOutOfRangeException(nameof(orderId));
-
-        return new CompleteOrder(orderId.Value);
-    }
+    public static CompleteOrder For(Guid? orderId) => new(orderId.NotEmpty());
 }
 
-public class HandleCompleteOrder(IMartenRepository<Order> orderRepository):
+public class HandleCompleteOrder(IMartenRepository<Order> orderRepository, TimeProvider timeProvider):
     ICommandHandler<CompleteOrder>
 {
     public Task Handle(CompleteOrder command, CancellationToken ct) =>
         orderRepository.GetAndUpdate(
             command.OrderId,
-            order => order.Complete(),
+            order => order.Complete(timeProvider.GetUtcNow()),
             ct: ct
         );
 }

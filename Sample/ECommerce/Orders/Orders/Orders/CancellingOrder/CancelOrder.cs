@@ -1,5 +1,8 @@
 using Core.Commands;
+using Core.Events;
 using Core.Marten.Repository;
+using Marten;
+using Orders.Orders.GettingOrderStatus;
 
 namespace Orders.Orders.CancellingOrder;
 
@@ -20,8 +23,12 @@ public record CancelOrder(
     }
 }
 
-public class HandleCancelOrder(IMartenRepository<Order> orderRepository):
-    ICommandHandler<CancelOrder>
+public class HandleCancelOrder(
+    IMartenRepository<Order> orderRepository,
+    IQuerySession querySession
+):
+    ICommandHandler<CancelOrder>,
+    IEventHandler<TimeHasPassed>
 {
     public Task Handle(CancelOrder command, CancellationToken ct) =>
         orderRepository.GetAndUpdate(
@@ -29,4 +36,21 @@ public class HandleCancelOrder(IMartenRepository<Order> orderRepository):
             order => order.Cancel(command.CancellationReason),
             ct: ct
         );
+
+    public async Task Handle(TimeHasPassed @event, CancellationToken ct)
+    {
+        var orderIds = await querySession.Query<PendingOrder>()
+            .Where(o => o.TimeoutAfter >= @event.Now)
+            .Select(o => o.Id)
+            .ToListAsync(token: ct);
+
+        foreach (var orderId in orderIds)
+        {
+            await orderRepository.GetAndUpdate(
+                orderId,
+                order => order.Cancel(OrderCancellationReason.TimedOut),
+                ct: ct
+            );
+        }
+    }
 }

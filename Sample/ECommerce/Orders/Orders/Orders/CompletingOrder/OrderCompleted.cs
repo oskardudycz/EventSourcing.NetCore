@@ -2,10 +2,10 @@ namespace Orders.Orders.CompletingOrder;
 
 public record OrderCompleted(
     Guid OrderId,
-    DateTime CompletedAt
+    DateTimeOffset CompletedAt
 )
 {
-    public static OrderCompleted Create(Guid orderId, DateTime completedAt)
+    public static OrderCompleted Create(Guid orderId, DateTimeOffset completedAt)
     {
         if (orderId == Guid.Empty)
             throw new ArgumentOutOfRangeException(nameof(orderId));
