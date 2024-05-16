@@ -40,7 +40,7 @@ public class HandleCancelOrder(
     public async Task Handle(TimeHasPassed @event, CancellationToken ct)
     {
         var orderIds = await querySession.Query<PendingOrder>()
-            .Where(o => o.TimeoutAfter >= @event.Now)
+            .Where(o => o.TimeoutAfter <= @event.Now)
             .Select(o => o.Id)
             .ToListAsync(token: ct);
 
