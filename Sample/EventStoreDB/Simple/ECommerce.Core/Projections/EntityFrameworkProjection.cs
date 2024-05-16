@@ -24,8 +24,6 @@ public class EntityFrameworkProjectionBuilder<TView, TDbContext>(IServiceCollect
     where TView : class
     where TDbContext : DbContext
 {
-    public readonly IServiceCollection services = services;
-
     public EntityFrameworkProjectionBuilder<TView, TDbContext> AddOn<TEvent>(Func<EventEnvelope<TEvent>, TView> handler) where TEvent : notnull
     {
         services.AddSingleton(handler);
