@@ -21,7 +21,7 @@ public class OrderDetails
 
     public Guid? PaymentId { get; private set; }
 
-    public List<EventsWrapper> Events = new();
+    public List<EventsWrapper> Events { get; private set; } = new();
 
     public DateTimeOffset InitiatedAt { get; private set; }
 
@@ -64,9 +64,10 @@ public class OrderDetails
     }
 }
 
-public record EventsWrapper(int Version, string Type, object Event)
+public record EventsWrapper(int Version, string Type, object Event, DateTimeOffset Timestamp)
 {
-    public static EventsWrapper From(IEvent @event) => new((int)@event.Version, @event.EventTypeName, @event.Data);
+    public static EventsWrapper From(IEvent @event) =>
+        new((int)@event.Version, @event.EventTypeName, @event.Data, @event.Timestamp);
 }
 
 public class OrderDetailsProjection: SingleStreamProjection<OrderDetails>
