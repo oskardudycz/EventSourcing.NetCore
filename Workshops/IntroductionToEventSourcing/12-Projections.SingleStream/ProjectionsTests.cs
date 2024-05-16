@@ -96,11 +96,7 @@ public class ProjectionsTests
         var eventStore = new EventStore();
         var database = new Database();
 
-        //
-        eventStore.Register<ShoppingCartOpened>(@event =>
-        {
-
-        });
+        // TODO:
         // 1. Register here your event handlers using `eventBus.Register`.
         // 2. Store results in database.
 

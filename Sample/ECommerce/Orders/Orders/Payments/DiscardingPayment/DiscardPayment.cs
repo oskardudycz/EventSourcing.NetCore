@@ -17,20 +17,13 @@ public record DiscardPayment(
     }
 }
 
-public class HandleDiscardPayment(
-    ExternalServicesConfig externalServicesConfig,
-    IExternalCommandBus externalCommandBus)
-    :
-        ICommandHandler<DiscardPayment>
+public class HandleDiscardPayment(PaymentsApiClient client): ICommandHandler<DiscardPayment>
 {
     public async Task Handle(DiscardPayment command, CancellationToken ct)
     {
-        await externalCommandBus.Delete(
-            externalServicesConfig.PaymentsUrl!,
-            "payments",
-            command,
-            ct
-        );
+        var result = await client.Discard(command, ct);
+
+        result.EnsureSuccessStatusCode();
     }
 }
 
