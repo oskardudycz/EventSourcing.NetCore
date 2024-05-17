@@ -16,7 +16,11 @@ public interface IProjection<in TEvent>: IProjection where TEvent : class
     }
 }
 
-public interface IVersionedProjection: IProjection
+public interface ITrackLastProcessedPosition
 {
     public ulong LastProcessedPosition { get; set; }
+}
+
+public interface IVersionedProjection: IProjection, ITrackLastProcessedPosition
+{
 }
