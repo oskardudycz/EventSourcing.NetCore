@@ -1,13 +1,18 @@
 ﻿using Core.Events;
 using Core.Projections;
 using Marten;
+using Marten.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace Core.Marten.ExternalProjections;
 
 public class MartenExternalProjection<TEvent, TView>(
     IDocumentSession session,
-    Func<TEvent, Guid> getId): IEventHandler<EventEnvelope<TEvent>>
+    ILogger<MartenExternalProjection<TEvent, TView>> logger,
+    Func<TEvent, Guid> getId
+): IEventHandler<EventEnvelope<TEvent>>
     where TView : IVersionedProjection
     where TEvent : notnull
 {
@@ -29,7 +34,15 @@ public class MartenExternalProjection<TEvent, TView>(
 
         session.Store(entity);
 
-        await session.SaveChangesAsync(ct).ConfigureAwait(false);
+        try
+        {
+            await session.SaveChangesAsync(ct).ConfigureAwait(false);
+        }
+        catch (MartenException martenException)
+            when (martenException.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+        {
+            logger.LogWarning(martenException, "{ViewType} already exists. Ignoring", typeof(TView).Name);
+        }
     }
 }
 
@@ -53,8 +66,9 @@ public static class MartenExternalProjectionConfig
             .AddTransient<IEventHandler<EventEnvelope<TEvent>>>(sp =>
             {
                 var session = sp.GetRequiredService<IDocumentSession>();
+                var logger = sp.GetRequiredService<ILogger<MartenExternalProjection<TEvent, TView>>>();
 
-                return new MartenExternalProjection<TEvent, TView>(session, getId);
+                return new MartenExternalProjection<TEvent, TView>(session, logger, getId);
             });
 
         return services;
