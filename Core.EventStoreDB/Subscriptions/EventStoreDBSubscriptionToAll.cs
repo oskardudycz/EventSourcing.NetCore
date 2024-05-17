@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Core.Events;
 using Core.EventStoreDB.Events;
 using Core.OpenTelemetry;
-using Core.Threading;
 using EventStore.Client;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,7 @@ namespace Core.EventStoreDB.Subscriptions;
 
 public class EventStoreDBSubscriptionToAllOptions
 {
-    public string SubscriptionId { get; set; } = "default";
+    public required string SubscriptionId { get; init; }
 
     public SubscriptionFilterOptions FilterOptions { get; set; } =
         new(EventTypeFilter.ExcludeSystemEvents());
@@ -34,8 +33,6 @@ public class EventStoreDBSubscriptionToAll(
 {
     private EventStoreDBSubscriptionToAllOptions subscriptionOptions = default!;
     private string SubscriptionId => subscriptionOptions.SubscriptionId;
-    private readonly object resubscribeLock = new();
-    private CancellationToken cancellationToken;
 
     public async Task SubscribeToAll(EventStoreDBSubscriptionToAllOptions subscriptionOptions, CancellationToken ct)
     {
@@ -43,7 +40,6 @@ public class EventStoreDBSubscriptionToAll(
         await Task.Yield();
 
         this.subscriptionOptions = subscriptionOptions;
-        cancellationToken = ct;
 
         logger.LogInformation("Subscription to all '{SubscriptionId}'", subscriptionOptions.SubscriptionId);
 

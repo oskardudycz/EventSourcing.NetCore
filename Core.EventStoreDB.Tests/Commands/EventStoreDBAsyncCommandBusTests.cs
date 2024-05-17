@@ -5,6 +5,7 @@ using Core.Events;
 using Core.EventStoreDB;
 using Core.EventStoreDB.Commands;
 using Core.EventStoreDB.Events;
+using Core.EventStoreDB.Subscriptions;
 using Core.OpenTelemetry;
 using Core.Testing;
 using EventStore.Client;
@@ -47,7 +48,7 @@ public class EventStoreDBAsyncCommandBusTests
             {
                 ConnectionString = "esdb://localhost:2113?tls=false"
             })
-            .AddEventStoreDBSubscriptionToAll()
+            .AddEventStoreDBSubscriptionToAll(new EventStoreDBSubscriptionToAllOptions(){SubscriptionId = "AsyncCommandBusTest"})
             .AddCommandHandler<AddUser, AddUserCommandHandler>(
                 _ => new AddUserCommandHandler(userIds)
             )

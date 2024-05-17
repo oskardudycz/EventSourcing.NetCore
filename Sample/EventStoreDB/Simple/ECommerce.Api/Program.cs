@@ -1,5 +1,6 @@
 using System.Net;
 using Core.EventStoreDB;
+using Core.EventStoreDB.Subscriptions;
 using Core.Exceptions;
 using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
@@ -27,7 +28,7 @@ builder.Services
             WrongExpectedVersionException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
             _ => null
         })
-    .AddEventStoreDBSubscriptionToAll()
+    .AddEventStoreDBSubscriptionToAll(new EventStoreDBSubscriptionToAllOptions { SubscriptionId = "SimpleESDB"})
     .AddECommerceModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>

@@ -118,10 +118,10 @@ public class UpdateProjection<TView, TEvent, TDbContext>(
         switch (view)
         {
             case null:
-                throw new InvalidOperationException($"{typeof(TView).Name} with id {viewId} wasn't found");
+                throw new InvalidOperationException($"{typeof(TView).Name} with id {viewId} wasn't found for event {typeof(TEvent).Name}");
             case ITrackLastProcessedPosition tracked when tracked.LastProcessedPosition <= eventEnvelope.Metadata.LogPosition:
                 logger.LogWarning(
-                    "{View} with id {ViewId} was already processe. LastProcessedPosition: {LastProcessedPosition}), event LogPosition: {LogPosition}",
+                    "{View} with id {ViewId} was already processed. LastProcessedPosition: {LastProcessedPosition}), event LogPosition: {LogPosition}",
                     typeof(TView).Name,
                     viewId,
                     tracked.LastProcessedPosition,
