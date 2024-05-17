@@ -1,0 +1,5 @@
+﻿{
+  ShoppingCartId: Guid_1,
+  ClientId: anonymised,
+  ConfirmedAt: DateTimeOffset_1
+}

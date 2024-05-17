@@ -1,0 +1,4 @@
+﻿{
+  ShoppingCartId: Guid_1,
+  ConfirmedAt: DateTimeOffset_1
+}
