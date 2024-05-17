@@ -38,7 +38,7 @@ public class MartenExternalProjection<TEvent, TView>(
         {
             await session.SaveChangesAsync(ct).ConfigureAwait(false);
         }
-        catch (MartenException martenException)
+        catch (Exception martenException)
             when (martenException.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
         {
             logger.LogWarning(martenException, "{ViewType} already exists. Ignoring", typeof(TView).Name);
