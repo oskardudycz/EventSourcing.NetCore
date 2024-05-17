@@ -40,8 +40,10 @@ public class InMemoryCommandBus(
 
 public static class EventBusExtensions
 {
-    public static IServiceCollection AddInMemoryCommandBus(this IServiceCollection services,
-        AsyncPolicy? asyncPolicy = null)
+    public static IServiceCollection AddInMemoryCommandBus(
+        this IServiceCollection services,
+        AsyncPolicy? asyncPolicy = null
+    )
     {
         services.AddSingleton<CommandHandlerMetrics>();
         services.AddSingleton<CommandHandlerActivity>();

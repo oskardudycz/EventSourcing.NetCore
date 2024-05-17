@@ -110,13 +110,10 @@ app.MapWolverineEndpoints();
 
 return await app.RunOaktonCommands(args);
 
-namespace Helpdesk.Api
+public class IncidentsHub: Hub
 {
-    public class IncidentsHub: Hub
-    {
-    }
+}
 
-    public partial class Program
-    {
-    }
+public partial class Program
+{
 }

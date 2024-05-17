@@ -82,5 +82,7 @@ public abstract record OrderEvent
             new(orderId.NotEmpty(), paymentId.NotEmpty(), orderCancellationReason.NotEmpty(), cancelledAt.NotEmpty());
     }
 
+    // QUESTION TO THE READER: How to split OrderCancelled into OrderCancelled and OrderTimedOut
+
     private OrderEvent() { }
 }

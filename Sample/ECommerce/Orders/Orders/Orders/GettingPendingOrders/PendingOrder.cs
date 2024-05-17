@@ -1,8 +1,6 @@
 using Marten.Events.Aggregation;
-using Orders.Orders.CompletingOrder;
-using Orders.Orders.InitializingOrder;
 
-namespace Orders.Orders.CancellingOrder;
+namespace Orders.Orders.GettingPending;
 using static OrderEvent;
 
 public class PendingOrder

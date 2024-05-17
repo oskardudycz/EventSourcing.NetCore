@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Orders.Orders.CancellingOrder;
 using Orders.Orders.CompletingOrder;
 using Orders.Orders.GettingOrderStatus;
+using Orders.Orders.GettingPending;
 using Orders.Orders.InitializingOrder;
 using Orders.Orders.RecordingOrderPayment;
 using Orders.Payments.FinalizingPayment;
@@ -24,7 +25,6 @@ internal static class OrdersConfig
         services
             .AddMartenRepository<Order>()
             .AddCommandHandlers()
-            .AddQueryHandlers()
             .AddEventHandlers();
 
     private static IServiceCollection AddCommandHandlers(this IServiceCollection services) =>
@@ -32,9 +32,6 @@ internal static class OrdersConfig
             .AddCommandHandler<RecordOrderPayment, HandleRecordOrderPayment>()
             .AddCommandHandler<CompleteOrder, HandleCompleteOrder>()
             .AddCommandHandler<CancelOrder, HandleCancelOrder>();
-
-    private static IServiceCollection AddQueryHandlers(this IServiceCollection services) =>
-        services.AddQueryHandler<GetOrderStatus, OrderDetails?, HandleGetOrderStatus>();
 
     private static IServiceCollection AddEventHandlers(this IServiceCollection services) =>
         services.AddEventHandler<CartFinalized, OrderSaga>()
