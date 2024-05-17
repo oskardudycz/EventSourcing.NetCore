@@ -78,7 +78,7 @@ public class EventStoreDBSubscriptionToAll(
         }
         catch (Exception ex)
         {
-            logger.LogWarning("Subscription was dropped: {ex}", ex);
+            logger.LogWarning("Subscription was dropped: {Exception}", ex);
 
             // Sleep between reconnections to not flood the database or not kill the CPU with infinite loop
             // Randomness added to reduce the chance of multiple subscriptions trying to reconnect at the same time

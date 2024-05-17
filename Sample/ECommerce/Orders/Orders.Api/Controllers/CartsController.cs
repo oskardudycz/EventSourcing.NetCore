@@ -2,9 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
 using Core.Ids;
 using Core.Queries;
+using Marten;
+using Marten.AspNetCore;
+using Marten.Pagination;
 using Orders.Api.Requests.Carts;
 using Orders.Orders.CompletingOrder;
 using Orders.Orders.GettingOrderStatus;
+using Orders.Orders.GettingPending;
 using Orders.Orders.InitializingOrder;
 using Orders.Products;
 
@@ -13,12 +17,11 @@ namespace Orders.Api.Controllers;
 [Route("api/[controller]")]
 public class OrdersController(
     ICommandBus commandBus,
-    IQueryBus queryBus,
-    IIdGenerator idGenerator)
+    IQuerySession querySession,
+    IIdGenerator idGenerator
+)
     : Controller
 {
-    private readonly IQueryBus queryBus = queryBus;
-
     [HttpPost]
     public async Task<IActionResult> InitOrder([FromBody] InitOrderRequest? request)
     {
@@ -28,7 +31,7 @@ public class OrdersController(
             orderId,
             request?.ClientId,
             request?.ProductItems?.Select(
-                pi => PricedProductItem.Create(pi.ProductId, pi.Quantity,pi.UnitPrice)).ToList(),
+                pi => PricedProductItem.Create(pi.ProductId, pi.Quantity, pi.UnitPrice)).ToList(),
             request?.TotalPrice
         );
 
@@ -77,11 +80,14 @@ public class OrdersController(
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetStatus(Guid id)
-    {
-        var query = GetOrderStatus.For(id);
+    public Task GetStatus(Guid id) =>
+        querySession.Json.WriteById<OrderDetails>(id, HttpContext);
 
-        return await queryBus.Query<GetOrderStatus, OrderDetails?>(query) is {} details ?
-                Ok(details) : NotFound();
-    }
+    [HttpGet]
+    public Task<IPagedList<PendingOrder>> GetPending(
+        [FromQuery] int? pageNumber,
+        [FromQuery] int? pageSize,
+        CancellationToken ct
+    ) =>
+        querySession.Query<PendingOrder>().ToPagedListAsync(pageNumber ?? 1, pageSize ?? 10, ct);
 }

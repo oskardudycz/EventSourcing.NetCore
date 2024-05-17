@@ -77,12 +77,13 @@ public class Order: Aggregate<OrderEvent>
 
     public void Cancel(OrderCancellationReason cancellationReason, DateTimeOffset now)
     {
+        // QUESTION TO THE READER: Is throwing Exception here fine or not?
         if (OrderStatus.Closed.HasFlag(Status))
             throw new InvalidOperationException("Cannot cancel a closed order.");
 
-        var @event = OrderCancelled.Create(Id, PaymentId, cancellationReason, now);
-
-        Enqueue(@event);
+        Enqueue(
+            OrderCancelled.Create(Id, PaymentId, cancellationReason, now)
+        );
     }
 
     public override void Apply(OrderEvent @event)
