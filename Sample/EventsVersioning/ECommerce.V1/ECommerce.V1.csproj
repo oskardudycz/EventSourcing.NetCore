@@ -3,7 +3,7 @@
     <!--  Catches incompatibility with the NuGet.
     Read more in: https://devblogs.microsoft.com/dotnet/package-validation/#validation-against-baseline-package-version
     -->
-    <Sdk Name="Microsoft.DotNet.PackageValidation" Version="1.0.0-preview.5.21302.8" />
+    <Sdk Name="Microsoft.DotNet.PackageValidation" Version="1.0.0-preview.5.21302.8"/>
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -13,4 +13,14 @@
         <!-- Ucomment if you have NuGet published. Set it to the previous major version -->
         <!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>-->
     </PropertyGroup>
+
+    <!-- You can also use Rosylyn Analyser.
+    Read more in: https://github.com/dotnet/roslyn-analyzers/blob/main/src/PublicApiAnalyzers/PublicApiAnalyzers.Help.md 
+    -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 </Project>
