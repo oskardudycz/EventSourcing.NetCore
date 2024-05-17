@@ -1,0 +1,41 @@
+#nullable enable
+ECommerce.V1.PricedProductItem
+ECommerce.V1.PricedProductItem.PricedProductItem(ECommerce.V1.ProductItem! ProductItem, decimal UnitPrice) -> void
+ECommerce.V1.PricedProductItem.ProductItem.get -> ECommerce.V1.ProductItem!
+ECommerce.V1.PricedProductItem.ProductItem.init -> void
+ECommerce.V1.PricedProductItem.UnitPrice.get -> decimal
+ECommerce.V1.PricedProductItem.UnitPrice.init -> void
+ECommerce.V1.ProductItem
+ECommerce.V1.ProductItem.ProductId.get -> System.Guid
+ECommerce.V1.ProductItem.ProductId.init -> void
+ECommerce.V1.ProductItem.ProductItem(System.Guid ProductId, int Quantity) -> void
+ECommerce.V1.ProductItem.Quantity.get -> int
+ECommerce.V1.ProductItem.Quantity.init -> void
+ECommerce.V1.ProductItemAddedToShoppingCart
+ECommerce.V1.ProductItemAddedToShoppingCart.ProductItem.get -> ECommerce.V1.PricedProductItem!
+ECommerce.V1.ProductItemAddedToShoppingCart.ProductItem.init -> void
+ECommerce.V1.ProductItemAddedToShoppingCart.ProductItemAddedToShoppingCart(System.Guid ShoppingCartId, ECommerce.V1.PricedProductItem! ProductItem) -> void
+ECommerce.V1.ProductItemAddedToShoppingCart.ShoppingCartId.get -> System.Guid
+ECommerce.V1.ProductItemAddedToShoppingCart.ShoppingCartId.init -> void
+ECommerce.V1.ProductItemRemovedFromShoppingCart
+ECommerce.V1.ProductItemRemovedFromShoppingCart.ProductItem.get -> ECommerce.V1.PricedProductItem!
+ECommerce.V1.ProductItemRemovedFromShoppingCart.ProductItem.init -> void
+ECommerce.V1.ProductItemRemovedFromShoppingCart.ProductItemRemovedFromShoppingCart(System.Guid ShoppingCartId, ECommerce.V1.PricedProductItem! ProductItem) -> void
+ECommerce.V1.ProductItemRemovedFromShoppingCart.ShoppingCartId.get -> System.Guid
+ECommerce.V1.ProductItemRemovedFromShoppingCart.ShoppingCartId.init -> void
+ECommerce.V1.ShoppingCartConfirmed
+ECommerce.V1.ShoppingCartConfirmed.ConfirmedAt.get -> System.DateTime
+ECommerce.V1.ShoppingCartConfirmed.ConfirmedAt.init -> void
+ECommerce.V1.ShoppingCartConfirmed.ShoppingCartConfirmed(System.Guid ShoppingCartId, System.DateTime ConfirmedAt) -> void
+ECommerce.V1.ShoppingCartConfirmed.ShoppingCartId.get -> System.Guid
+ECommerce.V1.ShoppingCartConfirmed.ShoppingCartId.init -> void
+ECommerce.V1.ShoppingCartOpened
+ECommerce.V1.ShoppingCartOpened.ClientId.get -> System.Guid
+ECommerce.V1.ShoppingCartOpened.ClientId.init -> void
+ECommerce.V1.ShoppingCartOpened.ShoppingCartId.get -> System.Guid
+ECommerce.V1.ShoppingCartOpened.ShoppingCartId.init -> void
+ECommerce.V1.ShoppingCartOpened.ShoppingCartOpened(System.Guid ShoppingCartId, System.Guid ClientId) -> void
+ECommerce.V1.ShoppingCartStatus
+ECommerce.V1.ShoppingCartStatus.Cancelled = 3 -> ECommerce.V1.ShoppingCartStatus
+ECommerce.V1.ShoppingCartStatus.Confirmed = 2 -> ECommerce.V1.ShoppingCartStatus
+ECommerce.V1.ShoppingCartStatus.Pending = 1 -> ECommerce.V1.ShoppingCartStatus
