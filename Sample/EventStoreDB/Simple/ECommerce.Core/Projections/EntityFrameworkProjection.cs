@@ -91,10 +91,10 @@ public class AddProjection<TView, TEvent, TDbContext>(
             await dbContext.AddAsync(view, ct);
             await dbContext.SaveChangesAsync(ct);
         }
-        catch (PostgresException postgresException)
-            when (postgresException is { SqlState: PostgresErrorCodes.UniqueViolation })
+        catch (Exception updateException)
+            when (updateException.GetBaseException() is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
         {
-            logger.LogWarning(postgresException, "{ViewType} already exists. Ignoring", typeof(TView).Name);
+            logger.LogWarning(updateException, "{ViewType} already exists. Ignoring", typeof(TView).Name);
         }
     }
 }
