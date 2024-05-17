@@ -56,7 +56,7 @@ public static class EventStoreDBConfigExtensions
 
     public static IServiceCollection AddEventStoreDBSubscriptionToAll(
         this IServiceCollection services,
-        EventStoreDBSubscriptionToAllOptions? subscriptionOptions = null,
+        EventStoreDBSubscriptionToAllOptions subscriptionOptions,
         bool checkpointToEventStoreDB = true)
     {
         if (checkpointToEventStoreDB)
@@ -77,11 +77,7 @@ public static class EventStoreDBConfigExtensions
 
                 return new BackgroundWorker(
                     logger,
-                    ct =>
-                        eventStoreDBSubscriptionToAll.SubscribeToAll(
-                            subscriptionOptions ?? new EventStoreDBSubscriptionToAllOptions(),
-                            ct
-                        )
+                    ct => eventStoreDBSubscriptionToAll.SubscribeToAll(subscriptionOptions, ct)
                 );
             }
         );
