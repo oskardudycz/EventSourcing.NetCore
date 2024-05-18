@@ -69,7 +69,7 @@ public class MergeEvents
         List<EventData> productItemsAdded
     )
     {
-        var shoppingCartInitializedJson = JsonDocument.Parse(shoppingCartInitialized!.Data).RootElement;
+        var shoppingCartInitializedJson = JsonDocument.Parse(shoppingCartInitialized.Data).RootElement;
 
         var newEvent = new ShoppingCartInitializedWithProducts(
             shoppingCartInitializedJson.GetProperty("ShoppingCartId").GetGuid(),

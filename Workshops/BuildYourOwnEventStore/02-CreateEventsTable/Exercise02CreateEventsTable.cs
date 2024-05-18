@@ -76,7 +76,7 @@ public class Exercise02CreateEventsTable: IDisposable
 
         dataColumn.Should().NotBeNull();
         dataColumn!.Name.Should().Be(DataColumnName);
-        dataColumn!.Type.Should().Be(Column.JsonType);
+        dataColumn.Type.Should().Be(Column.JsonType);
     }
 
     /// <summary>
