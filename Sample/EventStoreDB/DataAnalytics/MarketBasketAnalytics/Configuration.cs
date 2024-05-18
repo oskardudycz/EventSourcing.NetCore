@@ -1,5 +1,4 @@
-﻿using Core.EventStoreDB;
-using MarketBasketAnalytics.CartAbandonmentRateAnalysis;
+﻿using MarketBasketAnalytics.CartAbandonmentRateAnalysis;
 using MarketBasketAnalytics.MarketBasketAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

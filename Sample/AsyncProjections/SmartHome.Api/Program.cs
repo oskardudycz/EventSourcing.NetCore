@@ -1,4 +1,3 @@
-using System.Net;
 using Core;
 using Core.Exceptions;
 using Core.WebApi.Middlewares.ExceptionHandling;

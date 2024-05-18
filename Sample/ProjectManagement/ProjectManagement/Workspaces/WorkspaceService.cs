@@ -1,5 +1,3 @@
-using ProjectManagement.Core.Marten;
-using ProjectManagement.Projects;
 using ProjectManagement.Workspaces.Slug;
 
 namespace ProjectManagement.Workspaces;

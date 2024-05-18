@@ -1,7 +1,5 @@
 using Elastic.Clients.Elasticsearch;
-using Marten;
 using Marten.Events;
-using Marten.Events.Projections;
 
 namespace MartenMeetsElastic.Projections;
 

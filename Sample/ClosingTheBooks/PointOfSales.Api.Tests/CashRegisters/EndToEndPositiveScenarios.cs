@@ -1,5 +1,3 @@
-using System.Net;
-
 namespace PointOfSales.Api.Tests.CashRegisters;
 
 using static Scenarios;

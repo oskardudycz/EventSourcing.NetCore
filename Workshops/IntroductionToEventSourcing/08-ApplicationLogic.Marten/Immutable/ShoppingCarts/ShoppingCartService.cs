@@ -1,5 +1,4 @@
 using ApplicationLogic.Marten.Immutable.Pricing;
-using Core.Validation;
 
 namespace ApplicationLogic.Marten.Immutable.ShoppingCarts;
 using static ShoppingCartEvent;

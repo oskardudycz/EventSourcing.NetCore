@@ -1,7 +1,6 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using ECommerce.Domain.Core.Entities;
-using ECommerce.Domain.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Domain.Core.Services;

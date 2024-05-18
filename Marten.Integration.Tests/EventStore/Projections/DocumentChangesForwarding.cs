@@ -1,5 +1,4 @@
 using Core.Testing;
-using JasperFx.Core;
 using Marten.Events.Aggregation;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;

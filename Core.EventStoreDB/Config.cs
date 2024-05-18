@@ -1,7 +1,6 @@
 using Core.BackgroundWorkers;
 using Core.Configuration;
 using Core.Events;
-using Core.EventStoreDB.Repository;
 using Core.EventStoreDB.Subscriptions;
 using Core.OpenTelemetry;
 using EventStore.Client;

@@ -1,5 +1,4 @@
 using Core.Extensions;
-using Core.Structures;
 
 namespace HotelManagement.Choreography.GroupCheckouts;
 

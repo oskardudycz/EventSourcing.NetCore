@@ -1,5 +1,3 @@
-using ProjectManagement.Projects;
-
 namespace ProjectManagement.Workspaces;
 
 public record WorkspaceCreated(

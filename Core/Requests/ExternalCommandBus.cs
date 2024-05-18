@@ -1,6 +1,5 @@
 using System.Text.Json;
 using RestSharp;
-using RestSharp.Serializers;
 
 namespace Core.Requests;
 

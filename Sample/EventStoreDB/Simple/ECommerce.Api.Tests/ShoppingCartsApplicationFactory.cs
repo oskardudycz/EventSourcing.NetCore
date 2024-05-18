@@ -1,8 +1,4 @@
 ﻿using Core.Testing;
-using ECommerce.Storage;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace ECommerce.Api.Tests;
 

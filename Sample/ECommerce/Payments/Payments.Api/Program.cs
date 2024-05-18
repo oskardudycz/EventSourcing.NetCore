@@ -9,8 +9,6 @@ using Core.WebApi.Swagger;
 using Marten.Events.Daemon;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
-using Npgsql;
-using OpenTelemetry.Trace;
 using Payments;
 
 var builder = WebApplication.CreateBuilder(args);

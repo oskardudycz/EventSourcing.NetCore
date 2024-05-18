@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Helpdesk.Api;
 using Helpdesk.Api.Core.Http.Middlewares.ExceptionHandling;
 using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.SignalR;
@@ -7,7 +6,6 @@ using Helpdesk.Api.Incidents;
 using JasperFx.CodeGeneration;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
-using Marten.Events.Projections;
 using Marten.Exceptions;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;

@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using FluentAssertions;
-using Xunit;
 using V1 = ECommerce.V1;
 
 namespace EventsVersioning.Tests.SimpleMappings;

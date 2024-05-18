@@ -15,7 +15,6 @@ using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Pagination;
 using Marten.Schema.Identity;
-using Marten.Services.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Oakton;
