@@ -4,7 +4,6 @@ using Marten;
 using Reservations.Guests;
 using Reservations.Guests.GettingGuestByExternalId;
 using static Reservations.Guests.GuestExternalId;
-using static Reservations.Guests.GettingGuestByExternalId.GetGuestIdByExternalId;
 
 namespace Reservations.RoomReservations.ReservingRoom;
 

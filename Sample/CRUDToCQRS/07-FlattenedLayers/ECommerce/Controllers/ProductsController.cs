@@ -3,8 +3,6 @@ using ECommerce.Core.Controllers;
 using ECommerce.Domain.Core.Repositories;
 using ECommerce.Domain.Products;
 using ECommerce.Domain.Products.CreatingProduct;
-using ECommerce.Domain.Products.GettingById;
-using ECommerce.Domain.Products.GettingProducts;
 using ECommerce.Domain.Products.UpdatingProduct;
 using ECommerce.Domain.Storage;
 using Microsoft.AspNetCore.Mvc;

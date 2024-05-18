@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using static Microsoft.AspNetCore.Http.Results;
 
 namespace ECommerce.Domain.Products.GettingProducts;
 

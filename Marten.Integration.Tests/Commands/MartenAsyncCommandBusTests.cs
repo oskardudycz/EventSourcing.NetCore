@@ -7,7 +7,6 @@ using Core.Marten.Commands;
 using Core.OpenTelemetry;
 using Core.Testing;
 using FluentAssertions;
-using Marten.Events.Daemon;
 using Marten.Events.Daemon.Coordination;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Microsoft.Extensions.DependencyInjection;

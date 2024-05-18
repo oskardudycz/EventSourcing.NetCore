@@ -1,5 +1,3 @@
-using IntroductionToEventSourcing.BusinessLogic.Mutable;
-
 namespace IntroductionToEventSourcing.BusinessLogic.Immutable;
 using static ShoppingCartEvent;
 using static ShoppingCartCommand;

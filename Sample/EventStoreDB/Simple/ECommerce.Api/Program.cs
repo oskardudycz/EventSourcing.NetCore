@@ -1,4 +1,3 @@
-using System.Net;
 using Core.EventStoreDB;
 using Core.EventStoreDB.Subscriptions;
 using Core.Exceptions;

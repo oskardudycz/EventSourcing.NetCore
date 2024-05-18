@@ -2,7 +2,6 @@ using System.Text.Json;
 using EventStore.Client;
 using OptimisticConcurrency.Core.Entities;
 using OptimisticConcurrency.Core.Exceptions;
-using OptimisticConcurrency.Immutable.ShoppingCarts;
 
 namespace OptimisticConcurrency.Core.EventStoreDB;
 

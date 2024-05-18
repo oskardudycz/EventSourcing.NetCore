@@ -2,7 +2,6 @@ using ProjectManagement.Api.Core.Users;
 using ProjectManagement.Workspaces;
 using Marten;
 using Microsoft.AspNetCore.Mvc;
-using ProjectManagement.Projects;
 using ProjectManagement.Scenarios.WorkspaceCreation;
 
 namespace ProjectManagement.Api.Controllers;

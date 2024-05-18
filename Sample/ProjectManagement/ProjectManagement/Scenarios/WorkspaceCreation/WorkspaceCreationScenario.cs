@@ -1,4 +1,3 @@
-using Marten;
 using ProjectManagement.Projects;
 using ProjectManagement.Workspaces;
 

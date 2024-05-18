@@ -4,7 +4,6 @@ using Core.EventStoreDB.Events;
 using Core.EventStoreDB.Serialization;
 using Core.OpenTelemetry;
 using EventStore.Client;
-using OpenTelemetry.Context.Propagation;
 
 namespace Core.EventStoreDB.Repository;
 

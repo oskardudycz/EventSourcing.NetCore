@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Marten.Integration.Tests.TestsInfrastructure;
-using Npgsql;
 using Weasel.Core;
 using Xunit;
 

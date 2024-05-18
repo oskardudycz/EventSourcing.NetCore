@@ -1,4 +1,3 @@
-using Core.Aggregates;
 using Core.Exceptions;
 
 namespace Core.Marten.Repository;

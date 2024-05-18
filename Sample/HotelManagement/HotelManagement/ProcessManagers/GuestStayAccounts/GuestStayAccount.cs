@@ -1,7 +1,5 @@
 using Core.Aggregates;
-using Core.Structures;
 using Marten.Metadata;
-using static Core.Structures.Result;
 
 namespace HotelManagement.ProcessManagers.GuestStayAccounts;
 
