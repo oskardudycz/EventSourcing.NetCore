@@ -17,7 +17,7 @@ public class EventStore
     public TEvent[] ReadStream<TEvent>(Guid streamId) where TEvent : notnull =>
         events.TryGetValue(streamId, out var stream)
             ? stream.Select(@event =>
-                    JsonSerializer.Deserialize(@event.Json, Type.GetType(@event.EventType)!)
+                    JsonSerializer.Deserialize(@event.Json, Type.GetType(@event.EventType, true)!)
                 )
                 .Where(e => e != null).Cast<TEvent>().ToArray()
             : [];

@@ -168,7 +168,7 @@ public class GettingStateFromEventsTests: EventStoreDBTest
         {
             var eventData = JsonSerializer.Deserialize(
                 @event.Event.Data.Span,
-                Type.GetType(@event.Event.EventType)!
+                Type.GetType(@event.Event.EventType, true)!
             );
 
             shoppingCart.Evolve(eventData!);
