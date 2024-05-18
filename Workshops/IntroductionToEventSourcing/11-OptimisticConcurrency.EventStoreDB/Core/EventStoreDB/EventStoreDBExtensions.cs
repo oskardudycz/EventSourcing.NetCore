@@ -46,7 +46,7 @@ public static class EventStoreDBExtensions
             .Select(@event =>
                 (TEvent)JsonSerializer.Deserialize(
                     @event.Event.Data.Span,
-                    Type.GetType(@event.Event.EventType)!
+                    Type.GetType(@event.Event.EventType, true)!
                 )!
             )
             .AggregateAsync(

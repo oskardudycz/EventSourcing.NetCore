@@ -50,7 +50,7 @@ public static class EventStoreDBExtensions
                     revision = StreamRevision.FromStreamPosition(@event.Event.EventNumber);
                     return (TEvent)JsonSerializer.Deserialize(
                         @event.Event.Data.Span,
-                        Type.GetType(@event.Event.EventType)!
+                        Type.GetType(@event.Event.EventType, true)!
                     )!;
                 }
             )
