@@ -65,7 +65,7 @@ public class StoreInitializationTests(MartenFixture fixture): MartenTest(fixture
             });
 
             using var session = store.LightweightSession();
-            using var transaction = session.Connection!.BeginTransaction();
+            using var transaction = session.Connection.BeginTransaction();
             ConnectionShouldBeEstablished(store);
 
             transaction.Rollback();

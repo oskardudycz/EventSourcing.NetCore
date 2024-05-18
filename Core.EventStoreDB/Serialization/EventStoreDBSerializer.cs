@@ -51,7 +51,7 @@ public static class EventStoreDBSerializer
         return JsonConvert.DeserializeObject<PropagationContext>(
             Encoding.UTF8.GetString(resolvedEvent.Event.Metadata.Span),
             SerializerSettings
-        )!;
+        );
     }
 
     public static EventData ToJsonEventData(this object @event, object? metadata = null) =>

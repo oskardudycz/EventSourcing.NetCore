@@ -87,7 +87,7 @@ public static class DatabaseExtensions
 
         if (item.Version >= version) return;
 
-        database.Store(id, version, update(item!));
+        database.Store(id, version, update(item));
     }
 }
 

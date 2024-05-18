@@ -53,7 +53,7 @@ public class TextFormatter
         dateTime.Map(
             date => date.ToString(),
             milliseconds => DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).ToString()
-        )!;
+        );
 
     public static string FormatV3(Either<DateTimeOffset, long> dateTime) =>
         dateTime.Map(
