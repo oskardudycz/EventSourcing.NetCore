@@ -75,7 +75,7 @@ public class MartenEventPublisher(
         try
         {
             if (headers!.TryGetValue(key, out var value) != true)
-                return Enumerable.Empty<string>();
+                return [];
 
             var stringValue = value.ToString();
 
@@ -86,7 +86,7 @@ public class MartenEventPublisher(
         catch (Exception ex)
         {
             logger.LogError("Failed to extract trace context: {ex}", ex);
-            return Enumerable.Empty<string>();
+            return [];
         }
     }
 }
