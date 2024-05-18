@@ -133,18 +133,18 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
 
     private void CreateStreamsTable()
     {
-        const string creatStreamsTableSql =
+        const string createStreamsTableSql =
             @"CREATE TABLE IF NOT EXISTS streams(
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       type           TEXT                      NOT NULL,
                       version        BIGINT                    NOT NULL
                   );";
-        databaseConnection.Execute(creatStreamsTableSql);
+        databaseConnection.Execute(createStreamsTableSql);
     }
 
     private void CreateEventsTable()
     {
-        const string creatEventsTableSql =
+        const string createEventsTableSql =
             @"CREATE TABLE IF NOT EXISTS events(
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       data           JSONB                     NOT NULL,
@@ -155,7 +155,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
                       FOREIGN KEY(stream_id) REFERENCES streams(id),
                       CONSTRAINT events_stream_and_version UNIQUE(stream_id, version)
                 );";
-        databaseConnection.Execute(creatEventsTableSql);
+        databaseConnection.Execute(createEventsTableSql);
     }
 
     private void CreateAppendEventFunction()
