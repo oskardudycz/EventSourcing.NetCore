@@ -4,14 +4,15 @@ services:
     #  Postgres
     #######################################################
     postgres:
-        image: clkao/postgres-plv8
+        image: postgres:15.1-alpine
         container_name: postgres
         environment:
-            POSTGRES_PASSWORD: Password12!
+            - POSTGRES_DB=postgres
+            - POSTGRES_PASSWORD=Password12!
         ports:
             - "5432:5432"
         networks:
-            - pg_network
+            - postgres
 
     pgadmin:
         image: dpage/pgadmin4
@@ -22,10 +23,10 @@ services:
         ports:
             - "${PGADMIN_PORT:-5050}:80"
         networks:
-            - pg_network
+            - postgres
 
 networks:
-    pg_network:
+    postgres:
         driver: bridge
 
 volumes:

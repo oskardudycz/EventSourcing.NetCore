@@ -4,16 +4,19 @@ services:
     #  Postgres
     #######################################################
     postgres:
-        image: clkao/postgres-plv8
+        profiles: [ postgres, postgres-all, all, all-no-ui, ci ]
+        image: postgres:15.1-alpine
         container_name: postgres
         environment:
-            POSTGRES_PASSWORD: Password12!
+            - POSTGRES_DB=postgres
+            - POSTGRES_PASSWORD=Password12!
         ports:
             - "5432:5432"
         networks:
-            - pg_network
+            - postgres
 
     pgadmin:
+        profiles: [ postgres-ui, postgres-all, all ]
         image: dpage/pgadmin4
         container_name: pgadmin
         environment:
@@ -22,9 +25,10 @@ services:
         ports:
             - "${PGADMIN_PORT:-5050}:80"
         networks:
-            - pg_network
+            - postgres
 
     jaeger:
+        profiles: [ otel, otel-all, all ]
         image: jaegertracing/all-in-one:latest
         ports:
             - "5775:5775/udp"
@@ -39,6 +43,7 @@ services:
     #  EventStoreDB
     #######################################################
     eventstore.db:
+        profiles: [ eventstoredb, eventstoredb-all, all, all-no-ui, ci ]
         image: eventstore/eventstore:23.10.0-bookworm-slim
         # use this image if you're running ARM-based proc like Apple M1
         # image: eventstore/eventstore:23.10.0-alpha-arm64v8
@@ -69,6 +74,7 @@ services:
     #######################################################
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+        profiles: [ elastic, elastic-all, all, all-no-ui, ci ]
         environment:
             - discovery.type=single-node
             - cluster.name=docker-cluster
@@ -96,6 +102,7 @@ services:
 
     kibana:
         image: docker.elastic.co/kibana/kibana:8.13.2
+        profiles: [ elastic-ui, elastic-all, all ]
         environment:
             - ELASTICSEARCH_HOSTS=http://elastic_search:9200
         ports:
@@ -106,44 +113,47 @@ services:
             - elasticsearch
 
     #######################################################
-    #  Zookeeper
-    #######################################################
-    zookeeper:
-        image: confluentinc/cp-zookeeper:7.0.1
-        hostname: zookeeper
-        container_name: zookeeper
-        networks:
-            - kafka_network
-        ports:
-            - "2181:2181"
-        environment:
-            ZOOKEEPER_CLIENT_PORT: 2181
-            ZOOKEEPER_TICK_TIME: 2000
-
-    #######################################################
     #  Kafka
     #######################################################
     kafka:
-        image: confluentinc/cp-kafka:7.0.1
+        image: confluentinc/confluent-local:7.6.1
+        profiles: [kafka, kafka-all, all, all-no-ui]
         hostname: kafka
         container_name: kafka
-        depends_on:
-            - zookeeper
         networks:
             - kafka_network
         ports:
             - "9092:9092"
+            - "9091:9091"
+        healthcheck:
+            test: nc -z localhost 9092 || exit -1
+            interval: 5s
+            timeout: 10s
+            retries: 100
         environment:
-            KAFKA_BROKER_ID: 1
-            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_NODE_ID: 1
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
             KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
             ADVERTISED_HOST_NAME: kafka
             KAFKA_ADVERTISED_HOSTNAME: 127.0.0.1
+            KAFKA_JMX_PORT: 9101
+            KAFKA_JMX_HOSTNAME: localhost
+            KAFKA_PROCESS_ROLES: 'broker,controller'
+            KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+            KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+            KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+            KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+            KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
 
     init-kafka:
-        image: confluentinc/cp-kafka:7.0.1
+        image: confluentinc/confluent-local:7.6.1
+        profiles: [ kafka, kafka-all, all, all-no-ui ]
+        hostname: init-kafka
+        container_name: init-kafka
         depends_on:
             - kafka
         entrypoint: [ '/bin/sh', '-c' ]
@@ -165,46 +175,32 @@ services:
             "
 
     #######################################################
-    #  Avro Schema Registry
+    #  Schema Registry
     #######################################################
     schema_registry:
-        image: confluentinc/cp-schema-registry:7.0.1
+        image: confluentinc/cp-schema-registry:7.6.1
         container_name: schema_registry
         hostname: schema_registry
+        profiles: [ kafka-ui, kafka-all, all ]
         ports:
             - 8181:8181
             - 8081:8081
         depends_on:
-            - zookeeper
+            - kafka
         networks:
             - kafka_network
         environment:
             SCHEMA_REGISTRY_HOST_NAME: schema_registry
-            SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+            SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
             SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
             SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
             SCHEMA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
             SCHEMA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
 
-    kafka_rest:
-        image: confluentinc/cp-kafka-rest:7.0.1
-        hostname: kafka_rest
-        ports:
-            - "8082:8082"
-        depends_on:
-            - schema_registry
-        networks:
-            - kafka_network
-        environment:
-            KAFKA_REST_BOOTSTRAP_SERVERS: kafka:29092
-            KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
-            KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registry:8081
-            KAFKA_REST_HOST_NAME: kafka_rest
-            KAFKA_REST_LISTENERS: http://0.0.0.0:8082
-
     kafka_topics_ui:
         image: provectuslabs/kafka-ui:latest
         hostname: kafka-ui
+        profiles: [ kafka-ui, kafka-all, all ]
         ports:
             - "8080:8080"
         environment:
@@ -213,12 +209,29 @@ services:
         networks:
             - kafka_network
         depends_on:
-            - kafka_rest
+            - kafka
+
+    #######################################################
+    #  Test Backend Service
+    #######################################################
+    backend:
+        build:
+            dockerfile: Dockerfile
+            context: .
+        container_name: event_sourcing_sample
+        profiles: [sample]
+        ports:
+            - "5555:5000"
+        depends_on:
+            postgres:
+                condition: service_healthy
+        networks:
+            - postgres
 
 networks:
     es_network:
         driver: bridge
-    pg_network:
+    postgres:
         driver: bridge
     esdb_network:
         driver: bridge

@@ -1,10 +1,11 @@
 version: "3"
 services:
     postgres:
-        image: clkao/postgres-plv8
+        image: postgres:15.1-alpine
         container_name: postgres
         environment:
-            POSTGRES_PASSWORD: Password12!
+            - POSTGRES_DB=postgres
+            - POSTGRES_PASSWORD=Password12!
         ports:
             - "5432:5432"
         networks:
