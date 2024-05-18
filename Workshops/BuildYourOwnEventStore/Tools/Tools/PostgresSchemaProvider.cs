@@ -17,7 +17,7 @@ public class PostgresSchemaProvider(NpgsqlConnection databaseConnection)
                   AND table_schema in (select schemas[1] from (select current_schemas(false) as schemas) as currentschema)";
 
     private const string FunctionExistsSql =
-        @"select exists(select * from pg_proc where proname = @functionName);";
+        "select exists(select * from pg_proc where proname = @functionName);";
 
     /// <summary>
     /// Returns schema information about specific table
