@@ -11,7 +11,7 @@ public interface ISubscriptionCheckpointRepository
     public record StoreResult
     {
         public record Success(Checkpoint Checkpoint): StoreResult;
-
+        public record Ignored: StoreResult;
         public record Mismatch: StoreResult;
     }
 }
