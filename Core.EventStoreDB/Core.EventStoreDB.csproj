@@ -12,6 +12,8 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <!-- This dependency is only needed for the PostgreSQL subscriptions checkpoints -->
+        <PackageReference Include="Npgsql" Version="8.0.3" />
     </ItemGroup>
 
     <ItemGroup>
