@@ -48,8 +48,7 @@ public record GuestStayAccount(
 {
     public bool IsSettled => Balance == 0;
 
-    public static GuestCheckedIn CheckIn(Guid guestStayId, DateTimeOffset now) =>
-        new GuestCheckedIn(guestStayId, now);
+    public static GuestCheckedIn CheckIn(Guid guestStayId, DateTimeOffset now) => new(guestStayId, now);
 
     public ChargeRecorded RecordCharge(decimal amount, DateTimeOffset now)
     {
@@ -97,8 +96,7 @@ public record GuestStayAccount(
             );
     }
 
-    public static GuestStayAccount Create(GuestCheckedIn @event) =>
-        new GuestStayAccount(@event.GuestStayId);
+    public static GuestStayAccount Create(GuestCheckedIn @event) => new(@event.GuestStayId);
 
     public GuestStayAccount Apply(ChargeRecorded @event) =>
         this with { Balance = Balance - @event.Amount };

@@ -149,14 +149,12 @@ public abstract record ChemicalReaction
 
     public record NotStarted: ChemicalReaction
     {
-        public ChemicalReactionEvent.Started Start(DateTimeOffset now) =>
-            new ChemicalReactionEvent.Started(now);
+        public ChemicalReactionEvent.Started Start(DateTimeOffset now) => new(now);
     }
 
     public record InProgress: ChemicalReaction
     {
-        public ChemicalReactionEvent.Completed Stop(DateTimeOffset now) =>
-            new ChemicalReactionEvent.Completed(now);
+        public ChemicalReactionEvent.Completed Stop(DateTimeOffset now) => new(now);
     }
 
     public record Completed: ChemicalReaction;

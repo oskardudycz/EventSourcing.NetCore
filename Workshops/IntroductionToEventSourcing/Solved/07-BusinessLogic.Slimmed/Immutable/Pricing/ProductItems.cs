@@ -21,7 +21,7 @@ public record PricedProductItem(
 
 public class ProductItems(ImmutableDictionary<ProductIdWithPrice, Quantity> Items)
 {
-    public static ProductItems Empty => new ProductItems(ImmutableDictionary<ProductIdWithPrice, Quantity>.Empty);
+    public static ProductItems Empty => new(ImmutableDictionary<ProductIdWithPrice, Quantity>.Empty);
 
     public ProductItems Add(PricedProductItem productItem) =>
         new(Items.Set(Key(productItem), currentQuantity => currentQuantity + productItem.Quantity));

@@ -9,6 +9,5 @@ public class AggregateNotFoundException: Exception
     public static AggregateNotFoundException For<T>(Guid id) =>
         For<T>(id.ToString());
 
-    public static AggregateNotFoundException For<T>(string id) =>
-        new AggregateNotFoundException(typeof(T).Name, id);
+    public static AggregateNotFoundException For<T>(string id) => new(typeof(T).Name, id);
 }

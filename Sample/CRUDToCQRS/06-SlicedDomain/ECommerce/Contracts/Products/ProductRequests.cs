@@ -12,7 +12,7 @@ public record CreateProductRequest(
 )
 {
     public CreateProduct ToCommand(Guid id) =>
-        new CreateProduct(
+        new(
             id,
             Sku ?? throw new ArgumentNullException(nameof(Sku)),
             Name ?? throw new ArgumentNullException(nameof(Name)),
@@ -30,7 +30,7 @@ public record UpdateProductRequest(
 )
 {
     public UpdateProduct ToCommand(Guid id) =>
-        new UpdateProduct(
+        new(
             id,
             Name ?? throw new ArgumentNullException(nameof(Name)),
             Description,

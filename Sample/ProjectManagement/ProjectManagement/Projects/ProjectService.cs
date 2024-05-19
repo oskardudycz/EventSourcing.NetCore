@@ -9,7 +9,7 @@ public static class ProjectService
     );
 
     public static ProjectCreated Handle(CreateBacklogProject command) =>
-        new ProjectCreated(
+        new(
             ProjectId: command.ProjectId,
             Name: "Backlog",
             StartDate: null,
