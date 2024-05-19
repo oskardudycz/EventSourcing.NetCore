@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Core.Reflection;
+﻿namespace Core.Reflection;
 
 public static class ValueTypeConverter
 {

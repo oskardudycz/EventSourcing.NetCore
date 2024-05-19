@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using OpenTelemetry;
-using OpenTelemetry.Context.Propagation;
-
 namespace Core.OpenTelemetry;
 
 public static class TelemetryPropagator

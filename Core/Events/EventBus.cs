@@ -1,10 +1,3 @@
-using System.Collections.Concurrent;
-using System.Reflection;
-using Core.OpenTelemetry;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Polly;
-
 namespace Core.Events;
 
 public interface IEventBus

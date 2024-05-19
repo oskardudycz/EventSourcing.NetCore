@@ -1,13 +1,3 @@
-using Core.Commands;
-using Core.Events;
-using Core.Extensions;
-using Core.Ids;
-using Core.OpenTelemetry;
-using Core.Queries;
-using Core.Requests;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-
 namespace Core;
 
 public static class Config

@@ -1,7 +1,4 @@
-﻿using System.Numerics;
-using System.Runtime.CompilerServices;
-
-namespace Core.Validation;
+﻿namespace Core.Validation;
 
 public static class ValidationExtensions
 {

@@ -1,7 +1,4 @@
-﻿using System.Collections.Concurrent;
-using Core.Reflection;
-
-namespace Core.Events;
+﻿namespace Core.Events;
 
 public class EventTypeMapper
 {

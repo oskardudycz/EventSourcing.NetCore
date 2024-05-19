@@ -1,11 +1,3 @@
-using System.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-using OpenTelemetry;
-
 namespace Core.OpenTelemetry;
 
 public static class TelemetryExtensions

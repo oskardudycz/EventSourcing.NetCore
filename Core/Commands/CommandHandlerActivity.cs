@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using Core.OpenTelemetry;
-
 namespace Core.Commands;
 
 public class CommandHandlerActivity(CommandHandlerMetrics metrics)

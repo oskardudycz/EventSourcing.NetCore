@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace Core.Queries;
+﻿namespace Core.Queries;
 
 public static class Config
 {
