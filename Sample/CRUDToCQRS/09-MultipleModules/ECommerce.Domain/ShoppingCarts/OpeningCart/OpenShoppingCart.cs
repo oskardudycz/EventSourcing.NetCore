@@ -14,7 +14,7 @@ public record OpenShoppingCartRequest(
 )
 {
     public OpenShoppingCart ToCommand(Guid cartId) =>
-        new OpenShoppingCart(
+        new(
             cartId,
             ClientId ?? throw new ArgumentNullException(nameof(cartId))
         );

@@ -5,7 +5,7 @@ namespace ECommerce.Core.Controllers;
 public static class HttpExtensions
 {
     public static CreatedResult Created(this Controller controller, Guid id) =>
-        new CreatedResult($"api/{controller.ControllerContext.ActionDescriptor.ControllerName}/{id}", id);
+        new($"api/{controller.ControllerContext.ActionDescriptor.ControllerName}/{id}", id);
 
     public static OkResult OkWithLocation(this Controller controller, string location)
     {

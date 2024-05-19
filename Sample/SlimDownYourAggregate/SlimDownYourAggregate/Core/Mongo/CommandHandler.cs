@@ -9,8 +9,7 @@ public class Dummy
 
     public string Name { get; private set; }
 
-    public static Dummy Create(string name) =>
-        new Dummy(ObjectId.GenerateNewId().ToString(), name);
+    public static Dummy Create(string name) => new(ObjectId.GenerateNewId().ToString(), name);
 
     [BsonConstructor]
     private Dummy(string id, string name)

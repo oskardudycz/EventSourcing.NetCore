@@ -3,7 +3,7 @@ namespace Tickets.Api.Tests.Config;
 public static class TestConfiguration
 {
     public static Dictionary<string, string> Get(string fixtureName) =>
-        new Dictionary<string, string>
+        new()
         {
             {
                 "EventStore:ConnectionString",

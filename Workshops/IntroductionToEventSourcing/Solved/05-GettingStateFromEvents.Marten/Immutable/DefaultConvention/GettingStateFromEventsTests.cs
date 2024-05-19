@@ -56,7 +56,7 @@ public record ShoppingCart(
 ){
 
     public static ShoppingCart Create(ShoppingCartOpened opened) =>
-        new ShoppingCart(
+        new(
             opened.ShoppingCartId,
             opened.ClientId,
             ShoppingCartStatus.Pending,

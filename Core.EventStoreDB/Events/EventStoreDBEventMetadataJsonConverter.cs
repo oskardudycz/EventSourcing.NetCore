@@ -71,7 +71,7 @@ public class EventStoreDBEventMetadataJsonConverter: JsonConverter
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to extract trace context: {ex}");
-            return Enumerable.Empty<string>();
+            return [];
         }
     }
 }
