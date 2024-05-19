@@ -33,15 +33,11 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
             commandType: CommandType.Text
         );
 
-    public StreamState GetStreamState(Guid streamId)
-    {
+    public StreamState GetStreamState(Guid streamId) =>
         throw new NotImplementedException("Return here stream state, so: id, type and version.");
-    }
 
-    public IEnumerable GetEvents(Guid streamId)
-    {
+    public IEnumerable GetEvents(Guid streamId) =>
         throw new NotImplementedException("Return here stream events stored in database.");
-    }
 
     private void CreateStreamsTable()
     {
@@ -122,8 +118,6 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         databaseConnection.Execute(appendEventFunctionSql);
     }
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         databaseConnection.Dispose();
-    }
 }

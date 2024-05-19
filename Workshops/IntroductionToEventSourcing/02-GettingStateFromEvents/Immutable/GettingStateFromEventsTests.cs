@@ -62,11 +62,9 @@ public enum ShoppingCartStatus
 
 public class GettingStateFromEventsTests
 {
-    private static ShoppingCart GetShoppingCart(IEnumerable<ShoppingCartEvent> events)
-    {
-        // 1. Add logic here
+    // 1. Add logic here
+    private static ShoppingCart GetShoppingCart(IEnumerable<ShoppingCartEvent> events) =>
         throw new NotImplementedException();
-    }
 
     [Fact]
     [Trait("Category", "SkipCI")]

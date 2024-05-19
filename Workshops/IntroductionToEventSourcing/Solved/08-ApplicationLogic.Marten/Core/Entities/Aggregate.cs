@@ -24,10 +24,8 @@ public abstract class Aggregate<TEvent>: IAggregate
         return dequeuedEvents;
     }
 
-    protected void Enqueue(object @event)
-    {
+    protected void Enqueue(object @event) =>
         uncommittedEvents.Enqueue(@event);
-    }
 
     public void Apply(object @event)
     {

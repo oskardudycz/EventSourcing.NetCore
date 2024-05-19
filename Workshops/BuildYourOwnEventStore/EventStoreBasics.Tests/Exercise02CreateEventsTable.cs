@@ -183,8 +183,6 @@ public class Exercise02CreateEventsTable : IDisposable
     /// <summary>
     /// Disposes connection to database
     /// </summary>
-    public void Dispose()
-    {
+    public void Dispose() =>
         databaseConnection.Dispose();
-    }
 }

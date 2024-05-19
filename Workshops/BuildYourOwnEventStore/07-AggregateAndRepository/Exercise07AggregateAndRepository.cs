@@ -36,10 +36,8 @@ public class Exercise07AggregateAndRepository
             Name = @event.UserName;
         }
 
-        public void Apply(UserNameUpdated @event)
-        {
+        public void Apply(UserNameUpdated @event) =>
             Name = @event.UserName;
-        }
     }
 
     public class UserCreated(Guid userId, string userName)

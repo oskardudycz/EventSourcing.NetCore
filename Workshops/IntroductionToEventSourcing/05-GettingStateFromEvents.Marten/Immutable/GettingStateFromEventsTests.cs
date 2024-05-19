@@ -74,11 +74,9 @@ public class GettingStateFromEventsTests: MartenTest
     private static Task<ShoppingCart> GetShoppingCart(
         IDocumentSession documentSession,
         Guid shoppingCartId,
-        CancellationToken cancellationToken)
-    {
+        CancellationToken cancellationToken) =>
         // 1. Add logic here
         throw new NotImplementedException();
-    }
 
     [Fact]
     [Trait("Category", "SkipCI")]

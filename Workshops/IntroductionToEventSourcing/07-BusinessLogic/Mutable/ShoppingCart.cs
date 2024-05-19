@@ -87,10 +87,8 @@ public class ShoppingCart
 
     public static ShoppingCart Open(
         Guid cartId,
-        Guid clientId)
-    {
+        Guid clientId) =>
         throw new NotImplementedException("Fill the implementation part");
-    }
 
     private void Apply(ShoppingCartOpened opened)
     {
@@ -102,10 +100,8 @@ public class ShoppingCart
     public void AddProduct(
         IProductPriceCalculator priceCalculator,
         ProductItem productItem
-    )
-    {
+    ) =>
         throw new NotImplementedException("Fill the implementation part");
-    }
 
     private void Apply(ProductItemAddedToShoppingCart productItemAdded)
     {
@@ -123,10 +119,8 @@ public class ShoppingCart
             current.Quantity += quantityToAdd;
     }
 
-    public void RemoveProduct(PricedProductItem productItemToBeRemoved)
-    {
+    public void RemoveProduct(PricedProductItem productItemToBeRemoved) =>
         throw new NotImplementedException("Fill the implementation part");
-    }
 
     private void Apply(ProductItemRemovedFromShoppingCart productItemRemoved)
     {
@@ -144,10 +138,8 @@ public class ShoppingCart
             current.Quantity -= quantityToRemove;
     }
 
-    public void Confirm()
-    {
+    public void Confirm() =>
         throw new NotImplementedException("Fill the implementation part");
-    }
 
     private void Apply(ShoppingCartConfirmed confirmed)
     {
@@ -155,10 +147,8 @@ public class ShoppingCart
         ConfirmedAt = confirmed.ConfirmedAt;
     }
 
-    public void Cancel()
-    {
+    public void Cancel() =>
         throw new NotImplementedException("Fill the implementation part");
-    }
 
     private void Apply(ShoppingCartCanceled canceled)
     {

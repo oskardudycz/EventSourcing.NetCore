@@ -63,19 +63,15 @@ public class Exercise08Snapshots
     [Migration(1, "Create Users table")]
     public class CreateUsers : Migration
     {
-        protected override void Up()
-        {
+        protected override void Up() =>
             Execute(@"CREATE TABLE users (
                       id             UUID                      NOT NULL    PRIMARY KEY,
                       name           TEXT                      NOT NULL,
                       version        BIGINT                    NOT NULL
                   );");
-        }
 
-        protected override void Down()
-        {
+        protected override void Down() =>
             Execute("DROP TABLE users");
-        }
     }
 
     private readonly NpgsqlConnection databaseConnection;

@@ -33,14 +33,12 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
             commandType: CommandType.Text
         );
 
-    public T AggregateStream<T>(Guid streamId) where T: notnull
-    {
-        // 1. Create instance
-        // 2. Get Stream Events
-        // 3. For each event call apply method on aggregate and increment aggregate version
-        // 4. Return Aggregate
+    // 1. Create instance
+    // 2. Get Stream Events
+    // 3. For each event call apply method on aggregate and increment aggregate version
+    // 4. Return Aggregate
+    public T AggregateStream<T>(Guid streamId) where T: notnull =>
         throw new NotImplementedException("Implement aggregation based on the description above");
-    }
 
     public StreamState? GetStreamState(Guid streamId)
     {
@@ -156,8 +154,6 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         databaseConnection.Execute(appendEventFunctionSql);
     }
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         databaseConnection.Dispose();
-    }
 }

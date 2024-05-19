@@ -9,10 +9,8 @@ public class FakeProductPriceCalculator: IProductPriceCalculator
 {
     private readonly int value;
 
-    private FakeProductPriceCalculator(int value)
-    {
+    private FakeProductPriceCalculator(int value) =>
         this.value = value;
-    }
 
     public static FakeProductPriceCalculator Returning(int value) => new(value);
 

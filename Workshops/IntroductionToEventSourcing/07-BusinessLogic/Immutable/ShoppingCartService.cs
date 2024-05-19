@@ -32,10 +32,8 @@ public abstract record ShoppingCartCommand
 
 public static class ShoppingCartService
 {
-    public static ShoppingCartOpened Handle(OpenShoppingCart command)
-    {
+    public static ShoppingCartOpened Handle(OpenShoppingCart command) =>
         throw new NotImplementedException("Fill the implementation part");
-    }
 
     public static ProductItemAddedToShoppingCart Handle(
         IProductPriceCalculator priceCalculator,
@@ -49,18 +47,12 @@ public static class ShoppingCartService
     public static ProductItemRemovedFromShoppingCart Handle(
         RemoveProductItemFromShoppingCart command,
         ShoppingCart shoppingCart
-    )
-    {
+    ) =>
         throw new NotImplementedException("Fill the implementation part");
-    }
 
-    public static ShoppingCartConfirmed Handle(ConfirmShoppingCart command, ShoppingCart shoppingCart)
-    {
+    public static ShoppingCartConfirmed Handle(ConfirmShoppingCart command, ShoppingCart shoppingCart) =>
         throw new NotImplementedException("Fill the implementation part");
-    }
 
-    public static ShoppingCartCanceled Handle(CancelShoppingCart command, ShoppingCart shoppingCart)
-    {
+    public static ShoppingCartCanceled Handle(CancelShoppingCart command, ShoppingCart shoppingCart) =>
         throw new NotImplementedException("Fill the implementation part");
-    }
 }

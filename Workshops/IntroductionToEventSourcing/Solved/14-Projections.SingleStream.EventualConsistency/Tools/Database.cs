@@ -19,10 +19,8 @@ public class Database
         storage[GetId<T>(id)].Add(new DataWrapper(obj, validFrom));
     }
 
-    public void Delete<T>(Guid id)
-    {
+    public void Delete<T>(Guid id) =>
         storage.Remove(GetId<T>(id));
-    }
 
     public T? Get<T>(Guid id) where T : class
     {

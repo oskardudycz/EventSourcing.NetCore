@@ -58,10 +58,9 @@ public record ProductItem(
 public class GettingStateFromEventsTests
 {
     private Task<IWriteResult> AppendEvents(EventStoreClient eventStore, string streamName, object[] events,
-        CancellationToken ct)
-    {
+        CancellationToken ct) =>
         // TODO: Fill append events logic here.
-        return eventStore.AppendToStreamAsync(
+        eventStore.AppendToStreamAsync(
             streamName,
             StreamState.Any,
             events.Select(@event =>
@@ -71,7 +70,6 @@ public class GettingStateFromEventsTests
                     JsonSerializer.SerializeToUtf8Bytes(@event)
                 )
             ), cancellationToken: ct);
-    }
 
     [Fact]
     public async Task AppendingEvents_ForSequenceOfEvents_ShouldSucceed()
