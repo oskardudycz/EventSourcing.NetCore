@@ -1,8 +1,8 @@
 using Core.EventStoreDB.Subscriptions.Checkpoints;
-using Npgsql;
 using Xunit;
 
 namespace Core.EventStoreDB.Tests.Subscriptions.Checkpoints;
+
 using static ISubscriptionCheckpointRepository;
 
 public class PostgresSubscriptionCheckpointRepositoryTests(PostgresContainerFixture fixture)
@@ -10,13 +10,8 @@ public class PostgresSubscriptionCheckpointRepositoryTests(PostgresContainerFixt
 {
     private readonly string subscriptionId = Guid.NewGuid().ToString("N");
 
-    private readonly Func<CancellationToken, ValueTask<NpgsqlConnection>> connectionFactory =
-        _ =>
-        {
-            var connection = fixture.DataSource.CreateConnection();
-            connection.Open();
-            return ValueTask.FromResult(connection);
-        };
+    private readonly PostgresConnectionProvider connectionFactory =
+        PostgresConnectionProvider.From(fixture.DataSource);
 
     [Fact]
     public async Task Store_InitialInsert_Success()
