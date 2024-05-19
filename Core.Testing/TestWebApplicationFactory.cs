@@ -42,7 +42,7 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
     }
 
     public void PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent =>
-        externalEventProducer.PublishedEvents.OfType<TEvent>().ToList().Should().NotBeEmpty();
+        externalEventProducer.PublishedEvents.OfType<TEvent>().Should().NotBeEmpty();
 
     public Task PublishInternalEvent<TEvent>(TEvent @event, CancellationToken ct = default) where TEvent : notnull =>
         PublishInternalEvent(

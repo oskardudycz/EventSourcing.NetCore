@@ -27,7 +27,7 @@
 
             var currentSummary = await getCurrentSummary(ToStreamId(@event.ProductId), ct)
                 ?? ProductRelationshipsCalculated.Default();
-            
+
             var relatedProducts = Expand(@event.RelatedProducts).ToList();
 
             foreach (var currentRel in currentSummary.Relationships)
@@ -52,7 +52,7 @@
                 relatedProducts
                     .Select(relationship =>
                         new ProductRelationshipsInBaskets(relationship, 1)
-                    ).ToList()
+                    )
             );
 
             return currentSummary with { Relationships = result, BasketsCount = currentSummary.BasketsCount + 1 };

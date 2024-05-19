@@ -86,8 +86,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
                 JsonConvert.DeserializeObject(
                     @event.data,
                     Type.GetType(@event.type, true)!
-                ))
-            .ToList();
+                ));
     }
 
     private void CreateStreamsTable()
