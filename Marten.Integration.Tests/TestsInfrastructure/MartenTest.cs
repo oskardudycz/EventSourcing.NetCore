@@ -19,9 +19,7 @@ public class MartenFixture : IAsyncLifetime
 }
 
 [CollectionDefinition("MartenIntegrationTests", DisableParallelization = false)]
-public class MartenCollection : ICollectionFixture<MartenFixture>
-{
-}
+public class MartenCollection : ICollectionFixture<MartenFixture>;
 
 [Collection("MartenIntegrationTests")]
 public abstract class MartenTest(
@@ -38,7 +36,7 @@ public abstract class MartenTest(
 
     protected IEventStore EventStore => Session.Events;
 
-    protected readonly string SchemaName = useRandomSchema ? "sch" + Guid.NewGuid().ToString().Replace("-", string.Empty) : "EventStore";
+    protected readonly string SchemaName = useRandomSchema ? "sch" + Guid.NewGuid().ToString("N") : "EventStore";
 
     protected virtual IDocumentSession CreateSession(Action<StoreOptions>? storeOptions = null)
     {

@@ -247,9 +247,7 @@ app.MapHub<IncidentsHub>("/hubs/incidents");
 
 return await app.RunOaktonCommands(args);
 
-public class IncidentsHub: Hub
-{
-}
+public class IncidentsHub: Hub;
 
 public record LogIncidentRequest(
     Contact Contact,
@@ -277,6 +275,4 @@ public record ResolveIncidentRequest(
     ResolutionType Resolution
 );
 
-public partial class Program
-{
-}
+public partial class Program;

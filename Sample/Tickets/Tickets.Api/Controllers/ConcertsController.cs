@@ -1,6 +1,3 @@
 namespace Tickets.Api.Controllers;
 
-public class ConcertsController
-{
-        
-}
+public class ConcertsController;
