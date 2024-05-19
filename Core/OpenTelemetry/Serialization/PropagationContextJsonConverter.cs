@@ -37,7 +37,7 @@ public class PropagationContextJsonConverter: JsonConverter
     {
         var jObject = JObject.Load(reader);
 
-        var parentContext = TelemetryPropagator.Extract(
+        return TelemetryPropagator.Extract(
             new Dictionary<string, string?>
             {
                 { TraceParentPropertyName, jObject[TraceParentPropertyName]?.Value<string>() },
@@ -45,8 +45,6 @@ public class PropagationContextJsonConverter: JsonConverter
             },
             ExtractTraceContextFromEventMetadata
         );
-
-        return parentContext;
     }
 
     private static IEnumerable<string> ExtractTraceContextFromEventMetadata(Dictionary<string, string?> headers, string key) =>
