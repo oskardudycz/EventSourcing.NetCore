@@ -1,8 +1,6 @@
-using System.Diagnostics;
 using Core.Events;
 using Core.EventStoreDB.Events;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
-using Core.OpenTelemetry;
 using EventStore.Client;
 using Microsoft.Extensions.Logging;
 
@@ -23,6 +21,7 @@ public class EventsBatchProcessor(
         var events = TryDeserializeEvents(resolvedEvents, options.IgnoreDeserializationErrors);
         ulong? lastPosition = null;
 
+        // TODO: How would you implement Dead-Letter Queue here?
         await batchHandler.Handle(events, ct).ConfigureAwait(false);
 
         return lastPosition;

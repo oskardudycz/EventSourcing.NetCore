@@ -10,9 +10,9 @@ public class EventBusBatchHandler(
     ILogger<EventBusBatchHandler> logger
 ): IEventBatchHandler
 {
-    public async Task Handle(IEventEnvelope[] events, CancellationToken ct)
+    public async Task Handle(IEventEnvelope[] eventInEnvelopes, CancellationToken ct)
     {
-        foreach (var @event in events)
+        foreach (var @event in eventInEnvelopes)
         {
             await HandleEvent(@event, ct).ConfigureAwait(false);
         }
