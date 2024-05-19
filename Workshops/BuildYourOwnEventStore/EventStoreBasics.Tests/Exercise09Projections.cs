@@ -114,27 +114,22 @@ public class Exercise09Projections
             Projects<OrderCreated>(Apply);
         }
 
-        void Apply(UserCreated @event)
-        {
+        void Apply(UserCreated @event) =>
             databaseConnection.Execute(
                 @"INSERT INTO UserDashboards (Id, UserName, OrdersCount, TotalAmount)
                     VALUES (@UserId, @UserName, 0, 0)",
                 @event
             );
-        }
 
-        void Apply(UserNameUpdated @event)
-        {
+        void Apply(UserNameUpdated @event) =>
             databaseConnection.Execute(
                 @"UPDATE UserDashboards
                     SET UserName = @UserName
                     WHERE Id = @UserId",
                 @event
             );
-        }
 
-        void Apply(OrderCreated @event)
-        {
+        void Apply(OrderCreated @event) =>
             databaseConnection.Execute(
                 @"UPDATE UserDashboards
                     SET OrdersCount = OrdersCount + 1,
@@ -142,26 +137,21 @@ public class Exercise09Projections
                     WHERE Id = @UserId",
                 @event
             );
-        }
     }
 
     [Migration(2, "Create Users dashboard table")]
     public class CreateUsersDashboard : Migration
     {
-        protected override void Up()
-        {
+        protected override void Up() =>
             Execute(@"CREATE TABLE UserDashboards (
                       Id            UUID                      NOT NULL    PRIMARY KEY,
                       UserName      TEXT                      NOT NULL,
                       OrdersCount   integer                   NOT NULL,
                       TotalAmount   decimal                   NOT NULL
                   );");
-        }
 
-        protected override void Down()
-        {
+        protected override void Down() =>
             Execute("DROP TABLE UserDashboards");
-        }
     }
 
     private readonly NpgsqlConnection databaseConnection;

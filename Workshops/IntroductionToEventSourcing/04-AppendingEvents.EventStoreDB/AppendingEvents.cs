@@ -56,12 +56,10 @@ public record ProductItem(
 
 public class GettingStateFromEventsTests
 {
+    // TODO: Fill append events logic here.
     private Task<IWriteResult> AppendEvents(EventStoreClient eventStore, string streamName, object[] events,
-        CancellationToken ct)
-    {
-        // TODO: Fill append events logic here.
+        CancellationToken ct) =>
         throw new NotImplementedException();
-    }
 
     [Fact]
     [Trait("Category", "SkipCI")]

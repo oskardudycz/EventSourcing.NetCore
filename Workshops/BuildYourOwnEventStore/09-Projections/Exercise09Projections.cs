@@ -94,34 +94,24 @@ public class Exercise09Projections
     {
         private readonly NpgsqlConnection databaseConnection = databaseConnection;
 
-        public void Apply(UserCreated @event)
-        {
+        public void Apply(UserCreated @event) =>
             throw new NotImplementedException("TODO");
-        }
 
-        public void Apply(UserNameUpdated @event)
-        {
+        public void Apply(UserNameUpdated @event) =>
             throw new NotImplementedException("TODO");
-        }
 
-        public void Apply(OrderCreated @event)
-        {
+        public void Apply(OrderCreated @event) =>
             throw new NotImplementedException("TODO");
-        }
     }
 
     [Migration(2, "Create Users dashboard table")]
     public class CreateUsersDashboard: Migration
     {
-        protected override void Up()
-        {
+        protected override void Up() =>
             throw new NotImplementedException("TODO Create User Dashboard table");
-        }
 
-        protected override void Down()
-        {
+        protected override void Down() =>
             throw new NotImplementedException("TODO drop Dashboard table");
-        }
     }
 
     private readonly NpgsqlConnection databaseConnection;

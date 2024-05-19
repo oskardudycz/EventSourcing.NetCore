@@ -34,8 +34,6 @@ public static class ETagExtensions
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 public class FromIfMatchHeaderAttribute: FromHeaderAttribute
 {
-    public FromIfMatchHeaderAttribute()
-    {
+    public FromIfMatchHeaderAttribute() =>
         Name = "If-Match";
-    }
 }

@@ -12,13 +12,9 @@ public abstract class Projection : IProjection
 
     public Type[] Handles => handlers.Keys.ToArray();
 
-    protected void Projects<TEvent>(Action<TEvent> action)
-    {
+    protected void Projects<TEvent>(Action<TEvent> action) =>
         handlers.Add(typeof(TEvent), @event => action((TEvent) @event));
-    }
 
-    public void Handle(object @event)
-    {
+    public void Handle(object @event) =>
         handlers[@event.GetType()](@event);
-    }
 }

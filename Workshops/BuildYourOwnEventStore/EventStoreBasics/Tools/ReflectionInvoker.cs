@@ -21,11 +21,8 @@ public static class ReflectionInvoker
         method?.Invoke(item, [param]);
     }
 
-    public static void SetIfExists<T>(this T item, string propertyName, object value) where T : notnull
-    {
+    public static void SetIfExists<T>(this T item, string propertyName, object value) where T : notnull =>
         item.GetType()
             .GetProperty(propertyName)?
             .SetValue(item, value);
-    }
-
 }

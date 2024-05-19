@@ -100,8 +100,6 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         databaseConnection.Execute(appendEventFunctionSql);
     }
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         databaseConnection.Dispose();
-    }
 }

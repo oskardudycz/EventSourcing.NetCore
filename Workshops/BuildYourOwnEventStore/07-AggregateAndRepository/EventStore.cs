@@ -19,13 +19,11 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         CreateAppendEventFunction();
     }
 
-    public bool Store<TStream>(TStream aggregate) where TStream : IAggregate
-    {
-        // 1. get events from Aggregate
-        // 2. Foreach event append it to store
-        // 3. Return true if succeeded
+    // 1. get events from Aggregate
+    // 2. Foreach event append it to store
+    // 3. Return true if succeeded
+    public bool Store<TStream>(TStream aggregate) where TStream : IAggregate =>
         throw new NotImplementedException("Implement logic described above;");
-    }
 
     public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null) where TStream: notnull =>
         databaseConnection.QuerySingle<bool>(
@@ -175,8 +173,6 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         databaseConnection.Execute(appendEventFunctionSql);
     }
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         databaseConnection.Dispose();
-    }
 }

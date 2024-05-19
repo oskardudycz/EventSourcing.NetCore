@@ -23,13 +23,9 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         databaseConnection.Execute(creatStreamsTableSql);
     }
 
-    private void CreateEventsTable()
-    {
+    private void CreateEventsTable() =>
         throw new NotImplementedException("Add here create table sql run with Dapper");
-    }
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         databaseConnection.Dispose();
-    }
 }

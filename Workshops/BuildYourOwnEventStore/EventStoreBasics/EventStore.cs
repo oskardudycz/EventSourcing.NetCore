@@ -22,15 +22,11 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         CreateAppendEventFunction();
     }
 
-    public void AddSnapshot(ISnapshot snapshot)
-    {
+    public void AddSnapshot(ISnapshot snapshot) =>
         snapshots.Add(snapshot);
-    }
 
-    public void AddProjection(IProjection projection)
-    {
+    public void AddProjection(IProjection projection) =>
         projections.Add(projection);
-    }
 
     public bool Store<TStream>(TStream aggregate) where TStream : IAggregate
     {
@@ -208,8 +204,6 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         databaseConnection.Execute(appendEventFunctionSql);
     }
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         databaseConnection.Dispose();
-    }
 }

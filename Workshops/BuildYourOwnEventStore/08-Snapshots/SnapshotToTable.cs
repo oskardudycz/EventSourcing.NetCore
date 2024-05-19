@@ -9,8 +9,6 @@ public class SnapshotToTable<T>(NpgsqlConnection databaseConnection, string upse
 
     public Type Handles => typeof(T);
 
-    public void Handle(IAggregate aggregate)
-    {
+    public void Handle(IAggregate aggregate) =>
         throw new NotImplementedException("Call upsert statement");
-    }
 }

@@ -125,8 +125,6 @@ public class Exercise01CreateStreamsTable : IDisposable
     /// <summary>
     /// Disposes connection to database
     /// </summary>
-    public void Dispose()
-    {
+    public void Dispose() =>
         databaseConnection.Dispose();
-    }
 }

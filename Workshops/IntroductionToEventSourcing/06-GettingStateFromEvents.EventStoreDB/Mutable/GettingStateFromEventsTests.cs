@@ -149,11 +149,9 @@ public class GettingStateFromEventsTests: EventStoreDBTest
     /// <param name="streamName"></param>
     /// <param name="ct"></param>
     /// <returns></returns>
-    private static Task<ShoppingCart> GetShoppingCart(EventStoreClient eventStore, string streamName, CancellationToken ct)
-    {
+    private static Task<ShoppingCart> GetShoppingCart(EventStoreClient eventStore, string streamName, CancellationToken ct) =>
         // 1. Add logic here
         throw new NotImplementedException();
-    }
 
     [Fact]
     [Trait("Category", "SkipCI")]

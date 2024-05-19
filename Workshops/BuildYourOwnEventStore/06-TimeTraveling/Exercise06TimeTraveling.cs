@@ -28,10 +28,8 @@ public class Exercise06TimeTravelling
             Name = @event.UserName;
         }
 
-        public void Apply(UserNameUpdated @event)
-        {
+        public void Apply(UserNameUpdated @event) =>
             Name = @event.UserName;
-        }
     }
 
     public class UserCreated(Guid userId, string userName)
