@@ -24,14 +24,12 @@ public abstract class Service<TEntity>(DbContext dbContext, IMapper mapper): ISe
     public async Task UpdateAsync<TUpdateRequest>(
         TUpdateRequest request,
         CancellationToken ct
-    ) where TUpdateRequest : IUpdateRequest
-    {
+    ) where TUpdateRequest : IUpdateRequest =>
         await dbContext.UpdateAndSaveChanges<TEntity>(
             request.Id,
             entity => mapper.Map(request, entity),
             ct
         );
-    }
 
     public Task DeleteByIdAsync(Guid id, CancellationToken ct) =>
         dbContext.DeleteAndSaveChanges<TEntity>(id, ct);

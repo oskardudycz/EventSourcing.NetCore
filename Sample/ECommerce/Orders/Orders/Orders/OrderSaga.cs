@@ -37,24 +37,19 @@ public class OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus):
         );
     }
 
-    public async Task Handle(OrderInitiated @event, CancellationToken ct)
-    {
+    public async Task Handle(OrderInitiated @event, CancellationToken ct) =>
         await commandBus.Send(
             RequestPayment.Create(@event.OrderId, @event.TotalPrice),
             ct
         );
-    }
 
-    public async Task Handle(PaymentFinalized @event, CancellationToken ct)
-    {
+    public async Task Handle(PaymentFinalized @event, CancellationToken ct) =>
         await commandBus.Send(
             RecordOrderPayment.Create(@event.OrderId, @event.PaymentId, @event.FinalizedAt),
             ct
         );
-    }
 
-    public async Task Handle(OrderPaymentRecorded @event, CancellationToken ct)
-    {
+    public async Task Handle(OrderPaymentRecorded @event, CancellationToken ct) =>
         await commandBus.Send(
             SendPackage.Create(
                 @event.OrderId,
@@ -62,24 +57,19 @@ public class OrderSaga(IIdGenerator idGenerator, ICommandBus commandBus):
             ),
             ct
         );
-    }
 
-    public async Task Handle(PackageWasSent @event, CancellationToken ct)
-    {
+    public async Task Handle(PackageWasSent @event, CancellationToken ct) =>
         await commandBus.Send(
             CompleteOrder.For(@event.OrderId),
             ct
         );
-    }
 
     // Compensation
-    public async Task Handle(ProductWasOutOfStock @event, CancellationToken ct)
-    {
+    public async Task Handle(ProductWasOutOfStock @event, CancellationToken ct) =>
         await commandBus.Send(
             CancelOrder.Create(@event.OrderId, OrderCancellationReason.ProductWasOutOfStock),
             ct
         );
-    }
 
     public async Task Handle(OrderCancelled @event, CancellationToken ct)
     {

@@ -27,12 +27,10 @@ public class HandleSendPackage(ExternalServicesConfig externalServicesConfig, IE
     :
         ICommandHandler<SendPackage>
 {
-    public async Task Handle(SendPackage command, CancellationToken ct)
-    {
+    public async Task Handle(SendPackage command, CancellationToken ct) =>
         await externalCommandBus.Post(
             externalServicesConfig.ShipmentsUrl!,
             "shipments",
             command,
             ct);
-    }
 }

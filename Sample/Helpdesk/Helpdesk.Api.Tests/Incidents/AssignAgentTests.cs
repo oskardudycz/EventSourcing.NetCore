@@ -8,8 +8,7 @@ public class AssignAgentToIncidentTests(ApiWithLoggedIncident api): IClassFixtur
 {
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task AssignAgentCommand_ChangesIncidentCategory()
-    {
+    public async Task AssignAgentCommand_ChangesIncidentCategory() =>
         await api
             .Given()
             .When(
@@ -26,7 +25,6 @@ public class AssignAgentToIncidentTests(ApiWithLoggedIncident api): IClassFixtur
                     api.Incident with { AgentId = agentId, Version = 2 }
                 )
             );
-    }
 
     private readonly Guid agentId = Guid.NewGuid();
 }

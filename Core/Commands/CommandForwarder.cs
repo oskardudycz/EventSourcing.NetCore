@@ -10,10 +10,8 @@ namespace Core.Commands;
 public class CommandForwarder<T>(ICommandBus commandBus): IEventHandler<T>
     where T : notnull
 {
-    public async Task Handle(T command, CancellationToken ct)
-    {
+    public async Task Handle(T command, CancellationToken ct) =>
         await commandBus.TrySend(command, ct).ConfigureAwait(false);
-    }
 }
 
 public static class CommandForwarderConfig

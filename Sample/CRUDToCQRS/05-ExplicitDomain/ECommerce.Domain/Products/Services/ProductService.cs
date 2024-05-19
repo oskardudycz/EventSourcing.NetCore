@@ -27,8 +27,7 @@ public class ProductService(ECommerceDbContext dbContext)
     public async Task UpdateAsync(
         UpdateProductRequest request,
         CancellationToken ct
-    )
-    {
+    ) =>
         await dbContext.UpdateAndSaveChanges<Product>(
             request.Id,
             product =>
@@ -42,7 +41,6 @@ public class ProductService(ECommerceDbContext dbContext)
             },
             ct
         );
-    }
 
     public Task DeleteByIdAsync(Guid id, CancellationToken ct) =>
         dbContext.DeleteAndSaveChanges<Product>(id, ct);

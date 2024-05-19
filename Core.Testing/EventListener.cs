@@ -12,10 +12,8 @@ public class EventListener
     public ChannelReader<object> Reader => events.Reader;
     public ChannelWriter<object> Writer => events.Writer;
 
-    public async Task Handle(object @event, CancellationToken ct)
-    {
+    public async Task Handle(object @event, CancellationToken ct) =>
         await events.Writer.WriteAsync(@event, ct).ConfigureAwait(false);
-    }
 
     public async Task<object> WaitForProcessing(object @event, CancellationToken ct)
     {
