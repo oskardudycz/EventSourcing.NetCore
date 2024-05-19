@@ -69,6 +69,4 @@ if (app.Environment.IsDevelopment())
 
 return await app.RunOaktonCommands(args);
 
-public partial class Program
-{
-}
+public partial class Program;

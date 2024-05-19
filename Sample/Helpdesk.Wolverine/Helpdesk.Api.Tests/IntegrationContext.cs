@@ -70,9 +70,7 @@ public class AppFixture : IAsyncLifetime
 
 // xUnit specific junk
 [CollectionDefinition("integration")]
-public class IntegrationCollection : ICollectionFixture<AppFixture>
-{
-}
+public class IntegrationCollection : ICollectionFixture<AppFixture>;
 
 [Collection("integration")]
 public abstract class IntegrationContext(AppFixture fixture): IAsyncLifetime

@@ -9,6 +9,4 @@ public interface IAggregate: IProjection
     object[] DequeueUncommittedEvents();
 }
 
-public interface IAggregate<in TEvent>: IAggregate, IProjection<TEvent> where TEvent : class
-{
-}
+public interface IAggregate<in TEvent>: IAggregate, IProjection<TEvent> where TEvent : class;
