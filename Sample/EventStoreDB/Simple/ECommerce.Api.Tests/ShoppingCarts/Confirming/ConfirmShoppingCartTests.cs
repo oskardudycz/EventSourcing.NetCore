@@ -16,8 +16,7 @@ public class ConfirmShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task Put_Should_Return_OK_And_Confirm_Shopping_Cart()
-    {
+    public async Task Put_Should_Return_OK_And_Confirm_Shopping_Cart() =>
         await API
             .Given("Opened Shopping Cart", OpenShoppingCart(ClientId))
             .When(
@@ -38,7 +37,5 @@ public class ConfirmShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
                     details.ClientId.Should().Be(ClientId);
                     details.Version.Should().Be(1);
                 }));
-
-        // API.PublishedExternalEventsOfType<CartFinalized>();
-    }
+    // API.PublishedExternalEventsOfType<CartFinalized>();
 }

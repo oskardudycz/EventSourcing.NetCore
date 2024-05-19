@@ -13,8 +13,7 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
 {
     [Fact]
     [Trait("Category", "Acceptance")]
-    public async Task Delete_Should_Return_OK_And_Cancel_Shopping_Cart()
-    {
+    public async Task Delete_Should_Return_OK_And_Cancel_Shopping_Cart() =>
         await API
             .Given()
             .When(
@@ -45,7 +44,6 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
                     details.ClientId.Should().Be(ClientId);
                     details.Version.Should().Be(2);
                 }));
-    }
 
     public Guid ShoppingCartId { get; private set; }
 
