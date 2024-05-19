@@ -75,6 +75,5 @@ public static class JsonObjectContractProvider
     private static ConstructorInfo? GetTheMostSpecificConstructor(Type objectType) =>
         objectType
             .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-            .OrderByDescending(e => e.GetParameters().Length)
-            .FirstOrDefault();
+            .MaxBy(e => e.GetParameters().Length);
 }
