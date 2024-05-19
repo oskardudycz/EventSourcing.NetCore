@@ -5,7 +5,7 @@ namespace Carts.Tests.Stubs.Repositories;
 
 public class FakeRepository<T> : IEventStoreDBRepository<T> where T : class, IAggregate
 {
-    public Dictionary<Guid, T> Aggregates { get; private set; }
+    public Dictionary<Guid, T> Aggregates { get; }
 
     public FakeRepository(params (Guid, T)[] aggregates)
     {

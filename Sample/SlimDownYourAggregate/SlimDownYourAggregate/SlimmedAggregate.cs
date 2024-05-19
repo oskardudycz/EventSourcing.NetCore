@@ -165,7 +165,7 @@ public abstract record ChemicalReaction
 public class ReactionParticipant(double moles, ParticipantType type)
 {
     public double Moles { get; private set; } = moles;
-    public ParticipantType Type { get; private set; } = type;
+    public ParticipantType Type { get; } = type;
 
     public void UpdateMoles(double newMoles)
     {
