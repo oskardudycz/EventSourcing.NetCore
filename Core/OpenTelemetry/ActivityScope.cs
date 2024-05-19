@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using OpenTelemetry.Trace;
-
 namespace Core.OpenTelemetry;
 
 public interface IActivityScope

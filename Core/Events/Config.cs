@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace Core.Events;
+﻿namespace Core.Events;
 
 public static class Config
 {

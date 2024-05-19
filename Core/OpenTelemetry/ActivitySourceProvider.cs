@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Core.OpenTelemetry;
 
 public static class ActivitySourceProvider

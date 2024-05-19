@@ -1,6 +1,4 @@
-﻿using OpenTelemetry.Context.Propagation;
-
-namespace Core.Events;
+﻿namespace Core.Events;
 
 public record EventMetadata(
     string EventId,

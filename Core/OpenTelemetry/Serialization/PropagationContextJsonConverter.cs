@@ -1,6 +1,5 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OpenTelemetry.Context.Propagation;
 
 namespace Core.OpenTelemetry.Serialization;
 

@@ -1,6 +1,3 @@
-using Core.Projections;
-using Core.Structures;
-
 namespace Core.ProcessManagers;
 
 public interface IProcessManager: IProcessManager<Guid>;

@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Configuration;
-
 namespace Core.Configuration;
 
 public static class ConfigurationExtensions

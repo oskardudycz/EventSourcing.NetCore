@@ -1,5 +1,3 @@
-using Core.Projections;
-
 namespace Core.Aggregates;
 
 public interface IAggregate: IProjection

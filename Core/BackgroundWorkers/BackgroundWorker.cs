@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-namespace Core.BackgroundWorkers;
+﻿namespace Core.BackgroundWorkers;
 
 public class BackgroundWorker<TService>(
     TService service,

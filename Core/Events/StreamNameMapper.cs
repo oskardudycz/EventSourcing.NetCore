@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-
-namespace Core.Events;
+﻿namespace Core.Events;
 
 public class StreamNameMapper
 {

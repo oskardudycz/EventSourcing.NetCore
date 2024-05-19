@@ -1,8 +1,3 @@
-using Core.OpenTelemetry;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Polly;
-
 namespace Core.Commands;
 
 public class InMemoryCommandBus(

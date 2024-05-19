@@ -1,6 +1,3 @@
-using Core.Events;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Core.Commands;
 
 /// <summary>

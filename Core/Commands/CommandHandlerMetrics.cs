@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
-using Core.OpenTelemetry;
-
 namespace Core.Commands;
 
 public class CommandHandlerMetrics: IDisposable

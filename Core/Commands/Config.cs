@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace Core.Commands;
+﻿namespace Core.Commands;
 
 public static class Config
 {
