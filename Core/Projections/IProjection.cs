@@ -21,6 +21,4 @@ public interface ITrackLastProcessedPosition
     public ulong LastProcessedPosition { get; set; }
 }
 
-public interface IVersionedProjection: IProjection, ITrackLastProcessedPosition
-{
-}
+public interface IVersionedProjection: IProjection, ITrackLastProcessedPosition;

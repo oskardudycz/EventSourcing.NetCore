@@ -108,10 +108,6 @@ app.MapWolverineEndpoints();
 
 return await app.RunOaktonCommands(args);
 
-public class IncidentsHub: Hub
-{
-}
+public class IncidentsHub: Hub;
 
-public partial class Program
-{
-}
+public partial class Program;

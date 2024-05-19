@@ -2,9 +2,7 @@ using Core.Structures;
 
 namespace Core.ProcessManagers;
 
-public abstract class ProcessManager: ProcessManager<Guid>, IProcessManager
-{
-}
+public abstract class ProcessManager: ProcessManager<Guid>, IProcessManager;
 
 public abstract class ProcessManager<T>: IProcessManager<T> where T : notnull
 {

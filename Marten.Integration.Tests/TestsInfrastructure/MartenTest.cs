@@ -19,9 +19,7 @@ public class MartenFixture : IAsyncLifetime
 }
 
 [CollectionDefinition("MartenIntegrationTests", DisableParallelization = false)]
-public class MartenCollection : ICollectionFixture<MartenFixture>
-{
-}
+public class MartenCollection : ICollectionFixture<MartenFixture>;
 
 [Collection("MartenIntegrationTests")]
 public abstract class MartenTest(

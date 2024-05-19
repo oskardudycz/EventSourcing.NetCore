@@ -77,7 +77,5 @@ return await app.RunOaktonCommands(args);
 
 namespace OptimisticConcurrency
 {
-    public partial class Program
-    {
-    }
+    public partial class Program;
 }

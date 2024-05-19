@@ -206,6 +206,4 @@ public record CloseAndOpenShiftRequest(
 );
 
 
-public partial class Program
-{
-}
+public partial class Program;
