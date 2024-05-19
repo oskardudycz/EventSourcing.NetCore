@@ -1,4 +1,3 @@
-using System.Net;
 using Confluent.Kafka;
 using Core;
 using Core.Configuration;
@@ -11,9 +10,7 @@ using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
-using OpenTelemetry.Trace;
 using Orders;
-using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 

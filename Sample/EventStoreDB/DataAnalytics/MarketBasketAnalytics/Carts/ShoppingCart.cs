@@ -1,5 +1,4 @@
-﻿using System;
-using MarketBasketAnalytics.Carts.ProductItems;
+﻿using MarketBasketAnalytics.Carts.ProductItems;
 
 namespace MarketBasketAnalytics.Carts
 {

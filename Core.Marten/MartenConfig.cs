@@ -2,16 +2,12 @@ using Core.Configuration;
 using Core.Ids;
 using Core.Marten.Commands;
 using Core.Marten.Ids;
-using Core.Marten.Repository;
 using Core.Marten.Subscriptions;
-using Core.OpenTelemetry;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
-using Marten.Events.Projections;
 using Marten.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Npgsql;
 using Weasel.Core;
 

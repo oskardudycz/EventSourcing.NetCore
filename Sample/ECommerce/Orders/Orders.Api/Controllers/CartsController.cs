@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Core.Commands;
 using Core.Ids;
-using Core.Queries;
 using Marten;
 using Marten.AspNetCore;
 using Marten.Pagination;

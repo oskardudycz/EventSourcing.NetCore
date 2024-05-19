@@ -1,5 +1,4 @@
 ﻿using V1 = ECommerce.V1;
-using Xunit;
 using System.Text.Json;
 using FluentAssertions;
 
@@ -69,7 +68,7 @@ public class MergeEvents
         List<EventData> productItemsAdded
     )
     {
-        var shoppingCartInitializedJson = JsonDocument.Parse(shoppingCartInitialized!.Data).RootElement;
+        var shoppingCartInitializedJson = JsonDocument.Parse(shoppingCartInitialized.Data).RootElement;
 
         var newEvent = new ShoppingCartInitializedWithProducts(
             shoppingCartInitializedJson.GetProperty("ShoppingCartId").GetGuid(),

@@ -278,7 +278,7 @@ public class CompositeIdsTests(MartenFixture fixture): MartenTest(fixture.Postgr
         issuesListFromInlineAggregationFromLinqWithAggregateId.Should().NotBeNull();
 
         issuesListFromLiveAggregation!.AggregateId.Should().Be(reservationId.Value);
-        issuesListFromLiveAggregation!.AggregateId.Should().Be(reservationId.Value);
+        issuesListFromLiveAggregation.AggregateId.Should().Be(reservationId.Value);
         issuesListFromInlineAggregationFromLinq!.AggregateId.Should().Be(reservationId.Value);
         issuesListFromInlineAggregationFromLinqWithAggregateId!.AggregateId.Should().Be(reservationId.Value);
     }

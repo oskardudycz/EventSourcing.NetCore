@@ -1,7 +1,6 @@
 // Taken from: https://github.com/davidfowl/WaitForDependenciesAspire/blob/main/WaitForDependencies.Aspire.Hosting/WaitForDependenciesExtensions.cs
 using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
-using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Lifecycle;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;

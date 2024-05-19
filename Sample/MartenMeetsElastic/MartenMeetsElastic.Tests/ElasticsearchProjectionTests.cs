@@ -5,7 +5,6 @@ using FluentAssertions;
 using JasperFx.Core;
 using Marten;
 using Marten.Events;
-using Marten.Events.Daemon;
 using MartenMeetsElastic.Projections;
 using Polly;
 using Xunit;

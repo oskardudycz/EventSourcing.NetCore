@@ -1,9 +1,4 @@
 using ECommerce.Domain.Products;
-using ECommerce.Domain.Products.CreatingProduct;
-using ECommerce.Domain.Products.DeletingProduct;
-using ECommerce.Domain.Products.GettingById;
-using ECommerce.Domain.Products.GettingProducts;
-using ECommerce.Domain.Products.UpdatingProduct;
 using ECommerce.Domain.Storage;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;

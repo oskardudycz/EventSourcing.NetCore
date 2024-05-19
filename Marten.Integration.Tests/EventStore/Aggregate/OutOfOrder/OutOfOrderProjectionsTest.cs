@@ -92,6 +92,6 @@ public class OutOfOrderProjectionsTest(MartenFixture fixture): MartenTest(fixtur
         issuesListFromInlineAggregation.Should().NotBeNull();
 
         issuesListFromLiveAggregation!.Issues.Count.Should().Be(2);
-        issuesListFromLiveAggregation!.Issues.Count.Should().Be(issuesListFromInlineAggregation!.Issues.Count);
+        issuesListFromLiveAggregation.Issues.Count.Should().Be(issuesListFromInlineAggregation!.Issues.Count);
     }
 }

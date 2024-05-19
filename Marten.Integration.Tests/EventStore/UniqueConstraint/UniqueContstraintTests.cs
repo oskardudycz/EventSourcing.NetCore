@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 using Marten.Exceptions;

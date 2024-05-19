@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace MarketBasketAnalytics.MarketBasketAnalysis
+﻿namespace MarketBasketAnalytics.MarketBasketAnalysis
 {
     public record ProductRelationshipsInBaskets(
         IReadOnlyList<Guid> RelatedProducts,

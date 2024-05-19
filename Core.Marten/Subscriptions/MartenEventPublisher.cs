@@ -1,10 +1,8 @@
 ﻿using Core.Events;
 using Core.OpenTelemetry;
 using Marten;
-using Marten.Events;
 using Marten.Events.Daemon;
 using Marten.Events.Daemon.Internals;
-using Marten.Events.Projections;
 using Marten.Subscriptions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

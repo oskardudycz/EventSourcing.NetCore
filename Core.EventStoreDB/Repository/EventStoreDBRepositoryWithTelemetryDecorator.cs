@@ -1,6 +1,5 @@
 ﻿using Core.Aggregates;
 using Core.OpenTelemetry;
-using Microsoft.Extensions.Logging;
 
 namespace Core.EventStoreDB.Repository;
 

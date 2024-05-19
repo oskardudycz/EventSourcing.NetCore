@@ -8,7 +8,6 @@ using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Exceptions;
 using Marten.Schema.Identity;
-using Marten.Services.Json;
 using Oakton;
 using PointOfSales.Api.Core;
 using PointOfSales.Api.Core.Marten;
@@ -22,7 +21,6 @@ using static PointOfSales.CashierShifts.CashierShiftCommand;
 using static PointOfSales.CashierShifts.CashierShiftEvent;
 using static PointOfSales.Api.Core.ETagExtensions;
 using static System.DateTimeOffset;
-using static PointOfSales.CashierShifts.CloseAndOpenShift;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);

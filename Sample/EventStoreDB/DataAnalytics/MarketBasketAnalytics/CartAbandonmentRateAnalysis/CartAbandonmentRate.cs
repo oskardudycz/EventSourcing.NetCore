@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using MarketBasketAnalytics.Carts;
+﻿using MarketBasketAnalytics.Carts;
 
 namespace MarketBasketAnalytics.CartAbandonmentRateAnalysis
 {

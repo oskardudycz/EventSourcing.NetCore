@@ -1,7 +1,6 @@
 using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;
-using Core.Queries;
 using Marten;
 using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;

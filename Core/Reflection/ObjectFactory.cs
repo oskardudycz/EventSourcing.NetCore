@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 
 namespace Core.Reflection;
 

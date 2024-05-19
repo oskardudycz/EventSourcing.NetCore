@@ -1,5 +1,4 @@
 using Bogus;
-using Bogus.DataSets;
 
 namespace PointOfSales.Api.Tests.CashRegisters;
 

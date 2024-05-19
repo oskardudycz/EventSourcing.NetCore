@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using SlimDownYourAggregate.Slimmed;
 
 namespace SlimDownYourAggregate.Core.EF;

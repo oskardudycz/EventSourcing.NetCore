@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using OptimisticConcurrency.Core.Http;
 using OptimisticConcurrency.Core.Marten;
 using OptimisticConcurrency.Mixed.Pricing;
-using Polly;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static System.DateTimeOffset;
 

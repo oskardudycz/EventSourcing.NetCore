@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using FluentAssertions;
-using Xunit;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using V1 = ECommerce.V1;
 

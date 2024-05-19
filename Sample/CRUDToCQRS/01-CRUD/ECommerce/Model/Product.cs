@@ -1,4 +1,3 @@
-using ECommerce.Core;
 using ECommerce.Core.Entities;
 
 namespace ECommerce.Model;

@@ -1,5 +1,4 @@
 using ECommerce.Core.Requests;
-using ECommerce.Requests;
 
 namespace ECommerce.Core.Services;
 

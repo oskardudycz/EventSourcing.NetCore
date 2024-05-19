@@ -102,7 +102,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
             .Select(streamData =>
                 new StreamState(
                     streamData.id,
-                    Type.GetType(streamData.type),
+                    Type.GetType(streamData.type, true)!,
                     streamData.version
                 ))
             .SingleOrDefault();
@@ -126,7 +126,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
             .Select(@event =>
                 JsonConvert.DeserializeObject(
                     @event.data,
-                    Type.GetType(@event.type)
+                    Type.GetType(@event.type, true)!
                 ))
             .ToList();
     }

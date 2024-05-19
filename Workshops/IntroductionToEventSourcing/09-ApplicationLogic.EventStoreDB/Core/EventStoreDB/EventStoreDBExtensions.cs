@@ -1,6 +1,4 @@
-using System.Text.Json;
 using ApplicationLogic.EventStoreDB.Core.Entities;
-using ApplicationLogic.EventStoreDB.Core.Exceptions;
 using EventStore.Client;
 
 namespace ApplicationLogic.EventStoreDB.Core.EventStoreDB;

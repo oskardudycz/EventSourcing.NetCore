@@ -2,7 +2,6 @@ using System.Text.Json;
 using EventStore.Client;
 using OptimisticConcurrency.Core.Entities;
 using OptimisticConcurrency.Core.Exceptions;
-using OptimisticConcurrency.Immutable.ShoppingCarts;
 
 namespace OptimisticConcurrency.Core.EventStoreDB;
 
@@ -50,7 +49,7 @@ public static class EventStoreDBExtensions
                     revision = StreamRevision.FromStreamPosition(@event.Event.EventNumber);
                     return (TEvent)JsonSerializer.Deserialize(
                         @event.Event.Data.Span,
-                        Type.GetType(@event.Event.EventType)!
+                        Type.GetType(@event.Event.EventType, true)!
                     )!;
                 }
             )

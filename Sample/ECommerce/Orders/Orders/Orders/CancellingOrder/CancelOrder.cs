@@ -2,7 +2,6 @@ using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;
 using Marten;
-using Orders.Orders.GettingOrderStatus;
 using Orders.Orders.GettingPending;
 
 namespace Orders.Orders.CancellingOrder;

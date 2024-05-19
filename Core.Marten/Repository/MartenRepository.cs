@@ -1,8 +1,5 @@
-using System.Diagnostics;
 using Core.Aggregates;
-using Core.OpenTelemetry;
 using Marten;
-using Microsoft.Extensions.Logging;
 
 namespace Core.Marten.Repository;
 

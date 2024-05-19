@@ -97,7 +97,7 @@ public class Exercise08Snapshots
 
         var userSnapshot = new SnapshotToTable<User>(
             databaseConnection,
-            @"TODO write upsert here");
+            "TODO write upsert here");
 
         eventStore.AddSnapshot(userSnapshot);
 
