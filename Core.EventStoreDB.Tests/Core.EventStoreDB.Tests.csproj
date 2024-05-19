@@ -28,6 +28,9 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
+        <!-- For PostgreSQL checkpointing tests -->
+        <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
+        <PackageReference Include="Npgsql" Version="8.0.3" />
     </ItemGroup>
 
 

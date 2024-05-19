@@ -9,13 +9,13 @@ public class PostgresSubscriptionCheckpointRepository(
     // to update projection in the same transaction in the same transaction as checkpointing
     // to help handling idempotency
     Func<CancellationToken, ValueTask<NpgsqlConnection>> connectionFactory,
-    PostgresSubscriptionCheckpointTableCreator checkpointTableCreator
+    PostgresSubscriptionCheckpointSetup checkpointSetup
 ): ISubscriptionCheckpointRepository
 {
     public async ValueTask<Checkpoint> Load(string subscriptionId, CancellationToken ct)
     {
         var connection = await connectionFactory(ct).ConfigureAwait(false);
-        await checkpointTableCreator.EnsureCheckpointsTableExist(ct).ConfigureAwait(false);
+        await checkpointSetup.EnsureCheckpointsTableExist(ct).ConfigureAwait(false);
 
         await using var command = new NpgsqlCommand(SelectCheckpointSql, connection);
         command.Parameters.AddWithValue(subscriptionId);
@@ -32,24 +32,35 @@ public class PostgresSubscriptionCheckpointRepository(
     public async ValueTask<StoreResult> Store(
         string subscriptionId,
         ulong position,
-        Checkpoint previousCheckpoint, CancellationToken ct)
+        Checkpoint previousCheckpoint,
+        CancellationToken ct
+    )
     {
         var connection = await connectionFactory(ct).ConfigureAwait(false);
-        await checkpointTableCreator.EnsureCheckpointsTableExist(ct).ConfigureAwait(false);
+        await checkpointSetup.EnsureCheckpointsTableExist(ct).ConfigureAwait(false);
 
-        await using var command = new NpgsqlCommand(StoreCheckpointSql, connection);
+        await using var command = new NpgsqlCommand("SELECT store_subscription_checkpoint($1, $2, $3)", connection);
         command.Parameters.AddWithValue(subscriptionId);
-        command.Parameters.AddWithValue(position);
+        command.Parameters.AddWithValue((long)position);
+        command.Parameters.AddWithValue(previousCheckpoint != Checkpoint.None
+            ? (long)previousCheckpoint.Position
+            : DBNull.Value);
 
-        return await command.ExecuteNonQueryAsync(ct).ConfigureAwait(false) == 1
-            ? new StoreResult.Success(Checkpoint.From(position))
-            : new StoreResult.Mismatch();
+        var result = await command.ExecuteScalarAsync(ct).ConfigureAwait(false);
+
+        return result switch
+        {
+            1 => new StoreResult.Success(Checkpoint.From(position)),
+            0 => new StoreResult.Ignored(),
+            2 => new StoreResult.Mismatch(),
+            _ => new StoreResult.Mismatch(),
+        };
     }
 
     public async ValueTask<Checkpoint> Reset(string subscriptionId, CancellationToken ct)
     {
         var connection = await connectionFactory(ct).ConfigureAwait(false);
-        await checkpointTableCreator.EnsureCheckpointsTableExist(ct).ConfigureAwait(false);
+        await checkpointSetup.EnsureCheckpointsTableExist(ct).ConfigureAwait(false);
 
         await using var command = new NpgsqlCommand(ResetCheckpointSql, connection);
         command.Parameters.AddWithValue(subscriptionId);
@@ -82,10 +93,10 @@ public class PostgresSubscriptionCheckpointRepository(
         """;
 }
 
-public abstract class PostgresSubscriptionCheckpointTableCreator(NpgsqlDataSource dataSource)
+public class PostgresSubscriptionCheckpointSetup(NpgsqlDataSource dataSource)
 {
     private bool wasCreated;
-    private readonly SemaphoreSlim tableLock = new(0, 1);
+    private readonly SemaphoreSlim tableLock = new(1, 1);
 
     public async ValueTask EnsureCheckpointsTableExist(CancellationToken ct)
     {
@@ -99,7 +110,7 @@ public abstract class PostgresSubscriptionCheckpointTableCreator(NpgsqlDataSourc
 
         try
         {
-            await using var cmd = dataSource.CreateCommand(CreateCheckpointsTableSql);
+            await using var cmd = dataSource.CreateCommand(SetupSql);
             await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
             wasCreated = false;
         }
@@ -109,11 +120,71 @@ public abstract class PostgresSubscriptionCheckpointTableCreator(NpgsqlDataSourc
         }
     }
 
+    private const string SetupSql = $"{CreateCheckpointsTableSql}\n{CreateStoreCheckpointsProcedureSql}";
+
     private const string CreateCheckpointsTableSql =
         """
-        CREATE TABLE "subscription_checkpoints" (
+        CREATE TABLE IF NOT EXISTS "subscription_checkpoints" (
             "id" VARCHAR(100) PRIMARY KEY,
-            "position" BIGINT NULL
+            "position" BIGINT NULL,
+            "revision" BIGINT
         );
+        """;
+
+    private const string CreateStoreCheckpointsProcedureSql =
+        """
+        CREATE OR REPLACE FUNCTION store_subscription_checkpoint(
+            p_id VARCHAR(100),
+            p_position BIGINT,
+            check_position BIGINT DEFAULT NULL
+        ) RETURNS INT AS $$
+        DECLARE
+            current_position BIGINT;
+        BEGIN
+            -- Handle the case when check_position is provided
+            IF check_position IS NOT NULL THEN
+                -- Try to update if the position matches check_position
+                UPDATE "subscription_checkpoints"
+                SET "position" = p_position
+                WHERE "id" = p_id AND "position" = check_position;
+
+                IF FOUND THEN
+                    RETURN 1;  -- Successfully updated
+                END IF;
+
+                -- Retrieve the current position
+                SELECT "position" INTO current_position
+                FROM "subscription_checkpoints"
+                WHERE "id" = p_id;
+
+                -- Return appropriate codes based on current position
+                IF current_position = p_position THEN
+                    RETURN 0;  -- Idempotent check: position already set
+                ELSIF current_position > check_position THEN
+                    RETURN 2;  -- Failure: current position is greater
+                ELSE
+                    RETURN 2;  -- Default failure case for mismatched positions
+                END IF;
+            END IF;
+
+            -- Handle the case when check_position is NULL: Insert if not exists
+            BEGIN
+                INSERT INTO "subscription_checkpoints"("id", "position")
+                VALUES (p_id, p_position);
+                RETURN 1;  -- Successfully inserted
+            EXCEPTION WHEN unique_violation THEN
+                -- If insertion failed, it means the row already exists
+                SELECT "position" INTO current_position
+                FROM "subscription_checkpoints"
+                WHERE "id" = p_id;
+
+                IF current_position = p_position THEN
+                    RETURN 0;  -- Idempotent check: position already set
+                ELSE
+                    RETURN 2;  -- Insertion failed, row already exists with different position
+                END IF;
+            END;
+        END;
+        $$ LANGUAGE plpgsql;
         """;
 }
