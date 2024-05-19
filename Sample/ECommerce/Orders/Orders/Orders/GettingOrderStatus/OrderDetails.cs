@@ -19,7 +19,7 @@ public class OrderDetails
 
     public Guid? PaymentId { get; private set; }
 
-    public List<EventsWrapper> Events { get; private set; } = [];
+    public List<EventsWrapper> Events { get; } = [];
 
     public DateTimeOffset InitiatedAt { get; private set; }
 

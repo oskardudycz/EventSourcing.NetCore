@@ -5,7 +5,7 @@ namespace Tickets.Tests.Stubs.Storage;
 
 public class FakeRepository<T> : IMartenRepository<T> where T : class, IAggregate
 {
-    public Dictionary<Guid, T> Aggregates { get; private set; }
+    public Dictionary<Guid, T> Aggregates { get; }
 
     public FakeRepository(params (Guid, T)[] aggregates)
     {

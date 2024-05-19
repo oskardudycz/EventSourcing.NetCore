@@ -7,7 +7,7 @@ using System.Linq;
 public class ChemicalReaction
 {
     public Guid Id { get; private set; }
-    public List<ReactionParticipant> Participants { get; private set; }
+    public List<ReactionParticipant> Participants { get; }
     public ReactionState State { get; private set; }
 
     public ChemicalReaction(Guid id, List<ReactionParticipant> participants)
@@ -60,7 +60,7 @@ public class ReactionParticipant(Guid id, string chemicalName, double moles, Par
     public Guid Id { get; private set; } = id;
     public string ChemicalName { get; private set; } = chemicalName;
     public double Moles { get; private set; } = moles;
-    public ParticipantType Type { get; private set; } = type;
+    public ParticipantType Type { get; } = type;
 
     public void UpdateMoles(double newMoles)
     {
