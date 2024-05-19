@@ -46,13 +46,8 @@ public record GroupCheckout(
     CheckoutStatus Status = CheckoutStatus.Initiated
 )
 {
-    public static GroupCheckoutInitiated Initiate(
-        Guid groupCheckoutId,
-        Guid clerkId,
-        Guid[] guestStayIds,
-        DateTimeOffset initiatedAt
-    ) =>
-        new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStayIds, initiatedAt);
+    public static GroupCheckoutInitiated Initiate(Guid groupCheckoutId, Guid clerkId, Guid[] guestStayIds, DateTimeOffset initiatedAt) =>
+        new(groupCheckoutId, clerkId, guestStayIds, initiatedAt);
 
     public GuestCheckoutsInitiated? RecordGuestCheckoutsInitiation(
         Guid[] initiatedGuestStayIds,
@@ -128,7 +123,7 @@ public record GroupCheckout(
             .ToArray();
 
     public static GroupCheckout Create(GroupCheckoutInitiated @event) =>
-        new GroupCheckout(
+        new(
             @event.GroupCheckOutId,
             @event.GuestStayIds.ToDictionary(id => id, _ => CheckoutStatus.Pending)
         );

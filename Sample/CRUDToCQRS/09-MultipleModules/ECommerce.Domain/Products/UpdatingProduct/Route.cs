@@ -47,7 +47,7 @@ public record UpdateProductRequest(
 )
 {
     public UpdateProduct ToCommand(Guid id) =>
-        new UpdateProduct(
+        new(
             id,
             Name ?? throw new ArgumentNullException(nameof(Name)),
             Description,

@@ -26,7 +26,7 @@ internal class ReservationBuilder
         return this;
     }
 
-    public static ReservationBuilder Create() => new ReservationBuilder();
+    public static ReservationBuilder Create() => new();
 
     public Reservation Build()
     {

@@ -12,7 +12,7 @@ public static class WorkspaceService
     );
 
     public static WorkspaceCreated Handle(CreateWorkspace command) =>
-        new WorkspaceCreated(
+        new(
             WorkspaceId: command.WorkspaceId,
             Name: command.Name,
             TaskPrefix: command.TaskPrefix,

@@ -12,7 +12,7 @@ public record CreateProduct(
 public static class CreateProductHandler
 {
     public static Product Handle(CreateProduct command) =>
-        new Product
+        new()
         {
             Id = command.Id,
             Sku = command.Sku,
