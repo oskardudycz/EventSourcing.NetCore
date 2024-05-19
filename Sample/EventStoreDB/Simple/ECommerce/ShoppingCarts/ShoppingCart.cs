@@ -47,9 +47,8 @@ public record ShoppingCart(
 {
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    public static ShoppingCart Evolve(ShoppingCart entity, object @event)
-    {
-        return @event switch
+    public static ShoppingCart Evolve(ShoppingCart entity, object @event) =>
+        @event switch
         {
             ShoppingCartOpened (var cartId, var clientId) =>
                 entity with
@@ -87,7 +86,6 @@ public record ShoppingCart(
                 },
             _ => entity
         };
-    }
 
     public static ShoppingCart Default() =>
         new (default, default, default, ProductItemsList.Empty(), default, default);

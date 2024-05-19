@@ -64,9 +64,8 @@ public record ShoppingCart(
     public static ShoppingCart Default() =>
         new (default, default, default, [], default);
 
-    public ShoppingCart Apply(ShoppingCartEvent @event)
-    {
-        return @event switch
+    public ShoppingCart Apply(ShoppingCartEvent @event) =>
+        @event switch
         {
             ShoppingCartOpened(var shoppingCartId, var clientId, _) =>
                 this with
@@ -116,7 +115,6 @@ public record ShoppingCart(
                 },
             _ => this
         };
-    }
 
     // let's make Marten happy
     private ShoppingCart():this(Guid.Empty, Guid.Empty, ShoppingCartStatus.Pending, [], default){}

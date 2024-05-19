@@ -6,13 +6,9 @@ namespace Orders.Payments;
 
 public class PaymentsApiClient(HttpClient client)
 {
-    public  Task<HttpResponseMessage> Request(RequestPayment command, CancellationToken ct)
-    {
-        return client.PostAsJsonAsync("/api/payments", command, ct);
-    }
+    public  Task<HttpResponseMessage> Request(RequestPayment command, CancellationToken ct) =>
+        client.PostAsJsonAsync("/api/payments", command, ct);
 
-    public Task<HttpResponseMessage> Discard(DiscardPayment command, CancellationToken ct)
-    {
-        return client.DeleteAsync($"/api/payments/{command.PaymentId}", ct);
-    }
+    public Task<HttpResponseMessage> Discard(DiscardPayment command, CancellationToken ct) =>
+        client.DeleteAsync($"/api/payments/{command.PaymentId}", ct);
 }

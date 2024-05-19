@@ -75,9 +75,8 @@ public record ShoppingCart(
     public static ShoppingCart Initial() =>
         new (default, default, default, [], default);
 
-    public static ShoppingCart Evolve(ShoppingCart shoppingCart, ShoppingCartEvent @event)
-    {
-        return @event switch
+    public static ShoppingCart Evolve(ShoppingCart shoppingCart, ShoppingCartEvent @event) =>
+        @event switch
         {
             ShoppingCartOpened(var shoppingCartId, var clientId, var openedAt) =>
                 shoppingCart with
@@ -129,7 +128,6 @@ public record ShoppingCart(
                 },
             _ => shoppingCart
         };
-    }
 }
 
 public enum ShoppingCartStatus

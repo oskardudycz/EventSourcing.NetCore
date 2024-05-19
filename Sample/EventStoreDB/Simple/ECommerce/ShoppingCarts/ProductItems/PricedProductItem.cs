@@ -10,21 +10,17 @@ public record PricedProductItem(
 
     public decimal TotalPrice => Quantity * UnitPrice;
 
-    public static PricedProductItem From(ProductItem productItem, decimal? unitPrice)
-    {
-        return unitPrice switch
+    public static PricedProductItem From(ProductItem productItem, decimal? unitPrice) =>
+        unitPrice switch
         {
             null => throw new ArgumentNullException(nameof(unitPrice)),
             <= 0 => throw new ArgumentOutOfRangeException(nameof(unitPrice),
                 "Unit price has to be positive number"),
             _ => new PricedProductItem(productItem, unitPrice.Value)
         };
-    }
 
-    public bool MatchesProductAndUnitPrice(PricedProductItem pricedProductItem)
-    {
-        return ProductId == pricedProductItem.ProductId && UnitPrice == pricedProductItem.UnitPrice;
-    }
+    public bool MatchesProductAndUnitPrice(PricedProductItem pricedProductItem) =>
+        ProductId == pricedProductItem.ProductId && UnitPrice == pricedProductItem.UnitPrice;
 
     public PricedProductItem MergeWith(PricedProductItem productItem)
     {

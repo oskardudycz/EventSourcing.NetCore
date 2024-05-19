@@ -14,10 +14,8 @@ public class Payment: Aggregate
 
     public PaymentStatus Status { get; private set; }
 
-    public static Payment Initialize(Guid paymentId, Guid orderId, decimal amount)
-    {
-        return new Payment(paymentId, orderId, amount);
-    }
+    public static Payment Initialize(Guid paymentId, Guid orderId, decimal amount) =>
+        new(paymentId, orderId, amount);
 
     public Payment(){}
 

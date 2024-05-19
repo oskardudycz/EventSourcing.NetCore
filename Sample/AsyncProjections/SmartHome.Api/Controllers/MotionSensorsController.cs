@@ -17,10 +17,8 @@ public class MotionSensorsController(
     : Controller
 {
     [HttpGet]
-    public Task<IReadOnlyList<MotionSensor>> Get()
-    {
-        return queryBus.Query<GetMotionSensors, IReadOnlyList<MotionSensor>>(GetMotionSensors.Create());
-    }
+    public Task<IReadOnlyList<MotionSensor>> Get() =>
+        queryBus.Query<GetMotionSensors, IReadOnlyList<MotionSensor>>(GetMotionSensors.Create());
 
     [HttpPost]
     public async Task<IActionResult> Start()

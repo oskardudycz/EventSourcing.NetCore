@@ -29,5 +29,4 @@ public record GetCartById(
             )
             .WaitAndRetryAsync(10, i => TimeSpan.FromMilliseconds(50 * Math.Pow(i, 2)))
             .ExecuteAsync(ct => shoppingCarts.SingleOrDefaultAsync(x => x.Id == query.ShoppingCartId && x.Version >= expectedVersion, ct), token);
-    }
 }

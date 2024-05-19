@@ -45,18 +45,14 @@ public class ProductsController(ProductService service, ProductReadOnlyService r
     }
 
     [HttpGet("{id}")]
-    public Task<ProductDetailsResponse?> GetById(Guid id, CancellationToken ct)
-    {
-        return readOnlyService.GetByIdAsync(id, ct);
-    }
+    public Task<ProductDetailsResponse?> GetById(Guid id, CancellationToken ct) =>
+        readOnlyService.GetByIdAsync(id, ct);
 
     [HttpGet]
     public Task<List<ProductShortInfoResponse>> Get(
         CancellationToken ct,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20
-    )
-    {
-        return readOnlyService.GetPagedAsync(ct, pageNumber, pageSize);
-    }
+    ) =>
+        readOnlyService.GetPagedAsync(ct, pageNumber, pageSize);
 }

@@ -21,8 +21,6 @@ public class ShipmentsController(IPackageService packageService): Controller
     }
 
     [HttpGet("{id}")]
-    public Task<Package> Get(Guid id)
-    {
-        return packageService.GetById(id, HttpContext.RequestAborted);
-    }
+    public Task<Package> Get(Guid id) =>
+        packageService.GetById(id, HttpContext.RequestAborted);
 }

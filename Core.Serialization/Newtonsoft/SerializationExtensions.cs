@@ -36,12 +36,9 @@ public static class SerializationExtensions
     /// <param name="json">json string</param>
     /// <param name="converters"></param>
     /// <returns>deserialized object</returns>
-    public static T FromJson<T>(this string json, params JsonConverter[] converters)
-    {
-        return JsonConvert.DeserializeObject<T>(json,
+    public static T FromJson<T>(this string json, params JsonConverter[] converters) =>
+        JsonConvert.DeserializeObject<T>(json,
             new JsonSerializerSettings().WithNonDefaultConstructorContractResolver().WithConverters(converters))!;
-    }
-
 
     /// <summary>
     /// Deserialize object from json with JsonNet
@@ -51,11 +48,9 @@ public static class SerializationExtensions
     /// <param name="type">object type</param>
     /// <param name="converters"></param>
     /// <returns>deserialized object</returns>
-    public static object? FromJson(this string json, Type type, params JsonConverter[] converters)
-    {
-        return JsonConvert.DeserializeObject(json, type,
+    public static object? FromJson(this string json, Type type, params JsonConverter[] converters) =>
+        JsonConvert.DeserializeObject(json, type,
             new JsonSerializerSettings().WithNonDefaultConstructorContractResolver().WithConverters(converters));
-    }
 
     /// <summary>
     /// Serialize object to json with JsonNet
@@ -63,19 +58,15 @@ public static class SerializationExtensions
     /// <param name="obj">object to serialize</param>
     /// <param name="converters"></param>
     /// <returns>json string</returns>
-    public static string ToJson(this object obj, params JsonConverter[] converters)
-    {
-        return JsonConvert.SerializeObject(obj,
+    public static string ToJson(this object obj, params JsonConverter[] converters) =>
+        JsonConvert.SerializeObject(obj,
             new JsonSerializerSettings().WithNonDefaultConstructorContractResolver().WithConverters(converters));
-    }
 
     /// <summary>
     /// Serialize object to json with JsonNet
     /// </summary>
     /// <param name="obj">object to serialize</param>
     /// <returns>json string</returns>
-    public static StringContent ToJsonStringContent(this object obj)
-    {
-        return new StringContent(obj.ToJson(), Encoding.UTF8, "application/json");
-    }
+    public static StringContent ToJsonStringContent(this object obj) =>
+        new(obj.ToJson(), Encoding.UTF8, "application/json");
 }

@@ -13,19 +13,15 @@ public class EventStoreDBAsyncCommandBus(EventStoreClient eventStoreClient): IAs
 {
     public static readonly string CommandsStreamId = "commands-external";
 
-    public Task Schedule<TCommand>(TCommand command, CancellationToken ct = default) where TCommand: notnull
-    {
-        return eventStoreClient.Append(CommandsStreamId, command, ct);
-    }
+    public Task Schedule<TCommand>(TCommand command, CancellationToken ct = default) where TCommand: notnull =>
+        eventStoreClient.Append(CommandsStreamId, command, ct);
 }
 
 public static class Config
 {
     public static IServiceCollection AddEventStoreDBAsyncCommandBus(
         this IServiceCollection services
-    )
-    {
-        return services.AddScoped<IAsyncCommandBus, EventStoreDBAsyncCommandBus>()
+    ) =>
+        services.AddScoped<IAsyncCommandBus, EventStoreDBAsyncCommandBus>()
             .AddCommandForwarder();
-    }
 }

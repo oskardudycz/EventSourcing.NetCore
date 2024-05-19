@@ -86,10 +86,8 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         }
     }
 
-    public static ShoppingCart Open(Guid cartId, Guid clientId, DateTimeOffset now)
-    {
-        return new ShoppingCart(cartId, clientId, now);
-    }
+    public static ShoppingCart Open(Guid cartId, Guid clientId, DateTimeOffset now) =>
+        new(cartId, clientId, now);
 
     public static ShoppingCart Initial() => new();
 

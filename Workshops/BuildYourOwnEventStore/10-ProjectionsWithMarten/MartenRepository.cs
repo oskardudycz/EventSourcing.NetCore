@@ -7,10 +7,8 @@ public class MartenRepository<T>(IDocumentSession documentSession): IRepository<
 {
     private readonly IDocumentSession documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
 
-    public T? Find(Guid id)
-    {
-        return documentSession.Events.AggregateStream<T>(id);
-    }
+    public T? Find(Guid id) =>
+        documentSession.Events.AggregateStream<T>(id);
 
     public void Add(T aggregate)
     {

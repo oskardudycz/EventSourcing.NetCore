@@ -12,9 +12,8 @@ public partial class GroupCheckoutTests
     private readonly Guid clerkId = Guid.NewGuid();
     private readonly Faker faker = new();
 
-    private static GroupCheckout Evolve(GroupCheckout groupCheckout, object @event)
-    {
-        return @event switch
+    private static GroupCheckout Evolve(GroupCheckout groupCheckout, object @event) =>
+        @event switch
         {
             GroupCheckoutInitiated groupCheckoutInitiated => GroupCheckout.Create(groupCheckoutInitiated),
             GuestCheckoutsInitiated guestCheckoutsInitiated => groupCheckout.Apply(guestCheckoutsInitiated),
@@ -24,5 +23,4 @@ public partial class GroupCheckoutTests
             GroupCheckoutFailed groupCheckoutFailed => groupCheckout.Apply(groupCheckoutFailed),
             _ => groupCheckout
         };
-    }
 }

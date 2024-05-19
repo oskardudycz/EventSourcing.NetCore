@@ -19,10 +19,8 @@ public record CartFinalized(
         Guid clientId,
         IReadOnlyList<PricedProductItem> productItems,
         decimal totalPrice,
-        DateTime finalizedAt)
-    {
-        return new(cartId, clientId, productItems, totalPrice, finalizedAt);
-    }
+        DateTime finalizedAt) =>
+        new(cartId, clientId, productItems, totalPrice, finalizedAt);
 }
 
 internal class HandleCartFinalized(

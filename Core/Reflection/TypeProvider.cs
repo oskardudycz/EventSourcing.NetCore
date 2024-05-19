@@ -5,13 +5,11 @@ namespace Core.Reflection;
 
 public static class TypeProvider
 {
-    private static bool IsRecord(this Type objectType)
-    {
-        return objectType.GetMethod("<Clone>$") != null ||
-               ((TypeInfo)objectType)
-               .DeclaredProperties.FirstOrDefault(x => x.Name == "EqualityContract")?
-               .GetMethod?.GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
-    }
+    private static bool IsRecord(this Type objectType) =>
+        objectType.GetMethod("<Clone>$") != null ||
+        ((TypeInfo)objectType)
+        .DeclaredProperties.FirstOrDefault(x => x.Name == "EqualityContract")?
+        .GetMethod?.GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
 
     public static Type? GetTypeFromAnyReferencingAssembly(string typeName)
     {
@@ -28,10 +26,8 @@ public static class TypeProvider
             .FirstOrDefault();
     }
 
-    public static Type? GetFirstMatchingTypeFromCurrentDomainAssembly(string typeName)
-    {
-        return AppDomain.CurrentDomain.GetAssemblies()
+    public static Type? GetFirstMatchingTypeFromCurrentDomainAssembly(string typeName) =>
+        AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(a => a.GetTypes().Where(x => x.FullName == typeName || x.Name == typeName))
             .FirstOrDefault();
-    }
 }

@@ -43,14 +43,12 @@ public class InlineAggregationStorage(MartenFixture fixture): MartenTest(fixture
         }
     }
 
-    protected override IDocumentSession CreateSession(Action<StoreOptions>? storeOptions = null)
-    {
-        return base.CreateSession(options =>
+    protected override IDocumentSession CreateSession(Action<StoreOptions>? storeOptions = null) =>
+        base.CreateSession(options =>
         {
             //It's needed to manually set that inline aggregation should be applied
             options.Projections.Snapshot<IssuesList>(SnapshotLifecycle.Inline);
         });
-    }
 
     [Fact]
     public void GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()

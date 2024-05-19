@@ -53,10 +53,8 @@ public interface IEventTransformation<in TEvent, TTransformedEvent> : IEventHand
 {
     Type IEventHandler.CanHandle => typeof(TEvent);
 
-    async ValueTask<object?> IEventHandler.Handle(object @event, CancellationToken ct)
-    {
-        return await Handle((TEvent)@event, ct);
-    }
+    async ValueTask<object?> IEventHandler.Handle(object @event, CancellationToken ct) =>
+        await Handle((TEvent)@event, ct);
 
     ValueTask<TTransformedEvent> Handle(TEvent @event, CancellationToken ct);
 }

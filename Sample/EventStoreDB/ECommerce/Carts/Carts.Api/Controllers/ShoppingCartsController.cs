@@ -144,8 +144,6 @@ public class ShoppingCartsController(
     }
 
     [HttpGet("{id}/versions")]
-    public Task<ShoppingCartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion? query)
-    {
-        return queryBus.Query<GetCartAtVersion, ShoppingCartDetails>(GetCartAtVersion.Create(id, query?.Version));
-    }
+    public Task<ShoppingCartDetails> GetVersion(Guid id, [FromQuery] GetCartAtVersion? query) =>
+        queryBus.Query<GetCartAtVersion, ShoppingCartDetails>(GetCartAtVersion.Create(id, query?.Version));
 }

@@ -24,18 +24,12 @@ public class ElasticSearchRepository<T>(ElasticsearchClient elasticClient): IEla
         return response?.Source;
     }
 
-    public Task Add(Guid id, T aggregate, CancellationToken cancellationToken)
-    {
-        return elasticClient.IndexAsync(aggregate, i => i.Id(id).Index(IndexNameMapper.ToIndexName<T>()), cancellationToken);
-    }
+    public Task Add(Guid id, T aggregate, CancellationToken cancellationToken) =>
+        elasticClient.IndexAsync(aggregate, i => i.Id(id).Index(IndexNameMapper.ToIndexName<T>()), cancellationToken);
 
-    public Task Update(Guid id, T aggregate, CancellationToken cancellationToken)
-    {
-        return elasticClient.UpdateAsync<T, object>(IndexNameMapper.ToIndexName<T>(), id, i => i.Doc(aggregate), cancellationToken);
-    }
+    public Task Update(Guid id, T aggregate, CancellationToken cancellationToken) =>
+        elasticClient.UpdateAsync<T, object>(IndexNameMapper.ToIndexName<T>(), id, i => i.Doc(aggregate), cancellationToken);
 
-    public Task Delete(Guid id, T aggregate, CancellationToken cancellationToken)
-    {
-        return elasticClient.DeleteAsync<T>(id, cancellationToken);
-    }
+    public Task Delete(Guid id, T aggregate, CancellationToken cancellationToken) =>
+        elasticClient.DeleteAsync<T>(id, cancellationToken);
 }

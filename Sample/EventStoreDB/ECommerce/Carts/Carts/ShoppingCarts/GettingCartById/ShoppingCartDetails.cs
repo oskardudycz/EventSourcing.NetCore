@@ -111,11 +111,9 @@ public class ShoppingCartDetails: IVersionedProjection
         Status = ShoppingCartStatus.Canceled;
     }
 
-    private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)
-    {
-        return ProductItems
+    private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem) =>
+        ProductItems
             .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));
-    }
 
     public ulong LastProcessedPosition { get; set; }
 }

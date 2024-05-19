@@ -99,8 +99,6 @@ internal class PackageService(
         await eventBus.Publish(eventEnvelope, cancellationToken);
     }
 
-    private Task SaveChanges(CancellationToken cancellationToken = default)
-    {
-        return dbContext.SaveChangesAsync(cancellationToken);
-    }
+    private Task SaveChanges(CancellationToken cancellationToken = default) =>
+        dbContext.SaveChangesAsync(cancellationToken);
 }

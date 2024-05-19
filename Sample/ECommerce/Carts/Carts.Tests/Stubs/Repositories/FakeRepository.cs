@@ -7,15 +7,11 @@ public class FakeRepository<T>: IMartenRepository<T> where T : class, IAggregate
 {
     public Dictionary<Guid, T> Aggregates { get; }
 
-    public FakeRepository(params (Guid,T)[] aggregates)
-    {
+    public FakeRepository(params (Guid,T)[] aggregates) =>
         Aggregates = aggregates.ToDictionary(ks => ks.Item1, vs => vs.Item2);
-    }
 
-    public Task<T?> Find(Guid id, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(Aggregates.GetValueOrDefault(id));
-    }
+    public Task<T?> Find(Guid id, CancellationToken cancellationToken) =>
+        Task.FromResult(Aggregates.GetValueOrDefault(id));
 
     public async Task<long> Add(Guid id, T aggregate, CancellationToken cancellationToken = default)
     {

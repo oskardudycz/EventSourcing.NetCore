@@ -13,12 +13,10 @@ public class PricedProductItem
         UnitPrice = unitPrice;
     }
 
-    public static PricedProductItem Create(Guid? productId, int? quantity, decimal? unitPrice)
-    {
-        return new (
+    public static PricedProductItem Create(Guid? productId, int? quantity, decimal? unitPrice) =>
+        new (
             productId ?? throw new ArgumentNullException(nameof(productId)),
             quantity ?? throw new ArgumentNullException(nameof(quantity)),
             unitPrice ?? throw new ArgumentNullException(nameof(unitPrice))
         );
-    }
 }

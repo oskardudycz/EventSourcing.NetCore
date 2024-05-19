@@ -10,8 +10,6 @@ public record GetMeeting(
 
 internal class HandleGetMeeting(IQuerySession session): IQueryHandler<GetMeeting, MeetingView?>
 {
-    public Task<MeetingView?> Handle(GetMeeting request, CancellationToken cancellationToken)
-    {
-        return session.LoadAsync<MeetingView>(request.Id, cancellationToken);
-    }
+    public Task<MeetingView?> Handle(GetMeeting request, CancellationToken cancellationToken) =>
+        session.LoadAsync<MeetingView>(request.Id, cancellationToken);
 }

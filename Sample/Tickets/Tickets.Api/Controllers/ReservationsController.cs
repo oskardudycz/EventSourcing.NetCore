@@ -24,10 +24,8 @@ public class ReservationsController(
     : Controller
 {
     [HttpGet("{id}")]
-    public Task<ReservationDetails> Get(Guid id)
-    {
-        return queryBus.Query<GetReservationById, ReservationDetails>(new GetReservationById(id));
-    }
+    public Task<ReservationDetails> Get(Guid id) =>
+        queryBus.Query<GetReservationById, ReservationDetails>(new GetReservationById(id));
 
     [HttpGet]
     public async Task<PagedListResponse<ReservationShortInfo>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)

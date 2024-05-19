@@ -4,8 +4,5 @@ namespace Core.Testing;
 
 public class DummyExternalEventConsumer: IExternalEventConsumer
 {
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
+    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

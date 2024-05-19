@@ -17,10 +17,8 @@ public class Meeting: Aggregate
     {
     }
 
-    public static Meeting New(Guid id, string name)
-    {
-        return new(id, name, DateTime.UtcNow);
-    }
+    public static Meeting New(Guid id, string name) =>
+        new(id, name, DateTime.UtcNow);
 
     public Meeting(Guid id, string name, DateTime created)
     {

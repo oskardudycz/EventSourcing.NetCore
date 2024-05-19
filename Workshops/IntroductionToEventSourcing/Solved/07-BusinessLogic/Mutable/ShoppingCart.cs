@@ -82,12 +82,8 @@ public class ShoppingCart: Aggregate<ShoppingCartEvent>
         }
     }
 
-    public static ShoppingCart Open(
-        Guid cartId,
-        Guid clientId)
-    {
-        return new ShoppingCart(cartId, clientId);
-    }
+    public static ShoppingCart Open(Guid cartId, Guid clientId) =>
+        new(cartId, clientId);
 
     public static ShoppingCart Initial() => new();
 

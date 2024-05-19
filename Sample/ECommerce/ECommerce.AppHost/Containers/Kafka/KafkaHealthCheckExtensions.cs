@@ -10,18 +10,14 @@ public static class KafkaHealthCheckExtensions
     /// <summary>
     /// Adds a health check to the PostgreSQL server resource.
     /// </summary>
-    public static IResourceBuilder<KafkaServerResource> WithHealthCheck(this IResourceBuilder<KafkaServerResource> builder)
-    {
-        return builder.WithAnnotation(HealthCheckAnnotation.Create(cs =>
-        {
-            return new KafkaHealthCheck(new KafkaHealthCheckOptions
+    public static IResourceBuilder<KafkaServerResource> WithHealthCheck(this IResourceBuilder<KafkaServerResource> builder) =>
+        builder.WithAnnotation(HealthCheckAnnotation.Create(cs =>
+            new KafkaHealthCheck(new KafkaHealthCheckOptions
             {
                 Configuration = new ProducerConfig
                 {
                     BootstrapServers = cs,
                     AllowAutoCreateTopics = true
                 }
-            });
-        }));
-    }
+            })));
 }

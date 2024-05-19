@@ -13,8 +13,6 @@ public class GetMotionSensors
 public class HandleGetMotionSensors(IDocumentSession querySession)
     : IQueryHandler<GetMotionSensors, IReadOnlyList<MotionSensor>>
 {
-    public Task<IReadOnlyList<MotionSensor>> Handle(GetMotionSensors request, CancellationToken cancellationToken)
-    {
-        return querySession.Query<MotionSensor>().ToListAsync(cancellationToken);
-    }
+    public Task<IReadOnlyList<MotionSensor>> Handle(GetMotionSensors request, CancellationToken cancellationToken) =>
+        querySession.Query<MotionSensor>().ToListAsync(cancellationToken);
 }

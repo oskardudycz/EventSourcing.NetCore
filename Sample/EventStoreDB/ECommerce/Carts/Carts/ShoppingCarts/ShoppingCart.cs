@@ -20,12 +20,8 @@ public class ShoppingCart: Aggregate
 
     public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 
-    public static ShoppingCart Open(
-        Guid cartId,
-        Guid clientId)
-    {
-        return new ShoppingCart(cartId, clientId);
-    }
+    public static ShoppingCart Open(Guid cartId, Guid clientId) =>
+        new(cartId, clientId);
 
     private ShoppingCart(){}
 
@@ -185,9 +181,7 @@ public class ShoppingCart: Aggregate
         Status = ShoppingCartStatus.Canceled;
     }
 
-    private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)
-    {
-        return ProductItems
+    private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem) =>
+        ProductItems
             .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));
-    }
 }

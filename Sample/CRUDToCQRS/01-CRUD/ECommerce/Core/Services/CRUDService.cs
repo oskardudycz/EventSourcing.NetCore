@@ -51,24 +51,17 @@ public abstract class CRUDService<TEntity>(ICRUDRepository<TEntity> repository, 
         return true;
     }
 
-    public async Task<TResponse> GetByIdAsync<TResponse>(Guid id, CancellationToken ct)
-    {
-        return mapper.Map<TResponse>(await GetEntityByIdAsync(id, ct));
-    }
+    public async Task<TResponse> GetByIdAsync<TResponse>(Guid id, CancellationToken ct) =>
+        mapper.Map<TResponse>(await GetEntityByIdAsync(id, ct));
 
-    public Task<List<TResponse>> GetPagedAsync<TResponse>(CancellationToken ct, int pageNumber = 1, int pageSize = 20)
-    {
-        return Query()
+    public Task<List<TResponse>> GetPagedAsync<TResponse>(CancellationToken ct, int pageNumber = 1, int pageSize = 20) =>
+        Query()
             .Skip(pageNumber * pageSize)
             .Take(pageSize)
             .ProjectTo<TResponse>(mapper.ConfigurationProvider)
             .ToListAsync(ct);
-    }
 
-    public IQueryable<TEntity> Query()
-    {
-        return repository.Query();
-    }
+    public IQueryable<TEntity> Query() => repository.Query();
 
     protected async Task<TEntity> GetEntityByIdAsync(Guid id, CancellationToken ct)
     {

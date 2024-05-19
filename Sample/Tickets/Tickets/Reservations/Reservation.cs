@@ -21,13 +21,11 @@ public class Reservation : Aggregate
     public static Reservation CreateTentative(
         Guid id,
         IReservationNumberGenerator numberGenerator,
-        Guid seatId)
-    {
-        return new Reservation(
+        Guid seatId) =>
+        new(
             id,
             numberGenerator,
             seatId);
-    }
 
     private Reservation(
         Guid id,

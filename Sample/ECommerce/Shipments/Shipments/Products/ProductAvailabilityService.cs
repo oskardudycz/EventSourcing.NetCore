@@ -7,8 +7,6 @@ public interface IProductAvailabilityService
 
 public class ProductAvailabilityService: IProductAvailabilityService
 {
-    public bool IsEnoughOf(params ProductItem[] productItems)
-    {
-        return productItems.All(pi => pi.Quantity <= 100);
-    }
+    public bool IsEnoughOf(params ProductItem[] productItems) =>
+        productItems.All(pi => pi.Quantity <= 100);
 }

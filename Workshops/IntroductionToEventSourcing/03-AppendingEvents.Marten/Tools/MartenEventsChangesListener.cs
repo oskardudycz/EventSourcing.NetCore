@@ -9,10 +9,8 @@ public class MartenEventsChangesListener : IDocumentSessionListener
 
     public int AppendedEventsCount { get; private set; }
 
-    public void BeforeSaveChanges(IDocumentSession session)
-    {
+    public void BeforeSaveChanges(IDocumentSession session) =>
         AppendedEventsCount = session.PendingChanges.Streams().Sum(s => s.Events.Count);
-    }
 
     public Task BeforeSaveChangesAsync(IDocumentSession session, CancellationToken token)
     {
@@ -22,21 +20,16 @@ public class MartenEventsChangesListener : IDocumentSessionListener
 
     public void AfterCommit(IDocumentSession session, IChangeSet commit)
     {
-
     }
 
-    public Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token)
-    {
-        return Task.CompletedTask;
-    }
+    public Task AfterCommitAsync(IDocumentSession session, IChangeSet commit, CancellationToken token) =>
+        Task.CompletedTask;
 
     public void DocumentLoaded(object id, object document)
     {
-
     }
 
     public void DocumentAddedForStorage(object id, object document)
     {
-
     }
 }

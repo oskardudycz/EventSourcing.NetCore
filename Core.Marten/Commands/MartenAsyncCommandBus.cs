@@ -24,9 +24,7 @@ public static class Config
 {
     public static IServiceCollection AddMartenAsyncCommandBus(
         this IServiceCollection services
-    )
-    {
-        return services.AddScoped<IAsyncCommandBus, MartenAsyncCommandBus>()
+    ) =>
+        services.AddScoped<IAsyncCommandBus, MartenAsyncCommandBus>()
             .AddCommandForwarder();
-    }
 }

@@ -45,10 +45,8 @@ public static class Config
         );
     }
 
-    public static IServiceCollection AddKafkaProducerAndConsumer(this IServiceCollection services)
-    {
-        return services
+    public static IServiceCollection AddKafkaProducerAndConsumer(this IServiceCollection services) =>
+        services
             .AddKafkaProducer()
             .AddKafkaConsumer();
-    }
 }

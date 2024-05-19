@@ -8,9 +8,7 @@ public static class Config
         this IServiceCollection services
     )
         where TQuery : notnull
-        where TQueryHandler : class, IQueryHandler<TQuery, TQueryResult>
-    {
-        return services.AddTransient<TQueryHandler>()
+        where TQueryHandler : class, IQueryHandler<TQuery, TQueryResult> =>
+        services.AddTransient<TQueryHandler>()
             .AddTransient<IQueryHandler<TQuery, TQueryResult>>(sp => sp.GetRequiredService<TQueryHandler>());
-    }
 }

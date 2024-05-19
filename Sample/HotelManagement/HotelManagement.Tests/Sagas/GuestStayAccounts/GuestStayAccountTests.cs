@@ -11,9 +11,8 @@ public partial class GuestStayAccountTests
     private readonly Guid guestStayAccountId = Guid.NewGuid();
     private readonly Faker faker = new();
 
-    private static GuestStayAccount Evolve(GuestStayAccount guestStayAccount, object @event)
-    {
-        return @event switch
+    private static GuestStayAccount Evolve(GuestStayAccount guestStayAccount, object @event) =>
+        @event switch
         {
             GuestCheckedIn guestCheckedIn => GuestStayAccount.Create(guestCheckedIn),
             ChargeRecorded chargeRecorded => guestStayAccount.Apply(chargeRecorded),
@@ -21,5 +20,4 @@ public partial class GuestStayAccountTests
             GuestCheckedOut guestCheckedOut => guestStayAccount.Apply(guestCheckedOut),
             _ => guestStayAccount
         };
-    }
 }
