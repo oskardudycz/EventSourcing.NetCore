@@ -14,15 +14,8 @@ public record ShoppingCartFinalized(
     DateTime FinalizedAt
 ): IExternalEvent
 {
-    public static ShoppingCartFinalized Create(
-        Guid cartId,
-        Guid clientId,
-        IReadOnlyList<PricedProductItem> productItems,
-        decimal totalPrice,
-        DateTime finalizedAt)
-    {
-        return new ShoppingCartFinalized(cartId, clientId, productItems, totalPrice, finalizedAt);
-    }
+    public static ShoppingCartFinalized Create(Guid cartId, Guid clientId, IReadOnlyList<PricedProductItem> productItems, decimal totalPrice, DateTime finalizedAt) =>
+        new(cartId, clientId, productItems, totalPrice, finalizedAt);
 }
 
 internal class HandleCartFinalized(

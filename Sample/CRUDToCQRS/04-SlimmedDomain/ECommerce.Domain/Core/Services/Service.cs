@@ -33,8 +33,6 @@ public abstract class Service<TEntity>(DbContext dbContext, IMapper mapper): ISe
         );
     }
 
-    public Task DeleteByIdAsync(Guid id, CancellationToken ct)
-    {
-        return dbContext.DeleteAndSaveChanges<TEntity>(id, ct);
-    }
+    public Task DeleteByIdAsync(Guid id, CancellationToken ct) =>
+        dbContext.DeleteAndSaveChanges<TEntity>(id, ct);
 }

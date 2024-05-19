@@ -9,10 +9,8 @@ public class PropagationContextJsonConverter: JsonConverter
     private const string TraceParentPropertyName = "traceparent";
     private const string TraceStatePropertyName = "tracestate";
 
-    public override bool CanConvert(Type objectType)
-    {
-        return objectType == typeof(PropagationContext) || objectType == typeof(PropagationContext?);
-    }
+    public override bool CanConvert(Type objectType) =>
+        objectType == typeof(PropagationContext) || objectType == typeof(PropagationContext?);
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {

@@ -41,18 +41,12 @@ public record ProductItem
         return From(ProductId, Quantity - productItem.Quantity);
     }
 
-    public bool MatchesProduct(ProductItem productItem)
-    {
-        return ProductId == productItem.ProductId;
-    }
+    public bool MatchesProduct(ProductItem productItem) =>
+        ProductId == productItem.ProductId;
 
-    public bool HasEnough(int quantity)
-    {
-        return Quantity >= quantity;
-    }
+    public bool HasEnough(int quantity) =>
+        Quantity >= quantity;
 
-    public bool HasTheSameQuantity(ProductItem productItem)
-    {
-        return Quantity == productItem.Quantity;
-    }
+    public bool HasTheSameQuantity(ProductItem productItem) =>
+        Quantity == productItem.Quantity;
 }

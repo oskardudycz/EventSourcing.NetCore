@@ -12,9 +12,8 @@ public class HealthCheckAnnotation(Func<IResource, CancellationToken, Task<IHeal
 {
     public Func<IResource, CancellationToken, Task<IHealthCheck?>> HealthCheckFactory { get; } = healthCheckFactory;
 
-    public static HealthCheckAnnotation Create(Func<string, IHealthCheck> connectionStringFactory)
-    {
-        return new(async (resource, token) =>
+    public static HealthCheckAnnotation Create(Func<string, IHealthCheck> connectionStringFactory) =>
+        new(async (resource, token) =>
         {
             if (resource is not IResourceWithConnectionString c)
             {
@@ -28,5 +27,4 @@ public class HealthCheckAnnotation(Func<IResource, CancellationToken, Task<IHeal
 
             return connectionStringFactory(cs);
         });
-    }
 }

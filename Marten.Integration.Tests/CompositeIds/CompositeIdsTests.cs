@@ -28,20 +28,14 @@ public class StronglyTypedValue<T>(T value): IEquatable<StronglyTypedValue<T>>
         return Equals((StronglyTypedValue<T>)obj);
     }
 
-    public override int GetHashCode()
-    {
-        return EqualityComparer<T>.Default.GetHashCode(Value);
-    }
+    public override int GetHashCode() =>
+        EqualityComparer<T>.Default.GetHashCode(Value);
 
-    public static bool operator ==(StronglyTypedValue<T>? left, StronglyTypedValue<T>? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(StronglyTypedValue<T>? left, StronglyTypedValue<T>? right) =>
+        Equals(left, right);
 
-    public static bool operator !=(StronglyTypedValue<T>? left, StronglyTypedValue<T>? right)
-    {
-        return !Equals(left, right);
-    }
+    public static bool operator !=(StronglyTypedValue<T>? left, StronglyTypedValue<T>? right) =>
+        !Equals(left, right);
 }
 
 public class ReservationId(Guid value): StronglyTypedValue<Guid>(value);
@@ -131,15 +125,13 @@ public class Reservation: Aggregate<ReservationId, Guid>
 
     public static Reservation CreateTentative(
         SeatId seatId,
-        CustomerId customerId)
-    {
-        return new Reservation(
+        CustomerId customerId) =>
+        new(
             new ReservationId(Guid.NewGuid()),
             seatId,
             customerId,
             new ReservationNumber(Guid.NewGuid().ToString())
         );
-    }
 
     private Reservation() { }
 

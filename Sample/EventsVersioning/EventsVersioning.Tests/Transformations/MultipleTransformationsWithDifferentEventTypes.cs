@@ -47,14 +47,12 @@ public class MultipleTransformationsWithDifferentEventTypes
 
     public static ShoppingCartInitializedWithStatus UpcastV2(
         ShoppingCartOpened oldEvent
-    )
-    {
-        return new ShoppingCartInitializedWithStatus(
+    ) =>
+        new(
             oldEvent.ShoppingCartId,
             oldEvent.Client,
             ShoppingCartStatus.Opened
         );
-    }
 
     public class EventTransformations
     {

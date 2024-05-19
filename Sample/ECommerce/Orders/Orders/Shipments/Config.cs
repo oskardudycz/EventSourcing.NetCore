@@ -6,8 +6,6 @@ namespace Orders.Shipments;
 
 internal static class ShipmentsConfig
 {
-    internal static IServiceCollection AddShipments(this IServiceCollection services)
-    {
-        return services.AddCommandHandler<SendPackage, HandleSendPackage>();
-    }
+    internal static IServiceCollection AddShipments(this IServiceCollection services) =>
+        services.AddCommandHandler<SendPackage, HandleSendPackage>();
 }

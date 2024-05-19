@@ -32,33 +32,25 @@ public class ProductsController(ProductService service, ProductReadOnlyService r
     public Task<IActionResult> UpdateAsync(
         [FromBody] UpdateProductRequest request,
         CancellationToken ct
-    )
-    {
-        return UpdateAsync<UpdateProductRequest>(
+    ) =>
+        UpdateAsync<UpdateProductRequest>(
             request,
             ct
         );
-    }
 
     [HttpDelete("{id:guid}")]
-    public new Task<IActionResult> DeleteByIdAsync([FromRoute] Guid id, CancellationToken ct)
-    {
-        return base.DeleteByIdAsync(id, ct);
-    }
+    public new Task<IActionResult> DeleteByIdAsync([FromRoute] Guid id, CancellationToken ct) =>
+        base.DeleteByIdAsync(id, ct);
 
     [HttpGet("{id}")]
-    public Task<ProductDetailsResponse> GetById(Guid id, CancellationToken ct)
-    {
-        return ReadOnlyService.GetByIdAsync<ProductDetailsResponse>(id, ct);
-    }
+    public Task<ProductDetailsResponse> GetById(Guid id, CancellationToken ct) =>
+        ReadOnlyService.GetByIdAsync<ProductDetailsResponse>(id, ct);
 
     [HttpGet]
     public Task<List<ProductShortInfoResponse>> Get(
         CancellationToken ct,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20
-    )
-    {
-        return ReadOnlyService.GetPagedAsync<ProductShortInfoResponse>(ct, pageNumber, pageSize);
-    }
+    ) =>
+        ReadOnlyService.GetPagedAsync<ProductShortInfoResponse>(ct, pageNumber, pageSize);
 }

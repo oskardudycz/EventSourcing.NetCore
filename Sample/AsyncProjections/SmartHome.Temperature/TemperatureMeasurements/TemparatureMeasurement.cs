@@ -16,12 +16,10 @@ public class TemperatureMeasurement: Aggregate
 
 
     public static TemperatureMeasurement Start(
-        Guid measurementId)
-    {
-        return new TemperatureMeasurement(
+        Guid measurementId) =>
+        new(
             measurementId
         );
-    }
 
     private TemperatureMeasurement(Guid measurementId)
     {

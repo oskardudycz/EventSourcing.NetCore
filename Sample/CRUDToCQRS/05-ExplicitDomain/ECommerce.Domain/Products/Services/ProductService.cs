@@ -10,9 +10,8 @@ public class ProductService(ECommerceDbContext dbContext)
     public Task CreateAsync(
         CreateProductRequest command,
         CancellationToken ct
-    )
-    {
-        return dbContext.AddAndSaveChanges(
+    ) =>
+        dbContext.AddAndSaveChanges(
             new Product
             {
                 Id = command.Id,
@@ -24,7 +23,6 @@ public class ProductService(ECommerceDbContext dbContext)
             },
             ct
         );
-    }
 
     public async Task UpdateAsync(
         UpdateProductRequest request,
@@ -46,8 +44,6 @@ public class ProductService(ECommerceDbContext dbContext)
         );
     }
 
-    public Task DeleteByIdAsync(Guid id, CancellationToken ct)
-    {
-        return dbContext.DeleteAndSaveChanges<Product>(id, ct);
-    }
+    public Task DeleteByIdAsync(Guid id, CancellationToken ct) =>
+        dbContext.DeleteAndSaveChanges<Product>(id, ct);
 }

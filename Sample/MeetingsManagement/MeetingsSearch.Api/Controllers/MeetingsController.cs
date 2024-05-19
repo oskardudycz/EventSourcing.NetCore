@@ -9,8 +9,6 @@ namespace MeetingsSearch.Api.Controllers;
 public class MeetingsController(IQueryBus queryBus): Controller
 {
     [HttpGet]
-    public Task<IReadOnlyCollection<Meeting>> Search([FromQuery]string filter)
-    {
-        return queryBus.Query<SearchMeetings, IReadOnlyCollection<Meeting>>(new SearchMeetings(filter));
-    }
+    public Task<IReadOnlyCollection<Meeting>> Search([FromQuery]string filter) =>
+        queryBus.Query<SearchMeetings, IReadOnlyCollection<Meeting>>(new SearchMeetings(filter));
 }

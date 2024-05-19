@@ -18,13 +18,11 @@ public class ChangedStructure
 
     public static ShoppingCartOpened Upcast(
         V1.ShoppingCartOpened oldEvent
-    )
-    {
-        return new ShoppingCartOpened(
+    ) =>
+        new(
             oldEvent.ShoppingCartId,
             new Client(oldEvent.ClientId)
         );
-    }
 
     public static ShoppingCartOpened Upcast(
         string oldEventJson

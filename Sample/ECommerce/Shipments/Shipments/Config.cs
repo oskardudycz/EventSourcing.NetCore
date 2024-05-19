@@ -10,17 +10,14 @@ namespace Shipments;
 
 public static class Config
 {
-    public static IServiceCollection AddShipmentsModule(this IServiceCollection services, IConfiguration config)
-    {
-        return services
+    public static IServiceCollection AddShipmentsModule(this IServiceCollection services, IConfiguration config) =>
+        services
             .AddEntityFramework(config)
             .AddPackages()
             .AddProducts();
-    }
 
-    private static IServiceCollection AddEntityFramework(this IServiceCollection services, IConfiguration config)
-    {
-        return services.AddDbContext<ShipmentsDbContext>(
+    private static IServiceCollection AddEntityFramework(this IServiceCollection services, IConfiguration config) =>
+        services.AddDbContext<ShipmentsDbContext>(
             options =>
             {
                 var schemaName = Environment.GetEnvironmentVariable("SchemaName")!;
@@ -29,7 +26,6 @@ public static class Config
                     $"{connectionString}; searchpath = {schemaName.ToLower()}",
                     x => x.MigrationsHistoryTable("__EFMigrationsHistory", schemaName.ToLower()));
             });
-    }
 
     public static void ConfigureShipmentsModule(this IApplicationBuilder app)
     {

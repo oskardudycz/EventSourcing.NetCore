@@ -11,12 +11,10 @@ public class NonDefaultConstructorMartenJsonNetContractResolver(
     NonPublicMembersStorage nonPublicMembersStorage = NonPublicMembersStorage.Default)
     : JsonNetContractResolver(casing, collectionStorage, nonPublicMembersStorage)
 {
-    protected override JsonObjectContract CreateObjectContract(Type objectType)
-    {
-        return JsonObjectContractProvider.UsingNonDefaultConstructor(
+    protected override JsonObjectContract CreateObjectContract(Type objectType) =>
+        JsonObjectContractProvider.UsingNonDefaultConstructor(
             base.CreateObjectContract(objectType),
             objectType,
             base.CreateConstructorParameters
         );
-    }
 }

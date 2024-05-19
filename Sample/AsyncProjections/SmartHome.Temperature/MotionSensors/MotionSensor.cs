@@ -11,10 +11,8 @@ public class MotionSensor: Aggregate
     public MotionSensor() { }
 
 
-    public static MotionSensor Install(Guid motionSensorId)
-    {
-        return new MotionSensor(motionSensorId, DateTime.UtcNow);
-    }
+    public static MotionSensor Install(Guid motionSensorId) =>
+        new(motionSensorId, DateTime.UtcNow);
 
     private MotionSensor(Guid motionSensorId, in DateTime installedAt)
     {

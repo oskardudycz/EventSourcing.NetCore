@@ -10,9 +10,8 @@ namespace Orders;
 
 public static class Config
 {
-    public static IServiceCollection AddOrdersModule(this IServiceCollection services, IConfiguration config)
-    {
-        return services
+    public static IServiceCollection AddOrdersModule(this IServiceCollection services, IConfiguration config) =>
+        services
             .AddSingleton(sp =>
                 config.GetRequiredConfig<ExternalServicesConfig>(ExternalServicesConfig.ConfigName)
             )
@@ -26,7 +25,6 @@ public static class Config
             .AddOrders()
             .AddPayments()
             .AddShipments();
-    }
 }
 
 public class ExternalServicesConfig

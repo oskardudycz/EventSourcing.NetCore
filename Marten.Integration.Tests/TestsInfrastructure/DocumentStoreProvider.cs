@@ -6,9 +6,8 @@ public static class DocumentStoreProvider
 {
     private const string SchemaName = "EventStore";
 
-    public static IDocumentStore Get(string connectionString, string? schemaName = null, Action<StoreOptions>? setOptions = null)
-    {
-        return DocumentStore.For(options =>
+    public static IDocumentStore Get(string connectionString, string? schemaName = null, Action<StoreOptions>? setOptions = null) =>
+        DocumentStore.For(options =>
         {
             options.Connection(connectionString);
             options.AutoCreateSchemaObjects = AutoCreate.All;
@@ -17,5 +16,4 @@ public static class DocumentStoreProvider
 
             setOptions?.Invoke(options);
         });
-    }
 }

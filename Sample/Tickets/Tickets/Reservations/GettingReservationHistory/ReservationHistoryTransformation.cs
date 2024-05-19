@@ -15,39 +15,31 @@ public record ReservationHistory(
 
 public class ReservationHistoryTransformation: EventProjection
 {
-    public ReservationHistory Transform(IEvent<TentativeReservationCreated> input)
-    {
-        return new(
+    public ReservationHistory Transform(IEvent<TentativeReservationCreated> input) =>
+        new(
             Guid.NewGuid(),
             input.Data.ReservationId,
             $"Created tentative reservation with number {input.Data.Number}"
         );
-    }
 
-    public ReservationHistory Transform(IEvent<ReservationSeatChanged> input)
-    {
-        return new(
+    public ReservationHistory Transform(IEvent<ReservationSeatChanged> input) =>
+        new(
             Guid.NewGuid(),
             input.Data.ReservationId,
             $"Updated reservation seat to {input.Data.SeatId}"
         );
-    }
 
-    public ReservationHistory Transform(IEvent<ReservationConfirmed> input)
-    {
-        return new(
+    public ReservationHistory Transform(IEvent<ReservationConfirmed> input) =>
+        new(
             Guid.NewGuid(),
             input.Data.ReservationId,
             "Confirmed Reservation"
         );
-    }
 
-    public ReservationHistory Transform(IEvent<ReservationCancelled> input)
-    {
-        return new(
+    public ReservationHistory Transform(IEvent<ReservationCancelled> input) =>
+        new(
             Guid.NewGuid(),
             input.Data.ReservationId,
             "Cancelled Reservation"
         );
-    }
 }

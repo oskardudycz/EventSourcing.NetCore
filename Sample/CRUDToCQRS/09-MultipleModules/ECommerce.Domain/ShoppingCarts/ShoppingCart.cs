@@ -137,14 +137,10 @@ public class ShoppingCart
         return @event;
     }
 
-    private void Apply(ShoppingCartCanceled @event)
-    {
+    private void Apply(ShoppingCartCanceled @event) =>
         Status = ShoppingCartStatus.Canceled;
-    }
 
-    private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)
-    {
-        return ProductItems
+    private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem) =>
+        ProductItems
             .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));
-    }
 }

@@ -6,10 +6,8 @@ public static class QueryableExtensions
         this IQueryable<TEntity> query,
         int pageNumber = 1,
         int pageSize = 20
-    )
-    {
-        return query
+    ) =>
+        query
             .Skip(pageNumber * pageSize)
             .Take(pageSize);
-    }
 }

@@ -217,9 +217,8 @@ public record ShoppingCart(
     Dictionary<ProductId, Quantity> ProductItems
 )
 {
-    public static ShoppingCart Evolve(ShoppingCart entity, object @event)
-    {
-        return @event switch
+    public static ShoppingCart Evolve(ShoppingCart entity, object @event) =>
+        @event switch
         {
             ShoppingCartOpened (var cartId, var clientId) =>
                 new ShoppingCart(cartId, clientId, ShoppingCartStatus.Pending, new Dictionary<ProductId, Quantity>()),
@@ -237,7 +236,6 @@ public record ShoppingCart(
                 entity with { Status = ShoppingCartStatus.Canceled },
             _ => entity
         };
-    }
 
     public static ShoppingCart Default =>
         new(ShoppingCartId.Unknown, ClientId.Unknown, default, new Dictionary<ProductId, Quantity>());
@@ -266,9 +264,8 @@ public static class ProductItemsExtensions
 
 public class ShoppingCartEventsSerde
 {
-    public (string EventType, JsonObject Data) Serialize(ShoppingCartEvent @event)
-    {
-        return @event switch
+    public (string EventType, JsonObject Data) Serialize(ShoppingCartEvent @event) =>
+        @event switch
         {
             ShoppingCartOpened e =>
                 ("shopping_cart_opened",
@@ -308,7 +305,6 @@ public class ShoppingCartEventsSerde
                 ),
             _ => throw new InvalidOperationException()
         };
-    }
 
     public ShoppingCartEvent Deserialize(string eventType, JsonDocument document)
     {

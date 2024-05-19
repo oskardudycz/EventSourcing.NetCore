@@ -17,29 +17,23 @@ public record PricedProductItem
         UnitPrice = unitPrice;
     }
 
-    public static PricedProductItem Create(Guid? productId, int? quantity, decimal? unitPrice)
-    {
-        return Create(
+    public static PricedProductItem Create(Guid? productId, int? quantity, decimal? unitPrice) =>
+        Create(
             ProductItem.From(productId, quantity),
             unitPrice
         );
-    }
 
-    public static PricedProductItem Create(ProductItem productItem, decimal? unitPrice)
-    {
-        return unitPrice switch
+    public static PricedProductItem Create(ProductItem productItem, decimal? unitPrice) =>
+        unitPrice switch
         {
             null => throw new ArgumentNullException(nameof(unitPrice)),
             <= 0 => throw new ArgumentOutOfRangeException(nameof(unitPrice),
                 "Unit price has to be positive number"),
             _ => new PricedProductItem(productItem, unitPrice.Value)
         };
-    }
 
-    public bool MatchesProductAndPrice(PricedProductItem pricedProductItem)
-    {
-        return ProductId == pricedProductItem.ProductId && UnitPrice == pricedProductItem.UnitPrice;
-    }
+    public bool MatchesProductAndPrice(PricedProductItem pricedProductItem) =>
+        ProductId == pricedProductItem.ProductId && UnitPrice == pricedProductItem.UnitPrice;
 
     public PricedProductItem MergeWith(PricedProductItem pricedProductItem)
     {
@@ -57,13 +51,9 @@ public record PricedProductItem
         return new PricedProductItem(ProductItem.Subtract(pricedProductItem.ProductItem), UnitPrice);
     }
 
-    public bool HasEnough(int quantity)
-    {
-        return ProductItem.HasEnough(quantity);
-    }
+    public bool HasEnough(int quantity) =>
+        ProductItem.HasEnough(quantity);
 
-    public bool HasTheSameQuantity(PricedProductItem pricedProductItem)
-    {
-        return ProductItem.HasTheSameQuantity(pricedProductItem.ProductItem);
-    }
+    public bool HasTheSameQuantity(PricedProductItem pricedProductItem) =>
+        ProductItem.HasTheSameQuantity(pricedProductItem.ProductItem);
 }

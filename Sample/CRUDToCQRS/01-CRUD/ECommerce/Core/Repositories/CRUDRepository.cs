@@ -43,18 +43,12 @@ public class CRUDRepository<TEntity>: ICRUDRepository<TEntity>
         return entry.Entity;
     }
 
-    public ValueTask<TEntity?> FindByIdAsync(Guid id, CancellationToken ct)
-    {
-        return dbContext.Set<TEntity>().FindAsync([id], ct);
-    }
+    public ValueTask<TEntity?> FindByIdAsync(Guid id, CancellationToken ct) =>
+        dbContext.Set<TEntity>().FindAsync([id], ct);
 
-    public Task SaveChangesAsync(CancellationToken ct)
-    {
-        return dbContext.SaveChangesAsync(ct);
-    }
+    public Task SaveChangesAsync(CancellationToken ct) =>
+        dbContext.SaveChangesAsync(ct);
 
-    public IQueryable<TEntity> Query()
-    {
-        return dbContext.Set<TEntity>();
-    }
+    public IQueryable<TEntity> Query() =>
+        dbContext.Set<TEntity>();
 }

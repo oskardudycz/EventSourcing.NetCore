@@ -50,9 +50,8 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         return true;
     }
 
-    public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null)
-    {
-        return databaseConnection.QuerySingle<bool>(
+    public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null) =>
+        databaseConnection.QuerySingle<bool>(
             "SELECT append_event(@Id, @Data::jsonb, @Type, @StreamId, @StreamType, @ExpectedVersion)",
             new
             {
@@ -65,7 +64,6 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
             },
             commandType: CommandType.Text
         );
-    }
 
     public T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
         where T : notnull

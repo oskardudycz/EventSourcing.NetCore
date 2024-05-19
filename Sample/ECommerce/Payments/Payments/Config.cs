@@ -7,15 +7,13 @@ namespace Payments;
 
 public static class Config
 {
-    public static IServiceCollection AddPaymentsModule(this IServiceCollection services, IConfiguration config)
-    {
-        return services.AddMarten(config, options =>
-        {
-            options.ConfigurePayments();
-            options.DisableNpgsqlLogging = true;
-        })
-        .UseNpgsqlDataSource()
-        .Services
-        .AddPayments();
-    }
+    public static IServiceCollection AddPaymentsModule(this IServiceCollection services, IConfiguration config) =>
+        services.AddMarten(config, options =>
+            {
+                options.ConfigurePayments();
+                options.DisableNpgsqlLogging = true;
+            })
+            .UseNpgsqlDataSource()
+            .Services
+            .AddPayments();
 }

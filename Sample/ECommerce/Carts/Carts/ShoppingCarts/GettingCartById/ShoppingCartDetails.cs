@@ -69,21 +69,15 @@ public class ShoppingCartDetails
         );
     }
 
-    public void Apply(ShoppingCartConfirmed @event)
-    {
+    public void Apply(ShoppingCartConfirmed @event) =>
         Status = ShoppingCartStatus.Confirmed;
-    }
 
-    public void Apply(ShoppingCartCanceled @event)
-    {
+    public void Apply(ShoppingCartCanceled @event) =>
         Status = ShoppingCartStatus.Canceled;
-    }
 
-    private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem)
-    {
-        return ProductItems
+    private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem) =>
+        ProductItems
             .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));
-    }
 }
 
 public class CartDetailsProjection : SingleStreamProjection<ShoppingCartDetails>

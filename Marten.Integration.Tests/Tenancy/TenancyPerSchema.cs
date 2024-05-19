@@ -16,15 +16,13 @@ public class TenancyPerSchemaStoreFactory(Action<string, StoreOptions> configure
 {
     private readonly ConcurrentDictionary<string, DocumentStore> stores = new ();
 
-    public IDocumentStore Get(string? tenant)
-    {
-        return stores.GetOrAdd(tenant ?? "NO-TENANT", tenantId =>
+    public IDocumentStore Get(string? tenant) =>
+        stores.GetOrAdd(tenant ?? "NO-TENANT", tenantId =>
         {
             var storeOptions = new StoreOptions();
             configure.Invoke(tenantId, storeOptions);
             return new DocumentStore(storeOptions);
         });
-    }
 
     public void Dispose()
     {
@@ -46,15 +44,11 @@ public class TenancyPerSchemaSessionFactory(
     DummyTenancyContext tenancyContext)
     : ISessionFactory
 {
-    public IQuerySession QuerySession()
-    {
-        return storeFactory.Get(tenancyContext.TenantId).QuerySession();
-    }
+    public IQuerySession QuerySession() =>
+        storeFactory.Get(tenancyContext.TenantId).QuerySession();
 
-    public IDocumentSession OpenSession()
-    {
-        return storeFactory.Get(tenancyContext.TenantId).LightweightSession(IsolationLevel.Serializable);
-    }
+    public IDocumentSession OpenSession() =>
+        storeFactory.Get(tenancyContext.TenantId).LightweightSession(IsolationLevel.Serializable);
 }
 
 public record TestDocumentForTenancy(

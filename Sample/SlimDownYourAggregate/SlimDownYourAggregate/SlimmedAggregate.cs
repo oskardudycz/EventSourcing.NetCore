@@ -41,9 +41,8 @@ public static class ChemicalReactionModelExtensions
         };
 
 
-    public static ChemicalReactionModel Evolve(this ChemicalReactionModel model, ChemicalReactionEvent @event)
-    {
-        return @event switch
+    public static ChemicalReactionModel Evolve(this ChemicalReactionModel model, ChemicalReactionEvent @event) =>
+        @event switch
         {
             ChemicalReactionEvent.Initiated initiated =>
                 new ChemicalReactionModel(initiated.Id, initiated.Participants, ReactionState.NotStarted),
@@ -56,7 +55,6 @@ public static class ChemicalReactionModelExtensions
 
             _ => throw new ArgumentOutOfRangeException(nameof(@event), @event, null)
         };
-    }
 }
 
 public record ReactionParticipantModel(
@@ -104,9 +102,8 @@ public abstract record ChemicalReactionEvent
 
 public static class ChemicalReactionService
 {
-    public static ChemicalReactionEvent Decide(ChemicalReactionCommand command, ChemicalReaction state)
-    {
-        return command switch
+    public static ChemicalReactionEvent Decide(ChemicalReactionCommand command, ChemicalReaction state) =>
+        command switch
         {
             ChemicalReactionCommand.Initiate initiate =>
                 state is ChemicalReaction.NotInitiated
@@ -122,7 +119,6 @@ public static class ChemicalReactionService
                     : throw new InvalidOperationException(),
             _ => throw new ArgumentOutOfRangeException(nameof(command))
         };
-    }
 }
 
 public abstract record ChemicalReaction

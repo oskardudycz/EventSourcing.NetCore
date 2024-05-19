@@ -89,15 +89,10 @@ public abstract class IntegrationContext(AppFixture fixture): IAsyncLifetime
     // This is required because of the IAsyncLifetime
     // interface. Note that I do *not* tear down database
     // state after the test. That's purposeful
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
+    public Task DisposeAsync() => Task.CompletedTask;
 
-    public async Task<IScenarioResult> Scenario(Action<Scenario> configure)
-    {
-        return await Host.Scenario(configure);
-    }
+    public async Task<IScenarioResult> Scenario(Action<Scenario> configure) =>
+        await Host.Scenario(configure);
 
     // This method allows us to make HTTP calls into our system
     // in memory with Alba, but do so within Wolverine's test support

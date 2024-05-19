@@ -12,9 +12,7 @@ public record GetReservationById(
 internal class HandleGetReservationById(IDocumentSession querySession):
     IQueryHandler<GetReservationById, ReservationDetails>
 {
-    public async Task<ReservationDetails> Handle(GetReservationById request, CancellationToken cancellationToken)
-    {
-        return await querySession.LoadAsync<ReservationDetails>(request.ReservationId, cancellationToken)
-               ?? throw AggregateNotFoundException.For<ReservationDetails>(request.ReservationId);
-    }
+    public async Task<ReservationDetails> Handle(GetReservationById request, CancellationToken cancellationToken) =>
+        await querySession.LoadAsync<ReservationDetails>(request.ReservationId, cancellationToken)
+        ?? throw AggregateNotFoundException.For<ReservationDetails>(request.ReservationId);
 }

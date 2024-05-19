@@ -12,18 +12,14 @@ public class Database
         storage[GetId<T>(id)] = obj;
     }
 
-    public void Delete<T>(Guid id)
-    {
+    public void Delete<T>(Guid id) =>
         storage.Remove(GetId<T>(id));
-    }
 
-    public T? Get<T>(Guid id) where T : class, IVersioned
-    {
-        return storage.TryGetValue(GetId<T>(id), out var result) ?
+    public T? Get<T>(Guid id) where T : class, IVersioned =>
+        storage.TryGetValue(GetId<T>(id), out var result) ?
             // Clone to simulate getting new instance on loading
             JsonSerializer.Deserialize<T>(JsonSerializer.Serialize((T)result))
             : null;
-    }
 
     private static string GetId<T>(Guid id) => $"{typeof(T).Name}-{id}";
 }

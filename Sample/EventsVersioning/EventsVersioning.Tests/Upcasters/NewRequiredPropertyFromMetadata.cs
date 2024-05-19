@@ -19,14 +19,12 @@ public class NewRequiredPropertyFromMetadata
     public static ShoppingCartOpened Upcast(
         V1.ShoppingCartOpened oldEvent,
         EventMetadata eventMetadata
-    )
-    {
-        return new ShoppingCartOpened(
+    ) =>
+        new(
             oldEvent.ShoppingCartId,
             oldEvent.ClientId,
             eventMetadata.UserId
         );
-    }
 
     public static ShoppingCartOpened Upcast(
         string oldEventJson,

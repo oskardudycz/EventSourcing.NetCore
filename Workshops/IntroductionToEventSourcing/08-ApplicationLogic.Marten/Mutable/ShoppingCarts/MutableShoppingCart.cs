@@ -74,14 +74,8 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
         }
     }
 
-    public static MutableShoppingCart Open(
-        Guid cartId,
-        Guid clientId,
-        DateTimeOffset now
-    )
-    {
-        return new MutableShoppingCart(cartId, clientId, now);
-    }
+    public static MutableShoppingCart Open(Guid cartId, Guid clientId, DateTimeOffset now) =>
+        new(cartId, clientId, now);
 
     public static MutableShoppingCart Initial() => new();
 

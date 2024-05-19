@@ -30,16 +30,11 @@ public abstract class Repository<TEntity>(DbContext dbContext): IRepository<TEnt
         dbContext.Remove(entity);
     }
 
-    public ValueTask<TEntity?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        return dbContext.Set<TEntity>().FindAsync(
+    public ValueTask<TEntity?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
+        dbContext.Set<TEntity>().FindAsync(
             [id],
             cancellationToken: cancellationToken
         );
-    }
 
-    public Task SaveChangesAsync(CancellationToken ct)
-    {
-        return dbContext.SaveChangesAsync(ct);
-    }
+    public Task SaveChangesAsync(CancellationToken ct) => dbContext.SaveChangesAsync(ct);
 }

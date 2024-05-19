@@ -36,10 +36,8 @@ public class PostgresSchemaProvider(NpgsqlConnection databaseConnection)
     /// </summary>
     /// <param name="functionName">function name</param>
     /// <returns></returns>
-    public bool FunctionExists(string functionName)
-    {
-        return databaseConnection.QuerySingle<bool>(FunctionExistsSql, new {functionName});
-    }
+    public bool FunctionExists(string functionName) =>
+        databaseConnection.QuerySingle<bool>(FunctionExistsSql, new {functionName});
 }
 
 /// <summary>
@@ -57,10 +55,8 @@ public class Table(string name, IEnumerable<Column> columns)
     /// </summary>
     private IEnumerable<Column> Columns { get; } = columns;
 
-    public Column? GetColumn(string columnName)
-    {
-        return Columns.SingleOrDefault(column => column.Name == columnName);
-    }
+    public Column? GetColumn(string columnName) =>
+        Columns.SingleOrDefault(column => column.Name == columnName);
 }
 
 /// <summary>

@@ -22,8 +22,6 @@ public class PagedListResponse<T>
 
 public static class PagedListResponse
 {
-    public static PagedListResponse<T> From<T>(IPagedList<T> pagedList)
-    {
-        return new PagedListResponse<T>(pagedList, pagedList.TotalItemCount, pagedList.HasNextPage);
-    }
+    public static PagedListResponse<T> From<T>(IPagedList<T> pagedList) =>
+        new(pagedList, pagedList.TotalItemCount, pagedList.HasNextPage);
 }
