@@ -2,6 +2,8 @@ using Core.BackgroundWorkers;
 using Core.Configuration;
 using Core.Events;
 using Core.EventStoreDB.Subscriptions;
+using Core.EventStoreDB.Subscriptions.Batch;
+using Core.EventStoreDB.Subscriptions.Checkpoints;
 using Core.OpenTelemetry;
 using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,10 +60,13 @@ public static class EventStoreDBConfigExtensions
         EventStoreDBSubscriptionToAllOptions subscriptionOptions,
         bool checkpointToEventStoreDB = true)
     {
+        services.AddScoped<EventsBatchProcessor, EventsBatchProcessor>();
+        services.AddScoped<EventsBatchCheckpointer, EventsBatchCheckpointer>();
+
         if (checkpointToEventStoreDB)
         {
             services
-                .AddTransient<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
+                .AddSingleton<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
         }
 
         return services.AddHostedService(serviceProvider =>
