@@ -49,19 +49,8 @@ public class PropagationContextJsonConverter: JsonConverter
         return parentContext;
     }
 
-    private static IEnumerable<string> ExtractTraceContextFromEventMetadata(Dictionary<string, string?> headers,
-        string key)
-    {
-        try
-        {
-            return headers.TryGetValue(key, out var value) && value != null
-                ? new[] { value }
-                : Enumerable.Empty<string>();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to extract trace context: {ex}");
-            return Enumerable.Empty<string>();
-        }
-    }
+    private static IEnumerable<string> ExtractTraceContextFromEventMetadata(Dictionary<string, string?> headers, string key) =>
+        headers.TryGetValue(key, out var value) && value != null
+            ? new[] { value }
+            : Enumerable.Empty<string>();
 }
