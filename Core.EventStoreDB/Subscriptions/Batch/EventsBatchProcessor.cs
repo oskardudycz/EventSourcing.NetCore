@@ -10,8 +10,7 @@ namespace Core.EventStoreDB.Subscriptions.Batch;
 
 public class EventsBatchProcessor(
     EventTypeMapper eventTypeMapper,
-    IEventBus eventBus,
-    IActivityScope activityScope,
+    IEventBatchHandler batchHandler,
     ILogger<EventsBatchProcessor> logger
 )
 {
@@ -24,11 +23,7 @@ public class EventsBatchProcessor(
         var events = TryDeserializeEvents(resolvedEvents, options.IgnoreDeserializationErrors);
         ulong? lastPosition = null;
 
-        foreach (var @event in events)
-        {
-            await HandleEvent(@event, ct).ConfigureAwait(false);
-            lastPosition = @event.Metadata.LogPosition;
-        }
+        await batchHandler.Handle(events, ct).ConfigureAwait(false);
 
         return lastPosition;
     }
@@ -67,38 +62,6 @@ public class EventsBatchProcessor(
         }
 
         return result.ToArray();
-    }
-
-    private async Task HandleEvent(
-        IEventEnvelope eventEnvelope,
-        CancellationToken token
-    )
-    {
-        try
-        {
-            await activityScope.Run($"{nameof(EventStoreDBSubscriptionToAll)}/{nameof(HandleEvent)}",
-                async (_, ct) =>
-                {
-                    // publish event to internal event bus
-                    await eventBus.Publish(eventEnvelope, ct).ConfigureAwait(false);
-                },
-                new StartActivityOptions
-                {
-                    Tags = { { TelemetryTags.EventHandling.Event, eventEnvelope.Data.GetType() } },
-                    Parent = eventEnvelope.Metadata.PropagationContext?.ActivityContext,
-                    Kind = ActivityKind.Consumer
-                },
-                token
-            ).ConfigureAwait(false);
-        }
-        catch (Exception e)
-        {
-            logger.LogError("Error consuming message: {ExceptionMessage}{ExceptionStackTrace}", e.Message,
-                e.StackTrace);
-            // if you're fine with dropping some events instead of stopping subscription
-            // then you can add some logic if error should be ignored
-            throw;
-        }
     }
 
     private bool IsEventWithEmptyData(ResolvedEvent resolvedEvent)

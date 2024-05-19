@@ -9,8 +9,6 @@ using EventTypeFilter = EventStore.Client.EventTypeFilter;
 
 namespace Core.EventStoreDB.Subscriptions;
 
-using static ISubscriptionCheckpointRepository;
-
 public class EventStoreDBSubscriptionToAllOptions
 {
     public required string SubscriptionId { get; init; }

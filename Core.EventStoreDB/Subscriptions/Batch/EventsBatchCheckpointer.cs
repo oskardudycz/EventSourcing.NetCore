@@ -1,10 +1,7 @@
 using Core.EventStoreDB.Subscriptions.Checkpoints;
-using Core.Extensions;
 using EventStore.Client;
 
 namespace Core.EventStoreDB.Subscriptions.Batch;
-
-using static EventStoreClient;
 
 public class EventsBatchCheckpointer(
     ISubscriptionCheckpointRepository checkpointRepository,
