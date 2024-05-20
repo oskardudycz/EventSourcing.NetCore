@@ -1,4 +1,5 @@
 using Core.EventStoreDB.Subscriptions.Checkpoints;
+using Core.Testing.Fixtures;
 using Xunit;
 
 namespace Core.EventStoreDB.Tests.Subscriptions.Checkpoints;

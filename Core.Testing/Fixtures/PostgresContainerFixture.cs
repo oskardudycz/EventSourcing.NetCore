@@ -2,7 +2,7 @@ using Npgsql;
 using Testcontainers.PostgreSql;
 using Xunit;
 
-namespace Core.EventStoreDB.Tests.Subscriptions.Checkpoints;
+namespace Core.Testing.Fixtures;
 
 public class PostgresContainerFixture: IAsyncLifetime
 {
@@ -14,14 +14,13 @@ public class PostgresContainerFixture: IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await container.StartAsync();
+        await container.StartAsync().ConfigureAwait(false);
         DataSource = new NpgsqlDataSourceBuilder(container.GetConnectionString()).Build();
     }
 
     public async Task DisposeAsync()
     {
-        await DataSource.DisposeAsync();
-        await container.StopAsync();
+        await DataSource.DisposeAsync().ConfigureAwait(false);
+        await container.StopAsync().ConfigureAwait(false);
     }
-
 }
