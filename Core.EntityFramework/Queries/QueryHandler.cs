@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ECommerce.Core.Queries;
+namespace Core.EntityFramework.Queries;
 
 public static class QueryHandler
 {

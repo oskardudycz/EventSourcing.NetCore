@@ -1,3 +1,4 @@
+using System.Data.Common;
 using Npgsql;
 
 namespace Core.EventStoreDB.Subscriptions.Checkpoints;
@@ -118,6 +119,45 @@ public class PostgresSubscriptionCheckpointRepository(
         SET "position" = NULL
         WHERE "id" = $1;
         """;
+}
+
+public interface ICheckpointTransaction
+{
+    Task Commit(CancellationToken cancellationToken = default);
+
+    Task Rollback(CancellationToken cancellationToken = default);
+}
+
+public class TransactionalPostgresSubscriptionCheckpointRepository(
+    PostgresSubscriptionCheckpointRepository inner,
+    ICheckpointTransaction checkpointTransaction
+): ISubscriptionCheckpointRepository
+{
+    public ValueTask<Checkpoint> Load(string subscriptionId, CancellationToken ct) =>
+        inner.Load(subscriptionId, ct);
+
+    public async ValueTask<StoreResult> Store(
+        string subscriptionId,
+        ulong position,
+        Checkpoint previousCheckpoint,
+        CancellationToken ct
+    )
+    {
+        var result = await inner.Store(subscriptionId, position, previousCheckpoint, ct).ConfigureAwait(false);
+
+        if (result is not StoreResult.Success)
+        {
+            await checkpointTransaction.Rollback(ct).ConfigureAwait(false);
+            return result;
+        }
+
+        await checkpointTransaction.Commit(ct).ConfigureAwait(false);
+
+        return result;
+    }
+
+    public ValueTask<Checkpoint> Reset(string subscriptionId, CancellationToken ct) =>
+        inner.Reset(subscriptionId, ct);
 }
 
 public class PostgresSubscriptionCheckpointSetup(NpgsqlDataSource dataSource)

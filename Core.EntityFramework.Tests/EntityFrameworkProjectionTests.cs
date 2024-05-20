@@ -1,3 +1,4 @@
+using Core.EntityFramework.Projections;
 using Core.EntityFramework.Tests.Fixtures;
 using Core.Events;
 using FluentAssertions;

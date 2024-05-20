@@ -9,6 +9,8 @@ using EventTypeFilter = EventStore.Client.EventTypeFilter;
 
 namespace Core.EventStoreDB.Subscriptions;
 
+using static ISubscriptionCheckpointRepository;
+
 public class EventStoreDBSubscriptionToAllOptions
 {
     public required string SubscriptionId { get; init; }
@@ -56,9 +58,22 @@ public class EventStoreDBSubscriptionToAll(
 
             logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
 
-            await foreach (var events in subscription.BatchAsync(subscriptionOptions.BatchSize, ct).ConfigureAwait(false))
+            await foreach (var events in subscription.BatchAsync(subscriptionOptions.BatchSize, ct)
+                               .ConfigureAwait(false))
             {
-                checkpoint = await ProcessBatch(events, checkpoint, subscriptionOptions, ct).ConfigureAwait(false);
+                var result = await ProcessBatch(events, checkpoint, subscriptionOptions, ct).ConfigureAwait(false);
+
+                switch (result)
+                {
+                    case StoreResult.Success success:
+                        checkpoint = success.Checkpoint;
+                        break;
+                    case StoreResult.Ignored ignored:
+                        break;
+                    default:
+                        throw new InvalidOperationException(
+                            "Checkpoint mismatch, ensure that you have a single subscription running!");
+                }
             }
         }
         catch (RpcException rpcException) when (rpcException is { StatusCode: StatusCode.Cancelled } ||
@@ -87,14 +102,14 @@ public class EventStoreDBSubscriptionToAll(
         return scope.ServiceProvider.GetRequiredService<ISubscriptionCheckpointRepository>().Load(SubscriptionId, ct);
     }
 
-    private Task<Checkpoint> ProcessBatch(
+    private Task<StoreResult> ProcessBatch(
         ResolvedEvent[] events,
         Checkpoint lastCheckpoint,
         EventStoreDBSubscriptionToAllOptions subscriptionOptions,
         CancellationToken ct)
     {
         using var scope = serviceProvider.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<EventsBatchCheckpointer>()
+        return scope.ServiceProvider.GetRequiredService<IEventsBatchCheckpointer>()
             .Process(events, lastCheckpoint, subscriptionOptions, ct);
     }
 }

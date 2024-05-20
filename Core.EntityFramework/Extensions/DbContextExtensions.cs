@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Core.EntityFramework;
+namespace Core.EntityFramework.Extensions;
 
 public static class DbContextExtensions
 {

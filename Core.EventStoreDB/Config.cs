@@ -61,7 +61,7 @@ public static class EventStoreDBConfigExtensions
         bool checkpointToEventStoreDB = true)
     {
         services.AddScoped<EventsBatchProcessor, EventsBatchProcessor>();
-        services.AddScoped<EventsBatchCheckpointer, EventsBatchCheckpointer>();
+        services.AddScoped<IEventsBatchCheckpointer, EventsBatchCheckpointer>();
 
         if (checkpointToEventStoreDB)
         {
