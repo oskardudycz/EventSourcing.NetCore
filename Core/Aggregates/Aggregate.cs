@@ -18,11 +18,11 @@ public abstract class Aggregate<TEvent, TId>: IAggregate<TEvent>
 
     public object[] DequeueUncommittedEvents()
     {
-        var dequeuedEvents = uncommittedEvents.ToArray();
+        var dequeuedEvents = uncommittedEvents.Cast<object>().ToArray();;
 
         uncommittedEvents.Clear();
 
-        return dequeuedEvents.Cast<object>().ToArray();
+        return dequeuedEvents;
     }
 
     protected void Enqueue(TEvent @event)
