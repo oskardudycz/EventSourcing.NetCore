@@ -35,7 +35,7 @@ public class EntityFrameworkProjection<TDbContext>: IEventBatchHandler
 
 public class EntityFrameworkProjection<TView, TId, TDbContext>: EntityFrameworkProjection<TDbContext>
     where TView : class
-    where TId: struct
+    where TId : struct
     where TDbContext : DbContext
 {
     private record ProjectEvent(
@@ -97,47 +97,58 @@ public class EntityFrameworkProjection<TView, TId, TDbContext>: EntityFrameworkP
         Projects<TEvent>();
     }
 
+    protected TView? Apply(TView document, object @event) =>
+        projectors[@event.GetType()].Apply(document, @event);
+
+    protected TId? GetViewId(object @event) =>
+        projectors[@event.GetType()].GetId(@event);
+
     protected override Task ApplyAsync(object[] events, CancellationToken token) =>
         RetryPolicy.ExecuteAsync(async ct =>
         {
             var dbSet = DbContext.Set<TView>();
 
-            var ids = events.Select(GetViewId).ToList();
+            var eventWithViewIds = events.Select(e => (Event: e, ViewId: GetViewId(e))).ToList();
+            var ids = eventWithViewIds.Where(e => e.ViewId.HasValue).Select(e => e.ViewId!.Value).ToList();
 
-            var idPredicate = GetContainsExpression(ids.Where(e => e.HasValue).Cast<TId>().ToList());
+            var existingViews = await GetExistingViews(dbSet, ids, ct);
 
-            var existingViews = await dbSet
-                .Where(idPredicate)
-                .ToDictionaryAsync(viewId, ct);
-
-            for (var i = 0; i < events.Length; i++)
+            foreach (var (@event, id) in eventWithViewIds)
             {
-                var id = ids[i];
-
-                var current = id.HasValue && existingViews.TryGetValue(id.Value, out var existing) ? existing : null;
-
-                var result = Apply(current ?? GetDefault(events[i]), events[i]);
-
-                if (result == null)
-                {
-                    if (current != null)
-                        dbSet.Remove(current);
-                }
-                else if (current == null)
-                    dbSet.Add(result);
-                else
-                    dbSet.Update(result);
+                ProcessEvent(@event, id, existingViews, dbSet);
             }
         }, token);
+
+
+    private void ProcessEvent(object @event, TId? id, Dictionary<TId, TView> existingViews, DbSet<TView> dbSet)
+    {
+        var current = id.HasValue && existingViews.TryGetValue(id.Value, out var existing) ? existing : null;
+
+        var result = Apply(current ?? GetDefault(@event), @event);
+
+        if (result == null)
+        {
+            if (current != null)
+                dbSet.Remove(current);
+
+            return;
+        }
+
+        DbContext.AddOrUpdate(result);
+
+        if (current == null)
+            existingViews.Add(viewId(result), result);
+    }
 
     protected virtual TView GetDefault(object @event) =>
         ObjectFactory<TView>.GetDefaultOrUninitialized();
 
-    private TView? Apply(TView document, object @event) =>
-        projectors[@event.GetType()].Apply(document, @event);
+    private Expression<Func<TView, bool>> BuildContainsExpression(List<TId> ids) =>
+        GetContainsExpression(ids);
 
-    private TId? GetViewId(object @event) =>
-        projectors[@event.GetType()].GetId(@event);
+    private async Task<Dictionary<TId, TView>>
+        GetExistingViews(DbSet<TView> dbSet, List<TId> ids, CancellationToken ct) =>
+        await dbSet.Where(BuildContainsExpression(ids)).ToDictionaryAsync(viewId, ct);
 
     private Expression<Func<TView, bool>> GetContainsExpression(List<TId> ids)
     {
