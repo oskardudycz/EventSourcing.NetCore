@@ -24,7 +24,7 @@ public static class ElasticSearchRepository
         var indexType = typeof(TIndex);
         return TypeNameMap.GetOrAdd(indexType, _ =>
         {
-            var modulePrefix = indexType.Namespace!.Split(".").First();
+            var modulePrefix = indexType.Namespace!.Split('.').First();
             return $"{modulePrefix}-{indexType.Name}".ToLower();
         });
     }
