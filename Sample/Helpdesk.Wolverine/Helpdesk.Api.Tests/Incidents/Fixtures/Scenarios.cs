@@ -150,7 +150,7 @@ public static class Scenarios
     {
         response.Url.Should().StartWith(urlPrefix);
 
-        var uri = new Uri(response.Url.Split("?")[0]);
+        var uri = new Uri(response.Url.Split('?')[0]);
         var createdId = uri.Segments.Last();
 
         if (!Guid.TryParse(createdId, out var guid))
