@@ -1,6 +1,7 @@
-﻿using Core.Events;
+﻿using System.Linq.Expressions;
+using Core.EntityFramework;
+using Core.Events;
 using Core.Projections;
-using ECommerce.Core.Queries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,71 +9,6 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace ECommerce.Core.Projections;
-
-public static class EntityFrameworkProjection
-{
-    public static IServiceCollection For<TView, TDbContext>(
-        this IServiceCollection services,
-        Action<EntityFrameworkProjectionBuilder<TView, TDbContext>> setup
-    )
-        where TView : class
-        where TDbContext : DbContext
-    {
-        setup(new EntityFrameworkProjectionBuilder<TView, TDbContext>(services));
-        return services;
-    }
-}
-
-public class EntityFrameworkProjectionBuilder<TView, TDbContext>(IServiceCollection services)
-    where TView : class
-    where TDbContext : DbContext
-{
-
-    public EntityFrameworkProjectionBuilder<TView, TDbContext> AddOn<TEvent>(Func<EventEnvelope<TEvent>, TView> handler)
-        where TEvent : notnull
-    {
-        services.AddSingleton(handler);
-        services.AddTransient<IEventHandler<EventEnvelope<TEvent>>, AddProjection<TView, TEvent, TDbContext>>();
-
-        return this;
-    }
-
-    public EntityFrameworkProjectionBuilder<TView, TDbContext> UpdateOn<TEvent>(
-        Func<TEvent, object> getViewId,
-        Action<EventEnvelope<TEvent>, TView> handler,
-        Func<EntityEntry<TView>, CancellationToken, Task>? prepare = null
-    ) where TEvent : notnull
-    {
-        services.AddSingleton(getViewId);
-        services.AddSingleton(handler);
-        services.AddTransient<IEventHandler<EventEnvelope<TEvent>>, UpdateProjection<TView, TEvent, TDbContext>>();
-
-        if (prepare != null)
-        {
-            services.AddSingleton(prepare);
-        }
-
-        return this;
-    }
-
-    public EntityFrameworkProjectionBuilder<TView, TDbContext> QueryWith<TQuery>(
-        Func<IQueryable<TView>, TQuery, CancellationToken, Task<TView>> handler
-    )
-    {
-        services.AddEntityFrameworkQueryHandler<TDbContext, TQuery, TView>(handler);
-
-        return this;
-    }
-
-    public EntityFrameworkProjectionBuilder<TView, TDbContext> QueryWith<TQuery>(
-        Func<IQueryable<TView>, TQuery, CancellationToken, Task<IReadOnlyList<TView>>> handler
-    )
-    {
-        services.AddEntityFrameworkQueryHandler<TDbContext, TQuery, TView>(handler);
-
-        return this;
-    }
-}
 
 public class AddProjection<TView, TEvent, TDbContext>(
     TDbContext dbContext,
@@ -104,8 +40,7 @@ public class UpdateProjection<TView, TEvent, TDbContext>(
     TDbContext dbContext,
     ILogger<AddProjection<TView, TEvent, TDbContext>> logger,
     Func<TEvent, object> getViewId,
-    Action<EventEnvelope<TEvent>, TView> update,
-    Func<EntityEntry<TView>, CancellationToken, Task>? prepare = null
+    Action<EventEnvelope<TEvent>, TView> update
 ): IEventHandler<EventEnvelope<TEvent>>
     where TView : class
     where TDbContext : DbContext
@@ -133,8 +68,6 @@ public class UpdateProjection<TView, TEvent, TDbContext>(
                 tracked.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
                 break;
         }
-
-        prepare?.Invoke(dbContext.Entry(view), ct);
 
         update(eventEnvelope, view);
 

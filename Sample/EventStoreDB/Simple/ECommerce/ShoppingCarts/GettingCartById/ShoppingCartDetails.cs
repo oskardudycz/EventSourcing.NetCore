@@ -35,7 +35,7 @@ public static class ShoppingCartDetailsProjection
         };
     }
 
-    public static void Handle(EventEnvelope<ProductItemAddedToShoppingCart> eventEnvelope, ShoppingCartDetails view)
+    public static void Handle(ShoppingCartDetails view, EventEnvelope<ProductItemAddedToShoppingCart> eventEnvelope)
     {
         if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
             return;
@@ -62,7 +62,7 @@ public static class ShoppingCartDetailsProjection
         view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }
 
-    public static void Handle(EventEnvelope<ProductItemRemovedFromShoppingCart> eventEnvelope, ShoppingCartDetails view)
+    public static void Handle(ShoppingCartDetails view, EventEnvelope<ProductItemRemovedFromShoppingCart> eventEnvelope)
     {
         if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
             return;
@@ -84,7 +84,7 @@ public static class ShoppingCartDetailsProjection
         view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }
 
-    public static void Handle(EventEnvelope<ShoppingCartConfirmed> eventEnvelope, ShoppingCartDetails view)
+    public static void Handle(ShoppingCartDetails view, EventEnvelope<ShoppingCartConfirmed> eventEnvelope)
     {
         if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
             return;
@@ -94,7 +94,7 @@ public static class ShoppingCartDetailsProjection
         view.LastProcessedPosition = eventEnvelope.Metadata.LogPosition;
     }
 
-    public static void Handle(EventEnvelope<ShoppingCartCanceled> eventEnvelope, ShoppingCartDetails view)
+    public static void Handle(ShoppingCartDetails view, EventEnvelope<ShoppingCartCanceled> eventEnvelope)
     {
         if (view.LastProcessedPosition >= eventEnvelope.Metadata.LogPosition)
             return;

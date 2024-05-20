@@ -1,10 +1,11 @@
 ﻿using System.Linq.Expressions;
+using Core.EntityFramework.Extensions;
 using Core.Events;
 using Core.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 
-namespace Core.EntityFramework;
+namespace Core.EntityFramework.Projections;
 
 public class EntityFrameworkProjection<TDbContext>: IEventBatchHandler
     where TDbContext : DbContext
@@ -38,9 +39,11 @@ public class EntityFrameworkProjection<TView, TId, TDbContext>: EntityFrameworkP
     where TId : struct
     where TDbContext : DbContext
 {
+    public Expression<Func<TView, object>>? Include { protected get; set; }
+
     private record ProjectEvent(
-        Func<object, TId?> GetId,
-        Func<TView, object, TView?> Apply
+        Func<IEventEnvelope, TId?> GetId,
+        Func<TView, IEventEnvelope, TView?> Apply
     );
 
     private readonly Dictionary<Type, ProjectEvent> projectors = new();
@@ -54,56 +57,77 @@ public class EntityFrameworkProjection<TView, TId, TDbContext>: EntityFrameworkP
     }
 
     public void Creates<TEvent>(
-        Func<TEvent, TView> apply
-    )
-    {
-        projectors.Add(
-            typeof(TEvent),
+        Func<EventEnvelope<TEvent>, TView> apply
+    ) where TEvent : notnull =>
+        Projects<TEvent>(
             new ProjectEvent(
                 _ => null,
-                (_, @event) => apply((TEvent)@event)
+                (_, envelope) => apply((EventEnvelope<TEvent>)envelope)
             )
         );
-        Projects<TEvent>();
-    }
 
+    public void Creates<TEvent>(
+        Func<TEvent, TView> apply
+    ) where TEvent : notnull =>
+        Creates<TEvent>(envelope => apply(envelope.Data));
 
     public void Deletes<TEvent>(
         Func<TEvent, TId> getId
-    )
-    {
-        projectors.Add(
-            typeof(TEvent),
+    ) =>
+        Projects<TEvent>(
             new ProjectEvent(
-                @event => getId((TEvent)@event),
+                envelope => getId((TEvent)envelope.Data),
                 (_, _) => null
             )
         );
-        Projects<TEvent>();
-    }
+
+    public void Projects<TEvent>(
+        Func<TEvent, TId> getId,
+        Func<TView, EventEnvelope<TEvent>, TView> apply
+    ) where TEvent : notnull =>
+        Projects<TEvent>(
+            new ProjectEvent(
+                envelope => getId((TEvent)envelope.Data),
+                (document, envelope) => apply(document, (EventEnvelope<TEvent>)envelope)
+            )
+        );
+
+    public void Projects<TEvent>(
+        Func<TEvent, TId> getId,
+        Action<TView, EventEnvelope<TEvent>> apply
+    ) where TEvent : notnull =>
+        Projects(getId, (view, envelope) =>
+        {
+            apply(view, envelope);
+            return view;
+        });
 
     public void Projects<TEvent>(
         Func<TEvent, TId> getId,
         Func<TView, TEvent, TView> apply
-    )
+    ) where TEvent : notnull =>
+        Projects(getId, (view, envelope) => apply(view, envelope.Data));
+
+    public void Projects<TEvent>(
+        Func<TEvent, TId> getId,
+        Action<TView, TEvent> apply
+    ) where TEvent : notnull =>
+        Projects(getId, (view, envelope) => apply(view, envelope.Data));
+
+
+    private void Projects<TEvent>(ProjectEvent projectEvent)
     {
-        projectors.Add(
-            typeof(TEvent),
-            new ProjectEvent(
-                @event => getId((TEvent)@event),
-                (document, @event) => apply(document, (TEvent)@event)
-            )
-        );
+        projectors.Add(typeof(TEvent), projectEvent);
         Projects<TEvent>();
     }
 
-    protected TView? Apply(TView document, object @event) =>
-        projectors[@event.GetType()].Apply(document, @event);
+    private TView? Apply(TView document, IEventEnvelope @event) =>
+        projectors[@event.Data.GetType()].Apply(document, @event);
 
-    protected TId? GetViewId(object @event) =>
-        projectors[@event.GetType()].GetId(@event);
+    private TId? GetViewId(IEventEnvelope @event) =>
+        projectors[@event.Data.GetType()].GetId(@event);
 
-    protected override Task ApplyAsync(object[] events, CancellationToken token) =>
+    protected override Task ApplyAsync(IEventEnvelope[] events, CancellationToken token) =>
         RetryPolicy.ExecuteAsync(async ct =>
         {
             var dbSet = DbContext.Set<TView>();
@@ -113,18 +137,19 @@ public class EntityFrameworkProjection<TView, TId, TDbContext>: EntityFrameworkP
 
             var existingViews = await GetExistingViews(dbSet, ids, ct);
 
-            foreach (var (@event, id) in eventWithViewIds)
+            foreach (var (eventEnvelope, id) in eventWithViewIds)
             {
-                ProcessEvent(@event, id, existingViews, dbSet);
+                ProcessEvent(eventEnvelope, id, existingViews, dbSet);
             }
         }, token);
 
 
-    private void ProcessEvent(object @event, TId? id, Dictionary<TId, TView> existingViews, DbSet<TView> dbSet)
+    private void ProcessEvent(IEventEnvelope eventEnvelope, TId? id, Dictionary<TId, TView> existingViews,
+        DbSet<TView> dbSet)
     {
         var current = id.HasValue && existingViews.TryGetValue(id.Value, out var existing) ? existing : null;
 
-        var result = Apply(current ?? GetDefault(@event), @event);
+        var result = Apply(current ?? GetDefault(), eventEnvelope);
 
         if (result == null)
         {
@@ -140,7 +165,7 @@ public class EntityFrameworkProjection<TView, TId, TDbContext>: EntityFrameworkP
             existingViews.Add(viewId(result), result);
     }
 
-    protected virtual TView GetDefault(object @event) =>
+    protected virtual TView GetDefault() =>
         ObjectFactory<TView>.GetDefaultOrUninitialized();
 
     private Expression<Func<TView, bool>> BuildContainsExpression(List<TId> ids) =>
@@ -148,7 +173,9 @@ public class EntityFrameworkProjection<TView, TId, TDbContext>: EntityFrameworkP
 
     private async Task<Dictionary<TId, TView>>
         GetExistingViews(DbSet<TView> dbSet, List<TId> ids, CancellationToken ct) =>
-        await dbSet.Where(BuildContainsExpression(ids)).ToDictionaryAsync(viewId, ct);
+        Include != null
+            ? await dbSet.Include(Include).Where(BuildContainsExpression(ids)).ToDictionaryAsync(viewId, ct)
+            : await dbSet.Where(BuildContainsExpression(ids)).ToDictionaryAsync(viewId, ct);
 
     private Expression<Func<TView, bool>> GetContainsExpression(List<TId> ids)
     {

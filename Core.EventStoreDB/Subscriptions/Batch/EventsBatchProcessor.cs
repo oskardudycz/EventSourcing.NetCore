@@ -12,19 +12,16 @@ public class EventsBatchProcessor(
     ILogger<EventsBatchProcessor> logger
 )
 {
-    public async Task<ulong?> HandleEventsBatch(
+    public Task HandleEventsBatch(
         ResolvedEvent[] resolvedEvents,
         EventStoreDBSubscriptionToAllOptions options,
         CancellationToken ct
     )
     {
         var events = TryDeserializeEvents(resolvedEvents, options.IgnoreDeserializationErrors);
-        ulong? lastPosition = null;
 
         // TODO: How would you implement Dead-Letter Queue here?
-        await batchHandler.Handle(events, ct).ConfigureAwait(false);
-
-        return lastPosition;
+        return batchHandler.Handle(events, ct);
     }
 
     private IEventEnvelope[] TryDeserializeEvents(

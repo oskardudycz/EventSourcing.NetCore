@@ -1,5 +1,5 @@
-﻿using ECommerce.Core.Commands;
-using ECommerce.Core.Projections;
+﻿using Core.EntityFramework.Projections;
+using ECommerce.Core.Commands;
 using ECommerce.Pricing.ProductPricing;
 using ECommerce.ShoppingCarts.AddingProductItem;
 using ECommerce.ShoppingCarts.Canceling;
@@ -49,18 +49,16 @@ public static class Configuration
                         command => ShoppingCart.MapToStreamId(command.ShoppingCartId)
                     )
             )
-            .For<ShoppingCartDetails, ECommerceDbContext>(
+            .For<ShoppingCartDetails, Guid, ECommerceDbContext>(
                 builder => builder
                     .AddOn<ShoppingCartOpened>(ShoppingCartDetailsProjection.Handle)
                     .UpdateOn<ProductItemAddedToShoppingCart>(
                         e => e.ShoppingCartId,
-                        ShoppingCartDetailsProjection.Handle,
-                        (entry, ct) => entry.Collection(x => x.ProductItems).LoadAsync(ct)
+                        ShoppingCartDetailsProjection.Handle
                     )
                     .UpdateOn<ProductItemRemovedFromShoppingCart>(
                         e => e.ShoppingCartId,
-                        ShoppingCartDetailsProjection.Handle,
-                        (entry, ct) => entry.Collection(x => x.ProductItems).LoadAsync(ct)
+                        ShoppingCartDetailsProjection.Handle
                     )
                     .UpdateOn<ShoppingCartConfirmed>(
                         e => e.ShoppingCartId,
@@ -70,9 +68,10 @@ public static class Configuration
                         e => e.ShoppingCartId,
                         ShoppingCartDetailsProjection.Handle
                     )
+                    .Include(x => x.ProductItems)
                     .QueryWith<GetCartById>(GetCartById.Handle)
             )
-            .For<ShoppingCartShortInfo, ECommerceDbContext>(
+            .For<ShoppingCartShortInfo, Guid, ECommerceDbContext>(
                 builder => builder
                     .AddOn<ShoppingCartOpened>(ShoppingCartShortInfoProjection.Handle)
                     .UpdateOn<ProductItemAddedToShoppingCart>(
