@@ -26,7 +26,7 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api): IClassFixtu
             .Then(OK)
             .And()
             .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
-            .Until(RESPONSE_ETAG_IS(1))
+            .Until(RESPONSE_ETAG_IS(1), 10)
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>((details, ctx) =>

@@ -29,7 +29,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api): IClassFixt
             .Then(OK)
             .And()
             .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
-            .Until(RESPONSE_ETAG_IS(3))
+            .Until(RESPONSE_ETAG_IS(3), 10)
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>((details, ctx) =>

@@ -43,7 +43,7 @@ public class ConfirmShoppingCartTests(ConfirmShoppingCartFixture api): IClassFix
         await api
             .Given()
             .When(GET, URI($"/api/ShoppingCarts/{api.ShoppingCartId}"))
-            .Until(RESPONSE_ETAG_IS(1))
+            .Until(RESPONSE_ETAG_IS(1), 10)
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>

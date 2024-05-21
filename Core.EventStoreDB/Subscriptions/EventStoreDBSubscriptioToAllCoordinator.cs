@@ -16,6 +16,7 @@ public class SubscriptionInfo
 public class EventStoreDBSubscriptioToAllCoordinator
 {
     private readonly IDictionary<string, SubscriptionInfo> subscriptions;
+    private readonly ISubscriptionStoreSetup storeSetup;
     private readonly IServiceScopeFactory serviceScopeFactory;
 
     private readonly Channel<EventBatch> events = Channel.CreateBounded<EventBatch>(
@@ -28,23 +29,29 @@ public class EventStoreDBSubscriptioToAllCoordinator
         }
     );
 
-    public EventStoreDBSubscriptioToAllCoordinator(IDictionary<string, EventStoreDBSubscriptionToAll> subscriptions,
-        IServiceScopeFactory serviceScopeFactory)
+    public EventStoreDBSubscriptioToAllCoordinator(
+        IDictionary<string, EventStoreDBSubscriptionToAll> subscriptions,
+        ISubscriptionStoreSetup storeSetup,
+        IServiceScopeFactory serviceScopeFactory
+        )
     {
         this.subscriptions =
             subscriptions.ToDictionary(ks => ks.Key,
                 vs => new SubscriptionInfo { Subscription = vs.Value, LastCheckpoint = Checkpoint.None }
             );
+        this.storeSetup = storeSetup;
         this.serviceScopeFactory = serviceScopeFactory;
     }
 
-    public ChannelReader<EventBatch> Reader => events.Reader;
-    public ChannelWriter<EventBatch> Writer => events.Writer;
+    private ChannelReader<EventBatch> Reader => events.Reader;
+    private ChannelWriter<EventBatch> Writer => events.Writer;
 
     public async Task SubscribeToAll(CancellationToken ct)
     {
         // see: https://github.com/dotnet/runtime/issues/36063
         await Task.Yield();
+
+        await storeSetup.EnsureStoreExists(ct).ConfigureAwait(false);
 
         var tasks = subscriptions.Select(s => Task.Run(async () =>
         {

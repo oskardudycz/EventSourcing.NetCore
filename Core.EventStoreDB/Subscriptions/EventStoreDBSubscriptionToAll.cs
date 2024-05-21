@@ -1,18 +1,15 @@
 using System.Threading.Channels;
 using Core.Events;
-using Core.EventStoreDB.Subscriptions.Batch;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
 using Core.Extensions;
 using EventStore.Client;
 using Grpc.Core;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Open.ChannelExtensions;
 using Polly;
 using EventTypeFilter = EventStore.Client.EventTypeFilter;
 
 namespace Core.EventStoreDB.Subscriptions;
-
-using static ISubscriptionCheckpointRepository;
 
 public class EventStoreDBSubscriptionToAllOptions
 {
@@ -27,11 +24,11 @@ public class EventStoreDBSubscriptionToAllOptions
     public bool IgnoreDeserializationErrors { get; set; } = true;
 
     public int BatchSize { get; set; } = 1;
+    public int BatchDeadline { get; set; } = 50;
 }
 
 public class EventStoreDBSubscriptionToAll(
     EventStoreClient eventStoreClient,
-    ISubscriptionStoreSetup storeSetup,
     ILogger<EventStoreDBSubscriptionToAll> logger
 )
 {
@@ -63,8 +60,6 @@ public class EventStoreDBSubscriptionToAll(
 
         try
         {
-            await storeSetup.EnsureStoreExists(ct).ConfigureAwait(false);
-
             var subscription = eventStoreClient.SubscribeToAll(
                 checkpoint != Checkpoint.None ? FromAll.After(checkpoint) : FromAll.Start,
                 Options.ResolveLinkTos,
@@ -77,16 +72,14 @@ public class EventStoreDBSubscriptionToAll(
 
             logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
 
-           // await foreach (var @event in subscription)
-              //  TODO: Add proper batching here!
-              await foreach (var events in subscription
-                .BatchAsync(Options.BatchSize, TimeSpan.FromMilliseconds(100), ct)
-                .ConfigureAwait(false))
-            {
-                //ResolvedEvent[] events = [@event];
-                await cw.WriteAsync(new EventBatch(Options.SubscriptionId, events), ct)
-                    .ConfigureAwait(false);
-            }
+
+            await subscription.Pipe<ResolvedEvent, EventBatch>(
+                cw,
+                events => new EventBatch(Options.SubscriptionId, events.ToArray()),
+                Options.BatchSize,
+                Options.BatchDeadline,
+                ct
+            ).ConfigureAwait(false);
         }
         catch (RpcException rpcException) when (rpcException is { StatusCode: StatusCode.Cancelled } ||
                                                 rpcException.InnerException is ObjectDisposedException)
@@ -115,4 +108,11 @@ public class EventStoreDBSubscriptionToAll(
             await SubscribeToAll(checkpoint, cw, ct).ConfigureAwait(false);
         }
     }
+    //
+    // private AsyncPolicy retry = Policy.Handle<RpcException>(rpcException =>
+    //         rpcException is { StatusCode: StatusCode.Cancelled } ||
+    //         rpcException.InnerException is ObjectDisposedException)
+    //     .Or<OperationCanceledException>()
+    //     .F
+    //     .WaitAndRetryForeverAsync(_ => TimeSpan.FromMilliseconds(500));
 }

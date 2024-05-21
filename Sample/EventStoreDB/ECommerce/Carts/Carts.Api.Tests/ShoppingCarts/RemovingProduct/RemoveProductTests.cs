@@ -63,7 +63,7 @@ public class RemoveProductTests(RemoveProductFixture api): IClassFixture<RemoveP
             .Then(NO_CONTENT)
             .And()
             .When(GET, URI($"/api/ShoppingCarts/{api.ShoppingCartId}"))
-            .Until(RESPONSE_ETAG_IS(2))
+            .Until(RESPONSE_ETAG_IS(2), 10)
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>

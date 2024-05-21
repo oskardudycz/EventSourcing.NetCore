@@ -1,61 +1,36 @@
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
+using System.Threading.Channels;
+using Open.ChannelExtensions;
 
 namespace Core.Extensions;
 
 public static class AsyncEnumerableExtensions
 {
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-
-public static class AsyncEnumerableExtensions
-{
-    public static async IAsyncEnumerable<T[]> BatchAsync<T>(
-        this IAsyncEnumerable<T> source,
+    public static async Task Pipe<T, TResult>(
+        this IAsyncEnumerable<T> enumerable,
+        ChannelWriter<TResult> cw,
+        Func<List<T>, TResult> transform,
         int batchSize,
-        TimeSpan maxBatchTime,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        int timeout,
+        CancellationToken ct
+    )
     {
-        var batch = new List<T>();
-        var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-        try
-        {
-            await foreach (var item in source.WithCancellation(cts.Token).ConfigureAwait(false))
+        var channel = Channel.CreateUnbounded<T>(
+            new UnboundedChannelOptions
             {
-                batch.Add(item);
-                if (batch.Count == 1) // Reset the timer when the first item is added
-                {
-                    cts.CancelAfter(maxBatchTime); // Set or reset the deadline
-                }
+                SingleWriter = false, SingleReader = true, AllowSynchronousContinuations = false
+            }
+        );
 
-                if (batch.Count >= batchSize)
-                {
-                    yield return batch.ToArray();
-                    batch.Clear();
-                    cts.CancelAfter(maxBatchTime); // Reset the deadline for the new batch
-                }
-            }
+        channel.Reader.Batch(batchSize).WithTimeout(timeout).PipeAsync(async batch =>
+        {
+            await cw.WriteAsync(transform(batch), ct).ConfigureAwait(false);
 
-            if (batch.Count > 0)
-            {
-                yield return batch.ToArray(); // Return any remaining items as a batch
-            }
-        }
-        catch (OperationCanceledException)
+            return batch;
+        });
+
+        await foreach (var @event in enumerable.WithCancellation(ct))
         {
-            if (batch.Count > 0)
-            {
-                yield return batch.ToArray(); // Yield whatever is in the batch when the timeout occurs
-            }
-            // Optionally, rethrow or handle the cancellation if needed
-        }
-        finally
-        {
-            cts.Dispose(); // Ensure the CancellationTokenSource is disposed to free resources
+            await channel.Writer.WriteAsync(@event, ct).ConfigureAwait(false);
         }
     }
 }

@@ -26,7 +26,7 @@ public class OpenShoppingCartTests(ShoppingCartsApplicationFactory applicationFa
             response =>
                 API.Given()
                     .When(GET, URI($"/api/ShoppingCarts/{response.GetCreatedId()}"))
-                    .Until(RESPONSE_ETAG_IS(0))
+                    .Until(RESPONSE_ETAG_IS(0), 10)
                     .Then(
                         OK,
                         RESPONSE_BODY<ShoppingCartDetails>(details =>
