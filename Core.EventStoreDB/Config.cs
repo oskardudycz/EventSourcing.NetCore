@@ -43,7 +43,10 @@ public static class EventStoreDBConfigExtensions
     {
         services
             .AddSingleton(EventTypeMapper.Instance)
-            .AddSingleton(new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)));
+            .AddSingleton(new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
+            .AddScoped<EventsBatchProcessor, EventsBatchProcessor>()
+            .AddScoped<IEventsBatchCheckpointer, EventsBatchCheckpointer>()
+            .AddSingleton<ISubscriptionStoreSetup, NulloSubscriptionStoreSetup>();
 
         if (options?.UseInternalCheckpointing != false)
         {
@@ -69,29 +72,42 @@ public static class EventStoreDBConfigExtensions
         );
     }
 
+
+    public static IServiceCollection AddEventStoreDBSubscriptionToAll<THandler>(
+        this IServiceCollection services,
+        string subscriptionId
+    ) where THandler : IEventBatchHandler =>
+        services.AddEventStoreDBSubscriptionToAll(
+            new EventStoreDBSubscriptionToAllOptions { SubscriptionId = subscriptionId },
+            sp => [sp.GetRequiredService<THandler>()]
+        );
+
+
+    public static IServiceCollection AddEventStoreDBSubscriptionToAll<THandler>(
+        this IServiceCollection services,
+        EventStoreDBSubscriptionToAllOptions subscriptionOptions
+    ) where THandler : IEventBatchHandler =>
+        services.AddEventStoreDBSubscriptionToAll(subscriptionOptions, sp => [sp.GetRequiredService<THandler>()]);
+
     public static IServiceCollection AddEventStoreDBSubscriptionToAll(
         this IServiceCollection services,
         EventStoreDBSubscriptionToAllOptions subscriptionOptions,
-        bool checkpointToEventStoreDB = true)
+        Func<IServiceProvider, IEventBatchHandler[]> handlers
+    )
     {
-        services.AddScoped<EventsBatchProcessor, EventsBatchProcessor>();
-        services.AddScoped<IEventsBatchCheckpointer, EventsBatchCheckpointer>();
         services.AddSingleton<EventStoreDBSubscriptioToAllCoordinator>();
 
-        if (checkpointToEventStoreDB)
-        {
-            services
-                .AddSingleton<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
-        }
-
         return services.AddKeyedSingleton<EventStoreDBSubscriptionToAll>(
-            $"ESDB_subscription-{subscriptionOptions.SubscriptionId}",
-            (sp, _) => new EventStoreDBSubscriptionToAll(
-                subscriptionOptions,
-                sp.GetRequiredService<EventStoreClient>(),
-                sp,
-                sp.GetRequiredService<ILogger<EventStoreDBSubscriptionToAll>>()
-            )
-        );
+            subscriptionOptions.SubscriptionId,
+            (sp, _) =>
+            {
+                var subscription = new EventStoreDBSubscriptionToAll(
+                    sp.GetRequiredService<EventStoreClient>(),
+                    sp.GetRequiredService<ISubscriptionStoreSetup>(),
+                    sp.GetRequiredService<ILogger<EventStoreDBSubscriptionToAll>>()
+                ) { Options = subscriptionOptions, GetHandlers = handlers };
+
+                return subscription;
+            });
     }
 }

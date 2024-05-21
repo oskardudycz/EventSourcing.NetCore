@@ -86,7 +86,8 @@ public static class EventBusExtensions
             sp.GetRequiredService<IActivityScope>(),
             asyncPolicy ?? Policy.NoOpAsync()
         ));
-        services.AddScoped<IEventBatchHandler, EventBusBatchHandler>();
+        services.AddScoped<EventBusBatchHandler, EventBusBatchHandler>();
+        services.AddScoped<IEventBatchHandler>(sp => sp.GetRequiredService<EventBusBatchHandler>());
         services
             .TryAddSingleton<IEventBus>(sp => sp.GetRequiredService<EventBus>());
 

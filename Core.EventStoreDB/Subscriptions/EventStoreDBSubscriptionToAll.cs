@@ -1,3 +1,5 @@
+using System.Threading.Channels;
+using Core.Events;
 using Core.EventStoreDB.Subscriptions.Batch;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
 using Core.Extensions;
@@ -5,6 +7,7 @@ using EventStore.Client;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Polly;
 using EventTypeFilter = EventStore.Client.EventTypeFilter;
 
 namespace Core.EventStoreDB.Subscriptions;
@@ -27,51 +30,61 @@ public class EventStoreDBSubscriptionToAllOptions
 }
 
 public class EventStoreDBSubscriptionToAll(
-    EventStoreDBSubscriptionToAllOptions subscriptionOptions,
     EventStoreClient eventStoreClient,
-    IServiceProvider serviceProvider,
+    ISubscriptionStoreSetup storeSetup,
     ILogger<EventStoreDBSubscriptionToAll> logger
 )
 {
-    private string SubscriptionId => subscriptionOptions.SubscriptionId;
-
-    public async Task SubscribeToAll(CancellationToken ct)
+    public enum ProcessingStatus
     {
+        NotStarted,
+        Starting,
+        Started,
+        Paused,
+        Errored,
+        Stopped
+    }
+
+    public EventStoreDBSubscriptionToAllOptions Options { get; set; } = default!;
+
+    public Func<IServiceProvider, IEventBatchHandler[]> GetHandlers { get; set; } = default!;
+
+    public ProcessingStatus Status = ProcessingStatus.NotStarted;
+
+    private string SubscriptionId => Options.SubscriptionId;
+
+    public async Task SubscribeToAll(Checkpoint checkpoint, ChannelWriter<EventBatch> cw, CancellationToken ct)
+    {
+        Status = ProcessingStatus.Starting;
         // see: https://github.com/dotnet/runtime/issues/36063
         await Task.Yield();
 
-        logger.LogInformation("Subscription to all '{SubscriptionId}'", subscriptionOptions.SubscriptionId);
+        logger.LogInformation("Subscription to all '{SubscriptionId}'", Options.SubscriptionId);
 
         try
         {
-            var checkpoint = await LoadCheckpoint(ct).ConfigureAwait(false);
+            await storeSetup.EnsureStoreExists(ct).ConfigureAwait(false);
 
             var subscription = eventStoreClient.SubscribeToAll(
                 checkpoint != Checkpoint.None ? FromAll.After(checkpoint) : FromAll.Start,
-                subscriptionOptions.ResolveLinkTos,
-                subscriptionOptions.FilterOptions,
-                subscriptionOptions.Credentials,
+                Options.ResolveLinkTos,
+                Options.FilterOptions,
+                Options.Credentials,
                 ct
             );
 
+            Status = ProcessingStatus.Started;
+
             logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
 
-            await foreach (var events in subscription.BatchAsync(subscriptionOptions.BatchSize, ct)
-                               .ConfigureAwait(false))
+            await foreach (var @event in subscription)
+                // TODO: Add proper batching here!
+                // .BatchAsync(subscriptionOptions.BatchSize, TimeSpan.FromMilliseconds(100), ct)
+                // .ConfigureAwait(false))
             {
-                var result = await ProcessBatch(events, checkpoint, subscriptionOptions, ct).ConfigureAwait(false);
-
-                switch (result)
-                {
-                    case StoreResult.Success success:
-                        checkpoint = success.Checkpoint;
-                        break;
-                    case StoreResult.Ignored ignored:
-                        break;
-                    default:
-                        throw new InvalidOperationException(
-                            "Checkpoint mismatch, ensure that you have a single subscription running!");
-                }
+                ResolvedEvent[] events = [@event];
+                await cw.WriteAsync(new EventBatch(Options.SubscriptionId, events), ct)
+                    .ConfigureAwait(false);
             }
         }
         catch (RpcException rpcException) when (rpcException is { StatusCode: StatusCode.Cancelled } ||
@@ -82,32 +95,23 @@ public class EventStoreDBSubscriptionToAll(
                 SubscriptionId
             );
         }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning(
+                "Subscription to all '{SubscriptionId}' dropped by client",
+                SubscriptionId
+            );
+        }
         catch (Exception ex)
         {
+            Status = ProcessingStatus.Errored;
             logger.LogWarning("Subscription was dropped: {Exception}", ex);
 
             // Sleep between reconnections to not flood the database or not kill the CPU with infinite loop
             // Randomness added to reduce the chance of multiple subscriptions trying to reconnect at the same time
             Thread.Sleep(1000 + new Random((int)DateTime.UtcNow.Ticks).Next(1000));
 
-            await SubscribeToAll(ct).ConfigureAwait(false);
+            await SubscribeToAll(checkpoint, cw, ct).ConfigureAwait(false);
         }
-    }
-
-    private ValueTask<Checkpoint> LoadCheckpoint(CancellationToken ct)
-    {
-        using var scope = serviceProvider.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<ISubscriptionCheckpointRepository>().Load(SubscriptionId, ct);
-    }
-
-    private Task<StoreResult> ProcessBatch(
-        ResolvedEvent[] events,
-        Checkpoint lastCheckpoint,
-        EventStoreDBSubscriptionToAllOptions subscriptionOptions,
-        CancellationToken ct)
-    {
-        using var scope = serviceProvider.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<IEventsBatchCheckpointer>()
-            .Process(events, lastCheckpoint, subscriptionOptions, ct);
     }
 }

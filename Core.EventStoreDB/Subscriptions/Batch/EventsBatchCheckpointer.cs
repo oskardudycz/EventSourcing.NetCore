@@ -1,3 +1,4 @@
+using Core.Events;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
 using EventStore.Client;
 
@@ -9,7 +10,7 @@ public interface IEventsBatchCheckpointer
     Task<StoreResult> Process(
         ResolvedEvent[] events,
         Checkpoint lastCheckpoint,
-        EventStoreDBSubscriptionToAllOptions subscriptionOptions,
+        BatchProcessingOptions batchProcessingOptions,
         CancellationToken ct
     );
 }
@@ -22,7 +23,7 @@ public class EventsBatchCheckpointer(
     public async Task<StoreResult> Process(
         ResolvedEvent[] events,
         Checkpoint lastCheckpoint,
-        EventStoreDBSubscriptionToAllOptions subscriptionOptions,
+        BatchProcessingOptions options,
         CancellationToken ct
     )
     {
@@ -31,11 +32,11 @@ public class EventsBatchCheckpointer(
         if (!lastPosition.HasValue)
             return new StoreResult.Ignored();
 
-        await eventsBatchProcessor.HandleEventsBatch(events, subscriptionOptions, ct)
+        await eventsBatchProcessor.HandleEventsBatch(events, options, ct)
             .ConfigureAwait(false);
 
         return await checkpointRepository
-            .Store(subscriptionOptions.SubscriptionId, lastPosition.Value, lastCheckpoint, ct)
+            .Store(options.SubscriptionId, lastPosition.Value, lastCheckpoint, ct)
             .ConfigureAwait(false);
     }
 }

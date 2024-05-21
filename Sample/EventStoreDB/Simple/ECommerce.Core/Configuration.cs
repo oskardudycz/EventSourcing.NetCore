@@ -1,5 +1,6 @@
 ﻿using Core.Events;
 using Core.EventStoreDB;
+using Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 using Core.Extensions;
 using Core.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
@@ -17,5 +18,6 @@ public static class Configuration
             .AllowResolvingKeyedServicesAsDictionary()
             .AddSingleton<IActivityScope, ActivityScope>()
             .AddEventBus()
-            .AddEventStoreDB(configuration);
+            .AddEventStoreDB(configuration)
+            .AddPostgresCheckpointing();
 }

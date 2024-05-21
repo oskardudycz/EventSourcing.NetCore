@@ -51,6 +51,7 @@ public static class Configuration
             )
             .For<ShoppingCartDetails, Guid, ECommerceDbContext>(
                 builder => builder
+                    .ViewId(v => v.Id)
                     .AddOn<ShoppingCartOpened>(ShoppingCartDetailsProjection.Handle)
                     .UpdateOn<ProductItemAddedToShoppingCart>(
                         e => e.ShoppingCartId,
@@ -73,6 +74,7 @@ public static class Configuration
             )
             .For<ShoppingCartShortInfo, Guid, ECommerceDbContext>(
                 builder => builder
+                    .ViewId(v => v.Id)
                     .AddOn<ShoppingCartOpened>(ShoppingCartShortInfoProjection.Handle)
                     .UpdateOn<ProductItemAddedToShoppingCart>(
                         e => e.ShoppingCartId,

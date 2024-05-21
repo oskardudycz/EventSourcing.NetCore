@@ -1,5 +1,6 @@
 using Carts.ShoppingCarts;
 using Core.EventStoreDB;
+using Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 using Core.Marten;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

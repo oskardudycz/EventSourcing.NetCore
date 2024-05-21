@@ -1,6 +1,7 @@
 using Core.EventStoreDB.Subscriptions.Checkpoints;
 using Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 using Core.Testing.Fixtures;
+using Npgsql;
 using Xunit;
 
 namespace Core.EventStoreDB.Tests.Subscriptions.Checkpoints;
@@ -12,15 +13,13 @@ public class PostgresSubscriptionCheckpointRepositoryTests(PostgresContainerFixt
 {
     private readonly string subscriptionId = Guid.NewGuid().ToString("N");
 
-    private readonly PostgresConnectionProvider connectionFactory =
-        PostgresConnectionProvider.From(fixture.DataSource);
-
     [Fact]
     public async Task Store_InitialInsert_Success()
     {
         var checkpointTableCreator = new PostgresSubscriptionCheckpointSetup(fixture.DataSource);
-        await checkpointTableCreator.EnsureCheckpointsTableExist(CancellationToken.None);
-        var repository = new PostgresSubscriptionCheckpointRepository(connectionFactory);
+        await checkpointTableCreator.EnsureStoreExists(CancellationToken.None);
+        await using var connection = fixture.DataSource.CreateConnection();
+        var repository = new PostgresSubscriptionCheckpointRepository(connection);
 
         var result = await repository.Store(subscriptionId, 1, Checkpoint.None, CancellationToken.None);
 
@@ -31,8 +30,9 @@ public class PostgresSubscriptionCheckpointRepositoryTests(PostgresContainerFixt
     public async Task Store_UpdatePosition_Success()
     {
         var checkpointTableCreator = new PostgresSubscriptionCheckpointSetup(fixture.DataSource);
-        await checkpointTableCreator.EnsureCheckpointsTableExist(CancellationToken.None);
-        var repository = new PostgresSubscriptionCheckpointRepository(connectionFactory);
+        await checkpointTableCreator.EnsureStoreExists(CancellationToken.None);
+        await using var connection = fixture.DataSource.CreateConnection();
+        var repository = new PostgresSubscriptionCheckpointRepository(connection);
 
         await repository.Store(subscriptionId, 1, Checkpoint.None, CancellationToken.None);
         var result = await repository.Store(subscriptionId, 2, Checkpoint.From(1), CancellationToken.None);
@@ -44,8 +44,9 @@ public class PostgresSubscriptionCheckpointRepositoryTests(PostgresContainerFixt
     public async Task Store_IdempotentCheck_ReturnsZero()
     {
         var checkpointTableCreator = new PostgresSubscriptionCheckpointSetup(fixture.DataSource);
-        await checkpointTableCreator.EnsureCheckpointsTableExist(CancellationToken.None);
-        var repository = new PostgresSubscriptionCheckpointRepository(connectionFactory);
+        await checkpointTableCreator.EnsureStoreExists(CancellationToken.None);
+        await using var connection = fixture.DataSource.CreateConnection();
+        var repository = new PostgresSubscriptionCheckpointRepository(connection);
 
         await repository.Store(subscriptionId, 1, Checkpoint.None, CancellationToken.None);
         await repository.Store(subscriptionId, 2, Checkpoint.From(1), CancellationToken.None);
@@ -58,8 +59,9 @@ public class PostgresSubscriptionCheckpointRepositoryTests(PostgresContainerFixt
     public async Task Store_InvalidUpdate_Failure()
     {
         var checkpointTableCreator = new PostgresSubscriptionCheckpointSetup(fixture.DataSource);
-        await checkpointTableCreator.EnsureCheckpointsTableExist(CancellationToken.None);
-        var repository = new PostgresSubscriptionCheckpointRepository(connectionFactory);
+        await checkpointTableCreator.EnsureStoreExists(CancellationToken.None);
+        await using var connection = fixture.DataSource.CreateConnection();
+        var repository = new PostgresSubscriptionCheckpointRepository(connection);
 
         await repository.Store(subscriptionId, 1, Checkpoint.None, CancellationToken.None);
         await repository.Store(subscriptionId, 2, Checkpoint.From(1), CancellationToken.None);

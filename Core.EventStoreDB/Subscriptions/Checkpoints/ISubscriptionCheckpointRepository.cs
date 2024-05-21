@@ -15,3 +15,15 @@ public interface ISubscriptionCheckpointRepository
         public record Mismatch: StoreResult;
     }
 }
+
+
+public interface ISubscriptionStoreSetup
+{
+    ValueTask EnsureStoreExists(CancellationToken ct);
+}
+
+public class NulloSubscriptionStoreSetup: ISubscriptionStoreSetup
+{
+    public ValueTask EnsureStoreExists(CancellationToken ct) =>
+        ValueTask.CompletedTask;
+}
