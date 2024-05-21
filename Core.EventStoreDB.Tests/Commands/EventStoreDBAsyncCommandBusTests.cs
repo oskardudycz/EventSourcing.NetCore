@@ -44,11 +44,8 @@ public class EventStoreDBAsyncCommandBusTests
                 )
             )
             .AddCoreServices()
-            .AddEventStoreDB(new EventStoreDBConfig
-            {
-                ConnectionString = "esdb://localhost:2113?tls=false"
-            })
-            .AddEventStoreDBSubscriptionToAll(new EventStoreDBSubscriptionToAllOptions(){SubscriptionId = "AsyncCommandBusTest"})
+            .AddEventStoreDB(new EventStoreDBConfig { ConnectionString = "esdb://localhost:2113?tls=false" })
+            .AddEventStoreDBSubscriptionToAll<EventBusBatchHandler>("AsyncCommandBusTest")
             .AddCommandHandler<AddUser, AddUserCommandHandler>(
                 _ => new AddUserCommandHandler(userIds)
             )

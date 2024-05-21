@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Core.Extensions;
@@ -7,26 +8,36 @@ public static class AsyncEnumerableExtensions
     public static async IAsyncEnumerable<T[]> BatchAsync<T>(
         this IAsyncEnumerable<T> source,
         int batchSize,
-        [EnumeratorCancellation]CancellationToken cancellationToken = default)
+        TimeSpan maxBatchTime,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var batch = new List<T>(batchSize);
+        var batch = new List<T>();
+        var stopwatch = new Stopwatch();
 
-        await foreach (var item in source.WithCancellation(cancellationToken))
+        try
         {
-            if (cancellationToken.IsCancellationRequested)
-                yield break;
-
-            batch.Add(item);
-
-            if (batch.Count >= batchSize)
+            await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
             {
-                yield return batch.ToArray();
+                batch.Add(item);
+                if (batch.Count == 1)
+                    stopwatch.Start(); // Start the stopwatch when the first item is added to the batch
 
-                batch.Clear();
+                if (batch.Count >= batchSize || stopwatch.Elapsed >= maxBatchTime)
+                {
+                    yield return batch.ToArray();  // Yield the current batch
+                    batch.Clear();                // Clear the batch
+                    stopwatch.Restart();          // Restart the stopwatch
+                }
+            }
+
+            if (batch.Count > 0)
+            {
+                yield return batch.ToArray(); // Yield any remaining items in the batch
             }
         }
-
-        if (batch.Count > 0)
-            yield return batch.ToArray();
+        finally
+        {
+            stopwatch.Stop();  // Stop the stopwatch
+        }
     }
 }

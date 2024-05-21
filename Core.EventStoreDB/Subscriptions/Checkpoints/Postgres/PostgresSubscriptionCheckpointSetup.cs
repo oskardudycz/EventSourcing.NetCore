@@ -2,18 +2,12 @@ using Npgsql;
 
 namespace Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 
-public class PostgresSubscriptionCheckpointSetup(NpgsqlDataSource dataSource)
+public class PostgresSubscriptionCheckpointSetup(NpgsqlDataSource dataSource): ISubscriptionStoreSetup
 {
     private bool wasCreated;
-    private readonly SemaphoreSlim tableLock = new(1, 1);
 
-    public async ValueTask EnsureCheckpointsTableExist(CancellationToken ct)
+    public async ValueTask EnsureStoreExists(CancellationToken ct)
     {
-        if (wasCreated)
-            return;
-
-        await tableLock.WaitAsync(ct).ConfigureAwait(false);
-
         if (wasCreated)
             return;
 
@@ -24,9 +18,9 @@ public class PostgresSubscriptionCheckpointSetup(NpgsqlDataSource dataSource)
             await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
             wasCreated = false;
         }
-        finally
+        catch
         {
-            tableLock.Release();
+            Console.WriteLine();
         }
     }
 
@@ -36,8 +30,7 @@ public class PostgresSubscriptionCheckpointSetup(NpgsqlDataSource dataSource)
         """
         CREATE TABLE IF NOT EXISTS "subscription_checkpoints" (
             "id" VARCHAR(100) PRIMARY KEY,
-            "position" BIGINT NULL,
-            "revision" BIGINT
+            "position" BIGINT NULL
         );
         """;
 

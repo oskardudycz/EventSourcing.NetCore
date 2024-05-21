@@ -6,22 +6,30 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.EventStoreDB.Subscriptions.Batch;
 
+public record BatchProcessingOptions(
+    string SubscriptionId,
+    bool IgnoreDeserializationErrors,
+    IEventBatchHandler[] BatchHandlers
+);
+
 public class EventsBatchProcessor(
     EventTypeMapper eventTypeMapper,
-    IEventBatchHandler batchHandler,
     ILogger<EventsBatchProcessor> logger
 )
 {
-    public Task HandleEventsBatch(
+    public async Task HandleEventsBatch(
         ResolvedEvent[] resolvedEvents,
-        EventStoreDBSubscriptionToAllOptions options,
+        BatchProcessingOptions options,
         CancellationToken ct
     )
     {
         var events = TryDeserializeEvents(resolvedEvents, options.IgnoreDeserializationErrors);
 
-        // TODO: How would you implement Dead-Letter Queue here?
-        return batchHandler.Handle(events, ct);
+        foreach (var batchHandler in options.BatchHandlers)
+        {
+            // TODO: How would you implement Dead-Letter Queue here?
+            await batchHandler.Handle(events, ct).ConfigureAwait(false);
+        }
     }
 
     private IEventEnvelope[] TryDeserializeEvents(
