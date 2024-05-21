@@ -1,4 +1,7 @@
-﻿using ECommerce.Pricing;
+﻿using Core.Configuration;
+using Core.EntityFramework.Projections;
+using Core.EventStoreDB.Subscriptions.Checkpoints;
+using ECommerce.Pricing;
 using ECommerce.ShoppingCarts;
 using ECommerce.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +14,8 @@ public static class Configuration
 {
     public static IServiceCollection AddECommerceModule(this IServiceCollection services, IConfiguration config) =>
         services
+            .AddNpgsqlDataSource(config.GetRequiredConnectionString("ECommerceDB"))
+            .AddEntityFrameworkProject<ECommerceDbContext>()
             .AddShoppingCartsModule()
             .AddPricingModule()
             .AddDbContext<ECommerceDbContext>(
