@@ -1,12 +1,14 @@
+using System.Data;
 using System.Linq.Expressions;
 using Core.EntityFramework.Queries;
 using Core.EntityFramework.Subscriptions.Checkpoints;
 using Core.Events;
 using Core.EventStoreDB;
 using Core.EventStoreDB.Subscriptions;
-using Core.EventStoreDB.Subscriptions.Batch;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
+using Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 
@@ -14,6 +16,33 @@ namespace Core.EntityFramework.Projections;
 
 public static class EntityFrameworkProjection
 {
+    public static IServiceCollection AddEntityFrameworkProject<TDbContext>(
+        this IServiceCollection services
+    ) where TDbContext : DbContext =>
+        services.AddPostgresCheckpointing()
+            .AddSingleton<PostgresSubscriptionCheckpointSetup>()
+            .AddScoped<NpgsqlTransaction>(sp =>
+            {
+                var dbContext = sp.GetRequiredService<TDbContext>();
+                return (NpgsqlTransaction)dbContext.Database.BeginTransaction().GetDbTransaction();
+            })
+            .AddScoped<PostgresConnectionProvider>(sp =>
+                PostgresConnectionProvider.From(sp.GetRequiredService<NpgsqlTransaction>())
+            )
+            .AddScoped<ISubscriptionCheckpointRepository>(sp =>
+            {
+                var dbContext = sp.GetRequiredService<TDbContext>();
+
+                var checkpointTransaction = new EFCheckpointTransaction(dbContext);
+
+                var connectionProvider = sp.GetRequiredService<PostgresConnectionProvider>();
+
+                return new TransactionalPostgresSubscriptionCheckpointRepository(
+                    new PostgresSubscriptionCheckpointRepository(connectionProvider),
+                    checkpointTransaction
+                );
+            });
+
     public static IServiceCollection For<TView, TId, TDbContext>(
         this IServiceCollection services,
         Action<EntityFrameworkProjectionBuilder<TView, TId, TDbContext>> setup
@@ -30,27 +59,6 @@ public static class EntityFrameworkProjection
             false
         );
 
-        services.AddScoped<ISubscriptionCheckpointRepository>(sp =>
-        {
-            var dataSource = sp.GetRequiredService<NpgsqlDataSource>();
-            var dbContext = sp.GetRequiredService<TDbContext>();
-
-            var checkpointTransaction = new EFCheckpointTransaction(dbContext);
-
-            return new TransactionalPostgresSubscriptionCheckpointRepository(
-                new PostgresSubscriptionCheckpointRepository(
-                    new PostgresConnectionProvider(
-                        async ct =>
-                        {
-                            await dbContext.Database.BeginTransactionAsync(ct);
-
-                            return (NpgsqlConnection)dbContext.Database.GetDbConnection();
-                        }),
-                    new PostgresSubscriptionCheckpointSetup(dataSource)
-                ),
-                checkpointTransaction
-            );
-        });
 
         return services;
     }

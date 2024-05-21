@@ -1,4 +1,5 @@
 using Core.EventStoreDB.Subscriptions.Checkpoints;
+using Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.EntityFramework.Subscriptions.Checkpoints;
