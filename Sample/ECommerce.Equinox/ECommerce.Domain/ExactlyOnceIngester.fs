@@ -65,7 +65,7 @@ type Service<[<Measure>]'id, 'req, 'res, 'outcome> internal
     ///   a) back-off, re-read and retry if there's a concurrent write Optimistic Concurrency Check failure when writing the stream
     ///   b) enter a prolonged period of retries if multiple concurrent writes trigger rate limiting and 429s from CosmosDB
     ///   c) readers will less frequently encounter sustained 429s on the batch
-    let batchedIngest = Equinox.Core.Batching.Batcher(tryIngest, linger)
+    let batchedIngest = Equinox.Core.Batching.Batcher(tryIngest, Linger = linger)
 
     /// Run the requests over a chain of epochs.
     /// Returns the subset that actually got handled this time around (exclusive of items that did not trigger events per idempotency rules).
