@@ -12,14 +12,16 @@ public static class PostgresCheckpointingConfiguration
             .AddScoped<ISubscriptionCheckpointRepository, PostgresSubscriptionCheckpointRepository>()
             .AddHostedService(serviceProvider =>
             {
-                var logger = serviceProvider.GetRequiredService<ILogger<BackgroundWorker>>();
+                var logger = serviceProvider.GetRequiredService<ILogger<BackgroundWorker<
+                    PostgresSubscriptionCheckpointSetup>>>();
                 var checkpointSetup = serviceProvider.GetRequiredService<PostgresSubscriptionCheckpointSetup>();
 
                 TelemetryPropagator.UseDefaultCompositeTextMapPropagator();
 
-                return new BackgroundWorker(
+                return new BackgroundWorker<PostgresSubscriptionCheckpointSetup>(
+                    checkpointSetup,
                     logger,
-                    async ct => await checkpointSetup.EnsureCheckpointsTableExist(ct).ConfigureAwait(false)
+                    async (setup, ct) => await setup.EnsureCheckpointsTableExist(ct).ConfigureAwait(false)
                 );
             }
         );

@@ -27,20 +27,18 @@ public class EventStoreDBSubscriptionToAllOptions
 }
 
 public class EventStoreDBSubscriptionToAll(
+    EventStoreDBSubscriptionToAllOptions subscriptionOptions,
     EventStoreClient eventStoreClient,
     IServiceProvider serviceProvider,
     ILogger<EventStoreDBSubscriptionToAll> logger
 )
 {
-    private EventStoreDBSubscriptionToAllOptions subscriptionOptions = default!;
     private string SubscriptionId => subscriptionOptions.SubscriptionId;
 
-    public async Task SubscribeToAll(EventStoreDBSubscriptionToAllOptions subscriptionOptions, CancellationToken ct)
+    public async Task SubscribeToAll(CancellationToken ct)
     {
         // see: https://github.com/dotnet/runtime/issues/36063
         await Task.Yield();
-
-        this.subscriptionOptions = subscriptionOptions;
 
         logger.LogInformation("Subscription to all '{SubscriptionId}'", subscriptionOptions.SubscriptionId);
 
@@ -92,7 +90,7 @@ public class EventStoreDBSubscriptionToAll(
             // Randomness added to reduce the chance of multiple subscriptions trying to reconnect at the same time
             Thread.Sleep(1000 + new Random((int)DateTime.UtcNow.Ticks).Next(1000));
 
-            await SubscribeToAll(this.subscriptionOptions, ct).ConfigureAwait(false);
+            await SubscribeToAll(ct).ConfigureAwait(false);
         }
     }
 

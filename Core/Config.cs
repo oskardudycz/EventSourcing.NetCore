@@ -1,5 +1,6 @@
 using Core.Commands;
 using Core.Events;
+using Core.Extensions;
 using Core.Ids;
 using Core.OpenTelemetry;
 using Core.Queries;
@@ -14,6 +15,7 @@ public static class Config
     public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
         services
+            .AllowResolvingKeyedServicesAsDictionary()
             .AddSingleton(TimeProvider.System)
             .AddSingleton(ActivityScope.Instance)
             .AddEventBus()

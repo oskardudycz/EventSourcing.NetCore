@@ -43,8 +43,7 @@ public static class EventStoreDBConfigExtensions
     {
         services
             .AddSingleton(EventTypeMapper.Instance)
-            .AddSingleton(new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)))
-            .AddTransient<EventStoreDBSubscriptionToAll, EventStoreDBSubscriptionToAll>();
+            .AddSingleton(new EventStoreClient(EventStoreClientSettings.Create(eventStoreDBConfig.ConnectionString)));
 
         if (options?.UseInternalCheckpointing != false)
         {
@@ -52,7 +51,22 @@ public static class EventStoreDBConfigExtensions
                 .AddTransient<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
         }
 
-        return services;
+        return services.AddHostedService(serviceProvider =>
+            {
+                var logger =
+                    serviceProvider.GetRequiredService<ILogger<BackgroundWorker>>();
+
+                var coordinator = serviceProvider.GetRequiredService<EventStoreDBSubscriptioToAllCoordinator>();
+
+                TelemetryPropagator.UseDefaultCompositeTextMapPropagator();
+
+                return new BackgroundWorker<EventStoreDBSubscriptioToAllCoordinator>(
+                    coordinator,
+                    logger,
+                    (c, ct) => c.SubscribeToAll(ct)
+                );
+            }
+        );
     }
 
     public static IServiceCollection AddEventStoreDBSubscriptionToAll(
@@ -62,6 +76,7 @@ public static class EventStoreDBConfigExtensions
     {
         services.AddScoped<EventsBatchProcessor, EventsBatchProcessor>();
         services.AddScoped<IEventsBatchCheckpointer, EventsBatchCheckpointer>();
+        services.AddSingleton<EventStoreDBSubscriptioToAllCoordinator>();
 
         if (checkpointToEventStoreDB)
         {
@@ -69,21 +84,14 @@ public static class EventStoreDBConfigExtensions
                 .AddSingleton<ISubscriptionCheckpointRepository, EventStoreDBSubscriptionCheckpointRepository>();
         }
 
-        return services.AddHostedService(serviceProvider =>
-            {
-                var logger =
-                    serviceProvider.GetRequiredService<ILogger<BackgroundWorker>>();
-
-                var eventStoreDBSubscriptionToAll =
-                    serviceProvider.GetRequiredService<EventStoreDBSubscriptionToAll>();
-
-                TelemetryPropagator.UseDefaultCompositeTextMapPropagator();
-
-                return new BackgroundWorker(
-                    logger,
-                    ct => eventStoreDBSubscriptionToAll.SubscribeToAll(subscriptionOptions, ct)
-                );
-            }
+        return services.AddKeyedSingleton<EventStoreDBSubscriptionToAll>(
+            $"ESDB_subscription-{subscriptionOptions.SubscriptionId}",
+            (sp, _) => new EventStoreDBSubscriptionToAll(
+                subscriptionOptions,
+                sp.GetRequiredService<EventStoreClient>(),
+                sp,
+                sp.GetRequiredService<ILogger<EventStoreDBSubscriptionToAll>>()
+            )
         );
     }
 }

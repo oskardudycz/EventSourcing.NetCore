@@ -1,5 +1,6 @@
 ﻿using Core.Events;
 using Core.EventStoreDB;
+using Core.Extensions;
 using Core.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ public static class Configuration
         IConfiguration configuration
     ) =>
         services
+            .AllowResolvingKeyedServicesAsDictionary()
             .AddSingleton<IActivityScope, ActivityScope>()
             .AddEventBus()
             .AddEventStoreDB(configuration);
