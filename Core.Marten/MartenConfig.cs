@@ -38,19 +38,22 @@ public static class MartenConfigExtensions
         IConfiguration configuration,
         Action<StoreOptions>? configureOptions = null,
         string configKey = DefaultConfigKey,
-        bool useExternalBus = false
+        bool useExternalBus = false,
+        bool disableAsyncDaemon = false
     ) =>
         services.AddMarten(
             configuration.GetRequiredConfig<MartenConfig>(configKey),
             configureOptions,
-            useExternalBus
+            useExternalBus,
+            disableAsyncDaemon
         );
 
     public static MartenServiceCollectionExtensions.MartenConfigurationExpression AddMarten(
         this IServiceCollection services,
         MartenConfig martenConfig,
         Action<StoreOptions>? configureOptions = null,
-        bool useExternalBus = false
+        bool useExternalBus = false,
+        bool disableAsyncDaemon = false
     )
     {
         var config = services
@@ -67,10 +70,14 @@ public static class MartenConfigExtensions
                 return SetStoreOptions(martenConfig, configureOptions);
             })
             .UseLightweightSessions()
-            .ApplyAllDatabaseChangesOnStartup()
+            .ApplyAllDatabaseChangesOnStartup();
+
+        if (!disableAsyncDaemon)
+        {
             //.OptimizeArtifactWorkflow()
-            .AddAsyncDaemon(martenConfig.DaemonMode)
-            .AddSubscriptionWithServices<MartenEventPublisher>(ServiceLifetime.Scoped);
+            config.AddAsyncDaemon(martenConfig.DaemonMode)
+                .AddSubscriptionWithServices<MartenEventPublisher>(ServiceLifetime.Scoped);
+        }
 
         if (useExternalBus)
             services.AddMartenAsyncCommandBus();

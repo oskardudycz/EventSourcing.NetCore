@@ -30,7 +30,7 @@ public class AddProductTests(ApiSpecification<Program> api): IClassFixture<ApiSp
             .Then(OK)
             .And()
             .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
-            .Until(RESPONSE_ETAG_IS(1))
+            .Until(RESPONSE_ETAG_IS(1), 10)
             .Then(
                 RESPONSE_BODY<ShoppingCartDetails>((details, ctx) =>
                 {

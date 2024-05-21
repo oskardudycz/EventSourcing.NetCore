@@ -103,7 +103,6 @@ public static class EventStoreDBConfigExtensions
             {
                 var subscription = new EventStoreDBSubscriptionToAll(
                     sp.GetRequiredService<EventStoreClient>(),
-                    sp.GetRequiredService<ISubscriptionStoreSetup>(),
                     sp.GetRequiredService<ILogger<EventStoreDBSubscriptionToAll>>()
                 ) { Options = subscriptionOptions, GetHandlers = handlers };
 

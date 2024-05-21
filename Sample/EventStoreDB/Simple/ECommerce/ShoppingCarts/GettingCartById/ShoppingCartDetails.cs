@@ -7,7 +7,7 @@ public class ShoppingCartDetails
     public Guid Id { get; set; }
     public Guid ClientId { get; set; }
     public ShoppingCartStatus Status { get; set; }
-    public List<ShoppingCartDetailsProductItem> ProductItems { get; set; } = default!;
+    public List<ShoppingCartDetailsProductItem> ProductItems { get; set; } = new();
     public int Version { get; set; }
     public ulong LastProcessedPosition { get; set; }
 }

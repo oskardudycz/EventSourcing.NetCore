@@ -23,7 +23,7 @@ public class OpenShoppingCartTests(ApiSpecification<Program> api): IClassFixture
             response =>
                 api.Given()
                     .When(GET, URI($"/api/ShoppingCarts/{response.GetCreatedId()}"))
-                    .Until(RESPONSE_ETAG_IS(1))
+                    .Until(RESPONSE_ETAG_IS(1), 10)
                     .Then(
                         OK,
                         RESPONSE_BODY<ShoppingCartDetails>(details =>
