@@ -77,12 +77,13 @@ public class EventStoreDBSubscriptionToAll(
 
             logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
 
-            await foreach (var @event in subscription)
-                // TODO: Add proper batching here!
-                // .BatchAsync(subscriptionOptions.BatchSize, TimeSpan.FromMilliseconds(100), ct)
-                // .ConfigureAwait(false))
+           // await foreach (var @event in subscription)
+              //  TODO: Add proper batching here!
+              await foreach (var events in subscription
+                .BatchAsync(Options.BatchSize, TimeSpan.FromMilliseconds(100), ct)
+                .ConfigureAwait(false))
             {
-                ResolvedEvent[] events = [@event];
+                //ResolvedEvent[] events = [@event];
                 await cw.WriteAsync(new EventBatch(Options.SubscriptionId, events), ct)
                     .ConfigureAwait(false);
             }

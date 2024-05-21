@@ -69,34 +69,39 @@ public class EventStoreDBSubscriptioToAllCoordinator
 
             try
             {
-                using var scope = serviceScopeFactory.CreateScope();
-                var checkpointer = scope.ServiceProvider.GetRequiredService<IEventsBatchCheckpointer>();
-
-                var subscriptionInfo = subscriptions[batch.SubscriptionId];
-
-                var result = await checkpointer.Process(
-                        batch.Events,
-                        subscriptionInfo.LastCheckpoint,
-                        new BatchProcessingOptions(
-                            batch.SubscriptionId,
-                            subscriptionInfo.Subscription.Options.IgnoreDeserializationErrors,
-                            subscriptionInfo.Subscription.GetHandlers(scope.ServiceProvider)
-                        ),
-                        ct
-                    )
-                    .ConfigureAwait(false);
-
-
-                if (result is ISubscriptionCheckpointRepository.StoreResult.Success success)
-                {
-                    subscriptionInfo.LastCheckpoint = success.Checkpoint;
-                    Reader.TryRead(out _);
-                }
+                await ProcessBatch(ct, batch).ConfigureAwait(false);
             }
             catch (Exception exc)
             {
                 Console.WriteLine(exc);
             }
+        }
+    }
+
+    private async Task ProcessBatch(CancellationToken ct, EventBatch batch)
+    {
+        using var scope = serviceScopeFactory.CreateScope();
+        var checkpointer = scope.ServiceProvider.GetRequiredService<IEventsBatchCheckpointer>();
+
+        var subscriptionInfo = subscriptions[batch.SubscriptionId];
+
+        var result = await checkpointer.Process(
+                batch.Events,
+                subscriptionInfo.LastCheckpoint,
+                new BatchProcessingOptions(
+                    batch.SubscriptionId,
+                    subscriptionInfo.Subscription.Options.IgnoreDeserializationErrors,
+                    subscriptionInfo.Subscription.GetHandlers(scope.ServiceProvider)
+                ),
+                ct
+            )
+            .ConfigureAwait(false);
+
+
+        if (result is ISubscriptionCheckpointRepository.StoreResult.Success success)
+        {
+            subscriptionInfo.LastCheckpoint = success.Checkpoint;
+            Reader.TryRead(out _);
         }
     }
 
