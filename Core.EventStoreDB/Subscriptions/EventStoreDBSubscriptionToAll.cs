@@ -7,6 +7,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Open.ChannelExtensions;
 using Polly;
+using Polly.Wrap;
 using EventTypeFilter = EventStore.Client.EventTypeFilter;
 
 namespace Core.EventStoreDB.Subscriptions;
@@ -53,66 +54,67 @@ public class EventStoreDBSubscriptionToAll(
     public async Task SubscribeToAll(Checkpoint checkpoint, ChannelWriter<EventBatch> cw, CancellationToken ct)
     {
         Status = ProcessingStatus.Starting;
-        // see: https://github.com/dotnet/runtime/issues/36063
-        await Task.Yield();
 
         logger.LogInformation("Subscription to all '{SubscriptionId}'", Options.SubscriptionId);
 
-        try
+        await RetryPolicy.ExecuteAsync(token =>
+                OnSubscribe(checkpoint, cw, token), ct
+        ).ConfigureAwait(false);
+    }
+
+    private async Task OnSubscribe(Checkpoint checkpoint, ChannelWriter<EventBatch> cw, CancellationToken ct)
+    {
+        var subscription = eventStoreClient.SubscribeToAll(
+            checkpoint != Checkpoint.None ? FromAll.After(checkpoint) : FromAll.Start,
+            Options.ResolveLinkTos,
+            Options.FilterOptions,
+            Options.Credentials,
+            ct
+        );
+
+        Status = ProcessingStatus.Started;
+
+        logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
+
+        await subscription.Pipe<ResolvedEvent, EventBatch>(
+            cw,
+            events => new EventBatch(Options.SubscriptionId, events.ToArray()),
+            Options.BatchSize,
+            Options.BatchDeadline,
+            ct
+        ).ConfigureAwait(false);
+    }
+
+    private AsyncPolicyWrap RetryPolicy
+    {
+        get
         {
-            var subscription = eventStoreClient.SubscribeToAll(
-                checkpoint != Checkpoint.None ? FromAll.After(checkpoint) : FromAll.Start,
-                Options.ResolveLinkTos,
-                Options.FilterOptions,
-                Options.Credentials,
-                ct
-            );
+            var generalPolicy = Policy.Handle<Exception>(ex => !IsCancelledByUser(ex))
+                .WaitAndRetryForeverAsync(
+                    sleepDurationProvider: _ =>
+                        TimeSpan.FromMilliseconds(1000 + new Random((int)DateTime.UtcNow.Ticks).Next(1000)),
+                    onRetry: (exception, _, _) =>
+                        logger.LogWarning("Subscription was dropped: {Exception}", exception)
+                );
 
-            Status = ProcessingStatus.Started;
+            var fallbackPolicy = Policy.Handle<OperationCanceledException>()
+                .Or<RpcException>(IsCancelledByUser)
+                .FallbackAsync(_ =>
+                    {
+                        logger.LogWarning("Subscription to all '{SubscriptionId}' dropped by client", SubscriptionId);
+                        return Task.CompletedTask;
+                    }
+                );
 
-            logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
-
-
-            await subscription.Pipe<ResolvedEvent, EventBatch>(
-                cw,
-                events => new EventBatch(Options.SubscriptionId, events.ToArray()),
-                Options.BatchSize,
-                Options.BatchDeadline,
-                ct
-            ).ConfigureAwait(false);
-        }
-        catch (RpcException rpcException) when (rpcException is { StatusCode: StatusCode.Cancelled } ||
-                                                rpcException.InnerException is ObjectDisposedException)
-        {
-            logger.LogWarning(
-                "Subscription to all '{SubscriptionId}' dropped by client",
-                SubscriptionId
-            );
-        }
-        catch (OperationCanceledException)
-        {
-            logger.LogWarning(
-                "Subscription to all '{SubscriptionId}' dropped by client",
-                SubscriptionId
-            );
-        }
-        catch (Exception ex)
-        {
-            Status = ProcessingStatus.Errored;
-            logger.LogWarning("Subscription was dropped: {Exception}", ex);
-
-            // Sleep between reconnections to not flood the database or not kill the CPU with infinite loop
-            // Randomness added to reduce the chance of multiple subscriptions trying to reconnect at the same time
-            Thread.Sleep(1000 + new Random((int)DateTime.UtcNow.Ticks).Next(1000));
-
-            await SubscribeToAll(checkpoint, cw, ct).ConfigureAwait(false);
+            return Policy.WrapAsync(generalPolicy, fallbackPolicy);
         }
     }
-    //
-    // private AsyncPolicy retry = Policy.Handle<RpcException>(rpcException =>
-    //         rpcException is { StatusCode: StatusCode.Cancelled } ||
-    //         rpcException.InnerException is ObjectDisposedException)
-    //     .Or<OperationCanceledException>()
-    //     .F
-    //     .WaitAndRetryForeverAsync(_ => TimeSpan.FromMilliseconds(500));
+
+    private static bool IsCancelledByUser(RpcException rpcException) =>
+        rpcException.StatusCode == StatusCode.Cancelled
+        || rpcException.InnerException is ObjectDisposedException;
+
+    private static bool IsCancelledByUser(Exception exception) =>
+        exception is OperationCanceledException
+        || exception is RpcException rpcException && IsCancelledByUser(rpcException);
 }
