@@ -8,14 +8,14 @@ using static ECommerce.Api.Tests.ShoppingCarts.ShoppingCartsApi;
 
 namespace ECommerce.Api.Tests.ShoppingCarts.Canceling;
 
-public class CancelShoppingCartTests(ApiSpecification<Program> api): IClassFixture<ApiSpecification<Program>>
+public class CancelShoppingCartTests: ApiTest
 {
     public readonly Guid ClientId = Guid.NewGuid();
 
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task Delete_Should_Return_OK_And_Cancel_Shopping_Cart() =>
-        api
+        API
             .Given("Opened Shopping Cart", OpenShoppingCart(ClientId))
             .When(
                 "Cancel Shopping Cart",
@@ -37,4 +37,8 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api): IClassFixtu
                     details.ClientId.Should().Be(ClientId);
                     details.Version.Should().Be(1);
                 }));
+
+    public CancelShoppingCartTests(ApiFixture fixture) : base(fixture)
+    {
+    }
 }
