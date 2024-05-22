@@ -59,11 +59,11 @@ public static class EventStoreDBConfigExtensions
                 var logger =
                     serviceProvider.GetRequiredService<ILogger<BackgroundWorker>>();
 
-                var coordinator = serviceProvider.GetRequiredService<EventStoreDBSubscriptioToAllCoordinator>();
+                var coordinator = serviceProvider.GetRequiredService<EventStoreDBSubscriptionsToAllCoordinator>();
 
                 TelemetryPropagator.UseDefaultCompositeTextMapPropagator();
 
-                return new BackgroundWorker<EventStoreDBSubscriptioToAllCoordinator>(
+                return new BackgroundWorker<EventStoreDBSubscriptionsToAllCoordinator>(
                     coordinator,
                     logger,
                     (c, ct) => c.SubscribeToAll(ct)
@@ -95,7 +95,7 @@ public static class EventStoreDBConfigExtensions
         Func<IServiceProvider, IEventBatchHandler[]> handlers
     )
     {
-        services.AddSingleton<EventStoreDBSubscriptioToAllCoordinator>();
+        services.AddSingleton<EventStoreDBSubscriptionsToAllCoordinator>();
 
         return services.AddKeyedSingleton<EventStoreDBSubscriptionToAll>(
             subscriptionOptions.SubscriptionId,
@@ -103,6 +103,7 @@ public static class EventStoreDBConfigExtensions
             {
                 var subscription = new EventStoreDBSubscriptionToAll(
                     sp.GetRequiredService<EventStoreClient>(),
+                    sp.GetRequiredService<IServiceScopeFactory>(),
                     sp.GetRequiredService<ILogger<EventStoreDBSubscriptionToAll>>()
                 ) { Options = subscriptionOptions, GetHandlers = handlers };
 
