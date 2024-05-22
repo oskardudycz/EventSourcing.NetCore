@@ -3,9 +3,11 @@ using Core.EventStoreDB.Subscriptions.Batch;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
 using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Polly;
 
 namespace Core.EventStoreDB.Subscriptions;
+using static ISubscriptionCheckpointRepository;
 
 public class SubscriptionInfo
 {
@@ -18,6 +20,7 @@ public class EventStoreDBSubscriptioToAllCoordinator
     private readonly IDictionary<string, SubscriptionInfo> subscriptions;
     private readonly ISubscriptionStoreSetup storeSetup;
     private readonly IServiceScopeFactory serviceScopeFactory;
+    private readonly ILogger<EventStoreDBSubscriptioToAllCoordinator> logger;
 
     private readonly Channel<EventBatch> events = Channel.CreateBounded<EventBatch>(
         new BoundedChannelOptions(1)
@@ -32,7 +35,8 @@ public class EventStoreDBSubscriptioToAllCoordinator
     public EventStoreDBSubscriptioToAllCoordinator(
         IDictionary<string, EventStoreDBSubscriptionToAll> subscriptions,
         ISubscriptionStoreSetup storeSetup,
-        IServiceScopeFactory serviceScopeFactory
+        IServiceScopeFactory serviceScopeFactory,
+        ILogger<EventStoreDBSubscriptioToAllCoordinator> logger
         )
     {
         this.subscriptions =
@@ -41,6 +45,7 @@ public class EventStoreDBSubscriptioToAllCoordinator
             );
         this.storeSetup = storeSetup;
         this.serviceScopeFactory = serviceScopeFactory;
+        this.logger = logger;
     }
 
     private ChannelReader<EventBatch> Reader => events.Reader;
@@ -76,21 +81,28 @@ public class EventStoreDBSubscriptioToAllCoordinator
 
             try
             {
-                await ProcessBatch(ct, batch).ConfigureAwait(false);
+
+                var subscriptionInfo = subscriptions[batch.SubscriptionId];
+
+                var result = await ProcessBatch(subscriptionInfo, batch, ct).ConfigureAwait(false);
+
+                if (result is StoreResult.Success success)
+                {
+                    subscriptionInfo.LastCheckpoint = success.Checkpoint;
+                    Reader.TryRead(out _);
+                }
             }
             catch (Exception exc)
             {
-                Console.WriteLine(exc);
+                logger.LogError(exc, "Error processing batch for: {batch}", batch);
             }
         }
     }
 
-    private async Task ProcessBatch(CancellationToken ct, EventBatch batch)
+    private async Task<StoreResult> ProcessBatch(SubscriptionInfo subscriptionInfo, EventBatch batch, CancellationToken ct)
     {
         using var scope = serviceScopeFactory.CreateScope();
         var checkpointer = scope.ServiceProvider.GetRequiredService<IEventsBatchCheckpointer>();
-
-        var subscriptionInfo = subscriptions[batch.SubscriptionId];
 
         var result = await checkpointer.Process(
                 batch.Events,
@@ -101,15 +113,9 @@ public class EventStoreDBSubscriptioToAllCoordinator
                     subscriptionInfo.Subscription.GetHandlers(scope.ServiceProvider)
                 ),
                 ct
-            )
-            .ConfigureAwait(false);
+            ).ConfigureAwait(false);
 
-
-        if (result is ISubscriptionCheckpointRepository.StoreResult.Success success)
-        {
-            subscriptionInfo.LastCheckpoint = success.Checkpoint;
-            Reader.TryRead(out _);
-        }
+        return result;
     }
 
     private Task<Checkpoint> LoadCheckpoint(string subscriptionId, CancellationToken token) =>

@@ -4,11 +4,21 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace ECommerce.Storage;
 
-public class ECommerceDbContext(DbContextOptions<ECommerceDbContext> options): DbContext(options)
+public class ECommerceDbContext(DbContextOptions<ECommerceDbContext> options): DbContext(options), IDisposable, IAsyncDisposable
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.SetupShoppingCartsReadModels();
+    }
+
+    void IDisposable.Dispose()
+    {
+        base.Dispose();
+    }
+
+    ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        return base.DisposeAsync();
     }
 }
 
