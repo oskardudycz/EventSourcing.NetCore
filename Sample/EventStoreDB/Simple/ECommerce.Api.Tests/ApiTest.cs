@@ -23,11 +23,6 @@ public class ShoppingCartsApplicationFactory: TestWebApplicationFactory<Program>
 
 public class ApiFixture: IDisposable
 {
-    public ApiFixture()
-    {
-
-    }
-
     public ApiSpecification<Program> API { get; } =
         ApiSpecification<Program>.Setup(new ShoppingCartsApplicationFactory());
 
@@ -39,10 +34,7 @@ public class ApiFixture: IDisposable
 public class DatabaseCollection: ICollectionFixture<ApiFixture>;
 
 [Collection("ApiTests")]
-public abstract class ApiTest
+public abstract class ApiTest(ApiFixture fixture)
 {
-    protected readonly ApiSpecification<Program> API;
-
-    protected ApiTest(ApiFixture fixture) =>
-        API = fixture.API;
+    protected readonly ApiSpecification<Program> API = fixture.API;
 }

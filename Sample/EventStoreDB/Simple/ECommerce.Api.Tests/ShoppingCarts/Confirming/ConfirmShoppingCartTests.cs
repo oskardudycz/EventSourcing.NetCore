@@ -10,7 +10,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.Confirming;
 
 using static ShoppingCartsApi;
 
-public class ConfirmShoppingCartTests: ApiTest
+public class ConfirmShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
 {
     private Guid ClientId = Guid.NewGuid();
 
@@ -40,9 +40,5 @@ public class ConfirmShoppingCartTests: ApiTest
                 }));
 
         // API.PublishedExternalEventsOfType<CartFinalized>();
-    }
-
-    public ConfirmShoppingCartTests(ApiFixture fixture) : base(fixture)
-    {
     }
 }
