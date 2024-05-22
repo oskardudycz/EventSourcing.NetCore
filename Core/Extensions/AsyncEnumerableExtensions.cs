@@ -26,7 +26,7 @@ public static class AsyncEnumerableExtensions
             await cw.WriteAsync(transform(batch), ct).ConfigureAwait(false);
 
             return batch;
-        });
+        }, cancellationToken: ct);
 
         await foreach (var @event in enumerable.WithCancellation(ct))
         {
