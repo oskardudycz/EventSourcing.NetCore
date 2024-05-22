@@ -6,45 +6,6 @@ namespace Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 
 using static ISubscriptionCheckpointRepository;
 
-// public class PostgresConnectionProvider(Func<CancellationToken, ValueTask<NpgsqlConnection>> connectionFactory)
-// {
-//     public ValueTask<NpgsqlConnection> Get(CancellationToken ct) => connectionFactory(ct);
-//
-//     public void Set(NpgsqlConnection connection) =>
-//         connectionFactory = _ => ValueTask.FromResult(connection);
-//
-//     public void Set(NpgsqlTransaction transaction) =>
-//         connectionFactory = _ => ValueTask.FromResult(transaction.Connection!);
-//
-//     public void Set(NpgsqlDataSource dataSource) =>
-//         connectionFactory = async ct =>
-//         {
-//             var connection = dataSource.CreateConnection();
-//             await connection.OpenAsync(ct).ConfigureAwait(false);
-//             return connection;
-//         };
-//
-//     public static PostgresConnectionProvider From(NpgsqlDataSource npgsqlDataSource) =>
-//         new(async ct =>
-//         {
-//             var connection = npgsqlDataSource.CreateConnection();
-//             await connection.OpenAsync(ct).ConfigureAwait(false);
-//             return connection;
-//         });
-//
-//     public static PostgresConnectionProvider From(NpgsqlTransaction transaction) =>
-//         new(async ct =>
-//         {
-//             if (transaction.Connection == null)
-//                 throw new InvalidOperationException("Transaction connection is not opened!");
-//
-//             if (transaction.Connection.State == ConnectionState.Closed)
-//                 await transaction.Connection.OpenAsync(ct).ConfigureAwait(false);
-//
-//             return transaction.Connection;
-//         });
-// }
-
 public class PostgresSubscriptionCheckpointRepository(
     // I'm not using data source here, as I'd like to enable option
     // to update projection in the same transaction in the same transaction as checkpointing

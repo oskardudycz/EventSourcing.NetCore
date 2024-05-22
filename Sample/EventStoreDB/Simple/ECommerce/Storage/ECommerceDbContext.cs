@@ -10,16 +10,6 @@ public class ECommerceDbContext(DbContextOptions<ECommerceDbContext> options): D
     {
         modelBuilder.SetupShoppingCartsReadModels();
     }
-
-    void IDisposable.Dispose()
-    {
-        base.Dispose();
-    }
-
-    ValueTask IAsyncDisposable.DisposeAsync()
-    {
-        return base.DisposeAsync();
-    }
 }
 
 public class ECommerceDBContextFactory: IDesignTimeDbContextFactory<ECommerceDbContext>

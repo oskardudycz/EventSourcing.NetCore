@@ -91,8 +91,6 @@ public class EntityFrameworkProjectionTests(EfCorePostgresContainerFixture<TestD
         savedEntity.Should().BeEquivalentTo(new ShoppingCart { Id = cartId, ClientId = clientId, ProductCount = 10 });
     }
 
-
-
     [Fact]
     public async Task Applies_Works_In_Batch_With_AddAndDeleteOnTheSameRecord()
     {
