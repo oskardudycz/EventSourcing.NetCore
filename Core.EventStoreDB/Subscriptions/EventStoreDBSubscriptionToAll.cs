@@ -111,6 +111,7 @@ public class EventStoreDBSubscriptionToAll(
         }
         catch (Exception exc)
         {
+            // TODO: How would you implement Dead-Letter Queue here?
             logger.LogError(exc, "Error while handling batch");
             throw;
         }

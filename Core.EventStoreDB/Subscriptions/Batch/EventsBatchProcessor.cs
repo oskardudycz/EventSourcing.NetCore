@@ -27,7 +27,6 @@ public class EventsBatchProcessor(
 
         foreach (var batchHandler in options.BatchHandlers)
         {
-            // TODO: How would you implement Dead-Letter Queue here?
             await batchHandler.Handle(events, ct).ConfigureAwait(false);
         }
     }

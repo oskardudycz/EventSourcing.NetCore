@@ -19,8 +19,6 @@ public class TestDbContext(DbContextOptions<TestDbContext> options): DbContext(o
         modelBuilder.Entity<ShoppingCart>();
 }
 
-
-
 public class TestDbContextFactory: IDesignTimeDbContextFactory<TestDbContext>
 {
     public TestDbContext CreateDbContext(params string[] args)
