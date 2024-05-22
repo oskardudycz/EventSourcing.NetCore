@@ -9,7 +9,7 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace ECommerce.Api.Tests.ShoppingCarts.RemovingProduct;
 
-public class RemoveProductTests: ApiTest, IAsyncLifetime
+public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLifetime
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -81,8 +81,4 @@ public class RemoveProductTests: ApiTest, IAsyncLifetime
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
-
-    public RemoveProductTests(ApiFixture fixture) : base(fixture)
-    {
-    }
 }

@@ -8,7 +8,7 @@ using static ECommerce.Api.Tests.ShoppingCarts.ShoppingCartsApi;
 
 namespace ECommerce.Api.Tests.ShoppingCarts.Canceling;
 
-public class CancelShoppingCartTests: ApiTest
+public class CancelShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
 {
     public readonly Guid ClientId = Guid.NewGuid();
 
@@ -37,8 +37,4 @@ public class CancelShoppingCartTests: ApiTest
                     details.ClientId.Should().Be(ClientId);
                     details.Version.Should().Be(1);
                 }));
-
-    public CancelShoppingCartTests(ApiFixture fixture) : base(fixture)
-    {
-    }
 }

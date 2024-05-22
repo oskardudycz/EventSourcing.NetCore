@@ -8,7 +8,7 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace ECommerce.Api.Tests.ShoppingCarts.Opening;
 
-public class OpenShoppingCartTests: ApiTest
+public class OpenShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
 {
     [Fact]
     public Task Post_ShouldReturn_CreatedStatus_With_CartId() =>
@@ -37,8 +37,4 @@ public class OpenShoppingCartTests: ApiTest
         );
 
     public readonly Guid ClientId = Guid.NewGuid();
-
-    public OpenShoppingCartTests(ApiFixture fixture) : base(fixture)
-    {
-    }
 }

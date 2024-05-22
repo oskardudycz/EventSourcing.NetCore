@@ -10,7 +10,7 @@ namespace Carts.Api.Tests.ShoppingCarts.AddingProduct;
 
 using static ShoppingCartsApi;
 
-public class AddProductTests(ApiSpecification<Program> api): IClassFixture<ApiSpecification<Program>>
+public class AddProductTests(ApiFixture fixture): ApiTest(fixture)
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -18,7 +18,7 @@ public class AddProductTests(ApiSpecification<Program> api): IClassFixture<ApiSp
     {
         var product = new ProductItemRequest(Guid.NewGuid(), 1);
 
-        await api
+        await API
             .Given("Opened Shopping Cart", OpenShoppingCart())
             .When(
                 "Add new product",

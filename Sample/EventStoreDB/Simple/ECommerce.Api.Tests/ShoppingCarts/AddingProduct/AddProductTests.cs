@@ -10,7 +10,7 @@ namespace ECommerce.Api.Tests.ShoppingCarts.AddingProduct;
 
 using static ShoppingCartsApi;
 
-public class AddProductTests: ApiTest
+public class AddProductTests(ApiFixture fixture): ApiTest(fixture)
 {
     [Fact]
     [Trait("Category", "Acceptance")]
@@ -42,9 +42,5 @@ public class AddProductTests: ApiTest
                     details.Version.Should().Be(1);
                 })
             );
-    }
-
-    public AddProductTests(ApiFixture fixture) : base(fixture)
-    {
     }
 }
