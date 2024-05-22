@@ -22,7 +22,7 @@ public class OpenShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
                 .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 0)),
             response =>
                 API.Given()
-                    .When(GET, URI($"/api/ShoppingCarts/{response.GetCreatedId()}"))
+                    .When(GET, URI($"/api/ShoppingCarts/{response.GetCreatedId()}"), HEADERS(IF_MATCH(0)))
                     .Until(RESPONSE_ETAG_IS(0))
                     .Then(
                         OK,

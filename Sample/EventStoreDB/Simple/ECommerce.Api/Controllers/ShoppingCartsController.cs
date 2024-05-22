@@ -12,6 +12,8 @@ using ECommerce.ShoppingCarts.RemovingProductItem;
 
 namespace ECommerce.Api.Controllers;
 
+using static ETagExtensions;
+
 [Route("api/[controller]")]
 public class ShoppingCartsController: Controller
 {
@@ -66,9 +68,9 @@ public class ShoppingCartsController: Controller
     public async Task<IActionResult> RemoveProduct(
         [FromServices] Func<RemoveProductItemFromShoppingCart, CancellationToken, ValueTask> handle,
         Guid id,
-        [FromRoute]Guid? productId,
-        [FromQuery]int? quantity,
-        [FromQuery]decimal? unitPrice,
+        [FromRoute] Guid? productId,
+        [FromQuery] int? quantity,
+        [FromQuery] decimal? unitPrice,
         CancellationToken ct
     )
     {
@@ -120,10 +122,11 @@ public class ShoppingCartsController: Controller
     public async Task<IActionResult> Get(
         [FromServices] Func<GetCartById, CancellationToken, Task<ShoppingCartDetails?>> query,
         Guid id,
+        [FromIfMatchHeader] string? eTag,
         CancellationToken ct
     )
     {
-        var result = await query(GetCartById.From(id), ct);
+        var result = await query(GetCartById.From(id, eTag != null ? ToExpectedVersion(eTag) : null), ct);
 
         if (result == null)
             return NotFound();

@@ -25,7 +25,7 @@ public class CancelShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
             )
             .Then(OK)
             .And()
-            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
+            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"), HEADERS(IF_MATCH(1)))
             .Until(RESPONSE_ETAG_IS(1), 10)
             .Then(
                 OK,
