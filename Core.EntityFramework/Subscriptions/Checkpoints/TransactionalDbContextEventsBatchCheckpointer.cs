@@ -24,27 +24,26 @@ public class TransactionalDbContextEventsBatchCheckpointer<TDbContext>(
         Checkpoint lastCheckpoint,
         BatchProcessingOptions options,
         CancellationToken ct
-        )
+    )
     {
         await dbContext.Database.UseTransactionAsync(transaction, ct);
         var inner = new EventsBatchCheckpointer(
             new PostgresSubscriptionCheckpointRepository(connection, transaction),
             batchProcessor
         );
-
         var result = await inner.Process(events, lastCheckpoint, options, ct)
             .ConfigureAwait(false);
 
-        await dbContext.SaveChangesAsync(ct);
-
-        if (result is not StoreResult.Success)
+        if (result is StoreResult.Success)
         {
-            dbContext.ChangeTracker.Clear();
+            await dbContext.SaveChangesAsync(ct);
+            await transaction.CommitAsync(ct).ConfigureAwait(false);
+        }
+        else
+        {
             await transaction.RollbackAsync(ct);
             return result;
         }
-
-        await transaction.CommitAsync(ct).ConfigureAwait(false);
 
         return result;
     }
