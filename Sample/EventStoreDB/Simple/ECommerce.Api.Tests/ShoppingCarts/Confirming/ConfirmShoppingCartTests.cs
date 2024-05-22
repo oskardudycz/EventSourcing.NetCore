@@ -8,51 +8,41 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace ECommerce.Api.Tests.ShoppingCarts.Confirming;
 
-public class ConfirmShoppingCartFixture()
-    : ApiSpecification<Program>(new ShoppingCartsApplicationFactory()), IAsyncLifetime
+using static ShoppingCartsApi;
+
+public class ConfirmShoppingCartTests: ApiTest
 {
-    public Guid ShoppingCartId { get; private set; }
+    private Guid ClientId = Guid.NewGuid();
 
-    public readonly Guid ClientId = Guid.NewGuid();
-
-    public async Task InitializeAsync()
-    {
-        ShoppingCartId = await Given()
-            .When(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
-            .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 0))
-            .GetCreatedId<Guid>();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-}
-
-public class ConfirmShoppingCartTests(ConfirmShoppingCartFixture api): IClassFixture<ConfirmShoppingCartFixture>
-{
     [Fact]
     [Trait("Category", "Acceptance")]
     public async Task Put_Should_Return_OK_And_Confirm_Shopping_Cart()
     {
-        await api
-            .Given()
+        await API
+            .Given("Opened Shopping Cart", OpenShoppingCart(ClientId))
             .When(
                 PUT,
-                URI($"/api/ShoppingCarts/{api.ShoppingCartId}/confirmation"),
+                URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}/confirmation"),
                 HEADERS(IF_MATCH(0))
             )
             .Then(OK)
-            .AndWhen(GET, URI($"/api/ShoppingCarts/{api.ShoppingCartId}"))
+            .AndWhen(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
             .Until(RESPONSE_ETAG_IS(1), maxNumberOfRetries: 10)
             .Then(
                 OK,
-                RESPONSE_BODY<ShoppingCartDetails>(details =>
+                RESPONSE_BODY<ShoppingCartDetails>((details,ctx) =>
                 {
-                    details.Id.Should().Be(api.ShoppingCartId);
+                    details.Id.Should().Be(ctx.OpenedShoppingCartId());
                     details.Status.Should().Be(ShoppingCartStatus.Confirmed);
                     details.ProductItems.Should().BeEmpty();
-                    details.ClientId.Should().Be(api.ClientId);
+                    details.ClientId.Should().Be(ClientId);
                     details.Version.Should().Be(1);
                 }));
 
         // API.PublishedExternalEventsOfType<CartFinalized>();
+    }
+
+    public ConfirmShoppingCartTests(ApiFixture fixture) : base(fixture)
+    {
     }
 }

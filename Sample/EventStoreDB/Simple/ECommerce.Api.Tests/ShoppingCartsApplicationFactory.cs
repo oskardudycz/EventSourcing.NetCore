@@ -1,4 +1,6 @@
 ﻿using Core.Testing;
+using Ogooreck.API;
+using Xunit;
 
 namespace ECommerce.Api.Tests;
 
@@ -17,4 +19,30 @@ public class ShoppingCartsApplicationFactory: TestWebApplicationFactory<Program>
     //
     //     return host;
     // }
+}
+
+public class ApiFixture: IDisposable
+{
+    public ApiFixture()
+    {
+
+    }
+
+    public ApiSpecification<Program> API { get; } =
+        ApiSpecification<Program>.Setup(new ShoppingCartsApplicationFactory());
+
+    public void Dispose() =>
+        API.Dispose();
+}
+
+[CollectionDefinition("ApiTests")]
+public class DatabaseCollection: ICollectionFixture<ApiFixture>;
+
+[Collection("ApiTests")]
+public abstract class ApiTest
+{
+    protected readonly ApiSpecification<Program> API;
+
+    protected ApiTest(ApiFixture fixture) =>
+        API = fixture.API;
 }
