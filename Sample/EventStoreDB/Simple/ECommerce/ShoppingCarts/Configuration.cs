@@ -70,7 +70,7 @@ public static class Configuration
                         ShoppingCartDetailsProjection.Handle
                     )
                     .Include(x => x.ProductItems)
-                    .QueryWith<GetCartById>(GetCartById.Handle)
+                    .QueryWith<GetCartById, ShoppingCartDetails?>(GetCartById.Handle)
             )
             .For<ShoppingCartShortInfo, Guid, ECommerceDbContext>(
                 builder => builder

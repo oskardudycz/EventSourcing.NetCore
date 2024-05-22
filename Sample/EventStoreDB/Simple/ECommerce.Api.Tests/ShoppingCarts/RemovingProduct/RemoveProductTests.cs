@@ -25,7 +25,7 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
             )
             .Then(NO_CONTENT)
             .And()
-            .When(GET, URI($"/api/ShoppingCarts/{ShoppingCartId}"))
+            .When(GET, URI($"/api/ShoppingCarts/{ShoppingCartId}"), HEADERS(IF_MATCH(2)))
             .Until(RESPONSE_ETAG_IS(2), maxNumberOfRetries: 10)
             .Then(
                 OK,
@@ -71,7 +71,7 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
             )
             .Then(OK)
             .And()
-            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.GetCreatedId()}"))
+            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.GetCreatedId()}"), HEADERS(IF_MATCH(1)))
             .Until(RESPONSE_ETAG_IS(1), maxNumberOfRetries: 10)
             .Then(OK)
             .GetResponseBody<ShoppingCartDetails>();

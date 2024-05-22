@@ -94,6 +94,15 @@ public class EntityFrameworkProjectionBuilder<TView, TId, TDbContext>(IServiceCo
         return this;
     }
 
+    public EntityFrameworkProjectionBuilder<TView, TId, TDbContext> QueryWith<TQuery, TResult>(
+        Func<IQueryable<TView>, TQuery, CancellationToken, Task<TResult>> handler
+    )
+    {
+        services.AddEntityFrameworkQueryHandler<TDbContext, TView, TQuery, TResult>(handler);
+
+        return this;
+    }
+
     public EntityFrameworkProjectionBuilder<TView, TId, TDbContext> QueryWith<TQuery>(
         Func<IQueryable<TView>, TQuery, CancellationToken, Task<IReadOnlyList<TView>>> handler
     )

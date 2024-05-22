@@ -5,17 +5,27 @@ namespace Core.EntityFramework.Queries;
 
 public static class QueryHandler
 {
+
     public static IServiceCollection AddEntityFrameworkQueryHandler<TDbContext, TQuery, TResult>(
         this IServiceCollection services,
         Func<IQueryable<TResult>, TQuery, CancellationToken, Task<TResult>> handler
     )
-        where TDbContext : DbContext where TResult : class
+        where TDbContext : DbContext
+        where TResult : class
+        => services.AddEntityFrameworkQueryHandler<TDbContext, TResult, TQuery, TResult>(handler);
+
+    public static IServiceCollection AddEntityFrameworkQueryHandler<TDbContext, TView, TQuery, TResult>(
+        this IServiceCollection services,
+        Func<IQueryable<TView>, TQuery, CancellationToken, Task<TResult>> handler
+    )
+        where TDbContext : DbContext
+        where TView : class
         =>
             services.AddQueryHandler<TQuery, TResult>(sp =>
             {
                 var queryable =
                     sp.GetRequiredService<TDbContext>()
-                        .Set<TResult>()
+                        .Set<TView>()
                         .AsNoTracking()
                         .AsQueryable();
 

@@ -1,29 +1,68 @@
 using Core.Exceptions;
 using Core.Queries;
+using Core.Validation;
 using Marten;
+using Polly;
 
 namespace Carts.ShoppingCarts.GettingCartById;
 
 public record GetCartById(
-    Guid CartId
+    Guid CartId,
+    int? ExpectedVersion
 )
 {
-    public static GetCartById Create(Guid? cartId)
-    {
-        if (cartId == null || cartId == Guid.Empty)
-            throw new ArgumentOutOfRangeException(nameof(cartId));
-
-        return new GetCartById(cartId.Value);
-    }
+    public static GetCartById From(Guid cartId, int? expectedVersion) =>
+        new(cartId.NotEmpty(), expectedVersion);
 }
 
 internal class HandleGetCartById(IQuerySession querySession):
     IQueryHandler<GetCartById, ShoppingCartDetails>
 {
-    public async Task<ShoppingCartDetails> Handle(GetCartById request, CancellationToken cancellationToken)
+    public async Task<ShoppingCartDetails> Handle(GetCartById query, CancellationToken token)
     {
-        var cart = await querySession.LoadAsync<ShoppingCartDetails>(request.CartId, cancellationToken);
+        var expectedVersion = query.ExpectedVersion;
 
-        return cart ?? throw AggregateNotFoundException.For<ShoppingCart>(request.CartId);
+        if (!expectedVersion.HasValue)
+            return await querySession.LoadAsync<ShoppingCartDetails>(query.CartId, token)
+                   ?? throw AggregateNotFoundException.For<ShoppingCart>(query.CartId);
+
+        return await Policy
+                   .HandleResult<ShoppingCartDetails?>(cart =>
+                       cart == null || cart.Version < expectedVersion
+                   )
+                   .WaitAndRetryAsync(5, i => TimeSpan.FromMilliseconds(50 * Math.Pow(i, 2)))
+                   .ExecuteAsync(
+                       ct => querySession.Query<ShoppingCartDetails>()
+                           .SingleOrDefaultAsync(x => x.Id == query.CartId && x.Version >= expectedVersion, ct), token)
+               ?? throw AggregateNotFoundException.For<ShoppingCart>(query.CartId);
     }
 }
+
+
+// public record GetCartById(
+//     Guid ShoppingCartId,
+//     int? ExpectedVersion
+// )
+// {
+//     public static GetCartById From(Guid cartId, int? expectedVersion) =>
+//         new(cartId.NotEmpty(), expectedVersion);
+//
+//     public static Task<ShoppingCartDetails?> Handle(
+//         IQueryable<ShoppingCartDetails> shoppingCarts,
+//         GetCartById query,
+//         CancellationToken token
+//     )
+//     {
+//         var expectedVersion = query.ExpectedVersion;
+//
+//         if (!expectedVersion.HasValue)
+//             return shoppingCarts.SingleOrDefaultAsync(x => x.Id == query.ShoppingCartId, token);
+//
+//         return Policy
+//             .HandleResult<ShoppingCartDetails?>(cart =>
+//                 cart == null || cart.Version < expectedVersion
+//             )
+//             .WaitAndRetryAsync(5, i => TimeSpan.FromMilliseconds(50 * Math.Pow(i, 2)))
+//             .ExecuteAsync(ct => shoppingCarts.SingleOrDefaultAsync(x => x.Id == query.ShoppingCartId && x.Version >= expectedVersion, ct), token);
+//     }
+// }
