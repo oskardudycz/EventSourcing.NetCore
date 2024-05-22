@@ -1,16 +1,16 @@
-using System.Threading.Channels;
 using Core.Events;
+using Core.EventStoreDB.Subscriptions.Batch;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
 using Core.Extensions;
 using EventStore.Client;
 using Grpc.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Open.ChannelExtensions;
 using Polly;
 using Polly.Wrap;
-using EventTypeFilter = EventStore.Client.EventTypeFilter;
 
 namespace Core.EventStoreDB.Subscriptions;
+using static ISubscriptionCheckpointRepository;
 
 public class EventStoreDBSubscriptionToAllOptions
 {
@@ -30,6 +30,7 @@ public class EventStoreDBSubscriptionToAllOptions
 
 public class EventStoreDBSubscriptionToAll(
     EventStoreClient eventStoreClient,
+    IServiceScopeFactory serviceScopeFactory,
     ILogger<EventStoreDBSubscriptionToAll> logger
 )
 {
@@ -43,6 +44,8 @@ public class EventStoreDBSubscriptionToAll(
         Stopped
     }
 
+    public record EventBatch(string SubscriptionId, ResolvedEvent[] Events);
+
     public EventStoreDBSubscriptionToAllOptions Options { get; set; } = default!;
 
     public Func<IServiceProvider, IEventBatchHandler[]> GetHandlers { get; set; } = default!;
@@ -51,18 +54,18 @@ public class EventStoreDBSubscriptionToAll(
 
     private string SubscriptionId => Options.SubscriptionId;
 
-    public async Task SubscribeToAll(Checkpoint checkpoint, ChannelWriter<EventBatch> cw, CancellationToken ct)
+    public async Task SubscribeToAll(Checkpoint checkpoint, CancellationToken ct)
     {
         Status = ProcessingStatus.Starting;
 
         logger.LogInformation("Subscription to all '{SubscriptionId}'", Options.SubscriptionId);
 
         await RetryPolicy.ExecuteAsync(token =>
-                OnSubscribe(checkpoint, cw, token), ct
+                OnSubscribe(checkpoint, token), ct
         ).ConfigureAwait(false);
     }
 
-    private async Task OnSubscribe(Checkpoint checkpoint, ChannelWriter<EventBatch> cw, CancellationToken ct)
+    private async Task OnSubscribe(Checkpoint checkpoint, CancellationToken ct)
     {
         var subscription = eventStoreClient.SubscribeToAll(
             checkpoint != Checkpoint.None ? FromAll.After(checkpoint) : FromAll.Start,
@@ -76,13 +79,41 @@ public class EventStoreDBSubscriptionToAll(
 
         logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
 
-        await subscription.Pipe<ResolvedEvent, EventBatch>(
-            cw,
-            events => new EventBatch(Options.SubscriptionId, events.ToArray()),
-            Options.BatchSize,
-            Options.BatchDeadline,
-            ct
-        ).ConfigureAwait(false);
+        await foreach(var events in subscription.Batch(Options.BatchSize, Options.BatchDeadline, ct))
+        {
+            var batch = new EventBatch(Options.SubscriptionId, events.ToArray());
+            var result = await ProcessBatch(batch, checkpoint, ct).ConfigureAwait(false);
+
+            if (result is StoreResult.Success success)
+            {
+                checkpoint = success.Checkpoint;
+            }
+        }
+    }
+
+    private async Task<StoreResult> ProcessBatch(EventBatch batch, Checkpoint lastCheckpoint, CancellationToken ct)
+    {
+        try
+        {
+            await using var scope = serviceScopeFactory.CreateAsyncScope();
+            var checkpointer = scope.ServiceProvider.GetRequiredService<IEventsBatchCheckpointer>();
+
+            return await checkpointer.Process(
+                batch.Events,
+                lastCheckpoint,
+                new BatchProcessingOptions(
+                    batch.SubscriptionId,
+                    Options.IgnoreDeserializationErrors,
+                    GetHandlers(scope.ServiceProvider)
+                ),
+                ct
+            ).ConfigureAwait(false);
+        }
+        catch (Exception exc)
+        {
+            logger.LogError(exc, "Error while handling batch");
+            throw;
+        }
     }
 
     private AsyncPolicyWrap RetryPolicy
@@ -117,4 +148,5 @@ public class EventStoreDBSubscriptionToAll(
     private static bool IsCancelledByUser(Exception exception) =>
         exception is OperationCanceledException
         || exception is RpcException rpcException && IsCancelledByUser(rpcException);
+
 }

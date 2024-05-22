@@ -32,7 +32,7 @@ public class EventsBatchCheckpointer(
         if (!lastPosition.HasValue)
             return new StoreResult.Ignored();
 
-        await eventsBatchProcessor.HandleEventsBatch(events, options, ct)
+        await eventsBatchProcessor.Handle(events, options, ct)
             .ConfigureAwait(false);
 
         return await checkpointRepository

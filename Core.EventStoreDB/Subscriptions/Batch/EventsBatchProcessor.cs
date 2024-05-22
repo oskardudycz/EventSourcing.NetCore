@@ -17,7 +17,7 @@ public class EventsBatchProcessor(
     ILogger<EventsBatchProcessor> logger
 )
 {
-    public async Task HandleEventsBatch(
+    public async Task Handle(
         ResolvedEvent[] resolvedEvents,
         BatchProcessingOptions options,
         CancellationToken ct
