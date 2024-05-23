@@ -11,6 +11,7 @@ public static class Config
         services
             .AddMarten(config, options =>
             {
+                options.Projections.DaemonLockId = 222222;
                 options.ConfigureCarts();
                 //options.DisableNpgsqlLogging = true;
             }).UseNpgsqlDataSource()
