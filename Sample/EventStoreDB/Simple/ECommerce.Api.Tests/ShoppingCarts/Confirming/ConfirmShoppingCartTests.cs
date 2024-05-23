@@ -26,7 +26,7 @@ public class ConfirmShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
             )
             .Then(OK)
             .AndWhen(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"), HEADERS(IF_MATCH(1)))
-            .Until(RESPONSE_ETAG_IS(1), maxNumberOfRetries: 10)
+            .Until(RESPONSE_ETAG_IS(1))
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>((details,ctx) =>

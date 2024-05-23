@@ -10,14 +10,12 @@ namespace Carts.Api.Tests.ShoppingCarts.AddingProduct;
 
 using static ShoppingCartsApi;
 
-public class AddProductTests(ApiSpecification<Program> api): IClassFixture<ApiSpecification<Program>>
+public class AddProductTests(ApiFixture fixture): ApiTest(fixture)
 {
-    private readonly ProductItemRequest product = new(Guid.NewGuid(), 1);
-
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task Post_Should_AddProductItem_To_ShoppingCart() =>
-        api
+        API
             .Given("Opened Shopping Cart", OpenShoppingCart())
             .When(
                 "Add new product",
@@ -28,7 +26,8 @@ public class AddProductTests(ApiSpecification<Program> api): IClassFixture<ApiSp
             )
             .Then(OK)
             .And()
-            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
+            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"), HEADERS(IF_MATCH(2)))
+            .Until(RESPONSE_ETAG_IS(2))
             .Then(
                 RESPONSE_BODY<ShoppingCartDetails>((details, ctx) =>
                 {
@@ -40,4 +39,6 @@ public class AddProductTests(ApiSpecification<Program> api): IClassFixture<ApiSp
                     details.Version.Should().Be(2);
                 })
             );
+
+    private readonly ProductItemRequest product = new(Guid.NewGuid(), 1);
 }

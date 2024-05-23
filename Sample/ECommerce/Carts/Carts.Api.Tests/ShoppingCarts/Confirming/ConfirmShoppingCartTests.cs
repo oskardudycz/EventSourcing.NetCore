@@ -10,16 +10,16 @@ namespace Carts.Api.Tests.ShoppingCarts.Confirming;
 
 using static ShoppingCartsApi;
 
-public class ConfirmShoppingCartTests(ApiSpecification<Program> api): IClassFixture<ApiSpecification<Program>>
+public class ConfirmShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
 {
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task Put_Should_Return_OK_And_Confirm_Shopping_Cart() =>
-        api
+        API
             .Given(
                 "Shopping Cart with Product Item",
-                OpenShoppingCart(ClientId),
-                AddProductItem(ProductItem, ifMatch: 1)
+                OpenShoppingCart(clientId),
+                AddProductItem(productItem, ifMatch: 1)
             )
             .When(
                 PUT,
@@ -28,8 +28,8 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api): IClassFixt
             )
             .Then(OK)
             .And()
-            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
-            .Until(RESPONSE_ETAG_IS(3), 10)
+            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"), HEADERS(IF_MATCH(3)))
+            .Until(RESPONSE_ETAG_IS(3))
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>((details, ctx) =>
@@ -38,14 +38,14 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api): IClassFixt
                     details.Status.Should().Be(ShoppingCartStatus.Confirmed);
                     details.ProductItems.Count.Should().Be(1);
                     details.ProductItems.Single().ProductItem.Should()
-                        .Be(Carts.ShoppingCarts.Products.ProductItem.From(ProductItem.ProductId, ProductItem.Quantity));
-                    details.ClientId.Should().Be(ClientId);
+                        .Be(Carts.ShoppingCarts.Products.ProductItem.From(productItem.ProductId, productItem.Quantity));
+                    details.ClientId.Should().Be(clientId);
                     details.Version.Should().Be(3);
                 }));
 
     // API.PublishedExternalEventsOfType<CartFinalized>();
 
-    private readonly Guid ClientId = Guid.NewGuid();
+    private readonly Guid clientId = Guid.NewGuid();
 
-    private readonly ProductItemRequest ProductItem = new(Guid.NewGuid(), 1);
+    private readonly ProductItemRequest productItem = new(Guid.NewGuid(), 1);
 }
