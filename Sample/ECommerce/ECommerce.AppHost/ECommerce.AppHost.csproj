@@ -18,10 +18,10 @@
 
     <ItemGroup>
         <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="8.0.1"/>
-        <PackageReference Include="Aspire.Npgsql" Version="8.0.0-preview.7.24251.11"/>
-        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.0.0-preview.7.24251.11"/>
-        <PackageReference Include="Aspire.Hosting.Kafka" Version="8.0.0-preview.7.24251.11"/>
-        <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.0-preview.7.24251.11"/>
+        <PackageReference Include="Aspire.Npgsql" Version="8.0.1" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.0.1" />
+        <PackageReference Include="Aspire.Hosting.Kafka" Version="8.0.1" />
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.1" />
     </ItemGroup>
 
     <ItemGroup>

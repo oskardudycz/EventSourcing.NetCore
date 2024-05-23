@@ -8,7 +8,6 @@ global using System.Reflection;
 global using System.Runtime.CompilerServices;
 global using Core.Commands;
 global using Core.Events;
-global using Core.Exceptions;
 global using Core.Extensions;
 global using Core.Ids;
 global using Core.OpenTelemetry;
