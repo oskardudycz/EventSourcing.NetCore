@@ -26,7 +26,7 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
             .Then(NO_CONTENT)
             .And()
             .When(GET, URI($"/api/ShoppingCarts/{ShoppingCartId}"))
-            .Until(RESPONSE_ETAG_IS(2), 10)
+            .Until(RESPONSE_ETAG_IS(2))
             .Then(
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>

@@ -23,7 +23,7 @@ public class OpenShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
             response =>
                 API.Given()
                     .When(GET, URI($"/api/ShoppingCarts/{response.GetCreatedId()}"), HEADERS(IF_MATCH(0)))
-                    .Until(RESPONSE_ETAG_IS(0), 10)
+                    .Until(RESPONSE_ETAG_IS(0))
                     .Then(
                         OK,
                         RESPONSE_BODY<ShoppingCartDetails>(details =>

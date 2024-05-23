@@ -18,6 +18,8 @@ using Marten.Pagination;
 
 namespace Carts.Api.Controllers;
 
+using static ETagExtensions;
+
 [Route("api/[controller]")]
 public class ShoppingCartsController(
     ICommandBus commandBus,
@@ -62,9 +64,9 @@ public class ShoppingCartsController(
     [HttpDelete("{id}/products/{productId}")]
     public async Task<IActionResult> RemoveProduct(
         Guid id,
-        [FromRoute]Guid? productId,
-        [FromQuery]int? quantity,
-        [FromQuery]decimal? unitPrice
+        [FromRoute] Guid? productId,
+        [FromQuery] int? quantity,
+        [FromQuery] decimal? unitPrice
     )
     {
         var command = ShoppingCarts.RemovingProduct.RemoveProduct.Create(
@@ -94,7 +96,6 @@ public class ShoppingCartsController(
     }
 
 
-
     [HttpDelete("{id}")]
     public async Task<IActionResult> CancelCart(Guid id)
     {
@@ -108,9 +109,11 @@ public class ShoppingCartsController(
     }
 
     [HttpGet("{id}")]
-    public async Task<ShoppingCartDetails> Get(Guid id)
+    public async Task<ShoppingCartDetails> Get(Guid id, [FromIfMatchHeader] string? eTag)
     {
-        var result = await queryBus.Query<GetCartById, ShoppingCartDetails>(GetCartById.For(id));
+        var result = await queryBus.Query<GetCartById, ShoppingCartDetails>(
+            GetCartById.From(id, eTag != null ? ToExpectedVersion(eTag) : null)
+        );
 
         Response.TrySetETagResponseHeader(result.Version);
 
@@ -118,9 +121,11 @@ public class ShoppingCartsController(
     }
 
     [HttpGet]
-    public async Task<PagedListResponse<ShoppingCartShortInfo>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+    public async Task<PagedListResponse<ShoppingCartShortInfo>> Get([FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20)
     {
-        var pagedList = await queryBus.Query<GetCarts, IPagedList<ShoppingCartShortInfo>>(GetCarts.Create(pageNumber, pageSize));
+        var pagedList =
+            await queryBus.Query<GetCarts, IPagedList<ShoppingCartShortInfo>>(GetCarts.Create(pageNumber, pageSize));
 
         return pagedList.ToResponse();
     }
@@ -128,7 +133,8 @@ public class ShoppingCartsController(
     [HttpGet("{id}/history")]
     public async Task<PagedListResponse<ShoppingCartHistory>> GetHistory(Guid id)
     {
-        var pagedList = await queryBus.Query<GetCartHistory, IPagedList<ShoppingCartHistory>>(GetCartHistory.Create(id));
+        var pagedList =
+            await queryBus.Query<GetCartHistory, IPagedList<ShoppingCartHistory>>(GetCartHistory.Create(id));
 
         return pagedList.ToResponse();
     }

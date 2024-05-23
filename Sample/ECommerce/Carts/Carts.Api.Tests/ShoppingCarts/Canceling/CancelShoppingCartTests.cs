@@ -8,15 +8,13 @@ using static Carts.Api.Tests.ShoppingCarts.ShoppingCartsApi;
 
 namespace Carts.Api.Tests.ShoppingCarts.Canceling;
 
-public class CancelShoppingCartTests(ApiSpecification<Program> api): IClassFixture<ApiSpecification<Program>>
+public class CancelShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
 {
-    public readonly Guid ClientId = Guid.NewGuid();
-
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task Delete_Should_Return_OK_And_Cancel_Shopping_Cart() =>
-        api
-            .Given(OpenShoppingCart(ClientId))
+        API
+            .Given(OpenShoppingCart(clientId))
             .When(
                 "Cancel Shopping Cart",
                 DELETE,
@@ -25,7 +23,7 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api): IClassFixtu
             )
             .Then(OK)
             .And()
-            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"))
+            .When(GET, URI(ctx => $"/api/ShoppingCarts/{ctx.OpenedShoppingCartId()}"), HEADERS(IF_MATCH(2)))
             .Until(RESPONSE_ETAG_IS(2))
             .Then(
                 OK,
@@ -34,7 +32,9 @@ public class CancelShoppingCartTests(ApiSpecification<Program> api): IClassFixtu
                     details.Id.Should().Be(ctx.OpenedShoppingCartId());
                     details.Status.Should().Be(ShoppingCartStatus.Canceled);
                     details.ProductItems.Should().BeEmpty();
-                    details.ClientId.Should().Be(ClientId);
+                    details.ClientId.Should().Be(clientId);
                     details.Version.Should().Be(2);
                 }));
+
+    private readonly Guid clientId = Guid.NewGuid();
 }
