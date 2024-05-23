@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Open.ChannelExtensions;
+using Polly;
 
 namespace Core.Testing;
 
@@ -38,7 +39,9 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
 
         Environment.SetEnvironmentVariable("SchemaName", schemaName);
 
-        return base.CreateHost(builder);
+        return Policy.Handle<Exception>()
+            .WaitAndRetry(5, _=>TimeSpan.FromMilliseconds(500))
+            .Execute(() =>base.CreateHost(builder));
     }
 
     public void PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent =>
