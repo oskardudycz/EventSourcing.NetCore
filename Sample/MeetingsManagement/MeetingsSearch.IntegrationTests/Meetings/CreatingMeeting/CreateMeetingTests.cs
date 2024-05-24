@@ -10,7 +10,7 @@ using static Ogooreck.API.ApiSpecification;
 namespace MeetingsSearch.IntegrationTests.Meetings.CreatingMeeting;
 
 public class CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
-    : IClassFixture<TestWebApplicationFactory<Program>>
+    : IClassFixture<TestWebApplicationFactory<Program>>, IDisposable
 {
     private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(fixture);
 
@@ -46,4 +46,6 @@ public class CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
 
     private readonly Guid MeetingId = Guid.NewGuid();
     private readonly string MeetingName = "Event Sourcing Workshop";
+
+    public void Dispose() => API.Dispose();
 }

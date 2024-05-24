@@ -6,12 +6,8 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace MeetingsManagement.IntegrationTests.Meetings.CreatingMeeting;
 
-public class CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
-    : IClassFixture<TestWebApplicationFactory<Program>>
+public class CreateMeetingTests
 {
-    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(fixture);
-    private readonly TestWebApplicationFactory<Program> fixture = fixture;
-
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task CreateCommand_ShouldPublish_MeetingCreateEvent() =>
@@ -25,4 +21,9 @@ public class CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
 
     private readonly Guid MeetingId = Guid.NewGuid();
     private readonly string MeetingName = "Event Sourcing Workshop";
+
+
+    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(
+        new TestWebApplicationFactory<Program>()
+    );
 }

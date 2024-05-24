@@ -6,11 +6,11 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Payments.Api.Tests.Payments.RequestingPayment;
 
-public class RequestPaymentsTests(TestWebApplicationFactory<Program> fixture)
-    : IClassFixture<TestWebApplicationFactory<Program>>
+public class RequestPaymentsTests
 {
-    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(fixture);
-    private readonly TestWebApplicationFactory<Program> fixture = fixture;
+    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(
+        new TestWebApplicationFactory<Program>()
+    );
 
     [Fact]
     [Trait("Category", "Acceptance")]
