@@ -24,6 +24,7 @@ public class CustomerIncidentsSummaryProjection: MultiStreamProjection<CustomerI
 
     public void Apply(IncidentLogged logged, CustomerIncidentsSummary current)
     {
+        current.Id = logged.CustomerId;
         current.Pending++;
     }
 

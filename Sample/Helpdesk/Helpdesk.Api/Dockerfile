@@ -21,7 +21,10 @@ RUN dotnet restore ./${project_name}.csproj
 COPY ./ ./
 
 # Run code generation depending on the build argument
-RUN if [ "run_codegen" = true ] ; then dotnet run -- codegen write & dotnet run -- codegen test; else echo "skipping code generation"; fi
+RUN if [ "${run_codegen}" = true ] ; then dotnet run -- codegen write & dotnet run -- codegen test; else echo "skipping code generation"; fi
+
+RUN ls
+RUN ls -R Internal
 
 # Build project with Release configuration
 # and no restore, as we did it already
@@ -29,12 +32,12 @@ RUN dotnet build -c Release --no-restore ./${project_name}.csproj
 
 ## Test project with Release configuration
 ## and no build, as we did it already
-#RUN dotnet test -c Release --no-build ./Sample/Tickets/Tickets.Api/Tickets.Api.csproj
+# RUN dotnet test -c Release --no-build ./Sample/Tickets/Tickets.Api/Tickets.Api.csproj
 
 # Publish project to output folder
 # and no build, as we did it already
 WORKDIR /app/
-RUN ls
+
 RUN dotnet publish -c Release --no-build -o out
 
 ########################################

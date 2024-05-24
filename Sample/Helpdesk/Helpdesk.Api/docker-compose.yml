@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+    nginx:
+        restart: always
+        image: nginx:alpine
+        ports:
+            - 8089:80
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf
+#            - ./nginx.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - backend
+
+    backend:
+        build:
+            dockerfile: Dockerfile
+            context: .
+            args:
+                project_name: Helpdesk.Api
+                run_codegen: true
+        deploy:
+            replicas: 3
+        depends_on:
+            postgres:
+                condition: service_healthy
+        restart: always
+
+    postgres:
+        image: postgres:15.1-alpine
+        container_name: postgres
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_PASSWORD=Password12!
+        ports:
+            - "5432:5432"
