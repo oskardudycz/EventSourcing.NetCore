@@ -17,6 +17,7 @@ public static class Config
             )
             .AddMarten(config, options =>
             {
+                options.Projections.DaemonLockId = 44444;
                 options.ConfigureOrders();
                 options.DisableNpgsqlLogging = true;
             })

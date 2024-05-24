@@ -40,8 +40,8 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
         Environment.SetEnvironmentVariable("SchemaName", schemaName);
 
         return Policy.Handle<Exception>()
-            .WaitAndRetry(5, _=>TimeSpan.FromMilliseconds(500))
-            .Execute(() =>base.CreateHost(builder));
+            .WaitAndRetry(5, _ => TimeSpan.FromMilliseconds(500))
+            .Execute(() => base.CreateHost(builder));
     }
 
     public void PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent =>
