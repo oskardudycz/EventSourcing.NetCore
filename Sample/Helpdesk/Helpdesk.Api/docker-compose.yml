@@ -7,7 +7,6 @@ services:
             - 8089:80
         volumes:
             - ./nginx.conf:/etc/nginx/nginx.conf
-#            - ./nginx.conf:/etc/nginx/conf.d/default.conf
         depends_on:
             - backend
 

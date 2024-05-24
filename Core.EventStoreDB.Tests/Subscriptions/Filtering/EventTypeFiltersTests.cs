@@ -5,6 +5,7 @@ using FluentAssertions;
 using Xunit;
 
 namespace Core.EventStoreDB.Tests.Subscriptions.Filtering;
+
 using static EventFilters;
 
 public class EventTypeFiltersTests
@@ -14,7 +15,8 @@ public class EventTypeFiltersTests
     {
         ExcludeSystemAndCheckpointEventsRegex.IsMatch("$scavengeIndexInitialized").Should().BeFalse();
         ExcludeSystemAndCheckpointEventsRegex.IsMatch(typeof(CheckpointStored).FullName!).Should().BeFalse();
-        ExcludeSystemAndCheckpointEventsRegex.IsMatch("Core.EventStoreDB.Subscriptions.Checkpoints.CheckpointStored").Should().BeFalse();
+        ExcludeSystemAndCheckpointEventsRegex.IsMatch("Core.EventStoreDB.Subscriptions.Checkpoints.CheckpointStored")
+            .Should().BeFalse();
     }
 
     [Fact]
@@ -54,6 +56,17 @@ public class EventTypeFiltersTests
     }
 
     [Fact]
+    public void OneOfEventTypesRegex_WithEventTypeMapper_Should_NotMatch_EventTypesWithDefaultName()
+    {
+        var eventTypeMapper = new EventTypeMapper();
+        eventTypeMapper.AddCustomMap<ShoppingCartOpened>("ShoppingCartOpened");
+
+        var regex = OneOfEventTypesRegex(eventTypeMapper, typeof(ShoppingCartOpened));
+
+        regex.IsMatch(typeof(ShoppingCartOpened).FullName!).Should().BeFalse();
+    }
+
+    [Fact]
     public void OneOfEventTypesRegex_WithEventTypeMapper_Should_NotMatch_OtherEventTypesWithCustomMap()
     {
         var eventTypeMapper = new EventTypeMapper();
@@ -62,8 +75,10 @@ public class EventTypeFiltersTests
         var regex = OneOfEventTypesRegex(eventTypeMapper, typeof(ShoppingCartOpened));
 
         regex.IsMatch("OrderPlaced").Should().BeFalse();
+        regex.IsMatch(typeof(ShoppingCartOpened).FullName!).Should().BeFalse();
+        regex.IsMatch(typeof(OrderPlaced).FullName!).Should().BeFalse();
     }
-    
+
     [Fact]
     public void OneOfEventTypesRegex_WithEventTypeMapper_Should_Match_ProvidedEventTypes()
     {
@@ -82,10 +97,16 @@ public class EventTypeFiltersTests
         var regex = OneOfEventTypesRegex(eventTypeMapper, typeof(ShoppingCartOpened));
 
         regex.IsMatch("OrderPlaced").Should().BeFalse();
+        regex.IsMatch(typeof(OrderPlaced).FullName!).Should().BeFalse();
     }
 
     private record ShoppingCartOpened(
         Guid ShoppingCartId,
+        Guid ClientId
+    );
+
+    private record OrderPlaced(
+        Guid OrderId,
         Guid ClientId
     );
 }
