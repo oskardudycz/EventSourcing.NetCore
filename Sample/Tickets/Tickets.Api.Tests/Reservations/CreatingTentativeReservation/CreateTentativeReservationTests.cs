@@ -12,8 +12,7 @@ using static Ogooreck.API.ApiSpecification;
 
 namespace Tickets.Api.Tests.Reservations.CreatingTentativeReservation;
 
-public class CreateTentativeReservationTests(TestWebApplicationFactory<Program> fixture)
-    : IClassFixture<TestWebApplicationFactory<Program>>
+public class CreateTentativeReservationTests
 {
     [Fact]
     public Task Post_ShouldReturn_CreatedStatus_With_CartId() =>
@@ -78,5 +77,7 @@ public class CreateTentativeReservationTests(TestWebApplicationFactory<Program> 
 
     private readonly Guid SeatId = Guid.NewGuid();
 
-    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(fixture);
+    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(
+        new TestWebApplicationFactory<Program>()
+    );
 }

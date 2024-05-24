@@ -9,10 +9,8 @@ using static Ogooreck.API.ApiSpecification;
 namespace Shipments.Api.Tests.Packages;
 
 public class SendPackageTests(TestWebApplicationFactory<Program> fixture)
-    : IClassFixture<TestWebApplicationFactory<Program>>
+    : IClassFixture<TestWebApplicationFactory<Program>>, IDisposable
 {
-    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(fixture);
-
     [Fact]
     [Trait("Category", "Acceptance")]
     public Task SendPackage_ShouldReturn_CreatedStatus_With_PackageId() =>
@@ -43,4 +41,10 @@ public class SendPackageTests(TestWebApplicationFactory<Program> fixture)
         new ProductItem { ProductId = Guid.NewGuid(), Quantity = 10 },
         new ProductItem { ProductId = Guid.NewGuid(), Quantity = 3 }
     ];
+
+    private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(
+        new TestWebApplicationFactory<Program>()
+    );
+
+    public void Dispose() => API.Dispose();
 }
