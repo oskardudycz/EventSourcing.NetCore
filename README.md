@@ -15,15 +15,16 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
     - [1.7 Strongly-Typed ids with Marten](#17-strongly-typed-ids-with-marten)
   - [2. Videos](#2-videos)
     - [2.1. Practical Event Sourcing with Marten](#21-practical-event-sourcing-with-marten)
-    - [2.2. Let's build event store in one hour!](#22-lets-build-event-store-in-one-hour)
-    - [2.3. CQRS is Simpler than you think with C#11 \& NET7](#23-cqrs-is-simpler-than-you-think-with-c11--net7)
-    - [2.4. Practical Introduction to Event Sourcing with EventStoreDB](#24-practical-introduction-to-event-sourcing-with-eventstoredb)
-    - [2.5 Let's build the worst Event Sourcing system!](#25-lets-build-the-worst-event-sourcing-system)
-    - [2.6 The Light and The Dark Side of the Event-Driven Design](#26-the-light-and-the-dark-side-of-the-event-driven-design)
-    - [2.7 Implementing Distributed Processes](#27-implementing-distributed-processes)
-    - [2.8 Conversation with Yves Lorphelin about CQRS](#28-conversation-with-yves-lorphelin-about-cqrs)
-    - [2.9. Never Lose Data Again - Event Sourcing to the Rescue!](#29-never-lose-data-again---event-sourcing-to-the-rescue)
-    - [2.10. How to deal with privacy and GDPR in Event-Sourced systems](#210-how-to-deal-with-privacy-and-gdpr-in-event-sourced-systems)
+    - [2.2. Keep your streams short! Or how to model event-sourced systems efficiently](#22-keep-your-streams-short-or-how-to-model-event-sourced-systems-efficiently)
+    - [2.3. Let's build event store in one hour!](#23-lets-build-event-store-in-one-hour)
+    - [2.4. CQRS is Simpler than you think with C#11 \& NET7](#24-cqrs-is-simpler-than-you-think-with-c11--net7)
+    - [2.5. Practical Introduction to Event Sourcing with EventStoreDB](#25-practical-introduction-to-event-sourcing-with-eventstoredb)
+    - [2.6. How to deal with privacy and GDPR in Event-Sourced systems](#26-how-to-deal-with-privacy-and-gdpr-in-event-sourced-systems)
+    - [2.7 Let's build the worst Event Sourcing system!](#27-lets-build-the-worst-event-sourcing-system)
+    - [2.8 The Light and The Dark Side of the Event-Driven Design](#28-the-light-and-the-dark-side-of-the-event-driven-design)
+    - [2.9 Implementing Distributed Processes](#29-implementing-distributed-processes)
+    - [2.10 Conversation with Yves Lorphelin about CQRS](#210-conversation-with-yves-lorphelin-about-cqrs)
+    - [2.11. Never Lose Data Again - Event Sourcing to the Rescue!](#211-never-lose-data-again---event-sourcing-to-the-rescue)
   - [3. Support](#3-support)
   - [4. Prerequisites](#4-prerequisites)
   - [5. Tools used](#5-tools-used)
@@ -68,6 +69,7 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
     - [12.19 Event Sourcing Concerns](#1219-event-sourcing-concerns)
     - [12.20 This is NOT Event Sourcing (but Event Streaming)](#1220-this-is-not-event-sourcing-but-event-streaming)
     - [12.21 Architecture Weekly](#1221-architecture-weekly)
+  - [License](#license)
 
 ## 1. Event Sourcing
 
@@ -1175,5 +1177,9 @@ If you're interested in Architecture resources, check my other repository: https
 It contains a weekly updated list of materials I found valuable and educational.
 
 ---
+
+## License
+
+This blog is licensed under [License Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 **EventSourcing.NetCore** is Copyright &copy; 2017-2022 [Oskar Dudycz](http://event-driven.io) and other contributors under the [MIT license](LICENSE).
