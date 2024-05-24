@@ -19,7 +19,7 @@
         </PackageReference>
         <PackageReference Include="xunit" Version="2.8.0" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.5" />
-        <PackageReference Include="Ogooreck" Version="0.8.1" />
+        <PackageReference Include="Ogooreck" Version="0.8.2" />
         <PackageReference Include="Bogus" Version="35.5.1" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
             <PrivateAssets>all</PrivateAssets>
