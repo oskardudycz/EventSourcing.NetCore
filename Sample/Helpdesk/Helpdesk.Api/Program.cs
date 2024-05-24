@@ -15,6 +15,7 @@ using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Pagination;
 using Marten.Schema.Identity;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Oakton;
@@ -27,7 +28,7 @@ using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.WebHost.UseUrls("http://*:5248");
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
@@ -53,14 +54,24 @@ builder.Services
         options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
 
+        options.ApplicationAssembly = typeof(CustomerIncidentsSummaryProjection).Assembly;
+
         return options;
     })
     .AddSubscriptionWithServices<KafkaProducer>(ServiceLifetime.Singleton)
     .AddSubscriptionWithServices<SignalRProducer<IncidentsHub>>(ServiceLifetime.Singleton)
     .OptimizeArtifactWorkflow(TypeLoadMode.Static)
+    .ApplyAllDatabaseChangesOnStartup()
     .UseLightweightSessions()
-    .AddAsyncDaemon(DaemonMode.Solo);
+    .AddAsyncDaemon(DaemonMode.HotCold);
 
+
+// Header forwarding to enable Swagger in Nginx
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 
 builder.Services
     .AddCors(options =>
@@ -235,11 +246,9 @@ customersIncidents.MapGet("incidents-summary",
         querySession.Json.WriteById<CustomerIncidentsSummary>(customerId, context)
 );
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger()
-        .UseSwaggerUI();
-}
+app.UseSwagger()
+    .UseSwaggerUI()
+    .UseForwardedHeaders(); // Header forwarding to enable Swagger in Nginx
 
 
 app.UseCors("ClientPermission");
