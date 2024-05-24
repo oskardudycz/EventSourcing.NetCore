@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Core.Events;
 using Core.EventStoreDB.Subscriptions.Batch;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
@@ -10,14 +11,19 @@ using Polly;
 using Polly.Wrap;
 
 namespace Core.EventStoreDB.Subscriptions;
+
 using static ISubscriptionCheckpointRepository;
 
 public class EventStoreDBSubscriptionToAllOptions
 {
+    public static readonly IEventFilter ExcludeSystemAndCheckpointEvents =
+        EventTypeFilter.RegularExpression(
+            @"^(?!\$)(?!Core\.EventStoreDB\.Subscriptions\.Checkpoints\.CheckpointStored$).+");
+
     public required string SubscriptionId { get; init; }
 
     public SubscriptionFilterOptions FilterOptions { get; set; } =
-        new(EventTypeFilter.ExcludeSystemEvents());
+        new(ExcludeSystemAndCheckpointEvents);
 
     public Action<EventStoreClientOperationOptions>? ConfigureOperation { get; set; }
     public UserCredentials? Credentials { get; set; }
@@ -25,7 +31,7 @@ public class EventStoreDBSubscriptionToAllOptions
     public bool IgnoreDeserializationErrors { get; set; } = true;
 
     public int BatchSize { get; set; } = 1;
-    public int BatchDeadline { get; set; } = 50;
+    public TimeSpan BatchDeadline { get; set; } = TimeSpan.FromMilliseconds(50);
 }
 
 public class EventStoreDBSubscriptionToAll(
@@ -67,19 +73,21 @@ public class EventStoreDBSubscriptionToAll(
 
     private async Task OnSubscribe(Checkpoint checkpoint, CancellationToken ct)
     {
-        var subscription = eventStoreClient.SubscribeToAll(
-            checkpoint != Checkpoint.None ? FromAll.After(checkpoint) : FromAll.Start,
-            Options.ResolveLinkTos,
-            Options.FilterOptions,
-            Options.Credentials,
-            ct
-        );
+        var subscription = eventStoreClient
+            .SubscribeToAll(
+                checkpoint != Checkpoint.None ? FromAll.After(checkpoint) : FromAll.Start,
+                Options.ResolveLinkTos,
+                Options.FilterOptions,
+                Options.Credentials,
+                ct
+            )
+            .Batch(Options.BatchSize, Options.BatchDeadline, ct);
 
         Status = ProcessingStatus.Started;
 
         logger.LogInformation("Subscription to all '{SubscriptionId}' started", SubscriptionId);
 
-        await foreach(var events in subscription.Batch(Options.BatchSize, Options.BatchDeadline, ct))
+        await foreach (var events in subscription)
         {
             var batch = new EventBatch(Options.SubscriptionId, events.ToArray());
             var result = await ProcessBatch(batch, checkpoint, ct).ConfigureAwait(false);
@@ -149,5 +157,4 @@ public class EventStoreDBSubscriptionToAll(
     private static bool IsCancelledByUser(Exception exception) =>
         exception is OperationCanceledException
         || exception is RpcException rpcException && IsCancelledByUser(rpcException);
-
 }
