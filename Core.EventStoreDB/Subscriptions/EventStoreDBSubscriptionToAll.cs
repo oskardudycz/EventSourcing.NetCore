@@ -1,7 +1,7 @@
-using System.Text.RegularExpressions;
 using Core.Events;
 using Core.EventStoreDB.Subscriptions.Batch;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
+using Core.EventStoreDB.Subscriptions.Filtering;
 using Core.Extensions;
 using EventStore.Client;
 using Grpc.Core;
@@ -16,14 +16,10 @@ using static ISubscriptionCheckpointRepository;
 
 public class EventStoreDBSubscriptionToAllOptions
 {
-    public static readonly IEventFilter ExcludeSystemAndCheckpointEvents =
-        EventTypeFilter.RegularExpression(
-            @"^(?!\$)(?!Core\.EventStoreDB\.Subscriptions\.Checkpoints\.CheckpointStored$).+");
-
     public required string SubscriptionId { get; init; }
 
     public SubscriptionFilterOptions FilterOptions { get; set; } =
-        new(ExcludeSystemAndCheckpointEvents);
+        new(EventFilters.ExcludeSystemAndCheckpointEvents);
 
     public Action<EventStoreClientOperationOptions>? ConfigureOperation { get; set; }
     public UserCredentials? Credentials { get; set; }
