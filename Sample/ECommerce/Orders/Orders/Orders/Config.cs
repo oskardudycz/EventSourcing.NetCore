@@ -17,6 +17,7 @@ using Orders.ShoppingCarts.FinalizingCart;
 
 namespace Orders.Orders;
 using static OrderEvent;
+using static TimeHasPassed;
 
 internal static class OrdersConfig
 {
@@ -40,7 +41,7 @@ internal static class OrdersConfig
             .AddEventHandler<ProductWasOutOfStock, OrderSaga>()
             .AddEventHandler<OrderCancelled, OrderSaga>()
             .AddEventHandler<OrderPaymentRecorded, OrderSaga>()
-            .AddEventHandler<TimeHasPassed, HandleCancelOrder>();
+            .AddEventHandler<MinuteHasPassed, HandleCancelOrder>();
 
     internal static void ConfigureOrders(this StoreOptions options)
     {

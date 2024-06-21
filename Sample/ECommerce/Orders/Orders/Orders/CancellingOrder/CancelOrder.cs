@@ -5,6 +5,7 @@ using Marten;
 using Orders.Orders.GettingPending;
 
 namespace Orders.Orders.CancellingOrder;
+using static TimeHasPassed;
 
 public record CancelOrder(
     Guid OrderId,
@@ -29,7 +30,7 @@ public class HandleCancelOrder(
     TimeProvider timeProvider
 ):
     ICommandHandler<CancelOrder>,
-    IEventHandler<TimeHasPassed>
+    IEventHandler<MinuteHasPassed>
 {
     public Task Handle(CancelOrder command, CancellationToken ct) =>
         orderRepository.GetAndUpdate(
@@ -38,7 +39,7 @@ public class HandleCancelOrder(
             ct: ct
         );
 
-    public async Task Handle(TimeHasPassed @event, CancellationToken ct)
+    public async Task Handle(MinuteHasPassed @event, CancellationToken ct)
     {
         var orderIds = await querySession.Query<PendingOrder>()
             .Where(o => o.TimeoutAfter <= @event.Now)
