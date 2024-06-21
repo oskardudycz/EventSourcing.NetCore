@@ -14,7 +14,7 @@
         <PackageReference Include="Confluent.Kafka" Version="2.4.0" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.2" />
-        <PackageReference Include="WolverineFx.Marten" Version="2.9.0" />
-        <PackageReference Include="WolverineFx.Http" Version="2.9.0" />
+        <PackageReference Include="WolverineFx.Marten" Version="2.14.0" />
+        <PackageReference Include="WolverineFx.Http" Version="2.14.0" />
     </ItemGroup>
 </Project>
