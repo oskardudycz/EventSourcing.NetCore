@@ -16,7 +16,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.5" />
-        <PackageReference Include="Marten.AspNetCore" Version="7.16.0" />
+        <PackageReference Include="Marten.AspNetCore" Version="7.20.0" />
     </ItemGroup>
 
     <ItemGroup>

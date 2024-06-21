@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten.AspNetCore" Version="7.16.0" />
+        <PackageReference Include="Marten.AspNetCore" Version="7.20.0" />
         <PackageReference Include="Npgsql.OpenTelemetry" Version="8.0.3" />
         <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.5.1" />
         <PackageReference Include="Aspire.Confluent.Kafka" Version="8.0.1" />
