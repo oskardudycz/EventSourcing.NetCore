@@ -5,13 +5,12 @@ namespace Core.Scheduling;
 
 public static class QuartzExtensions
 {
-    public static IServiceCollection AddQuartzDefaults(
-        this IServiceCollection services,
-        TimeSpan? passageOfTimeInterval = null
-    ) =>
+    public static IServiceCollection AddQuartzDefaults(this IServiceCollection services) =>
         services
             .AddQuartz(q => q
-                .AddPassageOfTime(passageOfTimeInterval ?? TimeSpan.FromMinutes(1))
+                    .AddPassageOfTime(TimeUnit.Minute)
+                    .AddPassageOfTime(TimeUnit.Hour)
+                    .AddPassageOfTime(TimeUnit.Day)
                 // .UsePersistentStore(x =>
                 // {
                 //     x.UseProperties = false;
@@ -23,16 +22,17 @@ public static class QuartzExtensions
 
     public static IServiceCollectionQuartzConfigurator AddPassageOfTime(
         this IServiceCollectionQuartzConfigurator q,
-        TimeSpan interval
+        TimeUnit timeUnit
     )
     {
-        var jobKey = new JobKey($"PassageOfTimeJob_{interval}");
+        var jobKey = new JobKey($"PassageOfTimeJob_{timeUnit}");
         q.AddJob<PassageOfTimeJob>(opts => opts.WithIdentity(jobKey));
 
         q.AddTrigger(opts => opts
             .ForJob(jobKey)
             .WithIdentity($"{jobKey}-trigger")
-            .WithSimpleSchedule(x => x.WithInterval(interval))
+            .UsingJobData("timeUnit", timeUnit.ToString())
+            .WithSimpleSchedule(x => x.WithInterval(timeUnit.ToTimeSpan()))
         );
 
         return q;
