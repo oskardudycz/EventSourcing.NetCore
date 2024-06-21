@@ -11,10 +11,10 @@
         <PackageReference Include="Marten" Version="7.20.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Simple.Migrations" Version="0.9.21" />
-        <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3">
+        <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="xunit" Version="2.8.0" />
+        <PackageReference Include="xunit" Version="2.8.1" />
     </ItemGroup>
 </Project>
