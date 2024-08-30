@@ -4,7 +4,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Database = EntitiesDefinition.Core.Database;
 
-namespace EntitiesDefinition;
+namespace EntitiesDefinition.Solution1_Aggregates;
 
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
@@ -15,7 +15,6 @@ public class EntityDefinitionTests
     private readonly ITestOutputHelper testOutputHelper;
 
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task CheckingInGuest_Succeeds()
     {
         // Given
@@ -31,7 +30,6 @@ public class EntityDefinitionTests
     }
 
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task RecordingChargeForCheckedInGuest_Succeeds()
     {
         // Given
@@ -50,7 +48,6 @@ public class EntityDefinitionTests
     }
 
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task RecordingPaymentForCheckedInGuest_Succeeds()
     {
         // Given
@@ -69,7 +66,6 @@ public class EntityDefinitionTests
     }
 
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task RecordingPaymentForCheckedInGuestWithCharge_Succeeds()
     {
         // Given
@@ -89,7 +85,6 @@ public class EntityDefinitionTests
     }
 
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task CheckingOutGuestWithSettledBalance_Succeeds()
     {
         // Given
@@ -111,7 +106,6 @@ public class EntityDefinitionTests
     }
 
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task CheckingOutGuestWithSettledBalance_FailsWithGuestCheckoutFailed()
     {
         // Given
@@ -140,7 +134,6 @@ public class EntityDefinitionTests
     }
 
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task GroupCheckoutForMultipleGuestStay_ShouldBeInitiated()
     {
         // Given;
