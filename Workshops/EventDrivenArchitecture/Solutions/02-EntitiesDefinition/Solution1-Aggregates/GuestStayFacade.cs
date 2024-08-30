@@ -1,4 +1,6 @@
 using EntitiesDefinition.Core;
+using EntitiesDefinition.Solution1_Aggregates.GuestStayAccounts;
+using EntitiesDefinition.Solution1_Aggregates.GroupCheckouts;
 
 namespace EntitiesDefinition.Solution1_Aggregates;
 
@@ -7,45 +9,56 @@ using static GroupCheckoutCommand;
 
 public class GuestStayFacade(Database database, EventBus eventBus)
 {
-    public ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
+    public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
-        // TODO: Fill the implementation calling your entity/aggregate
-        throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
+        var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
+
+        await database.Store(command.GuestStayId, account, ct);
+        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
     {
-        // TODO: Fill the implementation calling your entity/aggregate, for instance:
-        var entity = await database.Get<object>(command.GuestStayId, ct) // use here your real type
-                     ?? throw new InvalidOperationException("Entity not found");
+        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
+                      ?? throw new InvalidOperationException("Entity not found");
 
-        // entity.DoSomething();
+        account.RecordCharge(command.Amount, command.Now);
 
-        object[] events = [new object()]; // get the new event(s) as an outcome of the business logic
-
-        await database.Store(command.GuestStayId, entity, ct);
-        await eventBus.Publish(events, ct);
-
-        throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
+        await database.Store(command.GuestStayId, account, ct);
+        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
-    public ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
+    public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
     {
-        // TODO: Fill the implementation calling your entity/aggregate
-        throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
+        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
+                      ?? throw new InvalidOperationException("Entity not found");
+
+        account.RecordPayment(command.Amount, command.Now);
+
+        await database.Store(command.GuestStayId, account, ct);
+        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
-    public ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
+    public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
-        // TODO: Fill the implementation calling your entity/aggregate
-        throw new NotImplementedException();
+        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
+                      ?? throw new InvalidOperationException("Entity not found");
+
+        account.CheckOut(command.Now, command.GroupCheckOutId);
+
+        await database.Store(command.GuestStayId, account, ct);
+        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
-    public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
-    {
-        // TODO: Fill the implementation calling your entity/aggregate
-        throw new NotImplementedException();
-    }
+    public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
+        eventBus.Publish([
+            new GroupCheckoutEvent.GroupCheckoutInitiated(
+                command.GroupCheckoutId,
+                command.ClerkId,
+                command.GuestStayIds,
+                command.Now
+            )
+        ], ct);
 }
 
 public abstract record GuestStayAccountCommand

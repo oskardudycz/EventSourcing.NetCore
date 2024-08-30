@@ -22,7 +22,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
     {
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                        ?? throw new InvalidOperationException("Entity not found");
+                      ?? throw new InvalidOperationException("Entity not found");
 
         var @event = account.RecordCharge(command.Amount, command.Now);
 
@@ -33,7 +33,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
     {
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                        ?? throw new InvalidOperationException("Entity not found");
+                      ?? throw new InvalidOperationException("Entity not found");
 
         var @event = account.RecordPayment(command.Amount, command.Now);
 
@@ -44,7 +44,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                        ?? throw new InvalidOperationException("Entity not found");
+                      ?? throw new InvalidOperationException("Entity not found");
 
         switch (account.CheckOut(command.Now, command.GroupCheckOutId))
         {
@@ -62,10 +62,13 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         }
     }
 
-    public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
+    public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
-        // TODO: Fill the implementation calling your entity/aggregate
-        throw new NotImplementedException();
+        var @event =
+            GroupCheckout.Initiate(command.GroupCheckoutId, command.ClerkId, command.GuestStayIds, command.Now);
+
+        await database.Store(command.GroupCheckoutId, GroupCheckout.Initial.Evolve(@event), ct);
+        await eventBus.Publish([@event], ct);
     }
 }
 

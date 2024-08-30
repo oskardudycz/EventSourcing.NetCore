@@ -24,9 +24,4 @@
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.6" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Solution1-Aggregates\GroupCheckouts\" />
-      <Folder Include="Solution1-Aggregates\GuestStayAccounts\" />
-    </ItemGroup>
-
 </Project>
