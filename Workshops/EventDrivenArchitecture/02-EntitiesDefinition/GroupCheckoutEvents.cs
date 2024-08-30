@@ -1,4 +1,4 @@
-namespace EventsDefinition;
+namespace EntitiesDefinition;
 
 public abstract record GroupCheckoutEvent
 {
