@@ -1,13 +1,13 @@
 using EntitiesDefinition.Core;
 
-namespace EntitiesDefinition;
+namespace EntitiesDefinition.Solution1_Aggregates;
 
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
 
 public class GuestStayFacade(Database database, EventBus eventBus)
 {
-    public ValueTask CheckInGuest(CheckInGuest command)
+    public ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
         // TODO: Fill the implementation calling your entity/aggregate
         throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");

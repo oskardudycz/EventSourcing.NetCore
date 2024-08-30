@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutions", "Solutions", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "01-EventsDefinition", "Solutions\01-EventsDefinition\01-EventsDefinition.csproj", "{7312A099-6FAD-462A-8D94-FB817B531A27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "02-EntitiesDefinition", "Solutions\02-EntitiesDefinition\02-EntitiesDefinition.csproj", "{4901FBDE-1248-402F-89F2-8027655B703D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,8 +58,13 @@ Global
 		{7312A099-6FAD-462A-8D94-FB817B531A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7312A099-6FAD-462A-8D94-FB817B531A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7312A099-6FAD-462A-8D94-FB817B531A27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4901FBDE-1248-402F-89F2-8027655B703D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4901FBDE-1248-402F-89F2-8027655B703D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4901FBDE-1248-402F-89F2-8027655B703D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4901FBDE-1248-402F-89F2-8027655B703D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7312A099-6FAD-462A-8D94-FB817B531A27} = {96700308-E324-4D7A-854D-9ED17ECEE9B7}
+		{4901FBDE-1248-402F-89F2-8027655B703D} = {96700308-E324-4D7A-854D-9ED17ECEE9B7}
 	EndGlobalSection
 EndGlobal
