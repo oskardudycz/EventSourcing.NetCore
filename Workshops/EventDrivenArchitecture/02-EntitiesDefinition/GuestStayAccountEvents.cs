@@ -1,4 +1,6 @@
-namespace EventsDefinition;
+namespace EntitiesDefinition;
+
+// 1. TODO: Define your Guest Stay Account events here
 
 public abstract record GuestStayAccountEvent
 {
