@@ -1,5 +1,7 @@
 using Bogus;
 using EntitiesDefinition.Core;
+using EntitiesDefinition.Solution1_Aggregates.GroupCheckouts;
+using EntitiesDefinition.Solution1_Aggregates.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
 using Database = EntitiesDefinition.Core.Database;

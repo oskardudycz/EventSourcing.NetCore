@@ -1,4 +1,4 @@
-namespace EntitiesDefinition.Solution1_Aggregates;
+namespace EntitiesDefinition.Solution1_Aggregates.GroupCheckouts;
 
 public abstract record GroupCheckoutEvent
 {
@@ -42,3 +42,4 @@ public abstract record GroupCheckoutEvent
 
     private GroupCheckoutEvent() { }
 }
+
