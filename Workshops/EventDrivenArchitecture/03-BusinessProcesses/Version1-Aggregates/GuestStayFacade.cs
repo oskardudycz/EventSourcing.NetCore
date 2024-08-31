@@ -1,22 +1,20 @@
-using EntitiesDefinition.Core;
-using EntitiesDefinition.Solution2_ImmutableEntities.GroupCheckouts;
-using EntitiesDefinition.Solution2_ImmutableEntities.GuestStayAccounts;
+using BusinessProcesses.Core;
+using BusinessProcesses.Version1_Aggregates.GroupCheckouts;
+using BusinessProcesses.Version1_Aggregates.GuestStayAccounts;
 
-namespace EntitiesDefinition.Solution2_ImmutableEntities;
+namespace BusinessProcesses.Version1_Aggregates;
 
-using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
-using static GroupCheckoutEvent;
 using static GroupCheckoutCommand;
 
 public class GuestStayFacade(Database database, EventBus eventBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
-        var @event = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
+        var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
-        await database.Store(command.GuestStayId, GuestStayAccount.Initial.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await database.Store(command.GuestStayId, account, ct);
+        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
@@ -24,10 +22,10 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        var @event = account.RecordCharge(command.Amount, command.Now);
+        account.RecordCharge(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await database.Store(command.GuestStayId, account, ct);
+        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
@@ -35,10 +33,10 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        var @event = account.RecordPayment(command.Amount, command.Now);
+        account.RecordPayment(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await database.Store(command.GuestStayId, account, ct);
+        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
@@ -46,25 +44,15 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        switch (account.CheckOut(command.Now, command.GroupCheckOutId))
-        {
-            case ({ } checkedOut, _):
-            {
-                await database.Store(command.GuestStayId, account.Evolve(checkedOut), ct);
-                await eventBus.Publish([checkedOut], ct);
-                return;
-            }
-            case (_, { } checkOutFailed):
-            {
-                await eventBus.Publish([checkOutFailed], ct);
-                return;
-            }
-        }
+        account.CheckOut(command.Now, command.GroupCheckOutId);
+
+        await database.Store(command.GuestStayId, account, ct);
+        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
         eventBus.Publish([
-            new GroupCheckoutInitiated(
+            new GroupCheckoutEvent.GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,
                 command.GuestStayIds,

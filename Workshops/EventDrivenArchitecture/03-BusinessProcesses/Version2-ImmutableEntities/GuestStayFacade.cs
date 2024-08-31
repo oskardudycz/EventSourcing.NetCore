@@ -1,12 +1,10 @@
-using EntitiesDefinition.Core;
-using EntitiesDefinition.Solution2_ImmutableEntities.GroupCheckouts;
-using EntitiesDefinition.Solution2_ImmutableEntities.GuestStayAccounts;
+using BusinessProcesses.Core;
+using BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
+using BusinessProcesses.Version2_ImmutableEntities.GuestStayAccounts;
 
-namespace EntitiesDefinition.Solution2_ImmutableEntities;
+namespace BusinessProcesses.Version2_ImmutableEntities;
 
-using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
-using static GroupCheckoutEvent;
 using static GroupCheckoutCommand;
 
 public class GuestStayFacade(Database database, EventBus eventBus)
@@ -62,15 +60,14 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         }
     }
 
-    public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
-        eventBus.Publish([
-            new GroupCheckoutInitiated(
-                command.GroupCheckoutId,
-                command.ClerkId,
-                command.GuestStayIds,
-                command.Now
-            )
-        ], ct);
+    public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
+    {
+        var @event =
+            GroupCheckout.Initiate(command.GroupCheckoutId, command.ClerkId, command.GuestStayIds, command.Now);
+
+        await database.Store(command.GroupCheckoutId, GroupCheckout.Initial.Evolve(@event), ct);
+        await eventBus.Publish([@event], ct);
+    }
 }
 
 public abstract record GuestStayAccountCommand
