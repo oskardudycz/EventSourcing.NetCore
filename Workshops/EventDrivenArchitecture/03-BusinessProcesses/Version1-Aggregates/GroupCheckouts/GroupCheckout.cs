@@ -1,4 +1,4 @@
-namespace EntitiesDefinition;
+namespace BusinessProcesses.Version1_Aggregates.GroupCheckouts;
 
 public abstract record GroupCheckoutEvent
 {
@@ -9,7 +9,6 @@ public abstract record GroupCheckoutEvent
         DateTimeOffset InitiatedAt
     ): GroupCheckoutEvent;
 
-    // Ignore those events below during this exercise
     public record GuestCheckoutsInitiated(
         Guid GroupCheckoutId,
         Guid[] InitiatedGuestStayIds,
@@ -43,3 +42,4 @@ public abstract record GroupCheckoutEvent
 
     private GroupCheckoutEvent() { }
 }
+

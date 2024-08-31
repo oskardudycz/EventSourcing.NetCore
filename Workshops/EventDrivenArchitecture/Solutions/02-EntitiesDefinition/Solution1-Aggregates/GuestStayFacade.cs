@@ -6,6 +6,7 @@ namespace EntitiesDefinition.Solution1_Aggregates;
 
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
+using static GroupCheckoutEvent;
 
 public class GuestStayFacade(Database database, EventBus eventBus)
 {
@@ -52,7 +53,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
         eventBus.Publish([
-            new GroupCheckoutEvent.GroupCheckoutInitiated(
+            new GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,
                 command.GuestStayIds,
