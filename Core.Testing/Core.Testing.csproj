@@ -6,20 +6,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus" Version="35.5.1" />
+        <PackageReference Include="Bogus" Version="35.6.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.1" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Open.ChannelExtensions" Version="8.3.0" />
+        <PackageReference Include="Open.ChannelExtensions" Version="8.4.3" />
         <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="xunit" Version="2.8.1" />
+        <PackageReference Include="xunit" Version="2.9.0" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.6" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.8" />
         <PackageReference Include="Ogooreck" Version="0.8.2" />
         <!-- For PostgreSQL checkpointing tests -->
         <PackageReference Include="Testcontainers.PostgreSql" Version="3.9.0"/>

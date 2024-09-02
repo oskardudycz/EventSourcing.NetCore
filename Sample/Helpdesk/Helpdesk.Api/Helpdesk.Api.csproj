@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten.CommandLine" Version="7.20.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-        <PackageReference Include="Marten.AspNetCore" Version="7.20.0" />
-        <PackageReference Include="Marten" Version="7.20.0" />
-        <PackageReference Include="Confluent.Kafka" Version="2.4.0" />
+        <PackageReference Include="Marten.CommandLine" Version="7.26.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
+        <PackageReference Include="Marten.AspNetCore" Version="7.26.4" />
+        <PackageReference Include="Marten" Version="7.26.4" />
+        <PackageReference Include="Confluent.Kafka" Version="2.5.2" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     </ItemGroup>
 </Project>
