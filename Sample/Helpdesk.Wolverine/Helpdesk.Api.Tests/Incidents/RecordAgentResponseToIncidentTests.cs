@@ -10,7 +10,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class RecordAgentResponseToIncidentTests(AppFixture fixture): ApiWithLoggedIncident(fixture)
 {
-    [Fact]
+    [Fact(Skip = "Need to bump wolverine")]
     [Trait("Category", "Acceptance")]
     public async Task RecordAgentResponseCommand_RecordsResponse()
     {
