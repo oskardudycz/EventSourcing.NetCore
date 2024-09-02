@@ -15,9 +15,9 @@
 9. Open `MeetingsManagement.sln` solution.
 10. Docker useful commands
 
-    - `docker-compose up` - start dockers
-    - `docker-compose kill` - to stop running dockers.
-    - `docker-compose down -v` - to clean stopped dockers.
+    - `docker compose up` - start dockers
+    - `docker compose kill` - to stop running dockers.
+    - `docker compose down -v` - to clean stopped dockers.
     - `docker ps` - for showing running dockers
     - `docker ps -a` - to show all dockers (also stopped)
 

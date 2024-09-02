@@ -62,7 +62,7 @@ API integration tests for:
 
 ## Running
 
-1. Go to [docker](./docker) and run: `docker-compose up`.
+1. Go to [docker](./docker) and run: `docker compose up`.
 2. Wait until all dockers got are downloaded and running.
 3. You should automatically get:
     - EventStoreDB UI (for event store): http://localhost:2113/

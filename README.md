@@ -629,7 +629,7 @@ For running the Event Store examples you need to have:
 2. [Docker](https://store.docker.com/search?type=edition&offering=community) installed. Then going to the `docker` folder and running:
 
 ```
-docker-compose --profile all up
+docker compose --profile all up
 ```
 
 **More information about using .NET, WebApi and Docker you can find in my other tutorials:** [WebApi with .NET](https://github.com/oskardudycz/WebApiWith.NETCore)

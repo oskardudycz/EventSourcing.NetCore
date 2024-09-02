@@ -11,10 +11,12 @@ using Helpdesk.Api.Incidents.GetIncidentShortInfo;
 using JasperFx.CodeGeneration;
 using Marten;
 using Marten.AspNetCore;
+using Marten.Events;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Pagination;
 using Marten.Schema.Identity;
+using Marten.Storage;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -44,15 +46,24 @@ builder.Services
 
         options.UseSystemTextJsonForSerialization(EnumStorage.AsString);
 
+        options.Events.TenancyStyle = TenancyStyle.Conjoined;
+        options.Policies.AllDocumentsAreMultiTenanted();
+
+        options.Events.StreamIdentity = StreamIdentity.AsString;
+        options.Events.MetadataConfig.HeadersEnabled = true;
+        options.Events.MetadataConfig.CausationIdEnabled = true;
+        options.Events.MetadataConfig.CorrelationIdEnabled = true;
+
+
         options.Projections.Errors.SkipApplyErrors = false;
         options.Projections.Errors.SkipSerializationErrors = false;
         options.Projections.Errors.SkipUnknownEvents = false;
 
-        options.Projections.LiveStreamAggregation<Incident>();
-        options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
-        options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
-        options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
-        options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
+        // options.Projections.LiveStreamAggregation<Incident>();
+        // options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
+        // options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
+        // options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
+        // options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
 
         options.ApplicationAssembly = typeof(CustomerIncidentsSummaryProjection).Assembly;
 

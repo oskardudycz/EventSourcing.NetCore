@@ -21,7 +21,7 @@ RUN dotnet restore ./${project_name}.csproj
 COPY ./ ./
 
 # Run code generation depending on the build argument
-RUN if [ "${run_codegen}" = true ] ; then dotnet run -- codegen write & dotnet run -- codegen test; else echo "skipping code generation"; fi
+RUN dotnet run -- codegen write & dotnet run -- codegen test
 
 RUN ls
 RUN ls -R Internal

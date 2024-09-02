@@ -18,7 +18,7 @@ services:
                 project_name: Helpdesk.Api
                 run_codegen: true
         deploy:
-            replicas: 3
+            replicas: 1
         depends_on:
             postgres:
                 condition: service_healthy

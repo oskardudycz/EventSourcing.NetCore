@@ -15,7 +15,7 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Start containers
-              run: docker-compose --profile ci up -d
+              run: docker compose --profile ci up -d
 
             - name: Setup .NET
               uses: actions/setup-dotnet@v4
@@ -36,4 +36,4 @@ jobs:
 
             - name: Stop containers
               if: always()
-              run: docker-compose --profile ci down
+              run: docker compose --profile ci down

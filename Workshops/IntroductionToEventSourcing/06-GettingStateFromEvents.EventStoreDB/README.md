@@ -11,10 +11,10 @@ There are two variations:
 Select your preferred approach (or both) to solve this use case. If needed you can modify entities or events.
 
 ## Prerequisites
-Run [docker-compose](../../docker-compose.yml) script from the main workshop repository to start EventStoreDB instance.
+Run [docker compose](../../docker-compose.yml) script from the main workshop repository to start EventStoreDB instance.
 
 ```shell
-docker-compose up
+docker compose up
 ```
 
 After that you can use EventStoreDB UI to see how streams and events look like. It's available at: http://localhost:2113/.

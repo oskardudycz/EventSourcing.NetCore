@@ -3,10 +3,10 @@
 Using a defined structure of events from the [first exercise](../01-EventsDefinition), fill a `AppendEvents` function to store events in [Marten](https://martendb.io).
 
 ## Prerequisites
-Run [docker-compose](../docker-compose.yml) script from the main workshop repository to start Postgres instance.
+Run [docker compose](../docker-compose.yml) script from the main workshop repository to start Postgres instance.
 
 ```shell
-docker-compose up
+docker compose up
 ```
 
 After that you can use PG Admin (IDE for Postgres) to see how tables and data look like. It's available at: http://localhost:5050.
