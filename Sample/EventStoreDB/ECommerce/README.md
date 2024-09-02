@@ -14,7 +14,7 @@ Sample is showing the typical flow of the Event Sourcing app with [EventStoreDB]
 
 ## Running
 
-1. Go to [docker](./docker) and run: `docker-compose up`.
+1. Go to [docker](./docker) and run: `docker compose up`.
 2. Wait until all dockers got are downloaded and running.
 3. You should automatically get:
     - EventStoreDB UI (for event store): http://localhost:2113/
@@ -66,9 +66,9 @@ It uses:
 ## Trivia
 
 1. Docker useful commands
-    - `docker-compose up` - start dockers
-    - `docker-compose kill` - to stop running dockers.
-    - `docker-compose down -v` - to clean stopped dockers.
+    - `docker compose up` - start dockers
+    - `docker compose kill` - to stop running dockers.
+    - `docker compose down -v` - to clean stopped dockers.
     - `docker ps` - for showing running dockers
     - `docker ps -a` - to show all dockers (also stopped)
 

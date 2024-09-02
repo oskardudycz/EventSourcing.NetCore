@@ -58,7 +58,7 @@ Read also more in my article [Introduction to Event Sourcing - Self Paced Kit](h
 
 ## Running
 
-1. Run: `docker-compose up`.
+1. Run: `docker compose up`.
 2. Wait until all dockers got are downloaded and running.
 3. You should automatically get:
     - Postgres DB running for [Marten storage](https://martendb.io)

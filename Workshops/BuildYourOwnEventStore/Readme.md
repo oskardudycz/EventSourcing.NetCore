@@ -39,13 +39,13 @@ and read:
 10. Open `BuildYourOwnEventStore.sln` solution.
 11. Docker useful commands
 
-    - `docker-compose up` - start dockers
-    - `docker-compose kill` - to stop running dockers.
-    - `docker-compose down -v` - to clean stopped dockers.
+    - `docker compose up` - start dockers
+    - `docker compose kill` - to stop running dockers.
+    - `docker compose down -v` - to clean stopped dockers.
     - `docker ps` - for showing running dockers
     - `docker ps -a` - to show all dockers (also stopped)
 
-12. For the first part of workshop please go to [./docker](./docker) and run: `docker-compose up`.
+12. For the first part of workshop please go to [./docker](./docker) and run: `docker compose up`.
 13. Wait until all dockers got are downloaded and running.
 14. You should automatically get:
 
