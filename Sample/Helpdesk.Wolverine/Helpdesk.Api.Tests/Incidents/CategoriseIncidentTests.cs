@@ -9,7 +9,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class CategoriseIncidentTests(AppFixture fixture): ApiWithLoggedIncident(fixture)
 {
-    [Fact]
+    [Fact(Skip = "Need to bump wolverine")]
     [Trait("Category", "Acceptance")]
     public async Task CategoriseCommand_ChangesIncidentCategory()
     {
