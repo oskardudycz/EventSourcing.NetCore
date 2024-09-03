@@ -16,7 +16,7 @@
         <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\Core.WebApi\Core.WebApi.csproj" />
-    </ItemGroup>
+<!--    <ItemGroup>-->
+<!--      <ProjectReference Include="..\..\..\Core.WebApi\Core.WebApi.csproj" />-->
+<!--    </ItemGroup>-->
 </Project>
