@@ -64,23 +64,23 @@ public abstract record GuestStayAccountCommand
     public record CheckInGuest(
         Guid GuestStayId,
         DateTimeOffset Now
-    );
+    ): GuestStayAccountCommand;
 
     public record RecordCharge(
         Guid GuestStayId,
         decimal Amount,
         DateTimeOffset Now
-    );
+    ): GuestStayAccountCommand;
 
     public record RecordPayment(
         Guid GuestStayId,
         decimal Amount,
         DateTimeOffset Now
-    );
+    ): GuestStayAccountCommand;
 
     public record CheckOutGuest(
         Guid GuestStayId,
         DateTimeOffset Now,
         Guid? GroupCheckOutId = null
-    );
+    ): GuestStayAccountCommand;
 }

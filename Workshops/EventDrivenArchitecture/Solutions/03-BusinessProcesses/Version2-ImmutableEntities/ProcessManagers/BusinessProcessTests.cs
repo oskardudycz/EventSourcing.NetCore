@@ -40,17 +40,14 @@ public class BusinessProcessTests
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[0], now, groupCheckoutId),
-                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now),
-                new GroupCheckoutEvent.GuestCheckoutCompleted(groupCheckoutId, guestStays[0], now),
+                new GroupCheckoutEvent.GuestCheckOutCompleted(groupCheckoutId, guestStays[0], now),
                 new CheckOutGuest(guestStays[1], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[1], now, groupCheckoutId),
-                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[1], now),
-                new GroupCheckoutEvent.GuestCheckoutCompleted(groupCheckoutId, guestStays[1], now),
+                new GroupCheckoutEvent.GuestCheckOutCompleted(groupCheckoutId, guestStays[1], now),
                 new CheckOutGuest(guestStays[2], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[2], now, groupCheckoutId),
-                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[2], now),
-                new GroupCheckoutEvent.GuestCheckoutCompleted(groupCheckoutId, guestStays[2], now),
-                new GroupCheckoutEvent.GroupCheckoutCompleted(groupCheckoutId, guestStays, now),
+                new GroupCheckoutEvent.GuestCheckOutCompleted(groupCheckoutId, guestStays[2], now),
+                new GroupCheckoutEvent.GroupCheckOutCompleted(groupCheckoutId, guestStays, now),
             ]
         );
     }
@@ -89,17 +86,14 @@ public class BusinessProcessTests
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[0], now, groupCheckoutId),
-                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now),
-                new GroupCheckoutEvent.GuestCheckoutCompleted(groupCheckoutId, guestStays[0], now),
+                new GroupCheckoutEvent.GuestCheckOutCompleted(groupCheckoutId, guestStays[0], now),
                 new CheckOutGuest(guestStays[1], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[1], now, groupCheckoutId),
-                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[1], now),
-                new GroupCheckoutEvent.GuestCheckoutCompleted(groupCheckoutId, guestStays[1], now),
+                new GroupCheckoutEvent.GuestCheckOutCompleted(groupCheckoutId, guestStays[1], now),
                 new CheckOutGuest(guestStays[2], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[2], now, groupCheckoutId),
-                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[2], now),
-                new GroupCheckoutEvent.GuestCheckoutCompleted(groupCheckoutId, guestStays[2], now),
-                new GroupCheckoutEvent.GroupCheckoutCompleted(groupCheckoutId, guestStays, now),
+                new GroupCheckoutEvent.GuestCheckOutCompleted(groupCheckoutId, guestStays[2], now),
+                new GroupCheckoutEvent.GroupCheckOutCompleted(groupCheckoutId, guestStays, now),
             ]
         );
     }
@@ -139,15 +133,12 @@ public class BusinessProcessTests
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[0], now, groupCheckoutId),
-                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now),
-                new GroupCheckoutEvent.GuestCheckoutCompleted(groupCheckoutId, guestStays[0], now),
+                new GroupCheckoutEvent.GuestCheckOutCompleted(groupCheckoutId, guestStays[0], now),
                 new CheckOutGuest(guestStays[1], now, groupCheckoutId),
-                new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[1], now),
                 new GuestCheckoutFailed(guestStays[1], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
                 new GroupCheckoutEvent.GuestCheckoutFailed(groupCheckoutId, guestStays[1], now),
                 new CheckOutGuest(guestStays[2], now, groupCheckoutId),
-                new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[2], now),
                 new GuestCheckoutFailed(guestStays[2], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
                 new GroupCheckoutEvent.GuestCheckoutFailed(groupCheckoutId, guestStays[2], now),
@@ -197,17 +188,14 @@ public class BusinessProcessTests
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
                 new GuestCheckoutFailed(guestStays[0], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
-                new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[0], now),
                 new GroupCheckoutEvent.GuestCheckoutFailed(groupCheckoutId, guestStays[0], now),
                 new CheckOutGuest(guestStays[1], now, groupCheckoutId),
                 new GuestCheckoutFailed(guestStays[1], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
-                new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[1], now),
                 new GroupCheckoutEvent.GuestCheckoutFailed(groupCheckoutId, guestStays[1], now),
                 new CheckOutGuest(guestStays[2], now, groupCheckoutId),
                 new GuestCheckoutFailed(guestStays[2], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
-                new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[2], now),
                 new GroupCheckoutEvent.GuestCheckoutFailed(groupCheckoutId, guestStays[2], now),
                 new GroupCheckoutEvent.GroupCheckoutFailed(
                     groupCheckoutId,
@@ -233,12 +221,12 @@ public class BusinessProcessTests
     {
         this.testOutputHelper = testOutputHelper;
         guestStayFacade = new GuestStayFacade(database, eventBus);
-        groupCheckoutFacade = new GroupCheckoutFacade(database, eventBus);
+        groupCheckoutFacade = new GroupCheckoutFacade(database, eventBus, commandBus);
 
         eventBus.Use(publishedMessages.Catch);
         commandBus.Use(publishedMessages.Catch);
 
-        ConfigureGroupCheckouts(eventBus, commandBus, groupCheckoutFacade);
+        ConfigureGroupCheckouts(eventBus, groupCheckoutFacade);
         ConfigureGuestStayAccounts(commandBus, guestStayFacade);
     }
 }

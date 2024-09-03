@@ -1,38 +1,42 @@
 using BusinessProcesses.Version2_ImmutableEntities.Core;
+using BusinessProcesses.Version2_ImmutableEntities.ProcessManagers.GuestStayAccounts;
 
 namespace BusinessProcesses.Version2_ImmutableEntities.ProcessManagers.GroupCheckouts;
 
+using static GuestStayAccountCommand;
 using static GroupCheckoutEvent;
+using static GroupCheckoutCommand;
+using static ProcessManagerResult;
 
 public abstract record GroupCheckoutEvent
 {
     public record GroupCheckoutInitiated(
-        Guid GroupCheckoutId,
+        Guid GroupCheckOutId,
         Guid ClerkId,
         Guid[] GuestStayIds,
         DateTimeOffset InitiatedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckoutCompleted(
-        Guid GroupCheckoutId,
+    public record GuestCheckOutCompleted(
+        Guid GroupCheckOutId,
         Guid GuestStayId,
         DateTimeOffset CompletedAt
     ): GroupCheckoutEvent;
 
     public record GuestCheckoutFailed(
-        Guid GroupCheckoutId,
+        Guid GroupCheckOutId,
         Guid GuestStayId,
         DateTimeOffset FailedAt
     ): GroupCheckoutEvent;
 
-    public record GroupCheckoutCompleted(
-        Guid GroupCheckoutId,
+    public record GroupCheckOutCompleted(
+        Guid GroupCheckOutId,
         Guid[] CompletedCheckouts,
         DateTimeOffset CompletedAt
     ): GroupCheckoutEvent;
 
     public record GroupCheckoutFailed(
-        Guid GroupCheckoutId,
+        Guid GroupCheckOutId,
         Guid[] CompletedCheckouts,
         Guid[] FailedCheckouts,
         DateTimeOffset FailedAt
@@ -41,48 +45,56 @@ public abstract record GroupCheckoutEvent
     private GroupCheckoutEvent() { }
 }
 
-public record GroupCheckout(
+public record GroupCheckOut(
     Guid Id,
     Dictionary<Guid, CheckoutStatus> GuestStayCheckouts,
     CheckoutStatus Status = CheckoutStatus.Initiated
 )
 {
-    public static GroupCheckoutInitiated Initiate(Guid groupCheckoutId, Guid clerkId, Guid[] guestStayIds,
-        DateTimeOffset initiatedAt) =>
-        new(groupCheckoutId, clerkId, guestStayIds, initiatedAt);
-
-    public GroupCheckoutEvent[] RecordGuestCheckoutCompletion(
-        Guid guestStayId,
-        DateTimeOffset now
-    )
+    public static ProcessManagerResult[] Handle(InitiateGroupCheckout command)
     {
-        if (Status != CheckoutStatus.Initiated || GuestStayCheckouts[guestStayId] == CheckoutStatus.Completed)
-            return [];
+        var (groupCheckoutId, clerkId, guestStayIds, initiatedAt) = command;
 
-        var guestCheckoutCompleted = new GuestCheckoutCompleted(Id, guestStayId, now);
+        return
+        [
+            Publish(new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStayIds, initiatedAt)),
+            ..guestStayIds.Select(guestAccountId =>
+                Send(new CheckOutGuest(guestAccountId, initiatedAt, groupCheckoutId))
+            )
+        ];
+    }
+
+    public ProcessManagerResult[] On(GuestStayAccountEvent.GuestCheckedOut @event)
+    {
+        var (guestStayId, checkedOutAt, _) = @event;
+
+        if (Status != CheckoutStatus.Initiated || GuestStayCheckouts[guestStayId] == CheckoutStatus.Completed)
+            return [Ignore];
+
+        // We could consider even not publishing this event, but storing the one from guest stay account
+        var guestCheckoutCompleted = new GuestCheckOutCompleted(Id, guestStayId, checkedOutAt);
 
         var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Completed);
 
         return AreAnyOngoingCheckouts(guestStayCheckouts)
-            ? [guestCheckoutCompleted]
-            : [guestCheckoutCompleted, Finalize(guestStayCheckouts, now)];
+            ? [Publish(guestCheckoutCompleted)]
+            : [Publish(guestCheckoutCompleted), Publish(Finalize(guestStayCheckouts, checkedOutAt))];
     }
 
-    public GroupCheckoutEvent[] RecordGuestCheckoutFailure(
-        Guid guestStayId,
-        DateTimeOffset now
-    )
+    public ProcessManagerResult[] On(GuestStayAccountEvent.GuestCheckoutFailed @event)
     {
+        var (guestStayId, _, failedAt, _) = @event;
+
         if (Status != CheckoutStatus.Initiated || GuestStayCheckouts[guestStayId] == CheckoutStatus.Failed)
             return [];
 
-        var guestCheckoutFailed = new GuestCheckoutFailed(Id, guestStayId, now);
+        var guestCheckoutFailed = new GuestCheckoutFailed(Id, guestStayId, failedAt);
 
         var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Failed);
 
         return AreAnyOngoingCheckouts(guestStayCheckouts)
-            ? [guestCheckoutFailed]
-            : [guestCheckoutFailed, Finalize(guestStayCheckouts, now)];
+            ? [Publish(guestCheckoutFailed)]
+            : [Publish(guestCheckoutFailed), Publish(Finalize(guestStayCheckouts, failedAt))];
     }
 
     private GroupCheckoutEvent Finalize(
@@ -90,7 +102,7 @@ public record GroupCheckout(
         DateTimeOffset now
     ) =>
         !AreAnyFailedCheckouts(guestStayCheckouts)
-            ? new GroupCheckoutCompleted
+            ? new GroupCheckOutCompleted
             (
                 Id,
                 CheckoutsWith(guestStayCheckouts, CheckoutStatus.Completed),
@@ -117,16 +129,16 @@ public record GroupCheckout(
             .ToArray();
 
 
-    public GroupCheckout Evolve(GroupCheckoutEvent @event) =>
+    public GroupCheckOut Evolve(GroupCheckoutEvent @event) =>
         @event switch
         {
             GroupCheckoutInitiated initiated => this with
             {
-                Id = initiated.GroupCheckoutId,
+                Id = initiated.GroupCheckOutId,
                 GuestStayCheckouts = initiated.GuestStayIds.ToDictionary(id => id, _ => CheckoutStatus.Initiated),
                 Status = CheckoutStatus.Initiated
             },
-            GuestCheckoutCompleted guestCheckedOut => this with
+            GuestCheckOutCompleted guestCheckedOut => this with
             {
                 GuestStayCheckouts = GuestStayCheckouts.ToDictionary(
                     ks => ks.Key,
@@ -140,12 +152,12 @@ public record GroupCheckout(
                     vs => vs.Key == guestCheckedOutFailed.GuestStayId ? CheckoutStatus.Failed : vs.Value
                 )
             },
-            GroupCheckoutCompleted => this with { Status = CheckoutStatus.Completed },
+            GroupCheckOutCompleted => this with { Status = CheckoutStatus.Completed },
             GroupCheckoutFailed => this with { Status = CheckoutStatus.Failed },
             _ => this
         };
 
-    public static GroupCheckout Initial = new(default, [], default);
+    public static GroupCheckOut Initial = new(default, [], default);
 }
 
 public enum CheckoutStatus
@@ -153,4 +165,21 @@ public enum CheckoutStatus
     Initiated,
     Completed,
     Failed
+}
+
+public abstract record ProcessManagerResult
+{
+    public record Command(object Message): ProcessManagerResult;
+    public record Command<T>(T TypedMessage): Command(TypedMessage) where T : notnull;
+
+    public record Event(object Message): ProcessManagerResult;
+    public record Event<T>(T TypedMessage): Event(TypedMessage) where T : notnull;
+
+    public record None: ProcessManagerResult;
+
+    public static Command<T> Send<T>(T command) where T : notnull => new(command);
+
+    public static Event<T> Publish<T>(T @event) where T : notnull => new(@event);
+
+    public static readonly None Ignore = new();
 }

@@ -41,7 +41,7 @@ public abstract record GroupCheckoutEvent
     private GroupCheckoutEvent() { }
 }
 
-public record GroupCheckout(
+public record GroupCheckOut(
     Guid Id,
     Dictionary<Guid, CheckoutStatus> GuestStayCheckouts,
     CheckoutStatus Status = CheckoutStatus.Initiated
@@ -117,7 +117,7 @@ public record GroupCheckout(
             .ToArray();
 
 
-    public GroupCheckout Evolve(GroupCheckoutEvent @event) =>
+    public GroupCheckOut Evolve(GroupCheckoutEvent @event) =>
         @event switch
         {
             GroupCheckoutInitiated initiated => this with
@@ -145,7 +145,7 @@ public record GroupCheckout(
             _ => this
         };
 
-    public static GroupCheckout Initial = new(default, [], default);
+    public static GroupCheckOut Initial = new(default, [], default);
 }
 
 public enum CheckoutStatus

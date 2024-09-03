@@ -1,81 +1,78 @@
 ﻿using BusinessProcesses.Core;
+using BusinessProcesses.Version2_ImmutableEntities.ProcessManagers.GuestStayAccounts;
 using Database = BusinessProcesses.Core.Database;
 
 namespace BusinessProcesses.Version2_ImmutableEntities.ProcessManagers.GroupCheckouts;
 
 using static GroupCheckoutCommand;
+using static GuestStayAccountEvent;
+using static ProcessManagerResult;
 
-public class GroupCheckoutFacade(Database database, EventBus eventBus)
+public class GroupCheckoutFacade(Database database, EventBus eventBus, CommandBus commandBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
-        var @event =
-            new GroupCheckoutEvent.GroupCheckoutInitiated(command.GroupCheckoutId, command.ClerkId,
-                command.GuestStayIds, command.Now);
+        var messages = GroupCheckOut.Handle(command);
 
-        await database.Store(command.GroupCheckoutId, GroupCheckout.Initial.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await ProcessMessages(command.GroupCheckOutId, GroupCheckOut.Initial, messages, ct);
     }
 
-    public async ValueTask RecordGuestCheckoutCompletion(
-        RecordGuestCheckoutCompletion command,
-        CancellationToken ct = default
-    )
+    public async ValueTask GuestCheckedOut(GuestCheckedOut @event, CancellationToken ct = default)
     {
-        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
-
-        var events = groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt);
-
-        if (events.Length == 0)
+        if (!@event.GroupCheckOutId.HasValue)
             return;
 
-        await database.Store(command.GroupCheckoutId,
-            events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event)), ct);
+        var groupCheckout = await database.Get<GroupCheckOut>(@event.GroupCheckOutId.Value, ct)
+                            ?? throw new InvalidOperationException("Entity not found");
 
-        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
+        var messages = groupCheckout.On(@event);
+
+        await ProcessMessages(groupCheckout.Id, groupCheckout, messages, ct);
     }
 
-    public async ValueTask RecordGuestCheckoutFailure(
-        RecordGuestCheckoutFailure command,
-        CancellationToken ct = default
-    )
+    public async ValueTask GuestCheckOutFailed(GuestCheckoutFailed @event, CancellationToken ct = default)
     {
-        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
-
-        var events = groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt);
-
-        if (events.Length == 0)
+        if (!@event.GroupCheckOutId.HasValue)
             return;
 
-        var newState = events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event));
+        var groupCheckout = await database.Get<GroupCheckOut>(@event.GroupCheckOutId.Value, ct)
+                            ?? throw new InvalidOperationException("Entity not found");
 
-        await database.Store(command.GroupCheckoutId, newState, ct);
+        var messages = groupCheckout.On(@event);
 
-        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
+        await ProcessMessages(groupCheckout.Id, groupCheckout, messages, ct);
+    }
+
+    private async Task ProcessMessages(
+        Guid groupCheckOutId,
+        GroupCheckOut groupCheckOut,
+        ProcessManagerResult[] messages,
+        CancellationToken ct
+    )
+    {
+        foreach (var message in messages)
+        {
+            switch (message)
+            {
+                case Event (GroupCheckoutEvent @event):
+                    await database.Store(groupCheckOutId, groupCheckOut.Evolve(@event), ct);
+                    await eventBus.Publish([@event], ct);
+                    break;
+                case Command(GuestStayAccountCommand command):
+                    await commandBus.Send([command], ct);
+                    break;
+            }
+        }
     }
 }
 
 public abstract record GroupCheckoutCommand
 {
     public record InitiateGroupCheckout(
-        Guid GroupCheckoutId,
+        Guid GroupCheckOutId,
         Guid ClerkId,
         Guid[] GuestStayIds,
         DateTimeOffset Now
-    ): GroupCheckoutCommand;
-
-    public record RecordGuestCheckoutCompletion(
-        Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset CompletedAt
-    ): GroupCheckoutCommand;
-
-    public record RecordGuestCheckoutFailure(
-        Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset FailedAt
     ): GroupCheckoutCommand;
 
     private GroupCheckoutCommand() { }
