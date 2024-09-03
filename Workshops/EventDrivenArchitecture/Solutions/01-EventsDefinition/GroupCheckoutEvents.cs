@@ -9,12 +9,6 @@ public abstract record GroupCheckoutEvent
         DateTimeOffset InitiatedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckoutsInitiated(
-        Guid GroupCheckoutId,
-        Guid[] InitiatedGuestStayIds,
-        DateTimeOffset InitiatedAt
-    ): GroupCheckoutEvent;
-
     public record GuestCheckoutCompleted(
         Guid GroupCheckoutId,
         Guid GuestStayId,

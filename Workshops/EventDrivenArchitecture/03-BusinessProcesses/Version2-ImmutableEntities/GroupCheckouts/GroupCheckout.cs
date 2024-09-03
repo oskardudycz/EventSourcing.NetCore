@@ -13,12 +13,6 @@ public abstract record GroupCheckoutEvent
         DateTimeOffset InitiatedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckoutsInitiated(
-        Guid GroupCheckoutId,
-        Guid[] InitiatedGuestStayIds,
-        DateTimeOffset InitiatedAt
-    ): GroupCheckoutEvent;
-
     public record GuestCheckoutCompleted(
         Guid GroupCheckoutId,
         Guid GuestStayId,
@@ -56,12 +50,6 @@ public record GroupCheckout(
     public static GroupCheckoutInitiated Initiate(Guid groupCheckoutId, Guid clerkId, Guid[] guestStayIds,
         DateTimeOffset initiatedAt) =>
         new(groupCheckoutId, clerkId, guestStayIds, initiatedAt);
-
-    public GuestCheckoutsInitiated? RecordGuestCheckoutsInitiation(
-        Guid[] initiatedGuestStayIds,
-        DateTimeOffset now
-    ) =>
-        Status == CheckoutStatus.Initiated ? new GuestCheckoutsInitiated(Id, initiatedGuestStayIds, now) : null;
 
     public (GuestCheckoutCompleted?, (GroupCheckoutCompleted?, GroupCheckoutFailed?)?) RecordGuestCheckoutCompletion(
         Guid guestStayId,
@@ -117,7 +105,7 @@ public record GroupCheckout(
             ));
 
     private static bool AreAnyOngoingCheckouts(Dictionary<Guid, CheckoutStatus> guestStayCheckouts) =>
-        guestStayCheckouts.Values.Any(status => status is CheckoutStatus.Initiated or CheckoutStatus.Pending);
+        guestStayCheckouts.Values.Any(status => status is CheckoutStatus.Initiated);
 
     private static bool AreAnyFailedCheckouts(Dictionary<Guid, CheckoutStatus> guestStayCheckouts) =>
         guestStayCheckouts.Values.Any(status => status is CheckoutStatus.Failed);
@@ -135,18 +123,8 @@ public record GroupCheckout(
             GroupCheckoutInitiated initiated => this with
             {
                 Id = initiated.GroupCheckoutId,
-                GuestStayCheckouts = initiated.GuestStayIds.ToDictionary(id => id, _ => CheckoutStatus.Pending),
+                GuestStayCheckouts = initiated.GuestStayIds.ToDictionary(id => id, _ => CheckoutStatus.Initiated),
                 Status = CheckoutStatus.Initiated
-            },
-            GuestCheckoutsInitiated checkoutsInitiated => this with
-            {
-                GuestStayCheckouts = GuestStayCheckouts.ToDictionary(
-                    ks => ks.Key,
-                    vs => checkoutsInitiated.InitiatedGuestStayIds.ToDictionary(
-                        id => id,
-                        _ => CheckoutStatus.Initiated
-                    ).GetValueOrDefault(vs.Key, vs.Value)
-                )
             },
             GuestCheckoutCompleted guestCheckedOut => this with
             {
@@ -172,7 +150,6 @@ public record GroupCheckout(
 
 public enum CheckoutStatus
 {
-    Pending,
     Initiated,
     Completed,
     Failed
