@@ -12,8 +12,6 @@ using static GroupCheckoutCommand;
 
 public class EntityDefinitionTests
 {
-    private readonly ITestOutputHelper testOutputHelper;
-
     [Fact]
     [Trait("Category", "SkipCI")]
     public async Task CheckingInGuest_Succeeds()
@@ -168,6 +166,7 @@ public class EntityDefinitionTests
     private readonly GuestStayFacade guestStayFacade;
     private readonly Faker generate = new();
     private readonly DateTimeOffset now = DateTimeOffset.Now;
+    private readonly ITestOutputHelper testOutputHelper;
 
     public EntityDefinitionTests(ITestOutputHelper testOutputHelper)
     {

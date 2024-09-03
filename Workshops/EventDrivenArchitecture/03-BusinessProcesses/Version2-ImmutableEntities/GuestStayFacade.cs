@@ -1,6 +1,7 @@
 using BusinessProcesses.Core;
 using BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
 using BusinessProcesses.Version2_ImmutableEntities.GuestStayAccounts;
+using GroupCheckoutEvent = BusinessProcesses.Version1_Aggregates.GroupCheckouts.GroupCheckoutEvent;
 
 namespace BusinessProcesses.Version2_ImmutableEntities;
 
@@ -63,9 +64,8 @@ public class GuestStayFacade(Database database, EventBus eventBus)
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
         var @event =
-            GroupCheckout.Initiate(command.GroupCheckoutId, command.ClerkId, command.GuestStayIds, command.Now);
+            new GroupCheckoutEvent.GroupCheckoutInitiated(command.GroupCheckoutId, command.ClerkId, command.GuestStayIds, command.Now);
 
-        await database.Store(command.GroupCheckoutId, GroupCheckout.Initial.Evolve(@event), ct);
         await eventBus.Publish([@event], ct);
     }
 }

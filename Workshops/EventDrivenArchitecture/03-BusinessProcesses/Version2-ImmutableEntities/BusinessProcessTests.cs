@@ -14,8 +14,6 @@ using static GroupCheckoutCommand;
 
 public class BusinessProcessTests
 {
-    private readonly ITestOutputHelper testOutputHelper;
-
     [Fact]
     public async Task GroupCheckoutForMultipleGuestStayWithoutPaymentsAndCharges_ShouldComplete()
     {
@@ -51,7 +49,6 @@ public class BusinessProcessTests
             ]
         );
     }
-
 
     [Fact]
     public async Task GroupCheckoutForMultipleGuestStayWithAllStaysSettled_ShouldComplete()
@@ -98,7 +95,6 @@ public class BusinessProcessTests
             ]
         );
     }
-
 
     [Fact]
     public async Task GroupCheckoutForMultipleGuestStayWithOneSettledAndRestUnsettled_ShouldFail()
@@ -215,6 +211,7 @@ public class BusinessProcessTests
     private readonly GuestStayFacade guestStayFacade;
     private readonly Faker generate = new();
     private readonly DateTimeOffset now = DateTimeOffset.Now;
+    private readonly ITestOutputHelper testOutputHelper;
 
     public BusinessProcessTests(ITestOutputHelper testOutputHelper)
     {
