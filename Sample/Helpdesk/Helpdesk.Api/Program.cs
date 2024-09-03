@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Core.WebApi.Middlewares.ExceptionHandling;
 using Helpdesk.Api.Core.Http;
 using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.Marten;
@@ -14,6 +13,7 @@ using Marten;
 using Marten.AspNetCore;
 using Marten.Events;
 using Marten.Events.Daemon.Resiliency;
+using Marten.Events.Projections;
 using Marten.Pagination;
 using Marten.Schema.Identity;
 using Marten.Storage;
@@ -34,8 +34,8 @@ builder.WebHost.UseUrls("http://*:5248");
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
-    .AddDefaultExceptionHandler()
-    .AddMarten(sp =>
+    //.AddDefaultExceptionHandler()
+    .AddMarten(_ =>
     {
         var options = new StoreOptions();
 
@@ -60,11 +60,11 @@ builder.Services
         options.Projections.Errors.SkipSerializationErrors = false;
         options.Projections.Errors.SkipUnknownEvents = false;
 
-        // options.Projections.LiveStreamAggregation<Incident>();
-        // options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
-        // options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
-        // options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
-        // options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
+        options.Projections.LiveStreamAggregation<Incident>();
+        options.Projections.Add<IncidentHistoryTransformation>(ProjectionLifecycle.Inline);
+        options.Projections.Add<IncidentDetailsProjection>(ProjectionLifecycle.Inline);
+        options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
+        options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
 
         options.ApplicationAssembly = typeof(CustomerIncidentsSummaryProjection).Assembly;
 
@@ -258,7 +258,8 @@ customersIncidents.MapGet("incidents-summary",
         querySession.Json.WriteById<CustomerIncidentsSummary>(customerId, context)
 );
 
-app.UseExceptionHandler().UseSwagger()
+app//.UseExceptionHandler()
+    .UseSwagger()
     .UseSwaggerUI()
     .UseForwardedHeaders(); // Header forwarding to enable Swagger in Nginx
 
