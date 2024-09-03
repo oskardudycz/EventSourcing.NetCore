@@ -19,9 +19,11 @@ public class CommandBus
         }
     }
 
-    public void Handle<T>(Func<T, CancellationToken, ValueTask> eventHandler)
+    public CommandBus Handle<T>(Func<T, CancellationToken, ValueTask> eventHandler)
     {
         commandHandlers[typeof(T)] = (command, ct) => eventHandler((T)command, ct);
+
+        return this;
     }
 
     public void Use(Action<object> middleware) =>

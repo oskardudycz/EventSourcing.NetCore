@@ -1,12 +1,12 @@
 using Bogus;
 using BusinessProcesses.Core;
-using BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
-using BusinessProcesses.Version2_ImmutableEntities.GuestStayAccounts;
+using BusinessProcesses.Version1_Aggregates.GroupCheckouts;
+using BusinessProcesses.Version1_Aggregates.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
 using Database = BusinessProcesses.Core.Database;
 
-namespace BusinessProcesses.Version2_ImmutableEntities;
+namespace BusinessProcesses.Version1_Aggregates;
 
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
@@ -131,6 +131,28 @@ public class EntityDefinitionTests
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new GuestCheckoutFailed(guestStayId, GuestCheckoutFailed.FailureReason.BalanceNotSettled, now));
+    }
+
+    [Fact]
+    public async Task GroupCheckoutForMultipleGuestStay_ShouldBeInitiated()
+    {
+        // Given;
+        Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
+        publishedMessages.Reset();
+        // And
+        var groupCheckoutId = Guid.NewGuid();
+        var clerkId = Guid.NewGuid();
+        var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
+
+        // When
+        await guestStayFacade.InitiateGroupCheckout(command);
+
+        // Then
+        publishedMessages.ShouldReceiveSingleMessage(new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
     }
 
     private readonly Database database = new();

@@ -1,4 +1,4 @@
-namespace EntitiesDefinition.Solution2_ImmutableEntities.GuestStayAccounts;
+namespace BusinessProcesses.Version2_ImmutableEntities.Sagas.GuestStayAccounts;
 
 using static GuestStayAccountEvent;
 

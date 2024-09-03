@@ -8,18 +8,18 @@ public class EventBus
     {
         foreach (var @event in events)
         {
-            if (!eventHandlers.TryGetValue(@event.GetType(), out var handlers))
-                continue;
-
             foreach (var middleware in middlewares)
                 middleware(@event);
+
+            if (!eventHandlers.TryGetValue(@event.GetType(), out var handlers))
+                continue;
 
             foreach (var handler in handlers)
                 await handler(@event, ct);
         }
     }
 
-    public void Subscribe<T>(Func<T, CancellationToken, ValueTask> eventHandler)
+    public EventBus Subscribe<T>(Func<T, CancellationToken, ValueTask> eventHandler)
     {
         Func<object, CancellationToken, ValueTask> handler = (@event, ct) => eventHandler((T)@event, ct);
 
@@ -32,6 +32,8 @@ public class EventBus
                 return handlers;
             }
         );
+
+        return this;
     }
 
     public void Use(Action<object> middleware) =>
