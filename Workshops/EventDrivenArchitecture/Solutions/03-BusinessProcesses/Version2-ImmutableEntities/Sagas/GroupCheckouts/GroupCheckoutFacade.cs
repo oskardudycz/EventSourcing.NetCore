@@ -5,7 +5,7 @@ namespace BusinessProcesses.Version2_ImmutableEntities.Sagas.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckoutFacade(Database database, EventBus eventBus)
+public class GroupCheckOutFacade(Database database, EventBus eventBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {

@@ -8,7 +8,7 @@ using static GroupCheckoutCommand;
 using static GuestStayAccountEvent;
 using static ProcessManagerResult;
 
-public class GroupCheckoutFacade(Database database, EventBus eventBus, CommandBus commandBus)
+public class GroupCheckOutFacade(Database database, EventBus eventBus, CommandBus commandBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -30,7 +30,7 @@ public class GroupCheckoutFacade(Database database, EventBus eventBus, CommandBu
         await ProcessMessages(groupCheckout.Id, groupCheckout, messages, ct);
     }
 
-    public async ValueTask GuestCheckOutFailed(GuestCheckoutFailed @event, CancellationToken ct = default)
+    public async ValueTask GuestCheckOutFailed(GuestCheckOutFailed @event, CancellationToken ct = default)
     {
         if (!@event.GroupCheckOutId.HasValue)
             return;

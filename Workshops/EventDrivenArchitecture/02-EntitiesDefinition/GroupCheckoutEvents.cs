@@ -15,7 +15,7 @@ public abstract record GroupCheckoutEvent
         DateTimeOffset CompletedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckoutFailed(
+    public record GuestCheckOutFailed(
         Guid GroupCheckoutId,
         Guid GuestStayId,
         DateTimeOffset FailedAt

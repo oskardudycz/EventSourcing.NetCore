@@ -1,6 +1,4 @@
 ﻿using BusinessProcesses.Core;
-using BusinessProcesses.Version2_ImmutableEntities.Choreography.GroupCheckouts;
-using BusinessProcesses.Version2_ImmutableEntities.Choreography.GuestStayAccounts;
 
 namespace BusinessProcesses.Version2_ImmutableEntities.Choreography.GuestStayAccounts;
 

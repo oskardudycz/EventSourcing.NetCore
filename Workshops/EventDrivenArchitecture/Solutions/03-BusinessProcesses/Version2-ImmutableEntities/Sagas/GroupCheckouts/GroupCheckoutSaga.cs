@@ -29,7 +29,7 @@ public static class GroupCheckoutSaga
         );
     }
 
-    public static SagaResult Handle(GuestStayAccountEvent.GuestCheckoutFailed @event)
+    public static SagaResult Handle(GuestStayAccountEvent.GuestCheckOutFailed @event)
     {
         if (!@event.GroupCheckOutId.HasValue)
             return Ignore;

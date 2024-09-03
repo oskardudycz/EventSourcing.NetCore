@@ -130,7 +130,7 @@ public class EntityDefinitionTests
         }
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckoutFailed(guestStayId, GuestCheckoutFailed.FailureReason.BalanceNotSettled, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
     }
 
     [Fact]

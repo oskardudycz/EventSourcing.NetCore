@@ -50,7 +50,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
                 await eventBus.Publish([checkedOut], ct);
                 return;
             }
-            case GuestCheckoutFailed checkOutFailed:
+            case GuestCheckOutFailed checkOutFailed:
             {
                 await eventBus.Publish([checkOutFailed], ct);
                 return;
