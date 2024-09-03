@@ -15,4 +15,8 @@
         <PackageReference Include="Confluent.Kafka" Version="2.5.2" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Core.WebApi\Core.WebApi.csproj" />
+    </ItemGroup>
 </Project>

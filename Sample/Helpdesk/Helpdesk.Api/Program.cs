@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Core.WebApi.Middlewares.ExceptionHandling;
 using Helpdesk.Api.Core.Http;
 using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.Marten;
@@ -13,7 +14,6 @@ using Marten;
 using Marten.AspNetCore;
 using Marten.Events;
 using Marten.Events.Daemon.Resiliency;
-using Marten.Events.Projections;
 using Marten.Pagination;
 using Marten.Schema.Identity;
 using Marten.Storage;
@@ -34,6 +34,7 @@ builder.WebHost.UseUrls("http://*:5248");
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
+    .AddDefaultExceptionHandler()
     .AddMarten(sp =>
     {
         var options = new StoreOptions();
@@ -49,7 +50,7 @@ builder.Services
         options.Events.TenancyStyle = TenancyStyle.Conjoined;
         options.Policies.AllDocumentsAreMultiTenanted();
 
-        options.Events.StreamIdentity = StreamIdentity.AsString;
+        options.Events.StreamIdentity = StreamIdentity.AsGuid;
         options.Events.MetadataConfig.HeadersEnabled = true;
         options.Events.MetadataConfig.CausationIdEnabled = true;
         options.Events.MetadataConfig.CorrelationIdEnabled = true;
@@ -257,7 +258,7 @@ customersIncidents.MapGet("incidents-summary",
         querySession.Json.WriteById<CustomerIncidentsSummary>(customerId, context)
 );
 
-app.UseSwagger()
+app.UseExceptionHandler().UseSwagger()
     .UseSwaggerUI()
     .UseForwardedHeaders(); // Header forwarding to enable Swagger in Nginx
 
