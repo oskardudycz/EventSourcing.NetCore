@@ -1,12 +1,12 @@
 using Bogus;
 using BusinessProcesses.Core;
-using BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
-using BusinessProcesses.Version2_ImmutableEntities.GuestStayAccounts;
+using BusinessProcesses.Version1_Aggregates.GroupCheckouts;
+using BusinessProcesses.Version1_Aggregates.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
 using Database = BusinessProcesses.Core.Database;
 
-namespace BusinessProcesses.Version2_ImmutableEntities;
+namespace BusinessProcesses.Version1_Aggregates;
 
 using static GuestStayAccountCommand;
 using static GuestStayAccountEvent;

@@ -1,11 +1,11 @@
 using BusinessProcesses.Core;
-using BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
 using BusinessProcesses.Version2_ImmutableEntities.GuestStayAccounts;
 using GroupCheckoutEvent = BusinessProcesses.Version1_Aggregates.GroupCheckouts.GroupCheckoutEvent;
 
 namespace BusinessProcesses.Version2_ImmutableEntities;
 
 using static GuestStayAccountCommand;
+using static GuestStayAccountEvent;
 using static GroupCheckoutCommand;
 
 public class GuestStayFacade(Database database, EventBus eventBus)
@@ -47,13 +47,13 @@ public class GuestStayFacade(Database database, EventBus eventBus)
 
         switch (account.CheckOut(command.Now, command.GroupCheckOutId))
         {
-            case ({ } checkedOut, _):
+            case GuestCheckedOut checkedOut:
             {
                 await database.Store(command.GuestStayId, account.Evolve(checkedOut), ct);
                 await eventBus.Publish([checkedOut], ct);
                 return;
             }
-            case (_, { } checkOutFailed):
+            case GuestCheckoutFailed checkOutFailed:
             {
                 await eventBus.Publish([checkOutFailed], ct);
                 return;

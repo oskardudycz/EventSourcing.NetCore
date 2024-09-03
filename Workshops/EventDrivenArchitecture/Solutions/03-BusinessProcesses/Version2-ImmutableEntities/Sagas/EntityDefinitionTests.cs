@@ -1,16 +1,14 @@
 using Bogus;
 using BusinessProcesses.Core;
-using BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
-using BusinessProcesses.Version2_ImmutableEntities.GuestStayAccounts;
+using BusinessProcesses.Version2_ImmutableEntities.Sagas.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
 using Database = BusinessProcesses.Core.Database;
 
-namespace BusinessProcesses.Version2_ImmutableEntities;
+namespace BusinessProcesses.Version2_ImmutableEntities.Sagas;
 
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
-using static GroupCheckoutCommand;
 
 public class EntityDefinitionTests
 {

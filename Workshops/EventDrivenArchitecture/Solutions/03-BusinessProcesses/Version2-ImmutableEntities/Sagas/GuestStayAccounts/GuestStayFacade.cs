@@ -1,13 +1,9 @@
-using EntitiesDefinition.Core;
-using EntitiesDefinition.Solution2_ImmutableEntities.GroupCheckouts;
-using EntitiesDefinition.Solution2_ImmutableEntities.GuestStayAccounts;
+using BusinessProcesses.Core;
 
-namespace EntitiesDefinition.Solution2_ImmutableEntities;
+namespace BusinessProcesses.Version2_ImmutableEntities.Sagas.GuestStayAccounts;
 
-using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
-using static GroupCheckoutEvent;
-using static GroupCheckoutCommand;
+using static GuestStayAccountEvent;
 
 public class GuestStayFacade(Database database, EventBus eventBus)
 {
@@ -54,23 +50,13 @@ public class GuestStayFacade(Database database, EventBus eventBus)
                 await eventBus.Publish([checkedOut], ct);
                 return;
             }
-            case GuestStayAccountEvent.GuestCheckoutFailed checkOutFailed:
+            case GuestCheckoutFailed checkOutFailed:
             {
                 await eventBus.Publish([checkOutFailed], ct);
                 return;
             }
         }
     }
-
-    public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
-        eventBus.Publish([
-            new GroupCheckoutInitiated(
-                command.GroupCheckoutId,
-                command.ClerkId,
-                command.GuestStayIds,
-                command.Now
-            )
-        ], ct);
 }
 
 public abstract record GuestStayAccountCommand
@@ -97,16 +83,4 @@ public abstract record GuestStayAccountCommand
         DateTimeOffset Now,
         Guid? GroupCheckOutId = null
     );
-}
-
-public abstract record GroupCheckoutCommand
-{
-    public record InitiateGroupCheckout(
-        Guid GroupCheckoutId,
-        Guid ClerkId,
-        Guid[] GuestStayIds,
-        DateTimeOffset Now
-    ): GroupCheckoutCommand;
-
-    private GroupCheckoutCommand() { }
 }

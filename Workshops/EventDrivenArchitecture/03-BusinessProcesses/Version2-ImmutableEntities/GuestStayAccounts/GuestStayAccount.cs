@@ -70,36 +70,27 @@ public record GuestStayAccount(
         return new PaymentRecorded(Id, amount, now);
     }
 
-    public (GuestCheckedOut?, GuestCheckoutFailed?) CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)
+    public GuestStayAccountEvent CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)
     {
         if (Status != GuestStayAccountStatus.Opened)
-            return (
-                null,
-                new GuestCheckoutFailed(
-                    Id,
-                    GuestCheckoutFailed.FailureReason.NotOpened,
-                    now,
-                    groupCheckoutId
-                )
+            return new GuestCheckoutFailed(
+                Id,
+                GuestCheckoutFailed.FailureReason.NotOpened,
+                now,
+                groupCheckoutId
             );
 
         return IsSettled
-            ? (
-                new GuestCheckedOut(
-                    Id,
-                    now,
-                    groupCheckoutId
-                ),
-                null
+            ? new GuestCheckedOut(
+                Id,
+                now,
+                groupCheckoutId
             )
-            : (
-                null,
-                new GuestCheckoutFailed(
-                    Id,
-                    GuestCheckoutFailed.FailureReason.BalanceNotSettled,
-                    now,
-                    groupCheckoutId
-                )
+            : new GuestCheckoutFailed(
+                Id,
+                GuestCheckoutFailed.FailureReason.BalanceNotSettled,
+                now,
+                groupCheckoutId
             );
     }
 
