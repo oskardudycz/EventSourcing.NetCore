@@ -45,7 +45,6 @@ public class EventsDefinitionTests
         var events = new GroupCheckoutEvent[]
         {
             new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStayIds, DateTimeOffset.Now),
-            new GuestCheckoutsInitiated(groupCheckoutId, guestStayIds, DateTimeOffset.Now),
             new GuestCheckoutCompleted(groupCheckoutId, guestStayIds[0], DateTimeOffset.Now),
             new GroupCheckoutEvent.GuestCheckoutFailed(groupCheckoutId, guestStayIds[1], DateTimeOffset.Now),
             new GroupCheckoutFailed(groupCheckoutId, [guestStayIds[0]], [guestStayIds[1]], DateTimeOffset.Now),
@@ -53,7 +52,7 @@ public class EventsDefinitionTests
         };
 
         // Then
-        const int minimumExpectedEventTypesCount = 3;
+        const int minimumExpectedEventTypesCount = 5;
         events.Should().HaveCountGreaterOrEqualTo(minimumExpectedEventTypesCount);
         events.GroupBy(e => e.GetType()).Should().HaveCountGreaterOrEqualTo(minimumExpectedEventTypesCount);
     }

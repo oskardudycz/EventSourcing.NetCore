@@ -36,7 +36,7 @@ public class EventsDefinitionTests
         };
 
         // Then
-        const int minimumExpectedEventTypesCount = 3;
+        const int minimumExpectedEventTypesCount = 5;
         events.Should().HaveCountGreaterOrEqualTo(minimumExpectedEventTypesCount);
         events.GroupBy(e => e.GetType()).Should().HaveCountGreaterOrEqualTo(minimumExpectedEventTypesCount);
     }
