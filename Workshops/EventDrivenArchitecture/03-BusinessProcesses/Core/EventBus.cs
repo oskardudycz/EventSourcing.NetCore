@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using FluentAssertions;
 
 namespace BusinessProcesses.Core;
 
@@ -42,24 +41,4 @@ public class EventBus
 
     private readonly ConcurrentDictionary<Type, List<Action<object>>> eventHandlers = new();
     private readonly List<Action<object>> middlewares = [];
-}
-
-public class EventCatcher
-{
-    public List<object> Published { get; } = [];
-
-    public void Catch(object @event) =>
-        Published.Add(@event);
-
-    public void Reset() => Published.Clear();
-
-    public void ShouldNotReceiveAnyEvent() =>
-        Published.Should().BeEmpty();
-
-    public void ShouldReceiveSingleEvent<T>(T @event)
-    {
-        Published.Should().HaveCount(1);
-        Published.OfType<T>().Should().HaveCount(1);
-        Published.Single().Should().Be(@event);
-    }
 }

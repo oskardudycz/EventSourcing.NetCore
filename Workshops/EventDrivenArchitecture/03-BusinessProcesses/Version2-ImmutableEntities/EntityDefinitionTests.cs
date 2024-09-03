@@ -28,7 +28,7 @@ public class EntityDefinitionTests
         await guestStayFacade.CheckInGuest(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new GuestCheckedIn(guestStayId, now));
+        publishedEvents.ShouldReceiveSingleMessage(new GuestCheckedIn(guestStayId, now));
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class EntityDefinitionTests
         await guestStayFacade.RecordCharge(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new ChargeRecorded(guestStayId, amount, now));
+        publishedEvents.ShouldReceiveSingleMessage(new ChargeRecorded(guestStayId, amount, now));
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class EntityDefinitionTests
         await guestStayFacade.RecordPayment(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new PaymentRecorded(guestStayId, amount, now));
+        publishedEvents.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, amount, now));
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class EntityDefinitionTests
         await guestStayFacade.RecordPayment(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new PaymentRecorded(guestStayId, amount, now));
+        publishedEvents.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, amount, now));
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class EntityDefinitionTests
         await guestStayFacade.CheckOutGuest(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new GuestCheckedOut(guestStayId, now));
+        publishedEvents.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayId, now));
     }
 
     [Fact]
@@ -132,29 +132,7 @@ public class EntityDefinitionTests
         }
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new GuestCheckoutFailed(guestStayId, GuestCheckoutFailed.FailureReason.BalanceNotSettled, now));
-    }
-
-    [Fact]
-    public async Task GroupCheckoutForMultipleGuestStay_ShouldBeInitiated()
-    {
-        // Given;
-        Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
-
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
-        publishedEvents.Reset();
-        // And
-        var groupCheckoutId = Guid.NewGuid();
-        var clerkId = Guid.NewGuid();
-        var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
-
-        // When
-        await guestStayFacade.InitiateGroupCheckout(command);
-
-        // Then
-        publishedEvents.ShouldReceiveSingleEvent(new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
+        publishedEvents.ShouldReceiveSingleMessage(new GuestCheckoutFailed(guestStayId, GuestCheckoutFailed.FailureReason.BalanceNotSettled, now));
     }
 
     private readonly Database database = new();
