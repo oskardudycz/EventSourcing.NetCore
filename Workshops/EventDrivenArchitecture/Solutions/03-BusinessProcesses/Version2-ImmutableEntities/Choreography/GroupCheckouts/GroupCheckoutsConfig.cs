@@ -17,15 +17,15 @@ public static class GroupCheckoutsConfig
     {
         eventBus
             .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>((@event, ct) =>
-                commandBus.Send(GroupCheckoutSaga.Handle(@event).Select(c => c.Message).ToArray(), ct)
+                commandBus.Send(GroupCheckoutSaga.On(@event).Select(c => c.Message).ToArray(), ct)
             )
             .Subscribe<GuestCheckedOut>((@event, ct) =>
-                GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutCompletion>(var command)
+                GroupCheckoutSaga.On(@event) is Command<RecordGuestCheckoutCompletion>(var command)
                     ? commandBus.Send([command], ct)
                     : ValueTask.CompletedTask
             )
             .Subscribe<GuestCheckoutFailed>((@event, ct) =>
-                GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutFailure>(var command)
+                GroupCheckoutSaga.On(@event) is Command<RecordGuestCheckoutFailure>(var command)
                     ? commandBus.Send([command], ct)
                     : ValueTask.CompletedTask
             );

@@ -10,12 +10,12 @@ using static SagaResult;
 
 public static class GroupCheckoutSaga
 {
-    public static Command<CheckOutGuest>[] Handle(GroupCheckoutInitiated @event) =>
+    public static Command<CheckOutGuest>[] On(GroupCheckoutInitiated @event) =>
         @event.GuestStayIds.Select(guestAccountId =>
             Send(new CheckOutGuest(guestAccountId, @event.InitiatedAt, @event.GroupCheckoutId))
         ).ToArray();
 
-    public static SagaResult Handle(GuestCheckedOut @event)
+    public static SagaResult On(GuestCheckedOut @event)
     {
         if (!@event.GroupCheckOutId.HasValue)
             return Ignore;
@@ -29,7 +29,7 @@ public static class GroupCheckoutSaga
         );
     }
 
-    public static SagaResult Handle(GuestStayAccountEvent.GuestCheckoutFailed @event)
+    public static SagaResult On(GuestStayAccountEvent.GuestCheckoutFailed @event)
     {
         if (!@event.GroupCheckOutId.HasValue)
             return Ignore;

@@ -5,32 +5,16 @@ namespace BusinessProcesses.Version2_ImmutableEntities.ProcessManagers.GroupChec
 
 using static GuestStayAccountEvent;
 using static GroupCheckoutCommand;
-using static SagaResult;
+using static ProcessManagerResult;
 
 public static class GroupCheckoutsConfig
 {
-    public static void ConfigureGroupCheckouts(
-        EventBus eventBus,
-        CommandBus commandBus,
+    public static void ConfigureGroupCheckouts(EventBus eventBus,
         GroupCheckoutFacade groupCheckoutFacade
     )
     {
         eventBus
-            .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>((@event, ct) =>
-                commandBus.Send(GroupCheckoutSaga.Handle(@event).Select(c => c.Message).ToArray(), ct)
-            )
-            .Subscribe<GuestCheckedOut>((@event, ct) =>
-                GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutCompletion>(var command)
-                    ? commandBus.Send([command], ct)
-                    : ValueTask.CompletedTask
-            )
-            .Subscribe<GuestCheckoutFailed>((@event, ct) =>
-                GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutFailure>(var command)
-                    ? commandBus.Send([command], ct)
-                    : ValueTask.CompletedTask
-            );
-
-        commandBus.Handle<RecordGuestCheckoutCompletion>(groupCheckoutFacade.RecordGuestCheckoutCompletion);
-        commandBus.Handle<RecordGuestCheckoutFailure>(groupCheckoutFacade.RecordGuestCheckoutFailure);
+            .Subscribe<GuestCheckedOut>(groupCheckoutFacade.GuestCheckedOut)
+            .Subscribe<GuestCheckoutFailed>(groupCheckoutFacade.GuestCheckOutFailed);
     }
 }

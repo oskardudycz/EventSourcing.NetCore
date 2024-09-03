@@ -9,11 +9,10 @@ public class GroupCheckoutFacade(Database database, EventBus eventBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
-        var @event =
-            new GroupCheckoutEvent.GroupCheckoutInitiated(command.GroupCheckoutId, command.ClerkId,
+        var @event = GroupCheckOut.Initiate(command.GroupCheckoutId, command.ClerkId,
                 command.GuestStayIds, command.Now);
 
-        await database.Store(command.GroupCheckoutId, GroupCheckout.Initial.Evolve(@event), ct);
+        await database.Store(command.GroupCheckoutId, GroupCheckOut.Initial.Evolve(@event), ct);
         await eventBus.Publish([@event], ct);
     }
 
@@ -22,7 +21,7 @@ public class GroupCheckoutFacade(Database database, EventBus eventBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct)
+        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct)
                             ?? throw new InvalidOperationException("Entity not found");
 
         var events = groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt);
@@ -41,7 +40,7 @@ public class GroupCheckoutFacade(Database database, EventBus eventBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct)
+        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct)
                             ?? throw new InvalidOperationException("Entity not found");
 
         var events = groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt);
