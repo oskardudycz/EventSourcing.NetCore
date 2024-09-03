@@ -1,58 +1,65 @@
 ﻿using BusinessProcesses.Core;
+using BusinessProcesses.Version2_ImmutableEntities.Choreography.GuestStayAccounts;
 using Database = BusinessProcesses.Core.Database;
 
 namespace BusinessProcesses.Version2_ImmutableEntities.Choreography.GroupCheckouts;
 
 using static GroupCheckoutCommand;
+using static GuestStayAccountEvent;
+using static GuestStayAccountCommand;
 
-public class GroupCheckoutFacade(Database database, EventBus eventBus)
+public class GroupCheckOutFacade(Database database, EventBus eventBus, CommandBus commandBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
         var @event = GroupCheckOut.Initiate(command.GroupCheckoutId, command.ClerkId,
-                command.GuestStayIds, command.Now);
+            command.GuestStayIds, command.Now);
 
         await database.Store(command.GroupCheckoutId, GroupCheckOut.Initial.Evolve(@event), ct);
         await eventBus.Publish([@event], ct);
     }
 
-    public async ValueTask RecordGuestCheckoutCompletion(
-        RecordGuestCheckoutCompletion command,
-        CancellationToken ct = default
-    )
+    public ValueTask GroupCheckoutInitiated(GroupCheckoutEvent.GroupCheckoutInitiated @event,
+        CancellationToken ct = default) =>
+        commandBus.Send(
+            [
+                ..@event.GuestStayIds
+                    .Select(guestStayId => new CheckOutGuest(guestStayId, @event.InitiatedAt, @event.GroupCheckoutId))
+            ],
+            ct
+        );
+
+    public async ValueTask GuestCheckedOut(GuestCheckedOut guestCheckedOut, CancellationToken ct = default)
     {
-        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
-
-        var events = groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt);
-
-        if (events.Length == 0)
+        if (!guestCheckedOut.GroupCheckOutId.HasValue)
             return;
 
-        await database.Store(command.GroupCheckoutId,
-            events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event)), ct);
+        var groupCheckout = await database.Get<GroupCheckOut>(guestCheckedOut.GroupCheckOutId.Value, ct)
+                            ?? throw new InvalidOperationException("Entity not found");
 
-        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
+        var events =
+            groupCheckout.RecordGuestCheckoutCompletion(guestCheckedOut.GuestStayId, guestCheckedOut.CheckedOutAt);
+
+        await database.Store(groupCheckout.Id,
+            events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event)), ct
+        );
+        await eventBus.Publish([..events], ct);
     }
 
-    public async ValueTask RecordGuestCheckoutFailure(
-        RecordGuestCheckoutFailure command,
-        CancellationToken ct = default
-    )
+    public async ValueTask GuestCheckOutFailed(GuestCheckOutFailed checkOutFailed, CancellationToken ct = default)
     {
-        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
-
-        var events = groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt);
-
-        if (events.Length == 0)
+        if (!checkOutFailed.GroupCheckOutId.HasValue)
             return;
 
-        var newState = events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event));
+        var groupCheckout = await database.Get<GroupCheckOut>(checkOutFailed.GroupCheckOutId.Value, ct)
+                            ?? throw new InvalidOperationException("Entity not found");
 
-        await database.Store(command.GroupCheckoutId, newState, ct);
+        var events = groupCheckout.RecordGuestCheckoutFailure(checkOutFailed.GuestStayId, checkOutFailed.FailedAt);
 
-        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
+        await database.Store(groupCheckout.Id,
+            events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event)), ct
+        );
+        await eventBus.Publish([..events], ct);
     }
 }
 
@@ -63,18 +70,6 @@ public abstract record GroupCheckoutCommand
         Guid ClerkId,
         Guid[] GuestStayIds,
         DateTimeOffset Now
-    ): GroupCheckoutCommand;
-
-    public record RecordGuestCheckoutCompletion(
-        Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset CompletedAt
-    ): GroupCheckoutCommand;
-
-    public record RecordGuestCheckoutFailure(
-        Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset FailedAt
     ): GroupCheckoutCommand;
 
     private GroupCheckoutCommand() { }

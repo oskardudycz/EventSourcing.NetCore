@@ -30,9 +30,9 @@ public abstract record GuestStayAccountEvent
         Guid? GroupCheckOutId = null
     ): GuestStayAccountEvent;
 
-    public record GuestCheckoutFailed(
+    public record GuestCheckOutFailed(
         Guid GuestStayId,
-        GuestCheckoutFailed.FailureReason Reason,
+        GuestCheckOutFailed.FailureReason Reason,
         DateTimeOffset FailedAt,
         Guid? GroupCheckOutId = null
     ): GuestStayAccountEvent
@@ -98,11 +98,11 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
     {
         if (status != GuestStayAccountStatus.Opened || !IsSettled)
         {
-            Enqueue(new GuestCheckoutFailed(
+            Enqueue(new GuestCheckOutFailed(
                 Id,
                 status != GuestStayAccountStatus.Opened
-                    ? GuestCheckoutFailed.FailureReason.NotOpened
-                    : GuestCheckoutFailed.FailureReason.BalanceNotSettled,
+                    ? GuestCheckOutFailed.FailureReason.NotOpened
+                    : GuestCheckOutFailed.FailureReason.BalanceNotSettled,
                 now,
                 groupCheckoutId
             ));

@@ -4,17 +4,15 @@ using BusinessProcesses.Version2_ImmutableEntities.ProcessManagers.GuestStayAcco
 namespace BusinessProcesses.Version2_ImmutableEntities.ProcessManagers.GroupCheckouts;
 
 using static GuestStayAccountEvent;
-using static GroupCheckoutCommand;
-using static ProcessManagerResult;
 
 public static class GroupCheckoutsConfig
 {
     public static void ConfigureGroupCheckouts(EventBus eventBus,
-        GroupCheckoutFacade groupCheckoutFacade
+        GroupCheckOutFacade groupCheckoutFacade
     )
     {
         eventBus
             .Subscribe<GuestCheckedOut>(groupCheckoutFacade.GuestCheckedOut)
-            .Subscribe<GuestCheckoutFailed>(groupCheckoutFacade.GuestCheckOutFailed);
+            .Subscribe<GuestCheckOutFailed>(groupCheckoutFacade.GuestCheckOutFailed);
     }
 }

@@ -25,9 +25,9 @@ public abstract record GuestStayAccountEvent
         Guid? GroupCheckOutId = null
     ): GuestStayAccountEvent;
 
-    public record GuestCheckoutFailed(
+    public record GuestCheckOutFailed(
         Guid GuestStayId,
-        GuestCheckoutFailed.FailureReason Reason,
+        GuestCheckOutFailed.FailureReason Reason,
         DateTimeOffset FailedAt,
         Guid? GroupCheckOutId = null
     ): GuestStayAccountEvent

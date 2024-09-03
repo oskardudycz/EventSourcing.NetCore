@@ -22,8 +22,8 @@ public class EventsDefinitionTests
             new ChargeRecorded(guestStayId, 100, DateTimeOffset.Now),
             new PaymentRecorded(guestStayId, 100, DateTimeOffset.Now),
             new GuestCheckedOut(guestStayId, DateTimeOffset.Now, groupCheckoutId),
-            new GuestStayAccountEvent.GuestCheckoutFailed(guestStayId,
-                GuestStayAccountEvent.GuestCheckoutFailed.FailureReason.NotOpened, DateTimeOffset.Now,
+            new GuestStayAccountEvent.GuestCheckOutFailed(guestStayId,
+                GuestStayAccountEvent.GuestCheckOutFailed.FailureReason.NotOpened, DateTimeOffset.Now,
                 groupCheckoutId)
         };
 
@@ -46,7 +46,7 @@ public class EventsDefinitionTests
         {
             new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStayIds, DateTimeOffset.Now),
             new GuestCheckoutCompleted(groupCheckoutId, guestStayIds[0], DateTimeOffset.Now),
-            new GroupCheckoutEvent.GuestCheckoutFailed(groupCheckoutId, guestStayIds[1], DateTimeOffset.Now),
+            new GroupCheckoutEvent.GuestCheckOutFailed(groupCheckoutId, guestStayIds[1], DateTimeOffset.Now),
             new GroupCheckoutFailed(groupCheckoutId, [guestStayIds[0]], [guestStayIds[1]], DateTimeOffset.Now),
             new GroupCheckoutCompleted(groupCheckoutId, guestStayIds, DateTimeOffset.Now)
         };

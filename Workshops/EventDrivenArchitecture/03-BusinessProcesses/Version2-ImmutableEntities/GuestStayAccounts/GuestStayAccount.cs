@@ -27,9 +27,9 @@ public abstract record GuestStayAccountEvent
         Guid? GroupCheckOutId = null
     ): GuestStayAccountEvent;
 
-    public record GuestCheckoutFailed(
+    public record GuestCheckOutFailed(
         Guid GuestStayId,
-        GuestCheckoutFailed.FailureReason Reason,
+        GuestCheckOutFailed.FailureReason Reason,
         DateTimeOffset FailedAt,
         Guid? GroupCheckOutId = null
     ): GuestStayAccountEvent
@@ -73,9 +73,9 @@ public record GuestStayAccount(
     public GuestStayAccountEvent CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)
     {
         if (Status != GuestStayAccountStatus.Opened)
-            return new GuestCheckoutFailed(
+            return new GuestCheckOutFailed(
                 Id,
-                GuestCheckoutFailed.FailureReason.NotOpened,
+                GuestCheckOutFailed.FailureReason.NotOpened,
                 now,
                 groupCheckoutId
             );
@@ -86,9 +86,9 @@ public record GuestStayAccount(
                 now,
                 groupCheckoutId
             )
-            : new GuestCheckoutFailed(
+            : new GuestCheckOutFailed(
                 Id,
-                GuestCheckoutFailed.FailureReason.BalanceNotSettled,
+                GuestCheckOutFailed.FailureReason.BalanceNotSettled,
                 now,
                 groupCheckoutId
             );
@@ -106,7 +106,7 @@ public record GuestStayAccount(
             ChargeRecorded charge => this with { Balance = Balance - charge.Amount },
             PaymentRecorded payment => this with { Balance = Balance + payment.Amount },
             GuestCheckedOut => this with { Status = GuestStayAccountStatus.CheckedOut },
-            GuestCheckoutFailed => this,
+            GuestCheckOutFailed => this,
             _ => this
         };
 

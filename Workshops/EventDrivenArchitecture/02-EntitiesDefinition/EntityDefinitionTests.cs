@@ -134,7 +134,7 @@ public class EntityDefinitionTests
         }
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new GuestCheckoutFailed(guestStayId, GuestCheckoutFailed.FailureReason.BalanceNotSettled, now));
+        publishedEvents.ShouldReceiveSingleEvent(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
     }
 
     [Fact]

@@ -23,7 +23,7 @@ public abstract record GroupCheckoutEvent
         DateTimeOffset CompletedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckoutFailed(
+    public record GuestCheckOutFailed(
         Guid GroupCheckOutId,
         Guid GuestStayId,
         DateTimeOffset FailedAt
@@ -81,14 +81,14 @@ public record GroupCheckOut(
             : [Publish(guestCheckoutCompleted), Publish(Finalize(guestStayCheckouts, checkedOutAt))];
     }
 
-    public ProcessManagerResult[] On(GuestStayAccountEvent.GuestCheckoutFailed @event)
+    public ProcessManagerResult[] On(GuestStayAccountEvent.GuestCheckOutFailed @event)
     {
         var (guestStayId, _, failedAt, _) = @event;
 
         if (Status != CheckoutStatus.Initiated || GuestStayCheckouts[guestStayId] == CheckoutStatus.Failed)
             return [];
 
-        var guestCheckoutFailed = new GuestCheckoutFailed(Id, guestStayId, failedAt);
+        var guestCheckoutFailed = new GuestCheckOutFailed(Id, guestStayId, failedAt);
 
         var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Failed);
 
@@ -145,7 +145,7 @@ public record GroupCheckOut(
                     vs => vs.Key == guestCheckedOut.GuestStayId ? CheckoutStatus.Completed : vs.Value
                 )
             },
-            GuestCheckoutFailed guestCheckedOutFailed => this with
+            GuestCheckOutFailed guestCheckedOutFailed => this with
             {
                 GuestStayCheckouts = GuestStayCheckouts.ToDictionary(
                     ks => ks.Key,

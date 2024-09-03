@@ -1,6 +1,5 @@
 using Bogus;
 using BusinessProcesses.Core;
-using BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
 using BusinessProcesses.Version2_ImmutableEntities.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
@@ -10,7 +9,6 @@ namespace BusinessProcesses.Version2_ImmutableEntities;
 
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
-using static GroupCheckoutCommand;
 
 public class EntityDefinitionTests
 {
@@ -130,7 +128,7 @@ public class EntityDefinitionTests
         }
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckoutFailed(guestStayId, GuestCheckoutFailed.FailureReason.BalanceNotSettled, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
     }
 
     private readonly Database database = new();

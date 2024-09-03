@@ -1,8 +1,4 @@
-using BusinessProcesses.Version2_ImmutableEntities.Core;
-
 namespace BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
-
-using static GroupCheckoutEvent;
 
 public abstract record GroupCheckoutEvent
 {
@@ -19,7 +15,7 @@ public abstract record GroupCheckoutEvent
         DateTimeOffset CompletedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckoutFailed(
+    public record GuestCheckOutFailed(
         Guid GroupCheckoutId,
         Guid GuestStayId,
         DateTimeOffset FailedAt
