@@ -1,6 +1,6 @@
-using BusinessProcesses.Sagas.Version2_ImmutableEntities.Core;
+using Idempotency.Sagas.Version2_ImmutableEntities.Core;
 
-namespace BusinessProcesses.Sagas.Version2_ImmutableEntities.GroupCheckouts;
+namespace Idempotency.Sagas.Version2_ImmutableEntities.GroupCheckouts;
 
 using static GroupCheckoutEvent;
 

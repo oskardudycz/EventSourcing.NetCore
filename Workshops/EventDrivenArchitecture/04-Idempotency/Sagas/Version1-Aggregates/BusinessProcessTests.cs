@@ -1,13 +1,13 @@
 using Bogus;
-using BusinessProcesses.Core;
-using BusinessProcesses.Sagas.Version1_Aggregates.GroupCheckouts;
-using BusinessProcesses.Sagas.Version1_Aggregates.GuestStayAccounts;
+using Idempotency.Core;
+using Idempotency.Sagas.Version1_Aggregates.GroupCheckouts;
+using Idempotency.Sagas.Version1_Aggregates.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
-using Database = BusinessProcesses.Core.Database;
-using GroupCheckoutCommand = BusinessProcesses.Sagas.Version1_Aggregates.GroupCheckouts.GroupCheckoutCommand;
+using Database = Idempotency.Core.Database;
+using GroupCheckoutCommand = Idempotency.Sagas.Version1_Aggregates.GroupCheckouts.GroupCheckoutCommand;
 
-namespace BusinessProcesses.Sagas.Version1_Aggregates;
+namespace Idempotency.Sagas.Version1_Aggregates;
 
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;

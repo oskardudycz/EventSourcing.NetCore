@@ -1,19 +1,18 @@
 using Bogus;
-using BusinessProcesses.Core;
-using BusinessProcesses.Sagas.Version1_Aggregates.GroupCheckouts;
-using BusinessProcesses.Sagas.Version1_Aggregates.GuestStayAccounts;
+using Idempotency.Core;
+using Idempotency.Sagas.Version2_ImmutableEntities.GroupCheckouts;
+using Idempotency.Sagas.Version2_ImmutableEntities.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
-using Database = BusinessProcesses.Core.Database;
-using GroupCheckoutCommand = BusinessProcesses.Sagas.Version1_Aggregates.GroupCheckouts.GroupCheckoutCommand;
+using Database = Idempotency.Core.Database;
 
-namespace BusinessProcesses.Sagas.Version1_Aggregates;
+namespace Idempotency.Sagas.Version2_ImmutableEntities;
 
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
+using static GroupCheckoutCommand;
 using static GroupCheckoutsConfig;
 using static GuestStayAccountsConfig;
-using static GroupCheckoutCommand;
 
 public class BusinessProcessTests
 {

@@ -1,7 +1,7 @@
-using BusinessProcesses.Core;
-using BusinessProcesses.Sagas.Version1_Aggregates.GroupCheckouts;
+using Idempotency.Core;
+using Idempotency.Sagas.Version1_Aggregates.GroupCheckouts;
 
-namespace BusinessProcesses.Sagas.Version1_Aggregates.GuestStayAccounts;
+namespace Idempotency.Sagas.Version1_Aggregates.GuestStayAccounts;
 
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
@@ -85,3 +85,4 @@ public abstract record GuestStayAccountCommand
         Guid? GroupCheckOutId = null
     ): GuestStayAccountCommand;
 }
+
