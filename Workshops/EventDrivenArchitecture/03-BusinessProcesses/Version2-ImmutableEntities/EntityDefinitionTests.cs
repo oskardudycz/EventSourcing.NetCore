@@ -128,7 +128,7 @@ public class EntityDefinitionTests
         }
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
+        publishedMessages.ShouldReceiveMessage(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
     }
 
     private readonly Database database = new();

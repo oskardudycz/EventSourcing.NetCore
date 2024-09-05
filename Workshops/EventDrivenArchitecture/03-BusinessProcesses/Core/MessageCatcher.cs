@@ -14,6 +14,12 @@ public class MessageCatcher
     public void ShouldNotReceiveAnyMessage() =>
         Published.Should().BeEmpty();
 
+
+    public void ShouldReceiveMessage<T>(T message) where T: notnull
+    {
+        Published.Should().Contain(message);
+    }
+
     public void ShouldReceiveSingleMessage<T>(T message)
     {
         Published.Should().HaveCount(1);

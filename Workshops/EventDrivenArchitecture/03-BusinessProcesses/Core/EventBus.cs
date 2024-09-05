@@ -8,11 +8,11 @@ public class EventBus
     {
         foreach (var @event in events)
         {
-            if (!eventHandlers.TryGetValue(@event.GetType(), out var handlers))
-                continue;
-
             foreach (var middleware in middlewares)
                 middleware(@event);
+
+            if (!eventHandlers.TryGetValue(@event.GetType(), out var handlers))
+                continue;
 
             foreach (var handler in handlers)
                 await handler(@event, ct);

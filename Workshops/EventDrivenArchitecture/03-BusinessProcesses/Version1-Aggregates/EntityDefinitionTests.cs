@@ -152,7 +152,7 @@ public class EntityDefinitionTests
         await guestStayFacade.InitiateGroupCheckout(command);
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
+        publishedMessages.ShouldReceiveMessage(new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
     }
 
     private readonly Database database = new();
