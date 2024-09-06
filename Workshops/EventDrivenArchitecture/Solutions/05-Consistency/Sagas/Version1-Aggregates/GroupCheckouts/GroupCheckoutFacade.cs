@@ -20,6 +20,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
                 command.Now
             );
 
+
         await database.Store(command.GroupCheckoutId, groupCheckout, ct);
         await eventBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
     }

@@ -7,7 +7,7 @@ public class EventBus
     public async ValueTask Publish(object[] events, CancellationToken ct)
     {
         if (DateTimeOffset.Now.Ticks % 5 == 0)
-            throw new InvalidOperationException("Database not available!");
+            throw new TimeoutException("Database not available!");
 
         foreach (var @event in events)
         {

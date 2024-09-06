@@ -12,7 +12,7 @@ public class Database
         try
         {
             if (DateTimeOffset.Now.Ticks % 5 == 0)
-                throw new InvalidOperationException("Database not available!");
+                throw new TimeoutException("Database not available!");
 
             storage[GetId<T>(id)] = obj;
 
@@ -30,7 +30,7 @@ public class Database
         try
         {
             if (DateTimeOffset.Now.Ticks % 5 == 0)
-                throw new InvalidOperationException("Database not available!");
+                throw new TimeoutException("Database not available!");
 
             storage.Remove(GetId<T>(id));
 
@@ -49,6 +49,16 @@ public class Database
                 // Clone to simulate getting new instance on loading
                 JsonSerializer.Deserialize<T>(JsonSerializer.Serialize((T)result))
                 : null
+        );
+
+    public ValueTask<T[]> Filter<T>(Func<T, bool> predicate, CancellationToken _) where T : class =>
+        ValueTask.FromResult(
+            storage.Values
+                .OfType<T>()
+                .Where(predicate)
+                .Select(record =>
+                    JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(record))!
+                ).ToArray()
         );
 
     public async ValueTask Transaction(Func<Database, ValueTask> action)
