@@ -1,20 +1,47 @@
-﻿namespace HotelManagement.EventStore;
+﻿using System.Collections.Concurrent;
+
+namespace HotelManagement.EventStore;
 
 public class EventTypeMapping
 {
-    private readonly Dictionary<string, Type> mappings = new();
+    private readonly ConcurrentDictionary<string, Type?> typeMap = new();
+    private readonly ConcurrentDictionary<Type, string> typeNameMap = new();
 
-    public EventTypeMapping Register<TEvent>(params string[] typeNames)
+    public void AddCustomMap<T>(string eventTypeName) => AddCustomMap(typeof(T), eventTypeName);
+
+    public void AddCustomMap(Type eventType, string eventTypeName)
     {
-        var eventType = typeof(TEvent);
-
-        foreach (var typeName in typeNames)
-        {
-            mappings.Add(typeName, eventType);
-        }
-
-        return this;
+        typeNameMap.AddOrUpdate(eventType, eventTypeName, (_, typeName) => typeName);
+        typeMap.AddOrUpdate(eventTypeName, eventType, (_, type) => type);
     }
 
-    public Type Map(string eventType) => mappings[eventType];
+    public string ToName<TEventType>() => ToName(typeof(TEventType));
+
+    public string ToName(Type eventType) =>
+        typeNameMap.GetOrAdd(eventType, _ =>
+        {
+            var eventTypeName = eventType.FullName!;
+
+            typeMap.TryAdd(eventTypeName, eventType);
+
+            return eventTypeName;
+        });
+
+    public Type? ToType(string eventTypeName) =>
+        typeMap.GetOrAdd(eventTypeName, _ =>
+        {
+            var type = GetFirstMatchingTypeFromCurrentDomainAssembly(eventTypeName);
+
+            if (type == null)
+                return null;
+
+            typeNameMap.TryAdd(type, eventTypeName);
+
+            return type;
+        });
+
+    private static Type? GetFirstMatchingTypeFromCurrentDomainAssembly(string typeName) =>
+        AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes().Where(x => x.FullName == typeName || x.Name == typeName))
+            .FirstOrDefault();
 }

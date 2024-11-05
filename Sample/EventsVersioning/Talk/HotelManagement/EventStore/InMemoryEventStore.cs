@@ -4,20 +4,40 @@ namespace HotelManagement.EventStore;
 
 public interface IEventStore
 {
-    ValueTask AppendToStream(Guid streamId, IEnumerable<object> newEvents, CancellationToken ct = default);
-    ValueTask<TEvent[]> ReadStream<TEvent>(Guid streamId, CancellationToken ct = default) where TEvent : notnull;
+    ValueTask AppendToStream(
+        Guid streamId,
+        IEnumerable<object> newEvents,
+        CancellationToken ct = default
+    );
+
+    ValueTask<TEvent[]> ReadStream<TEvent>(
+        Guid streamId,
+        CancellationToken ct = default
+    ) where TEvent : notnull;
 }
+
+public record EventMetadata(
+    Guid CorrelationId
+);
+
+public record SerializedEvent(
+    string EventType,
+    string Data,
+    string MetaData = ""
+);
 
 public class InMemoryEventStore: IEventStore
 {
-    private readonly Dictionary<Guid, List<(string EventType, string Json)>> events = new();
+    private readonly Dictionary<Guid, List<SerializedEvent>> events = new();
 
     public ValueTask AppendToStream(Guid streamId, IEnumerable<object> newEvents, CancellationToken _ = default)
     {
         if (!events.ContainsKey(streamId))
             events[streamId] = [];
 
-        var serializedEvents = newEvents.Select(e => (e.GetType().FullName!, JsonSerializer.Serialize(e)));
+        var serializedEvents = newEvents.Select(e =>
+            new SerializedEvent(e.GetType().FullName!, JsonSerializer.Serialize(e))
+        );
 
         events[streamId].AddRange(serializedEvents);
 
@@ -33,7 +53,7 @@ public class InMemoryEventStore: IEventStore
         var deserializedEvents = streamEvents
             .Select(@event =>
                 Type.GetType(@event.EventType, true) is { } clrEventType
-                    ? JsonSerializer.Deserialize(@event.Json, clrEventType)
+                    ? JsonSerializer.Deserialize(@event.Data, clrEventType)
                     : null
             )
             .Where(e => e != null)

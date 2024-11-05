@@ -1,20 +1,11 @@
 ﻿namespace HotelManagement.EventStore;
 
-public record EventMetadata(
-    Guid CorrelationId
-);
-
-public record EventData(
-    string EventType,
-    string Data,
-    string MetaData
-);
 
 public class StreamTransformations
 {
-    private readonly List<Func<List<EventData>, List<EventData>>> jsonTransformations = [];
+    private readonly List<Func<List<SerializedEvent>, List<SerializedEvent>>> jsonTransformations = [];
 
-    public List<EventData> Transform(List<EventData> events)
+    public List<SerializedEvent> Transform(List<SerializedEvent> events)
     {
         if (!jsonTransformations.Any())
             return events;
@@ -26,7 +17,7 @@ public class StreamTransformations
     }
 
     public StreamTransformations Register(
-        Func<List<EventData>, List<EventData>> transformJson
+        Func<List<SerializedEvent>, List<SerializedEvent>> transformJson
     )
     {
         jsonTransformations.Add(transformJson);
