@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelManagement", "HotelManagement\HotelManagement.csproj", "{8B5F91C2-572B-4B2D-B67B-3EA98584888E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelManagement.Tests", "HotelManagement.Tests\HotelManagement.Tests.csproj", "{79C84CFC-D0C4-4341-B262-92A99A372242}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{8B5F91C2-572B-4B2D-B67B-3EA98584888E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B5F91C2-572B-4B2D-B67B-3EA98584888E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B5F91C2-572B-4B2D-B67B-3EA98584888E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79C84CFC-D0C4-4341-B262-92A99A372242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79C84CFC-D0C4-4341-B262-92A99A372242}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79C84CFC-D0C4-4341-B262-92A99A372242}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79C84CFC-D0C4-4341-B262-92A99A372242}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

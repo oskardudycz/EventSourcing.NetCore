@@ -7,12 +7,17 @@ public class EventTypeMapping
     private readonly ConcurrentDictionary<string, Type?> typeMap = new();
     private readonly ConcurrentDictionary<Type, string> typeNameMap = new();
 
-    public void AddCustomMap<T>(string eventTypeName) => AddCustomMap(typeof(T), eventTypeName);
+    public EventTypeMapping CustomMap<T>(params string[] eventTypeNames) => CustomMap(typeof(T), eventTypeNames);
 
-    public void AddCustomMap(Type eventType, string eventTypeName)
+    public EventTypeMapping CustomMap(Type eventType, params string[] eventTypeNames)
     {
-        typeNameMap.AddOrUpdate(eventType, eventTypeName, (_, typeName) => typeName);
-        typeMap.AddOrUpdate(eventTypeName, eventType, (_, type) => type);
+        foreach (var eventTypeName in eventTypeNames)
+        {
+            typeNameMap.AddOrUpdate(eventType, eventTypeName, (_, typeName) => typeName);
+            typeMap.AddOrUpdate(eventTypeName, eventType, (_, type) => type);
+        }
+
+        return this;
     }
 
     public string ToName<TEventType>() => ToName(typeof(TEventType));
