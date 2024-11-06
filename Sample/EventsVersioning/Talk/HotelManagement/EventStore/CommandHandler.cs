@@ -1,24 +1,23 @@
 ﻿namespace HotelManagement.EventStore;
 
-public class CommandHandler<T, TEvent>(
-    IEventStore eventStore,
-    Func<T, TEvent, T> evolve,
+public class CommandHandler<T>(
+    Func<T, object, T> evolve,
     Func<T> getInitial
-) where TEvent : notnull
+)
 {
-    public async Task GetAndUpdate(
-        Guid id,
-        Func<T, TEvent[]> handle,
+    public async Task Handle(
+        IEventStore eventStore,
+        string id,
+        Func<T, object[]> handle,
         CancellationToken ct
     )
     {
-        var events = await eventStore.ReadStream<TEvent>(id, ct);
+        var events = await eventStore.ReadStream(id, ct);
 
         var state = events.Aggregate(getInitial(), evolve);
 
         var result = handle(state);
 
-        if(result.Length > 0)
-            await eventStore.AppendToStream(id, result.Cast<object>(), ct);
+        await eventStore.AppendToStream(id, result, ct);
     }
 }

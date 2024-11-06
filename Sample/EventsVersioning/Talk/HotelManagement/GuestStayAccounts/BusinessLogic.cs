@@ -29,7 +29,11 @@ public static class GuestStayAccountDecider
 {
     public static GuestCheckedIn CheckIn(CheckIn command, GuestStayAccount state) =>
         new GuestCheckedIn(
-            $"{command.GuestStayId}:{command.RoomId}:{command.Now.Date:yyyy-MM-dd}",
+            GuestStayAccount.GuestStayAccountId(
+                command.GuestStayId,
+                command.RoomId,
+                DateOnly.FromDateTime(command.Now.Date)
+            ),
             command.GuestStayId,
             command.RoomId,
             command.ClerkId,

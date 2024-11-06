@@ -5,20 +5,16 @@ namespace HotelManagement.EventStore;
 public interface IEventStore
 {
     ValueTask AppendToStream(
-        Guid streamId,
+        string streamId,
         IEnumerable<object> newEvents,
         CancellationToken ct = default
     );
 
-    ValueTask<TEvent[]> ReadStream<TEvent>(
-        Guid streamId,
+    ValueTask<object[]> ReadStream(
+        string streamId,
         CancellationToken ct = default
-    ) where TEvent : notnull;
+    );
 }
-
-public record EventMetadata(
-    Guid CorrelationId
-);
 
 public record SerializedEvent(
     string EventType,
@@ -26,38 +22,32 @@ public record SerializedEvent(
     string MetaData = ""
 );
 
-public class InMemoryEventStore: IEventStore
+public class InMemoryEventStore(EventSerializer eventSerializer): IEventStore
 {
-    private readonly Dictionary<Guid, List<SerializedEvent>> events = new();
+    private readonly Dictionary<string, List<SerializedEvent>> events = new();
 
-    public ValueTask AppendToStream(Guid streamId, IEnumerable<object> newEvents, CancellationToken _ = default)
+    public ValueTask AppendToStream(string streamId, IEnumerable<object> newEvents, CancellationToken _ = default)
     {
         if (!events.ContainsKey(streamId))
             events[streamId] = [];
 
-        var serializedEvents = newEvents.Select(e =>
-            new SerializedEvent(e.GetType().FullName!, JsonSerializer.Serialize(e))
-        );
+        var serializedEvents = newEvents.Select(eventSerializer.Serialize);
 
         events[streamId].AddRange(serializedEvents);
 
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask<TEvent[]> ReadStream<TEvent>(Guid streamId, CancellationToken _ = default) where TEvent : notnull
+    public ValueTask<object[]> ReadStream(string streamId, CancellationToken _ = default)
     {
         var streamEvents = events.TryGetValue(streamId, out var stream)
             ? stream
             : [];
 
-        var deserializedEvents = streamEvents
-            .Select(@event =>
-                Type.GetType(@event.EventType, true) is { } clrEventType
-                    ? JsonSerializer.Deserialize(@event.Data, clrEventType)
-                    : null
-            )
+        var deserializedEvents = eventSerializer.Deserialize(streamEvents)
             .Where(e => e != null)
-            .Cast<TEvent>().ToArray();
+            .Cast<object>()
+            .ToArray();
 
         return ValueTask.FromResult(deserializedEvents);
     }

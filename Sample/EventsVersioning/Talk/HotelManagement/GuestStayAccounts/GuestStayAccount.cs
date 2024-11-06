@@ -8,25 +8,29 @@ public record GuestStayAccount(
 {
     public bool IsSettled => Balance == 0;
 
-    public GuestStayAccount Evolve(object @event) =>
+    public static string GuestStayAccountId(string guestStayId, string roomId, DateOnly checkInDate) =>
+        $"{guestStayId}:{roomId}:{checkInDate:yyyy-MM-dd}";
+
+    public static GuestStayAccount Evolve(GuestStayAccount state, object @event) =>
         @event switch
         {
-            GuestCheckedIn checkedIn => this with
+            GuestCheckedIn checkedIn => state with
             {
                 Id = checkedIn.GuestStayAccountId, Status = GuestStayAccountStatus.Opened
             },
-            ChargeRecorded charge => this with { Balance = Balance - charge.Amount },
-            PaymentRecorded payment => this with { Balance = Balance + payment.Amount },
-            GuestCheckedOut => this with { Status = GuestStayAccountStatus.CheckedOut },
-            GuestCheckoutFailed => this,
-            _ => this
+            ChargeRecorded charge => state with { Balance = state.Balance - charge.Amount },
+            PaymentRecorded payment => state with { Balance = state.Balance + payment.Amount },
+            GuestCheckedOut => state with { Status = GuestStayAccountStatus.CheckedOut },
+            GuestCheckoutFailed => state,
+            _ => state
         };
 
-    public static readonly GuestStayAccount Initial = new("", default, default);
+    public static readonly GuestStayAccount Initial = new("Unknown", -1, GuestStayAccountStatus.NotExisting);
 }
 
 public enum GuestStayAccountStatus
 {
+    NotExisting = 0,
     Opened = 1,
     CheckedOut = 2
 }

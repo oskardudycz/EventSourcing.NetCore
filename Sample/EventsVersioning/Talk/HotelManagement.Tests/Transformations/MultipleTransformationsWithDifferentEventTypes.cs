@@ -92,14 +92,14 @@ namespace HotelManagement.Tests.Transformations
 
             var events = new[]
             {
-                new { EventType = eventTypeV1Name, EventData = JsonSerializer.Serialize(eventV1) },
-                new { EventType = eventTypeV2Name, EventData = JsonSerializer.Serialize(eventV2) },
-                new { EventType = eventTypeV3Name, EventData = JsonSerializer.Serialize(eventV3) }
+                new SerializedEvent(eventTypeV1Name, JsonSerializer.Serialize(eventV1)),
+                new SerializedEvent(eventTypeV2Name, JsonSerializer.Serialize(eventV2)),
+                new SerializedEvent(eventTypeV3Name, JsonSerializer.Serialize(eventV3))
             };
 
             // When
             var deserializedEvents = events
-                .Select(ev => serializer.Deserialize(ev.EventType, ev.EventData))
+                .Select(serializer.Deserialize)
                 .OfType<PaymentRecorded>()
                 .ToList();
 
