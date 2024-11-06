@@ -3,29 +3,29 @@ using FluentAssertions;
 using HotelManagement.EventStore;
 using V1 = HotelManagement.GuestStayAccounts;
 
-public record Money(
-    decimal Amount,
-    string Currency
-);
-
-namespace V2
+namespace HotelManagement.Tests.Transformations
 {
+    public record Money(
+        decimal Amount,
+        string Currency
+    );
+
+    namespace V2
+    {
+        public record PaymentRecorded(
+            string GuestStayAccountId,
+            Money Amount,
+            DateTimeOffset RecordedAt
+        );
+    }
+
     public record PaymentRecorded(
         string GuestStayAccountId,
         Money Amount,
-        DateTimeOffset RecordedAt
+        DateTimeOffset RecordedAt,
+        string ClerkId
     );
-}
 
-public record PaymentRecorded(
-    string GuestStayAccountId,
-    Money Amount,
-    DateTimeOffset RecordedAt,
-    string ClerkId
-);
-
-namespace HotelManagement.Tests.Transformations
-{
     public class MultipleTransformationsWithDifferentEventTypes
     {
         public static PaymentRecorded UpcastV1(

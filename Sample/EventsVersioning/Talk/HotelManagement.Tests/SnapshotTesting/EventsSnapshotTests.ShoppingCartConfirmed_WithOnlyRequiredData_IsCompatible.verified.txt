@@ -1,4 +1,5 @@
 ﻿{
-  ShoppingCartId: Guid_1,
-  ConfirmedAt: DateTimeOffset_1
+  GuestStayAccountId: Guid_1,
+  Amount: 292.333,
+  RecordedAt: DateTimeOffset_1
 }
