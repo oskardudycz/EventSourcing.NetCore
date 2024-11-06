@@ -1,7 +1,5 @@
 ﻿namespace HotelManagement.GuestStayAccounts;
 
-using static GuestStayAccountEvent;
-
 public record GuestStayAccount(
     string Id,
     decimal Balance = 0,
@@ -10,7 +8,7 @@ public record GuestStayAccount(
 {
     public bool IsSettled => Balance == 0;
 
-    public GuestStayAccount Evolve(GuestStayAccountEvent @event) =>
+    public GuestStayAccount Evolve(object @event) =>
         @event switch
         {
             GuestCheckedIn checkedIn => this with
@@ -33,47 +31,42 @@ public enum GuestStayAccountStatus
     CheckedOut = 2
 }
 
-public abstract record GuestStayAccountEvent
+public record GuestCheckedIn(
+    string GuestStayAccountId,
+    string GuestStayId,
+    string RoomId,
+    string ClerkId,
+    DateTimeOffset CheckedInAt
+);
+
+public record ChargeRecorded(
+    string GuestStayAccountId,
+    decimal Amount,
+    DateTimeOffset RecordedAt
+);
+
+public record PaymentRecorded(
+    string GuestStayAccountId,
+    decimal Amount,
+    DateTimeOffset RecordedAt
+);
+
+public record GuestCheckedOut(
+    string GuestStayAccountId,
+    string ClerkId,
+    DateTimeOffset CheckedOutAt
+);
+
+public record GuestCheckoutFailed(
+    string GuestStayAccountId,
+    string ClerkId,
+    GuestCheckoutFailed.FailureReason Reason,
+    DateTimeOffset FailedAt
+)
 {
-    public record GuestCheckedIn(
-        string GuestStayAccountId,
-        string GuestStayId,
-        string RoomId,
-        string ClerkId,
-        DateTimeOffset CheckedInAt
-    ): GuestStayAccountEvent;
-
-    public record ChargeRecorded(
-        string GuestStayAccountId,
-        decimal Amount,
-        DateTimeOffset RecordedAt
-    ): GuestStayAccountEvent;
-
-    public record PaymentRecorded(
-        string GuestStayAccountId,
-        decimal Amount,
-        DateTimeOffset RecordedAt
-    ): GuestStayAccountEvent;
-
-    public record GuestCheckedOut(
-        string GuestStayAccountId,
-        string ClerkId,
-        DateTimeOffset CheckedOutAt
-    ): GuestStayAccountEvent;
-
-    public record GuestCheckoutFailed(
-        string GuestStayAccountId,
-        string ClerkId,
-        GuestCheckoutFailed.FailureReason Reason,
-        DateTimeOffset FailedAt
-    ): GuestStayAccountEvent
+    public enum FailureReason
     {
-        public enum FailureReason
-        {
-            NotOpened,
-            BalanceNotSettled
-        }
+        NotOpened,
+        BalanceNotSettled
     }
-
-    private GuestStayAccountEvent(){}
 }

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using FluentAssertions;
-using V1 = HotelManagement.GuestStayAccounts.GuestStayAccountEvent;
+using V1 = HotelManagement.GuestStayAccounts;
 
 namespace HotelManagement.Tests.Upcasters;
 

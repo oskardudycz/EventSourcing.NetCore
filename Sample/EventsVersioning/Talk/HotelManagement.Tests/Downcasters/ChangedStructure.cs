@@ -1,10 +1,8 @@
 ﻿using System.Text.Json;
 using FluentAssertions;
-using HotelManagement.GuestStayAccounts;
+using V1 = HotelManagement.GuestStayAccounts;
 
 namespace HotelManagement.Tests.Downcasters;
-
-using V1 = GuestStayAccountEvent;
 
 public class ChangedStructure
 {

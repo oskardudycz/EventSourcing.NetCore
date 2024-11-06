@@ -1,37 +1,29 @@
 ﻿namespace HotelManagement.GuestStayAccounts;
 
-using static GuestStayAccountEvent;
-using static GuestStayAccountCommand;
+public record CheckIn(
+    string ClerkId,
+    string GuestStayId,
+    string RoomId,
+    DateTimeOffset Now
+);
 
-public abstract record GuestStayAccountCommand
-{
-    public record CheckIn(
-        string ClerkId,
-        string GuestStayId,
-        string RoomId,
-        DateTimeOffset Now
-    ): GuestStayAccountCommand;
+public record RecordCharge(
+    string GuestStayAccountId,
+    decimal Amount,
+    DateTimeOffset Now
+);
 
-    public record RecordCharge(
-        string GuestStayAccountId,
-        decimal Amount,
-        DateTimeOffset Now
-    ): GuestStayAccountCommand;
+public record RecordPayment(
+    string GuestStayAccountId,
+    decimal Amount,
+    DateTimeOffset Now
+);
 
-    public record RecordPayment(
-        string GuestStayAccountId,
-        decimal Amount,
-        DateTimeOffset Now
-    ): GuestStayAccountCommand;
-
-    public record CheckOut(
-        string ClerkId,
-        string GuestStayAccountId,
-        DateTimeOffset Now
-    ): GuestStayAccountCommand;
-
-    private GuestStayAccountCommand() { }
-}
+public record CheckOut(
+    string ClerkId,
+    string GuestStayAccountId,
+    DateTimeOffset Now
+);
 
 public static class GuestStayAccountDecider
 {
@@ -60,7 +52,7 @@ public static class GuestStayAccountDecider
         return new PaymentRecorded(state.Id, command.Amount, command.Now);
     }
 
-    public static GuestStayAccountEvent CheckOut(CheckOut command, GuestStayAccount state)
+    public static object CheckOut(CheckOut command, GuestStayAccount state)
     {
         if (state.Status != GuestStayAccountStatus.Opened)
             return new GuestCheckoutFailed(

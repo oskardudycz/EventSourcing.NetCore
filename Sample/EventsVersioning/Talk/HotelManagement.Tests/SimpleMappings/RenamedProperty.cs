@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentAssertions;
-using V1 = HotelManagement.GuestStayAccounts.GuestStayAccountEvent;
+using V1 = HotelManagement.GuestStayAccounts;
 
 namespace HotelManagement.Tests.SimpleMappings;
 

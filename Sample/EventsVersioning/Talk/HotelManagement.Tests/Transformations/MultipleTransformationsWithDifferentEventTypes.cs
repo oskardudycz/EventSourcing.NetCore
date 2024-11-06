@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using FluentAssertions;
 using HotelManagement.EventStore;
-using V1 = HotelManagement.GuestStayAccounts.GuestStayAccountEvent;
+using V1 = HotelManagement.GuestStayAccounts;
 
 public record Money(
     decimal Amount,
