@@ -12,8 +12,8 @@
         <PackageReference Include="Marten.AspNetCore" Version="7.37.3" />
         <PackageReference Include="Marten" Version="7.37.3" />
         <PackageReference Include="Confluent.Kafka" Version="2.8.0" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.7.3" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
         <PackageReference Include="WolverineFx.Marten" Version="3.9.1" />
         <PackageReference Include="WolverineFx.Http" Version="3.9.1" />
     </ItemGroup>
