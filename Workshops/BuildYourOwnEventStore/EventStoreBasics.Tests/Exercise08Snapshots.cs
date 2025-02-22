@@ -10,7 +10,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests;
 
-public class Exercise08Snapshots
+public class Exercise08Snapshots: IAsyncLifetime
 {
     class User : Aggregate
     {
@@ -104,21 +104,18 @@ public class Exercise08Snapshots
 
         eventStore.AddSnapshot(userSnapshot);
 
-        // Initialize Event Store
-        eventStore.Init();
-
         repository = new Repository<User>(eventStore);
     }
 
     [Fact]
-    public void AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
+    public async Task AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
     {
         var streamId = Guid.NewGuid();
         var user = new User(streamId, "John Doe");
 
-        repository.Add(user);
+        await repository.Add(user);
 
-        var userFromDb = databaseConnection.Get<User>(streamId);
+        var userFromDb = await databaseConnection.GetAsync<User>(streamId);
 
         userFromDb.Should().NotBeNull();
         userFromDb.Id.Should().Be(streamId);
@@ -127,19 +124,17 @@ public class Exercise08Snapshots
 
         userFromDb.ChangeName("Adam Smith");
 
-        repository.Update(userFromDb);
+        await repository.Update(userFromDb);
 
-        var userAfterUpdate = databaseConnection.Get<User>(streamId);
+        var userAfterUpdate = await databaseConnection.GetAsync<User>(streamId);
 
         userAfterUpdate.Id.Should().Be(streamId);
         userAfterUpdate.Name.Should().Be("Adam Smith");
         userFromDb.Version.Should().Be(2);
     }
 
-
-
     [Fact]
-    public void Snapshots_ShouldBeQueryable()
+    public async Task Snapshots_ShouldBeQueryable()
     {
         const string john = "John";
 
@@ -147,12 +142,12 @@ public class Exercise08Snapshots
         var secondMatchingUser = new User(Guid.NewGuid(), $"{john} Smith");
         var notMatchingUser = new User(Guid.NewGuid(), "Anna Smith");
 
-        repository.Add(firstMatchingUser);
-        repository.Add(secondMatchingUser);
-        repository.Add(notMatchingUser);
+        await repository.Add(firstMatchingUser);
+        await repository.Add(secondMatchingUser);
+        await repository.Add(notMatchingUser);
 
 
-        var users = databaseConnection.Query<User>(
+        var users = await databaseConnection.QueryAsync<User>(
             @"SELECT id, name, version
                     FROM USERS
                     WHERE name LIKE '%" + john + "%'" );
@@ -170,4 +165,10 @@ public class Exercise08Snapshots
         users.Should().Contain(UserEqualTo(secondMatchingUser));
         users.Should().NotContain(UserEqualTo(notMatchingUser));
     }
+
+    public Task InitializeAsync() =>
+        eventStore.Init();
+
+    public async Task DisposeAsync() =>
+        await eventStore.DisposeAsync();
 }

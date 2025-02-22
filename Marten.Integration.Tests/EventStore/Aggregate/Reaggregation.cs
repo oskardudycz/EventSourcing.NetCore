@@ -70,7 +70,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
         }
 
         [Fact]
-        public void Given_When_Then()
+        public async Task Given_When_Then()
         {
             var taskId = Guid.NewGuid();
 
@@ -82,15 +82,15 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             OldVersion.Issue issueFromV1InlineAggregation;
             OldVersion.Issue issueFromV1OnlineAggregation;
 
-            using (var session = CreateSessionWithInlineAggregationFor<OldVersion.Issue>())
+            await using (var session = CreateSessionWithInlineAggregationFor<OldVersion.Issue>())
             {
                 //1. Publish events
                 session.Events.StartStream<OldVersion.Issue>(taskId, events);
 
-                session.SaveChanges();
+                await session.SaveChangesAsync();
 
-                issueFromV1InlineAggregation = session.Load<OldVersion.Issue>(taskId)!;
-                issueFromV1OnlineAggregation = session.Events.AggregateStream<OldVersion.Issue>(taskId)!;
+                issueFromV1InlineAggregation = (await session.LoadAsync<OldVersion.Issue>(taskId))!;
+                issueFromV1OnlineAggregation = (await session.Events.AggregateStreamAsync<OldVersion.Issue>(taskId))!;
             }
 
             //2. Both inline and online aggregation for the same type should be the same
@@ -101,10 +101,10 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             NewVersion.Issue issueFromV2InlineAggregation;
             NewVersion.Issue issueFromV2OnlineAggregation;
 
-            using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
+            await using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
             {
-                issueFromV2InlineAggregation = session.Load<NewVersion.Issue>(taskId)!;
-                issueFromV2OnlineAggregation = session.Events.AggregateStream<NewVersion.Issue>(taskId)!;
+                issueFromV2InlineAggregation = (await session.LoadAsync<NewVersion.Issue>(taskId))!;
+                issueFromV2OnlineAggregation = (await session.Events.AggregateStreamAsync<NewVersion.Issue>(taskId))!;
             }
 
             //4. Inline aggregated snapshot won't change automatically
@@ -116,31 +116,31 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
             issueFromV2OnlineAggregation.Description.Should().Be("New Logic: Issue 1 Updated");
 
             //6. Reagregation
-            using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
+            await using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
             {
                 //7. Get online aggregation
                 //8. Store manually online aggregation as inline aggregation
                 session.Store(issueFromV2OnlineAggregation);
-                session.SaveChanges();
+                await session.SaveChangesAsync();
 
-                var taskFromV2AfterReaggregation = session.Load<NewVersion.Issue>(taskId)!;
+                var taskFromV2AfterReaggregation = (await session.LoadAsync<NewVersion.Issue>(taskId))!;
 
                 taskFromV2AfterReaggregation.Description.Should().NotBe(issueFromV1OnlineAggregation.Description);
                 taskFromV2AfterReaggregation.Description.Should().Be(issueFromV2OnlineAggregation.Description);
                 taskFromV2AfterReaggregation.Description.Should().Be("New Logic: Issue 1 Updated");
             }
 
-            using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
+            await using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
             {
                 //9. Check if next event would be properly applied to inline aggregation
                 session.Events.Append(taskId, new IssueUpdated(taskId, "Completely New text"));
-                session.SaveChanges();
+                await session.SaveChangesAsync();
             }
 
             // TODO: Something has changed here in Marten v7
             // using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
             // {
-            //     var taskFromV2NewInlineAggregation = session.Load<NewVersion.Issue>(taskId)!;
+            //     var taskFromV2NewInlineAggregation = await session.LoadAsync<NewVersion.Issue>(taskId)!;
             //     taskFromV2NewInlineAggregation.Description.Should().Be("New Logic: Completely New text");
             // }
         }

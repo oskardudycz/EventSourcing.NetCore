@@ -237,7 +237,7 @@ public class CompositeIdsTests(MartenFixture fixture): MartenTest(fixture.Postgr
     }
 
     [Fact]
-    public void GivenAggregateWithCompositeId_WhenAppendedEvent_LiveAndInlineAggregationWorks()
+    public async Task GivenAggregateWithCompositeId_WhenAppendedEvent_LiveAndInlineAggregationWorks()
     {
         var seatId = new SeatId(Guid.NewGuid());
         var customerId = new CustomerId(Guid.NewGuid());
@@ -248,13 +248,13 @@ public class CompositeIdsTests(MartenFixture fixture): MartenTest(fixture.Postgr
         //1. Create events
         EventStore.Append(reservation.AggregateId, @event);
 
-        Session.SaveChanges();
+        await Session.SaveChangesAsync();
 
         //2. Get live aggregation
-        var issuesListFromLiveAggregation = EventStore.AggregateStream<Reservation>(reservation.AggregateId);
+        var issuesListFromLiveAggregation = await EventStore.AggregateStreamAsync<Reservation>(reservation.AggregateId);
 
         //3. Get inline aggregation
-        var issuesListFromInlineAggregation = Session.Load<Reservation>(reservation.AggregateId);
+        var issuesListFromInlineAggregation = await Session.LoadAsync<Reservation>(reservation.AggregateId);
 
         //4. Get inline aggregation through linq
         var reservationId = reservation.Id;

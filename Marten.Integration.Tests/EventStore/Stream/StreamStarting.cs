@@ -23,19 +23,19 @@ public record Issue(
 public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     [Fact(Skip = "Skipped because of https://github.com/JasperFx/marten/issues/1648")]
-    public void GivenNoEvents_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
+    public async Task GivenNoEvents_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
     {
         var @event = new IssueCreated(Guid.NewGuid(), "Description");
 
         var streamId = EventStore.StartStream(@event.IssueId);
 
-        Session.SaveChanges();
+        await Session.SaveChangesAsync();
 
         streamId.Should().NotBeNull();
     }
 
     [Fact]
-    public void GivenOneEvent_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
+    public Task GivenOneEvent_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
     {
         var @event = new IssueCreated(Guid.NewGuid(), "Description");
 
@@ -43,43 +43,43 @@ public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSq
 
         streamId.Should().NotBeNull();
 
-        Session.SaveChanges();
+        return Session.SaveChangesAsync();
     }
 
     [Fact]
-    public void GivenStartedStream_WhenStartStreamIsBeingCalledAgain_ThenExceptionIsThrown()
+    public async Task GivenStartedStream_WhenStartStreamIsBeingCalledAgain_ThenExceptionIsThrown()
     {
         var @event = new IssueCreated(Guid.NewGuid(), "Description");
 
         var streamId = EventStore.StartStream(@event.IssueId, @event);
 
-        Session.SaveChanges();
+        await Session.SaveChangesAsync();
 
-        Assert.Throws<ExistingStreamIdCollisionException>(() =>
+        await Assert.ThrowsAsync<ExistingStreamIdCollisionException>(async () =>
         {
             EventStore.StartStream(@event.IssueId, @event);
-            Session.SaveChanges();
+            await Session.SaveChangesAsync();
         });
     }
 
     [Fact]
-    public void GivenOneEvent_WhenEventsArePublishedWithStreamId_ThenEventsAreSavedWithoutErrorAndStreamIsStarted()
+    public async Task GivenOneEvent_WhenEventsArePublishedWithStreamId_ThenEventsAreSavedWithoutErrorAndStreamIsStarted()
     {
         var @event = new IssueCreated(Guid.NewGuid(), "Description");
         var streamId = Guid.NewGuid();
 
         EventStore.Append(streamId, @event);
 
-        Session.SaveChanges();
+        await Session.SaveChangesAsync();
 
-        var streamState = EventStore.FetchStreamState(streamId);
+        var streamState = await EventStore.FetchStreamStateAsync(streamId);
 
         streamState.Should().NotBeNull();
         streamState!.Version.Should().Be(1);
     }
 
     [Fact]
-    public void GivenMoreThenOneEvent_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
+    public async Task GivenMoreThenOneEvent_WhenStreamIsStarting_ThenEventsAreSavedWithoutError()
     {
         var taskId = Guid.NewGuid();
         var events = new object[]
@@ -91,6 +91,6 @@ public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSq
 
         streamId.Should().NotBeNull();
 
-        Session.SaveChanges();
+        await Session.SaveChangesAsync();
     }
 }

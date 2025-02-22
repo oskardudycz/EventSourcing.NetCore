@@ -5,15 +5,15 @@ public class Repository<T>(IEventStore eventStore): IRepository<T>
 {
     private readonly IEventStore eventStore = eventStore ?? throw  new ArgumentNullException(nameof(eventStore));
 
-    public T Find(Guid id) =>
-        eventStore.AggregateStream<T>(id);
+    public Task<T?> Find(Guid id, CancellationToken ct = default) =>
+        eventStore.AggregateStream<T>(id, ct: ct);
 
-    public void Add(T aggregate) =>
-        eventStore.Store(aggregate);
+    public Task Add(T aggregate, CancellationToken ct = default) =>
+        eventStore.Store(aggregate, ct);
 
-    public void Update(T aggregate) =>
-        eventStore.Store(aggregate);
+    public Task Update(T aggregate, CancellationToken ct = default) =>
+        eventStore.Store(aggregate, ct);
 
-    public void Delete(T aggregate) =>
-        eventStore.Store(aggregate);
+    public Task Delete(T aggregate, CancellationToken ct = default) =>
+        eventStore.Store(aggregate, ct);
 }

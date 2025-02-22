@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="8.0.1"/>
+        <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0"/>
         <PackageReference Include="Aspire.Npgsql" Version="8.2.0" />
         <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.2.0" />
         <PackageReference Include="Aspire.Hosting.Kafka" Version="8.2.0" />

@@ -102,7 +102,7 @@
 //             //1. Create events
 //             EventStore.StartStream<IssuesList>(events);
 //
-//             Session.SaveChanges();
+//             await Session.SaveChangesAsync();
 //
 //             //2. Get transformed events
 //             var changeLogs = Session.Query<IssueChangesLog>().ToList();

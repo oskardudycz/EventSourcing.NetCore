@@ -92,7 +92,7 @@ public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixtu
     }
 
     [Fact]
-    public void GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
+    public async Task GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
     {
         var issue1Id = Guid.NewGuid();
         var issue2Id = Guid.NewGuid();
@@ -107,13 +107,13 @@ public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixtu
         //1. Create events
         var streamId = EventStore.StartStream<IssuesList>(events).Id;
 
-        Session.SaveChanges();
+        await Session.SaveChangesAsync();
 
         //2. Get live agregation
-        var issuesListFromLiveAggregation = EventStore.AggregateStream<IssuesList>(streamId);
+        var issuesListFromLiveAggregation = await EventStore.AggregateStreamAsync<IssuesList>(streamId);
 
         //3. Get inline aggregation
-        var issuesListFromInlineAggregation = Session.Load<IssuesList>(streamId);
+        var issuesListFromInlineAggregation = await Session.LoadAsync<IssuesList>(streamId);
 
         var projection = Session.Query<IssueDescriptions>().FirstOrDefault();
 

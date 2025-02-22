@@ -5,7 +5,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests;
 
-public class Exercise07AggregateAndRepository
+public class Exercise07AggregateAndRepository: IAsyncLifetime
 {
 
     class User : Aggregate
@@ -70,34 +70,39 @@ public class Exercise07AggregateAndRepository
         // Create Event Store
         eventStore = new EventStore(databaseConnection);
 
-        // Initialize Event Store
-        eventStore.Init();
-
         repository = new Repository<User>(eventStore);
     }
 
     [Fact]
-    public void Repository_FullFlow_ShouldSucceed()
+    public async Task Repository_FullFlow_ShouldSucceed()
     {
         var streamId = Guid.NewGuid();
         var user = new User(streamId, "John Doe");
 
-        repository.Add(user);
+        await repository.Add(user);
 
-        var userFromRepository = repository.Find(streamId);
+        var userFromRepository = await repository.Find(streamId);
 
-        userFromRepository.Id.Should().Be(streamId);
+        userFromRepository.Should().NotBeNull();
+        userFromRepository!.Id.Should().Be(streamId);
         userFromRepository.Name.Should().Be("John Doe");
         userFromRepository.Version.Should().Be(1);
 
         userFromRepository.ChangeName("Adam Smith");
 
-        repository.Update(userFromRepository);
+        await repository.Update(userFromRepository);
 
-        var userAfterUpdate = repository.Find(streamId);
+        var userAfterUpdate = await repository.Find(streamId);
 
-        userAfterUpdate.Id.Should().Be(streamId);
+        userAfterUpdate.Should().NotBeNull();
+        userAfterUpdate!.Id.Should().Be(streamId);
         userAfterUpdate.Name.Should().Be("Adam Smith");
         userFromRepository.Version.Should().Be(2);
     }
+
+    public Task InitializeAsync() =>
+        eventStore.Init();
+
+    public async Task DisposeAsync() =>
+        await eventStore.DisposeAsync();
 }

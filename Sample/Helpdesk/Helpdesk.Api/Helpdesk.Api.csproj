@@ -8,12 +8,31 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten.CommandLine" Version="7.26.4" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
-        <PackageReference Include="Marten.AspNetCore" Version="7.26.4" />
-        <PackageReference Include="Marten" Version="7.26.4" />
-        <PackageReference Include="Confluent.Kafka" Version="2.5.2" />
+        <PackageReference Include="Marten.CommandLine" Version="7.37.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+        <PackageReference Include="Marten.AspNetCore" Version="7.37.3" />
+        <PackageReference Include="Marten" Version="7.37.3" />
+        <PackageReference Include="Confluent.Kafka" Version="2.8.0" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Internal\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="out\out\web.config" />
+      <_ContentIncludedByDefault Remove="out\web.config" />
+      <_ContentIncludedByDefault Remove="out\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="out\appsettings.json" />
+      <_ContentIncludedByDefault Remove="out\appsettings.Production.json" />
+      <_ContentIncludedByDefault Remove="out\Helpdesk.Api.deps.json" />
+      <_ContentIncludedByDefault Remove="out\Helpdesk.Api.runtimeconfig.json" />
+      <_ContentIncludedByDefault Remove="out\out\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="out\out\appsettings.json" />
+      <_ContentIncludedByDefault Remove="out\out\appsettings.Production.json" />
+      <_ContentIncludedByDefault Remove="out\out\Helpdesk.Api.deps.json" />
+      <_ContentIncludedByDefault Remove="out\out\Helpdesk.Api.runtimeconfig.json" />
     </ItemGroup>
 
 <!--    <ItemGroup>-->

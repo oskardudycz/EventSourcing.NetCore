@@ -2,11 +2,11 @@ namespace EventStoreBasics;
 
 public interface IRepository<T> where T : IAggregate
 {
-    T? Find(Guid id);
+    Task<T?> Find(Guid id, CancellationToken ct = default);
 
-    void Add(T aggregate);
+    Task Add(T aggregate, CancellationToken ct = default);
 
-    void Update(T aggregate);
+    Task Update(T aggregate, CancellationToken ct = default);
 
-    void Delete(T aggregate);
+    Task Delete(T aggregate, CancellationToken ct = default);
 }
