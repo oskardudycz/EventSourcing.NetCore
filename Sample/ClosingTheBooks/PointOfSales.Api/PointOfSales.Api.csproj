@@ -12,7 +12,7 @@
         <PackageReference Include="Marten" Version="7.37.3" />
         <PackageReference Include="Marten.AspNetCore" Version="7.37.3" />
         <PackageReference Include="Marten.CommandLine" Version="7.37.3" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
     </ItemGroup>
 
     <ItemGroup>
