@@ -18,6 +18,7 @@ using Wolverine.Marten;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#pragma warning disable CS0618 // Type or member is obsolete
 builder.Services
     .AddDefaultExceptionHandler(
         (exception, _) => exception switch
@@ -65,6 +66,7 @@ builder.Services
     // I also added this to opt into events being forward to
     // the Wolverine outbox during SaveChangesAsync()
     .EventForwardingToWolverine();
+#pragma warning restore CS0618 // Type or member is obsolete
 
 builder.Services.AddResourceSetupOnStartup();
 

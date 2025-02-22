@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Shipments.Storage;
 
+#nullable disable
+
 namespace Shipments.Migrations
 {
     [DbContext(typeof(ShipmentsDbContext))]
@@ -15,9 +17,10 @@ namespace Shipments.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "5.0.0")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Shipments.Packages.Package", b =>
                 {
@@ -29,7 +32,7 @@ namespace Shipments.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("SentAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -63,6 +66,11 @@ namespace Shipments.Migrations
                     b.HasOne("Shipments.Packages.Package", null)
                         .WithMany("ProductItems")
                         .HasForeignKey("PackageId");
+                });
+
+            modelBuilder.Entity("Shipments.Packages.Package", b =>
+                {
+                    b.Navigation("ProductItems");
                 });
 #pragma warning restore 612, 618
         }

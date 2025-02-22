@@ -62,22 +62,22 @@ public class TenancyPerSchema(MartenFixture fixture): MartenTest(fixture.Postgre
     private const string SecondTenant = "Tenant2";
 
     [Fact]
-    public void GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
+    public async Task GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
     {
         var services = new ServiceCollection();
 
         AddMarten(services);
 
-        using var sp = services.BuildServiceProvider();
+        await using var sp = services.BuildServiceProvider();
         // simulate scope per HTTP request with different tenant
         using (var firstScope = sp.CreateScope())
         {
             firstScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = FirstTenant;
 
-            using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
+            await using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
             {
                 session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), FirstTenant));
-                session.SaveChanges();
+                await session.SaveChangesAsync();
             }
         }
 
@@ -86,10 +86,10 @@ public class TenancyPerSchema(MartenFixture fixture): MartenTest(fixture.Postgre
         {
             secondScope.ServiceProvider.GetRequiredService<DummyTenancyContext>().TenantId = SecondTenant;
 
-            using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
+            await using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
             {
                 session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), SecondTenant));
-                session.SaveChanges();
+                await session.SaveChangesAsync();
             }
         }
     }

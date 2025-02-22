@@ -7,19 +7,19 @@ using Npgsql;
 
 namespace EventStoreBasics;
 
-public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEventStore
+public class EventStore(NpgsqlConnection databaseConnection): IAsyncDisposable, IEventStore
 {
     private readonly IList<ISnapshot> snapshots = new List<ISnapshot>();
     private readonly IList<IProjection> projections = new List<IProjection>();
 
     private const string Apply = "Apply";
 
-    public void Init()
+    public async Task Init(CancellationToken ct = default)
     {
         // See more in Greg Young's "Building an Event Storage" article https://cqrs.wordpress.com/documents/building-event-storage/
-        CreateStreamsTable();
-        CreateEventsTable();
-        CreateAppendEventFunction();
+        await CreateStreamsTable(ct);
+        await CreateEventsTable(ct);
+        await CreateAppendEventFunction(ct);
     }
 
     public void AddSnapshot(ISnapshot snapshot) =>
@@ -28,14 +28,14 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
     public void AddProjection(IProjection projection) =>
         projections.Add(projection);
 
-    public bool Store<TStream>(TStream aggregate) where TStream : IAggregate
+    public async Task<bool> Store<TStream>(TStream aggregate, CancellationToken ct = default) where TStream : IAggregate
     {
         var events = aggregate.DequeueUncommittedEvents();
         var initialVersion = aggregate.Version - events.Count();
 
         foreach (var @event in events)
         {
-            AppendEvent<TStream>(aggregate.Id, @event, initialVersion++);
+            await AppendEvent<TStream>(aggregate.Id, @event, initialVersion++, ct);
 
             foreach (var projection in projections.Where(
                          projection => projection.Handles.Contains(@event.GetType())))
@@ -51,9 +51,10 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         return true;
     }
 
-    public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null)
+    public Task<bool> AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null,
+        CancellationToken ct = default)
         where TStream : notnull =>
-        databaseConnection.QuerySingle<bool>(
+        databaseConnection.QuerySingleAsync<bool>(
             "SELECT append_event(@Id, @Data::jsonb, @Type, @StreamId, @StreamType, @ExpectedVersion)",
             new
             {
@@ -67,12 +68,13 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
             commandType: CommandType.Text
         );
 
-    public T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
+    public async Task<T?> AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null,
+        CancellationToken ct = default)
         where T : notnull
     {
         var aggregate = (T)Activator.CreateInstance(typeof(T), true)!;
 
-        var events = GetEvents(streamId, atStreamVersion, atTimestamp);
+        var events = await GetEvents(streamId, atStreamVersion, atTimestamp, ct);
         var version = 0;
 
         foreach (var @event in events)
@@ -84,15 +86,17 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         return aggregate;
     }
 
-    public StreamState? GetStreamState(Guid streamId)
+    public async Task<StreamState?> GetStreamState(Guid streamId, CancellationToken ct = default)
     {
         const string getStreamSql =
             @"SELECT id, type, version
                   FROM streams
                   WHERE id = @streamId";
 
-        return databaseConnection
-            .Query<dynamic>(getStreamSql, new { streamId })
+        var result = await databaseConnection
+            .QueryAsync<dynamic>(getStreamSql, new { streamId });
+
+        return result
             .Select(streamData =>
                 new StreamState(
                     streamData.id,
@@ -102,7 +106,8 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
             .SingleOrDefault();
     }
 
-    public IEnumerable GetEvents(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null)
+    public async Task<IEnumerable> GetEvents(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null,
+        CancellationToken ct = default)
     {
         var atStreamCondition = atStreamVersion != null ? "AND version <= @atStreamVersion" : string.Empty;
         var atTimestampCondition = atTimestamp != null ? "AND created <= @atTimestamp" : string.Empty;
@@ -115,8 +120,10 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
                   {atTimestampCondition}
                   ORDER BY version";
 
-        return databaseConnection
-            .Query<dynamic>(getStreamSql, new { streamId, atStreamVersion, atTimestamp })
+        var result = await databaseConnection
+            .QueryAsync<dynamic>(getStreamSql, new { streamId, atStreamVersion, atTimestamp });
+
+        return result
             .Select(@event =>
                 JsonConvert.DeserializeObject(
                     @event.data,
@@ -125,7 +132,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
             .ToList();
     }
 
-    private void CreateStreamsTable()
+    private Task CreateStreamsTable(CancellationToken ct)
     {
         const string createStreamsTableSql =
             @"CREATE TABLE IF NOT EXISTS streams(
@@ -133,10 +140,10 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
                       type           TEXT                      NOT NULL,
                       version        BIGINT                    NOT NULL
                   );";
-        databaseConnection.Execute(createStreamsTableSql);
+        return databaseConnection.ExecuteAsync(createStreamsTableSql);
     }
 
-    private void CreateEventsTable()
+    private Task CreateEventsTable(CancellationToken ct)
     {
         const string createEventsTableSql =
             @"CREATE TABLE IF NOT EXISTS events(
@@ -149,10 +156,10 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
                       FOREIGN KEY(stream_id) REFERENCES streams(id),
                       CONSTRAINT events_stream_and_version UNIQUE(stream_id, version)
                 );";
-        databaseConnection.Execute(createEventsTableSql);
+        return databaseConnection.ExecuteAsync(createEventsTableSql);
     }
 
-    private void CreateAppendEventFunction()
+    private Task CreateAppendEventFunction(CancellationToken ct)
     {
         const string appendEventFunctionSql =
             @"CREATE OR REPLACE FUNCTION append_event(id uuid, data jsonb, type text, stream_id uuid, stream_type text, expected_stream_version bigint default null) RETURNS boolean
@@ -201,9 +208,9 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
                     RETURN TRUE;
                 END;
                 $$;";
-        databaseConnection.Execute(appendEventFunctionSql);
+        return databaseConnection.ExecuteAsync(appendEventFunctionSql);
     }
 
-    public void Dispose() =>
-        databaseConnection.Dispose();
+    public ValueTask DisposeAsync() =>
+        databaseConnection.DisposeAsync();
 }

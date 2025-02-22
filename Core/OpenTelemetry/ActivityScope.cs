@@ -77,7 +77,7 @@ public class ActivityScope: IActivityScope
         catch(Exception ex)
         {
             activity?.SetStatus(ActivityStatusCode.Error);
-            activity?.RecordException(ex);
+            activity?.AddException(ex);
             throw;
         }
     }
@@ -101,7 +101,7 @@ public class ActivityScope: IActivityScope
         }
         catch(Exception ex)
         {
-            activity?.RecordException(ex);
+            activity?.AddException(ex);
             activity?.SetStatus(ActivityStatusCode.Error);
             throw;
         }

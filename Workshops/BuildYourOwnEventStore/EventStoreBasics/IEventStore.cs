@@ -4,19 +4,19 @@ namespace EventStoreBasics;
 
 public interface IEventStore
 {
-    void Init();
+    Task Init(CancellationToken ct = default);
 
     void AddSnapshot(ISnapshot snapshot);
 
     void AddProjection(IProjection projection);
 
-    bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null) where TStream: notnull;
+    Task<bool> AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null, CancellationToken ct = default) where TStream: notnull;
 
-    T AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null) where T: notnull;
+    Task<T?> AggregateStream<T>(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null, CancellationToken ct = default) where T: notnull;
 
-    StreamState? GetStreamState(Guid streamId);
+    Task<StreamState?> GetStreamState(Guid streamId, CancellationToken ct = default);
 
-    IEnumerable GetEvents(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null);
+    Task<IEnumerable> GetEvents(Guid streamId, long? atStreamVersion = null, DateTime? atTimestamp = null, CancellationToken ct = default);
 
-    bool Store<TStream>(TStream aggregate) where TStream : IAggregate;
+    Task<bool> Store<TStream>(TStream aggregate, CancellationToken ct = default) where TStream : IAggregate;
 }

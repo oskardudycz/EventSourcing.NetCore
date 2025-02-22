@@ -9,7 +9,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests;
 
-public class Exercise09Projections
+public class Exercise09Projections: IAsyncLifetime
 {
     class User : Aggregate
     {
@@ -179,31 +179,28 @@ public class Exercise09Projections
 
         eventStore.AddProjection(new UserDashboardProjection(databaseConnection));
 
-        // Initialize Event Store
-        eventStore.Init();
-
         userRepository = new Repository<User>(eventStore);
         orderRepository = new Repository<Order>(eventStore);
     }
 
     [Fact]
-    public void AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
+    public async Task AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
     {
         var user = new User(Guid.NewGuid(), "John Doe");
 
-        userRepository.Add(user);
+        await userRepository.Add(user);
 
         var firstOrder = new Order(Guid.NewGuid(), user.Id, "ORD/2019/08/01", 100.13M);
         var secondOrder = new Order(Guid.NewGuid(), user.Id, "ORD/2019/08/01", 2.110M);
 
-        orderRepository.Add(firstOrder);
-        orderRepository.Add(secondOrder);
+        await orderRepository.Add(firstOrder);
+        await orderRepository.Add(secondOrder);
 
         user.ChangeName("Alan Smith");
 
-        userRepository.Update(user);
+        await userRepository.Update(user);
 
-        var userDashboard = databaseConnection.Get<UserDashboard>(user.Id);
+        var userDashboard = await databaseConnection.GetAsync<UserDashboard>(user.Id);
 
         userDashboard.Should().NotBeNull();
         userDashboard.Id.Should().Be(user.Id);
@@ -211,4 +208,10 @@ public class Exercise09Projections
         userDashboard.OrdersCount.Should().Be(2);
         userDashboard.TotalAmount.Should().Be(firstOrder.Amount + secondOrder.Amount);
     }
+
+    public Task InitializeAsync() =>
+        eventStore.Init();
+
+    public async Task DisposeAsync() =>
+        await eventStore.DisposeAsync();
 }

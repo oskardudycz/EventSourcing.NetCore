@@ -7,35 +7,35 @@ public class MartenRepository<T>(IDocumentSession documentSession): IRepository<
 {
     private readonly IDocumentSession documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
 
-    public T? Find(Guid id) =>
-        documentSession.Events.AggregateStream<T>(id);
+    public Task<T?> Find(Guid id, CancellationToken ct = default) =>
+        documentSession.Events.AggregateStreamAsync<T>(id, token: ct);
 
-    public void Add(T aggregate)
+    public Task Add(T aggregate, CancellationToken ct = default)
     {
         documentSession.Events.StartStream<T>(
             aggregate.Id,
             aggregate.DequeueUncommittedEvents().ToArray()
         );
-        documentSession.SaveChanges();
+        return documentSession.SaveChangesAsync(ct);
     }
 
-    public void Update(T aggregate)
+    public Task Update(T aggregate, CancellationToken ct = default)
     {
         documentSession.Events.Append(
             aggregate.Id,
             aggregate.Version,
             aggregate.DequeueUncommittedEvents().ToArray()
         );
-        documentSession.SaveChanges();
+        return documentSession.SaveChangesAsync(ct);
     }
 
-    public void Delete(T aggregate)
+    public Task Delete(T aggregate, CancellationToken ct = default)
     {
         documentSession.Events.Append(
             aggregate.Id,
             aggregate.Version,
             aggregate.DequeueUncommittedEvents().ToArray()
         );
-        documentSession.SaveChanges();
+        return documentSession.SaveChangesAsync(ct);
     }
 }

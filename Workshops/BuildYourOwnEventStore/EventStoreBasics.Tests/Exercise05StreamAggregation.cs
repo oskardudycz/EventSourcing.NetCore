@@ -5,7 +5,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests;
 
-public class Exercise05StreamAggregation
+public class Exercise05StreamAggregation: IAsyncLifetime
 {
     class User
     {
@@ -59,25 +59,28 @@ public class Exercise05StreamAggregation
 
         // Create Event Store
         eventStore = new EventStore(databaseConnection);
-
-        // Initialize Event Store
-        eventStore.Init();
     }
 
     [Fact]
-    public void AggregateStream_ShouldReturnObjectWithStateBasedOnEvents()
+    public async Task AggregateStream_ShouldReturnObjectWithStateBasedOnEvents()
     {
         var streamId = Guid.NewGuid();
         var userCreated = new UserCreated(streamId, "John Doe");
         var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
 
-        eventStore.AppendEvent<User>(streamId, userCreated);
-        eventStore.AppendEvent<User>(streamId, userNameUpdated);
+        await eventStore.AppendEvent<User>(streamId, userCreated);
+        await eventStore.AppendEvent<User>(streamId, userNameUpdated);
 
-        var aggregate = eventStore.AggregateStream<User>(streamId);
+        var aggregate = await eventStore.AggregateStream<User>(streamId);
 
-        aggregate.Id.Should().Be(streamId);
+        aggregate!.Id.Should().Be(streamId);
         aggregate.Name.Should().Be(userNameUpdated.UserName);
         aggregate.Version.Should().Be(2);
     }
+
+    public Task InitializeAsync() =>
+        eventStore.Init();
+
+    public async Task DisposeAsync() =>
+        await eventStore.DisposeAsync();
 }

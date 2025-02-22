@@ -156,23 +156,23 @@ public class Exercise10ProjectionsWithMarten
 
     [Fact]
     [Trait("Category", "SkipCI")]
-    public void AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
+    public async Task AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
     {
         var user = new User(Guid.NewGuid(), "John Doe");
 
-        userRepository.Add(user);
+        await userRepository.Add(user);
 
         var firstOrder = new Order(Guid.NewGuid(), user.Id, "ORD/2019/08/01", 100.13M);
         var secondOrder = new Order(Guid.NewGuid(), user.Id, "ORD/2019/08/01", 2.110M);
 
-        orderRepository.Add(firstOrder);
-        orderRepository.Add(secondOrder);
+        await orderRepository.Add(firstOrder);
+        await orderRepository.Add(secondOrder);
 
         user.ChangeName("Alan Smith");
 
-        userRepository.Update(user);
+        await userRepository.Update(user);
 
-        var userDashboard = documentSession.Load<UserDashboard>(user.Id);
+        var userDashboard = await documentSession.LoadAsync<UserDashboard>(user.Id);
 
         userDashboard.Should().NotBeNull();
         userDashboard!.Id.Should().Be(user.Id);

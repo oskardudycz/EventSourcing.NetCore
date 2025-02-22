@@ -17,7 +17,7 @@ namespace Warehouse.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -42,7 +42,7 @@ namespace Warehouse.Api.Migrations
 
             modelBuilder.Entity("Warehouse.Api.Products.Product", b =>
                 {
-                    b.OwnsOne("Warehouse.Api.Products.Primitives.SKU", "Sku", b1 =>
+                    b.OwnsOne("Warehouse.Api.Products.SKU", "Sku", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
                                 .HasColumnType("uuid");

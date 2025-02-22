@@ -5,7 +5,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests;
 
-public class Exercise06TimeTravelling
+public class Exercise06TimeTravelling: IAsyncLifetime
 {
     class User
     {
@@ -59,41 +59,44 @@ public class Exercise06TimeTravelling
 
         // Create Event Store
         eventStore = new EventStore(databaseConnection);
-
-        // Initialize Event Store
-        eventStore.Init();
     }
 
     [Fact]
-    public void AggregateStream_ShouldReturnSpecifiedVersionOfTheStream()
+    public async Task AggregateStream_ShouldReturnSpecifiedVersionOfTheStream()
     {
         var streamId = Guid.NewGuid();
         var userCreated = new UserCreated(streamId, "John Doe");
         var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
         var userNameUpdatedAgain = new UserNameUpdated(streamId, "Michael Newman");
 
-        eventStore.AppendEvent<User>(streamId, userCreated);
-        eventStore.AppendEvent<User>(streamId, userNameUpdated);
-        eventStore.AppendEvent<User>(streamId, userNameUpdatedAgain);
+        await eventStore.AppendEvent<User>(streamId, userCreated);
+        await eventStore.AppendEvent<User>(streamId, userNameUpdated);
+        await eventStore.AppendEvent<User>(streamId, userNameUpdatedAgain);
 
-        var aggregateAtVersion1 = eventStore.AggregateStream<User>(streamId, 1);
+        var aggregateAtVersion1 = await eventStore.AggregateStream<User>(streamId, 1);
 
-        aggregateAtVersion1.Id.Should().Be(streamId);
+        aggregateAtVersion1!.Id.Should().Be(streamId);
         aggregateAtVersion1.Name.Should().Be(userCreated.UserName);
         aggregateAtVersion1.Version.Should().Be(1);
 
 
-        var aggregateAtVersion2 = eventStore.AggregateStream<User>(streamId, 2);
+        var aggregateAtVersion2 = await eventStore.AggregateStream<User>(streamId, 2);
 
-        aggregateAtVersion2.Id.Should().Be(streamId);
+        aggregateAtVersion2!.Id.Should().Be(streamId);
         aggregateAtVersion2.Name.Should().Be(userNameUpdated.UserName);
         aggregateAtVersion2.Version.Should().Be(2);
 
 
-        var aggregateAtVersion3 = eventStore.AggregateStream<User>(streamId, 3);
+        var aggregateAtVersion3 = await eventStore.AggregateStream<User>(streamId, 3);
 
-        aggregateAtVersion3.Id.Should().Be(streamId);
+        aggregateAtVersion3!.Id.Should().Be(streamId);
         aggregateAtVersion3.Name.Should().Be(userNameUpdatedAgain.UserName);
         aggregateAtVersion3.Version.Should().Be(3);
     }
+
+    public Task InitializeAsync() =>
+        eventStore.Init();
+
+    public async Task DisposeAsync() =>
+        await eventStore.DisposeAsync();
 }

@@ -908,7 +908,7 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
             ```csharp
             var onlineAggregation = documentSession.Events.AggregateStream<TEntity>(streamId);
             documentSession.Store<TEntity>(onlineAggregation);
-            documentSession.SaveChanges();
+            documentawait Session.SaveChangesAsync();
             ```
 -   **Event transformations**
     -   **[One event to one object transformations](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Transformations/OneToOneEventTransformations.cs)**

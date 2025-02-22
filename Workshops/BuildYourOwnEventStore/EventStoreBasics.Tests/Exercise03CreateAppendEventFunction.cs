@@ -6,7 +6,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests;
 
-public class Exercise03CreateAppendEventFunction
+public class Exercise03CreateAppendEventFunction: IAsyncLifetime
 {
     public record User(
         string Name
@@ -33,9 +33,6 @@ public class Exercise03CreateAppendEventFunction
 
         // Create Event Store
         eventStore = new EventStore(databaseConnection);
-
-        // Initialize Event Store
-        eventStore.Init();
     }
 
     [Fact]
@@ -48,23 +45,29 @@ public class Exercise03CreateAppendEventFunction
     }
 
     [Fact]
-    public void AppendEventFunction_WhenStreamDoesNotExist_CreateNewStream_And_AppendNewEvent()
+    public async Task AppendEventFunction_WhenStreamDoesNotExist_CreateNewStream_And_AppendNewEvent()
     {
         var streamId = Guid.NewGuid();
         var @event = new UserCreated("John Doe");
 
-        var result = eventStore.AppendEvent<User>(streamId, @event);
+        var result = await eventStore.AppendEvent<User>(streamId, @event);
 
         result.Should().BeTrue();
 
-        var wasStreamCreated = databaseConnection.QuerySingle<bool>(
+        var wasStreamCreated = await databaseConnection.QuerySingleAsync<bool>(
             "select exists (select 1 from streams where id = @streamId)", new {streamId}
         );
         wasStreamCreated.Should().BeTrue();
 
-        var wasEventAppended = databaseConnection.QuerySingle<bool>(
+        var wasEventAppended = await databaseConnection.QuerySingleAsync<bool>(
             "select exists (select 1 from events where stream_id = @streamId)", new {streamId}
         );
         wasEventAppended.Should().BeTrue();
     }
+
+    public Task InitializeAsync() =>
+        eventStore.Init();
+
+    public async Task DisposeAsync() =>
+        await eventStore.DisposeAsync();
 }

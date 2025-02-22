@@ -10,8 +10,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Npgsql.DependencyInjection" Version="8.0.3"/>
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+      <PackageReference Include="Npgsql.DependencyInjection" Version="8.0.6"/>
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2" />
     </ItemGroup>
 
     <ItemGroup>

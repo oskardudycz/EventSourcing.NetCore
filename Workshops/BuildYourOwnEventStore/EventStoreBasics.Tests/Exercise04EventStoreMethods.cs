@@ -5,7 +5,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests;
 
-public class Exercise04EventStoreMethods
+public class Exercise04EventStoreMethods: IAsyncLifetime
 {
     public record User(
         string Name
@@ -33,20 +33,17 @@ public class Exercise04EventStoreMethods
 
         // Create Event Store
         eventStore = new EventStore(databaseConnection);
-
-        // Initialize Event Store
-        eventStore.Init();
     }
 
     [Fact]
-    public void GetStreamState_ShouldReturnProperStreamInfo()
+    public async Task GetStreamState_ShouldReturnProperStreamInfo()
     {
         var streamId = Guid.NewGuid();
         var @event = new UserCreated(streamId,"John Doe");
 
-        eventStore.AppendEvent<User>(streamId, @event);
+        await eventStore.AppendEvent<User>(streamId, @event);
 
-        var streamState = eventStore.GetStreamState(streamId);
+        var streamState = await eventStore.GetStreamState(streamId);
 
         streamState.Should().NotBeNull();
         streamState!.Id.Should().Be(streamId);
@@ -55,16 +52,16 @@ public class Exercise04EventStoreMethods
     }
 
     [Fact]
-    public void GetEvents_ShouldReturnAppendedEvents()
+    public async Task GetEvents_ShouldReturnAppendedEvents()
     {
         var streamId = Guid.NewGuid();
         var userCreated = new UserCreated(streamId, "John Doe");
         var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
 
-        eventStore.AppendEvent<User>(streamId, userCreated);
-        eventStore.AppendEvent<User>(streamId, userNameUpdated);
+        await eventStore.AppendEvent<User>(streamId, userCreated);
+        await eventStore.AppendEvent<User>(streamId, userNameUpdated);
 
-        var events = eventStore.GetEvents(streamId);
+        var events = await eventStore.GetEvents(streamId);
 
         events.Cast<object>().Should().HaveCount(2);
 
@@ -74,4 +71,10 @@ public class Exercise04EventStoreMethods
         events.OfType<UserNameUpdated>().Should().Contain(
             e => e.UserId == userNameUpdated.UserId && e.UserName == userNameUpdated.UserName);
     }
+
+    public Task InitializeAsync() =>
+        eventStore.Init();
+
+    public async Task DisposeAsync() =>
+        await eventStore.DisposeAsync();
 }

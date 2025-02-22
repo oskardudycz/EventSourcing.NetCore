@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Npgsql;
 using Tools.Tools;
 using Xunit;
 
@@ -49,10 +48,10 @@ namespace EventStoreBasics.Tests;
 /// Class provides set of tests verifying if <see cref="EventStore.Init()"/> method initializes <c>Events</c> table properly.
 /// </para>
 /// </remarks>
-public class Exercise02CreateEventsTable : IDisposable
+public class Exercise02CreateEventsTable : IAsyncLifetime
 {
-    private readonly NpgsqlConnection databaseConnection;
     private readonly PostgresSchemaProvider schemaProvider;
+    private readonly EventStore eventStore;
 
     private const string EventsTableName = "events";
 
@@ -68,14 +67,11 @@ public class Exercise02CreateEventsTable : IDisposable
     /// </summary>
     public Exercise02CreateEventsTable()
     {
-        databaseConnection = PostgresDbConnectionProvider.GetFreshDbConnection();
-        schemaProvider = new PostgresSchemaProvider(databaseConnection);
+        var databaseConnection1 = PostgresDbConnectionProvider.GetFreshDbConnection();
+        schemaProvider = new PostgresSchemaProvider(databaseConnection1);
 
         // Create Event Store
-        var eventStore = new EventStore(databaseConnection);
-
-        // Initialize Event Store
-        eventStore.Init();
+        eventStore = new EventStore(databaseConnection1);
     }
 
     /// <summary>
@@ -180,9 +176,9 @@ public class Exercise02CreateEventsTable : IDisposable
         createdColumn.Type.Should().Be(Column.DateTimeType);
     }
 
-    /// <summary>
-    /// Disposes connection to database
-    /// </summary>
-    public void Dispose() =>
-        databaseConnection.Dispose();
+    public Task InitializeAsync() =>
+        eventStore.Init();
+
+    public async Task DisposeAsync() =>
+        await eventStore.DisposeAsync();
 }

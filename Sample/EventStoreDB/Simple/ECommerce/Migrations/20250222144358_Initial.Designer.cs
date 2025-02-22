@@ -7,19 +7,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
+#nullable disable
+
 namespace ECommerce.Migrations
 {
     [DbContext(typeof(ECommerceDbContext))]
-    [Migration("20210929153413_Initial")]
+    [Migration("20250222144358_Initial")]
     partial class Initial
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.7")
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("ECommerce.ShoppingCarts.GettingCartById.ShoppingCartDetails", b =>
                 {
@@ -30,14 +34,14 @@ namespace ECommerce.Migrations
                     b.Property<Guid>("ClientId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("LastProcessedPosition")
+                        .HasColumnType("numeric(20,0)");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.Property<int>("Version")
                         .HasColumnType("integer");
-
-                    b.Property<int>("LastProcessedPosition")
-                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -53,6 +57,9 @@ namespace ECommerce.Migrations
                     b.Property<Guid>("ClientId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("LastProcessedPosition")
+                        .HasColumnType("numeric(20,0)");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -65,9 +72,6 @@ namespace ECommerce.Migrations
                     b.Property<int>("Version")
                         .HasColumnType("integer");
 
-                    b.Property<int>("LastProcessedPosition")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.ToTable("ShoppingCartShortInfo");
@@ -79,8 +83,9 @@ namespace ECommerce.Migrations
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("integer")
-                                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
                             b1.Property<Guid>("ProductId")
                                 .HasColumnType("uuid");

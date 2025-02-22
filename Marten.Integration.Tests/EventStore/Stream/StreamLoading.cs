@@ -18,23 +18,23 @@ public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSql
 
     private readonly Guid issueId = Guid.NewGuid();
 
-    private Guid GetExistingStreamId()
+    private async Task<Guid> GetExistingStreamId()
     {
         var @event = new IssueCreated(issueId, "Description");
         var streamId = EventStore.StartStream(@event).Id;
-        Session.SaveChanges();
+        await Session.SaveChangesAsync();
 
         return streamId;
     }
 
     [Fact]
-    public void GivenExistingStream_WithOneEventWhenStreamIsLoaded_ThenItLoadsOneEvent()
+    public async Task GivenExistingStream_WithOneEventWhenStreamIsLoaded_ThenItLoadsOneEvent()
     {
         //Given
-        var streamId = GetExistingStreamId();
+        var streamId = await GetExistingStreamId();
 
         //When
-        var events = EventStore.FetchStream(streamId);
+        var events = await EventStore.FetchStreamAsync(streamId);
 
         //Then
         events.Count.Should().Be(1);
@@ -42,31 +42,31 @@ public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSql
     }
 
     [Fact]
-    public void GivenExistingStreamWithOneEvent_WhenEventIsAppended_ThenItLoadsTwoEvents()
+    public async Task GivenExistingStreamWithOneEvent_WhenEventIsAppended_ThenItLoadsTwoEvents()
     {
         //Given
-        var streamId = GetExistingStreamId();
+        var streamId = await GetExistingStreamId();
 
         //When
         EventStore.Append(streamId, new IssueUpdated(issueId, "New Description"));
-        Session.SaveChanges();
+        await Session.SaveChangesAsync();
 
         //Then
-        var events = EventStore.FetchStream(streamId);
+        var events = await EventStore.FetchStreamAsync(streamId);
 
         events.Count.Should().Be(2);
         events.Last().Version.Should().Be(2);
     }
 
     [Fact]
-    public void GivenExistingStreamWithOneEvent_WhenStreamIsLoadedByEventType_ThenItLoadsOneEvent()
+    public async Task GivenExistingStreamWithOneEvent_WhenStreamIsLoadedByEventType_ThenItLoadsOneEvent()
     {
         //Given
-        var streamId = GetExistingStreamId();
-        var eventId = EventStore.FetchStream(streamId).Single().Id;
+        var streamId = await GetExistingStreamId();
+        var eventId = (await EventStore.FetchStreamAsync(streamId)).Single().Id;
 
         //When
-        var @event = EventStore.Load<IssueCreated>(eventId);
+        var @event = await EventStore.LoadAsync<IssueCreated>(eventId);
 
         //Then
         @event.Should().NotBeNull();

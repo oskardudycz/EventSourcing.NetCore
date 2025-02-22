@@ -63,7 +63,7 @@ public class OutOfOrderProjectionsTest(MartenFixture fixture): MartenTest(fixtur
     }
 
     [Fact]
-    public void GivenOutOfOrderEvents_WhenPublishedWithSetVersion_ThenLiveAggregationWorksFine()
+    public async Task GivenOutOfOrderEvents_WhenPublishedWithSetVersion_ThenLiveAggregationWorksFine()
     {
         var firstTaskId = Guid.NewGuid();
         var secondTaskId = Guid.NewGuid();
@@ -80,13 +80,13 @@ public class OutOfOrderProjectionsTest(MartenFixture fixture): MartenTest(fixtur
         //1. Create events
         var streamId = EventStore.StartStream<IssuesList>(events).Id;
 
-        Session.SaveChanges();
+        await Session.SaveChangesAsync();
 
-        //2. Get live agregation
-        var issuesListFromLiveAggregation = EventStore.AggregateStream<IssuesList>(streamId);
+        //2. Get live aggregation
+        var issuesListFromLiveAggregation = await EventStore.AggregateStreamAsync<IssuesList>(streamId);
 
         //3. Get inline aggregation
-        var issuesListFromInlineAggregation = Session.Load<IssuesList>(streamId);
+        var issuesListFromInlineAggregation = await Session.LoadAsync<IssuesList>(streamId);
 
         issuesListFromLiveAggregation.Should().NotBeNull();
         issuesListFromInlineAggregation.Should().NotBeNull();
