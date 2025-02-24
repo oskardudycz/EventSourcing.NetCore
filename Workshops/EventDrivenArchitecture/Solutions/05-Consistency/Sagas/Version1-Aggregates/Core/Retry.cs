@@ -17,6 +17,6 @@ public class Retry
                 return TimeSpan.FromMilliseconds(1);
             });
 
-    public Task UntilSucceeds(Func<CancellationToken, ValueTask> handle, CancellationToken token = default) =>
+    public static Task UntilSucceeds(Func<CancellationToken, ValueTask> handle, CancellationToken token = default) =>
         retryPolicy.ExecuteAsync(async ct => await handle(ct), token);
 }
