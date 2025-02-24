@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{4C3A99D5-0531-4E9A-87C5-CBF8B2166E2C}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
+		docker-compose.arm.yml = docker-compose.arm.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "02-GettingStateFromEvents", "Solved\02-GettingStateFromEvents\02-GettingStateFromEvents.csproj", "{5F093CC8-9EE4-4EA5-9FAC-CA8566D8F280}"

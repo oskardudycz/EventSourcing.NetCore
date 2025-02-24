@@ -26,6 +26,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{2BDFA622-061E-4685-A76D-B9616D0FE814}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
+		docker-compose.arm.yml = docker-compose.arm.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "12-Projections.SingleStream", "12-Projections.SingleStream\12-Projections.SingleStream.csproj", "{9829BFD1-CC7D-45E1-9CAB-E33A6E756B19}"
