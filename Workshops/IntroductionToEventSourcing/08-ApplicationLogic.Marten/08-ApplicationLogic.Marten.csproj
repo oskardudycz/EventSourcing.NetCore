@@ -14,8 +14,4 @@
         <PackageReference Include="Marten.AspNetCore" Version="7.37.3" />
         <PackageReference Include="Marten" Version="7.37.3" />
     </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Core.csproj" />
-    </ItemGroup>
 </Project>
