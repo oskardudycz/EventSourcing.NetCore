@@ -1,0 +1,36 @@
+﻿using Consistency.Core;
+using Consistency.Sagas.Version2_ImmutableEntities.GuestStayAccounts;
+
+namespace Consistency.Sagas.Version2_ImmutableEntities.GroupCheckouts;
+
+using static GuestStayAccountEvent;
+using static GroupCheckoutCommand;
+using static SagaResult;
+
+public static class GroupCheckoutsConfig
+{
+    public static void ConfigureGroupCheckouts(
+        EventBus eventBus,
+        CommandBus commandBus,
+        GroupCheckOutFacade groupCheckoutFacade
+    )
+    {
+        eventBus
+            .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>((@event, ct) =>
+                commandBus.Send(GroupCheckoutSaga.Handle(@event).Select(c => c.Message).ToArray(), ct)
+            )
+            .Subscribe<GuestCheckedOut>((@event, ct) =>
+                GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutCompletion>(var command)
+                    ? commandBus.Send([command], ct)
+                    : ValueTask.CompletedTask
+            )
+            .Subscribe<GuestCheckOutFailed>((@event, ct) =>
+                GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutFailure>(var command)
+                    ? commandBus.Send([command], ct)
+                    : ValueTask.CompletedTask
+            );
+
+        commandBus.Handle<RecordGuestCheckoutCompletion>(groupCheckoutFacade.RecordGuestCheckoutCompletion);
+        commandBus.Handle<RecordGuestCheckoutFailure>(groupCheckoutFacade.RecordGuestCheckoutFailure);
+    }
+}
