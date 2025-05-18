@@ -1,65 +1,72 @@
 using EntitiesDefinition.Core;
-using EntitiesDefinition.Solution1_Aggregates.GuestStayAccounts;
 using EntitiesDefinition.Solution1_Aggregates.GroupCheckouts;
+using EntitiesDefinition.Solution1_Aggregates.GuestStayAccounts;
 
 namespace EntitiesDefinition.Solution1_Aggregates;
 
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
-using static GroupCheckoutEvent;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(EventStore eventStore)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
         var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
-        await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(command.GuestStayId.ToString(), account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
+        var account = await GetAccount(command.GuestStayId, ct);
 
         account.RecordCharge(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(command.GuestStayId.ToString(), account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
+        var account = await GetAccount(command.GuestStayId, ct);
 
         account.RecordPayment(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(command.GuestStayId.ToString(), account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
+        var account = await GetAccount(command.GuestStayId, ct);
 
         account.CheckOut(command.Now, command.GroupCheckOutId);
 
-        await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(command.GuestStayId.ToString(), account.DequeueUncommittedEvents(), ct);
     }
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
-        eventBus.Publish([
-            new GroupCheckoutInitiated(
+        eventStore.AppendToStream(command.GroupCheckoutId.ToString(), [
+            new GroupCheckoutEvent.GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,
                 command.GuestStayIds,
                 command.Now
             )
         ], ct);
+
+    private async ValueTask<GuestStayAccount> GetAccount(Guid guestStayId, CancellationToken ct)
+    {
+        return await eventStore.AggregateStream(
+            guestStayId.ToString(),
+            (GuestStayAccount? state, GuestStayAccountEvent @event) =>
+            {
+                state ??= GuestStayAccount.Initial();
+                state.Apply(@event);
+                return state;
+            },
+            () => null,
+            ct
+        ) ?? throw new InvalidOperationException("Entity not found");
+    }
 }
 
 public abstract record GuestStayAccountCommand
@@ -85,7 +92,7 @@ public abstract record GuestStayAccountCommand
         Guid GuestStayId,
         DateTimeOffset Now,
         Guid? GroupCheckOutId = null
-    );
+    ): GuestStayAccountCommand;
 }
 
 public abstract record GroupCheckoutCommand

@@ -65,6 +65,8 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         this.status = status;
     }
 
+    public static GuestStayAccount Initial() => new GuestStayAccount(Guid.Empty, 0, default);
+
     public static GuestStayAccount CheckIn(Guid guestStayId, DateTimeOffset now)
     {
         var guestStay = new GuestStayAccount(guestStayId, 0, GuestStayAccountStatus.Opened);

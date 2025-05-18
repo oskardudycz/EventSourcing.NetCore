@@ -65,6 +65,8 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         this.status = status;
     }
 
+    public static GuestStayAccount Initial() => new GuestStayAccount(Guid.Empty, 0, default);
+
     public static GuestStayAccount CheckIn(Guid guestStayId, DateTimeOffset now)
     {
         var guestStay = new GuestStayAccount(guestStayId, 0, GuestStayAccountStatus.Opened);
@@ -79,8 +81,6 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         if (status != GuestStayAccountStatus.Opened)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
-        balance -= amount;
-
         Enqueue(new ChargeRecorded(Id, amount, now));
     }
 
@@ -88,8 +88,6 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
     {
         if (status != GuestStayAccountStatus.Opened)
             throw new InvalidOperationException("Cannot record charge for not opened account");
-
-        balance += amount;
 
         Enqueue(new PaymentRecorded(Id, amount, now));
     }
@@ -109,8 +107,6 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
             return;
         }
 
-        status = GuestStayAccountStatus.CheckedOut;
-
         Enqueue(
             new GuestCheckedOut(
                 Id,
@@ -118,6 +114,37 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
                 groupCheckoutId
             )
         );
+    }
+
+    public override void Apply(GuestStayAccountEvent @event)
+    {
+        switch (@event)
+        {
+            case GuestCheckedIn guestCheckedIn:
+            {
+                Id = guestCheckedIn.GuestStayId;
+                balance = 0;
+                status = GuestStayAccountStatus.Opened;
+                return;
+            }
+            case ChargeRecorded chargeRecorded:
+            {
+                balance -= chargeRecorded.Amount;
+                return;
+            }
+            case PaymentRecorded paymentRecorded:
+            {
+                balance += paymentRecorded.Amount;
+                return;
+            }
+            case GuestCheckedOut:
+            {
+                status = GuestStayAccountStatus.CheckedOut;
+                return;
+            }
+            default:
+                return;
+        }
     }
 }
 

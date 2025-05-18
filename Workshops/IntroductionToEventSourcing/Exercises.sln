@@ -55,10 +55,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "16-EntitiesDefinition", "16
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "17-BusinessProcesses", "17-BusinessProcesses\17-BusinessProcesses.csproj", "{F681E7A7-7E7F-4EA3-9DFA-9B041327A367}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "18-Idempotency", "18-Idempotency\18-Idempotency.csproj", "{8CD14393-C881-4ADC-8477-B929F6EA4927}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "19-Consistency", "19-Consistency\19-Consistency.csproj", "{D8D1A9AF-869D-417C-93A4-D813B9F52E60}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,13 +149,5 @@ Global
 		{F681E7A7-7E7F-4EA3-9DFA-9B041327A367}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F681E7A7-7E7F-4EA3-9DFA-9B041327A367}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F681E7A7-7E7F-4EA3-9DFA-9B041327A367}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8CD14393-C881-4ADC-8477-B929F6EA4927}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8CD14393-C881-4ADC-8477-B929F6EA4927}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8CD14393-C881-4ADC-8477-B929F6EA4927}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8CD14393-C881-4ADC-8477-B929F6EA4927}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D8D1A9AF-869D-417C-93A4-D813B9F52E60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8D1A9AF-869D-417C-93A4-D813B9F52E60}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D8D1A9AF-869D-417C-93A4-D813B9F52E60}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8D1A9AF-869D-417C-93A4-D813B9F52E60}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

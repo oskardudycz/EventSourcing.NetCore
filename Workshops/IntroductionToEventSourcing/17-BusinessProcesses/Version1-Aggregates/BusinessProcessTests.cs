@@ -4,7 +4,6 @@ using BusinessProcesses.Version1_Aggregates.GroupCheckouts;
 using BusinessProcesses.Version1_Aggregates.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
-using Database = BusinessProcesses.Core.Database;
 
 namespace BusinessProcesses.Version1_Aggregates;
 
@@ -205,8 +204,7 @@ public class BusinessProcessTests
         );
     }
 
-    private readonly Database database = new();
-    private readonly EventBus eventBus = new();
+    private readonly EventStore eventStore = new();
     private readonly CommandBus commandBus = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
@@ -217,8 +215,8 @@ public class BusinessProcessTests
     public BusinessProcessTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
+        guestStayFacade = new GuestStayFacade(eventStore);
 
-        eventBus.Use(publishedMessages.Catch);
+        eventStore.Use(publishedMessages.Catch);
     }
 }

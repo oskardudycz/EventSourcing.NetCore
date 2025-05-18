@@ -4,7 +4,6 @@ using EntitiesDefinition.Solution1_Aggregates.GroupCheckouts;
 using EntitiesDefinition.Solution1_Aggregates.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
-using Database = EntitiesDefinition.Core.Database;
 
 namespace EntitiesDefinition.Solution1_Aggregates;
 
@@ -155,8 +154,7 @@ public class EntityDefinitionTests
         publishedEvents.ShouldReceiveSingleEvent(new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
     }
 
-    private readonly Database database = new();
-    private readonly EventBus eventBus = new();
+    private readonly EventStore eventStore = new();
     private readonly EventCatcher publishedEvents = new();
     private readonly GuestStayFacade guestStayFacade;
     private readonly Faker generate = new();
@@ -166,7 +164,7 @@ public class EntityDefinitionTests
     public EntityDefinitionTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
-        eventBus.Use(publishedEvents.Catch);
+        guestStayFacade = new GuestStayFacade(eventStore);
+        eventStore.Use(publishedEvents.Catch);
     }
 }

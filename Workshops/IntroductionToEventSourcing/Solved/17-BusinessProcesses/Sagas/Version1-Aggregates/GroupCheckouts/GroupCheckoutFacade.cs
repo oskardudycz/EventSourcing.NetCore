@@ -1,11 +1,10 @@
 ﻿using BusinessProcesses.Core;
-using Database = BusinessProcesses.Core.Database;
 
 namespace BusinessProcesses.Sagas.Version1_Aggregates.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade(Database database, EventBus eventBus)
+public class GroupCheckOutFacade(EventStore eventStore)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -17,9 +16,8 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
                 command.Now
             );
 
-
-        await database.Store(command.GroupCheckoutId, groupCheckout, ct);
-        await eventBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(command.GroupCheckoutId.ToString(), groupCheckout.DequeueUncommittedEvents(),
+            ct);
     }
 
     public async ValueTask RecordGuestCheckoutCompletion(
@@ -27,13 +25,12 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await GetGroupCheckOut(command.GroupCheckoutId, ct);
 
         groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt);
 
-        await database.Store(command.GroupCheckoutId, groupCheckout, ct);
-        await eventBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(command.GroupCheckoutId.ToString(), groupCheckout.DequeueUncommittedEvents(),
+            ct);
     }
 
     public async ValueTask RecordGuestCheckoutFailure(
@@ -41,13 +38,27 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await GetGroupCheckOut(command.GroupCheckoutId, ct);
 
         groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt);
 
-        await database.Store(command.GroupCheckoutId, groupCheckout, ct);
-        await eventBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(command.GroupCheckoutId.ToString(), groupCheckout.DequeueUncommittedEvents(),
+            ct);
+    }
+
+    private async ValueTask<GroupCheckOut> GetGroupCheckOut(Guid guestStayId, CancellationToken ct)
+    {
+        return await eventStore.AggregateStream(
+            guestStayId.ToString(),
+            (GroupCheckOut? state, GroupCheckoutEvent @event) =>
+            {
+                state ??= GroupCheckOut.Initial();
+                state.Apply(@event);
+                return state;
+            },
+            () => null,
+            ct
+        ) ?? throw new InvalidOperationException("Entity not found");
     }
 }
 
