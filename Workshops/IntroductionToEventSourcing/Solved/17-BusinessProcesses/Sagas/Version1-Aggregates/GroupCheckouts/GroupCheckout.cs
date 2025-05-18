@@ -44,7 +44,7 @@ public abstract record GroupCheckoutEvent
 
 public class GroupCheckOut: Aggregate<GroupCheckoutEvent, Guid>
 {
-    [JsonInclude] private readonly Dictionary<Guid, CheckoutStatus> guestStayCheckouts = new();
+    [JsonInclude] private Dictionary<Guid, CheckoutStatus> guestStayCheckouts;
     [JsonInclude] private CheckoutStatus status;
 
     [JsonConstructor]
@@ -59,7 +59,8 @@ public class GroupCheckOut: Aggregate<GroupCheckoutEvent, Guid>
         this.status = status;
     }
 
-    public static GroupCheckOut Initial() => new GroupCheckOut(Guid.Empty, new Dictionary<Guid, CheckoutStatus>(), default);
+    public static GroupCheckOut Initial() =>
+        new GroupCheckOut(Guid.Empty, new Dictionary<Guid, CheckoutStatus>(), default);
 
     public static GroupCheckOut Initiate(
         Guid groupCheckoutId,
@@ -109,8 +110,6 @@ public class GroupCheckOut: Aggregate<GroupCheckoutEvent, Guid>
 
         Enqueue(guestCheckoutFailed);
 
-        guestStayCheckouts[guestStayId] = CheckoutStatus.Failed;
-
         if (!AreAnyOngoingCheckouts())
             Enqueue(Finalize(now));
     }
@@ -141,6 +140,41 @@ public class GroupCheckOut: Aggregate<GroupCheckoutEvent, Guid>
             .Where(pair => pair.Value == guestStayStatus)
             .Select(pair => pair.Key)
             .ToArray();
+
+
+    public override void Apply(GroupCheckoutEvent @event)
+    {
+        switch (@event)
+        {
+            case GroupCheckoutInitiated initiated:
+            {
+                Id = initiated.GroupCheckoutId;
+                guestStayCheckouts = initiated.GuestStayIds.ToDictionary(id => id, _ => CheckoutStatus.Initiated);
+                status = CheckoutStatus.Initiated;
+                break;
+            }
+            case GuestCheckoutCompleted guestCheckedOut:
+            {
+                guestStayCheckouts[guestCheckedOut.GuestStayId] = CheckoutStatus.Completed;
+                break;
+            }
+            case GuestCheckOutFailed guestCheckedOutFailed:
+            {
+                guestStayCheckouts[guestCheckedOutFailed.GuestStayId] = CheckoutStatus.Failed;
+                break;
+            }
+            case GroupCheckoutCompleted:
+            {
+                status = CheckoutStatus.Completed;
+                break;
+            }
+            case GroupCheckoutFailed:
+            {
+                status = CheckoutStatus.Failed;
+                break;
+            }
+        }
+    }
 }
 
 public enum CheckoutStatus
