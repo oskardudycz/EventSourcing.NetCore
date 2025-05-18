@@ -151,7 +151,7 @@ public record GroupCheckOut(
             _ => this
         };
 
-    public static GroupCheckOut Initial = new(default, [], default);
+    public static GroupCheckOut Initial = new(Guid.Empty, [], default);
 }
 
 public enum CheckoutStatus

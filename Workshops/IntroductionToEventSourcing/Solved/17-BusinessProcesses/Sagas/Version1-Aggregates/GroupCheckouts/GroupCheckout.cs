@@ -59,6 +59,8 @@ public class GroupCheckOut: Aggregate<GroupCheckoutEvent, Guid>
         this.status = status;
     }
 
+    public static GroupCheckOut Initial() => new GroupCheckOut(Guid.Empty, new Dictionary<Guid, CheckoutStatus>(), default);
+
     public static GroupCheckOut Initiate(
         Guid groupCheckoutId,
         Guid clerkId,

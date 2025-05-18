@@ -305,7 +305,7 @@ public class ProjectionsTests
         var database = new Database();
 
         // TODO:
-        // 1. Register here your event handlers using `eventBus.Register`.
+        // 1. Register here your event handlers using `eventStore.Register`.
         // 2. Store results in database.
         var shoppingCartDetailsProjection = new ShoppingCartDetailsProjection(database);
 

@@ -8,54 +8,47 @@ using static GuestStayAccountCommand;
 using static GuestStayAccountEvent;
 using static GroupCheckoutCommand;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(EventStore eventStore)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
         var @event = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
-        await database.Store(command.GuestStayId, GuestStayAccount.Initial.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await eventStore.AppendToStream(command.GuestStayId.ToString(), [@event], ct);
     }
 
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
+        var account = await GetAccount(command.GuestStayId, ct);
 
         var @event = account.RecordCharge(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await eventStore.AppendToStream(command.GuestStayId.ToString(), [@event], ct);
     }
 
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
+        var account = await GetAccount(command.GuestStayId, ct);
 
         var @event = account.RecordPayment(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await eventStore.AppendToStream(command.GuestStayId.ToString(), [@event], ct);
     }
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
+        var account = await GetAccount(command.GuestStayId, ct);
 
         switch (account.CheckOut(command.Now, command.GroupCheckOutId))
         {
             case GuestCheckedOut checkedOut:
             {
-                await database.Store(command.GuestStayId, account.Evolve(checkedOut), ct);
-                await eventBus.Publish([checkedOut], ct);
+                await eventStore.AppendToStream(command.GuestStayId.ToString(), [checkedOut], ct);
                 return;
             }
             case GuestCheckOutFailed checkOutFailed:
             {
-                await eventBus.Publish([checkOutFailed], ct);
+                await eventStore.AppendToStream(command.GuestStayId.ToString(), [checkOutFailed], ct);
                 return;
             }
         }
@@ -64,9 +57,24 @@ public class GuestStayFacade(Database database, EventBus eventBus)
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
         var @event =
-            new GroupCheckoutEvent.GroupCheckoutInitiated(command.GroupCheckoutId, command.ClerkId, command.GuestStayIds, command.Now);
+            new GroupCheckoutEvent.GroupCheckoutInitiated(command.GroupCheckoutId, command.ClerkId,
+                command.GuestStayIds, command.Now);
 
-        await eventBus.Publish([@event], ct);
+        await eventStore.AppendToStream(command.GroupCheckoutId.ToString(), [@event], ct);
+    }
+
+    private async ValueTask<GuestStayAccount> GetAccount(Guid guestStayId, CancellationToken ct)
+    {
+        var account = await eventStore.AggregateStream(
+            guestStayId.ToString(),
+            (GuestStayAccount state, GuestStayAccountEvent @event) => state.Evolve(@event),
+            () => GuestStayAccount.Initial,
+            ct
+        );
+        if (account == GuestStayAccount.Initial)
+            throw new InvalidOperationException("Entity not found");
+
+        return account;
     }
 }
 

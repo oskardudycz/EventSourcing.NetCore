@@ -11,6 +11,6 @@ With the [Database](./Tools/Database.cs) interface representing the sample datab
     - total number of products
     - confirmed and canceled shopping carts should not be visible.
 
-Add event handlers registrations in [ProjectionsTests](ProjectionsTests.cs) calling [EventBus.Register](./Tools/EventBus.cs) method.
+Add event handlers registrations in [ProjectionsTests](ProjectionsTests.cs) calling [EventStore.Register](./Tools/EventStore.cs) method.
 
 If needed expand existing classes definition.

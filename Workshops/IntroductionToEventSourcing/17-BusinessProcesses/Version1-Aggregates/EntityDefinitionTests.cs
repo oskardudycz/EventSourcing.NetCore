@@ -155,8 +155,7 @@ public class EntityDefinitionTests
         publishedMessages.ShouldReceiveMessage(new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
     }
 
-    private readonly Database database = new();
-    private readonly EventBus eventBus = new();
+    private readonly EventStore eventStore = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
     private readonly Faker generate = new();
@@ -166,8 +165,8 @@ public class EntityDefinitionTests
     public EntityDefinitionTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
+        guestStayFacade = new GuestStayFacade(eventStore);
 
-        eventBus.Use(publishedMessages.Catch);
+        eventStore.Use(publishedMessages.Catch);
     }
 }

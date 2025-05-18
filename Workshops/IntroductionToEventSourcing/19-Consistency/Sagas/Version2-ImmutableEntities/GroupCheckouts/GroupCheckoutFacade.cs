@@ -5,7 +5,7 @@ namespace Consistency.Sagas.Version2_ImmutableEntities.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade(Database database, EventBus eventBus)
+public class GroupCheckOutFacade(Database database, EventStore eventStore)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -20,7 +20,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
         );
 
         await database.Store(command.GroupCheckoutId, GroupCheckOut.Initial.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await eventStore.AppendToStream([@event], ct);
     }
 
     public async ValueTask RecordGuestCheckoutCompletion(
@@ -39,7 +39,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
         await database.Store(command.GroupCheckoutId,
             events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event)), ct);
 
-        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
+        await eventStore.AppendToStream(events.Cast<object>().ToArray(), ct);
     }
 
     public async ValueTask RecordGuestCheckoutFailure(
@@ -59,7 +59,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
 
         await database.Store(command.GroupCheckoutId, newState, ct);
 
-        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
+        await eventStore.AppendToStream(events.Cast<object>().ToArray(), ct);
     }
 }
 

@@ -5,7 +5,7 @@ namespace Consistency.Sagas.Version1_Aggregates.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade(Database database, EventBus eventBus)
+public class GroupCheckOutFacade(Database database, EventStore eventStore)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -21,7 +21,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
             );
 
         await database.Store(command.GroupCheckoutId, groupCheckout, ct);
-        await eventBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(groupCheckout.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordGuestCheckoutCompletion(
@@ -35,7 +35,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
         groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt);
 
         await database.Store(command.GroupCheckoutId, groupCheckout, ct);
-        await eventBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(groupCheckout.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordGuestCheckoutFailure(
@@ -49,7 +49,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
         groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt);
 
         await database.Store(command.GroupCheckoutId, groupCheckout, ct);
-        await eventBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(groupCheckout.DequeueUncommittedEvents(), ct);
     }
 }
 

@@ -5,7 +5,7 @@ namespace EntitiesDefinition;
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(EventStore eventStore)
 {
     public ValueTask CheckInGuest(CheckInGuest command)
     {
@@ -16,15 +16,14 @@ public class GuestStayFacade(Database database, EventBus eventBus)
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
     {
         // TODO: Fill the implementation calling your entity/aggregate, for instance:
-        var entity = await database.Get<object>(command.GuestStayId, ct) // use here your real type
-                     ?? throw new InvalidOperationException("Entity not found");
-
+        // var entity = await eventStore.AggregateStream<GuestStayAccount>(command.GuestStayId, ct) // use here your real type
+        //              ?? throw new InvalidOperationException("Entity not found");
+        //
         // entity.DoSomething();
-
-        object[] events = [new object()]; // get the new event(s) as an outcome of the business logic
-
-        await database.Store(command.GuestStayId, entity, ct);
-        await eventBus.Publish(events, ct);
+        //
+        // object[] events = [new object()]; // get the new event(s) as an outcome of the business logic
+        //
+        // await eventStore.AppendToStream(entity.Id, events, ct);
 
         throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
     }

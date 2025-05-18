@@ -10,12 +10,12 @@ using static SagaResult;
 public static class GroupCheckoutsConfig
 {
     public static void ConfigureGroupCheckouts(
-        EventBus eventBus,
+        EventStore eventStore,
         CommandBus commandBus,
         GroupCheckOutFacade groupCheckoutFacade
     )
     {
-        eventBus
+        eventStore
             .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>((@event, ct) =>
                 commandBus.Send(GroupCheckoutSaga.Handle(@event).Select(c => c.Message).ToArray(), ct)
             )
