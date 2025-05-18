@@ -83,7 +83,7 @@ public class IdempotencyTests
     }
 
     private readonly Database database = new();
-    private readonly EventBus eventBus = new();
+    private readonly EventStore eventStore = new();
     private readonly CommandBus commandBus = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
@@ -95,10 +95,10 @@ public class IdempotencyTests
     public IdempotencyTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
-        groupCheckoutFacade = new GroupCheckOutFacade(database, eventBus);
+        guestStayFacade = new GuestStayFacade(database, eventStore);
+        groupCheckoutFacade = new GroupCheckOutFacade(database, eventStore);
 
-        eventBus.Use(publishedMessages.Catch);
+        eventStore.Use(publishedMessages.Catch);
         commandBus.Use(publishedMessages.Catch);
     }
 }

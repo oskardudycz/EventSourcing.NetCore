@@ -9,7 +9,7 @@ using static GroupCheckoutCommand;
 using static GroupCheckoutEvent;
 using static GuestStayAccountCommand;
 
-public class GroupCheckOutToDoList(Database database, EventBus eventBus, CommandBus commandBus)
+public class GroupCheckOutToDoList(Database database, EventStore eventStore, CommandBus commandBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -24,7 +24,7 @@ public class GroupCheckOutToDoList(Database database, EventBus eventBus, Command
         var @event = new GroupCheckoutInitiated(command.GroupCheckoutId, command.ClerkId,
             command.GuestStayIds, command.Now);
 
-        await eventBus.Publish([@event], ct);
+        await eventStore.AppendToStream([@event], ct);
     }
 
     public ValueTask GroupCheckoutInitiated(GroupCheckoutInitiated @event,
@@ -53,7 +53,7 @@ public class GroupCheckOutToDoList(Database database, EventBus eventBus, Command
         var completed = TryComplete(groupCheckout, guestCheckedOut.CheckedOutAt);
 
         if (completed != null)
-            await eventBus.Publish([completed], ct);
+            await eventStore.AppendToStream([completed], ct);
     }
 
     public async ValueTask GuestCheckOutFailed(GuestStayAccountEvent.GuestCheckOutFailed checkOutFailed,
@@ -72,7 +72,7 @@ public class GroupCheckOutToDoList(Database database, EventBus eventBus, Command
         var completed = TryComplete(groupCheckout, checkOutFailed.FailedAt);
 
         if (completed != null)
-            await eventBus.Publish([completed], ct);
+            await eventStore.AppendToStream([completed], ct);
     }
 
     // This could be also checked by Cron

@@ -7,14 +7,14 @@ namespace BusinessProcesses.Version1_Aggregates;
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(Database database, EventStore eventStore)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
         var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
         await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
@@ -25,7 +25,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         account.RecordCharge(command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
@@ -36,7 +36,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         account.RecordPayment(command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
@@ -47,11 +47,11 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         account.CheckOut(command.Now, command.GroupCheckOutId);
 
         await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await eventStore.AppendToStream(account.DequeueUncommittedEvents(), ct);
     }
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
-        eventBus.Publish([
+        eventStore.AppendToStream([
             new GroupCheckoutEvent.GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,

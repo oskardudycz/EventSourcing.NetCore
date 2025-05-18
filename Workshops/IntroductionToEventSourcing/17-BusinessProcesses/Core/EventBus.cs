@@ -2,9 +2,9 @@ using System.Collections.Concurrent;
 
 namespace BusinessProcesses.Core;
 
-public class EventBus
+public class EventStore
 {
-    public async ValueTask Publish(object[] events, CancellationToken ct)
+    public async ValueTask AppendToStream(object[] events, CancellationToken ct)
     {
         foreach (var @event in events)
         {

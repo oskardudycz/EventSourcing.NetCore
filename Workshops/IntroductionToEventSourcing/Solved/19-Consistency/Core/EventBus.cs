@@ -2,9 +2,9 @@ using System.Collections.Concurrent;
 
 namespace Consistency.Core;
 
-public class EventBus
+public class EventStore
 {
-    public async ValueTask Publish(object[] events, CancellationToken ct)
+    public async ValueTask AppendToStream(object[] events, CancellationToken ct)
     {
         if (DateTimeOffset.Now.Ticks % 5 == 0)
             throw new TimeoutException("Database not available!");
@@ -22,7 +22,7 @@ public class EventBus
         }
     }
 
-    public EventBus Subscribe<T>(Func<T, CancellationToken, ValueTask> eventHandler)
+    public EventStore Subscribe<T>(Func<T, CancellationToken, ValueTask> eventHandler)
     {
         Func<object, CancellationToken, ValueTask> handler = (@event, ct) => eventHandler((T)@event, ct);
 

@@ -3,9 +3,9 @@ using FluentAssertions;
 
 namespace EntitiesDefinition.Core;
 
-public class EventBus
+public class EventStore
 {
-    public ValueTask Publish(object[] events, CancellationToken _)
+    public ValueTask AppendToStream(object[] events, CancellationToken _)
     {
         foreach (var @event in events)
         {

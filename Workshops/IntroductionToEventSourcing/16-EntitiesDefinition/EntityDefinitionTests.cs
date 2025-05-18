@@ -161,7 +161,7 @@ public class EntityDefinitionTests
     }
 
     private readonly Database database = new();
-    private readonly EventBus eventBus = new();
+    private readonly EventStore eventStore = new();
     private readonly EventCatcher publishedEvents = new();
     private readonly GuestStayFacade guestStayFacade;
     private readonly Faker generate = new();
@@ -171,7 +171,7 @@ public class EntityDefinitionTests
     public EntityDefinitionTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
-        eventBus.Use(publishedEvents.Catch);
+        guestStayFacade = new GuestStayFacade(database, eventStore);
+        eventStore.Use(publishedEvents.Catch);
     }
 }

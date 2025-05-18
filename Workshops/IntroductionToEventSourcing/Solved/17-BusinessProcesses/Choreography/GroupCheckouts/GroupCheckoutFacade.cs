@@ -8,7 +8,7 @@ using static GroupCheckoutCommand;
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
 
-public class GroupCheckOutFacade(Database database, EventBus eventBus, CommandBus commandBus)
+public class GroupCheckOutFacade(Database database, EventStore eventStore, CommandBus commandBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -16,7 +16,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus, CommandBu
             command.GuestStayIds, command.Now);
 
         await database.Store(command.GroupCheckoutId, GroupCheckOut.Initial.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await eventStore.AppendToStream([@event], ct);
     }
 
     public ValueTask GroupCheckoutInitiated(GroupCheckoutEvent.GroupCheckoutInitiated @event,
@@ -43,7 +43,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus, CommandBu
         await database.Store(groupCheckout.Id,
             events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event)), ct
         );
-        await eventBus.Publish([..events], ct);
+        await eventStore.AppendToStream([..events], ct);
     }
 
     public async ValueTask GuestCheckOutFailed(GuestCheckOutFailed checkOutFailed, CancellationToken ct = default)
@@ -59,7 +59,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus, CommandBu
         await database.Store(groupCheckout.Id,
             events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event)), ct
         );
-        await eventBus.Publish([..events], ct);
+        await eventStore.AppendToStream([..events], ct);
     }
 }
 

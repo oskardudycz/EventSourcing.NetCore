@@ -5,7 +5,7 @@ namespace EntitiesDefinition;
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(Database database, EventStore eventStore)
 {
     public ValueTask CheckInGuest(CheckInGuest command)
     {
@@ -24,7 +24,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         object[] events = [new object()]; // get the new event(s) as an outcome of the business logic
 
         await database.Store(command.GuestStayId, entity, ct);
-        await eventBus.Publish(events, ct);
+        await eventStore.AppendToStream(events, ct);
 
         throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
     }
