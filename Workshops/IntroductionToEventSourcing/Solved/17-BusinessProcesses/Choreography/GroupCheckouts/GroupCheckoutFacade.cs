@@ -7,7 +7,7 @@ using static GroupCheckoutCommand;
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
 
-public class GroupCheckOutFacade(EventStore eventStore, CommandBus commandBus)
+public class GroupCheckOutFacade(EventStore eventStore)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -19,7 +19,7 @@ public class GroupCheckOutFacade(EventStore eventStore, CommandBus commandBus)
 
     public ValueTask GroupCheckoutInitiated(GroupCheckoutEvent.GroupCheckoutInitiated @event,
         CancellationToken ct = default) =>
-        commandBus.Send(
+        eventStore.AppendToStream("commands",
             [
                 ..@event.GuestStayIds
                     .Select(guestStayId => new CheckOutGuest(guestStayId, @event.InitiatedAt, @event.GroupCheckoutId))

@@ -7,7 +7,7 @@ using static GroupCheckoutCommand;
 using static GuestStayAccountEvent;
 using static ProcessManagerResult;
 
-public class GroupCheckOutFacade(EventStore eventStore, CommandBus commandBus)
+public class GroupCheckOutFacade(EventStore eventStore)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -21,7 +21,7 @@ public class GroupCheckOutFacade(EventStore eventStore, CommandBus commandBus)
         if (!@event.GroupCheckOutId.HasValue)
             return;
 
-        var groupCheckout = await  GetGroupCheckOut(@event.GroupCheckOutId.Value, ct);
+        var groupCheckout = await GetGroupCheckOut(@event.GroupCheckOutId.Value, ct);
 
         var messages = groupCheckout.On(@event);
 
@@ -33,7 +33,7 @@ public class GroupCheckOutFacade(EventStore eventStore, CommandBus commandBus)
         if (!@event.GroupCheckOutId.HasValue)
             return;
 
-        var groupCheckout = await  GetGroupCheckOut(@event.GroupCheckOutId.Value, ct);
+        var groupCheckout = await GetGroupCheckOut(@event.GroupCheckOutId.Value, ct);
 
         var messages = groupCheckout.On(@event);
 
@@ -47,18 +47,11 @@ public class GroupCheckOutFacade(EventStore eventStore, CommandBus commandBus)
         CancellationToken ct
     )
     {
-        foreach (var message in messages)
-        {
-            switch (message)
-            {
-                case Event (GroupCheckoutEvent @event):
-                    await eventStore.AppendToStream(groupCheckOutId.ToString(), [@event], ct);
-                    break;
-                case Command(GuestStayAccountCommand command):
-                    await commandBus.Send([command], ct);
-                    break;
-            }
-        }
+        await eventStore.AppendToStream(
+            groupCheckOutId.ToString(),
+            messages.Where(m => m is not None).Select(m => m is Event @event ? @event.Message : ((Command)m).Message).ToArray(),
+            ct
+        );
     }
 
     private async ValueTask<GroupCheckOut> GetGroupCheckOut(Guid guestStayId, CancellationToken ct)
@@ -70,7 +63,7 @@ public class GroupCheckOutFacade(EventStore eventStore, CommandBus commandBus)
             ct
         );
 
-        if(groupCheckout == GroupCheckOut.Initial)
+        if (groupCheckout == GroupCheckOut.Initial)
             throw new InvalidOperationException("Entity not found");
 
         return groupCheckout;

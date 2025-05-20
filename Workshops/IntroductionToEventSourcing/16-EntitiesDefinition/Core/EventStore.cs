@@ -42,7 +42,7 @@ public class EventStore
     public ValueTask<TEvent[]> ReadStream<TEvent>(string streamId, CancellationToken ct = default)
         where TEvent : notnull =>
         ValueTask.FromResult(events.TryGetValue(streamId, out var stream)
-            ? stream.Select(e => e.Data).Cast<TEvent>().ToArray()
+            ? stream.Select(e => e.Data).OfType<TEvent>().ToArray()
             : []);
 
     public EventStore Subscribe<T>(Func<T, CancellationToken, ValueTask> eventHandler)

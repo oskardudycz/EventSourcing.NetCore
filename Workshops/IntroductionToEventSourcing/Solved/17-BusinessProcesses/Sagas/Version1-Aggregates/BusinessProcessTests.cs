@@ -220,7 +220,6 @@ public class BusinessProcessTests
     }
 
     private readonly EventStore eventStore = new();
-    private readonly CommandBus commandBus = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
     private readonly GroupCheckOutFacade groupCheckoutFacade;
@@ -235,9 +234,8 @@ public class BusinessProcessTests
         groupCheckoutFacade = new GroupCheckOutFacade(eventStore);
 
         eventStore.Use(publishedMessages.Catch);
-        commandBus.Use(publishedMessages.Catch);
 
-        ConfigureGroupCheckouts(eventStore, commandBus, groupCheckoutFacade);
-        ConfigureGuestStayAccounts(commandBus, guestStayFacade);
+        ConfigureGroupCheckouts(eventStore, groupCheckoutFacade);
+        ConfigureGuestStayAccounts(eventStore, guestStayFacade);
     }
 }
