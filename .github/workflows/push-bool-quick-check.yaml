@@ -1,0 +1,15 @@
+# .github/workflows/push-bool-quick-check.yml
+name: push-bool-quick-check
+on: workflow_dispatch
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show expression result
+        run: echo "expr -> ${{ github.ref == 'refs/heads/main' }}"
+      - name: WRONG input (should error immediately)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          tags: noop/test:latest
+          push: github.ref == 'refs/heads/main'  # <-- wrong on purpose
