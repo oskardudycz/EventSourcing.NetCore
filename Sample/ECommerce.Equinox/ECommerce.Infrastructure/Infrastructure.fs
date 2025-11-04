@@ -128,13 +128,11 @@ module Sinks =
         let t = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {NewLine}{Exception}"
         configuration.WriteTo.Console(theme=Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code, outputTemplate=t)
 
-[<System.Runtime.CompilerServices.Extension>]
 type Logging() =
 
     [<System.Runtime.CompilerServices.Extension>]
     static member Configure(configuration : LoggerConfiguration, ?verbose) =
         configuration
-            .Destructure.FSharpTypes()
             .Enrich.FromLogContext()
         |> fun c -> if verbose = Some true then c.MinimumLevel.Debug() else c
 

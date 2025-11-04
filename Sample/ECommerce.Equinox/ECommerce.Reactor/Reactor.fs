@@ -28,9 +28,9 @@ type Stats(log, statsInterval, stateInterval, verboseStore, ?logExternalStats) =
 let reactionCategories = [| ShoppingCart.CategoryName |]
 
 let handle
-        (cartSummary : ShoppingCartSummaryHandler.Service)
-        (confirmedCarts : ConfirmedHandler.Service)
-        stream span : Async<Propulsion.Sinks.StreamResult * Outcome> = async {
+        (cartSummary: ShoppingCartSummaryHandler.Service)
+        (confirmedCarts: ConfirmedHandler.Service)
+        stream span: Async<Outcome * int64> = async {
     match struct (stream, span) with
     | ShoppingCart.Reactions.Decode (cartId, events) ->
         match events with
@@ -39,10 +39,10 @@ let handle
         | _ -> ()
         match events with
         | ShoppingCart.Reactions.StateChanged ->
-            let! worked, version' = cartSummary.TryIngestSummary(cartId)
-            let outcome = if worked then Outcome.Ok (1, Array.length span - 1) else Outcome.Skipped span.Length
-            return Propulsion.Sinks.StreamResult.OverrideNextIndex version', outcome
-        | _ -> return Propulsion.Sinks.StreamResult.AllProcessed, Outcome.NotApplicable span.Length
+            let! dirty, version' = cartSummary.TryIngestSummary(cartId)
+            let outcome = if dirty then Outcome.Ok (1, Array.length span - 1) else Outcome.Skipped span.Length
+            return outcome, version'
+        | _ -> return Outcome.NotApplicable span.Length, Streams.next span
     | x -> return failwith $"Invalid event %A{x}" } // should be filtered by isReactionStream
 
 module Config =

@@ -7,8 +7,8 @@ type Service internal (source : ShoppingCart.Service, destination : ShoppingCart
     member _.TryIngestSummary(cartId) : Async<bool * int64> = async {
         match! source.SummarizeWithVersion(cartId) with
         | Some view, version' ->
-            let! worked = destination.TryIngest(cartId, version', view)
-            return worked, version'
+            let! dirty = destination.TryIngest(cartId, version', view)
+            return dirty, version'
         | None, version' -> return false, version' }
 
 module Config =
