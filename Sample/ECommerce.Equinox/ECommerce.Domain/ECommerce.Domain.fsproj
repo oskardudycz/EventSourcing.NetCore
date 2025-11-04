@@ -18,14 +18,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Equinox.Core" Version="4.0.4" />
-        <PackageReference Include="Equinox.CosmosStore" Version="4.0.0" />
-        <PackageReference Include="Equinox.DynamoStore" Version="4.0.0" />
-        <PackageReference Include="Equinox.EventStoreDb" Version="4.0.0" />
-        <PackageReference Include="Equinox.SqlStreamStore" Version="4.0.0" />
-        <PackageReference Include="Equinox.MemoryStore" Version="4.0.0" />
-        <PackageReference Include="FsCodec.SystemTextJson" Version="3.0.2" />
-        <PackageReference Include="Propulsion" Version="3.0.0-rc.11" />
+        <PackageReference Include="Equinox.Core" Version="4.1.1" />
+        <PackageReference Include="Equinox.CosmosStore" Version="4.1.0" />
+        <PackageReference Include="Equinox.DynamoStore" Version="4.1.0" />
+        <PackageReference Include="Equinox.EventStoreDb" Version="4.1.0" />
+        <PackageReference Include="Equinox.SqlStreamStore" Version="4.1.0" />
+        <PackageReference Include="Equinox.MemoryStore" Version="4.1.0" />
+        <PackageReference Include="FsCodec.SystemTextJson" Version="3.1.0" />
+        <PackageReference Include="Propulsion" Version="3.0.0" />
     </ItemGroup>
 
 </Project>

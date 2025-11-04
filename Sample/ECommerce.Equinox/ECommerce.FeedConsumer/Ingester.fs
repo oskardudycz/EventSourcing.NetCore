@@ -36,11 +36,12 @@ module PipelineEvent =
             Unchecked.defaultof<_>,
             context = item)
     let (|ItemsForFc|_|) = function
-        | FsCodec.StreamName.Split (_, FsCodec.StreamId.Parse 2 [|_ ; FcId.Parse fc|]), (s : Propulsion.Sinks.Event[]) ->
+        | FsCodec.StreamName.Split (_, FsCodec.StreamId.Parse 2 [| _ ; FcId.Parse fc |]), (s: Propulsion.Sinks.Event[]) ->
             Some (fc, s |> Seq.map (fun e -> Unchecked.unbox<Item> e.Context))
         | _ -> None
 
-let handle maxDop stream span: Async<Propulsion.Sinks.StreamResult * Outcome> = async {
+let handle maxDop stream span: Async<Outcome * int64> = async {
+    let span, nextIndex = Streams.truncate 1000 span
     match stream, span with
     | PipelineEvent.ItemsForFc (_fc, items) ->
         // Take chunks of max 1000 in order to make handler latency be less 'lumpy'
@@ -50,7 +51,7 @@ let handle maxDop stream span: Async<Propulsion.Sinks.StreamResult * Outcome> = 
             do! Async.Sleep(TimeSpan.FromSeconds 1.)
             return if i % 3 = 1 then Some 42 else None
         })
-        let! results = Async.Parallel(maybeAccept, maxDegreeOfParallelism=maxDop)
+        let! results = Async.Parallel(maybeAccept, maxDegreeOfParallelism = maxDop)
         let ready = results |> Array.choose id
         let maybeAdd = ready |> Seq.mapi (fun i _x -> async {
             do! Async.Sleep(TimeSpan.FromSeconds 1.)
@@ -58,6 +59,6 @@ let handle maxDop stream span: Async<Propulsion.Sinks.StreamResult * Outcome> = 
         })
         let! added = Async.Parallel(maybeAdd, maxDegreeOfParallelism=maxDop)
         let outcome = { added = Seq.length added; notReady = results.Length - ready.Length; dups = results.Length - ticketIds.Length }
-        return Propulsion.Sinks.StreamResult.PartiallyProcessed ticketIds.Length, outcome
-    | x -> return failwithf "Unexpected stream %O" x
+        return outcome, nextIndex
+    | x -> return failwithf $"Unexpected stream {x}"
 }

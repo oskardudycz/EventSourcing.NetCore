@@ -8,8 +8,8 @@ let createDecider category = Equinox.Decider.forStream Metrics.log category
 
 module Memory =
 
-    let create name codec initial fold store : Equinox.Category<_, _, _> =
-        Equinox.MemoryStore.MemoryStoreCategory(store, name, FsCodec.Compression.EncodeUncompressed codec, fold, initial)
+    let create name codec initial fold store: Equinox.Category<_, _, _> =
+        Equinox.MemoryStore.MemoryStoreCategory(store, name, FsCodec.Encoder.Uncompressed codec, fold, initial)
 
 module Codec =
 
@@ -26,7 +26,7 @@ module Cosmos =
 
     let private createCached name codec initial fold accessStrategy (context, cache) =
         let cacheStrategy = Equinox.CachingStrategy.SlidingWindow (cache, defaultCacheDuration)
-        Equinox.CosmosStore.CosmosStoreCategory(context, name, codec, fold, initial, accessStrategy, cacheStrategy)
+        Equinox.CosmosStore.CosmosStoreCategory(context, name,  FsCodec.SystemTextJson.Encoder.Compressed codec, fold, initial, accessStrategy, cacheStrategy)
 
     let createUnoptimized name codec initial fold (context, cache) =
         let accessStrategy = Equinox.CosmosStore.AccessStrategy.Unoptimized
@@ -44,7 +44,7 @@ module Dynamo =
 
     let private createCached name codec initial fold accessStrategy (context, cache) =
         let cacheStrategy = Equinox.CachingStrategy.SlidingWindow (cache, defaultCacheDuration)
-        Equinox.DynamoStore.DynamoStoreCategory(context, name, FsCodec.Compression.EncodeTryCompress codec, fold, initial, accessStrategy, cacheStrategy)
+        Equinox.DynamoStore.DynamoStoreCategory(context, name, FsCodec.Encoder.Compressed codec, fold, initial, accessStrategy, cacheStrategy)
 
     let createUnoptimized name codec initial fold (context, cache) =
         let accessStrategy = Equinox.DynamoStore.AccessStrategy.Unoptimized

@@ -21,7 +21,7 @@ module Events =
 module Reactions =
 
     let [<return: Struct>] (|For|_|) = catId.TryDecode
-    let dec = Streams.Codec.dec<Events.Event>
+    let dec = Streams.Codec.gen<Events.Event>
     let config = catId.StreamName, dec
     let [<return: Struct>] (|Decode|_|) = function
         | struct (For id, _) & Streams.Decode dec events -> ValueSome struct (id, events)
