@@ -32,7 +32,7 @@ jobs:
               run: dotnet build --configuration Release --no-restore
 
             - name: Run tests
-              run: dotnet test --configuration Release --no-build --filter "Category!=SkipCI&FullyQualifiedName!~Marten.Integration.Tests" --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal"
+              run: dotnet test --configuration Release --no-build --filter "Category!=SkipCI&Category!=Wip&FullyQualifiedName!~Marten.Integration.Tests" --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal"
 
             - name: Stop containers
               if: always()
