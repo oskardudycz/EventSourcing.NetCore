@@ -42,7 +42,7 @@ module Fold =
     type Status = Pending | Confirmed
     type State =
         {   clientId : ClientId option
-            status : Status; items : Item array
+            status : Status; items : Item[]
             confirmedAt : System.DateTimeOffset option
             confirmedOriginEpoch : ConfirmedEpochId option }
     let initial = { clientId = None; status = Status.Pending; items = Array.empty; confirmedAt = None; confirmedOriginEpoch = None }

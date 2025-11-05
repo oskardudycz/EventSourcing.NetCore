@@ -122,7 +122,7 @@ let run args = async {
     return! [|  Async.AwaitKeyboardInterruptAsTaskCanceledException()
                 source.AwaitWithStopOnCancellation()
                 sink.AwaitWithStopOnCancellation()
-            |] |> Async.Parallel |> Async.Ignore<unit array> }
+            |] |> Async.Parallel |> Async.Ignore<unit[]> }
 
 [<EntryPoint>]
 let main argv =
