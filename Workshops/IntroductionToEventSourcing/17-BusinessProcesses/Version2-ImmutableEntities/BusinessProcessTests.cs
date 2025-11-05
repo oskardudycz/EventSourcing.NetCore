@@ -14,8 +14,8 @@ using static GroupCheckoutCommand;
 
 public class BusinessProcessTests
 {
-    // TODO: For each WIP test, fill out the implementation to pass the test, then remove the Trait
-    [Fact, Trait("Category", "Wip")]
+    // TODO: For each SkipCI test, fill out the implementation to pass the test, then remove the Trait
+    [Fact, Trait("Category", "SkipCI")]
     public async Task GroupCheckoutForMultipleGuestStayWithoutPaymentsAndCharges_ShouldComplete()
     {
         // Given;
@@ -51,7 +51,7 @@ public class BusinessProcessTests
         );
     }
 
-    [Fact, Trait("Category", "Wip")]
+    [Fact, Trait("Category", "SkipCI")]
     public async Task GroupCheckoutForMultipleGuestStayWithAllStaysSettled_ShouldComplete()
     {
         // Given;
@@ -97,7 +97,7 @@ public class BusinessProcessTests
         );
     }
 
-    [Fact, Trait("Category", "Wip")]
+    [Fact, Trait("Category", "SkipCI")]
     public async Task GroupCheckoutForMultipleGuestStayWithOneSettledAndRestUnsettled_ShouldFail()
     {
         // Given;
@@ -151,7 +151,7 @@ public class BusinessProcessTests
         );
     }
 
-    [Fact, Trait("Category", "Wip")]
+    [Fact, Trait("Category", "SkipCI")]
     public async Task GroupCheckoutForMultipleGuestStayWithAllUnsettled_ShouldFail()
     {
         // Given;
