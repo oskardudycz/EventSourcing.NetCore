@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solutions/">
+    <Project Path="Solutions/01-EventsDefinition/01-EventsDefinition.csproj" />
+    <Project Path="Solutions/02-EntitiesDefinition/02-EntitiesDefinition.csproj" />
+    <Project Path="Solutions/03-BusinessProcesses/03-BusinessProcesses.csproj" />
+    <Project Path="Solutions/04-Idempotency/04-Idempotency.csproj" />
+    <Project Path="Solutions/05-Consistency/05-Consistency.csproj" />
+  </Folder>
+  <Project Path="00-Modelling/00-Modelling.csproj" />
+  <Project Path="01-EventsDefinition/01-EventsDefinition.csproj" />
+  <Project Path="02-EntitiesDefinition/02-EntitiesDefinition.csproj" />
+  <Project Path="03-BusinessProcesses/03-BusinessProcesses.csproj" />
+  <Project Path="04-Idempotency/04-Idempotency.csproj" />
+  <Project Path="05-Consistency/05-Consistency.csproj" />
+</Solution>

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="../../Core.Testing/Core.Testing.csproj" />
+    <Project Path="../../Core.WebApi/Core.WebApi.csproj" />
+  </Folder>
+  <Project Path="Warehouse.Api.Tests/Warehouse.Api.Tests.csproj" />
+  <Project Path="Warehouse.Api/Warehouse.Api.csproj" />
+  <Project Path="Warehouse/Warehouse.csproj" />
+</Solution>

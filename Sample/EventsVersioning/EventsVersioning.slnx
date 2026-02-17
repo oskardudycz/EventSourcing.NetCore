@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ECommerce.V1/ECommerce.V1.csproj" />
+  <Project Path="EventsVersioning.Tests/EventsVersioning.Tests.csproj" />
+</Solution>

@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/CI/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="../../Core.Testing/Core.Testing.csproj" />
+    <Project Path="../../Core.WebApi/Core.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/Docs/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Warehouse.Api/Warehouse.Api.csproj" />
+</Solution>

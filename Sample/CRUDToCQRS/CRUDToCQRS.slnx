@@ -1,0 +1,36 @@
+<Solution>
+  <Folder Name="/01-CRUD/">
+    <Project Path="01-CRUD/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/02-CRUDWithCQRS/">
+    <Project Path="02-CRUDWithCQRS/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/03-DomainGrouping/">
+    <Project Path="03-DomainGrouping/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="03-DomainGrouping/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/04-SlimmedDomain/">
+    <Project Path="04-SlimmedDomain/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="04-SlimmedDomain/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/05-ExplicitDomain/">
+    <Project Path="05-ExplicitDomain/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="05-ExplicitDomain/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/06-SlicedDomain/">
+    <Project Path="06-SlicedDomain/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="06-SlicedDomain/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/07-FlattenedLayers/">
+    <Project Path="07-FlattenedLayers/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="07-FlattenedLayers/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/08-SlicedEndpoints/">
+    <Project Path="08-SlicedEndpoints/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="08-SlicedEndpoints/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/09-MultipleModules/">
+    <Project Path="09-MultipleModules/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="09-MultipleModules/ECommerce/ECommerce.csproj" />
+  </Folder>
+</Solution>
