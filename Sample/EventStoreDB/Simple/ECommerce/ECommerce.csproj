@@ -5,21 +5,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Npgsql.DependencyInjection" Version="8.0.6"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
-        <PackageReference Include="Polly" Version="8.5.2" />
+        <PackageReference Include="Npgsql.DependencyInjection"/>
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+        <PackageReference Include="Polly" />
 
-        <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.3.8" />
+        <PackageReference Include="EventStore.Client.Grpc.Streams" />
 
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     </ItemGroup>
 
     <ItemGroup>

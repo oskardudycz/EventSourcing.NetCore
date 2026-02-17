@@ -5,10 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Npgsql.OpenTelemetry" Version="8.0.6" />
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.5.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.13" />
+        <PackageReference Include="Npgsql.OpenTelemetry" />
+        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" />
+        <PackageReference Include="Swashbuckle.AspNetCore" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
     </ItemGroup>
 
     <ItemGroup>

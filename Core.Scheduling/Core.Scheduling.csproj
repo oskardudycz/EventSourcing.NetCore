@@ -4,11 +4,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Quartz" Version="3.13.1" />
-        <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.13.1" />
-        <PackageReference Include="Quartz.Extensions.Hosting" Version="3.13.1" />
-        <PackageReference Include="Quartz.OpenTelemetry.Instrumentation" Version="3.13.1" />
-        <PackageReference Include="Quartz.Serialization.Json" Version="3.13.1" />
+        <PackageReference Include="Quartz" />
+        <PackageReference Include="Quartz.Extensions.DependencyInjection" />
+        <PackageReference Include="Quartz.Extensions.Hosting" />
+        <PackageReference Include="Quartz.OpenTelemetry.Instrumentation" />
+        <PackageReference Include="Quartz.Serialization.Json" />
     </ItemGroup>
 
     <ItemGroup>
