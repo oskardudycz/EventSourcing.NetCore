@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="../../Core.Marten/Core.Marten.csproj" />
+    <Project Path="../../Core.Serialization/Core.Serialization.csproj" />
+    <Project Path="../../Core.Testing/Core.Testing.csproj" />
+    <Project Path="../../Core.WebApi/Core.WebApi.csproj" />
+    <Project Path="../../Core/Core.csproj" />
+  </Folder>
+  <Folder Name="/docker/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Docs/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="HotelManagement.Api/HotelManagement.Api.csproj" />
+  <Project Path="HotelManagement.Tests/HotelManagement.Tests.csproj" />
+  <Project Path="HotelManagement/HotelManagement.csproj" />
+</Solution>

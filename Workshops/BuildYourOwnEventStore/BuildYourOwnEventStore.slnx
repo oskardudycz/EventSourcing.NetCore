@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/docker/">
+    <File Path="docker/docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Readme.md" />
+  </Folder>
+  <Folder Name="/Solved/">
+    <Project Path="EventStoreBasics.Tests/EventStoreBasics.Tests.csproj" />
+    <Project Path="EventStoreBasics/EventStoreBasics.csproj" />
+  </Folder>
+  <Project Path="01-CreateStreamsTable/01-CreateStreamsTable.csproj" />
+  <Project Path="02-CreateEventsTable/02-CreateEventsTable.csproj" />
+  <Project Path="03-CreateAppendEventFunction/03-CreateAppendEventFunction.csproj" />
+  <Project Path="03-OptimisticConcurrency/03-OptimisticConcurrency.csproj" />
+  <Project Path="04-EventStoreMethods/04-EventStoreMethods.csproj" />
+  <Project Path="05-StreamAggregation/05-StreamAggregation.csproj" />
+  <Project Path="06-TimeTraveling/06-TimeTraveling.csproj" />
+  <Project Path="07-AggregateAndRepository/07-AggregateAndRepository.csproj" />
+  <Project Path="08-Snapshots/08-Snapshots.csproj" />
+  <Project Path="09-Projections/09-Projections.csproj" />
+  <Project Path="10-ProjectionsWithMarten/10-ProjectionsWithMarten.csproj" />
+  <Project Path="Tools/Tools.csproj" />
+</Solution>

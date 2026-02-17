@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Docs/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="EventPipelines.MediatR/EventPipelines.MediatR.csproj" />
+  <Project Path="EventPipelines.Tests/EventPipelines.Tests.csproj" />
+  <Project Path="EventPipelines/EventPipelines.csproj" />
+</Solution>

@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/docker/">
+    <File Path="../../.github/workflows/build.docker.helpdesk.wolverine.yml" />
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Helpdesk.Api.Tests/Helpdesk.Api.Tests.csproj" />
+  <Project Path="Helpdesk.Api/Helpdesk.Api.csproj" />
+</Solution>

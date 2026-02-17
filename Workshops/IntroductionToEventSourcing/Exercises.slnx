@@ -1,0 +1,31 @@
+<Solution>
+  <Folder Name="/docker/">
+    <File Path="docker-compose.arm.yml" />
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="01-EventsDefinition/01-EventsDefinition.csproj" />
+  <Project Path="02-GettingStateFromEvents/02-GettingStateFromEvents.csproj" />
+  <Project Path="03-AppendingEvents.Marten/03-AppendingEvents.Marten.csproj" />
+  <Project Path="04-AppendingEvents.EventStoreDB/04-AppendingEvents.EventStoreDB.csproj" />
+  <Project Path="05-GettingStateFromEvents.Marten/05-GettingStateFromEvents.Marten.csproj" />
+  <Project Path="06-GettingStateFromEvents.EventStoreDB/06-GettingStateFromEvents.EventStoreDB.csproj" />
+  <Project Path="07-BusinessLogic.Slimmed/07-BusinessLogic.Slimmed.csproj" />
+  <Project Path="07-BusinessLogic/07-BusinessLogic.csproj" />
+  <Project Path="08-ApplicationLogic.Marten.Tests/08-ApplicationLogic.Marten.Tests.csproj" />
+  <Project Path="08-ApplicationLogic.Marten/08-ApplicationLogic.Marten.csproj" />
+  <Project Path="09-ApplicationLogic.EventStoreDB.Tests/09-ApplicationLogic.EventStoreDB.Tests.csproj" />
+  <Project Path="09-ApplicationLogic.EventStoreDB/09-ApplicationLogic.EventStoreDB.csproj" />
+  <Project Path="10-OptimisticConcurrency.Marten.Tests/10-OptimisticConcurrency.Marten.Tests.csproj" />
+  <Project Path="10-OptimisticConcurrency.Marten/10-OptimisticConcurrency.Marten.csproj" />
+  <Project Path="11-OptimisticConcurrency.EventStoreDB.Tests/11-OptimisticConcurrency.EventStoreDB.Tests.csproj" />
+  <Project Path="11-OptimisticConcurrency.EventStoreDB/11-OptimisticConcurrency.EventStoreDB.csproj" />
+  <Project Path="12-Projections.SingleStream/12-Projections.SingleStream.csproj" />
+  <Project Path="13-Projections.SingleStream.Idempotency/13-Projections.SingleStream.Idempotency.csproj" />
+  <Project Path="14-Projections.SingleStream.EventualConsistency/14-Projections.SingleStream.EventualConsistency.csproj" />
+  <Project Path="15-EventsDefinition/15-EventsDefinition.csproj" />
+  <Project Path="16-EntitiesDefinition/16-EntitiesDefinition.csproj" />
+  <Project Path="17-BusinessProcesses/17-BusinessProcesses.csproj" />
+</Solution>

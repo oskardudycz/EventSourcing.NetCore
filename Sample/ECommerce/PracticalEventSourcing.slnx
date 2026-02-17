@@ -1,0 +1,40 @@
+<Solution>
+  <Folder Name="/Carts/">
+    <Project Path="Carts/Carts.Api.Tests/Carts.Api.Tests.csproj" />
+    <Project Path="Carts/Carts.Api/Carts.Api.csproj" />
+    <Project Path="Carts/Carts.Tests/Carts.Tests.csproj" />
+    <Project Path="Carts/Carts/Carts.csproj" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="../../Core.Kafka/Core.Kafka.csproj" />
+    <Project Path="../../Core.Marten/Core.Marten.csproj" />
+    <Project Path="../../Core.Serialization/Core.Serialization.csproj" />
+    <Project Path="../../Core.Testing/Core.Testing.csproj" />
+    <Project Path="../../Core.WebApi/Core.WebApi.csproj" />
+    <Project Path="../../Core/Core.csproj" />
+  </Folder>
+  <Folder Name="/docker/">
+    <File Path="docker/docker-compose.yml" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Orders/">
+    <Project Path="Orders/Orders.Api.Tests/Orders.Api.Tests.csproj" />
+    <Project Path="Orders/Orders.Api/Orders.Api.csproj" />
+    <Project Path="Orders/Orders.Tests/Orders.Tests.csproj" />
+    <Project Path="Orders/Orders/Orders.csproj" />
+  </Folder>
+  <Folder Name="/Payments/">
+    <Project Path="Payments/Payments.Api.Tests/Payments.Api.Tests.csproj" />
+    <Project Path="Payments/Payments.Api/Payments.Api.csproj" />
+    <Project Path="Payments/Payments.Tests/Payments.Tests.csproj" />
+    <Project Path="Payments/Payments/Payments.csproj" />
+  </Folder>
+  <Folder Name="/Shipments/">
+    <Project Path="Shipments/Shipments.Api.Tests/Shipments.Api.Tests.csproj" />
+    <Project Path="Shipments/Shipments.Api/Shipments.Api.csproj" />
+    <Project Path="Shipments/Shipments.Tests/Shipments.Tests.csproj" />
+    <Project Path="Shipments/Shipments/Shipments.csproj" />
+  </Folder>
+</Solution>

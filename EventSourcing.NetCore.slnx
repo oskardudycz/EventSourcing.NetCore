@@ -1,0 +1,318 @@
+<Solution>
+  <Folder Name="/CI/">
+    <File Path=".github/workflows/build.dotnet.testcontainers.yml" />
+    <File Path=".github/workflows/build.dotnet.yml" />
+    <File Path=".github/workflows/publish.docker.yml" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="Core.ElasticSearch/Core.ElasticSearch.csproj" />
+    <Project Path="Core.EntityFramework.Tests/Core.EntityFramework.Tests.csproj" />
+    <Project Path="Core.EntityFramework/Core.EntityFramework.csproj" />
+    <Project Path="Core.EventStoreDB.Tests/Core.EventStoreDB.Tests.csproj" />
+    <Project Path="Core.EventStoreDB/Core.EventStoreDB.csproj" />
+    <Project Path="Core.Kafka.Tests/Core.Kafka.Tests.csproj" />
+    <Project Path="Core.Kafka/Core.Kafka.csproj" />
+    <Project Path="Core.Marten/Core.Marten.csproj" />
+    <Project Path="Core.Scheduling/Core.Scheduling.csproj" />
+    <Project Path="Core.Serialization/Core.Serialization.csproj" />
+    <Project Path="Core.Testing/Core.Testing.csproj" />
+    <Project Path="Core.Tests/Core.Tests.csproj" />
+    <Project Path="Core.WebApi/Core.WebApi.csproj" />
+    <Project Path="Core/Core.csproj" />
+    <Project Path="SwaggerUi.Aspire.Hosting/SwaggerUi.Aspire.Hosting.csproj" />
+  </Folder>
+  <Folder Name="/docker/">
+    <File Path="docker-compose.yml" />
+    <File Path="Dockerfile" />
+  </Folder>
+  <Folder Name="/Sample/">
+    <File Path="Sample/README.md" />
+  </Folder>
+  <Folder Name="/Sample/AsyncProjections/">
+    <Project Path="Sample/AsyncProjections/SmartHome.Api/SmartHome.Api.csproj" />
+    <Project Path="Sample/AsyncProjections/SmartHome.Temperature/SmartHome.Temperature.csproj" />
+  </Folder>
+  <Folder Name="/Sample/ClosingTheBooks/">
+    <File Path="Sample/ClosingTheBooks/README.md" />
+    <Project Path="Sample/ClosingTheBooks/PointOfSales.Api.Tests/PointOfSales.Api.Tests.csproj" />
+    <Project Path="Sample/ClosingTheBooks/PointOfSales.Api/PointOfSales.Api.csproj" />
+    <Project Path="Sample/ClosingTheBooks/PointOfSales/PointOfSales.csproj" />
+  </Folder>
+  <Folder Name="/Sample/CRUDToCQRS/" />
+  <Folder Name="/Sample/CRUDToCQRS/01-CRUD/">
+    <Project Path="Sample/CRUDToCQRS/01-CRUD/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/CRUDToCQRS/02-CRUDWithCQRS/">
+    <Project Path="Sample/CRUDToCQRS/02-CRUDWithCQRS/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/CRUDToCQRS/03-DomainGrouping/">
+    <Project Path="Sample/CRUDToCQRS/03-DomainGrouping/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="Sample/CRUDToCQRS/03-DomainGrouping/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/CRUDToCQRS/04-SlimmedDomain/">
+    <Project Path="Sample/CRUDToCQRS/04-SlimmedDomain/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="Sample/CRUDToCQRS/04-SlimmedDomain/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/CRUDToCQRS/05-ExplicitDomain/">
+    <Project Path="Sample/CRUDToCQRS/05-ExplicitDomain/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="Sample/CRUDToCQRS/05-ExplicitDomain/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/CRUDToCQRS/06-SlicedDomain/">
+    <Project Path="Sample/CRUDToCQRS/06-SlicedDomain/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="Sample/CRUDToCQRS/06-SlicedDomain/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/CRUDToCQRS/07-FlattenedLayers/">
+    <Project Path="Sample/CRUDToCQRS/07-FlattenedLayers/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="Sample/CRUDToCQRS/07-FlattenedLayers/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/CRUDToCQRS/08-SlicedEndpoints/">
+    <Project Path="Sample/CRUDToCQRS/08-SlicedEndpoints/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="Sample/CRUDToCQRS/08-SlicedEndpoints/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/CRUDToCQRS/09-MultipleModules/">
+    <Project Path="Sample/CRUDToCQRS/09-MultipleModules/ECommerce.Domain/ECommerce.Domain.csproj" />
+    <Project Path="Sample/CRUDToCQRS/09-MultipleModules/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/Decider/">
+    <Project Path="Sample/decider/Decider.Tests/Decider.Tests.csproj" />
+    <Project Path="Sample/decider/Decider/Decider.csproj" />
+  </Folder>
+  <Folder Name="/Sample/ECommerce.Equinox/">
+    <Project Path="Sample/ECommerce.Equinox/ECommerce.Api/ECommerce.Api.fsproj">
+      <BuildType Solution="Release|*" Project="?" />
+      <Platform Solution="Release|*" Project="?" />
+      <Build Solution="Release|*" Project="false" />
+    </Project>
+    <Project Path="Sample/ECommerce.Equinox/ECommerce.Domain/ECommerce.Domain.fsproj">
+      <BuildType Solution="Release|*" Project="?" />
+      <Platform Solution="Release|*" Project="?" />
+      <Build Solution="Release|*" Project="false" />
+    </Project>
+    <Project Path="Sample/ECommerce.Equinox/ECommerce.FeedConsumer/ECommerce.FeedConsumer.fsproj">
+      <BuildType Solution="Release|*" Project="?" />
+      <Platform Solution="Release|*" Project="?" />
+      <Build Solution="Release|*" Project="false" />
+    </Project>
+    <Project Path="Sample/ECommerce.Equinox/ECommerce.Infrastructure/ECommerce.Infrastructure.fsproj">
+      <BuildType Solution="Release|*" Project="?" />
+      <Platform Solution="Release|*" Project="?" />
+      <Build Solution="Release|*" Project="false" />
+    </Project>
+    <Project Path="Sample/ECommerce.Equinox/ECommerce.Reactor/ECommerce.Reactor.fsproj">
+      <BuildType Solution="Release|*" Project="?" />
+      <Platform Solution="Release|*" Project="?" />
+      <Build Solution="Release|*" Project="false" />
+    </Project>
+    <Project Path="Sample/ECommerce.Equinox/ECommerce.Tests/ECommerce.Tests.fsproj">
+      <BuildType Solution="Release|*" Project="?" />
+      <Platform Solution="Release|*" Project="?" />
+      <Build Solution="Release|*" Project="false" />
+    </Project>
+  </Folder>
+  <Folder Name="/Sample/ECommerce/">
+    <File Path="Sample/ECommerce/README.md" />
+    <Project Path="Sample/ECommerce/ECommerce.AppHost/ECommerce.AppHost.csproj" />
+    <Project Path="Sample/ECommerce/ECommerce.ServiceDefaults/ECommerce.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Sample/ECommerce/Carts/">
+    <Project Path="Sample/ECommerce/Carts/Carts.Api.Tests/Carts.Api.Tests.csproj" />
+    <Project Path="Sample/ECommerce/Carts/Carts.Api/Carts.Api.csproj" />
+    <Project Path="Sample/ECommerce/Carts/Carts.Tests/Carts.Tests.csproj" />
+    <Project Path="Sample/ECommerce/Carts/Carts/Carts.csproj" />
+  </Folder>
+  <Folder Name="/Sample/ECommerce/docker/">
+    <File Path="Sample/ECommerce/docker/docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Sample/ECommerce/Orders/">
+    <Project Path="Sample/ECommerce/Orders/Orders.Api.Tests/Orders.Api.Tests.csproj" />
+    <Project Path="Sample/ECommerce/Orders/Orders.Api/Orders.Api.csproj" />
+    <Project Path="Sample/ECommerce/Orders/Orders.Tests/Orders.Tests.csproj" />
+    <Project Path="Sample/ECommerce/Orders/Orders/Orders.csproj" />
+  </Folder>
+  <Folder Name="/Sample/ECommerce/Payments/">
+    <Project Path="Sample/ECommerce/Payments/Payments.Api.Tests/Payments.Api.Tests.csproj" />
+    <Project Path="Sample/ECommerce/Payments/Payments.Api/Payments.Api.csproj" />
+    <Project Path="Sample/ECommerce/Payments/Payments.Tests/Payments.Tests.csproj" />
+    <Project Path="Sample/ECommerce/Payments/Payments/Payments.csproj" />
+  </Folder>
+  <Folder Name="/Sample/ECommerce/Shipments/">
+    <Project Path="Sample/ECommerce/Shipments/Shipments.Api.Tests/Shipments.Api.Tests.csproj" />
+    <Project Path="Sample/ECommerce/Shipments/Shipments.Api/Shipments.Api.csproj" />
+    <Project Path="Sample/ECommerce/Shipments/Shipments.Tests/Shipments.Tests.csproj" />
+    <Project Path="Sample/ECommerce/Shipments/Shipments/Shipments.csproj" />
+  </Folder>
+  <Folder Name="/Sample/EventPipelines/">
+    <File Path="Sample/EventPipelines/README.md" />
+    <Project Path="Sample/EventPipelines/EventPipelines.MediatR/EventPipelines.MediatR.csproj" />
+    <Project Path="Sample/EventPipelines/EventPipelines.Tests/EventPipelines.Tests.csproj" />
+    <Project Path="Sample/EventPipelines/EventPipelines/EventPipelines.csproj" />
+  </Folder>
+  <Folder Name="/Sample/EventStoreDB/" />
+  <Folder Name="/Sample/EventStoreDB/DataAnalytics/">
+    <Project Path="Sample/EventStoreDB/DataAnalytics/MarketBasketAnalytics.Api/MarketBasketAnalytics.Api.csproj" />
+    <Project Path="Sample/EventStoreDB/DataAnalytics/MarketBasketAnalytics/MarketBasketAnalytics.csproj" />
+  </Folder>
+  <Folder Name="/Sample/EventStoreDB/ECommerce/">
+    <File Path="Sample/EventStoreDB/ECommerce/README.md" />
+  </Folder>
+  <Folder Name="/Sample/EventStoreDB/ECommerce/Carts/">
+    <Project Path="Sample/EventStoreDB/ECommerce/Carts/Carts.Api.Tests/Carts.Api.Tests.csproj" />
+    <Project Path="Sample/EventStoreDB/ECommerce/Carts/Carts.Api/Carts.Api.csproj" />
+    <Project Path="Sample/EventStoreDB/ECommerce/Carts/Carts.Tests/Carts.Tests.csproj" />
+    <Project Path="Sample/EventStoreDB/ECommerce/Carts/Carts/Carts.csproj" />
+  </Folder>
+  <Folder Name="/Sample/EventStoreDB/Simple/">
+    <File Path="Sample/EventStoreDB/Simple/README.md" />
+    <Project Path="Sample/EventStoreDB/Simple/ECommerce.Api.Tests/ECommerce.Api.Tests.csproj" />
+    <Project Path="Sample/EventStoreDB/Simple/ECommerce.Api/ECommerce.Api.csproj" />
+    <Project Path="Sample/EventStoreDB/Simple/ECommerce.Core/ECommerce.Core.csproj" />
+    <Project Path="Sample/EventStoreDB/Simple/ECommerce/ECommerce.csproj" />
+  </Folder>
+  <Folder Name="/Sample/EventsVersioning/">
+    <File Path="Sample/EventsVersioning/README.md" />
+    <Project Path="Sample/EventsVersioning/ECommerce.V1/ECommerce.V1.csproj" />
+    <Project Path="Sample/EventsVersioning/EventsVersioning.Tests/EventsVersioning.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Sample/Helpdesk.Wolverine/">
+    <File Path="Sample/Helpdesk.Wolverine/docker-compose.yml" />
+    <File Path="Sample/Helpdesk.Wolverine/README.md" />
+    <Project Path="Sample/Helpdesk.Wolverine/Helpdesk.Api.Tests/Helpdesk.Api.Tests.csproj" />
+    <Project Path="Sample/Helpdesk.Wolverine/Helpdesk.Api/Helpdesk.Api.csproj" />
+  </Folder>
+  <Folder Name="/Sample/Helpdesk/">
+    <File Path="Sample/Helpdesk/README.md" />
+    <Project Path="Sample/Helpdesk/Helpdesk.Api.Tests/Helpdesk.Api.Tests.csproj" />
+    <Project Path="Sample/Helpdesk/Helpdesk.Api/Helpdesk.Api.csproj" />
+  </Folder>
+  <Folder Name="/Sample/HotelManagement/">
+    <File Path="Sample/HotelManagement/README.md" />
+    <Project Path="Sample/HotelManagement/HotelManagement.Tests/HotelManagement.Tests.csproj" />
+    <Project Path="Sample/HotelManagement/HotelManagement/HotelManagement.csproj" />
+    <Project Path="Sample/HotelManagement/Reservations/Reservations.csproj" />
+  </Folder>
+  <Folder Name="/Sample/MartenMeetsElastic/">
+    <Project Path="Sample/MartenMeetsElastic/MartenMeetsElastic.Tests/MartenMeetsElastic.Tests.csproj" />
+    <Project Path="Sample/MartenMeetsElastic/MartenMeetsElastic/MartenMeetsElastic.csproj" />
+  </Folder>
+  <Folder Name="/Sample/MeetingsManagement/">
+    <File Path="Sample/MeetingsManagement/Readme.md" />
+    <Project Path="Sample/MeetingsManagement/MeetingsManagement.Api/MeetingsManagement.Api.csproj" />
+    <Project Path="Sample/MeetingsManagement/MeetingsManagement.IntegrationTests/MeetingsManagement.IntegrationTests.csproj" />
+    <Project Path="Sample/MeetingsManagement/MeetingsManagement/MeetingsManagement.csproj" />
+    <Project Path="Sample/MeetingsManagement/MeetingsSearch.Api/MeetingsSearch.Api.csproj" />
+    <Project Path="Sample/MeetingsManagement/MeetingsSearch.IntegrationTests/MeetingsSearch.IntegrationTests.csproj" />
+    <Project Path="Sample/MeetingsManagement/MeetingsSearch/MeetingsSearch.csproj" />
+  </Folder>
+  <Folder Name="/Sample/MeetingsManagement/docker/">
+    <File Path="Sample/MeetingsManagement/docker/docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Sample/ProjectManagement/">
+    <Project Path="Sample/ProjectManagement/ProjectManagement.Api/ProjectManagement.Api.csproj" />
+    <Project Path="Sample/ProjectManagement/ProjectManagement/ProjectManagement.csproj" />
+  </Folder>
+  <Folder Name="/Sample/SlimDownYourAggregate/">
+    <Project Path="Sample/SlimDownYourAggregate/SlimDownYourAggregate/SlimDownYourAggregate.csproj" />
+  </Folder>
+  <Folder Name="/Sample/Tickets/">
+    <Project Path="Sample/Tickets/Tickets.Api.Tests/Tickets.Api.Tests.csproj" />
+    <Project Path="Sample/Tickets/Tickets.Api/Tickets.Api.csproj" />
+    <Project Path="Sample/Tickets/Tickets.Tests/Tickets.Tests.csproj" />
+    <Project Path="Sample/Tickets/Tickets/Tickets.csproj" />
+  </Folder>
+  <Folder Name="/Sample/Warehouse.MinimalAPI/">
+    <File Path="Sample/Warehouse.MinimalAPI/docker-compose.yml" />
+    <File Path="Sample/Warehouse.MinimalAPI/README.md" />
+    <Project Path="Sample/Warehouse.MinimalAPI/Warehouse.Api/Warehouse.Api.csproj" />
+  </Folder>
+  <Folder Name="/Sample/Warehouse/">
+    <Project Path="Sample/Warehouse/Warehouse.Api.Tests/Warehouse.Api.Tests.csproj" />
+    <Project Path="Sample/Warehouse/Warehouse.Api/Warehouse.Api.csproj" />
+    <Project Path="Sample/Warehouse/Warehouse/Warehouse.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Core.Build.props" />
+    <File Path="Directory.Build.props" />
+    <File Path="Dockerfile" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Marten.Integration.Tests/Marten.Integration.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Workshops/" />
+  <Folder Name="/Workshops/BuildYourOwnEventStore/">
+    <File Path="Workshops/BuildYourOwnEventStore/Readme.md" />
+    <Project Path="Workshops/BuildYourOwnEventStore/01-CreateStreamsTable/01-CreateStreamsTable.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/02-CreateEventsTable/02-CreateEventsTable.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/03-CreateAppendEventFunction/03-CreateAppendEventFunction.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/03-OptimisticConcurrency/03-OptimisticConcurrency.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/04-EventStoreMethods/04-EventStoreMethods.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/05-StreamAggregation/05-StreamAggregation.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/06-TimeTraveling/06-TimeTraveling.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/07-AggregateAndRepository/07-AggregateAndRepository.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/08-Snapshots/08-Snapshots.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/09-Projections/09-Projections.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/10-ProjectionsWithMarten/10-ProjectionsWithMarten.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/Tools/Tools.csproj" />
+  </Folder>
+  <Folder Name="/Workshops/BuildYourOwnEventStore/docker/">
+    <File Path="Workshops/BuildYourOwnEventStore/docker/docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Workshops/BuildYourOwnEventStore/Solved/">
+    <Project Path="Workshops/BuildYourOwnEventStore/EventStoreBasics.Tests/EventStoreBasics.Tests.csproj" />
+    <Project Path="Workshops/BuildYourOwnEventStore/EventStoreBasics/EventStoreBasics.csproj" />
+  </Folder>
+  <Folder Name="/Workshops/IntroductionToEventSourcing/">
+    <File Path="Workshops/IntroductionToEventSourcing/README.md" />
+    <Project Path="Workshops/IntroductionToEventSourcing/01-EventsDefinition/01-EventsDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/02-GettingStateFromEvents/02-GettingStateFromEvents.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/03-AppendingEvents.Marten/03-AppendingEvents.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/04-AppendingEvents.EventStoreDB/04-AppendingEvents.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/05-GettingStateFromEvents.Marten/05-GettingStateFromEvents.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/06-GettingStateFromEvents.EventStoreDB/06-GettingStateFromEvents.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/07-BusinessLogic.Slimmed/07-BusinessLogic.Slimmed.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/07-BusinessLogic/07-BusinessLogic.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/08-ApplicationLogic.Marten.Tests/08-ApplicationLogic.Marten.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/08-ApplicationLogic.Marten/08-ApplicationLogic.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/09-ApplicationLogic.EventStoreDB.Tests/09-ApplicationLogic.EventStoreDB.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/09-ApplicationLogic.EventStoreDB/09-ApplicationLogic.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/10-OptimisticConcurrency.Marten.Tests/10-OptimisticConcurrency.Marten.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/10-OptimisticConcurrency.Marten/10-OptimisticConcurrency.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/11-OptimisticConcurrency.EventStoreDB.Tests/11-OptimisticConcurrency.EventStoreDB.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/11-OptimisticConcurrency.EventStoreDB/11-OptimisticConcurrency.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/12-Projections.SingleStream/12-Projections.SingleStream.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/13-Projections.SingleStream.Idempotency/13-Projections.SingleStream.Idempotency.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/14-Projections.SingleStream.EventualConsistency/14-Projections.SingleStream.EventualConsistency.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/15-EventsDefinition/15-EventsDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/16-EntitiesDefinition/16-EntitiesDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/17-BusinessProcesses/17-BusinessProcesses.csproj" />
+  </Folder>
+  <Folder Name="/Workshops/IntroductionToEventSourcing/docker/">
+    <File Path="Workshops/IntroductionToEventSourcing/docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Workshops/IntroductionToEventSourcing/Solved/">
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/01-EventsDefinition/01-EventsDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/02-GettingStateFromEvents/02-GettingStateFromEvents.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/03-AppendingEvents.Marten/03-AppendingEvents.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/04-AppendingEvents.EventStoreDB/04-AppendingEvents.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/05-GettingStateFromEvents.Marten/05-GettingStateFromEvents.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/06-GettingStateFromEvents.EventStoreDB/06-GettingStateFromEvents.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/07-BusinessLogic.Slimmed/07-BusinessLogic.Slimmed.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/07-BusinessLogic/07-BusinessLogic.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/08-ApplicationLogic.Marten.Tests/08-ApplicationLogic.Marten.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/08-ApplicationLogic.Marten/08-ApplicationLogic.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/09-ApplicationLogic.EventStoreDB.Tests/09-ApplicationLogic.EventStoreDB.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/09-ApplicationLogic.EventStoreDB/09-ApplicationLogic.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/10-OptimisticConcurrency.Marten.Tests/10-OptimisticConcurrency.Marten.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/10-OptimisticConcurrency.Marten/10-OptimisticConcurrency.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/11-OptimisticConcurrency.EventStoreDB.Tests/11-OptimisticConcurrency.EventStoreDB.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/11-OptimisticConcurrency.EventStoreDB/11-OptimisticConcurrency.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/12-Projections.SingleStream/12-Projections.SingleStream.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/13-Projections.SingleStream.Idempotency/13-Projections.SingleStream.Idempotency.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/14-Projections.SingleStream.EventualConsistency/14-Projections.SingleStream.EventualConsistency.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/15-EventsDefinition/15-EventsDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/16-EntitiesDefinition/16-EntitiesDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/17-BusinessProcesses/17-BusinessProcesses.csproj" />
+  </Folder>
+  <Properties Name="RiderSharedRunConfigurations" Scope="PostLoad" />
+</Solution>

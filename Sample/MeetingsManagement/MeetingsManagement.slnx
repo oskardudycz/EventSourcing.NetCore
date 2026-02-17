@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/docker/">
+    <File Path="../docker/docker-compose.yml" />
+  </Folder>
+  <Folder Name="/docker/postgres/">
+    <File Path="../docker/postgres/variables.env" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Readme.md" />
+  </Folder>
+  <Project Path="../../Core.Kafka/Core.Kafka.csproj" />
+  <Project Path="../../Core.Marten/Core.Marten.csproj" />
+  <Project Path="../../Core.Testing/Core.Testing.csproj" />
+  <Project Path="../../Core/Core.csproj" />
+  <Project Path="MeetingsManagement.Api/MeetingsManagement.Api.csproj" />
+  <Project Path="MeetingsManagement.IntegrationTests/MeetingsManagement.IntegrationTests.csproj" />
+  <Project Path="MeetingsManagement/MeetingsManagement.csproj" />
+  <Project Path="MeetingsSearch.Api/MeetingsSearch.Api.csproj" />
+  <Project Path="MeetingsSearch.IntegrationTests/MeetingsSearch.IntegrationTests.csproj" />
+  <Project Path="MeetingsSearch/MeetingsSearch.csproj" />
+</Solution>

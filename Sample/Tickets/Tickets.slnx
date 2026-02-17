@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="../../Core.Marten/Core.Marten.csproj" />
+  <Project Path="../../Core.Testing/Core.Testing.csproj" />
+  <Project Path="../../Core/Core.csproj" />
+  <Project Path="Tickets.Api.Tests/Tickets.Api.Tests.csproj" />
+  <Project Path="Tickets.Api/Tickets.Api.csproj" />
+  <Project Path="Tickets.Tests/Tickets.Tests.csproj" />
+  <Project Path="Tickets/Tickets.csproj" />
+</Solution>

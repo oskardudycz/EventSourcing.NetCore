@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../Tickets/Core/Core.csproj" />
+  <Project Path="SmartHome.Api/SmartHome.Api.csproj" />
+  <Project Path="SmartHome.Temperature/SmartHome.Temperature.csproj" />
+</Solution>
