@@ -1,4 +1,4 @@
-ARG dotnet_version=8.0
+ARG dotnet_version=10.0
 ########################################
 #  First stage of multistage build
 ########################################
@@ -45,7 +45,7 @@ RUN dotnet publish -c Release --no-build -o out
 ########################################
 FROM mcr.microsoft.com/dotnet/aspnet:${dotnet_version}-alpine
 ARG project_name
-ARG dotnet_version=8.0
+ARG dotnet_version=10.0
 
 # Setup working directory for project
 WORKDIR /app

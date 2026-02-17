@@ -6,7 +6,7 @@
     <Sdk Name="Microsoft.DotNet.PackageValidation" Version="1.0.0-preview.5.21302.8"/>
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>Ecommerce.V1</PackageId>
         <Version>1.0.0</Version>
