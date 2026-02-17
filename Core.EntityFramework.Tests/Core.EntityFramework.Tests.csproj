@@ -16,21 +16,21 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="7.2.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.2.0" />
-        <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1">
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+        <PackageReference Include="GitHubActionsTestLogger">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="xunit" Version="2.9.3"/>
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+        <PackageReference Include="xunit"/>
+        <PackageReference Include="xunit.runner.visualstudio">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
         <!-- For PostgreSQL checkpointing tests -->
-        <PackageReference Include="Testcontainers.PostgreSql" Version="4.2.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
+        <PackageReference Include="Testcontainers.PostgreSql" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

@@ -13,19 +13,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="JsonNet.PrivateSettersContractResolvers" Version="1.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2">
+        <PackageReference Include="JsonNet.PrivateSettersContractResolvers" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     </ItemGroup>
 
     <ItemGroup>

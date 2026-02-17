@@ -5,17 +5,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="7.2.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-        <PackageReference Include="NSubstitute" Version="5.3.0" />
-        <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1">
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="NSubstitute" />
+        <PackageReference Include="GitHubActionsTestLogger">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="PublicApiGenerator" Version="11.4.2" />
-        <PackageReference Include="Verify.Xunit" Version="28.11.0" />
-        <PackageReference Include="xunit" Version="2.9.3" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+        <PackageReference Include="PublicApiGenerator" />
+        <PackageReference Include="Verify.Xunit" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>

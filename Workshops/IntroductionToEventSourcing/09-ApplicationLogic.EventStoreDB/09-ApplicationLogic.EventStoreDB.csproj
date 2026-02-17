@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-        <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.3.8" />
+        <PackageReference Include="Swashbuckle.AspNetCore" />
+        <PackageReference Include="EventStore.Client.Grpc.Streams" />
     </ItemGroup>
 </Project>

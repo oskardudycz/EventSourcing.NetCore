@@ -9,20 +9,20 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus" Version="35.6.2" />
-        <PackageReference Include="FluentAssertions" Version="7.2.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-        <PackageReference Include="Ogooreck" Version="0.8.2" />
-        <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1">
+        <PackageReference Include="Bogus" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="Ogooreck" />
+        <PackageReference Include="GitHubActionsTestLogger">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="xunit" Version="2.9.3" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" />
     </ItemGroup>
 
     <ItemGroup>
