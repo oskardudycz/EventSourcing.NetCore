@@ -10,7 +10,7 @@ Sample is showing the typical flow of the Event Sourcing app with [EventStoreDB]
 2. Install .NET 6.0 - https://dotnet.microsoft.com/download/dotnet/6.0.
 3. Install Visual Studio 2022, Rider or VSCode.
 4. Install docker - https://docs.docker.com/engine/install/.
-5. Open `ECommerce.sln` solution.
+5. Open `ECommerce.slnx` solution.
 
 ## Running
 
@@ -22,7 +22,7 @@ Sample is showing the typical flow of the Event Sourcing app with [EventStoreDB]
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `admin@pgadmin.org`, Password: `admin`
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
-4. Open, build and run `ECommerce.sln` solution.
+4. Open, build and run `ECommerce.slnx` solution.
     - Swagger should be available at: http://localhost:5000/index.html
 
 

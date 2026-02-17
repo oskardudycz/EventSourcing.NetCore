@@ -12,7 +12,7 @@
 6. Create Github Account
 7. Clone Project https://github.com/oskardudycz/EventSourcing.NetCore, make sure that's compiling
 8. Check https://github.com/jbogard/MediatR, http://jasperfx.github.io/marten/documentation/
-9. Open `MeetingsManagement.sln` solution.
+9. Open `MeetingsManagement.slnx` solution.
 10. Docker useful commands
 
     - `docker compose up` - start dockers
