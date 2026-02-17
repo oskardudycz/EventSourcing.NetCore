@@ -54,7 +54,7 @@ Read also more in my article [Introduction to Event Sourcing - Self Paced Kit](h
 3. Install .NET 8.0 - https://dotnet.microsoft.com/download/dotnet/8.0.
 4. Install Visual Studio, Rider or VSCode.
 5. Install docker - https://docs.docker.com/engine/install/.
-6. Open [Exercises.sln](./Exercises.sln) solution.
+6. Open [Exercises.slnx](./Exercises.slnx) solution.
 
 ## Running
 
@@ -66,5 +66,5 @@ Read also more in my article [Introduction to Event Sourcing - Self Paced Kit](h
         - Login: `admin@pgadmin.org`, Password: `admin`
         - To connect to server click right mouse on Servers, then Register Server and use host: `postgres`, user: `postgres`, password: `Password12!`
    - EventStoreDB UI: http://localhost:2113/
-4. Open, build and run [Exercises.sln](./Exercises.sln) solution.
-4. To see solved exercises, open [Solved.sln](./Solved.sln) solution.
+4. Open, build and run [Exercises.slnx](./Exercises.slnx) solution.
+4. To see solved exercises, open [Solved.slnx](./Solved.slnx) solution.
