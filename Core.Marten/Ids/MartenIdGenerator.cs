@@ -8,5 +8,5 @@ public class MartenIdGenerator(IDocumentSession documentSession): IIdGenerator
 {
     private readonly IDocumentSession documentSession = documentSession ?? throw new ArgumentNullException(nameof(documentSession));
 
-    public Guid New() => CombGuidIdGeneration.NewGuid();
+    public Guid New() => Marten.Schema.Identity.CombGuid.NewGuid();
 }

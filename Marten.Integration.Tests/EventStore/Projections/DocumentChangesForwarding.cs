@@ -32,7 +32,7 @@ public record ProjectInfo(
     Guid? ManagerId = null
 );
 
-public class ProjectInfoProjection: SingleStreamProjection<ProjectInfo>
+public class ProjectInfoProjection: SingleStreamProjection<ProjectInfo, string>
 {
     public static ProjectInfo Create(ProjectCreated created) =>
         new(created.ProjectId, created.Name);

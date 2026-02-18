@@ -28,7 +28,7 @@ public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.P
         string Email
     );
 
-    public class UserNameGuardProjection: SingleStreamProjection<UserNameGuard>
+    public class UserNameGuardProjection: SingleStreamProjection<UserNameGuard, string>
     {
         public UserNameGuardProjection() =>
             DeleteEvent<UserDeleted>();

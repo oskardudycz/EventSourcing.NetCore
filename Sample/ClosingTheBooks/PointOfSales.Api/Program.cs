@@ -56,7 +56,6 @@ builder.Services
         // Added as inline for now to make tests easier, should be async in the end
         options.Projections.Add<CashierShiftTrackerProjection>(ProjectionLifecycle.Inline);
     })
-    .OptimizeArtifactWorkflow(TypeLoadMode.Static)
     .UseLightweightSessions()
     .AddAsyncDaemon(DaemonMode.Solo);
 
@@ -65,7 +64,14 @@ builder.Services
     .Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o =>
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-builder.Host.ApplyOaktonExtensions();
+// Configure production vs development settings
+builder.Services.CritterStackDefaults(x =>
+{
+    x.Production.GeneratedCodeMode = TypeLoadMode.Static;
+    x.Production.ResourceAutoCreate = AutoCreate.None;
+});
+
+builder.Host.ApplyJasperFxExtensions();
 
 var app = builder.Build();
 

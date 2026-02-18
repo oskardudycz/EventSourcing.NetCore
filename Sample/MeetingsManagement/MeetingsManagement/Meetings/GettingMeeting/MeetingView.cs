@@ -19,7 +19,7 @@ public class MeetingView
     public int Version { get; set; }
 }
 
-public class MeetingViewProjection: SingleStreamProjection<MeetingView>
+public class MeetingViewProjection: SingleStreamProjection<MeetingView, string>
 {
     public void Apply(MeetingCreated @event, MeetingView view)
     {

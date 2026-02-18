@@ -26,7 +26,7 @@ public class ReservationShortInfo
     }
 }
 
-public class ReservationShortInfoProjection : SingleStreamProjection<ReservationShortInfo>
+public class ReservationShortInfoProjection : SingleStreamProjection<ReservationShortInfo, string>
 {
     public ReservationShortInfoProjection()
     {

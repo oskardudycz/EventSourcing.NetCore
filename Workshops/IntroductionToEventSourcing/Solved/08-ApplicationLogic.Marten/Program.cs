@@ -28,10 +28,16 @@ builder.Services
             .ConfigureMixedShoppingCarts();
     })
     .ApplyAllDatabaseChangesOnStartup()
-    .OptimizeArtifactWorkflow()
     .UseLightweightSessions();
 
-builder.Host.ApplyOaktonExtensions();
+// Configure production vs development settings
+builder.Services.CritterStackDefaults(x =>
+{
+    x.Production.GeneratedCodeMode = TypeLoadMode.Static;
+    x.Production.ResourceAutoCreate = AutoCreate.None;
+});
+
+builder.Host.ApplyJasperFxExtensions();
 
 var app = builder.Build();
 

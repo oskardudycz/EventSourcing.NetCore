@@ -61,7 +61,7 @@ public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixtu
         }
     }
 
-    public class IssueDescriptionsProjection: SingleStreamProjection<IssueDescriptions>
+    public class IssueDescriptionsProjection: SingleStreamProjection<IssueDescriptions, string>
     {
         public void Apply(IssueCreated @event, IssueDescriptions item)
         {
