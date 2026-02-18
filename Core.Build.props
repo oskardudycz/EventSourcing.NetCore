@@ -6,6 +6,6 @@
         <AnalysisLevel>latest</AnalysisLevel>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2" PrivateAssets="All"/>
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" PrivateAssets="All"/>
     </ItemGroup>
 </Project>

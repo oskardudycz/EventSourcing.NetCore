@@ -10,6 +10,7 @@ WORKDIR /app
 
 COPY ./.editorconfig ./
 COPY ./Directory.Build.props ./
+COPY ./Directory.Packages.props ./
 COPY ./Core.Build.props ./
 COPY ./Core/Core.csproj ./Core/
 COPY ./Core.Serialization/Core.Serialization.csproj ./Core.Serialization/
