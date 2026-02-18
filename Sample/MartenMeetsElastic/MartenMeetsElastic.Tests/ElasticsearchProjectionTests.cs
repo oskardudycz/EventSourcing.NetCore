@@ -4,6 +4,7 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentAssertions;
 using JasperFx.Core;
 using Marten;
+using JasperFx.Events;
 using Marten.Events;
 using MartenMeetsElastic.Projections;
 using Polly;

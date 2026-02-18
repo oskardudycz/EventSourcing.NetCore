@@ -1,6 +1,7 @@
 using Core.Commands;
 using Core.Marten.Repository;
 using Core.Queries;
+using JasperFx.Events.Projections;
 using Marten;
 using Marten.Events.Projections;
 using Marten.Pagination;

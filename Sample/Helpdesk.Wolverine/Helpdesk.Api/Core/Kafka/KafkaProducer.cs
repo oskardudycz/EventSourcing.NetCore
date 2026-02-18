@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
 using Confluent.Kafka;
 using Marten;
-using Marten.Events;
-using Marten.Events.Daemon;
-using Marten.Events.Daemon.Internals;
+using JasperFx.Events;
+using JasperFx.Events.Daemon;
+using JasperFx.Events.Projections;
 using Marten.Subscriptions;
 
 namespace Helpdesk.Api.Core.Kafka;

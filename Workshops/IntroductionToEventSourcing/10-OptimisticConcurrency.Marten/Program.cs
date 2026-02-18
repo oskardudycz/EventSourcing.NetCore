@@ -1,3 +1,5 @@
+using JasperFx;
+using JasperFx.CodeGeneration;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics;
 using Oakton;
@@ -71,7 +73,7 @@ if (app.Environment.IsDevelopment())
         .UseSwaggerUI();
 }
 
-return await app.RunOaktonCommands(args);
+return await app.RunJasperFxCommands(args);
 
 namespace OptimisticConcurrency
 {

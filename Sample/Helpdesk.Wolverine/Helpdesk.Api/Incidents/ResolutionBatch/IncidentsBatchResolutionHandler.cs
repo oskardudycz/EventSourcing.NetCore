@@ -15,7 +15,7 @@ public static class IncidentsBatchResolutionHandler
     )
     {
         var (incidents, agentId, resolutionType) = command;
-        var batchId = CombGuidIdGeneration.NewGuid();
+        var batchId = Guid.CreateVersion7();
 
         var @event = new IncidentsBatchResolutionResolutionInitiated(batchId, incidents, agentId, now);
 

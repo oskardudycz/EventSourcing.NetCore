@@ -1,3 +1,5 @@
+extern alias SystemLinqAsync;
+using SystemLinqAsync::System.Linq;
 using System.Text.Json;
 using EventStore.Client;
 using OptimisticConcurrency.Core.Entities;
@@ -43,6 +45,7 @@ public static class EventStoreDBExtensions
             return null;
 
         return await result
+            .AsAsyncEnumerable()
             .Select(@event =>
                 (TEvent)JsonSerializer.Deserialize(
                     @event.Event.Data.Span,

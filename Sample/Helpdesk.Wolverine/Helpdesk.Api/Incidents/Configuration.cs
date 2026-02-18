@@ -4,8 +4,8 @@ using Helpdesk.Api.Incidents.GettingDetails;
 using Helpdesk.Api.Incidents.GettingHistory;
 using Helpdesk.Api.Incidents.ResolutionBatch;
 using Helpdesk.Api.Incidents.Resolving;
+using JasperFx.Events.Projections;
 using Marten;
-using Marten.Events.Projections;
 using Wolverine;
 
 namespace Helpdesk.Api.Incidents;

@@ -1,4 +1,6 @@
 using FluentAssertions;
+using JasperFx;
+using JasperFx.Events.Projections;
 using Marten;
 using Marten.Events.Projections;
 using Tools.Tools;

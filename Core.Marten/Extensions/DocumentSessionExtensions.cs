@@ -31,21 +31,23 @@ public static class DocumentSessionExtensions
         this IDocumentSession documentSession,
         Guid id, int version,
         Func<T, object> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id, version, stream =>
-            stream.AppendOne(handle(stream.Aggregate)), ct);
+            stream.AppendOne(handle(stream.Aggregate ?? initial())), ct);
 
     public static Task GetAndUpdate<T>(
         this IDocumentSession documentSession,
         string id,
         int version,
         Func<T, IEnumerable<EventOrCommand>> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id, version, stream =>
         {
-            var messages = handle(stream.Aggregate);
+            var messages = handle(stream.Aggregate ?? initial());
 
             foreach (var message in messages)
             {
@@ -61,11 +63,12 @@ public static class DocumentSessionExtensions
         this IDocumentSession documentSession,
         string id,
         Func<T, IEnumerable<EventOrCommand>> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id, stream =>
         {
-            var messages = handle(stream.Aggregate);
+            var messages = handle(stream.Aggregate ?? initial());
 
             foreach (var message in messages)
             {
@@ -80,44 +83,49 @@ public static class DocumentSessionExtensions
         this IDocumentSession documentSession,
         string id,
         Func<T, IEnumerable<object>> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id,
-            stream => stream.AppendMany(handle(stream.Aggregate)), ct);
+            stream => stream.AppendMany(handle(stream.Aggregate ?? initial())), ct);
 
     public static Task GetAndUpdate<T>(
         this IDocumentSession documentSession,
         Guid id,
         Func<T, object> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id, stream =>
-            stream.AppendOne(handle(stream.Aggregate)), ct);
+            stream.AppendOne(handle(stream.Aggregate ?? initial())), ct);
 
     public static Task GetAndUpdate<T, TEvent>(
         this IDocumentSession documentSession,
         Guid id,
         Func<T, Maybe<TEvent>> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id, stream =>
-            handle(stream.Aggregate).IfExists(@event => stream.AppendOne(@event)), ct);
+            handle(stream.Aggregate ?? initial()).IfExists(@event => stream.AppendOne(@event!)), ct);
 
     public static Task GetAndUpdate<T>(
         this IDocumentSession documentSession,
         Guid id,
         Func<T, Maybe<object>> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id, stream =>
-            handle(stream.Aggregate).IfExists(stream.AppendOne), ct);
+            handle(stream.Aggregate ?? initial()).IfExists(stream.AppendOne), ct);
 
     public static Task GetAndUpdate<T>(
         this IDocumentSession documentSession,
         Guid id,
         Func<T, Maybe<object[]>> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id, stream =>
-            handle(stream.Aggregate).IfExists(stream.AppendMany), ct);
+            handle(stream.Aggregate ?? initial()).IfExists(stream.AppendMany), ct);
 }

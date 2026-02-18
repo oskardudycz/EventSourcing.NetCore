@@ -1,3 +1,4 @@
+using JasperFx.CommandLine;
 using Oakton;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,6 +15,6 @@ public sealed class AssemblyFixture : XunitTestFramework
     public AssemblyFixture(IMessageSink messageSink)
         :base(messageSink)
     {
-        OaktonEnvironment.AutoStartHost = true;
+        JasperFxEnvironment.AutoStartHost = true;
     }
 }

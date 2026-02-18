@@ -22,7 +22,7 @@ public static class Api
                 Guid clientId,
                 CancellationToken ct) =>
             {
-                var shoppingCartId = CombGuidIdGeneration.NewGuid();
+                var shoppingCartId = Guid.CreateVersion7();
 
                 await session.Add<MixedShoppingCart>(shoppingCartId,
                     [MixedShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now).Item1], ct);

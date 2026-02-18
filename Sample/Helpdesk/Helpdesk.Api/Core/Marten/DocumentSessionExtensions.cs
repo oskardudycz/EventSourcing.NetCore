@@ -16,8 +16,9 @@ public static class DocumentSessionExtensions
         Guid id,
         int version,
         Func<T, object> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id, version, stream =>
-            stream.AppendOne(handle(stream.Aggregate)), ct);
+            stream.AppendOne(handle(stream.Aggregate ?? initial())), ct);
 }

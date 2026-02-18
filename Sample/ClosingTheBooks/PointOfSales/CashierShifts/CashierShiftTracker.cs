@@ -1,4 +1,4 @@
-using Marten.Events;
+using JasperFx.Events;
 using Marten.Events.Projections;
 using PointOfSales.CashRegister;
 

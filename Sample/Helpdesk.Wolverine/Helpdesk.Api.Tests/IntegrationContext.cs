@@ -1,6 +1,7 @@
 using Alba;
 using Alba.Security;
 using FluentAssertions;
+using JasperFx.CommandLine;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Oakton;
@@ -21,7 +22,7 @@ public class AppFixture : IAsyncLifetime
         // Sorry folks, but this is absolutely necessary if you
         // use Oakton for command line processing and want to
         // use WebApplicationFactory and/or Alba for integration testing
-        OaktonEnvironment.AutoStartHost = true;
+        JasperFxEnvironment.AutoStartHost = true;
 
         // This is bootstrapping the actual application using
         // its implied Program.Main() set up

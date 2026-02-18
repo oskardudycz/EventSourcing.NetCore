@@ -1,3 +1,4 @@
+using System.Xml;
 using Core.EventStoreDB.Serialization;
 using Core.Exceptions;
 using Core.OpenTelemetry;

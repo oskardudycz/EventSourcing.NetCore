@@ -1,6 +1,7 @@
 using Core.Testing;
-using Marten.Events;
-using Marten.Events.Daemon.Resiliency;
+using JasperFx.Events;
+using JasperFx.Events.Daemon;
+using JasperFx.Events.Projections;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Marten.Services;

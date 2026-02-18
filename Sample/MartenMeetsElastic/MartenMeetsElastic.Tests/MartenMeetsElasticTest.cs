@@ -1,6 +1,7 @@
 using Elastic.Clients.Elasticsearch;
 using Marten;
-using Marten.Events;
+using JasperFx.Events;
+using JasperFx.Events.Daemon;
 using Marten.Events.Daemon;
 
 namespace MartenMeetsElastic.Tests;

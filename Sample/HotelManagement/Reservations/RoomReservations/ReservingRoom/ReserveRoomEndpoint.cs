@@ -20,7 +20,7 @@ internal static class ReserveRoomEndpoint
         ) =>
         {
             var (roomType, from, to, guestId, numberOfPeople) = request;
-            var reservationId = CombGuidIdGeneration.NewGuid().ToString();
+            var reservationId = Guid.CreateVersion7().ToString();
 
             var dailyAvailability = await session.GetRoomTypeAvailabilityForPeriod(Of(roomType, from, to), ct);
 

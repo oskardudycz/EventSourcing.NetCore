@@ -76,38 +76,6 @@
     <Project Path="Sample/decider/Decider.Tests/Decider.Tests.csproj" />
     <Project Path="Sample/decider/Decider/Decider.csproj" />
   </Folder>
-  <Folder Name="/Sample/ECommerce.Equinox/">
-    <Project Path="Sample/ECommerce.Equinox/ECommerce.Api/ECommerce.Api.fsproj">
-      <BuildType Solution="Release|*" Project="?" />
-      <Platform Solution="Release|*" Project="?" />
-      <Build Solution="Release|*" Project="false" />
-    </Project>
-    <Project Path="Sample/ECommerce.Equinox/ECommerce.Domain/ECommerce.Domain.fsproj">
-      <BuildType Solution="Release|*" Project="?" />
-      <Platform Solution="Release|*" Project="?" />
-      <Build Solution="Release|*" Project="false" />
-    </Project>
-    <Project Path="Sample/ECommerce.Equinox/ECommerce.FeedConsumer/ECommerce.FeedConsumer.fsproj">
-      <BuildType Solution="Release|*" Project="?" />
-      <Platform Solution="Release|*" Project="?" />
-      <Build Solution="Release|*" Project="false" />
-    </Project>
-    <Project Path="Sample/ECommerce.Equinox/ECommerce.Infrastructure/ECommerce.Infrastructure.fsproj">
-      <BuildType Solution="Release|*" Project="?" />
-      <Platform Solution="Release|*" Project="?" />
-      <Build Solution="Release|*" Project="false" />
-    </Project>
-    <Project Path="Sample/ECommerce.Equinox/ECommerce.Reactor/ECommerce.Reactor.fsproj">
-      <BuildType Solution="Release|*" Project="?" />
-      <Platform Solution="Release|*" Project="?" />
-      <Build Solution="Release|*" Project="false" />
-    </Project>
-    <Project Path="Sample/ECommerce.Equinox/ECommerce.Tests/ECommerce.Tests.fsproj">
-      <BuildType Solution="Release|*" Project="?" />
-      <Platform Solution="Release|*" Project="?" />
-      <Build Solution="Release|*" Project="false" />
-    </Project>
-  </Folder>
   <Folder Name="/Sample/ECommerce/">
     <File Path="Sample/ECommerce/README.md" />
     <Project Path="Sample/ECommerce/ECommerce.AppHost/ECommerce.AppHost.csproj" />

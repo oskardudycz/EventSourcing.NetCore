@@ -1,7 +1,7 @@
 using FluentAssertions;
+using JasperFx;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
-using Weasel.Core;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate.OutOfOrder;
