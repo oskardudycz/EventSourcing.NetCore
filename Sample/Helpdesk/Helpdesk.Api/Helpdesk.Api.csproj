@@ -13,7 +13,6 @@
         <PackageReference Include="Marten.AspNetCore" />
         <PackageReference Include="Marten" />
         <PackageReference Include="Confluent.Kafka" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR" />
     </ItemGroup>
 
     <ItemGroup>
