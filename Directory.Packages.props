@@ -5,11 +5,10 @@
 
   <ItemGroup>
     <PackageVersion Include="Alba" Version="8.1.1" />
-    <PackageVersion Include="Aspire.Confluent.Kafka" Version="9.0.0" />
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="8.2.0" />
-    <PackageVersion Include="Aspire.Hosting.Kafka" Version="8.2.0" />
-    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="8.2.0" />
-    <PackageVersion Include="Aspire.Npgsql" Version="8.2.0" />
+    <PackageVersion Include="Aspire.Confluent.Kafka" Version="13.1.1" />
+    <PackageVersion Include="Aspire.Hosting.Kafka" Version="13.1.1" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.1.1" />
+    <PackageVersion Include="Aspire.Npgsql" Version="13.1.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0" />
     <PackageVersion Include="AutoMapper" Version="14.0.0" />
     <PackageVersion Include="Bogus" Version="35.6.2" />
@@ -31,6 +30,7 @@
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="18.3.3" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.11.0" />
