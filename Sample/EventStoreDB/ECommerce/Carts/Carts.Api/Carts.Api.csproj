@@ -8,6 +8,7 @@
         <PackageReference Include="OpenTelemetry.Exporter.Jaeger" />
         <PackageReference Include="Swashbuckle.AspNetCore" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
+        <PackageReference Include="Microsoft.Build.Tasks.Core" />
         <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
           <PrivateAssets>all</PrivateAssets>
