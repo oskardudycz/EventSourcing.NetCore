@@ -4,7 +4,7 @@ using Core.Marten.Commands;
 using Core.Marten.Ids;
 using Core.Marten.Subscriptions;
 using Marten;
-using Marten.Events.Daemon.Resiliency;
+using Marten.Events.Daemon;
 using Marten.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

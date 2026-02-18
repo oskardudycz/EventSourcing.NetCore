@@ -26,7 +26,7 @@ public record ClosingDetails(
     DateTimeOffset? ClosedAt = null
 );
 
-public class CurrentCashierShiftProjection: SingleStreamProjection<CurrentCashierShift>
+public class CurrentCashierShiftProjection: SingleStreamProjection<CurrentCashierShift, string>
 {
     public static CurrentCashierShift Create(ShiftOpened @event) =>
         new(

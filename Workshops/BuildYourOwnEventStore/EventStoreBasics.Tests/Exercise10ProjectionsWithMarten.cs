@@ -150,12 +150,12 @@ public class Exercise10ProjectionsWithMarten
         var store = DocumentStore.For(options =>
         {
             options.Connection(Settings.ConnectionString);
-            options.AutoCreateSchemaObjects = AutoCreate.All;
+            options.AutoCreateSchemaObjects = Weasel.Core.AutoCreate.All;
             options.DatabaseSchemaName =
                 options.Events.DatabaseSchemaName = nameof(Exercise10ProjectionsWithMarten);
-            options.Projections.Snapshot<User>(SnapshotLifecycle.Inline);
-            options.Projections.Snapshot<Order>(SnapshotLifecycle.Inline);
-            options.Projections.Add<UserDashboardProjection>(ProjectionLifecycle.Async);
+            options.Projections.Snapshot<User>(Marten.Events.Projections.SnapshotLifecycle.Inline);
+            options.Projections.Snapshot<Order>(Marten.Events.Projections.SnapshotLifecycle.Inline);
+            options.Projections.Add<UserDashboardProjection>(Marten.Events.Projections.ProjectionLifecycle.Async);
 
             // options.Events.AddEventTypes(new[] {typeof(UserCreated)});
             // options.Projections.Add(new UserDashboardProjection());

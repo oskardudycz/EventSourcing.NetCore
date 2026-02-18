@@ -72,11 +72,16 @@ builder.Services
     })
     .AddSubscriptionWithServices<KafkaProducer>(ServiceLifetime.Singleton)
     .AddSubscriptionWithServices<SignalRProducer<IncidentsHub>>(ServiceLifetime.Singleton)
-    .OptimizeArtifactWorkflow(TypeLoadMode.Static)
     .ApplyAllDatabaseChangesOnStartup()
     .UseLightweightSessions()
     .AddAsyncDaemon(DaemonMode.HotCold);
 
+// Configure production vs development settings
+builder.Services.CritterStackDefaults(x =>
+{
+    x.Production.GeneratedCodeMode = TypeLoadMode.Static;
+    x.Production.ResourceAutoCreate = AutoCreate.None;
+});
 
 // Header forwarding to enable Swagger in Nginx
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -99,7 +104,7 @@ builder.Services
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
     .AddSignalR();
 
-builder.Host.ApplyOaktonExtensions();
+builder.Host.ApplyJasperFxExtensions();
 
 var app = builder.Build();
 

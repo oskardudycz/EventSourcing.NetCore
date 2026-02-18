@@ -3,6 +3,7 @@ using Core.OpenTelemetry;
 using Marten;
 using Marten.Events.Daemon;
 using Marten.Events.Daemon.Internals;
+using Marten.Storage;
 using Marten.Subscriptions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
