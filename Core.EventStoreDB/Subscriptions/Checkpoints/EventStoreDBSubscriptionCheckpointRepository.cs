@@ -17,18 +17,19 @@ public class EventStoreDBSubscriptionCheckpointRepository(EventStoreClient event
     {
         var streamName = GetCheckpointStreamName(subscriptionId);
 
-        var result = eventStoreClient.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1,
+        var readResult = eventStoreClient.ReadStreamAsync(Direction.Backwards, streamName, StreamPosition.End, 1,
             cancellationToken: ct);
 
-        if (await result.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
+        if (await readResult.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
             return Checkpoint.None;
 
-        ResolvedEvent? resolvedEvent = await result.FirstOrDefaultAsync(ct).ConfigureAwait(false);
+        await foreach (var resolvedEvent in readResult)
+            return Checkpoint.From(
+                resolvedEvent.Deserialize<CheckpointStored>()?.Position,
+                resolvedEvent.Event.EventNumber
+            );
 
-        return Checkpoint.From(
-            resolvedEvent?.Deserialize<CheckpointStored>()?.Position,
-            resolvedEvent?.Event.EventNumber
-        );
+        throw new InvalidOperationException("Didn't find Checkpoint!");
     }
 
     public async ValueTask<StoreResult> Store(

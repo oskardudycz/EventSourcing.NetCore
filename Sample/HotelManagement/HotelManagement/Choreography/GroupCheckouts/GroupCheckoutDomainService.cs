@@ -69,7 +69,7 @@ public class GuestStayDomainService(IDocumentSession documentSession, IAsyncComm
             }
         }
 
-        return documentSession.GetAndUpdate<GroupCheckout>(@event.GroupCheckOutId.ToString(), OnInitiated, ct);
+        return documentSession.GetAndUpdate<GroupCheckout>(@event.GroupCheckOutId.ToString(), OnInitiated, GroupCheckout.Initial, ct);
     }
 
     public Task Handle(GuestStayAccounts.GuestCheckedOut @event, CancellationToken ct)
@@ -79,6 +79,7 @@ public class GuestStayDomainService(IDocumentSession documentSession, IAsyncComm
 
         return documentSession.GetAndUpdate<GroupCheckout>(@event.GroupCheckOutId.Value.ToString(),
             groupCheckout => groupCheckout.RecordGuestCheckoutCompletion(@event.GuestStayId, @event.CheckedOutAt),
+            GroupCheckout.Initial,
             ct
         );
     }
@@ -91,6 +92,7 @@ public class GuestStayDomainService(IDocumentSession documentSession, IAsyncComm
         return documentSession.GetAndUpdate<GroupCheckout>(@event.GroupCheckOutId.Value.ToString(),
             groupCheckout =>
                 groupCheckout.RecordGuestCheckoutFailure(@event.GuestStayId, @event.FailedAt),
+            GroupCheckout.Initial,
             ct
         );
     }

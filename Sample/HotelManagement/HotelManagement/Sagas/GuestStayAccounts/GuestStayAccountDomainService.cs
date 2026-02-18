@@ -42,7 +42,8 @@ public class GuestStayDomainService(IDocumentSession documentSession):
         documentSession.GetAndUpdate(
             command.GuestStayId,
             command.ExpectedVersion,
-            (GuestStayAccount state) => state.RecordCharge(command.Amount, DateTimeOffset.UtcNow),
+            state => state.RecordCharge(command.Amount, DateTimeOffset.UtcNow),
+            GuestStayAccount.Initial,
             ct
         );
 
@@ -50,14 +51,16 @@ public class GuestStayDomainService(IDocumentSession documentSession):
         documentSession.GetAndUpdate(
             command.GuestStayId,
             command.ExpectedVersion,
-            (GuestStayAccount state) => state.RecordPayment(command.Amount, DateTimeOffset.UtcNow),
+            state => state.RecordPayment(command.Amount, DateTimeOffset.UtcNow),
+            GuestStayAccount.Initial,
             ct
         );
 
     public Task Handle(CheckOutGuest command, CancellationToken ct) =>
         documentSession.GetAndUpdate(
             command.GuestStayId,
-            (GuestStayAccount state) => state.CheckOut(DateTimeOffset.UtcNow).FlatMap(),
+            state => state.CheckOut(DateTimeOffset.UtcNow).FlatMap(),
+            GuestStayAccount.Initial,
             ct
         );
 }

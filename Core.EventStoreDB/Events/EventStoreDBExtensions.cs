@@ -1,4 +1,3 @@
-using System.Xml;
 using Core.EventStoreDB.Serialization;
 using Core.Exceptions;
 using Core.OpenTelemetry;
@@ -26,13 +25,10 @@ public static class EventStoreDBExtensions
         if (await readResult.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
             return null;
 
-        return await readResult
-            .Select(@event => @event.Deserialize()!)
-            .AggregateAsync(
-                ObjectFactory<TEntity>.GetDefaultOrUninitialized(),
-                when,
-                cancellationToken
-            ).ConfigureAwait(false);
+        var result = ObjectFactory<TEntity>.GetDefaultOrUninitialized();
+        await foreach (var @event in readResult)
+            result = when(result, @event);
+        return result;
     }
 
     public static async Task<TEntity> Find<TEntity>(
@@ -52,13 +48,10 @@ public static class EventStoreDBExtensions
         if (await readResult.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
             throw AggregateNotFoundException.For<TEntity>(id);
 
-        return await readResult
-            .Select(@event => @event.Deserialize()!)
-            .AggregateAsync(
-                getDefault(),
-                when,
-                cancellationToken
-            ).ConfigureAwait(false);
+        var result = getDefault();
+        await foreach (var @event in readResult)
+            result = when(result, @event);
+        return result;
     }
 
     public static async Task<List<object>> ReadStream(
@@ -76,9 +69,10 @@ public static class EventStoreDBExtensions
         if (await readResult.ReadState.ConfigureAwait(false) == ReadState.StreamNotFound)
             return [];
 
-        return await readResult
-            .Select(@event => @event.Deserialize()!)
-            .ToListAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+        var result =  new List<object>();
+        await foreach (var @event in readResult)
+            result.Add(@event);
+        return result;
     }
 
     public static async Task<ulong> Append(
@@ -147,7 +141,10 @@ public static class EventStoreDBExtensions
             return null;
         }
 
-        return await result.FirstAsync(ct).ConfigureAwait(false);
+        await foreach (var @event in result)
+            return @event;
+
+        return null;
     }
 
     public static async Task AppendToStreamWithSingleEvent(

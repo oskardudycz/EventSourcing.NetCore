@@ -48,21 +48,24 @@ public class GuestStayDomainService(IDocumentSession documentSession):
     public Task Handle(RecordGuestCheckoutsInitiation command, CancellationToken ct) =>
         documentSession.GetAndUpdate(
             command.GroupCheckoutId,
-            (GroupCheckout state) => state.RecordGuestCheckoutsInitiation(command.InitiatedGuestStayIds, DateTimeOffset.UtcNow),
+            state => state.RecordGuestCheckoutsInitiation(command.InitiatedGuestStayIds, DateTimeOffset.UtcNow),
+            GroupCheckout.Initial,
             ct
         );
 
     public Task Handle(RecordGuestCheckoutCompletion command, CancellationToken ct) =>
         documentSession.GetAndUpdate(
             command.GuestStayId,
-            (GroupCheckout state) => state.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt),
+            state => state.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt),
+            GroupCheckout.Initial,
             ct
         );
 
     public Task Handle(RecordGuestCheckoutFailure command, CancellationToken ct) =>
         documentSession.GetAndUpdate(
             command.GuestStayId,
-            (GroupCheckout state) => state.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt),
+            state => state.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt),
+            GroupCheckout.Initial,
             ct
         );
 }

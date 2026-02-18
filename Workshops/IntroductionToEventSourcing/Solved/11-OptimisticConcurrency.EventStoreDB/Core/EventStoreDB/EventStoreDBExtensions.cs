@@ -32,32 +32,27 @@ public static class EventStoreDBExtensions
         CancellationToken cancellationToken = default
     ) where T : class
     {
-        var result = eventStore.ReadStreamAsync(
+        var readResult = eventStore.ReadStreamAsync(
             Direction.Forwards,
             ToStreamName<T>(id),
             StreamPosition.Start,
             cancellationToken: cancellationToken
         );
 
-        if (await result.ReadState == ReadState.StreamNotFound)
+        if (await readResult.ReadState == ReadState.StreamNotFound)
             return (null, null);
 
         StreamRevision? revision = null;
-        var state = await result
-            .Select(@event =>
-                {
-                    revision = StreamRevision.FromStreamPosition(@event.Event.EventNumber);
-                    return (TEvent)JsonSerializer.Deserialize(
-                        @event.Event.Data.Span,
-                        Type.GetType(@event.Event.EventType, true)!
-                    )!;
-                }
-            )
-            .AggregateAsync(
-                getInitial(),
-                evolve,
-                cancellationToken
-            );
+
+        var state = getInitial();
+        await foreach (var @event in readResult)
+        {
+            revision = StreamRevision.FromStreamPosition(@event.Event.EventNumber);
+            state = evolve(state, (TEvent)JsonSerializer.Deserialize(
+                @event.Event.Data.Span,
+                Type.GetType(@event.Event.EventType, true)!
+            )!);
+        }
 
         return (state, revision);
     }

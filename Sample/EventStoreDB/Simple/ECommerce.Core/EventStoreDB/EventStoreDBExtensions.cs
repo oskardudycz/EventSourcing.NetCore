@@ -24,13 +24,10 @@ public static class EventStoreDBExtensions
         if (await readResult.ReadState == ReadState.StreamNotFound)
             throw AggregateNotFoundException.For<TEntity>(id);
 
-        return await readResult
-            .Select(@event => @event.Deserialize()!)
-            .AggregateAsync(
-                getDefault(),
-                when,
-                cancellationToken
-            );
+        var result = getDefault();
+        await foreach (var @event in readResult)
+            result = when(result, @event);
+        return result;
     }
 
     public static async Task<List<object>> ReadStream(
@@ -48,9 +45,10 @@ public static class EventStoreDBExtensions
         if (await readResult.ReadState == ReadState.StreamNotFound)
             return [];
 
-        return await readResult
-            .Select(@event => @event.Deserialize()!)
-            .ToListAsync(cancellationToken: cancellationToken);
+        var result = new List<object>();
+        await foreach (var @event in readResult)
+            result.Add(@event.Deserialize()!);
+        return result;
     }
 
     public static async Task<ulong> Append(

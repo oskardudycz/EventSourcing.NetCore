@@ -46,6 +46,7 @@ public record GuestStayAccount(
     GuestStayAccountStatus Status = GuestStayAccountStatus.Opened
 )
 {
+    public static Func<GuestStayAccount> Initial = () => new GuestStayAccount(Guid.Empty);
     public bool IsSettled => Balance == 0;
 
     public static GuestCheckedIn CheckIn(Guid guestStayId, DateTimeOffset now) => new(guestStayId, now);

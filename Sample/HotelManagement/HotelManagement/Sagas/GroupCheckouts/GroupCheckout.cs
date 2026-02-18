@@ -47,6 +47,9 @@ public record GroupCheckoutFailed(
         CheckoutStatus Status = CheckoutStatus.Initiated
     )
     {
+        public static Func<GroupCheckout> Initial = () =>
+            new GroupCheckout(Guid.Empty, new Dictionary<Guid, CheckoutStatus>());
+
         public static GroupCheckoutInitiated Initiate(Guid groupCheckoutId, Guid clerkId, Guid[] guestStayIds, DateTimeOffset initiatedAt) =>
             new(groupCheckoutId, clerkId, guestStayIds, initiatedAt);
 
