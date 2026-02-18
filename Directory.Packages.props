@@ -17,7 +17,7 @@
     <PackageVersion Include="Dapper" Version="2.1.66" />
     <PackageVersion Include="Dapper.Contrib" Version="2.0.78" />
     <PackageVersion Include="Elastic.Clients.Elasticsearch" Version="8.17.1" />
-    <PackageVersion Include="EventStore.Client.Grpc.Streams" Version="23.3.8" />
+    <PackageVersion Include="EventStore.Client.Grpc.Streams" Version="23.3.9" />
     <PackageVersion Include="FluentAssertions" Version="7.2.0" />
     <PackageVersion Include="GitHubActionsTestLogger" Version="2.4.1" />
     <PackageVersion Include="JsonNet.PrivateSettersContractResolvers" Version="1.0.0" />

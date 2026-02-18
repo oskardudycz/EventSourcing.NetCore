@@ -1,5 +1,3 @@
-extern alias SystemLinqAsync;
-using SystemLinqAsync::System.Linq;
 using System.Text.Json;
 using EventStore.Client;
 using OptimisticConcurrency.Core.Entities;
@@ -34,29 +32,23 @@ public static class EventStoreDBExtensions
         CancellationToken cancellationToken = default
     ) where T : class
     {
-        var result = eventStore.ReadStreamAsync(
+        var readResult = eventStore.ReadStreamAsync(
             Direction.Forwards,
             ToStreamName<T>(id),
             StreamPosition.Start,
             cancellationToken: cancellationToken
         );
 
-        if (await result.ReadState == ReadState.StreamNotFound)
+        if (await readResult.ReadState == ReadState.StreamNotFound)
             return null;
 
-        return await result
-            .AsAsyncEnumerable()
-            .Select(@event =>
-                (TEvent)JsonSerializer.Deserialize(
-                    @event.Event.Data.Span,
-                    Type.GetType(@event.Event.EventType, true)!
-                )!
-            )
-            .AggregateAsync(
-                getInitial(),
-                evolve,
-                cancellationToken
-            );
+        var result = getInitial();
+        await foreach (var @event in readResult)
+            result = evolve(result, (TEvent)JsonSerializer.Deserialize(
+                @event.Event.Data.Span,
+                Type.GetType(@event.Event.EventType, true)!
+            )!);
+        return result;
     }
 
     public static Task Add<T>(this EventStoreClient eventStore, Guid id, T aggregate, CancellationToken ct)
@@ -121,13 +113,14 @@ public static class EventStoreDBExtensions
     }
 
     private static IEnumerable<EventData> ToEventData(IEnumerable<object> events) =>
-        events.Select(@event =>
-            new EventData(
-                Uuid.NewUuid(),
-                @event.GetType().FullName!,
-                JsonSerializer.SerializeToUtf8Bytes(@event)
-            )
-        );
+        events
+            .Select(@event =>
+                new EventData(
+                    Uuid.NewUuid(),
+                    @event.GetType().FullName!,
+                    JsonSerializer.SerializeToUtf8Bytes(@event)
+                )
+            );
 
     private static string ToStreamName<T>(Guid id) =>
         $"{typeof(T).Name}-{id}";

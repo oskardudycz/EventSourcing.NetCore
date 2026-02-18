@@ -1,6 +1,7 @@
 using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;
+using JasperFx.Events.Projections;
 using Marten;
 using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;

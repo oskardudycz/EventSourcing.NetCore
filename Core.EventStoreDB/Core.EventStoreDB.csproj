@@ -21,9 +21,5 @@
         <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="System.Linq.Async" ExcludeAssets="all" />
-    </ItemGroup>
-
     <Import Project="../Core.Build.props" />
 </Project>

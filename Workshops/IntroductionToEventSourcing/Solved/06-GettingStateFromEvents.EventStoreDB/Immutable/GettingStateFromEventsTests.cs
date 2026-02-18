@@ -83,7 +83,7 @@ public record ShoppingCart(
                                 group.First().UnitPrice
                             )
                         )
-                        .ToArray()
+                        .ToArray(),
                 },
             ProductItemRemovedFromShoppingCart(_, var pricedProductItem) =>
                 shoppingCart with
@@ -94,7 +94,7 @@ public record ShoppingCart(
                             :pi
                         )
                         .Where(pi => pi.Quantity > 0)
-                        .ToArray()
+                        .ToArray(),
                 },
             ShoppingCartConfirmed(_, var confirmedAt) =>
                 shoppingCart with
@@ -127,28 +127,24 @@ public class GettingStateFromEventsTests: EventStoreDBTest
     /// <returns></returns>
     private static async Task<ShoppingCart> GetShoppingCart(EventStoreClient eventStore, string streamName, CancellationToken ct)
     {
-        var result = eventStore.ReadStreamAsync(
+        var readResult = eventStore.ReadStreamAsync(
             Direction.Forwards,
             streamName,
             StreamPosition.Start,
             cancellationToken: ct
         );
 
-        if (await result.ReadState == ReadState.StreamNotFound)
+        if (await readResult.ReadState == ReadState.StreamNotFound)
             throw new InvalidOperationException("Shopping Cart was not found!");
 
-        return await result
-            .Select(@event =>
-                JsonSerializer.Deserialize(
-                    @event.Event.Data.Span,
-                    Type.GetType(@event.Event.EventType, true)!
-                )!
-            )
-            .AggregateAsync(
-                ShoppingCart.Default(),
-                ShoppingCart.Evolve,
-                ct
-            );
+
+        var result = ShoppingCart.Default();
+        await foreach (var @event in readResult)
+            result = ShoppingCart.Evolve(result, JsonSerializer.Deserialize(
+                @event.Event.Data.Span,
+                Type.GetType(@event.Event.EventType, true)!
+            )!);
+        return result;
     }
 
     [Fact]

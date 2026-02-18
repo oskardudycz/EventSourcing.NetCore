@@ -32,28 +32,23 @@ public static class EventStoreDBExtensions
         CancellationToken cancellationToken = default
     ) where T : class
     {
-        var result = eventStore.ReadStreamAsync(
+        var readResult = eventStore.ReadStreamAsync(
             Direction.Forwards,
             ToStreamName<T>(id),
             StreamPosition.Start,
             cancellationToken: cancellationToken
         );
 
-        if (await result.ReadState == ReadState.StreamNotFound)
+        if (await readResult.ReadState == ReadState.StreamNotFound)
             return null;
 
-        return await result
-            .Select(@event =>
-                (TEvent)JsonSerializer.Deserialize(
-                    @event.Event.Data.Span,
-                    Type.GetType(@event.Event.EventType, true)!
-                )!
-            )
-            .AggregateAsync(
-                getInitial(),
-                evolve,
-                cancellationToken
-            );
+        var result = getInitial();
+        await foreach (var @event in readResult)
+            result = evolve(result, (TEvent)JsonSerializer.Deserialize(
+                @event.Event.Data.Span,
+                Type.GetType(@event.Event.EventType, true)!
+            )!);
+        return result;
     }
 
     public static Task Add<T>(this EventStoreClient eventStore, Guid id, T aggregate, CancellationToken ct)
