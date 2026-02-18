@@ -6,7 +6,6 @@
   <ItemGroup>
     <PackageVersion Include="Alba" Version="8.1.1" />
     <PackageVersion Include="Aspire.Confluent.Kafka" Version="9.0.0" />
-    <PackageVersion Include="Aspire.Hosting" Version="9.0.0" />
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="8.2.0" />
     <PackageVersion Include="Aspire.Hosting.Kafka" Version="8.2.0" />
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="8.2.0" />
@@ -87,7 +86,6 @@
     <PackageVersion Include="WolverineFx.Marten" Version="3.9.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
-    <PackageVersion Include="Yarp.ReverseProxy" Version="2.1.0" />
   </ItemGroup>
 
   <!-- F# / ECommerce.Equinox packages -->
@@ -102,7 +100,7 @@
     <PackageVersion Include="Equinox.MemoryStore" Version="4.1.0" />
     <PackageVersion Include="Equinox.SqlStreamStore" Version="4.1.0" />
     <PackageVersion Include="Equinox.SqlStreamStore.MsSql" Version="4.1.0" />
-    <PackageVersion Include="FsCheck.Xunit" Version="3.0.0-rc1" />
+    <PackageVersion Include="FsCheck.Xunit" Version="3.3.0" />
     <PackageVersion Include="FsCodec.SystemTextJson" Version="3.1.0" />
     <PackageVersion Include="prometheus-net.AspNetCore" Version="3.6.0" />
     <PackageVersion Include="Propulsion" Version="3.0.0" />

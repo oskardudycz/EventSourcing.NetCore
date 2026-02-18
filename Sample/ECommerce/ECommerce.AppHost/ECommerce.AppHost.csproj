@@ -10,7 +10,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\SwaggerUi.Aspire.Hosting\SwaggerUi.Aspire.Hosting.csproj" IsAspireProjectResource="false"/>
         <ProjectReference Include="..\Carts\Carts.Api\Carts.Api.csproj"/>
         <ProjectReference Include="..\Orders\Orders.Api\Orders.Api.csproj"/>
         <ProjectReference Include="..\Payments\Payments.Api\Payments.Api.csproj"/>
