@@ -12,6 +12,7 @@ ARG run_codegen=true
 # Setup working directory for project
 WORKDIR /app
 
+COPY --from=root Directory.Packages.props ./
 COPY ./${project_name}.csproj ./
 
 # Restore nuget packages

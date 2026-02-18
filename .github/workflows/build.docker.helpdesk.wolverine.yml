@@ -34,6 +34,8 @@ jobs:
               uses: docker/build-push-action@v4
               with:
                   context: "./Sample/Helpdesk.Wolverine/Helpdesk.Api"
+                  build-contexts: |
+                    root=.
                   push: false
                   tags: oskardudycz/eventsourcing.netcore.helpdesk.wolverine:latest
                   build-args: |
