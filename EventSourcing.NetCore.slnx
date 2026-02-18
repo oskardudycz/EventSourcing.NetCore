@@ -19,7 +19,6 @@
     <Project Path="Core.Tests/Core.Tests.csproj" />
     <Project Path="Core.WebApi/Core.WebApi.csproj" />
     <Project Path="Core/Core.csproj" />
-    <Project Path="SwaggerUi.Aspire.Hosting/SwaggerUi.Aspire.Hosting.csproj" />
   </Folder>
   <Folder Name="/docker/">
     <File Path="docker-compose.yml" />
