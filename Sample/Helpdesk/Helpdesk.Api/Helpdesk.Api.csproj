@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Marten.CommandLine" />
+
         <PackageReference Include="Swashbuckle.AspNetCore" />
         <PackageReference Include="Marten.AspNetCore" />
         <PackageReference Include="Marten" />
