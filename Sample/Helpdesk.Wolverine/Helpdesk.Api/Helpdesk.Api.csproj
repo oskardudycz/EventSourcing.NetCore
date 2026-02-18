@@ -12,7 +12,6 @@
         <PackageReference Include="Marten.AspNetCore" />
         <PackageReference Include="Marten" />
         <PackageReference Include="Confluent.Kafka" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR" />
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
         <PackageReference Include="WolverineFx.Marten" />
         <PackageReference Include="WolverineFx.Http" />

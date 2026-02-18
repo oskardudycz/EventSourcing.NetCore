@@ -16,8 +16,6 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Common" />
     </ItemGroup>
 
     <ItemGroup>

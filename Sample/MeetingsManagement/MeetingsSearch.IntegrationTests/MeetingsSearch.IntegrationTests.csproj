@@ -13,9 +13,6 @@
     <ItemGroup>
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="Marten" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="NSubstitute" />
         <PackageReference Include="GitHubActionsTestLogger">

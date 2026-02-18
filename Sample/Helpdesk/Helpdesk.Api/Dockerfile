@@ -24,9 +24,6 @@ COPY ./ ./
 # Run code generation depending on the build argument
 RUN dotnet run -- codegen write & dotnet run -- codegen test
 
-RUN ls
-RUN ls -R Internal
-
 # Build project with Release configuration
 # and no restore, as we did it already
 RUN dotnet build -c Release --no-restore ./${project_name}.csproj
