@@ -8,7 +8,7 @@
     <PackageVersion Include="Aspire.Confluent.Kafka" Version="13.1.1" />
     <PackageVersion Include="Aspire.Hosting.Kafka" Version="13.1.1" />
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.1.1" />
-    <PackageVersion Include="Aspire.Npgsql" Version="13.1.0" />
+    <PackageVersion Include="Aspire.Npgsql" Version="13.1.1" />
     <PackageVersion Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0" />
     <PackageVersion Include="AutoMapper" Version="14.0.0" />
     <PackageVersion Include="Bogus" Version="35.6.2" />
@@ -21,22 +21,19 @@
     <PackageVersion Include="FluentAssertions" Version="7.2.0" />
     <PackageVersion Include="GitHubActionsTestLogger" Version="2.4.1" />
     <PackageVersion Include="JsonNet.PrivateSettersContractResolvers" Version="1.0.0" />
-    <PackageVersion Include="Marten" Version="7.37.3" />
-    <PackageVersion Include="Marten.AspNetCore" Version="7.37.3" />
-    <PackageVersion Include="Marten.CommandLine" Version="7.37.3" />
+    <PackageVersion Include="Marten" Version="8.22.0" />
+    <PackageVersion Include="Marten.AspNetCore" Version="8.22.0" />
+    <PackageVersion Include="Marten.CommandLine" Version="7.40.5" />
     <PackageVersion Include="MediatR" Version="12.4.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.13" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="18.3.3" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.11.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2" />
@@ -55,10 +52,10 @@
     <PackageVersion Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2" />
     <PackageVersion Include="MongoDB.Driver" Version="3.2.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="Npgsql" Version="8.0.6" />
-    <PackageVersion Include="Npgsql.DependencyInjection" Version="8.0.6" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
-    <PackageVersion Include="Npgsql.OpenTelemetry" Version="8.0.6" />
+    <PackageVersion Include="Npgsql" Version="9.0.3" />
+    <PackageVersion Include="Npgsql.DependencyInjection" Version="9.0.3" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageVersion Include="Npgsql.OpenTelemetry" Version="9.0.3" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="Ogooreck" Version="0.8.2" />
     <PackageVersion Include="Open.ChannelExtensions" Version="9.0.0" />
@@ -82,8 +79,8 @@
     <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.2.0" />
     <PackageVersion Include="Verify.Xunit" Version="28.11.0" />
-    <PackageVersion Include="WolverineFx.Http" Version="3.9.1" />
-    <PackageVersion Include="WolverineFx.Marten" Version="3.9.1" />
+    <PackageVersion Include="WolverineFx.Http" Version="5.16.1" />
+    <PackageVersion Include="WolverineFx.Marten" Version="5.16.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
