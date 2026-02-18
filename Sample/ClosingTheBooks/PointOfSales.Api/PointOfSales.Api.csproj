@@ -11,7 +11,7 @@
         <PackageReference Include="Swashbuckle.AspNetCore"/>
         <PackageReference Include="Marten" />
         <PackageReference Include="Marten.AspNetCore" />
-        <PackageReference Include="Marten.CommandLine" />
+
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
     </ItemGroup>
 
