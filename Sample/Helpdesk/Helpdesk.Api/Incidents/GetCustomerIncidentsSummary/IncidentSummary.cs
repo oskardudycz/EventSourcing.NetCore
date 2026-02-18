@@ -1,5 +1,6 @@
 using Marten;
-using Marten.Events;
+using JasperFx.Events;
+using JasperFx.Events.Grouping;
 using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 
@@ -55,7 +56,7 @@ public class CustomerIncidentsSummaryGrouper: IAggregateGrouper<Guid>
         typeof(IncidentClosed)
     ];
 
-    public async Task Group(IQuerySession session, IEnumerable<IEvent> events, ITenantSliceGroup<Guid> grouping)
+    public async Task Group(IQuerySession session, IEnumerable<IEvent> events, IEventGrouping<Guid> grouping)
     {
         var filteredEvents = events
             .Where(ev => eventTypes.Contains(ev.EventType))

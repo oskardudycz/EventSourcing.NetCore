@@ -74,6 +74,8 @@ public record Incident(
     bool HasOutstandingResponseToCustomer = false
 )
 {
+    public static Func<Incident> Initial = () => new Incident(Guid.Empty, default);
+
     public static Incident Create(IncidentLogged logged) =>
         new(logged.IncidentId, IncidentStatus.Pending);
 

@@ -1,4 +1,4 @@
-﻿using Weasel.Core;
+﻿using JasperFx;
 
 namespace Marten.Integration.Tests.TestsInfrastructure;
 

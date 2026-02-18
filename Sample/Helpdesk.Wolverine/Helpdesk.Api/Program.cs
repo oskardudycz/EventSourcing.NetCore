@@ -3,14 +3,13 @@ using Helpdesk.Api.Core.Http.Middlewares.ExceptionHandling;
 using Helpdesk.Api.Core.Kafka;
 using Helpdesk.Api.Core.SignalR;
 using Helpdesk.Api.Incidents;
+using JasperFx;
 using JasperFx.CodeGeneration;
+using JasperFx.Events.Daemon;
+using JasperFx.Resources;
 using Marten;
-using Marten.Events.Daemon.Resiliency;
-using Marten.Exceptions;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;
-using Oakton;
-using Oakton.Resources;
 using Weasel.Core;
 using Wolverine;
 using Wolverine.Http;
@@ -20,12 +19,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 #pragma warning disable CS0618 // Type or member is obsolete
 builder.Services
-    .AddDefaultExceptionHandler(
-        (exception, _) => exception switch
-        {
-            ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-            _ => null
-        })
+    .AddDefaultExceptionHandler((exception, _) => exception switch
+    {
+        ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+        _ => null
+    })
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddMarten(sp =>
@@ -56,7 +54,6 @@ builder.Services
         options.DisableNpgsqlLogging = true;
         return options;
     })
-    .OptimizeArtifactWorkflow(TypeLoadMode.Static)
     .UseLightweightSessions()
     .AddSubscriptionWithServices<KafkaProducer>(ServiceLifetime.Singleton)
     .AddSubscriptionWithServices<SignalRProducer<IncidentsHub>>(ServiceLifetime.Singleton)
@@ -68,7 +65,12 @@ builder.Services
     .EventForwardingToWolverine();
 #pragma warning restore CS0618 // Type or member is obsolete
 
-builder.Services.AddResourceSetupOnStartup();
+builder.Services.AddResourceSetupOnStartup()
+    .CritterStackDefaults(x =>
+    {
+        x.Production.GeneratedCodeMode = TypeLoadMode.Static;
+        x.Production.ResourceAutoCreate = AutoCreate.None;
+    });
 
 builder.Services
     .AddCors(options =>
@@ -84,7 +86,7 @@ builder.Services
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
     .AddSignalR();
 
-builder.Host.ApplyOaktonExtensions();
+builder.Host.ApplyJasperFxExtensions();
 // Configure Wolverine
 builder.Host.UseWolverine(opts =>
 {
@@ -108,7 +110,7 @@ app.MapHub<IncidentsHub>("/hubs/incidents");
 // Let's add in Wolverine HTTP endpoints to the routing tree
 app.MapWolverineEndpoints();
 
-return await app.RunOaktonCommands(args);
+return await app.RunJasperFxCommands(args);
 
 public class IncidentsHub: Hub;
 

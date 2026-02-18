@@ -26,7 +26,7 @@ public static class Api
                 Guid clientId,
                 CancellationToken ct) =>
             {
-                var shoppingCartId = CombGuidIdGeneration.NewGuid();
+                var shoppingCartId = Guid.CreateVersion7();
 
                 await session.Add(shoppingCartId,
                     MutableShoppingCart.Open(shoppingCartId, clientId.NotEmpty(), Now), ct);

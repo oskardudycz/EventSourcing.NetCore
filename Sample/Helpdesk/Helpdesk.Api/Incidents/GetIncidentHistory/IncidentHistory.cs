@@ -1,4 +1,4 @@
-using Marten.Events;
+using JasperFx.Events;
 using Marten.Events.Projections;
 using Marten.Schema.Identity;
 
@@ -17,7 +17,7 @@ public class IncidentHistoryTransformation: EventProjection
         var (incidentId, customerId, contact, description, loggedBy, loggedAt) = input.Data;
 
         return new IncidentHistory(
-            CombGuidIdGeneration.NewGuid(),
+            Guid.CreateVersion7(),
             incidentId,
             $"['{loggedAt}'] Logged Incident with id: '{incidentId}' for customer '{customerId}' and description `{description}' through {contact} by '{loggedBy}'"
         );
@@ -28,7 +28,7 @@ public class IncidentHistoryTransformation: EventProjection
         var (incidentId, category, categorisedBy, categorisedAt) = input.Data;
 
         return new IncidentHistory(
-            CombGuidIdGeneration.NewGuid(),
+            Guid.CreateVersion7(),
             incidentId,
             $"[{categorisedAt}] Categorised Incident with id: '{incidentId}' as {category} by {categorisedBy}"
         );
@@ -39,7 +39,7 @@ public class IncidentHistoryTransformation: EventProjection
         var (incidentId, priority, prioritisedBy, prioritisedAt) = input.Data;
 
         return new IncidentHistory(
-            CombGuidIdGeneration.NewGuid(),
+            Guid.CreateVersion7(),
             incidentId,
             $"[{prioritisedAt}] Prioritised Incident with id: '{incidentId}' as '{priority}' by {prioritisedBy}"
         );
@@ -50,7 +50,7 @@ public class IncidentHistoryTransformation: EventProjection
         var (incidentId, agentId, assignedAt) = input.Data;
 
         return new IncidentHistory(
-            CombGuidIdGeneration.NewGuid(),
+            Guid.CreateVersion7(),
             incidentId,
             $"[{assignedAt}] Assigned agent `{agentId} to incident with id: '{incidentId}'"
         );
@@ -61,7 +61,7 @@ public class IncidentHistoryTransformation: EventProjection
         var (incidentId, response, respondedAt) = input.Data;
 
         return new IncidentHistory(
-            CombGuidIdGeneration.NewGuid(),
+            Guid.CreateVersion7(),
             incidentId,
             $"[{respondedAt}] Agent '{response.CustomerId}' responded with response '{response.Content}' to Incident with id: '{incidentId}'"
         );
@@ -74,7 +74,7 @@ public class IncidentHistoryTransformation: EventProjection
         var responseVisibility = response.VisibleToCustomer ? "public" : "private";
 
         return new IncidentHistory(
-            CombGuidIdGeneration.NewGuid(),
+            Guid.CreateVersion7(),
             incidentId,
             $"[{respondedAt}] Agent '{response.AgentId}' responded with {responseVisibility} response '{response.Content}' to Incident with id: '{incidentId}'"
         );
@@ -85,7 +85,7 @@ public class IncidentHistoryTransformation: EventProjection
         var (incidentId, resolution, resolvedBy, resolvedAt) = input.Data;
 
         return new IncidentHistory(
-            CombGuidIdGeneration.NewGuid(),
+            Guid.CreateVersion7(),
             incidentId,
             $"[{resolvedAt}] Resolved Incident with id: '{incidentId}' with resolution `{resolution} by '{resolvedBy}'"
         );
@@ -96,7 +96,7 @@ public class IncidentHistoryTransformation: EventProjection
         var (incidentId, acknowledgedBy, acknowledgedAt) = input.Data;
 
         return new IncidentHistory(
-            CombGuidIdGeneration.NewGuid(),
+            Guid.CreateVersion7(),
             incidentId,
             $"[{acknowledgedAt}] Customer '{acknowledgedBy}' acknowledged resolution of Incident with id: '{incidentId}'"
         );
@@ -107,7 +107,7 @@ public class IncidentHistoryTransformation: EventProjection
         var (incidentId, closedBy, closedAt) = input.Data;
 
         return new IncidentHistory(
-            CombGuidIdGeneration.NewGuid(),
+            Guid.CreateVersion7(),
             incidentId,
             $"[{closedAt}] Agent '{closedBy}' closed Incident with id: '{incidentId}'"
         );

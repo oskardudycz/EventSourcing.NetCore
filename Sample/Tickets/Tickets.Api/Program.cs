@@ -5,6 +5,7 @@ using Core.Serialization.Newtonsoft;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
+using JasperFx;
 using Marten.Exceptions;
 using Microsoft.OpenApi.Models;
 using Npgsql;

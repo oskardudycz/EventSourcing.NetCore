@@ -3,8 +3,9 @@ using Core.Ids;
 using Core.Marten.Commands;
 using Core.Marten.Ids;
 using Core.Marten.Subscriptions;
+using JasperFx;
+using JasperFx.Events.Daemon;
 using Marten;
-using Marten.Events.Daemon;
 using Marten.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,7 +58,7 @@ public static class MartenConfigExtensions
     )
     {
         var config = services
-            .AddScoped<IIdGenerator, MartenIdGenerator>()
+            .AddScoped<IIdGenerator, UUIDv7IdGenerator>()
             .AddMarten(sp =>
             {
                 var dataSource = sp.GetService<NpgsqlDataSource>();

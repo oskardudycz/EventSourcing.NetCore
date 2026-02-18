@@ -34,7 +34,7 @@ public abstract class MartenTest(
 
     protected string ConnectionString => postgreSqlContainer.GetConnectionString();
 
-    protected IEventStore EventStore => Session.Events;
+    protected IEventStoreOperations EventStore => Session.Events;
 
     protected readonly string SchemaName = useRandomSchema ? "sch" + Guid.NewGuid().ToString("N") : "EventStore";
 

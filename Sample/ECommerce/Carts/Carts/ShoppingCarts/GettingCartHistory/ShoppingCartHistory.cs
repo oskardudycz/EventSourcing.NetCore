@@ -3,7 +3,7 @@ using Carts.ShoppingCarts.CancelingCart;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.ShoppingCarts.OpeningCart;
 using Carts.ShoppingCarts.RemovingProduct;
-using Marten.Events;
+using JasperFx.Events;
 using Marten.Events.Projections;
 
 namespace Carts.ShoppingCarts.GettingCartHistory;

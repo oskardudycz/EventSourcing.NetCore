@@ -5,6 +5,7 @@ using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
+using JasperFx;
 using Marten.Exceptions;
 using MeetingsManagement;
 using Microsoft.OpenApi.Models;

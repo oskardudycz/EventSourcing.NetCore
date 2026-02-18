@@ -1,14 +1,13 @@
 using System.Text.Json.Serialization;
 using Helpdesk.Api.Core.Http.Middlewares.ExceptionHandling;
+using JasperFx;
 using JasperFx.CodeGeneration;
 using Marten;
 using Marten.AspNetCore;
-using Marten.Events;
-using Marten.Events.Daemon.Resiliency;
-using Marten.Events.Projections;
+using JasperFx.Events;
+using JasperFx.Events.Daemon;
+using JasperFx.Events.Projections;
 using Marten.Exceptions;
-using Marten.Schema.Identity;
-using Oakton;
 using PointOfSales.Api.Core;
 using PointOfSales.Api.Core.Marten;
 using PointOfSales.CashierShifts;
@@ -29,15 +28,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
-    .AddDefaultExceptionHandler(
-        (exception, _) => exception switch
-        {
-            ConcurrencyException =>
-                exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-            ExistingStreamIdCollisionException =>
-                exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-            _ => null,
-        })
+    .AddDefaultExceptionHandler((exception, _) => exception switch
+    {
+        ConcurrencyException =>
+            exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+        ExistingStreamIdCollisionException =>
+            exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+        _ => null,
+    })
     .AddMarten(options =>
     {
         var schemaName = Environment.GetEnvironmentVariable("SchemaName") ?? "PointOfSales";
@@ -126,10 +124,13 @@ app.MapPost("/api/cash-registers/{cashRegisterId}/cashier-shifts/{shiftNumber:in
     ) =>
     {
         var cashierShiftId = new CashierShiftId(cashRegisterId, shiftNumber);
-        var transactionId = CombGuidIdGeneration.NewGuid().ToString();
+        var transactionId = Guid.CreateVersion7().ToString();
 
         return documentSession.GetAndUpdate<CashierShift, CashierShiftEvent>(cashierShiftId, ToExpectedVersion(eTag),
-            state => Decide(new RegisterTransaction(cashierShiftId, transactionId, body.Amount, Now), state), ct);
+            state => Decide(new RegisterTransaction(cashierShiftId, transactionId, body.Amount, Now), state),
+            CashierShift.Initial,
+            ct
+        );
     }
 );
 
@@ -146,7 +147,10 @@ app.MapPost("/api/cash-registers/{cashRegisterId}/cashier-shifts/{shiftNumber:in
         var cashierShiftId = new CashierShiftId(cashRegisterId, shiftNumber);
 
         return documentSession.GetAndUpdate<CashierShift, CashierShiftEvent>(cashierShiftId, ToExpectedVersion(eTag),
-            state => Decide(new CloseShift(cashierShiftId, body.DeclaredTender, Now), state), ct);
+            state => Decide(new CloseShift(cashierShiftId, body.DeclaredTender, Now), state),
+            CashierShift.Initial,
+            ct
+        );
     }
 );
 
@@ -191,7 +195,7 @@ if (app.Environment.IsDevelopment())
         .UseSwaggerUI();
 }
 
-return await app.RunOaktonCommands(args);
+return await app.RunJasperFxCommands(args);
 
 public record OpenShiftRequest(
     string CashierId

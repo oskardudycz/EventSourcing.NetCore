@@ -1,9 +1,9 @@
 using FluentAssertions;
+using JasperFx;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Marten.Schema;
 using Newtonsoft.Json;
-using Weasel.Core;
 using Xunit;
 
 namespace Marten.Integration.Tests.CompositeIds;

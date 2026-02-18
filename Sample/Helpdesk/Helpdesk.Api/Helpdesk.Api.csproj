@@ -16,10 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Internal\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <_ContentIncludedByDefault Remove="out\out\web.config" />
       <_ContentIncludedByDefault Remove="out\web.config" />
       <_ContentIncludedByDefault Remove="out\appsettings.Development.json" />

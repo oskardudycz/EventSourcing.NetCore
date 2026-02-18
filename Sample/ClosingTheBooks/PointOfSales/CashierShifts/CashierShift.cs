@@ -7,6 +7,8 @@ public record CashierShift
 {
     public record NonExisting: CashierShift;
 
+    public static Func<CashierShift> Initial = () => new NonExisting();
+
     public record Opened(
         CashierShiftId ShiftId,
         // The amount of money in a cash register or till before and after a person's shift

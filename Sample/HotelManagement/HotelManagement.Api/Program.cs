@@ -56,7 +56,7 @@ var app = builder.Build();
 
 app.MapPost("/api/chain", async (IDocumentSession session, string name, CancellationToken ct) =>
 {
-    var chainId = CombGuidIdGeneration.NewGuid();
+    var chainId = Guid.CreateVersion7();
     var @event = new HotelChainSetUp(chainId, name);
 
     var correlationId = Guid.NewGuid().ToString();

@@ -24,10 +24,11 @@ public static class DocumentSessionExtensionsWithOpenTelemetry
         Guid id,
         int version,
         Func<T, object> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.WithTelemetry<T>(
-            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, version, handle, token),
+            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, version, handle, initial, token),
             ct
         );
 
@@ -35,10 +36,11 @@ public static class DocumentSessionExtensionsWithOpenTelemetry
         this IDocumentSession documentSession,
         Guid id,
         Func<T, object> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.WithTelemetry<T>(
-            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, handle, token),
+            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, handle, initial, token),
             ct
         );
 
@@ -46,10 +48,11 @@ public static class DocumentSessionExtensionsWithOpenTelemetry
         this IDocumentSession documentSession,
         Guid id,
         Func<T, Maybe<TEvent>> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.WithTelemetry<T>(
-            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, handle, token),
+            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, handle, initial, token),
             ct
         );
 
@@ -57,10 +60,11 @@ public static class DocumentSessionExtensionsWithOpenTelemetry
         this IDocumentSession documentSession,
         Guid id,
         Func<T, Maybe<object>> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.WithTelemetry<T>(
-            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, handle, token),
+            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, handle, initial, token),
             ct
         );
 
@@ -68,10 +72,11 @@ public static class DocumentSessionExtensionsWithOpenTelemetry
         this IDocumentSession documentSession,
         Guid id,
         Func<T, Maybe<object[]>> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.WithTelemetry<T>(
-            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, handle, token),
+            token => DocumentSessionExtensions.GetAndUpdate(documentSession, id, handle, initial, token),
             ct
         );
 

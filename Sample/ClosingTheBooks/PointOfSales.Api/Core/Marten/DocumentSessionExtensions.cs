@@ -24,11 +24,12 @@ public static class DocumentSessionExtensions
         string id,
         int version,
         Func<T, TEvent[]> handle,
+        Func<T> initial,
         CancellationToken ct
     ) where T : class =>
         documentSession.Events.WriteToAggregate<T>(id, version, stream =>
         {
-            var result = handle(stream.Aggregate);
+            var result = handle(stream.Aggregate ?? initial());
             if (result.Length != 0)
                 stream.AppendMany(result.Cast<object>().ToArray());
         }, ct);

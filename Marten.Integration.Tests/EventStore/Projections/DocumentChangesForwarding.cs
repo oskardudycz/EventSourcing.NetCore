@@ -1,7 +1,7 @@
 using Core.Testing;
+using JasperFx.Events.Daemon;
+using JasperFx.Events.Projections;
 using Marten.Events.Aggregation;
-using Marten.Events.Daemon.Resiliency;
-using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Marten.Services;
 using Microsoft.Extensions.DependencyInjection;

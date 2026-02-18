@@ -1,6 +1,6 @@
 // using System;
 // using System.Linq;
-// using Marten.Events;
+// using JasperFx.Events;
 // using Marten.Events.Projections;
 // using Marten.Integration.Tests.TestsInfrasructure;
 // using SharpTestsEx;

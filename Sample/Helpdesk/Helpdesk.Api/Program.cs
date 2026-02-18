@@ -8,19 +8,18 @@ using Helpdesk.Api.Incidents.GetCustomerIncidentsSummary;
 using Helpdesk.Api.Incidents.GetIncidentDetails;
 using Helpdesk.Api.Incidents.GetIncidentHistory;
 using Helpdesk.Api.Incidents.GetIncidentShortInfo;
+using JasperFx;
 using JasperFx.CodeGeneration;
 using Marten;
 using Marten.AspNetCore;
-using Marten.Events;
-using Marten.Events.Daemon.Resiliency;
-using Marten.Events.Projections;
+using JasperFx.Events;
+using JasperFx.Events.Daemon;
+using JasperFx.Events.Projections;
 using Marten.Pagination;
-using Marten.Schema.Identity;
 using Marten.Storage;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Oakton;
 using Weasel.Core;
 using static Microsoft.AspNetCore.Http.TypedResults;
 using static Helpdesk.Api.Incidents.IncidentService;
@@ -66,8 +65,6 @@ builder.Services
         options.Projections.Add<IncidentShortInfoProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<CustomerIncidentsSummaryProjection>(ProjectionLifecycle.Async);
 
-        options.ApplicationAssembly = typeof(CustomerIncidentsSummaryProjection).Assembly;
-
         return options;
     })
     .AddSubscriptionWithServices<KafkaProducer>(ServiceLifetime.Singleton)
@@ -81,6 +78,7 @@ builder.Services.CritterStackDefaults(x =>
 {
     x.Production.GeneratedCodeMode = TypeLoadMode.Static;
     x.Production.ResourceAutoCreate = AutoCreate.None;
+    x.ApplicationAssembly = typeof(CustomerIncidentsSummaryProjection).Assembly;
 });
 
 // Header forwarding to enable Swagger in Nginx
@@ -120,7 +118,7 @@ customersIncidents.MapPost("",
         CancellationToken ct) =>
     {
         var (contact, description) = body;
-        var incidentId = CombGuidIdGeneration.NewGuid();
+        var incidentId = Guid.CreateVersion7();
 
         await documentSession.Add<Incident>(incidentId,
             Handle(new LogIncident(incidentId, customerId, contact, description, customerId, Now)), ct);
@@ -139,7 +137,7 @@ agentIncidents.MapPost("{incidentId:guid}/category",
             CancellationToken ct
         ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new CategoriseIncident(incidentId, body.Category, agentId, Now)), ct)
+            state => Handle(state, new CategoriseIncident(incidentId, body.Category, agentId, Now)), Incident.Initial, ct)
 );
 
 agentIncidents.MapPost("{incidentId:guid}/priority",
@@ -152,7 +150,7 @@ agentIncidents.MapPost("{incidentId:guid}/priority",
             CancellationToken ct
         ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new PrioritiseIncident(incidentId, body.Priority, agentId, Now)), ct)
+            state => Handle(state, new PrioritiseIncident(incidentId, body.Priority, agentId, Now)), Incident.Initial, ct)
 );
 
 agentIncidents.MapPost("{incidentId:guid}/assign",
@@ -164,7 +162,7 @@ agentIncidents.MapPost("{incidentId:guid}/assign",
             CancellationToken ct
         ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new AssignAgentToIncident(incidentId, agentId, Now)), ct)
+            state => Handle(state, new AssignAgentToIncident(incidentId, agentId, Now)), Incident.Initial, ct)
 );
 
 customersIncidents.MapPost("{incidentId:guid}/responses/",
@@ -179,7 +177,7 @@ customersIncidents.MapPost("{incidentId:guid}/responses/",
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
             state => Handle(state,
                 new RecordCustomerResponseToIncident(incidentId,
-                    new IncidentResponse.FromCustomer(customerId, body.Content), Now)), ct)
+                    new IncidentResponse.FromCustomer(customerId, body.Content), Now)), Incident.Initial, ct)
 );
 
 agentIncidents.MapPost("{incidentId:guid}/responses/",
@@ -197,7 +195,7 @@ agentIncidents.MapPost("{incidentId:guid}/responses/",
         return documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
             state => Handle(state,
                 new RecordAgentResponseToIncident(incidentId,
-                    new IncidentResponse.FromAgent(agentId, content, visibleToCustomer), Now)), ct);
+                    new IncidentResponse.FromAgent(agentId, content, visibleToCustomer), Now)), Incident.Initial, ct);
     }
 );
 
@@ -211,7 +209,7 @@ agentIncidents.MapPost("{incidentId:guid}/resolve",
             CancellationToken ct
         ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new ResolveIncident(incidentId, body.Resolution, agentId, Now)), ct)
+            state => Handle(state, new ResolveIncident(incidentId, body.Resolution, agentId, Now)), Incident.Initial, ct)
 );
 
 customersIncidents.MapPost("{incidentId:guid}/acknowledge",
@@ -223,7 +221,7 @@ customersIncidents.MapPost("{incidentId:guid}/acknowledge",
             CancellationToken ct
         ) =>
         documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new AcknowledgeResolution(incidentId, customerId, Now)), ct)
+            state => Handle(state, new AcknowledgeResolution(incidentId, customerId, Now)), Incident.Initial, ct)
 );
 
 agentIncidents.MapPost("{incidentId:guid}/close",
@@ -235,7 +233,7 @@ agentIncidents.MapPost("{incidentId:guid}/close",
         CancellationToken ct) =>
     {
         await documentSession.GetAndUpdate<Incident>(incidentId, ToExpectedVersion(eTag),
-            state => Handle(state, new CloseIncident(incidentId, agentId, Now)), ct);
+            state => Handle(state, new CloseIncident(incidentId, agentId, Now)), Incident.Initial, ct);
 
         return Ok();
     }
@@ -263,7 +261,7 @@ customersIncidents.MapGet("incidents-summary",
         querySession.Json.WriteById<CustomerIncidentsSummary>(customerId, context)
 );
 
-app//.UseExceptionHandler()
+app //.UseExceptionHandler()
     .UseSwagger()
     .UseSwaggerUI()
     .UseForwardedHeaders(); // Header forwarding to enable Swagger in Nginx
@@ -272,7 +270,7 @@ app//.UseExceptionHandler()
 app.UseCors("ClientPermission");
 app.MapHub<IncidentsHub>("/hubs/incidents");
 
-return await app.RunOaktonCommands(args);
+return await app.RunJasperFxCommands(args);
 
 public class IncidentsHub: Hub;
 

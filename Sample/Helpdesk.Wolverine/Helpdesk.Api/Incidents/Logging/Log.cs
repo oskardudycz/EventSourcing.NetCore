@@ -13,7 +13,7 @@ public static class LogEndpoint
     )
     {
         var (customerId, contact, description) = command;
-        var incidentId = CombGuidIdGeneration.NewGuid();
+        var incidentId = Guid.CreateVersion7();
 
         var @event = new IncidentLogged(incidentId, customerId, contact, description, customerId, now);
 

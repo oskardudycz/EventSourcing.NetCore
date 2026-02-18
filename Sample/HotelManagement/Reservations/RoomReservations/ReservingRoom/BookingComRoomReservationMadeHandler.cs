@@ -28,7 +28,7 @@ public class BookingComRoomReservationMadeHandler(
     public async Task Handle(BookingComRoomReservationMade @event, CancellationToken ct)
     {
         var (bookingComReservationId, roomTypeText, from, to, bookingComGuestId, numberOfPeople, madeAt) = @event;
-        var reservationId = CombGuidIdGeneration.NewGuid().ToString();
+        var reservationId = Guid.CreateVersion7().ToString();
 
         var guestId = await getGuestId(new GetGuestIdByExternalId(FromPrefix("BCOM", bookingComGuestId)), ct);
         var roomType = Enum.Parse<RoomType>(roomTypeText);

@@ -3,7 +3,7 @@ using Core.Exceptions;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
-using Marten.Exceptions;
+using JasperFx;
 using Microsoft.OpenApi.Models;
 using SmartHome.Temperature;
 

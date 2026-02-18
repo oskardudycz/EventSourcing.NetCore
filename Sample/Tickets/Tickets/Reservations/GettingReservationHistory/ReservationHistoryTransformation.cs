@@ -1,4 +1,4 @@
-using Marten.Events;
+using JasperFx.Events;
 using Marten.Events.Projections;
 using Tickets.Reservations.CancellingReservation;
 using Tickets.Reservations.ChangingReservationSeat;

@@ -2,6 +2,8 @@ using ApplicationLogic.Marten.Core.Exceptions;
 using ApplicationLogic.Marten.Immutable.ShoppingCarts;
 using ApplicationLogic.Marten.Mixed.ShoppingCarts;
 using ApplicationLogic.Marten.Mutable.ShoppingCarts;
+using JasperFx;
+using JasperFx.CodeGeneration;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics;
 using Oakton;
@@ -72,6 +74,6 @@ if (app.Environment.IsDevelopment())
         .UseSwaggerUI();
 }
 
-return await app.RunOaktonCommands(args);
+return await app.RunJasperFxCommands(args);
 
 public partial class Program;

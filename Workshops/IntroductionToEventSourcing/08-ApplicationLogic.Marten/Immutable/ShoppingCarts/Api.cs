@@ -1,6 +1,7 @@
 using ApplicationLogic.Marten.Core.Marten;
 using ApplicationLogic.Marten.Immutable.Pricing;
 using Core.Validation;
+using JasperFx.Core;
 using Marten;
 using Marten.Schema.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,7 @@ public static class Api
                 Guid clientId,
                 CancellationToken ct) =>
             {
-                var shoppingCartId = CombGuidIdGeneration.NewGuid();
+                var shoppingCartId = Guid.CreateVersion7();
 
                 await session.Add<ShoppingCart>(shoppingCartId,
                     [Handle(new OpenShoppingCart(shoppingCartId, clientId.NotEmpty(), Now))], ct);

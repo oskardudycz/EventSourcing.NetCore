@@ -1,8 +1,9 @@
 using FluentAssertions;
+using JasperFx;
+using JasperFx.Events.Projections;
 using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
-using Weasel.Core;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections;
