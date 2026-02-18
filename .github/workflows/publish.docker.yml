@@ -8,21 +8,21 @@ jobs:
 
         steps:
             - name: Check Out Repo
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Login to DockerHub
-              uses: docker/login-action@v2
+              uses: docker/login-action@v3
               with:
                   username: ${{ secrets.DOCKERHUB_USERNAME }}
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             - name: Set up Docker Buildx
               id: buildx
-              uses: docker/setup-buildx-action@v2
+              uses: docker/setup-buildx-action@v3
 
             - name: Build and push
               id: docker_build
-              uses: docker/build-push-action@v4
+              uses: docker/build-push-action@v6
               with:
                   push: ${{ github.ref == 'refs/heads/main'}}
                   tags: oskardudycz/eventsourcing.netcore:latest
