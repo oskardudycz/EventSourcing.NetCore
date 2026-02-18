@@ -89,4 +89,31 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageVersion Include="Yarp.ReverseProxy" Version="2.1.0" />
   </ItemGroup>
+
+  <!-- F# / ECommerce.Equinox packages -->
+  <ItemGroup>
+    <PackageVersion Include="Argu" Version="6.2.5" />
+    <PackageVersion Include="Equinox.Core" Version="4.1.1" />
+    <PackageVersion Include="Equinox.CosmosStore" Version="4.1.0" />
+    <PackageVersion Include="Equinox.CosmosStore.Prometheus" Version="4.1.0" />
+    <PackageVersion Include="Equinox.DynamoStore" Version="4.1.0" />
+    <PackageVersion Include="Equinox.DynamoStore.Prometheus" Version="4.1.0" />
+    <PackageVersion Include="Equinox.EventStoreDb" Version="4.1.0" />
+    <PackageVersion Include="Equinox.MemoryStore" Version="4.1.0" />
+    <PackageVersion Include="Equinox.SqlStreamStore" Version="4.1.0" />
+    <PackageVersion Include="Equinox.SqlStreamStore.MsSql" Version="4.1.0" />
+    <PackageVersion Include="FsCheck.Xunit" Version="3.0.0-rc1" />
+    <PackageVersion Include="FsCodec.SystemTextJson" Version="3.1.0" />
+    <PackageVersion Include="prometheus-net.AspNetCore" Version="3.6.0" />
+    <PackageVersion Include="Propulsion" Version="3.0.0" />
+    <PackageVersion Include="Propulsion.CosmosStore" Version="3.0.0" />
+    <PackageVersion Include="Propulsion.DynamoStore" Version="3.0.0" />
+    <PackageVersion Include="Propulsion.EventStoreDb" Version="3.0.0" />
+    <PackageVersion Include="Propulsion.MemoryStore" Version="3.0.0" />
+    <PackageVersion Include="Propulsion.SqlStreamStore" Version="3.0.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="3.2.0" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="1.5.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageVersion Include="unquote" Version="6.1.0" />
+  </ItemGroup>
 </Project>
