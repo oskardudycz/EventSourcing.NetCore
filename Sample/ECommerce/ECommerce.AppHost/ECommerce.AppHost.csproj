@@ -21,10 +21,5 @@
         <PackageReference Include="Aspire.Hosting.Kafka" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Reference Include="HealthChecks.Kafka">
-            <HintPath>..\..\..\..\..\.nuget\packages\aspnetcore.healthchecks.kafka\8.0.1\lib\net6.0\HealthChecks.Kafka.dll</HintPath>
-        </Reference>
-    </ItemGroup>
 
 </Project>
