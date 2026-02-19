@@ -30,7 +30,7 @@ namespace MarketBasketAnalytics.CartAbandonmentRateAnalysis
     )
     {
         public static CartAbandonmentRatesSummary Default() =>
-            new(default, default, default, default, default, default, default, default, default, default);
+            new(0, 0, 0, 0, 0, TimeSpan.Zero, 0, 0, 0, 0);
 
         public static async Task<CartAbandonmentRatesSummary> Handle(
             Func<CancellationToken, Task<CartAbandonmentRatesSummary?>> getCurrentSummary,

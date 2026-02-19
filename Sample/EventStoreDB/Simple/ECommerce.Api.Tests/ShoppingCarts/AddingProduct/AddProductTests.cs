@@ -16,7 +16,7 @@ public class AddProductTests(ApiFixture fixture): ApiTest(fixture)
     [Trait("Category", "Acceptance")]
     public Task Post_Should_AddProductItem_To_ShoppingCart()
     {
-        var product = new ProductItemRequest(Guid.NewGuid(), 1);
+        var product = new ProductItemRequest(Guid.CreateVersion7(), 1);
 
         return API
             .Given("Opened Shopping Cart", OpenShoppingCart())

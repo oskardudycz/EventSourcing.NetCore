@@ -43,7 +43,7 @@ public class ClientId: StronglyTypedValue<Guid>
 
     public static readonly ClientId Unknown = new(Guid.Empty);
 
-    public static ClientId New() => new(Guid.NewGuid());
+    public static ClientId New() => new(Guid.CreateVersion7());
 
     public static ClientId Parse(string? value)
     {
@@ -60,7 +60,7 @@ public class ProductId: StronglyTypedValue<Guid>
 
     public static readonly ProductId Unknown = new(Guid.Empty);
 
-    public static ProductId New() => new(Guid.NewGuid());
+    public static ProductId New() => new(Guid.CreateVersion7());
 
     public static ProductId Parse(string? value)
     {
@@ -79,7 +79,7 @@ public class ShoppingCartId: StronglyTypedValue<Guid>
 
     public static readonly ShoppingCartId Unknown = new(Guid.Empty);
 
-    public static ShoppingCartId New() => new(Guid.NewGuid());
+    public static ShoppingCartId New() => new(Guid.CreateVersion7());
 
     public static ShoppingCartId Parse(string? value)
     {
@@ -246,7 +246,7 @@ public static class ProductItemsExtensions
     public static Dictionary<ProductId, Quantity> Add(this Dictionary<ProductId, Quantity> productItems,
         PricedProductItem productItem) =>
         productItems
-            .Union(new[] { new KeyValuePair<ProductId, Quantity>(productItem.ProductId, productItem.Quantity) })
+            .Union([new KeyValuePair<ProductId, Quantity>(productItem.ProductId, productItem.Quantity)])
             .GroupBy(ks => ks.Key)
             .ToDictionary(ks => ks.Key, ps => Quantity.Parse((uint)ps.Sum(x => x.Value.Value)));
 

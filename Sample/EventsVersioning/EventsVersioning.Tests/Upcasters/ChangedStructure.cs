@@ -42,7 +42,7 @@ public class ChangedStructure
     public void UpcastObjects_Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.CreateVersion7(), Guid.CreateVersion7());
 
         // When
         var @event = Upcast(oldEvent);
@@ -57,7 +57,7 @@ public class ChangedStructure
     public void UpcastJson_Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.CreateVersion7(), Guid.CreateVersion7());
 
         // When
         var @event = Upcast(

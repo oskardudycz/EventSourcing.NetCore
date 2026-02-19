@@ -38,6 +38,6 @@ public class RecordCustomerResponseToIncidentTests(ApiWithLoggedIncident api): I
             );
     }
 
-    private readonly Guid customerId = Guid.NewGuid();
+    private readonly Guid customerId = Guid.CreateVersion7();
     private readonly string content = new Lorem().Sentence();
 }

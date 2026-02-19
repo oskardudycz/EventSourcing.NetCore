@@ -1,5 +1,6 @@
 using FluentAssertions;
 using JasperFx;
+using JasperFx.Events;
 using JasperFx.Events.Projections;
 using Marten.Events.Aggregation;
 using Marten.Events.Projections;
@@ -11,24 +12,24 @@ namespace Marten.Integration.Tests.EventStore.Projections;
 public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
     public record IssueUpdated(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
     public record Issue(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
     public class IssuesList
     {
-        public Guid Id { get; set; }
-        public Dictionary<Guid, Issue> Issues { get; } = new();
+        public string Id { get; set; } = null!;
+        public Dictionary<string, Issue> Issues { get; set;  } = new();
 
         public void Apply(IssueCreated @event)
         {
@@ -48,8 +49,8 @@ public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixtu
 
     public class IssueDescriptions
     {
-        public Guid Id { get; set; }
-        public Dictionary<Guid, string> Descriptions { get; } = new();
+        public string Id { get; set; } = null!;
+        public Dictionary<string, string> Descriptions { get; set; } = new();
 
         public void Apply(IssueCreated @event)
         {
@@ -83,6 +84,7 @@ public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixtu
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.DatabaseSchemaName = SchemaName;
             options.Events.DatabaseSchemaName = SchemaName;
+            options.Events.StreamIdentity = StreamIdentity.AsString;
 
             //It's needed to manually set that inline aggregation should be applied
             options.Projections.Snapshot<IssuesList>(SnapshotLifecycle.Inline);
@@ -95,8 +97,9 @@ public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixtu
     [Fact]
     public async Task GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
     {
-        var issue1Id = Guid.NewGuid();
-        var issue2Id = Guid.NewGuid();
+        var streamId = GenerateRandomId();
+        var issue1Id = GenerateRandomId();
+        var issue2Id = GenerateRandomId();
 
         var events = new object[]
         {
@@ -106,7 +109,7 @@ public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixtu
         };
 
         //1. Create events
-        var streamId = EventStore.StartStream<IssuesList>(events).Id;
+        EventStore.StartStream<IssuesList>(streamId, events);
 
         await Session.SaveChangesAsync();
 

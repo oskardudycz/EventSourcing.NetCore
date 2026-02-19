@@ -10,7 +10,7 @@ namespace Core.EntityFramework.Projections;
 public class EntityFrameworkProjection<TDbContext>: IEventBatchHandler
     where TDbContext : DbContext
 {
-    public TDbContext DbContext { protected get; set; } = default!;
+    public TDbContext DbContext { protected get; set; } = null!;
     public IAsyncPolicy RetryPolicy { protected get; set; } = Policy.NoOpAsync();
 
     private readonly HashSet<Type> handledEventTypes = [];
@@ -47,8 +47,8 @@ public class EntityFrameworkProjection<TView, TId, TDbContext>: EntityFrameworkP
     );
 
     private readonly Dictionary<Type, ProjectEvent> projectors = new();
-    private Expression<Func<TView, TId>> viewIdExpression = default!;
-    private Func<TView, TId> viewId = default!;
+    private Expression<Func<TView, TId>> viewIdExpression = null!;
+    private Func<TView, TId> viewId = null!;
 
     public void ViewId(Expression<Func<TView, TId>> id)
     {

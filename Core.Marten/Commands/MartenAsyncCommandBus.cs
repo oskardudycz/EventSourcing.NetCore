@@ -10,7 +10,7 @@ namespace Core.Marten.Commands;
 /// </summary>
 public class MartenAsyncCommandBus(IDocumentSession documentSession): IAsyncCommandBus
 {
-    public static readonly Guid CommandsStreamId = new("11111111-1111-1111-1111-111111111111");
+    public const string CommandsStreamId = "__commands";
 
     public Task Schedule<TCommand>(TCommand command, CancellationToken ct = default) where TCommand: notnull
     {

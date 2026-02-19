@@ -1,4 +1,5 @@
 using JasperFx;
+using JasperFx.Events;
 using JasperFx.Events.Projections;
 using Marten.Events.Aggregation;
 using Marten.Exceptions;
@@ -10,21 +11,21 @@ namespace Marten.Integration.Tests.EventStore.UniqueConstraint;
 public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record UserCreated(
-        Guid UserId,
+        string UserId,
         string Email
     );
 
     public record UserEmailUpdated(
-        Guid UserId,
+        string UserId,
         string Email
     );
 
     public record UserDeleted(
-        Guid UserId
+        string UserId
     );
 
     public record UserNameGuard(
-        Guid Id,
+        string Id,
         string Email
     );
 
@@ -50,6 +51,8 @@ public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.P
             options.DatabaseSchemaName = SchemaName;
             options.Events.DatabaseSchemaName = SchemaName;
 
+            options.Events.StreamIdentity = StreamIdentity.AsString;
+
             options.Projections.Add<UserNameGuardProjection>(ProjectionLifecycle.Inline);
 
             options.Schema.For<UserNameGuard>().UniqueIndex(guard => guard.Email);
@@ -63,35 +66,40 @@ public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.P
     {
         // Create user 1
         var email = "john.doe@gmail.com";
-        var user1Created = new UserCreated(Guid.NewGuid(), email);
-        var user1Id = EventStore.StartStream(user1Created).Id;
+        var user1Id = GenerateRandomId();
+        var user1Created = new UserCreated(user1Id, email);
+        EventStore.StartStream(user1Id, user1Created);
         await Session.SaveChangesAsync();
 
         // should succeed for user with other name
-        EventStore.StartStream(new UserCreated(Guid.NewGuid(), "some.other@email.com"));
+        var user2Id = GenerateRandomId();
+        EventStore.StartStream(user2Id, new UserCreated(user2Id, "some.other@email.com"));
         await Session.SaveChangesAsync();
 
         // should fail if added again
-        EventStore.StartStream(new UserCreated(Guid.NewGuid(), email));
+        var user3Id = GenerateRandomId();
+        EventStore.StartStream(user3Id, new UserCreated(user3Id, email));
         await SaveChangesAsyncShouldFailWith<DocumentAlreadyExistsException>();
 
         // should fail if updated to other existing
-        EventStore.Append(user1Id, new UserEmailUpdated(Guid.NewGuid(), "some.other@email.com"));
+        EventStore.Append(user1Id, new UserEmailUpdated(GenerateRandomId(), "some.other@email.com"));
         await SaveChangesAsyncShouldFailWith<DocumentAlreadyExistsException>();
 
         // should succeed if updated to yet another non-existing email
-        EventStore.Append(user1Id, new UserEmailUpdated(Guid.NewGuid(), "yet.another@email.com"));
+        EventStore.Append(user1Id, new UserEmailUpdated(GenerateRandomId(), "yet.another@email.com"));
         await Session.SaveChangesAsync();
 
         // should fail for user with updated email
-        EventStore.StartStream(new UserCreated(Guid.NewGuid(), "yet.another@email.com"));
+        var user4Id = GenerateRandomId();
+        EventStore.StartStream(user4Id, new UserCreated(user4Id, "yet.another@email.com"));
         await SaveChangesAsyncShouldFailWith<DocumentAlreadyExistsException>();
 
         EventStore.Append(user1Id, new UserDeleted(user1Id));
         await Session.SaveChangesAsync();
 
         // should succeed as we deleted
-        EventStore.StartStream(new UserCreated(Guid.NewGuid(), "yet.another@email.com"));
+        var user5Id = GenerateRandomId();
+        EventStore.StartStream(user3Id, new UserCreated(user5Id, "yet.another@email.com"));
         await Session.SaveChangesAsync();
     }
 }

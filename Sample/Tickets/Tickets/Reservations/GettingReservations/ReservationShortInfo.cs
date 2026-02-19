@@ -9,7 +9,7 @@ public class ReservationShortInfo
 {
     public Guid Id { get; set; }
 
-    public string Number { get; set; } = default!;
+    public string Number { get; set; } = null!;
 
     public ReservationStatus Status { get; set; }
 
@@ -26,7 +26,7 @@ public class ReservationShortInfo
     }
 }
 
-public class ReservationShortInfoProjection : SingleStreamProjection<ReservationShortInfo, string>
+public class ReservationShortInfoProjection : SingleStreamProjection<ReservationShortInfo, Guid>
 {
     public ReservationShortInfoProjection()
     {

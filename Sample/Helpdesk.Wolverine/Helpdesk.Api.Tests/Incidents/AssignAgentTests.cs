@@ -7,7 +7,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class AssignAgentToIncidentTests(AppFixture fixture): ApiWithLoggedIncident(fixture)
 {
-    [Fact(Skip = "Need to bump wolverine")]
+    [Fact]
     [Trait("Category", "Acceptance")]
     public async Task AssignAgentCommand_ChangesIncidentCategory()
     {
@@ -22,5 +22,5 @@ public class AssignAgentToIncidentTests(AppFixture fixture): ApiWithLoggedIncide
         await Host.IncidentDetailsShouldBe(Incident with { AgentId = agentId, Version = 2 });
     }
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
 }

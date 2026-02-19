@@ -11,7 +11,7 @@ public class ApiWithResolvedIncident: ApiSpecification<Program>, IAsyncLifetime
         Incident = await this.ResolvedIncident();
     }
 
-    public IncidentDetails Incident { get; set; } = default!;
+    public IncidentDetails Incident { get; set; } = null!;
 
     public Task DisposeAsync() => Task.CompletedTask;
 }

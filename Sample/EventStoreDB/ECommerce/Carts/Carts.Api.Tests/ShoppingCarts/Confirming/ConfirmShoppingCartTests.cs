@@ -39,5 +39,5 @@ public class ConfirmShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
         // API.PublishedExternalEventsOfType<CartFinalized>();
     }
 
-    private readonly Guid ClientId = Guid.NewGuid();
+    private readonly Guid ClientId = Guid.CreateVersion7();
 }

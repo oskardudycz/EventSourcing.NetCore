@@ -42,11 +42,11 @@ public enum InvoiceStatus
 public class Invoice: Aggregate<object, string>
 {
     public double Amount { get; private set; }
-    public string Number { get; private set; } = default!;
+    public string Number { get; private set; } = null!;
 
     public InvoiceStatus Status { get; private set; }
 
-    public Person IssuedTo { get; private set; } = default!;
+    public Person IssuedTo { get; private set; } = null!;
     public DateTime InitiatedAt { get; private set; }
 
     public string? IssuedBy { get; private set; }

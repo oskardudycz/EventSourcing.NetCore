@@ -88,7 +88,7 @@ public record ShoppingCart(
         };
 
     public static ShoppingCart Default() =>
-        new (default, default, default, ProductItemsList.Empty(), default, default);
+        new (Guid.Empty, Guid.Empty, default, ProductItemsList.Empty(), null, null);
 
     public static string MapToStreamId(Guid shoppingCartId) =>
         $"ShoppingCart-{shoppingCartId}";

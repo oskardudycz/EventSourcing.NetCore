@@ -14,7 +14,7 @@ namespace MartenMeetsElastic.Projections;
 public abstract class ElasticsearchProjection: SubscriptionBase
 {
     protected abstract string IndexName { get; }
-    public ElasticsearchClient ElasticsearchClient { private get; init; } = default!;
+    public ElasticsearchClient ElasticsearchClient { private get; init; } = null!;
     public IAsyncPolicy RetryPolicy { protected get; init; } = Policy.NoOpAsync();
 
     private readonly HashSet<Type> handledEventTypes = [];
@@ -77,7 +77,7 @@ public abstract class ElasticsearchProjection<TDocument>:
     protected override string IndexName => IndexNameMapper.ToIndexName<TDocument>();
 
     private readonly Dictionary<Type, ProjectEvent> projectors = new();
-    private Func<TDocument, string> getDocumentId = default!;
+    private Func<TDocument, string> getDocumentId = null!;
 
     protected void Projects<TEvent>(
         Func<TEvent, string> getId,

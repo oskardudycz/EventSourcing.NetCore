@@ -8,7 +8,7 @@ public class MeetingView
 {
     public Guid Id { get; set; }
 
-    public string Name { get; set; } = default!;
+    public string Name { get; set; } = null!;
 
     public DateTime Created { get; set; }
 

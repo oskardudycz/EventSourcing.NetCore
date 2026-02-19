@@ -1,5 +1,6 @@
 using FluentAssertions;
 using JasperFx;
+using JasperFx.Events;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Xunit;
@@ -9,26 +10,26 @@ namespace Marten.Integration.Tests.EventStore.Aggregate.OutOfOrder;
 public class OutOfOrderProjectionsTest(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
-        Guid IssueId,
+        string IssueId,
         string Description,
         int IssueVersion
     );
 
     public record IssueUpdated(
-        Guid IssueId,
+        string IssueId,
         string Description,
         int IssueVersion
     );
 
     public record Issue(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
     public class IssuesList
     {
-        public Guid Id { get; set; }
-        public Dictionary<Guid, Issue> Issues { get; } = new();
+        public string Id { get; set; } = null!;
+        public Dictionary<string, Issue> Issues { get; set; } = new();
 
         public void Apply(IssueCreated @event)
         {
@@ -55,6 +56,8 @@ public class OutOfOrderProjectionsTest(MartenFixture fixture): MartenTest(fixtur
             options.DatabaseSchemaName = SchemaName;
             options.Events.DatabaseSchemaName = SchemaName;
 
+            options.Events.StreamIdentity = StreamIdentity.AsString;
+
             //It's needed to manually set that inline aggregation should be applied
             options.Projections.Snapshot<IssuesList>(SnapshotLifecycle.Inline);
         });
@@ -65,8 +68,9 @@ public class OutOfOrderProjectionsTest(MartenFixture fixture): MartenTest(fixtur
     [Fact]
     public async Task GivenOutOfOrderEvents_WhenPublishedWithSetVersion_ThenLiveAggregationWorksFine()
     {
-        var firstTaskId = Guid.NewGuid();
-        var secondTaskId = Guid.NewGuid();
+        var streamId = GenerateRandomId();
+        var firstTaskId = GenerateRandomId();
+        var secondTaskId = GenerateRandomId();
 
         var events = new object[]
         {
@@ -78,7 +82,7 @@ public class OutOfOrderProjectionsTest(MartenFixture fixture): MartenTest(fixtur
         };
 
         //1. Create events
-        var streamId = EventStore.StartStream<IssuesList>(events).Id;
+        EventStore.StartStream<IssuesList>(streamId, events);
 
         await Session.SaveChangesAsync();
 

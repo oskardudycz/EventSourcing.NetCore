@@ -10,9 +10,9 @@ internal class ReservationBuilder
 
     public ReservationBuilder Tentative()
     {
-        var reservationId = Guid.NewGuid();
+        var reservationId = Guid.CreateVersion7();
         var numberGenerator = new FakeReservationNumberGenerator();
-        var seatId = Guid.NewGuid();
+        var seatId = Guid.CreateVersion7();
 
         // When
         var reservation = Reservation.CreateTentative(

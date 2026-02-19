@@ -47,7 +47,7 @@ public class Exercise03CreateAppendEventFunction: IAsyncLifetime
     [Fact]
     public async Task AppendEventFunction_WhenStreamDoesNotExist_CreateNewStream_And_AppendNewEvent()
     {
-        var streamId = Guid.NewGuid();
+        var streamId = Guid.CreateVersion7();
         var @event = new UserCreated("John Doe");
 
         var result = await eventStore.AppendEvent<User>(streamId, @event);

@@ -7,7 +7,7 @@ namespace MeetingsManagement.Meetings;
 
 public class Meeting: Aggregate
 {
-    public string Name { get; private set; } = default!;
+    public string Name { get; private set; } = null!;
 
     public DateTime Created { get; private set; }
 

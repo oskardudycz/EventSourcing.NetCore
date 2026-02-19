@@ -63,8 +63,8 @@ public class EventStoreDBEventMetadataJsonConverter: JsonConverter
         try
         {
             return headers.TryGetValue(key, out var value) && value != null
-                ? new[] { value }
-                : Enumerable.Empty<string>();
+                ? [value]
+                : [];
         }
         catch (Exception ex)
         {

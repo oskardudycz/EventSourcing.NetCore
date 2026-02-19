@@ -21,7 +21,7 @@ public static class Scenarios
         this IAlbaHost api
     )
     {
-        var customerId = Guid.NewGuid();
+        var customerId = Guid.CreateVersion7();
 
         var contact = new Contact(
             faker.PickRandom<ContactChannel>(),
@@ -44,7 +44,7 @@ public static class Scenarios
         this IAlbaHost api
     )
     {
-        var agentId = Guid.NewGuid();
+        var agentId = Guid.CreateVersion7();
         var resolvedType = faker.PickRandom<ResolutionType>();
         var incident = await api.LoggedIncident();
 

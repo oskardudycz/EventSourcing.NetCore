@@ -37,6 +37,6 @@ public class PrioritiseIncidentTests(ApiWithLoggedIncident api): IClassFixture<A
             );
     }
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
     private readonly IncidentPriority priority = new Faker().PickRandom<IncidentPriority>();
 }

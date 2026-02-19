@@ -78,8 +78,8 @@ public class MartenEventPublisher(
             var stringValue = value.ToString();
 
             return stringValue != null
-                ? new[] { stringValue }
-                : Enumerable.Empty<string>();
+                ? [stringValue]
+                : [];
         }
         catch (Exception ex)
         {

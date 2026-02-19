@@ -296,10 +296,10 @@ public class BusinessLogicTests
             .ThenThrows<InvalidOperationException>();
 
     private readonly DateTimeOffset now = DateTimeOffset.Now;
-    private readonly Guid clientId = Guid.NewGuid();
-    private readonly Guid shoppingCartId = Guid.NewGuid();
-    private static readonly ProductItem ProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
-    private static readonly ProductItem OtherProductItem = new(Guid.NewGuid(), Random.Shared.Next(1, 200));
+    private readonly Guid clientId = Guid.CreateVersion7();
+    private readonly Guid shoppingCartId = Guid.CreateVersion7();
+    private static readonly ProductItem ProductItem = new(Guid.CreateVersion7(), Random.Shared.Next(1, 200));
+    private static readonly ProductItem OtherProductItem = new(Guid.CreateVersion7(), Random.Shared.Next(1, 200));
     private static readonly int Price = Random.Shared.Next(1, 1000);
     private static readonly int OtherPrice = Random.Shared.Next(1, 1000);
     private readonly PricedProductItem pricedProductItem =

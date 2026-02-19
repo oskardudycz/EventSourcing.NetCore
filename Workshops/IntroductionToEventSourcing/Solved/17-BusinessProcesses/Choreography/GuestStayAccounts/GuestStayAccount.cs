@@ -68,7 +68,7 @@ public record GuestStayAccount(
             _ => this
         };
 
-    public static readonly GuestStayAccount Initial = new(default, default, default);
+    public static readonly GuestStayAccount Initial = new(Guid.Empty, 0, default);
 }
 
 public enum GuestStayAccountStatus

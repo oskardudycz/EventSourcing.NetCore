@@ -9,10 +9,10 @@ namespace MartenMeetsElastic.Tests;
 public abstract class MartenMeetsElasticTest: IDisposable
 {
     private readonly DocumentStore documentStore;
-    protected IDocumentSession DocumentSession = default!;
+    protected IDocumentSession DocumentSession = null!;
     protected ElasticsearchClient elasticClient;
 
-    protected IProjectionDaemon daemon = default!;
+    protected IProjectionDaemon daemon = null!;
 
     protected MartenMeetsElasticTest()
     {

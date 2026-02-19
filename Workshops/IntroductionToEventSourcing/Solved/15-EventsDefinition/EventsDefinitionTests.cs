@@ -12,8 +12,8 @@ public class EventsDefinitionTests
     public void GuestStayAccountEventTypes_AreDefined()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
-        var groupCheckoutId = Guid.NewGuid();
+        var guestStayId = Guid.CreateVersion7();
+        var groupCheckoutId = Guid.CreateVersion7();
 
         // When
         var events = new GuestStayAccountEvent[]
@@ -37,9 +37,9 @@ public class EventsDefinitionTests
     public void GroupCheckoutEventTypes_AreDefined()
     {
         // Given
-        var groupCheckoutId = Guid.NewGuid();
-        Guid[] guestStayIds = [Guid.NewGuid(), Guid.NewGuid()];
-        var clerkId = Guid.NewGuid();
+        var groupCheckoutId = Guid.CreateVersion7();
+        Guid[] guestStayIds = [Guid.CreateVersion7(), Guid.CreateVersion7()];
+        var clerkId = Guid.CreateVersion7();
 
         // When
         var events = new GroupCheckoutEvent[]

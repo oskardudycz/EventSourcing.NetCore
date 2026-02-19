@@ -129,7 +129,7 @@ public class EventTransformationsWithForwarding: MartenTest
 
         await daemon.StartAsync(cts.Token);
 
-        var projectId = Guid.NewGuid().ToString();
+        var projectId = GenerateRandomId();
         var name = "Test";
 
         var projectCreated = new ProjectCreated(projectId, name);
@@ -177,7 +177,7 @@ public class EventTransformationsWithForwarding: MartenTest
 
     public override async Task DisposeAsync()
     {
-        await daemon.StopAsync(default);
+        await daemon.StopAsync(CancellationToken.None);
         serviceScope.Dispose();
     }
 }

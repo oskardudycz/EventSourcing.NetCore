@@ -17,7 +17,6 @@ using Wolverine.Marten;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#pragma warning disable CS0618 // Type or member is obsolete
 builder.Services
     .AddDefaultExceptionHandler((exception, _) => exception switch
     {
@@ -26,6 +25,7 @@ builder.Services
     })
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
+    .AddWolverineHttp()
     .AddMarten(sp =>
     {
         var options = new StoreOptions();
@@ -59,11 +59,10 @@ builder.Services
     .AddSubscriptionWithServices<SignalRProducer<IncidentsHub>>(ServiceLifetime.Singleton)
     .AddAsyncDaemon(DaemonMode.Solo)
     // Add Marten/PostgreSQL integration with Wolverine's outbox
-    .IntegrateWithWolverine()
-    // I also added this to opt into events being forward to
-    // the Wolverine outbox during SaveChangesAsync()
-    .EventForwardingToWolverine();
-#pragma warning restore CS0618 // Type or member is obsolete
+    .IntegrateWithWolverine(opt =>
+        // I also added this to opt into events being forward to
+        // the Wolverine outbox during SaveChangesAsync()
+        opt.UseFastEventForwarding = true);
 
 builder.Services.AddResourceSetupOnStartup()
     .CritterStackDefaults(x =>

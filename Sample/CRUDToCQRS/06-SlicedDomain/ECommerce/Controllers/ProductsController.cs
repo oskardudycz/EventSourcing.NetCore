@@ -18,7 +18,7 @@ public class ProductsController(ProductService service, ProductReadOnlyService r
         CancellationToken ct
     )
     {
-        var command = request.ToCommand(Guid.NewGuid());
+        var command = request.ToCommand(Guid.CreateVersion7());
 
         await service.CreateAsync(command, ct);
 
@@ -32,7 +32,7 @@ public class ProductsController(ProductService service, ProductReadOnlyService r
         CancellationToken ct
     )
     {
-        var command = request.ToCommand(Guid.NewGuid());
+        var command = request.ToCommand(Guid.CreateVersion7());
 
         await service.UpdateAsync(command, ct);
 

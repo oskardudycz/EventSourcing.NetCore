@@ -8,6 +8,6 @@ public class ApiWithResolvedIncident(AppFixture fixture): IntegrationContext(fix
     public override async Task InitializeAsync() =>
         Incident = await Host.ResolvedIncident();
 
-    public IncidentDetails Incident { get; set; } = default!;
+    public IncidentDetails Incident { get; set; } = null!;
 }
 

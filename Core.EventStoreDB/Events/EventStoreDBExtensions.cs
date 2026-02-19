@@ -49,8 +49,8 @@ public static class EventStoreDBExtensions
             throw AggregateNotFoundException.For<TEntity>(id);
 
         var result = getDefault();
-        await foreach (var @event in readResult)
-            result = when(result, @event);
+        await foreach (var resolvedEvent in readResult)
+            result = when(result, resolvedEvent.Deserialize()!);
         return result;
     }
 
@@ -71,7 +71,7 @@ public static class EventStoreDBExtensions
 
         var result =  new List<object>();
         await foreach (var @event in readResult)
-            result.Add(@event);
+            result.Add(@event.Deserialize()!);
         return result;
     }
 
@@ -85,8 +85,8 @@ public static class EventStoreDBExtensions
     {
         var result = await eventStore.AppendToStreamAsync(
             id,
-            StreamState.NoStream,
-            new[] { @event.ToJsonEventData(TelemetryPropagator.GetPropagationContext()) },
+            StreamState.Any,
+            [@event.ToJsonEventData(TelemetryPropagator.GetPropagationContext())],
             cancellationToken: cancellationToken
         ).ConfigureAwait(false);
         return result.NextExpectedStreamRevision;
@@ -104,7 +104,7 @@ public static class EventStoreDBExtensions
         var result = await eventStore.AppendToStreamAsync(
             id,
             expectedRevision,
-            new[] { @event.ToJsonEventData(TelemetryPropagator.GetPropagationContext()) },
+            [@event.ToJsonEventData(TelemetryPropagator.GetPropagationContext())],
             cancellationToken: cancellationToken
         ).ConfigureAwait(false);
 

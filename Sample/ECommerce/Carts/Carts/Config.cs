@@ -1,5 +1,6 @@
 using Carts.ShoppingCarts;
 using Core.Marten;
+using JasperFx.Events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +14,8 @@ public static class Config
             {
                 options.Projections.DaemonLockId = 222222;
                 options.ConfigureCarts();
-                //options.DisableNpgsqlLogging = true;
+                options.DisableNpgsqlLogging = true;
+                options.Events.StreamIdentity = StreamIdentity.AsGuid;
             }).UseNpgsqlDataSource()
             .Services
             .AddCarts();

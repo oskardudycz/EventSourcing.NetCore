@@ -75,7 +75,7 @@ public class CreateTentativeReservationTests
                 })
             );
 
-    private readonly Guid SeatId = Guid.NewGuid();
+    private readonly Guid SeatId = Guid.CreateVersion7();
 
     private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(
         new TestWebApplicationFactory<Program>()

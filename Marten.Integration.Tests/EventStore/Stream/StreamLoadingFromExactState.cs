@@ -7,21 +7,21 @@ namespace Marten.Integration.Tests.EventStore.Stream;
 public class StreamLoadingFromExactState(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
     public record IssueUpdated(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
-    [Fact(Skip = "Skipping - AppVeyor for some reason doesn't like it -_-")]
+    [Fact]
     public async Task GivenSetOfEvents_WithFetchEventsFromDifferentTimes_ThenProperSetsAreLoaded()
     {
         //Given
-        var streamId = Guid.NewGuid();
-        var taskId = Guid.NewGuid();
+        var streamId = GenerateRandomId();
+        var taskId = GenerateRandomId();
 
         //When
         var beforeCreateTimestamp = DateTime.UtcNow;
@@ -57,8 +57,8 @@ public class StreamLoadingFromExactState(MartenFixture fixture): MartenTest(fixt
     public async Task GivenSetOfEvents_WithFetchEventsFromDifferentVersionNumber_ThenProperSetsAreLoaded()
     {
         //Given
-        var streamId = Guid.NewGuid();
-        var taskId = Guid.NewGuid();
+        var streamId = GenerateRandomId();
+        var taskId = GenerateRandomId();
 
         //When
         EventStore.Append(streamId, new IssueCreated(taskId, "Initial Name"));

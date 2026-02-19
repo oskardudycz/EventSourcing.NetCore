@@ -37,7 +37,7 @@ public class LogIncidentsTests(ApiSpecification<Program> api): IClassFixture<Api
                 )
             );
 
-    private readonly Guid CustomerId = Guid.NewGuid();
+    private readonly Guid CustomerId = Guid.CreateVersion7();
 
     private readonly Contact Contact = new Faker<Contact>().CustomInstantiator(
         f => new Contact(

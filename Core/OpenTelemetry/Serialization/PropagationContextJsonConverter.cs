@@ -46,6 +46,6 @@ public class PropagationContextJsonConverter: JsonConverter
 
     private static IEnumerable<string> ExtractTraceContextFromEventMetadata(Dictionary<string, string?> headers, string key) =>
         headers.TryGetValue(key, out var value) && value != null
-            ? new[] { value }
-            : Enumerable.Empty<string>();
+            ? [value]
+            : [];
 }

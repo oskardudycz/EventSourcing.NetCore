@@ -100,7 +100,7 @@ public class ExplicitSerializationTests
         shoppingCart.ClientId.Should().Be(clientId);
         shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
         shoppingCart.ProductItems.Should().HaveCount(2);
-        shoppingCart.ProductItems.Keys.Should().Contain(new[] { tShirt, shoes });
+        shoppingCart.ProductItems.Keys.Should().Contain([tShirt, shoes]);
         shoppingCart.ProductItems[tShirt].Should().Be(Quantity.Parse(2));
         shoppingCart.ProductItems[shoes].Should().Be(Quantity.Parse(1));
     }

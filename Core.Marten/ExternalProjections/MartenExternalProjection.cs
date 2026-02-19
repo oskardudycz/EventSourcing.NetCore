@@ -47,7 +47,7 @@ public class MartenExternalProjection<TEvent, TView>(
 
 public class MartenCheckpoint
 {
-    public string Id { get; set; } = default!;
+    public string Id { get; set; } = null!;
 
     public ulong? Position { get; set; }
 

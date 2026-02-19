@@ -25,7 +25,7 @@ public class GetProductDetailsTests(GetProductDetailsFixture api): IClassFixture
     [Fact]
     public Task NotExistingId_ShouldReturn_404() =>
         api.Given()
-            .When(GET, URI($"/api/products/{Guid.NewGuid()}"))
+            .When(GET, URI($"/api/products/{Guid.CreateVersion7()}"))
             .Then(NOT_FOUND);
 }
 
@@ -33,7 +33,7 @@ public class GetProductDetailsTests(GetProductDetailsFixture api): IClassFixture
 public class GetProductDetailsFixture()
     : ApiSpecification<Program>(new WarehouseTestWebApplicationFactory()), IAsyncLifetime
 {
-    public ProductDetails ExistingProduct = default!;
+    public ProductDetails ExistingProduct = null!;
 
     public async Task InitializeAsync()
     {

@@ -17,7 +17,7 @@ public class ChangeSeatTests
             .Tentative()
             .Build();
 
-        var newSeatId = Guid.NewGuid();
+        var newSeatId = Guid.CreateVersion7();
 
         // When
         reservation.ChangeSeat(newSeatId);

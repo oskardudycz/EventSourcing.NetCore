@@ -36,5 +36,5 @@ public class OpenShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
                         }))
         );
 
-    public readonly Guid ClientId = Guid.NewGuid();
+    public readonly Guid ClientId = Guid.CreateVersion7();
 }

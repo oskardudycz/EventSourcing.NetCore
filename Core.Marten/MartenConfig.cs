@@ -4,6 +4,7 @@ using Core.Marten.Commands;
 using Core.Marten.Ids;
 using Core.Marten.Subscriptions;
 using JasperFx;
+using JasperFx.Events;
 using JasperFx.Events.Daemon;
 using Marten;
 using Marten.Services;
@@ -18,7 +19,7 @@ public class MartenConfig
 {
     private const string DefaultSchema = "public";
 
-    public string ConnectionString { get; set; } = default!;
+    public string ConnectionString { get; set; } = null!;
 
     public string WriteModelSchema { get; set; } = DefaultSchema;
     public string ReadModelSchema { get; set; } = DefaultSchema;
@@ -104,6 +105,8 @@ public static class MartenConfigExtensions
             EnumStorage.AsString,
             nonPublicMembersStorage: NonPublicMembersStorage.All
         );
+
+        options.Events.StreamIdentity = StreamIdentity.AsString;
 
         options.Projections.Errors.SkipApplyErrors = false;
         options.Projections.Errors.SkipSerializationErrors = false;

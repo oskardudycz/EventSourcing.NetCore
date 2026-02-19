@@ -20,7 +20,7 @@ internal static class Route
                 CancellationToken ct
             ) =>
             {
-                var command = request.ToCommand(Guid.NewGuid());
+                var command = request.ToCommand(Guid.CreateVersion7());
 
                 await dbContext.AddAndSaveChanges(
                     Handle(command),

@@ -72,7 +72,7 @@ app.MapPost(
             CancellationToken ct
         ) =>
         {
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
             var (sku, name, description) = request;
 
             await registerProduct(

@@ -41,7 +41,7 @@ public class RecordAgentResponseToIncidentTests(ApiWithLoggedIncident api): ICla
             );
     }
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
     private readonly string content = new Lorem().Sentence();
     private readonly bool visibleToCustomer = new Faker().Random.Bool();
 }

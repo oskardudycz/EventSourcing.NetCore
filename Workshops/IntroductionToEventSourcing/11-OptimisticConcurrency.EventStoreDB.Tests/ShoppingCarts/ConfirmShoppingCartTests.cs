@@ -101,7 +101,7 @@ public class ConfirmShoppingCartTests(ApiSpecification<Program> api):
             .Then(OK, RESPONSE_ETAG_HEADER(2));
 
     private static readonly Faker Faker = new();
-    private readonly Guid NotExistingShoppingCartId = Guid.NewGuid();
-    private readonly Guid ClientId = Guid.NewGuid();
-    private readonly ProductItemRequest ProductItem = new(Guid.NewGuid(), Faker.Random.Number(1, 500));
+    private readonly Guid NotExistingShoppingCartId = Guid.CreateVersion7();
+    private readonly Guid ClientId = Guid.CreateVersion7();
+    private readonly ProductItemRequest ProductItem = new(Guid.CreateVersion7(), Faker.Random.Number(1, 500));
 }

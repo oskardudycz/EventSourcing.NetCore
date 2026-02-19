@@ -45,8 +45,8 @@ public class EntityFrameworkProjectionTests(EfCorePostgresContainerFixture<TestD
     {
         var projection = new ShoppingCartProjection { DbContext = context };
 
-        var cartId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
+        var cartId = Guid.CreateVersion7();
+        var clientId = Guid.CreateVersion7();
 
         await projection.Handle([EventEnvelope.From(new Opened(cartId, clientId))], CancellationToken.None);
         await context.SaveChangesAsync();
@@ -75,8 +75,8 @@ public class EntityFrameworkProjectionTests(EfCorePostgresContainerFixture<TestD
     {
         var projection = new ShoppingCartProjection { DbContext = context };
 
-        var cartId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
+        var cartId = Guid.CreateVersion7();
+        var clientId = Guid.CreateVersion7();
 
         await projection.Handle([
             EventEnvelope.From(new Opened(cartId, clientId)),
@@ -96,8 +96,8 @@ public class EntityFrameworkProjectionTests(EfCorePostgresContainerFixture<TestD
     {
         var projection = new ShoppingCartProjection { DbContext = context };
 
-        var cartId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
+        var cartId = Guid.CreateVersion7();
+        var clientId = Guid.CreateVersion7();
 
         await projection.Handle([
             EventEnvelope.From(new Opened(cartId, clientId)),
@@ -112,7 +112,7 @@ public class EntityFrameworkProjectionTests(EfCorePostgresContainerFixture<TestD
     [Fact]
     public async Task SmokeTest()
     {
-        var entity = new ShoppingCart { Id = Guid.NewGuid(), ProductCount = 2, ClientId = Guid.NewGuid() };
+        var entity = new ShoppingCart { Id = Guid.CreateVersion7(), ProductCount = 2, ClientId = Guid.CreateVersion7() };
         context.ShoppingCarts.Add(entity);
         await context.SaveChangesAsync();
 

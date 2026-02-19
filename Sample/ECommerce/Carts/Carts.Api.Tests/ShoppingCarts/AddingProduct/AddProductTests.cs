@@ -40,5 +40,5 @@ public class AddProductTests(ApiFixture fixture): ApiTest(fixture)
                 })
             );
 
-    private readonly ProductItemRequest product = new(Guid.NewGuid(), 1);
+    private readonly ProductItemRequest product = new(Guid.CreateVersion7(), 1);
 }

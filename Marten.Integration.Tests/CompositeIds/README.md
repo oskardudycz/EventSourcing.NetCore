@@ -158,10 +158,10 @@ public class Reservation : Aggregate<ReservationId, Guid>
         CustomerId customerId)
     {
         return new Reservation(
-            new ReservationId(Guid.NewGuid()),
+            new ReservationId(Guid.CreateVersion7()),
             seatId,
             customerId,
-            new ReservationNumber(Guid.NewGuid().ToString())
+            new ReservationNumber(Guid.CreateVersion7().ToString())
         );
     }
 

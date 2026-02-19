@@ -70,7 +70,7 @@ public class EventStoreDBAsyncCommandBusTests
     public async Task CommandIsStoredInEventStoreDBAndForwardedToCommandHandler()
     {
         // Given
-        var userId = Guid.NewGuid();
+        var userId = Guid.CreateVersion7();
         var command = new AddUser(userId);
 
         // When
@@ -91,7 +91,7 @@ public class EventStoreDBAsyncCommandBusTests
     }
 }
 
-public record AddUser(Guid UserId, string? Sth = default);
+public record AddUser(Guid UserId, string? Sth = null);
 
 internal class AddUserCommandHandler(List<Guid> userIds): ICommandHandler<AddUser>
 {

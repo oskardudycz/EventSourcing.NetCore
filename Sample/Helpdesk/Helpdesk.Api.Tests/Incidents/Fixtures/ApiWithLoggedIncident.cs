@@ -10,6 +10,6 @@ public class ApiWithLoggedIncident: ApiSpecification<Program>, IAsyncLifetime
     {
         Incident = await this.LoggedIncident();
     }
-    public IncidentDetails Incident { get; protected set; } = default!;
+    public IncidentDetails Incident { get; protected set; } = null!;
     public Task DisposeAsync() => Task.CompletedTask;
 }

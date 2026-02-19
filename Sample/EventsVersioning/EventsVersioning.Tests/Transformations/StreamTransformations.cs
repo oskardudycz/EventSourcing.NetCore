@@ -215,10 +215,10 @@ public class MergeEvents
             new EventTransformations()
         );
 
-        var shoppingCardId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
-        var theSameCorrelationId = Guid.NewGuid();
-        var productItem = new V1.PricedProductItem(new V1.ProductItem(Guid.NewGuid(), 1), 23.22m);
+        var shoppingCardId = Guid.CreateVersion7();
+        var clientId = Guid.CreateVersion7();
+        var theSameCorrelationId = Guid.CreateVersion7();
+        var productItem = new V1.PricedProductItem(new V1.ProductItem(Guid.CreateVersion7(), 1), 23.22m);
 
         var events = new (string EventTypeName, object EventData, EventMetadata MetaData)[]
         {
@@ -240,12 +240,12 @@ public class MergeEvents
             (
                 "product_item_added_v1",
                 new V1.ProductItemAddedToShoppingCart(shoppingCardId, productItem),
-                new EventMetadata(Guid.NewGuid())
+                new EventMetadata(Guid.CreateVersion7())
             ),
             (
                 "shopping_card_confirmed_v1",
                 new V1.ShoppingCartConfirmed(shoppingCardId, DateTime.UtcNow),
-                new EventMetadata(Guid.NewGuid())
+                new EventMetadata(Guid.CreateVersion7())
             )
         };
 

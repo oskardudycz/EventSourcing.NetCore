@@ -23,7 +23,7 @@ internal static class Route
                 [FromBody] UpdateProductRequest request,
                 CancellationToken ct) =>
             {
-                var command = request.ToCommand(Guid.NewGuid());
+                var command = request.ToCommand(Guid.CreateVersion7());
 
                 await dbContext.UpdateAndSaveChanges<Product>(
                     command.Id,

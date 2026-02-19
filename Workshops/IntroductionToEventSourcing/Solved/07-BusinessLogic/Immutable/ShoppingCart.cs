@@ -69,7 +69,7 @@ public record ShoppingCart(
     }
 
     public static ShoppingCart Default() =>
-        new (default, default, default, []);
+        new (Guid.Empty, Guid.Empty, default, []);
 
     public static ShoppingCart Evolve(ShoppingCart shoppingCart, ShoppingCartEvent @event) =>
         @event switch
@@ -85,7 +85,7 @@ public record ShoppingCart(
                 shoppingCart with
                 {
                     ProductItems = shoppingCart.ProductItems
-                        .Concat(new [] { pricedProductItem })
+                        .Concat([pricedProductItem])
                         .GroupBy(pi => pi.ProductId)
                         .Select(group => group.Count() == 1?
                             group.First()

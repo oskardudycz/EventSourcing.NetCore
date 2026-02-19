@@ -10,7 +10,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class RecordAgentResponseToIncidentTests(AppFixture fixture): ApiWithLoggedIncident(fixture)
 {
-    [Fact(Skip = "Need to bump wolverine")]
+    [Fact]
     [Trait("Category", "Acceptance")]
     public async Task RecordAgentResponseCommand_RecordsResponse()
     {
@@ -32,7 +32,7 @@ public class RecordAgentResponseToIncidentTests(AppFixture fixture): ApiWithLogg
         });
     }
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
     private readonly string content = new Lorem().Sentence();
     private readonly bool visibleToCustomer = new Faker().Random.Bool();
 }

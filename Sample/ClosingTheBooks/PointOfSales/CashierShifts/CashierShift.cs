@@ -37,7 +37,7 @@ public record CashierShift
 
     private CashierShift() { }
 
-    public string Id { get; init; } = default!;
+    public string Id { get; init; } = null!;
 }
 
 public record CashierShiftId(string CashRegisterId, int ShiftNumber)

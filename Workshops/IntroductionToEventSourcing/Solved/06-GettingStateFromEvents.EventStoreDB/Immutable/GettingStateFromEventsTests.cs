@@ -57,7 +57,7 @@ public record ShoppingCart(
 )
 {
     public static ShoppingCart Default() =>
-        new (default, default, default, []);
+        new (Guid.Empty, Guid.Empty, default, []);
 
     public static ShoppingCart Evolve(ShoppingCart shoppingCart, object @event) =>
         @event switch
@@ -73,7 +73,7 @@ public record ShoppingCart(
                 shoppingCart with
                 {
                     ProductItems = shoppingCart.ProductItems
-                        .Concat(new [] { pricedProductItem })
+                        .Concat([pricedProductItem])
                         .GroupBy(pi => pi.ProductId)
                         .Select(group => group.Count() == 1?
                             group.First()
@@ -150,10 +150,10 @@ public class GettingStateFromEventsTests: EventStoreDBTest
     [Fact]
     public async Task GettingState_FromEventStoreDB_ShouldSucceed()
     {
-        var shoppingCartId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
-        var shoesId = Guid.NewGuid();
-        var tShirtId = Guid.NewGuid();
+        var shoppingCartId = Guid.CreateVersion7();
+        var clientId = Guid.CreateVersion7();
+        var shoesId = Guid.CreateVersion7();
+        var tShirtId = Guid.CreateVersion7();
         var twoPairsOfShoes = new PricedProductItem(shoesId, 2, 100);
         var pairOfShoes = new PricedProductItem(shoesId, 1, 100);
         var tShirt = new PricedProductItem(tShirtId, 1, 50);

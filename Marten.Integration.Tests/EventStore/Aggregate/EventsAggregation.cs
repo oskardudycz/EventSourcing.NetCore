@@ -7,28 +7,28 @@ namespace Marten.Integration.Tests.EventStore.Aggregate;
 public class EventsAggregation(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
     public record IssueUpdated(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
     public record IssueRemoved(
-        Guid IssueId
+        string IssueId
     );
 
     public record Issue(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
     public class IssuesList
     {
-        public Guid Id { get; set; }
-        public Dictionary<Guid, Issue> Issues { get; } = new();
+        public string Id { get; set; } = null!;
+        public Dictionary<string, Issue> Issues { get; } = new();
 
         public void Apply(IssueCreated @event)
         {
@@ -54,10 +54,10 @@ public class EventsAggregation(MartenFixture fixture): MartenTest(fixture.Postgr
     [Fact]
     public async Task GivenStreamOfEvents_WhenAggregateStreamIsCalled_ThenChangesAreAppliedProperly()
     {
-        var streamId = Guid.NewGuid();
+        var streamId = GenerateRandomId();
 
         //1. First Issue Was Created
-        var issue1Id = Guid.NewGuid();
+        var issue1Id = GenerateRandomId();
         EventStore.Append(streamId, new IssueCreated(issue1Id, "Description"));
         await Session.SaveChangesAsync();
 
@@ -78,8 +78,8 @@ public class EventsAggregation(MartenFixture fixture): MartenTest(fixture.Postgr
         issuesList.Issues.Values.Single().Description.Should().Be("New Description");
 
         //3. Two Other tasks were added
-        EventStore.Append(streamId, new IssueCreated(Guid.NewGuid(), "Description2"),
-            new IssueCreated(Guid.NewGuid(), "Description3"));
+        EventStore.Append(streamId, new IssueCreated(GenerateRandomId(), "Description2"),
+            new IssueCreated(GenerateRandomId(), "Description3"));
         await Session.SaveChangesAsync();
 
         issuesList = await EventStore.AggregateStreamAsync<IssuesList>(streamId);

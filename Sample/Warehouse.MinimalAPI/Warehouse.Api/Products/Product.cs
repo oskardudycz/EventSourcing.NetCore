@@ -11,12 +11,12 @@ internal class Product
     /// The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers.
     /// </summary>
     /// <returns></returns>
-    public SKU Sku { get; set; } = default!;
+    public SKU Sku { get; set; } = null!;
 
     /// <summary>
     /// Product Name
     /// </summary>
-    public string Name { get; set; } = default!;
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// Optional Product description

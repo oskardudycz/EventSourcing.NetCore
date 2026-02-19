@@ -19,7 +19,7 @@ public class CreateMeetingTests
             )
             .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
-    private readonly Guid MeetingId = Guid.NewGuid();
+    private readonly Guid MeetingId = Guid.CreateVersion7();
     private readonly string MeetingName = "Event Sourcing Workshop";
 
 

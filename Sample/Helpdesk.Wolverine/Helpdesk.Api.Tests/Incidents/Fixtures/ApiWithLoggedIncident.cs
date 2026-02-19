@@ -8,5 +8,5 @@ public class ApiWithLoggedIncident(AppFixture fixture): IntegrationContext(fixtu
     public override async Task InitializeAsync() =>
         Incident = await Host.LoggedIncident();
 
-    public IncidentDetails Incident { get; protected set; } = default!;
+    public IncidentDetails Incident { get; protected set; } = null!;
 }

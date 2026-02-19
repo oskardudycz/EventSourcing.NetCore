@@ -11,7 +11,7 @@ using static ISubscriptionCheckpointRepository;
 public class PostgresSubscriptionCheckpointRepositoryTests(PostgresContainerFixture fixture)
     : IClassFixture<PostgresContainerFixture>
 {
-    private readonly string subscriptionId = Guid.NewGuid().ToString("N");
+    private readonly string subscriptionId = Guid.CreateVersion7().ToString("N");
 
     [Fact]
     public async Task Store_InitialInsert_Success()

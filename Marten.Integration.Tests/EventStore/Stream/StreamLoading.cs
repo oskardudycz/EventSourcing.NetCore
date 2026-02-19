@@ -7,21 +7,22 @@ namespace Marten.Integration.Tests.EventStore.Stream;
 public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
     public record IssueUpdated(
-        Guid IssueId,
+        string IssueId,
         string Description
     );
 
-    private readonly Guid issueId = Guid.NewGuid();
+    private readonly string issueId = GenerateRandomId();
 
-    private async Task<Guid> GetExistingStreamId()
+    private async Task<string> GetExistingStreamId()
     {
+        var streamId = GenerateRandomId();
         var @event = new IssueCreated(issueId, "Description");
-        var streamId = EventStore.StartStream(@event).Id;
+        EventStore.StartStream(streamId, @event);
         await Session.SaveChangesAsync();
 
         return streamId;
@@ -77,7 +78,7 @@ public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSql
     public async Task
         GivenExistingStreamWithMultipleEvents_WhenEventsAreQueriedOrderedDescending_ThenLastEventIsLoaded()
     {
-        var streamId = Guid.NewGuid();
+        var streamId = GenerateRandomId();
         Session.Events.Append(streamId,
             new IssueCreated(streamId, "Description"),
             new IssueUpdated(streamId, "Description"),
@@ -86,7 +87,7 @@ public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSql
         await Session.SaveChangesAsync();
 
         var lastEvent = Session.Events.QueryAllRawEvents()
-            .Where(e => e.StreamId == streamId)
+            .Where(e => e.StreamKey == streamId)
             .OrderByDescending(e => e.Version)
             .FirstOrDefault();
 

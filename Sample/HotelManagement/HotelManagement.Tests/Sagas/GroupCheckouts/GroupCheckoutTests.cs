@@ -8,8 +8,8 @@ public partial class GroupCheckoutTests
 {
     private readonly HandlerSpecification<GroupCheckout> Spec = Specification.For<GroupCheckout>(Evolve);
     private readonly DateTimeOffset now = DateTimeOffset.UtcNow;
-    private readonly Guid groupCheckoutId = Guid.NewGuid();
-    private readonly Guid clerkId = Guid.NewGuid();
+    private readonly Guid groupCheckoutId = Guid.CreateVersion7();
+    private readonly Guid clerkId = Guid.CreateVersion7();
     private readonly Faker faker = new();
 
     private static GroupCheckout Evolve(GroupCheckout groupCheckout, object @event) =>

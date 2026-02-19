@@ -33,6 +33,6 @@ public class CategoriseIncidentTests(ApiWithLoggedIncident api): IClassFixture<A
             );
     }
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
     private readonly IncidentCategory category = new Faker().PickRandom<IncidentCategory>();
 }

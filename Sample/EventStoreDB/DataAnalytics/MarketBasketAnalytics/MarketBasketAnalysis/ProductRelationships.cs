@@ -12,7 +12,7 @@
     )
     {
         public static ProductRelationshipsCalculated Default() =>
-            new(default, Array.Empty<ProductRelationshipsInBaskets>(), default);
+            new(Guid.Empty, [], 0);
     }
 
     public static class ProductRelationships
@@ -62,7 +62,7 @@
             => relatedProducts
                 .SelectMany(
                     (relatedProduct, index) =>
-                        Expand(new[] { relatedProduct }, relatedProducts.Skip(index + 1).ToList())
+                        Expand([relatedProduct], relatedProducts.Skip(index + 1).ToList())
                 )
                 .ToList();
 
@@ -73,10 +73,10 @@
         )
         {
             if (!relatedProducts.Any())
-                return new[] { accumulator };
+                return [accumulator];
 
             var aggregates = relatedProducts
-                .Select(relatedProduct => accumulator.Union(new[] { relatedProduct }).ToList())
+                .Select(relatedProduct => accumulator.Union([relatedProduct]).ToList())
                 .ToList();
 
             return aggregates.Union(

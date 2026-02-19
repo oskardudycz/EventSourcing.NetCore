@@ -19,7 +19,7 @@ internal static class Route
         endpoints.MapPost("api/products/", async (HttpContext context, RegisterProductRequest request) =>
         {
             var (sku, name, description) = request;
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
 
             var command = RegisterProduct.Create(productId, sku, name, description);
 

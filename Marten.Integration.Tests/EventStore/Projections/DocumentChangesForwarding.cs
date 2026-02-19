@@ -1,4 +1,5 @@
 using Core.Testing;
+using JasperFx.Events;
 using JasperFx.Events.Daemon;
 using JasperFx.Events.Projections;
 using Marten.Events.Aggregation;
@@ -11,25 +12,25 @@ using Xunit;
 namespace Marten.Integration.Tests.EventStore.Projections;
 
 public record ProjectCreated(
-    Guid ProjectId,
+    string ProjectId,
     string Name
 );
 
 public record ProjectStarted(
-    Guid ProjectId,
+    string ProjectId,
     DateTimeOffset StartedAt
 );
 
 public record ManagerAssignedToProject(
-    Guid ProjectId,
-    Guid ManagerId
+    string ProjectId,
+    string ManagerId
 );
 
 public record ProjectInfo(
-    Guid Id,
+    string Id,
     string Name,
     DateTimeOffset? StartedAt = null,
-    Guid? ManagerId = null
+    string? ManagerId = null
 );
 
 public class ProjectInfoProjection: SingleStreamProjection<ProjectInfo, string>
@@ -114,7 +115,7 @@ public class DocumentChangesForwarding(MartenFixture fixture): MartenTest(fixtur
 
         await daemon.StartAsync(cts.Token);
 
-        var projectId = Guid.NewGuid();
+        var projectId = GenerateRandomId();
         var name = "Test";
 
         var projectCreated = new ProjectCreated(projectId, name);
@@ -139,6 +140,7 @@ public class DocumentChangesForwarding(MartenFixture fixture): MartenTest(fixtur
                 options.DatabaseSchemaName = SchemaName;
                 options.Connection(ConnectionString);
                 options.Projections.Add<ProjectInfoProjection>(ProjectionLifecycle.Async);
+                options.Events.StreamIdentity = StreamIdentity.AsString;
                 options.Projections.AsyncListeners.Add(
                     new AsyncListenerWrapper(
                         eventListener,
@@ -154,15 +156,15 @@ public class DocumentChangesForwarding(MartenFixture fixture): MartenTest(fixtur
         documentSession = serviceScope.ServiceProvider.GetRequiredService<IDocumentSession>();
     }
 
-    private IHostedService daemon = default!;
-    private IServiceScope serviceScope = default!;
-    private IDocumentSession documentSession = default!;
+    private IHostedService daemon = null!;
+    private IServiceScope serviceScope = null!;
+    private IDocumentSession documentSession = null!;
     private EventListener eventListener = new();
     private MessagingSystemStub messagingSystemStub = new();
 
     public override async Task DisposeAsync()
     {
-        await daemon.StopAsync(default);
+        await daemon.StopAsync(CancellationToken.None);
         serviceScope.Dispose();
 
         await base.DisposeAsync();

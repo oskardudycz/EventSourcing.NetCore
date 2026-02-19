@@ -22,7 +22,7 @@ public class CreateTentativeReservationCommandHandlerTests
             numberGenerator
         );
 
-        var command = CreateTentativeReservation.Create(Guid.NewGuid(), Guid.NewGuid());
+        var command = CreateTentativeReservation.Create(Guid.CreateVersion7(), Guid.CreateVersion7());
 
         // When
         await commandHandler.Handle(command, CancellationToken.None);

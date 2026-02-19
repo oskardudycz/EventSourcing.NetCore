@@ -1,4 +1,5 @@
 using Core.Marten;
+using JasperFx.Events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tickets.Maintenance;
@@ -12,6 +13,7 @@ public static class Config
         services
             .AddMarten(config, options =>
             {
+                options.Events.StreamIdentity = StreamIdentity.AsGuid;
                 options.ConfigureReservations();
             })
             .Services

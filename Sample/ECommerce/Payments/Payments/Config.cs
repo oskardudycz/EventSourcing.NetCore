@@ -1,4 +1,5 @@
 using Core.Marten;
+using JasperFx.Events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Payments.Payments;
@@ -12,6 +13,7 @@ public static class Config
             {
                 options.ConfigurePayments();
                 options.DisableNpgsqlLogging = true;
+                options.Events.StreamIdentity = StreamIdentity.AsGuid;
             })
             .UseNpgsqlDataSource()
             .Services

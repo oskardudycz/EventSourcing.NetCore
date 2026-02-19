@@ -20,7 +20,7 @@ public class ProductsController(ProductService service, ProductReadOnlyService r
         CancellationToken ct
     )
     {
-        request.Id = Guid.NewGuid();
+        request.Id = Guid.CreateVersion7();
 
         return CreateAsync<CreateProductRequest>(
             request,

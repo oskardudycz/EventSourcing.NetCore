@@ -7,7 +7,7 @@ public class Package
     public Guid Id { get; set; }
     public Guid OrderId { get; set; }
 
-    public List<ProductItem> ProductItems { get; set; } = default!;
+    public List<ProductItem> ProductItems { get; set; } = null!;
 
     public DateTime SentAt { get; set; }
 }

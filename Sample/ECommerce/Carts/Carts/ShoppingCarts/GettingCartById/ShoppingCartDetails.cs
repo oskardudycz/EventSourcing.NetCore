@@ -16,7 +16,7 @@ public class ShoppingCartDetails
 
     public ShoppingCartStatus Status { get; set; }
 
-    public IList<PricedProductItem> ProductItems { get; set; } = default!;
+    public IList<PricedProductItem> ProductItems { get; set; } = null!;
 
     public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 

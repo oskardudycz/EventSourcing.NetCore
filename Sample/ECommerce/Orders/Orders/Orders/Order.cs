@@ -10,7 +10,7 @@ public class Order: Aggregate<OrderEvent>
 {
     public readonly TimeSpan DefaultTimeOut = TimeSpan.FromMinutes(5);
 
-    public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = default!;
+    public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = null!;
 
     public decimal TotalPrice { get; private set; }
 

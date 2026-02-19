@@ -26,7 +26,7 @@ public enum IncidentNoteType
     FromCustomer
 }
 
-public class IncidentDetailsProjection: SingleStreamProjection<IncidentDetails, string>
+public class IncidentDetailsProjection: SingleStreamProjection<IncidentDetails, Guid>
 {
     public static IncidentDetails Create(IncidentLogged logged) =>
         new(logged.IncidentId, logged.CustomerId, IncidentStatus.Pending, []);
@@ -44,30 +44,28 @@ public class IncidentDetailsProjection: SingleStreamProjection<IncidentDetails, 
         current with
         {
             Notes = current.Notes.Union(
-                new[]
-                {
-                    new IncidentNote(
+            [
+                new IncidentNote(
                         IncidentNoteType.FromAgent,
                         agentResponded.Response.AgentId,
                         agentResponded.Response.Content,
                         agentResponded.Response.VisibleToCustomer
                     )
-                }).ToArray()
+            ]).ToArray()
         };
 
     public IncidentDetails Apply(CustomerRespondedToIncident customerResponded, IncidentDetails current) =>
         current with
         {
             Notes = current.Notes.Union(
-                new[]
-                {
-                    new IncidentNote(
+            [
+                new IncidentNote(
                         IncidentNoteType.FromCustomer,
                         customerResponded.Response.CustomerId,
                         customerResponded.Response.Content,
                         true
                     )
-                }).ToArray()
+            ]).ToArray()
         };
 
     public IncidentDetails Apply(IncidentResolved resolved, IncidentDetails current) =>

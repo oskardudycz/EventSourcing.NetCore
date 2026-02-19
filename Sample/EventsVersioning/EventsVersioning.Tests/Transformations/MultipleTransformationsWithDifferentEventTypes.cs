@@ -142,16 +142,16 @@ public class MultipleTransformationsWithDifferentEventTypes
         var serializer = new EventSerializer(mapping, transformations);
 
         var eventV1 = new V1.ShoppingCartOpened(
-            Guid.NewGuid(),
-            Guid.NewGuid()
+            Guid.CreateVersion7(),
+            Guid.CreateVersion7()
         );
         var eventV2 = new ShoppingCartOpened(
-            Guid.NewGuid(),
-            new Client(Guid.NewGuid(), "Oscar the Grouch")
+            Guid.CreateVersion7(),
+            new Client(Guid.CreateVersion7(), "Oscar the Grouch")
         );
         var eventV3 = new ShoppingCartInitializedWithStatus(
-            Guid.NewGuid(),
-            new Client(Guid.NewGuid(), "Big Bird"),
+            Guid.CreateVersion7(),
+            new Client(Guid.CreateVersion7(), "Big Bird"),
             ShoppingCartStatus.Pending
         );
 

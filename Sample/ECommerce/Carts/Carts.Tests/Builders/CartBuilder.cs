@@ -14,8 +14,8 @@ internal class CartBuilder
 
     public CartBuilder Opened()
     {
-        var cartId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
+        var cartId = Guid.CreateVersion7();
+        var clientId = Guid.CreateVersion7();
 
         // When
         var cart = ShoppingCart.Open(
@@ -30,7 +30,7 @@ internal class CartBuilder
 
     public CartBuilder WithProduct()
     {
-        var productId = Guid.NewGuid();
+        var productId = Guid.CreateVersion7();
         const int quantity = 1;
         modify += cart =>
         {

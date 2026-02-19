@@ -219,13 +219,13 @@ public class ProjectionsTests
     [Trait("Category", "SkipCI")]
     public void GettingState_ForSequenceOfEvents_ShouldSucceed()
     {
-        var shoppingCartId = Guid.NewGuid();
+        var shoppingCartId = Guid.CreateVersion7();
 
-        var clientId = Guid.NewGuid();
-        var shoesId = Guid.NewGuid();
-        var tShirtId = Guid.NewGuid();
-        var dressId = Guid.NewGuid();
-        var trousersId = Guid.NewGuid();
+        var clientId = Guid.CreateVersion7();
+        var shoesId = Guid.CreateVersion7();
+        var tShirtId = Guid.CreateVersion7();
+        var dressId = Guid.CreateVersion7();
+        var trousersId = Guid.CreateVersion7();
 
         var twoPairsOfShoes = new PricedProductItem(shoesId, 2, 100);
         var pairOfShoes = new PricedProductItem(shoesId, 1, 100);
@@ -233,11 +233,11 @@ public class ProjectionsTests
         var dress = new PricedProductItem(dressId, 3, 150);
         var trousers = new PricedProductItem(trousersId, 1, 300);
 
-        var cancelledShoppingCartId = Guid.NewGuid();
-        var otherClientShoppingCartId = Guid.NewGuid();
-        var otherConfirmedShoppingCartId = Guid.NewGuid();
-        var otherPendingShoppingCartId = Guid.NewGuid();
-        var otherClientId = Guid.NewGuid();
+        var cancelledShoppingCartId = Guid.CreateVersion7();
+        var otherClientShoppingCartId = Guid.CreateVersion7();
+        var otherConfirmedShoppingCartId = Guid.CreateVersion7();
+        var otherPendingShoppingCartId = Guid.CreateVersion7();
+        var otherClientId = Guid.CreateVersion7();
 
         var eventStore = new EventStore();
         var database = new Database();

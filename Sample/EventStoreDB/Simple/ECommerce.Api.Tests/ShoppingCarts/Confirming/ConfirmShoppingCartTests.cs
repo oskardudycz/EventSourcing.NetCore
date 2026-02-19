@@ -12,7 +12,7 @@ using static ShoppingCartsApi;
 
 public class ConfirmShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
 {
-    private Guid ClientId = Guid.NewGuid();
+    private Guid ClientId = Guid.CreateVersion7();
 
     [Fact]
     [Trait("Category", "Acceptance")]
