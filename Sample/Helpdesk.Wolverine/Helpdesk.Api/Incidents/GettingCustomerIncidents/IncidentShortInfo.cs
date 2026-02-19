@@ -11,7 +11,7 @@ public record IncidentShortInfo(
     IncidentPriority? Priority = null
 );
 
-public class IncidentShortInfoProjection: SingleStreamProjection<IncidentShortInfo, string>
+public class IncidentShortInfoProjection: SingleStreamProjection<IncidentShortInfo, Guid>
 {
     public static IncidentShortInfo Create(IncidentLogged logged) =>
         new(logged.IncidentId, logged.CustomerId, IncidentStatus.Pending, 0);
