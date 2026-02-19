@@ -21,14 +21,6 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        builder.ConfigureAppConfiguration((_, config) =>
-        {
-            config.AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["ConnectionStrings:kafka"] = "localhost:9092"
-            });
-        });
-
         builder.ConfigureServices(services =>
         {
             services
@@ -45,7 +37,7 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
                 .AddSingleton<IExternalEventConsumer, DummyExternalEventConsumer>();
         });
 
-
+        Environment.SetEnvironmentVariable("ConnectionStrings__kafka", "localhost:9092");
         Environment.SetEnvironmentVariable("SchemaName", schemaName);
 
         return Policy.Handle<Exception>()

@@ -12,37 +12,21 @@ namespace Carts.ShoppingCarts;
 
 public class ShoppingCart: Aggregate
 {
-    public Guid ClientId { get; private set; }
+    public Guid ClientId { get; set; }
 
-    public ShoppingCartStatus Status { get; private set; }
+    public ShoppingCartStatus Status { get; set; }
 
-    public IList<PricedProductItem> ProductItems { get; private set; } = null!;
+    public IList<PricedProductItem> ProductItems { get; set; } = new List<PricedProductItem>();
 
     public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 
-    public static ShoppingCart Open(Guid cartId, Guid clientId) => new(cartId, clientId);
-
-    public ShoppingCart(){}
-
-    private ShoppingCart(
-        Guid id,
-        Guid clientId)
+    public static ShoppingCart Open(Guid cartId, Guid clientId)
     {
-        var @event = ShoppingCartOpened.Create(
-            id,
-            clientId
-        );
+        var shoppingCart = new ShoppingCart();
 
-        Enqueue(@event);
-        Apply(@event);
-    }
+        shoppingCart.Enqueue(ShoppingCartOpened.Create(cartId, clientId));
 
-    public void Apply(ShoppingCartOpened @event)
-    {
-        Id = @event.CartId;
-        ClientId = @event.ClientId;
-        ProductItems = new List<PricedProductItem>();
-        Status = ShoppingCartStatus.Pending;
+        return shoppingCart;
     }
 
     public void AddProduct(
@@ -54,28 +38,7 @@ public class ShoppingCart: Aggregate
 
         var pricedProductItem = productPriceCalculator.Calculate(productItem).Single();
 
-        var @event = ProductAdded.Create(Id, pricedProductItem);
-
-        Enqueue(@event);
-        Apply(@event);
-    }
-
-    public void Apply(ProductAdded @event)
-    {
-        var newProductItem = @event.ProductItem;
-
-        var existingProductItem = FindProductItemMatchingWith(newProductItem);
-
-        if (existingProductItem is null)
-        {
-            ProductItems.Add(newProductItem);
-            return;
-        }
-
-        ProductItems.Replace(
-            existingProductItem,
-            existingProductItem.MergeWith(newProductItem)
-        );
+        Enqueue(ProductAdded.Create(Id, pricedProductItem));
     }
 
     public void RemoveProduct(
@@ -92,31 +55,7 @@ public class ShoppingCart: Aggregate
         if(!existingProductItem.HasEnough(productItemToBeRemoved.Quantity))
             throw new InvalidOperationException($"Cannot remove {productItemToBeRemoved.Quantity} items of Product with id `{productItemToBeRemoved.ProductId}` as there are only ${existingProductItem.Quantity} items in card");
 
-        var @event = ProductRemoved.Create(Id, productItemToBeRemoved);
-
-        Enqueue(@event);
-        Apply(@event);
-    }
-
-    public void Apply(ProductRemoved @event)
-    {
-        var productItemToBeRemoved = @event.ProductItem;
-
-        var existingProductItem = FindProductItemMatchingWith(@event.ProductItem);
-
-        if (existingProductItem == null)
-            return;
-
-        if (existingProductItem.HasTheSameQuantity(productItemToBeRemoved))
-        {
-            ProductItems.Remove(existingProductItem);
-            return;
-        }
-
-        ProductItems.Replace(
-            existingProductItem,
-            existingProductItem.Subtract(productItemToBeRemoved)
-        );
+        Enqueue(ProductRemoved.Create(Id, productItemToBeRemoved));
     }
 
     public void Confirm()
@@ -127,15 +66,7 @@ public class ShoppingCart: Aggregate
         if (ProductItems.Count == 0)
             throw new InvalidOperationException($"Confirming empty cart is not allowed.");
 
-        var @event = ShoppingCartConfirmed.Create(Id, DateTime.UtcNow);
-
-        Enqueue(@event);
-        Apply(@event);
-    }
-
-    public void Apply(ShoppingCartConfirmed @event)
-    {
-        Status = ShoppingCartStatus.Confirmed;
+        Enqueue(ShoppingCartConfirmed.Create(Id, DateTime.UtcNow));
     }
 
     public void Cancel()
@@ -143,14 +74,44 @@ public class ShoppingCart: Aggregate
         if(Status != ShoppingCartStatus.Pending)
             throw new InvalidOperationException($"Canceling cart in '{Status}' status is not allowed.");
 
-        var @event = ShoppingCartCanceled.Create(Id, DateTime.UtcNow);
-
-        Enqueue(@event);
-        Apply(@event);
+        Enqueue(ShoppingCartCanceled.Create(Id, DateTime.UtcNow));
     }
 
-    public void Apply(ShoppingCartCanceled @event) =>
-        Status = ShoppingCartStatus.Canceled;
+    public override void Apply(object @event)
+    {
+        switch (@event)
+        {
+            case ShoppingCartOpened opened:
+                Id = opened.CartId;
+                ClientId = opened.ClientId;
+                ProductItems = new List<PricedProductItem>();
+                Status = ShoppingCartStatus.Pending;
+                break;
+            case ProductAdded productAdded:
+                var newProductItem = productAdded.ProductItem;
+                var existing = FindProductItemMatchingWith(newProductItem);
+                if (existing is null)
+                    ProductItems.Add(newProductItem);
+                else
+                    ProductItems.Replace(existing, existing.MergeWith(newProductItem));
+                break;
+            case ProductRemoved productRemoved:
+                var toRemove = productRemoved.ProductItem;
+                var found = FindProductItemMatchingWith(toRemove);
+                if (found == null) break;
+                if (found.HasTheSameQuantity(toRemove))
+                    ProductItems.Remove(found);
+                else
+                    ProductItems.Replace(found, found.Subtract(toRemove));
+                break;
+            case ShoppingCartConfirmed:
+                Status = ShoppingCartStatus.Confirmed;
+                break;
+            case ShoppingCartCanceled:
+                Status = ShoppingCartStatus.Canceled;
+                break;
+        }
+    }
 
     private PricedProductItem? FindProductItemMatchingWith(PricedProductItem productItem) =>
         ProductItems
