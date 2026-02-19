@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Carts.ShoppingCarts.Products;
 
 public record PricedProductItem
@@ -11,6 +13,7 @@ public record PricedProductItem
     public decimal TotalPrice => Quantity * UnitPrice;
     public ProductItem ProductItem { get; }
 
+    [JsonConstructor]
     private PricedProductItem(ProductItem productItem, decimal unitPrice)
     {
         ProductItem = productItem;

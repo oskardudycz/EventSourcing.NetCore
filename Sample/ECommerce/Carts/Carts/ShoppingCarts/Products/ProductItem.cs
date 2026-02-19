@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Carts.ShoppingCarts.Products;
 
 public record ProductItem
@@ -6,6 +8,7 @@ public record ProductItem
 
     public int Quantity { get; }
 
+    [JsonConstructor]
     private ProductItem(Guid productId, int quantity)
     {
         ProductId = productId;

@@ -14,7 +14,7 @@ public class PendingOrder
 }
 
 
-public class PendingOrdersProjection: SingleStreamProjection<PendingOrder, string>
+public class PendingOrdersProjection: SingleStreamProjection<PendingOrder, Guid>
 {
     public PendingOrdersProjection()
     {

@@ -14,7 +14,7 @@ public class InitializeOrderTests
 
     [Fact]
     [Trait("Category", "Acceptance")]
-    public Task InitializeOrder_ShouldReturn_CreatedStatus_With_OrderId() =>
+    public Task InitializeOrder_ShouldReturn_CreatedStatuudes_With_OrderId() =>
         API.Given()
             .When(
                 POST,
