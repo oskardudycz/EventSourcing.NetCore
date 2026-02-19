@@ -5,6 +5,7 @@ using Helpdesk.Api.Core.SignalR;
 using Helpdesk.Api.Incidents;
 using JasperFx;
 using JasperFx.CodeGeneration;
+using JasperFx.Events;
 using JasperFx.Events.Daemon;
 using JasperFx.Resources;
 using Marten;
@@ -40,6 +41,8 @@ builder.Services
             EnumStorage.AsString,
             casing: Casing.CamelCase
         );
+
+        options.Events.StreamIdentity = StreamIdentity.AsGuid;
 
         options.Projections.Errors.SkipApplyErrors = false;
         options.Projections.Errors.SkipSerializationErrors = false;
@@ -84,6 +87,8 @@ builder.Services
     .Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o =>
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
     .AddSignalR();
+
+builder.Services.AddAuthentication();
 
 builder.Host.ApplyJasperFxExtensions();
 // Configure Wolverine
