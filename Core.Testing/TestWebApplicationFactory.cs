@@ -3,6 +3,7 @@ using Core.Events.External;
 using Core.Requests;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Open.ChannelExtensions;
@@ -20,6 +21,14 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
+        builder.ConfigureAppConfiguration((_, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["ConnectionStrings:kafka"] = "localhost:9092"
+            });
+        });
+
         builder.ConfigureServices(services =>
         {
             services
