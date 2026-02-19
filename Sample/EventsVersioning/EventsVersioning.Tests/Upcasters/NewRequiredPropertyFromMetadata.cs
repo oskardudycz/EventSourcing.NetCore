@@ -45,8 +45,8 @@ public class NewRequiredPropertyFromMetadata
     public void UpcastObjects_Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
-        var eventMetadata = new EventMetadata(Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.CreateVersion7(), Guid.CreateVersion7());
+        var eventMetadata = new EventMetadata(Guid.CreateVersion7());
 
         // When
         var @event = Upcast(oldEvent, eventMetadata);
@@ -61,8 +61,8 @@ public class NewRequiredPropertyFromMetadata
     public void UpcastJson_Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
-        var eventMetadata = new EventMetadata(Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.CreateVersion7(), Guid.CreateVersion7());
+        var eventMetadata = new EventMetadata(Guid.CreateVersion7());
 
         // When
         var @event = Upcast(

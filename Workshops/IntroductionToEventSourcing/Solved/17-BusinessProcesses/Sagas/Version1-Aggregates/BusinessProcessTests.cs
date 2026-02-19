@@ -20,15 +20,15 @@ public class BusinessProcessTests
     public async Task GroupCheckoutForMultipleGuestStayWithoutPaymentsAndCharges_ShouldComplete()
     {
         // Given;
-        Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        Guid[] guestStays = [Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7()];
 
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
         publishedMessages.Reset();
         // And
-        var groupCheckoutId = Guid.NewGuid();
-        var clerkId = Guid.NewGuid();
+        var groupCheckoutId = Guid.CreateVersion7();
+        var clerkId = Guid.CreateVersion7();
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
@@ -59,7 +59,7 @@ public class BusinessProcessTests
     public async Task GroupCheckoutForMultipleGuestStayWithAllStaysSettled_ShouldComplete()
     {
         // Given;
-        Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        Guid[] guestStays = [Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7()];
         decimal[] amounts = [generate.Finance.Amount(), generate.Finance.Amount(), generate.Finance.Amount()];
 
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
@@ -76,8 +76,8 @@ public class BusinessProcessTests
         await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[2] / 2, now.AddHours(-1)));
         publishedMessages.Reset();
         // And
-        var groupCheckoutId = Guid.NewGuid();
-        var clerkId = Guid.NewGuid();
+        var groupCheckoutId = Guid.CreateVersion7();
+        var clerkId = Guid.CreateVersion7();
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
@@ -108,7 +108,7 @@ public class BusinessProcessTests
     public async Task GroupCheckoutForMultipleGuestStayWithOneSettledAndRestUnsettled_ShouldFail()
     {
         // Given;
-        Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        Guid[] guestStays = [Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7()];
         decimal[] amounts = [generate.Finance.Amount(), generate.Finance.Amount(), generate.Finance.Amount()];
 
         // 🟢 settled
@@ -126,8 +126,8 @@ public class BusinessProcessTests
         await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)));
         publishedMessages.Reset();
         // And
-        var groupCheckoutId = Guid.NewGuid();
-        var clerkId = Guid.NewGuid();
+        var groupCheckoutId = Guid.CreateVersion7();
+        var clerkId = Guid.CreateVersion7();
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
@@ -166,7 +166,7 @@ public class BusinessProcessTests
     public async Task GroupCheckoutForMultipleGuestStayWithAllUnsettled_ShouldFail()
     {
         // Given;
-        Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        Guid[] guestStays = [Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7()];
         decimal[] amounts = [generate.Finance.Amount(), generate.Finance.Amount(), generate.Finance.Amount()];
 
         // 🛑 charge without payment
@@ -183,8 +183,8 @@ public class BusinessProcessTests
         await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)));
         publishedMessages.Reset();
         // And
-        var groupCheckoutId = Guid.NewGuid();
-        var clerkId = Guid.NewGuid();
+        var groupCheckoutId = Guid.CreateVersion7();
+        var clerkId = Guid.CreateVersion7();
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When

@@ -17,7 +17,7 @@ public class OpenCartCommandHandlerTests
 
         var commandHandler = new HandleOpenCart(repository);
 
-        var command = OpenShoppingCart.Create(Guid.NewGuid(), Guid.NewGuid());
+        var command = OpenShoppingCart.Create(Guid.CreateVersion7(), Guid.CreateVersion7());
 
         // When
         await commandHandler.Handle(command, CancellationToken.None);

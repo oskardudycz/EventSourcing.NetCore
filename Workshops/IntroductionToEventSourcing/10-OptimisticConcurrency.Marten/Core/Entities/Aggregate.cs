@@ -9,7 +9,7 @@ public interface IAggregate
 
 public abstract class Aggregate<TEvent>: IAggregate
 {
-    public Guid Id { get; protected set; } = default!;
+    public Guid Id { get; protected set; } = Guid.Empty!;
 
     private readonly Queue<object> uncommittedEvents = new();
 

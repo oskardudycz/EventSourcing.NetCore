@@ -56,10 +56,10 @@ internal class PackageService(
 
         var package = new Package
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             OrderId = request.OrderId,
             ProductItems = request.ProductItems.Select(pi =>
-                new ProductItem {Id = Guid.NewGuid(), ProductId = pi.ProductId, Quantity = pi.Quantity}).ToList(),
+                new ProductItem {Id = Guid.CreateVersion7(), ProductId = pi.ProductId, Quantity = pi.Quantity}).ToList(),
             SentAt = DateTime.UtcNow
         };
 
@@ -94,7 +94,7 @@ internal class PackageService(
     private async Task Publish<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : notnull
     {
         //TODO: metadata should be taken by event bus internally
-        var eventEnvelope = new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.NewGuid().ToString(), 0, 0, null));
+        var eventEnvelope = new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.CreateVersion7().ToString(), 0, 0, null));
 
         await eventBus.Publish(eventEnvelope, cancellationToken);
     }

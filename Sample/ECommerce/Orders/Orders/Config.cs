@@ -1,6 +1,7 @@
 using Core.Configuration;
 using Orders.Orders;
 using Core.Marten;
+using JasperFx.Events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orders.Payments;
@@ -20,6 +21,7 @@ public static class Config
                 options.Projections.DaemonLockId = 44444;
                 options.ConfigureOrders();
                 options.DisableNpgsqlLogging = true;
+                options.Events.StreamIdentity = StreamIdentity.AsGuid;
             })
             .UseNpgsqlDataSource()
             .Services

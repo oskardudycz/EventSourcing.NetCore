@@ -47,9 +47,9 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
 
     public Guid ShoppingCartId { get; private set; }
 
-    public readonly Guid ClientId = Guid.NewGuid();
+    public readonly Guid ClientId = Guid.CreateVersion7();
 
-    public readonly ProductItemRequest ProductItem = new(Guid.NewGuid(), 10);
+    public readonly ProductItemRequest ProductItem = new(Guid.CreateVersion7(), 10);
 
     public decimal UnitPrice;
 

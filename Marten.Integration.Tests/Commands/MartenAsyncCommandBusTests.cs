@@ -24,7 +24,7 @@ public class MartenAsyncCommandBusTests(MartenFixture fixture): MartenTest(fixtu
     public async Task CommandIsStoredInMartenAndForwardedToCommandHandler()
     {
         // Given
-        var userId = Guid.NewGuid();
+        var userId = Guid.CreateVersion7();
         var command = new AddUser(userId);
 
         // When
@@ -88,14 +88,14 @@ public class MartenAsyncCommandBusTests(MartenFixture fixture): MartenTest(fixtu
         martenAsyncCommandBus = new MartenAsyncCommandBus(session);
     }
 
-    private MartenAsyncCommandBus martenAsyncCommandBus = default!;
+    private MartenAsyncCommandBus martenAsyncCommandBus = null!;
     private readonly List<Guid> userIds = [];
     private readonly EventListener eventListener = new();
-    private IProjectionCoordinator asyncDaemon = default!;
+    private IProjectionCoordinator asyncDaemon = null!;
     private readonly CancellationToken ct = new CancellationTokenSource().Token;
 }
 
-public record AddUser(Guid UserId, string? Sth = default);
+public record AddUser(Guid UserId, string? Sth = null);
 
 internal class AddUserCommandHandler(List<Guid> userIds): ICommandHandler<AddUser>
 {

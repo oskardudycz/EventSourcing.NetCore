@@ -11,7 +11,7 @@ public class Reservation : Aggregate
 {
     public Guid SeatId { get; private set; }
 
-    public string Number { get; private set; } = default!;
+    public string Number { get; private set; } = null!;
 
     public ReservationStatus Status { get; private set; }
 

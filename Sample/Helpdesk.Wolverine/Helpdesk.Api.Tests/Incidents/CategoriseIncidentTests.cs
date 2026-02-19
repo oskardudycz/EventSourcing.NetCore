@@ -9,7 +9,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class CategoriseIncidentTests(AppFixture fixture): ApiWithLoggedIncident(fixture)
 {
-    [Fact(Skip = "Need to bump wolverine")]
+    [Fact]
     [Trait("Category", "Acceptance")]
     public async Task CategoriseCommand_ChangesIncidentCategory()
     {
@@ -24,6 +24,6 @@ public class CategoriseIncidentTests(AppFixture fixture): ApiWithLoggedIncident(
         await Host.IncidentDetailsShouldBe(Incident with { Category = category, Version = 2 });
     }
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
     private readonly IncidentCategory category = new Faker().PickRandom<IncidentCategory>();
 }

@@ -9,7 +9,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class RecordCustomerResponseToIncidentTests(AppFixture fixture): ApiWithLoggedIncident(fixture)
 {
-    [Fact(Skip = "Need to bump wolverine")]
+    [Fact]
     [Trait("Category", "Acceptance")]
     public async Task RecordCustomerResponseCommand_RecordsResponse()
     {
@@ -29,6 +29,6 @@ public class RecordCustomerResponseToIncidentTests(AppFixture fixture): ApiWithL
         });
     }
 
-    private readonly Guid customerId = Guid.NewGuid();
+    private readonly Guid customerId = Guid.CreateVersion7();
     private readonly string content = new Lorem().Sentence();
 }

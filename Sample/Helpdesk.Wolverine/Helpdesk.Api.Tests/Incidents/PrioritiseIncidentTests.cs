@@ -9,7 +9,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class PrioritiseIncidentTests(AppFixture fixture): ApiWithLoggedIncident(fixture)
 {
-    [Fact(Skip = "Need to bump wolverine")]
+    [Fact]
     [Trait("Category", "Acceptance")]
     public async Task PrioritiseCommand_ChangesIncidentPriority()
     {
@@ -24,6 +24,6 @@ public class PrioritiseIncidentTests(AppFixture fixture): ApiWithLoggedIncident(
         await Host.IncidentDetailsShouldBe(Incident with { Priority = priority, Version = 2 });
     }
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
     private readonly IncidentPriority priority = new Faker().PickRandom<IncidentPriority>();
 }

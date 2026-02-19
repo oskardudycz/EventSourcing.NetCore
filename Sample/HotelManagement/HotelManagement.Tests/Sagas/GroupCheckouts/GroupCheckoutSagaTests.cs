@@ -13,8 +13,8 @@ public class GroupCheckoutSagaTests
 {
     private readonly GroupCheckoutSaga saga;
     private readonly AsyncCommandBusStub commandBus = new();
-    private readonly Guid groupCheckoutId = Guid.NewGuid();
-    private readonly Guid clerkId = Guid.NewGuid();
+    private readonly Guid groupCheckoutId = Guid.CreateVersion7();
+    private readonly Guid clerkId = Guid.CreateVersion7();
     private readonly DateTimeOffset now = DateTimeOffset.UtcNow;
     private readonly CancellationToken ct = CancellationToken.None;
 
@@ -25,7 +25,7 @@ public class GroupCheckoutSagaTests
     public async Task GroupCheckoutInitiated_ShouldSchedule_CheckOutGuestForEachGuesAndRecordGuestCheckoutsInitiation()
     {
         // Given
-        var guestStayAccountIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStayAccountIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
         var @event = new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStayAccountIds, now);
 
         // When
@@ -44,7 +44,7 @@ public class GroupCheckoutSagaTests
     public async Task GuestCheckedOutWithGroupCheckOutId_ShouldSchedule_RecordGuestCheckoutCompletion()
     {
         // Given
-        var guestStayAccountId = Guid.NewGuid();
+        var guestStayAccountId = Guid.CreateVersion7();
         var @event = new GuestCheckedOut(guestStayAccountId, now, groupCheckoutId);
 
         // When
@@ -60,7 +60,7 @@ public class GroupCheckoutSagaTests
     public async Task GuestCheckedOutWithoutGroupCheckOutId_ShouldNotSchedule_RecordsGuestCheckoutCompletion()
     {
         // Given
-        var guestStayAccountId = Guid.NewGuid();
+        var guestStayAccountId = Guid.CreateVersion7();
         var @event = new GuestCheckedOut(guestStayAccountId, now);
 
         // When
@@ -76,7 +76,7 @@ public class GroupCheckoutSagaTests
     public async Task GuestCheckoutFailedWithGroupCheckOutId_ShouldSchedule_RecordGuestCheckoutFailure()
     {
         // Given
-        var guestStayAccountId = Guid.NewGuid();
+        var guestStayAccountId = Guid.CreateVersion7();
         var @event = new GuestCheckoutFailed(guestStayAccountId, FailureReason.BalanceNotSettled, now, groupCheckoutId);
 
         // When
@@ -92,7 +92,7 @@ public class GroupCheckoutSagaTests
     public async Task GuestCheckoutFailedWithoutGroupCheckOutId_ShouldNotSchedule_RecordGuestCheckoutFailure()
     {
         // Given
-        var guestStayAccountId = Guid.NewGuid();
+        var guestStayAccountId = Guid.CreateVersion7();
         var @event = new GuestCheckoutFailed(guestStayAccountId, FailureReason.BalanceNotSettled, now);
 
         // When

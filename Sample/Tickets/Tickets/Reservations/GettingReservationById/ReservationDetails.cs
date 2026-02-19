@@ -10,7 +10,7 @@ public class ReservationDetails
 {
     public Guid Id { get; set; }
 
-    public string Number { get; set; } = default!;
+    public string Number { get; set; } = null!;
 
     public Guid SeatId { get; set; }
 
@@ -42,7 +42,7 @@ public class ReservationDetails
     }
 }
 
-public class ReservationDetailsProjection: SingleStreamProjection<ReservationDetails, string>
+public class ReservationDetailsProjection: SingleStreamProjection<ReservationDetails, Guid>
 {
     public ReservationDetailsProjection()
     {

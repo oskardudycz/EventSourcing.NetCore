@@ -30,5 +30,5 @@ public class OpenShoppingCartTests(ApiSpecification<Program> api):
             .When(GET, URI(ctx => ShoppingCartUrl(apiPrefix, ClientId, ctx.GetCreatedId<Guid>())))
             .Then(OK, RESPONSE_ETAG_HEADER(1));
 
-    private readonly Guid ClientId = Guid.NewGuid();
+    private readonly Guid ClientId = Guid.CreateVersion7();
 }

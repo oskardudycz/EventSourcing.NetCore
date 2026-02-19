@@ -9,7 +9,7 @@ public class ProductProfile : Profile
     public ProductProfile()
     {
         CreateMap<CreateProductRequest, Product>()
-            .ForMember(e => e.Id, opt => opt.MapFrom(src => Guid.NewGuid()));
+            .ForMember(e => e.Id, opt => opt.MapFrom(src => Guid.CreateVersion7()));
 
         CreateMap<UpdateProductRequest, Product>()
             .ForMember(e => e.Id, opt => opt.Ignore())

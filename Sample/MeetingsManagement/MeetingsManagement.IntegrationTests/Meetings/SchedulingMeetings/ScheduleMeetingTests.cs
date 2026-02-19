@@ -42,6 +42,6 @@ public class ScheduleMeetingTests(ApiSpecification<Program> api): IClassFixture<
     private readonly DateTime Start = DateTime.UtcNow;
     private readonly DateTime End = DateTime.UtcNow;
 
-    public readonly Guid MeetingId = Guid.NewGuid();
+    public readonly Guid MeetingId = Guid.CreateVersion7();
     public readonly string MeetingName = "Event Sourcing Workshop";
 }

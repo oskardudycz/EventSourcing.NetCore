@@ -10,7 +10,7 @@ namespace Warehouse.Api.Tests;
 
 public class WarehouseTestWebApplicationFactory: WebApplicationFactory<Program>
 {
-    private readonly string schemaName = Guid.NewGuid().ToString("N").ToLower();
+    private readonly string schemaName = Guid.CreateVersion7().ToString("N").ToLower();
 
     protected override IHost CreateHost(IHostBuilder builder)
     {

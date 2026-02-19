@@ -13,7 +13,7 @@ namespace Helpdesk.Api.Tests;
 
 public class AppFixture : IAsyncLifetime
 {
-    public IAlbaHost Host { get; private set; } = default!;
+    public IAlbaHost Host { get; private set; } = null!;
 
     // This is a one time initialization of the
     // system under test before the first usage
@@ -53,7 +53,7 @@ public class AppFixture : IAsyncLifetime
 
 // public class BaselineData : IInitialData
 // {
-//     public static Guid Customer1Id { get; } = Guid.NewGuid();
+//     public static Guid Customer1Id { get; } = Guid.CreateVersion7();
 //
 //     public async Task Populate(IDocumentStore store, CancellationToken cancellation)
 //     {

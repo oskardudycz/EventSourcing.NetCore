@@ -10,7 +10,7 @@ public class PostgresContainerFixture: IAsyncLifetime
         .WithReuse(true)
         .Build();
 
-    public NpgsqlDataSource DataSource { get; private set; } = default!;
+    public NpgsqlDataSource DataSource { get; private set; } = null!;
 
     public async Task InitializeAsync()
     {

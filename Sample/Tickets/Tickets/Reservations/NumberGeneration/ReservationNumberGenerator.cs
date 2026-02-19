@@ -7,5 +7,5 @@ public interface IReservationNumberGenerator
 
 internal class ReservationNumberGenerator: IReservationNumberGenerator
 {
-    public string Next() => Guid.NewGuid().ToString();
+    public string Next() => Guid.CreateVersion7().ToString();
 }

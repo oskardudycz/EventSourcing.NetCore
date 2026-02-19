@@ -11,7 +11,7 @@ public class EndToEndPositiveScenarios(ApiSpecification<Program> api):
             .When(
                 POST,
                 URI($"/api/cash-registers/{cashRegisterId}/cashier-shifts"),
-                BODY(new OpenShiftRequest(Guid.NewGuid().ToString()))
+                BODY(new OpenShiftRequest(Guid.CreateVersion7().ToString()))
             ).Then(CREATED_WITH_DEFAULT_HEADERS($"/api/cash-registers/{cashRegisterId}/cashier-shifts/1"));
 
     [Fact]
@@ -20,7 +20,7 @@ public class EndToEndPositiveScenarios(ApiSpecification<Program> api):
             .When(
                 POST,
                 URI($"/api/cash-registers/{cashRegisterId}/cashier-shifts"),
-                BODY(new OpenShiftRequest(Guid.NewGuid().ToString()))
+                BODY(new OpenShiftRequest(Guid.CreateVersion7().ToString()))
             ).Then(PRECONDITION_FAILED);
 
     [Fact]
@@ -47,8 +47,8 @@ public class EndToEndPositiveScenarios(ApiSpecification<Program> api):
             .When(
                 POST,
                 URI($"/api/cash-registers/{cashRegisterId}/cashier-shifts"),
-                BODY(new OpenShiftRequest(Guid.NewGuid().ToString()))
+                BODY(new OpenShiftRequest(Guid.CreateVersion7().ToString()))
             ).Then(CREATED_WITH_DEFAULT_HEADERS($"/api/cash-registers/{cashRegisterId}/cashier-shifts/2"));
 
-    private readonly string cashRegisterId = Guid.NewGuid().ToString();
+    private readonly string cashRegisterId = Guid.CreateVersion7().ToString();
 }

@@ -9,7 +9,7 @@ public interface IProjection
 
 public abstract class Projection: IProjection
 {
-    public Type[] Handles { get; set; } = default!;
+    public Type[] Handles { get; set; } = null!;
 
     protected void Projects<TEvent>(Action<TEvent> action) =>
         throw new NotImplementedException("TODO add storing the projection logic.");

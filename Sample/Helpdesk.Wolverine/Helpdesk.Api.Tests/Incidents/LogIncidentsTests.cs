@@ -12,7 +12,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class LogIncidentsTests(AppFixture fixture): IntegrationContext(fixture)
 {
-    [Fact(Skip = "Need to bump wolverine")]
+    [Fact]
     public async Task LogIncident_ShouldSucceed()
     {
         var result = await Host.Scenario(x =>
@@ -42,7 +42,7 @@ public class LogIncidentsTests(AppFixture fixture): IntegrationContext(fixture)
         );
     }
 
-    private readonly Guid CustomerId = Guid.NewGuid();
+    private readonly Guid CustomerId = Guid.CreateVersion7();
 
     private readonly Contact Contact = new Faker<Contact>().CustomInstantiator(
         f => new Contact(

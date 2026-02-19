@@ -62,16 +62,16 @@ public class RegisterProductTests(WarehouseTestWebApplicationFactory webApplicat
     private static string ValidSKU => $"CC{DateTime.Now.Ticks}";
     private const string ValidDescription = "VALID_DESCRIPTION";
 
-    public static TheoryData<RegisterProductRequest> ValidRequests = new()
-    {
+    public static TheoryData<RegisterProductRequest> ValidRequests =
+    [
         new RegisterProductRequest(ValidSKU, ValidName, ValidDescription),
         new RegisterProductRequest(ValidSKU, ValidName, null)
-    };
+    ];
 
-    public static TheoryData<RegisterProductRequest> InvalidRequests =new()
-    {
+    public static TheoryData<RegisterProductRequest> InvalidRequests =
+    [
         new RegisterProductRequest(null, ValidName, ValidDescription),
         new RegisterProductRequest("INVALID_SKU", ValidName, ValidDescription),
         new RegisterProductRequest(ValidSKU, null, ValidDescription)
-    };
+    ];
 }

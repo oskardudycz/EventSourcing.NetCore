@@ -27,12 +27,12 @@ public class InitializeOrderTests
             )
             .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
-    private readonly Guid ClientId = Guid.NewGuid();
+    private readonly Guid ClientId = Guid.CreateVersion7();
 
     private readonly List<PricedProductItemRequest> ProductItems =
     [
-        new PricedProductItemRequest { ProductId = Guid.NewGuid(), Quantity = 10, UnitPrice = 3 },
-        new PricedProductItemRequest { ProductId = Guid.NewGuid(), Quantity = 3, UnitPrice = 7 }
+        new PricedProductItemRequest { ProductId = Guid.CreateVersion7(), Quantity = 10, UnitPrice = 3 },
+        new PricedProductItemRequest { ProductId = Guid.CreateVersion7(), Quantity = 3, UnitPrice = 7 }
     ];
 
     private decimal TotalPrice => ProductItems.Sum(pi => pi.Quantity!.Value * pi.UnitPrice!.Value);

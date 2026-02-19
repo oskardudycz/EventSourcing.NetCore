@@ -7,8 +7,8 @@ namespace Core.ElasticSearch;
 
 public class ElasticSearchConfig
 {
-    public string Url { get; set; } = default!;
-    public string DefaultIndex { get; set; } = default!;
+    public string Url { get; set; } = null!;
+    public string DefaultIndex { get; set; } = null!;
 }
 
 public static class ElasticSearchConfigExtensions

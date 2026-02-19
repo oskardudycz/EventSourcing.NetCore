@@ -10,7 +10,7 @@ public class Exercise07AggregateAndRepository: IAsyncLifetime
 
     class User : Aggregate
     {
-        public string Name { get; private set; } = default!;
+        public string Name { get; private set; } = null!;
 
         public User(Guid id, string name)
         {
@@ -76,7 +76,7 @@ public class Exercise07AggregateAndRepository: IAsyncLifetime
     [Fact]
     public async Task Repository_FullFlow_ShouldSucceed()
     {
-        var streamId = Guid.NewGuid();
+        var streamId = Guid.CreateVersion7();
         var user = new User(streamId, "John Doe");
 
         await repository.Add(user);

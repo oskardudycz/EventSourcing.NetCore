@@ -58,7 +58,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IAsyncDisposable, 
             "SELECT append_event(@Id, @Data::jsonb, @Type, @StreamId, @StreamType, @ExpectedVersion)",
             new
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 Data = JsonConvert.SerializeObject(@event),
                 Type = @event.GetType().AssemblyQualifiedName,
                 StreamId = streamId,

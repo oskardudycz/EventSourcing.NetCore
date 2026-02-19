@@ -32,14 +32,14 @@ public class SendPackageTests(TestWebApplicationFactory<Program> fixture)
                             expi => expi.ProductId == pi.ProductId && expi.Quantity == pi.Quantity))
             ));
 
-    private readonly Guid OrderId = Guid.NewGuid();
+    private readonly Guid OrderId = Guid.CreateVersion7();
 
     private readonly DateTime TimeBeforeSending = DateTime.UtcNow;
 
     private readonly List<ProductItem> ProductItems =
     [
-        new ProductItem { ProductId = Guid.NewGuid(), Quantity = 10 },
-        new ProductItem { ProductId = Guid.NewGuid(), Quantity = 3 }
+        new ProductItem { ProductId = Guid.CreateVersion7(), Quantity = 10 },
+        new ProductItem { ProductId = Guid.CreateVersion7(), Quantity = 3 }
     ];
 
     private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(

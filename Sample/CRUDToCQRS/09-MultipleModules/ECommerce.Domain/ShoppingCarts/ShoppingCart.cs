@@ -13,7 +13,7 @@ public class ShoppingCart
     public Guid Id { get; private set; }
     public Guid ClientId { get; private set; }
     public ShoppingCartStatus Status { get; private set; }
-    public IList<PricedProductItem> ProductItems { get; private set; } = default!;
+    public IList<PricedProductItem> ProductItems { get; private set; } = null!;
 
     public decimal TotalPrice => ProductItems.Sum(pi => pi.TotalPrice);
 

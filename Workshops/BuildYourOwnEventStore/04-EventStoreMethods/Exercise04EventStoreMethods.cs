@@ -43,7 +43,7 @@ public class Exercise04EventStoreMethods
     [Trait("Category", "SkipCI")]
     public void GetStreamState_ShouldReturnProperStreamInfo()
     {
-        var streamId = Guid.NewGuid();
+        var streamId = Guid.CreateVersion7();
         var @event = new UserCreated(streamId, "John Doe");
 
         eventStore.AppendEvent<User>(streamId, @event);
@@ -59,7 +59,7 @@ public class Exercise04EventStoreMethods
     [Trait("Category", "SkipCI")]
     public void GetEvents_ShouldReturnAppendedEvents()
     {
-        var streamId = Guid.NewGuid();
+        var streamId = Guid.CreateVersion7();
         var userCreated = new UserCreated(streamId, "John Doe");
         var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
 

@@ -8,7 +8,7 @@ public partial class GuestStayAccountTests
 {
     private readonly HandlerSpecification<GuestStayAccount> Spec = Specification.For<GuestStayAccount>(Evolve);
     private readonly DateTimeOffset now = DateTimeOffset.UtcNow;
-    private readonly Guid guestStayAccountId = Guid.NewGuid();
+    private readonly Guid guestStayAccountId = Guid.CreateVersion7();
     private readonly Faker faker = new();
 
     private static GuestStayAccount Evolve(GuestStayAccount guestStayAccount, object @event) =>

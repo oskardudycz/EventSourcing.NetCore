@@ -12,7 +12,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class BatchResolutionTests(AppFixture fixture): IntegrationContext(fixture)
 {
-    [Fact(Skip = "Need to bump wolverine")]
+    [Fact]
     public async Task InitiateBatch_ShouldSucceed()
     {
         // Given
@@ -57,7 +57,7 @@ public class BatchResolutionTests(AppFixture fixture): IntegrationContext(fixtur
         );
     }
 
-    [Fact(Skip = "Need to bump wolverine")]
+    [Fact]
     public async Task Batch_ShouldComplete()
     {
         // Given
@@ -101,6 +101,6 @@ public class BatchResolutionTests(AppFixture fixture): IntegrationContext(fixtur
         );
     }
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
     private readonly ResolutionType resolution = ResolutionType.Permanent;
 }

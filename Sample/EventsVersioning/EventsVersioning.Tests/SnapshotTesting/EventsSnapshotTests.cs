@@ -13,14 +13,14 @@ public class EventsSnapshotTests
     [Fact]
     public Task ShoppingCartConfirmed_WithCompleteData_IsCompatible()
     {
-        var @event = new ShoppingCartConfirmed(Guid.NewGuid(), "Oskar Dudycz", DateTimeOffset.UtcNow);
+        var @event = new ShoppingCartConfirmed(Guid.CreateVersion7(), "Oskar Dudycz", DateTimeOffset.UtcNow);
         return Verify(@event);
     }
 
     [Fact]
     public Task ShoppingCartConfirmed_WithOnlyRequiredData_IsCompatible()
     {
-        var @event = new ShoppingCartConfirmed(Guid.NewGuid(), null, DateTimeOffset.UtcNow);
+        var @event = new ShoppingCartConfirmed(Guid.CreateVersion7(), null, DateTimeOffset.UtcNow);
         return Verify(@event);
     }
 }

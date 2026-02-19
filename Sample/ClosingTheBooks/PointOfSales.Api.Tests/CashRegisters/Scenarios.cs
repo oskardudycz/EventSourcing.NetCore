@@ -10,7 +10,7 @@ public static class Scenarios
         SEND(
             "Initialize Cash Register",
             POST,
-            URI($"/api/cash-registers/{cashRegisterId ?? Guid.NewGuid().ToString()}")
+            URI($"/api/cash-registers/{cashRegisterId ?? Guid.CreateVersion7().ToString()}")
         );
 
     public static RequestDefinition OpenedCashierShift(string cashRegisterId, string? cashierId = null) =>
@@ -18,7 +18,7 @@ public static class Scenarios
             "Open Cashier Shift",
             POST,
             URI($"/api/cash-registers/{cashRegisterId}/cashier-shifts"),
-            BODY(new OpenShiftRequest(cashierId ?? Guid.NewGuid().ToString()))
+            BODY(new OpenShiftRequest(cashierId ?? Guid.CreateVersion7().ToString()))
         );
 
     public static RequestDefinition RegisteredTransaction(Guid cashRegisterId, int shiftNumber, decimal? amount) =>

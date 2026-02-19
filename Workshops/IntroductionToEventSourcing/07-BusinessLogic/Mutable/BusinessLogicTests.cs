@@ -23,10 +23,10 @@ public class BusinessLogicTests
     [Trait("Category", "SkipCI")]
     public void RunningSequenceOfBusinessLogic_ShouldGenerateSequenceOfEvents()
     {
-        var shoppingCartId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
-        var shoesId = Guid.NewGuid();
-        var tShirtId = Guid.NewGuid();
+        var shoppingCartId = Guid.CreateVersion7();
+        var clientId = Guid.CreateVersion7();
+        var shoesId = Guid.CreateVersion7();
+        var tShirtId = Guid.CreateVersion7();
         var twoPairsOfShoes = new ProductItem { ProductId = shoesId, Quantity = 2 };
         var pairOfShoes = new ProductItem { ProductId = shoesId, Quantity = 1 };
         var tShirt = new ProductItem { ProductId = tShirtId, Quantity = 1 };

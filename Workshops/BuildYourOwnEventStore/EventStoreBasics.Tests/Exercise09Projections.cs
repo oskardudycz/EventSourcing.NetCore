@@ -13,7 +13,7 @@ public class Exercise09Projections: IAsyncLifetime
 {
     class User : Aggregate
     {
-        public string Name { get; private set; } = default!;
+        public string Name { get; private set; } = null!;
 
         // added only for dapper deserialization needs
         private User() {}
@@ -61,7 +61,7 @@ public class Exercise09Projections: IAsyncLifetime
 
     class Order : Aggregate
     {
-        public string Number { get; private set; } = default!;
+        public string Number { get; private set; } = null!;
 
         public decimal Amount { get; private set; }
 
@@ -186,12 +186,12 @@ public class Exercise09Projections: IAsyncLifetime
     [Fact]
     public async Task AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
     {
-        var user = new User(Guid.NewGuid(), "John Doe");
+        var user = new User(Guid.CreateVersion7(), "John Doe");
 
         await userRepository.Add(user);
 
-        var firstOrder = new Order(Guid.NewGuid(), user.Id, "ORD/2019/08/01", 100.13M);
-        var secondOrder = new Order(Guid.NewGuid(), user.Id, "ORD/2019/08/01", 2.110M);
+        var firstOrder = new Order(Guid.CreateVersion7(), user.Id, "ORD/2019/08/01", 100.13M);
+        var secondOrder = new Order(Guid.CreateVersion7(), user.Id, "ORD/2019/08/01", 2.110M);
 
         await orderRepository.Add(firstOrder);
         await orderRepository.Add(secondOrder);

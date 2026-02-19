@@ -9,10 +9,10 @@ public record MeetingScheduled(
 {
     public static MeetingScheduled Create(Guid meetingId, DateRange occurs)
     {
-        if (meetingId == default)
+        if (meetingId == Guid.Empty)
             throw new ArgumentException($"{nameof(meetingId)} needs to be defined.");
 
-        if (occurs == default(DateRange))
+        if (occurs == null)
             throw new ArgumentException($"{nameof(occurs)} needs to be defined.");
 
         return new MeetingScheduled(meetingId, occurs);

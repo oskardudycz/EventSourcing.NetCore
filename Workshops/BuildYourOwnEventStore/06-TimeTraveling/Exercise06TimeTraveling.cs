@@ -10,7 +10,7 @@ public class Exercise06TimeTravelling
     public class User
     {
         public Guid Id { get; private set; }
-        public string Name { get; private set; } = default!;
+        public string Name { get; private set; } = null!;
         public long Version { get; private set; }
 
         public User(Guid id, string name)
@@ -65,7 +65,7 @@ public class Exercise06TimeTravelling
     [Trait("Category", "SkipCI")]
     public void AggregateStream_ShouldReturnSpecifiedVersionOfTheStream()
     {
-        var streamId = Guid.NewGuid();
+        var streamId = Guid.CreateVersion7();
         var userCreated = new UserCreated(streamId, "John Doe");
         var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
         var userNameUpdatedAgain = new UserNameUpdated(streamId, "Michael Newman");

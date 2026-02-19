@@ -36,6 +36,6 @@ public class ResolveIncidentTests(ApiWithLoggedIncident api): IClassFixture<ApiW
             );
     }
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
     private readonly ResolutionType resolutionType = new Faker().PickRandom<ResolutionType>();
 }

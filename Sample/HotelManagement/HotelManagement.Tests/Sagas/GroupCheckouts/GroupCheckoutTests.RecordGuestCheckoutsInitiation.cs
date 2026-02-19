@@ -9,7 +9,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenNonExistingGroupCheckout_WhenRecordGuestCheckoutsInitiation_ThenIgnores()
     {
-        var guestStaysIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStaysIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
 
         Spec.Given()
             .When(state => state.RecordGuestCheckoutsInitiation(guestStaysIds, now).IsPresent)
@@ -19,7 +19,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenInitiatedGroupCheckout_WhenRecordGuestCheckoutsInitiation_ThenSucceeds()
     {
-        var guestStaysIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStaysIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
 
         Spec.Given(new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStaysIds, now))
             .When(state => state.RecordGuestCheckoutsInitiation(guestStaysIds, now).GetOrThrow())

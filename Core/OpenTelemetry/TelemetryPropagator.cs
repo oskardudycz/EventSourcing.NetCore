@@ -7,10 +7,9 @@ public static class TelemetryPropagator
     public static void UseDefaultCompositeTextMapPropagator()
     {
         propagator =
-            new CompositeTextMapPropagator(new TextMapPropagator[]
-            {
+            new CompositeTextMapPropagator([
                 new TraceContextPropagator(), new BaggagePropagator()
-            });
+            ]);
     }
 
     public static void Inject<T>(

@@ -6,8 +6,8 @@ namespace Core.Kafka.Consumers;
 
 public class KafkaConsumerConfig
 {
-    public ConsumerConfig ConsumerConfig { get; set; } = default!;
-    public string[] Topics { get; set; } = default!;
+    public ConsumerConfig ConsumerConfig { get; set; } = null!;
+    public string[] Topics { get; set; } = null!;
 
     public bool IgnoreDeserializationErrors { get; set; } =  true;
 }

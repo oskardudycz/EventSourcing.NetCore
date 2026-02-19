@@ -94,11 +94,11 @@ public class EventsDefinitionTests
     [Fact]
     public void AllEventTypes_ShouldBeDefined()
     {
-        var shoppingCartId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
+        var shoppingCartId = Guid.CreateVersion7();
+        var clientId = Guid.CreateVersion7();
         var pairOfShoes = new PricedProductItem
         {
-            ProductId = Guid.NewGuid(),
+            ProductId = Guid.CreateVersion7(),
             Quantity = 1,
             UnitPrice = 100
         };

@@ -11,7 +11,7 @@ public class ApiWithAcknowledgedIncident: ApiSpecification<Program>, IAsyncLifet
         Incident = await this.AcknowledgedIncident();
     }
 
-    public IncidentDetails Incident { get; set; } = default!;
+    public IncidentDetails Incident { get; set; } = null!;
 
     public Task DisposeAsync() => Task.CompletedTask;
 }

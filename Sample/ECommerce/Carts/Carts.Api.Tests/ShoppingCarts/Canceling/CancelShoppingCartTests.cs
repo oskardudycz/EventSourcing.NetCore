@@ -36,5 +36,5 @@ public class CancelShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
                     details.Version.Should().Be(2);
                 }));
 
-    private readonly Guid clientId = Guid.NewGuid();
+    private readonly Guid clientId = Guid.CreateVersion7();
 }

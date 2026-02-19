@@ -13,7 +13,7 @@ public class ShoppingCart
 
 public class TestDbContext(DbContextOptions<TestDbContext> options): DbContext(options)
 {
-    public DbSet<ShoppingCart> ShoppingCarts { get; set; } = default!;
+    public DbSet<ShoppingCart> ShoppingCarts { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.Entity<ShoppingCart>();

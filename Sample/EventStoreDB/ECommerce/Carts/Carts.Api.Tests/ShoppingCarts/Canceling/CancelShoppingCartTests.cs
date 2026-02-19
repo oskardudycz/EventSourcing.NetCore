@@ -10,7 +10,7 @@ namespace Carts.Api.Tests.ShoppingCarts.Canceling;
 
 public class CancelShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
 {
-    public readonly Guid ClientId = Guid.NewGuid();
+    public readonly Guid ClientId = Guid.CreateVersion7();
 
     [Fact]
     [Trait("Category", "Acceptance")]

@@ -22,7 +22,7 @@ public class ProductItems
     public ProductItems Add(PricedProductItem productItem) =>
         new(
             Values
-                .Concat(new[] { productItem })
+                .Concat([productItem])
                 .GroupBy(pi => pi.ProductId)
                 .Select(group => group.Count() == 1
                     ? group.First()

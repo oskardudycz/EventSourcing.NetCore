@@ -287,10 +287,10 @@ public class BusinessLogicTests
             .ThenThrows<InvalidOperationException>();
 
     private readonly DateTimeOffset now = DateTimeOffset.Now;
-    private readonly Guid clientId = Guid.NewGuid();
-    private readonly Guid shoppingCartId = Guid.NewGuid();
-    private static readonly Guid ProductId = Guid.NewGuid();
-    private static readonly Guid OtherProductId = Guid.NewGuid();
+    private readonly Guid clientId = Guid.CreateVersion7();
+    private readonly Guid shoppingCartId = Guid.CreateVersion7();
+    private static readonly Guid ProductId = Guid.CreateVersion7();
+    private static readonly Guid OtherProductId = Guid.CreateVersion7();
     private static readonly int Quantity = Random.Shared.Next(1, 1000);
     private static readonly int OtherQuantity = Random.Shared.Next(1, 1000);
     private static readonly int Price = Random.Shared.Next(1, 1000);

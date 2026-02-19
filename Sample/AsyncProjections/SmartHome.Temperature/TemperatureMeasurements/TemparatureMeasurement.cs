@@ -9,7 +9,7 @@ public class TemperatureMeasurement: Aggregate
     public DateTimeOffset Started { get; set; }
     public DateTimeOffset? LastRecorded { get; set; }
 
-    public List<decimal> Mesurements { get; set; } = default!;
+    public List<decimal> Mesurements { get; set; } = null!;
 
     // For serialization
     public TemperatureMeasurement() { }

@@ -14,7 +14,7 @@ public class Exercise08Snapshots
 {
     public class User: Aggregate
     {
-        public string Name { get; private set; } = default!;
+        public string Name { get; private set; } = null!;
 
         // added only for dapper deserialization needs
         private User() { }
@@ -111,7 +111,7 @@ public class Exercise08Snapshots
     [Trait("Category", "SkipCI")]
     public void AddingAndUpdatingAggregate_ShouldCreateAndUpdateSnapshotAccordingly()
     {
-        var streamId = Guid.NewGuid();
+        var streamId = Guid.CreateVersion7();
         var user = new User(streamId, "John Doe");
 
         repository.Add(user);
@@ -140,9 +140,9 @@ public class Exercise08Snapshots
     {
         const string john = "John";
 
-        var firstMatchingUser = new User(Guid.NewGuid(), $"{john} Doe");
-        var secondMatchingUser = new User(Guid.NewGuid(), $"{john} Smith");
-        var notMatchingUser = new User(Guid.NewGuid(), "Anna Smith");
+        var firstMatchingUser = new User(Guid.CreateVersion7(), $"{john} Doe");
+        var secondMatchingUser = new User(Guid.CreateVersion7(), $"{john} Smith");
+        var notMatchingUser = new User(Guid.CreateVersion7(), "Anna Smith");
 
         repository.Add(firstMatchingUser);
         repository.Add(secondMatchingUser);

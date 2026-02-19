@@ -18,7 +18,7 @@ public class EntityDefinitionTests
     public async Task CheckingInGuest_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
+        var guestStayId = Guid.CreateVersion7();
         var command = new CheckInGuest(guestStayId, now);
         publishedMessages.Reset();
 
@@ -33,7 +33,7 @@ public class EntityDefinitionTests
     public async Task RecordingChargeForCheckedInGuest_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
+        var guestStayId = Guid.CreateVersion7();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
         publishedMessages.Reset();
         // And
@@ -51,7 +51,7 @@ public class EntityDefinitionTests
     public async Task RecordingPaymentForCheckedInGuest_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
+        var guestStayId = Guid.CreateVersion7();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
         publishedMessages.Reset();
         // And
@@ -69,7 +69,7 @@ public class EntityDefinitionTests
     public async Task RecordingPaymentForCheckedInGuestWithCharge_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
+        var guestStayId = Guid.CreateVersion7();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
         await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, generate.Finance.Amount(), now.AddHours(-1)));
         publishedMessages.Reset();
@@ -88,7 +88,7 @@ public class EntityDefinitionTests
     public async Task CheckingOutGuestWithSettledBalance_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
+        var guestStayId = Guid.CreateVersion7();
 
         var amount = generate.Finance.Amount();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
@@ -109,7 +109,7 @@ public class EntityDefinitionTests
     public async Task CheckingOutGuestWithSettledBalance_FailsWithGuestCheckoutFailed()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
+        var guestStayId = Guid.CreateVersion7();
 
         var amount = generate.Finance.Amount();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
@@ -137,15 +137,15 @@ public class EntityDefinitionTests
     public async Task GroupCheckoutForMultipleGuestStay_ShouldBeInitiated()
     {
         // Given;
-        Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        Guid[] guestStays = [Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7()];
 
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
         publishedMessages.Reset();
         // And
-        var groupCheckoutId = Guid.NewGuid();
-        var clerkId = Guid.NewGuid();
+        var groupCheckoutId = Guid.CreateVersion7();
+        var clerkId = Guid.CreateVersion7();
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When

@@ -87,8 +87,8 @@
 //         [Fact]
 //         public void GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
 //         {
-//             var issue1Id = Guid.NewGuid();
-//             var issue2Id = Guid.NewGuid();
+//             var issue1Id = Guid.CreateVersion7();
+//             var issue2Id = Guid.CreateVersion7();
 //
 //             var events = new IIssueEvent[]
 //             {

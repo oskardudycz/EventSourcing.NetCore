@@ -76,7 +76,7 @@ public class TenancyPerSchema(MartenFixture fixture): MartenTest(fixture.Postgre
 
             await using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
             {
-                session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), FirstTenant));
+                session.Insert(new TestDocumentForTenancy(Guid.CreateVersion7(), FirstTenant));
                 await session.SaveChangesAsync();
             }
         }
@@ -88,7 +88,7 @@ public class TenancyPerSchema(MartenFixture fixture): MartenTest(fixture.Postgre
 
             await using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
             {
-                session.Insert(new TestDocumentForTenancy(Guid.NewGuid(), SecondTenant));
+                session.Insert(new TestDocumentForTenancy(Guid.CreateVersion7(), SecondTenant));
                 await session.SaveChangesAsync();
             }
         }

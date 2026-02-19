@@ -8,7 +8,7 @@ public class EfCorePostgresContainerFixture<TContext>: IAsyncLifetime where TCon
 {
     private readonly PostgresContainerFixture postgresContainerFixture = new();
 
-    public TContext DbContext { get; private set; } = default!;
+    public TContext DbContext { get; private set; } = null!;
 
     public async Task InitializeAsync()
     {

@@ -59,10 +59,10 @@ public class GettingStateFromEventsTests
     [Trait("Category", "SkipCI")]
     public async Task AppendingEvents_ForSequenceOfEvents_ShouldSucceed()
     {
-        var shoppingCartId = Guid.NewGuid();
-        var clientId = Guid.NewGuid();
-        var shoesId = Guid.NewGuid();
-        var tShirtId = Guid.NewGuid();
+        var shoppingCartId = Guid.CreateVersion7();
+        var clientId = Guid.CreateVersion7();
+        var shoesId = Guid.CreateVersion7();
+        var tShirtId = Guid.CreateVersion7();
         var twoPairsOfShoes = new PricedProductItem(new ProductItem(shoesId, 2), 100);
         var pairOfShoes = new PricedProductItem(new ProductItem(shoesId, 1), 100);
         var tShirt = new PricedProductItem(new ProductItem(tShirtId, 1), 50);

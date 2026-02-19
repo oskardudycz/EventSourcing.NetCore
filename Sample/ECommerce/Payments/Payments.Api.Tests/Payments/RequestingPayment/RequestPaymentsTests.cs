@@ -23,7 +23,7 @@ public class RequestPaymentsTests
             )
             .Then(CREATED_WITH_DEFAULT_HEADERS(eTag: 1));
 
-    private readonly Guid OrderId = Guid.NewGuid();
+    private readonly Guid OrderId = Guid.CreateVersion7();
 
     private readonly decimal Amount = new Random().Next(100);
 }

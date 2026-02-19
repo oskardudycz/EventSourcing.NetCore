@@ -11,7 +11,7 @@ public class OrderDetails
     public Guid Id { get; private set; }
     public Guid ClientId { get; private set; }
 
-    public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = default!;
+    public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = null!;
 
     public decimal TotalPrice { get; private set; } = 0;
 

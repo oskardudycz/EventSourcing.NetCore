@@ -44,7 +44,7 @@ public class CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
                 ));
     }
 
-    private readonly Guid MeetingId = Guid.NewGuid();
+    private readonly Guid MeetingId = Guid.CreateVersion7();
     private readonly string MeetingName = "Event Sourcing Workshop";
 
     public void Dispose() => API.Dispose();

@@ -26,7 +26,7 @@ public static class EventStoreDBExtensions
 
         var result = getDefault();
         await foreach (var @event in readResult)
-            result = when(result, @event);
+            result = when(result, @event.Deserialize()!);
         return result;
     }
 
@@ -62,7 +62,7 @@ public static class EventStoreDBExtensions
         var result = await eventStore.AppendToStreamAsync(
             id,
             StreamState.NoStream,
-            new[] { @event.ToJsonEventData(TelemetryPropagator.GetPropagationContext()) },
+            [@event.ToJsonEventData(TelemetryPropagator.GetPropagationContext())],
             cancellationToken: cancellationToken
         );
         return result.NextExpectedStreamRevision;
@@ -80,7 +80,7 @@ public static class EventStoreDBExtensions
         var result = await eventStore.AppendToStreamAsync(
             id,
             expectedRevision,
-            new[] { @event.ToJsonEventData(TelemetryPropagator.GetPropagationContext()) },
+            [@event.ToJsonEventData(TelemetryPropagator.GetPropagationContext())],
             cancellationToken: cancellationToken
         );
 

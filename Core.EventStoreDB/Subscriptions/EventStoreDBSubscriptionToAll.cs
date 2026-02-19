@@ -48,9 +48,9 @@ public class EventStoreDBSubscriptionToAll(
 
     public record EventBatch(string SubscriptionId, ResolvedEvent[] Events);
 
-    public EventStoreDBSubscriptionToAllOptions Options { get; set; } = default!;
+    public EventStoreDBSubscriptionToAllOptions Options { get; set; } = null!;
 
-    public Func<IServiceProvider, IEventBatchHandler[]> GetHandlers { get; set; } = default!;
+    public Func<IServiceProvider, IEventBatchHandler[]> GetHandlers { get; set; } = null!;
 
     public ProcessingStatus Status = ProcessingStatus.NotStarted;
 

@@ -43,8 +43,8 @@ public static V1.ShoppingCartOpened Downcast(
     {
         // Given
         var newEvent = new ShoppingCartOpened(
-            Guid.NewGuid(),
-            new Client( Guid.NewGuid(), "Oskar the Grouch")
+            Guid.CreateVersion7(),
+            new Client( Guid.CreateVersion7(), "Oskar the Grouch")
         );
 
         // When
@@ -60,8 +60,8 @@ public static V1.ShoppingCartOpened Downcast(
     {
         // Given
         var newEvent = new ShoppingCartOpened(
-            Guid.NewGuid(),
-            new Client( Guid.NewGuid(), "Oskar the Grouch")
+            Guid.CreateVersion7(),
+            new Client( Guid.CreateVersion7(), "Oskar the Grouch")
         );
         // When
         var @event = Downcast(

@@ -9,7 +9,7 @@ public class Exercise07AggregateAndRepository
 {
     public class User: Aggregate
     {
-        public string Name { get; private set; } = default!;
+        public string Name { get; private set; } = null!;
 
         public User(Guid id, string name)
         {
@@ -76,7 +76,7 @@ public class Exercise07AggregateAndRepository
     [Trait("Category", "SkipCI")]
     public void Repository_FullFlow_ShouldSucceed()
     {
-        var streamId = Guid.NewGuid();
+        var streamId = Guid.CreateVersion7();
         var user = new User(streamId, "John Doe");
 
         repository.Add(user);

@@ -77,7 +77,7 @@ public abstract class Aggregate<TKey, T>
     where TKey : StronglyTypedValue<T>
     where T : IComparable<T>
 {
-    public TKey Id { get; set; } = default!;
+    public TKey Id { get; set; } = null!;
 
     [Identity]
     public T AggregateId
@@ -114,11 +114,11 @@ public enum ReservationStatus
 
 public class Reservation: Aggregate<ReservationId, Guid>
 {
-    public CustomerId CustomerId { get; private set; } = default!;
+    public CustomerId CustomerId { get; private set; } = null!;
 
-    public SeatId SeatId { get; private set; } = default!;
+    public SeatId SeatId { get; private set; } = null!;
 
-    public ReservationNumber Number { get; private set; } = default!;
+    public ReservationNumber Number { get; private set; } = null!;
 
     public ReservationStatus Status { get; private set; }
 
@@ -127,10 +127,10 @@ public class Reservation: Aggregate<ReservationId, Guid>
         SeatId seatId,
         CustomerId customerId) =>
         new(
-            new ReservationId(Guid.NewGuid()),
+            new ReservationId(Guid.CreateVersion7()),
             seatId,
             customerId,
-            new ReservationNumber(Guid.NewGuid().ToString())
+            new ReservationNumber(Guid.CreateVersion7().ToString())
         );
 
     private Reservation() { }
@@ -239,8 +239,8 @@ public class CompositeIdsTests(MartenFixture fixture): MartenTest(fixture.Postgr
     [Fact]
     public async Task GivenAggregateWithCompositeId_WhenAppendedEvent_LiveAndInlineAggregationWorks()
     {
-        var seatId = new SeatId(Guid.NewGuid());
-        var customerId = new CustomerId(Guid.NewGuid());
+        var seatId = new SeatId(Guid.CreateVersion7());
+        var customerId = new CustomerId(Guid.CreateVersion7());
 
         var reservation = Reservation.CreateTentative(seatId, customerId);
         var @event = reservation.DequeueUncommittedEvents().Single();

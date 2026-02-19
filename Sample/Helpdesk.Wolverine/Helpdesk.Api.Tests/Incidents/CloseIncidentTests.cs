@@ -8,7 +8,7 @@ namespace Helpdesk.Api.Tests.Incidents;
 
 public class CloseIncidentTests(AppFixture fixture): ApiWithAcknowledgedIncident(fixture)
 {
-    [Fact(Skip = "Need to bump wolverine")]
+    [Fact]
     [Trait("Category", "Acceptance")]
     public async Task ResolveCommand_Succeeds()
     {
@@ -23,5 +23,5 @@ public class CloseIncidentTests(AppFixture fixture): ApiWithAcknowledgedIncident
         await Host.IncidentDetailsShouldBe(Incident with { Status = IncidentStatus.Closed, Version = 4 });
     }
 
-    private Guid agentId = Guid.NewGuid();
+    private Guid agentId = Guid.CreateVersion7();
 }

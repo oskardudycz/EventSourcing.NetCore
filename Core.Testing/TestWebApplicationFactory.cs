@@ -16,7 +16,7 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
     private readonly DummyExternalCommandBus externalCommandBus = new();
     private readonly EventListener eventListener = new();
 
-    private readonly string schemaName = $"test{Guid.NewGuid().ToString("N").ToLower()}";
+    private readonly string schemaName = $"test{Guid.CreateVersion7().ToString("N").ToLower()}";
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
@@ -49,7 +49,7 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
 
     public Task PublishInternalEvent<TEvent>(TEvent @event, CancellationToken ct = default) where TEvent : notnull =>
         PublishInternalEvent(
-            new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.NewGuid().ToString(), 0, 0, null)), ct);
+            new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.CreateVersion7().ToString(), 0, 0, null)), ct);
 
     public async Task PublishInternalEvent<TEvent>(EventEnvelope<TEvent> eventEnvelope, CancellationToken ct = default)
         where TEvent : notnull

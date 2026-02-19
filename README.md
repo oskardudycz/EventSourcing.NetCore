@@ -548,10 +548,10 @@ public class Reservation : Aggregate<ReservationId, Guid>
         CustomerId customerId)
     {
         return new Reservation(
-            new ReservationId(Guid.NewGuid()),
+            new ReservationId(Guid.CreateVersion7()),
             seatId,
             customerId,
-            new ReservationNumber(Guid.NewGuid().ToString())
+            new ReservationNumber(Guid.CreateVersion7().ToString())
         );
     }
 
@@ -866,18 +866,18 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
     -   **[Stream starting](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Stream/StreamStarting.cs)** - stream should be always started with a unique id. Marten provides three ways of starting the stream:
         -   calling StartStream method with a stream id
             ```csharp
-            var streamId = Guid.NewGuid();
+            var streamId = Guid.CreateVersion7();
             documentSession.Events.StartStream<IssuesList>(streamId);
             ```
         -   calling StartStream method with a set of events
             ```csharp
-            var @event = new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description" };
+            var @event = new IssueCreated { IssueId = Guid.CreateVersion7(), Description = "Description" };
             var streamId = documentSession.Events.StartStream<IssuesList>(@event);
             ```
         -   just appending events with a stream id
             ```csharp
-            var @event = new IssueCreated { IssueId = Guid.NewGuid(), Description = "Description" };
-            var streamId = Guid.NewGuid();
+            var @event = new IssueCreated { IssueId = Guid.CreateVersion7(), Description = "Description" };
+            var streamId = Guid.CreateVersion7();
             documentSession.Events.Append(streamId, @event);
             ```
     -   **[Stream loading](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Stream/StreamLoading.cs)** - all events that were placed on the event store should be possible to load them back. [Marten](https://github.com/JasperFx/marten) allows to:

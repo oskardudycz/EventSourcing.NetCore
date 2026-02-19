@@ -11,7 +11,7 @@ public static class ShoppingCartsApi
             "Open ShoppingCart",
             POST,
             URI("/api/ShoppingCarts"),
-            BODY(new OpenShoppingCartRequest(clientId ?? Guid.NewGuid()))
+            BODY(new OpenShoppingCartRequest(clientId ?? Guid.CreateVersion7()))
         );
 
     public static Guid OpenedShoppingCartId(this TestContext ctx) =>

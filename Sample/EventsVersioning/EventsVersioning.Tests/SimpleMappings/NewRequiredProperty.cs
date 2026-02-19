@@ -25,7 +25,7 @@ public class NewRequiredProperty
     public void Should_BeForwardCompatible()
     {
         // Given
-        var oldEvent = new V1.ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid());
+        var oldEvent = new V1.ShoppingCartOpened(Guid.CreateVersion7(), Guid.CreateVersion7());
         var json = JsonSerializer.Serialize(oldEvent);
 
         // When
@@ -41,7 +41,7 @@ public class NewRequiredProperty
     public void Should_BeBackwardCompatible()
     {
         // Given
-        var @event = new ShoppingCartOpened(Guid.NewGuid(), Guid.NewGuid(), ShoppingCartStatus.Pending);
+        var @event = new ShoppingCartOpened(Guid.CreateVersion7(), Guid.CreateVersion7(), ShoppingCartStatus.Pending);
         var json = JsonSerializer.Serialize(@event);
 
         // When

@@ -7,7 +7,7 @@ namespace Core.Kafka.Producers;
 public class KafkaProducerConfig
 {
     public ProducerConfig? ProducerConfig { get; set; }
-    public string Topic { get; set; } = default!;
+    public string Topic { get; set; } = null!;
     public int? ProducerTimeoutInMs { get; set; }
 }
 

@@ -14,7 +14,7 @@ namespace Core.EventStoreDB;
 
 public class EventStoreDBConfig
 {
-    public string ConnectionString { get; set; } = default!;
+    public string ConnectionString { get; set; } = null!;
 }
 
 public record EventStoreDBOptions(

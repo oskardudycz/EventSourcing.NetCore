@@ -8,7 +8,7 @@ using static GuestCheckoutFailed;
 
 public partial class GuestStayAccountTests
 {
-    private readonly Guid groupCheckoutId = Guid.NewGuid();
+    private readonly Guid groupCheckoutId = Guid.CreateVersion7();
 
     [Fact]
     public void GivenNonExistingGuestStayAccount_WhenCheckOut_ThenFails() =>

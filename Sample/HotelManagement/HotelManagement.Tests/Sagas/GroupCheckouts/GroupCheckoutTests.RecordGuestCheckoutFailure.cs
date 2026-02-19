@@ -9,7 +9,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenNonExistingGroupCheckout_WhenRecordGuestCheckoutFailure_ThenIgnores()
     {
-        var guestStaysId = Guid.NewGuid();
+        var guestStaysId = Guid.CreateVersion7();
 
         Spec.Given()
             .When(state => state.RecordGuestCheckoutFailure(guestStaysId, now).IsPresent)
@@ -19,7 +19,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenInitiatedGroupCheckout_WhenRecordGuestCheckoutFailure_ThenSucceeds()
     {
-        var guestStaysIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStaysIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
 
         Spec.Given(
                 new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStaysIds, now),
@@ -32,7 +32,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenInitiatedGroupCheckout_WhenRecordGuestCheckoutFailureTwice_ThenIgnores()
     {
-        var guestStaysIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStaysIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
 
         Spec.Given(
                 new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStaysIds, now),
@@ -46,7 +46,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenInitiatedGroupCheckout_WhenRecordLastGuestCheckoutFailure_ThenCompletesWithFailure()
     {
-        var guestStaysIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStaysIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
 
         Spec.Given(
                 new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStaysIds, now),
@@ -70,7 +70,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenInitiatedGroupCheckoutWithFailure_WhenRecordLastGuestCheckoutFailure_ThenCompletesWithFailure()
     {
-        var guestStaysIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStaysIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
 
         Spec.Given(
                 new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStaysIds, now),
@@ -93,7 +93,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenCompletedGroupCheckoutWithFailure_WhenRecordGuestCheckoutFailure_ThenIgnores()
     {
-        var guestStaysIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStaysIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
 
         Spec.Given(
                 new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStaysIds, now),
@@ -115,7 +115,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenCompletedGroupCheckout_WhenRecordGuestCheckoutFailure_ThenIgnores()
     {
-        var guestStaysIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStaysIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
 
         Spec.Given(
                 new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStaysIds, now),

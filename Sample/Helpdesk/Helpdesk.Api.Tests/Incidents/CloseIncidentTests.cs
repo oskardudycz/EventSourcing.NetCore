@@ -31,5 +31,5 @@ public class CloseIncidentTests(ApiWithAcknowledgedIncident api): IClassFixture<
             );
     }
 
-    private Guid agentId = Guid.NewGuid();
+    private Guid agentId = Guid.CreateVersion7();
 }

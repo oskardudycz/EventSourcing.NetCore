@@ -35,8 +35,9 @@ public abstract class MartenTest(
     protected string ConnectionString => postgreSqlContainer.GetConnectionString();
 
     protected IEventStoreOperations EventStore => Session.Events;
+    protected static string GenerateRandomId() => Guid.CreateVersion7().ToString();
 
-    protected readonly string SchemaName = useRandomSchema ? "sch" + Guid.NewGuid().ToString("N") : "EventStore";
+    protected readonly string SchemaName = useRandomSchema ? "sch" + Guid.CreateVersion7().ToString("N") : "EventStore";
 
     protected virtual IDocumentSession CreateSession(Action<StoreOptions>? storeOptions = null)
     {

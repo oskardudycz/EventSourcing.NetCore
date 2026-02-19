@@ -10,7 +10,7 @@ public record MeetingCreated(
 {
     public static MeetingCreated Create(Guid meetingId, string name, DateTime created)
     {
-        if (meetingId == default)
+        if (meetingId == Guid.Empty)
             throw new ArgumentException($"{nameof(meetingId)} needs to be defined.");
 
         if (created == default)

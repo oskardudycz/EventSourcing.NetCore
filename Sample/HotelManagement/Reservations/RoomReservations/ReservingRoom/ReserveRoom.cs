@@ -81,7 +81,7 @@ public record ReserveRoom
             numberOfPeople.NotEmpty(),
             now.NotEmpty(),
             ReservationSource.External,
-            Array.Empty<DailyRoomTypeAvailability>(),
+            [],
             externalId.NotEmpty()
         );
 }

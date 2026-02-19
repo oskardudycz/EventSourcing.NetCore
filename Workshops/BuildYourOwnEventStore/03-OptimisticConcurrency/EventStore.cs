@@ -17,7 +17,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
     public bool AppendEvent<TStream>(Guid streamId, object @event, long? expectedVersion = null)
     {
         // 1. Pass unique event id as Guid (as it's the primary key)
-        var eventId = Guid.NewGuid();
+        var eventId = Guid.CreateVersion7();
 
         //2. Serialize event data to JSON
         string eventData = null!; // TODO: Add here @event serialization

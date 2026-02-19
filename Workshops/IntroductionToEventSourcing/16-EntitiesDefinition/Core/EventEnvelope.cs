@@ -7,7 +7,7 @@ public record EventMetadata(
 )
 {
     public static EventMetadata For(ulong streamPosition, ulong logPosition) =>
-        new(Guid.NewGuid().ToString(), streamPosition, logPosition);
+        new(Guid.CreateVersion7().ToString(), streamPosition, logPosition);
 }
 
 public record EventEnvelope(

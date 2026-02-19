@@ -50,8 +50,8 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
 
 
     private Guid ShoppingCartId { get; set; }
-    private readonly Guid clientId = Guid.NewGuid();
-    private readonly ProductItemRequest productItem = new(Guid.NewGuid(), 10);
+    private readonly Guid clientId = Guid.CreateVersion7();
+    private readonly ProductItemRequest productItem = new(Guid.CreateVersion7(), 10);
     private decimal unitPrice;
     private const int RemovedCount = 5;
 

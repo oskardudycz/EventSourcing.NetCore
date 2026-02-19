@@ -31,5 +31,5 @@ public static class EventEnvelope
     }
 
     public static EventEnvelope<T> From<T>(T data) where T : notnull =>
-        new(data, new EventMetadata(Guid.NewGuid().ToString(), 0, 0, null));
+        new(data, new EventMetadata(Guid.CreateVersion7().ToString(), 0, 0, null));
 }

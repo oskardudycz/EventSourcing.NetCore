@@ -1,4 +1,5 @@
 ﻿using JasperFx;
+using JasperFx.Events;
 
 namespace Marten.Integration.Tests.TestsInfrastructure;
 
@@ -13,6 +14,7 @@ public static class DocumentStoreProvider
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.DatabaseSchemaName = schemaName ?? SchemaName;
             options.Events.DatabaseSchemaName = schemaName ?? SchemaName;
+            options.Events.StreamIdentity = StreamIdentity.AsString;
 
             setOptions?.Invoke(options);
         });

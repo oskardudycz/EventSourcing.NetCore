@@ -27,7 +27,7 @@ namespace MarketBasketAnalytics.CartAbandonmentRateAnalysis
             @event switch
             {
                 ShoppingCartInitialized (var cartId, var clientId, var initializedAt) =>
-                    new CartAbandonmentRateCalculated(cartId, clientId, 0, 0, initializedAt, default, default),
+                    new CartAbandonmentRateCalculated(cartId, clientId, 0, 0, initializedAt, default, TimeSpan.Zero),
 
                 ProductItemAddedToShoppingCart (_, var productItem) =>
                     lastEvent! with

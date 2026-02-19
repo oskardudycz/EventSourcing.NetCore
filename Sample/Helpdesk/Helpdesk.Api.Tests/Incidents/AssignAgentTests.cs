@@ -26,5 +26,5 @@ public class AssignAgentToIncidentTests(ApiWithLoggedIncident api): IClassFixtur
                 )
             );
 
-    private readonly Guid agentId = Guid.NewGuid();
+    private readonly Guid agentId = Guid.CreateVersion7();
 }

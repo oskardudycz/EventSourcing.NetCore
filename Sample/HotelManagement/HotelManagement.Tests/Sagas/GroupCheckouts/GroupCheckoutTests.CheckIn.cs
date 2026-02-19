@@ -9,7 +9,7 @@ public partial class GroupCheckoutTests
     [Fact]
     public void GivenNonExistingGroupCheckout_WhenInitiate_ThenSucceeds()
     {
-        var guestStaysIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var guestStaysIds = new[] { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };
 
         Spec.Given()
             .When(_ => GroupCheckout.Initiate(groupCheckoutId, clerkId, guestStaysIds, now))
