@@ -1,0 +1,245 @@
+using FluentAssertions;
+using JasperFx;
+using JasperFx.Events.Projections;
+using Marten;
+using Marten.Events.Projections;
+using Weasel.Core;
+using Xunit;
+
+namespace IntroductionToEventSourcing.Projections.MultiStream.OutOfOrder.Marten;
+
+// EVENTS
+public record PaymentRecorded(
+    Guid PaymentId,
+    Guid OrderId,
+    decimal Amount
+);
+
+public record MerchantLimitsChecked(
+    Guid PaymentId,
+    Guid MerchantId,
+    bool IsWithinLimits
+);
+
+public record FraudScoreCalculated(
+    Guid PaymentId,
+    decimal Score,
+    bool IsAcceptable
+);
+
+// ENUMS
+public enum VerificationStatus
+{
+    Pending,
+    Passed,
+    Failed
+}
+
+public enum PaymentStatus
+{
+    Pending,
+    Approved,
+    Rejected
+}
+
+public enum DataQuality
+{
+    Partial,
+    Sufficient,
+    Complete
+}
+
+// READ MODEL
+public class PaymentVerification
+{
+    public Guid Id { get; set; }
+    public Guid? OrderId { get; set; }
+    public decimal? Amount { get; set; }
+    public VerificationStatus MerchantLimitStatus { get; set; }
+    public VerificationStatus FraudStatus { get; set; }
+    public decimal FraudScore { get; set; }
+    public PaymentStatus Status { get; set; }
+    public DataQuality DataQuality { get; set; }
+
+    public void Recalculate()
+    {
+        // Check if we have all required data
+        var hasMerchantCheck = MerchantLimitStatus != VerificationStatus.Pending;
+        var hasFraudCheck = FraudStatus != VerificationStatus.Pending;
+        var hasPaymentData = OrderId.HasValue && Amount.HasValue;
+
+        // Update data quality
+        if (hasPaymentData && hasMerchantCheck && hasFraudCheck)
+            DataQuality = DataQuality.Complete;
+        else if (hasMerchantCheck || hasFraudCheck)
+            DataQuality = DataQuality.Sufficient;
+        else
+            DataQuality = DataQuality.Partial;
+
+        // Derive status based on available data
+        // If either check failed, reject immediately (even if we're missing payment data)
+        if (MerchantLimitStatus == VerificationStatus.Failed ||
+            FraudStatus == VerificationStatus.Failed)
+        {
+            Status = PaymentStatus.Rejected;
+        }
+        // If we have both checks and they passed, approve
+        else if (hasMerchantCheck && hasFraudCheck)
+        {
+            Status = PaymentStatus.Approved;
+        }
+        // Otherwise, still pending
+        else
+        {
+            Status = PaymentStatus.Pending;
+        }
+    }
+}
+
+public class PaymentVerificationProjection: MultiStreamProjection<PaymentVerification, Guid>
+{
+    public PaymentVerificationProjection()
+    {
+        Identity<PaymentRecorded>(e => e.PaymentId);
+        Identity<MerchantLimitsChecked>(e => e.PaymentId);
+        Identity<FraudScoreCalculated>(e => e.PaymentId);
+    }
+
+    public void Apply(PaymentVerification item, PaymentRecorded @event)
+    {
+        item.Id = @event.PaymentId;
+        item.OrderId = @event.OrderId;
+        item.Amount = @event.Amount;
+
+        item.Recalculate();
+    }
+
+    public void Apply(PaymentVerification item, MerchantLimitsChecked @event)
+    {
+        item.Id = @event.PaymentId;
+        item.MerchantLimitStatus = @event.IsWithinLimits
+            ? VerificationStatus.Passed
+            : VerificationStatus.Failed;
+
+        item.Recalculate();
+    }
+
+    public void Apply(PaymentVerification item, FraudScoreCalculated @event)
+    {
+        item.Id = @event.PaymentId;
+        item.FraudScore = @event.Score;
+        item.FraudStatus = @event.IsAcceptable
+            ? VerificationStatus.Passed
+            : VerificationStatus.Failed;
+
+        item.Recalculate();
+    }
+}
+
+public class ProjectionsTests
+{
+    private const string ConnectionString =
+        "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'";
+
+    [Fact]
+    [Trait("Category", "SkipCI")]
+    public async Task MultiStreamProjection_WithOutOfOrderEventsAndMarten_ShouldSucceed()
+    {
+        var payment1Id = Guid.CreateVersion7();
+        var payment2Id = Guid.CreateVersion7();
+        var payment3Id = Guid.CreateVersion7();
+        var payment4Id = Guid.CreateVersion7();
+
+        var order1Id = Guid.CreateVersion7();
+        var order2Id = Guid.CreateVersion7();
+        var order3Id = Guid.CreateVersion7();
+        var order4Id = Guid.CreateVersion7();
+
+        var merchant1Id = Guid.CreateVersion7();
+        var merchant2Id = Guid.CreateVersion7();
+
+        var fraudCheck1Id = Guid.CreateVersion7();
+        var fraudCheck2Id = Guid.CreateVersion7();
+        var fraudCheck3Id = Guid.CreateVersion7();
+
+        await using var documentStore = DocumentStore.For(options =>
+        {
+            options.Connection(ConnectionString);
+            options.DatabaseSchemaName = options.Events.DatabaseSchemaName = "Exercise18MultiStreamOutOfOrderMarten";
+            options.AutoCreateSchemaObjects = AutoCreate.All;
+
+            options.Projections.Add<PaymentVerificationProjection>(ProjectionLifecycle.Inline);
+        });
+
+        await using var session = documentStore.LightweightSession();
+
+        // Payment 1: Approved — events arrive out of order (fraud score first!)
+        session.Events.Append(fraudCheck1Id, new FraudScoreCalculated(payment1Id, 0.1m, true));
+        session.Events.Append(merchant1Id, new MerchantLimitsChecked(payment1Id, merchant1Id, true));
+        session.Events.Append(payment1Id, new PaymentRecorded(payment1Id, order1Id, 100m));
+
+        // Payment 2: Merchant rejected — merchant check arrives first
+        session.Events.Append(merchant2Id, new MerchantLimitsChecked(payment2Id, merchant2Id, false));
+        session.Events.Append(fraudCheck2Id, new FraudScoreCalculated(payment2Id, 0.2m, true));
+        session.Events.Append(payment2Id, new PaymentRecorded(payment2Id, order2Id, 5000m));
+
+        // Payment 3: Fraud rejected — payment recorded last
+        session.Events.Append(fraudCheck3Id, new FraudScoreCalculated(payment3Id, 0.95m, false));
+        session.Events.Append(merchant1Id, new MerchantLimitsChecked(payment3Id, merchant1Id, true));
+        session.Events.Append(payment3Id, new PaymentRecorded(payment3Id, order3Id, 200m));
+
+        // Payment 4: Pending — missing fraud check (payment recorded, merchant checked, but no fraud score yet)
+        session.Events.Append(payment4Id, new PaymentRecorded(payment4Id, order4Id, 50m));
+        session.Events.Append(merchant1Id, new MerchantLimitsChecked(payment4Id, merchant1Id, true));
+
+        await session.SaveChangesAsync();
+
+        // Assert Payment 1: Approved (all data arrived, all checks passed)
+        var payment1 = await session.LoadAsync<PaymentVerification>(payment1Id);
+        payment1.Should().NotBeNull();
+        payment1!.Id.Should().Be(payment1Id);
+        payment1.OrderId.Should().Be(order1Id);
+        payment1.Amount.Should().Be(100m);
+        payment1.MerchantLimitStatus.Should().Be(VerificationStatus.Passed);
+        payment1.FraudStatus.Should().Be(VerificationStatus.Passed);
+        payment1.FraudScore.Should().Be(0.1m);
+        payment1.Status.Should().Be(PaymentStatus.Approved);
+        payment1.DataQuality.Should().Be(DataQuality.Complete);
+
+        // Assert Payment 2: Merchant rejected
+        var payment2 = await session.LoadAsync<PaymentVerification>(payment2Id);
+        payment2.Should().NotBeNull();
+        payment2!.Id.Should().Be(payment2Id);
+        payment2.OrderId.Should().Be(order2Id);
+        payment2.Amount.Should().Be(5000m);
+        payment2.MerchantLimitStatus.Should().Be(VerificationStatus.Failed);
+        payment2.FraudStatus.Should().Be(VerificationStatus.Passed);
+        payment2.FraudScore.Should().Be(0.2m);
+        payment2.Status.Should().Be(PaymentStatus.Rejected);
+        payment2.DataQuality.Should().Be(DataQuality.Complete);
+
+        // Assert Payment 3: Fraud rejected
+        var payment3 = await session.LoadAsync<PaymentVerification>(payment3Id);
+        payment3.Should().NotBeNull();
+        payment3!.Id.Should().Be(payment3Id);
+        payment3.OrderId.Should().Be(order3Id);
+        payment3.Amount.Should().Be(200m);
+        payment3.MerchantLimitStatus.Should().Be(VerificationStatus.Passed);
+        payment3.FraudStatus.Should().Be(VerificationStatus.Failed);
+        payment3.FraudScore.Should().Be(0.95m);
+        payment3.Status.Should().Be(PaymentStatus.Rejected);
+        payment3.DataQuality.Should().Be(DataQuality.Complete);
+
+        // Assert Payment 4: Pending (waiting for fraud check)
+        var payment4 = await session.LoadAsync<PaymentVerification>(payment4Id);
+        payment4.Should().NotBeNull();
+        payment4!.Id.Should().Be(payment4Id);
+        payment4.OrderId.Should().Be(order4Id);
+        payment4.Amount.Should().Be(50m);
+        payment4.MerchantLimitStatus.Should().Be(VerificationStatus.Passed);
+        payment4.FraudStatus.Should().Be(VerificationStatus.Pending);
+        payment4.FraudScore.Should().Be(0m);
+        payment4.Status.Should().Be(PaymentStatus.Pending);
+        payment4.DataQuality.Should().Be(DataQuality.Sufficient);
+    }
+}

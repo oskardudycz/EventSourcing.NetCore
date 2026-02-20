@@ -251,9 +251,15 @@
     <Project Path="Workshops/IntroductionToEventSourcing/12-Projections.SingleStream/12-Projections.SingleStream.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/13-Projections.SingleStream.Idempotency/13-Projections.SingleStream.Idempotency.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/14-Projections.SingleStream.EventualConsistency/14-Projections.SingleStream.EventualConsistency.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/15-EventsDefinition/15-EventsDefinition.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/16-EntitiesDefinition/16-EntitiesDefinition.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/17-BusinessProcesses/17-BusinessProcesses.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/15-Projections.MultiStream/15-Projections.MultiStream.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/16-Projections.MultiStream.OutOfOrder/16-Projections.MultiStream.OutOfOrder.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/17-Projections.MultiStream.Marten/17-Projections.MultiStream.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/18-Projections.MultiStream.OutOfOrder.Marten/18-Projections.MultiStream.OutOfOrder.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/19-EventsDefinition/19-EventsDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/20-EntitiesDefinition/20-EntitiesDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/21-BusinessProcesses/21-BusinessProcesses.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/22-Idempotency/22-Idempotency.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/23-Consistency/23-Consistency.csproj" />
   </Folder>
   <Folder Name="/Workshops/IntroductionToEventSourcing/docker/">
     <File Path="Workshops/IntroductionToEventSourcing/docker-compose.yml" />
@@ -278,9 +284,15 @@
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/12-Projections.SingleStream/12-Projections.SingleStream.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/13-Projections.SingleStream.Idempotency/13-Projections.SingleStream.Idempotency.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/14-Projections.SingleStream.EventualConsistency/14-Projections.SingleStream.EventualConsistency.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/Solved/15-EventsDefinition/15-EventsDefinition.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/Solved/16-EntitiesDefinition/16-EntitiesDefinition.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/Solved/17-BusinessProcesses/17-BusinessProcesses.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/15-Projections.MultiStream/15-Projections.MultiStream.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/16-Projections.MultiStream.OutOfOrder/16-Projections.MultiStream.OutOfOrder.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/17-Projections.MultiStream.Marten/17-Projections.MultiStream.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/18-Projections.MultiStream.OutOfOrder.Marten/18-Projections.MultiStream.OutOfOrder.Marten.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/19-EventsDefinition/19-EventsDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/20-EntitiesDefinition/20-EntitiesDefinition.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/21-BusinessProcesses/21-BusinessProcesses.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/22-Idempotency/22-Idempotency.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/23-Consistency/23-Consistency.csproj" />
   </Folder>
   <Properties Name="RiderSharedRunConfigurations" Scope="PostLoad" />
 </Solution>
