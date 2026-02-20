@@ -25,7 +25,13 @@
   <Project Path="12-Projections.SingleStream/12-Projections.SingleStream.csproj" />
   <Project Path="13-Projections.SingleStream.Idempotency/13-Projections.SingleStream.Idempotency.csproj" />
   <Project Path="14-Projections.SingleStream.EventualConsistency/14-Projections.SingleStream.EventualConsistency.csproj" />
-  <Project Path="15-EventsDefinition/15-EventsDefinition.csproj" />
-  <Project Path="16-EntitiesDefinition/16-EntitiesDefinition.csproj" />
-  <Project Path="17-BusinessProcesses/17-BusinessProcesses.csproj" />
+  <Project Path="15-Projections.MultiStream/15-Projections.MultiStream.csproj" />
+  <Project Path="16-Projections.MultiStream.OutOfOrder/16-Projections.MultiStream.OutOfOrder.csproj" />
+  <Project Path="17-Projections.MultiStream.Marten/17-Projections.MultiStream.Marten.csproj" />
+  <Project Path="18-Projections.MultiStream.OutOfOrder.Marten/18-Projections.MultiStream.OutOfOrder.Marten.csproj" />
+  <Project Path="19-EventsDefinition/19-EventsDefinition.csproj" />
+  <Project Path="20-EntitiesDefinition/20-EntitiesDefinition.csproj" />
+  <Project Path="21-BusinessProcesses/21-BusinessProcesses.csproj" />
+  <Project Path="22-Idempotency/22-Idempotency.csproj" />
+  <Project Path="23-Consistency/23-Consistency.csproj" />
 </Solution>
