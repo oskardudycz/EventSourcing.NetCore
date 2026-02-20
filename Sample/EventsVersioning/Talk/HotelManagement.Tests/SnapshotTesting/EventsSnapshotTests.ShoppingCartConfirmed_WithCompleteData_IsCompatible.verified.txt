@@ -1,0 +1,6 @@
+﻿{
+  GuestStayAccountId: Guid_1,
+  Amount: 292.333,
+  RecordedAt: DateTimeOffset_1,
+  ClerkId: anonymised
+}
