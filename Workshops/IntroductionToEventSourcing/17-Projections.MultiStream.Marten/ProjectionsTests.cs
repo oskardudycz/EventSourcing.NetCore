@@ -1,8 +1,6 @@
 using FluentAssertions;
 using JasperFx;
 using Marten;
-using Marten.Events.Projections;
-using Weasel.Core;
 using Xunit;
 
 namespace IntroductionToEventSourcing.Projections.MultiStream.Marten;

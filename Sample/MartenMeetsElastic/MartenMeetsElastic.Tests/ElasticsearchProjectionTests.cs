@@ -4,7 +4,6 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentAssertions;
 using JasperFx.Core;
 using Marten;
-using JasperFx.Events;
 using Marten.Events;
 using MartenMeetsElastic.Projections;
 using Polly;
@@ -118,7 +117,7 @@ public class MeetsElasticTest: MartenMeetsElasticTest
             .ExecuteAsync(async () =>
             {
                 var searchResponse = await elasticClient.SearchAsync<Order>(s => s
-                    .Index(IndexNameMapper.ToIndexName<Order>())
+                    .Indices(IndexNameMapper.ToIndexName<Order>())
                     .Query(q => q.Ids(new IdsQuery { Values = new Ids("order1") }))
                 );
 

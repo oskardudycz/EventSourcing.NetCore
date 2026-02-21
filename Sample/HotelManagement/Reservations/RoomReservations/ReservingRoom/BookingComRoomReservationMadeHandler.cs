@@ -1,5 +1,4 @@
 using Core.Events;
-using JasperFx.Core;
 using Marten;
 using Reservations.Guests;
 using Reservations.Guests.GettingGuestByExternalId;

@@ -4,7 +4,6 @@ using EntitiesDefinition.Solution2_ImmutableEntities.GroupCheckouts;
 using EntitiesDefinition.Solution2_ImmutableEntities.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
-using Database = EntitiesDefinition.Core.Database;
 
 namespace EntitiesDefinition.Solution2_ImmutableEntities;
 

@@ -4,7 +4,7 @@ using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.Swagger;
 using MeetingsSearch;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);

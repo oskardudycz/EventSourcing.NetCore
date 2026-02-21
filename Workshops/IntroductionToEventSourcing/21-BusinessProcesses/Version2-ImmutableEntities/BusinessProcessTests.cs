@@ -4,7 +4,6 @@ using BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
 using BusinessProcesses.Version2_ImmutableEntities.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
-using Database = BusinessProcesses.Core.Database;
 
 namespace BusinessProcesses.Version2_ImmutableEntities;
 

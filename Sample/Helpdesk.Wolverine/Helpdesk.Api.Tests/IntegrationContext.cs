@@ -4,7 +4,6 @@ using FluentAssertions;
 using JasperFx.CommandLine;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
-using Oakton;
 using Wolverine;
 using Wolverine.Tracking;
 using Xunit;

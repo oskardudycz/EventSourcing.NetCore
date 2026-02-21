@@ -4,7 +4,6 @@ using JasperFx.Events.Projections;
 using Marten;
 using Marten.Events.Projections;
 using Tools.Tools;
-using Weasel.Core;
 using Xunit;
 
 namespace EventStoreBasics.Tests;

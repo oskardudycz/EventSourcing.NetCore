@@ -3,7 +3,6 @@ using Core.Events;
 using Core.Marten.Repository;
 using JasperFx.Events.Projections;
 using Marten;
-using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Orders.Orders.CancellingOrder;
 using Orders.Orders.CompletingOrder;

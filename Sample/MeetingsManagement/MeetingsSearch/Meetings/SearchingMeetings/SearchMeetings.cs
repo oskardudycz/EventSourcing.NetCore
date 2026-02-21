@@ -19,7 +19,7 @@ internal class HandleSearchMeetings(ElasticsearchClient elasticClient)
     public async Task<IReadOnlyCollection<Meeting>> Handle(SearchMeetings query, CancellationToken cancellationToken)
     {
         var response = await elasticClient.SearchAsync<Meeting>(
-            s => s.Index(IndexNameMapper.ToIndexName<Meeting>())
+            s => s.Indices(IndexNameMapper.ToIndexName<Meeting>())
                 .Query(q => q.QueryString(d => d.Query(query.Filter))).Size(MaxItemsCount), cancellationToken);
 
         return response.Documents;

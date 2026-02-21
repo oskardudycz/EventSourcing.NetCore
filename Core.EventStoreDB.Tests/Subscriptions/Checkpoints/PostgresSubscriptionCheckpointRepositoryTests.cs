@@ -1,7 +1,6 @@
 using Core.EventStoreDB.Subscriptions.Checkpoints;
 using Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 using Core.Testing.Fixtures;
-using Npgsql;
 using Xunit;
 
 namespace Core.EventStoreDB.Tests.Subscriptions.Checkpoints;

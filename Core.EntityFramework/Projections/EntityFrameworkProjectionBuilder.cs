@@ -7,7 +7,6 @@ using Core.EventStoreDB.Subscriptions;
 using Core.EventStoreDB.Subscriptions.Batch;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
 
 namespace Core.EntityFramework.Projections;
 

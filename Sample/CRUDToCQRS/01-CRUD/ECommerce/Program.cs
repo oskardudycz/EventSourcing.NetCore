@@ -1,7 +1,7 @@
 using ECommerce.Repositories;
 using ECommerce.Services;
 using ECommerce.Storage;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 

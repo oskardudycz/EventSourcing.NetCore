@@ -1,4 +1,3 @@
-using System.Threading.Channels;
 using Open.ChannelExtensions;
 
 namespace Core.Extensions;

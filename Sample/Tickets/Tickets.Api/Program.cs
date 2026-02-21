@@ -6,8 +6,7 @@ using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using JasperFx;
-using Marten.Exceptions;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Npgsql;
 using OpenTelemetry.Trace;
 using Tickets;
@@ -21,13 +20,12 @@ builder.Services
         c.OperationFilter<MetadataOperationFilter>();
     })
     .AddCoreServices()
-    .AddDefaultExceptionHandler(
-        (exception, _) => exception switch
-        {
-            AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
-            ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-            _ => null
-        })
+    .AddDefaultExceptionHandler((exception, _) => exception switch
+    {
+        AggregateNotFoundException => exception.MapToProblemDetails(StatusCodes.Status404NotFound),
+        ConcurrencyException => exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
+        _ => null
+    })
     .AddTicketsModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Tickets", OpenTelemetryOptions.Build(options =>
