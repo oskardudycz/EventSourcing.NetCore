@@ -1,5 +1,4 @@
 ﻿using BusinessProcesses.Core;
-using Consistency.Core;
 using Database = Consistency.Core.Database;
 
 namespace Consistency.Sagas.Version1_Aggregates.GroupCheckouts;

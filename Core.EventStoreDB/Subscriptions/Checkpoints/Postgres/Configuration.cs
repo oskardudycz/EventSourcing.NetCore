@@ -1,8 +1,4 @@
-using Core.BackgroundWorkers;
-using Core.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Npgsql;
 
 namespace Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 

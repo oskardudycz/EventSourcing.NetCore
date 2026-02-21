@@ -4,7 +4,6 @@ using BusinessProcesses.Version1_Aggregates.GroupCheckouts;
 using BusinessProcesses.Version1_Aggregates.GuestStayAccounts;
 using Xunit;
 using Xunit.Abstractions;
-using Database = BusinessProcesses.Core.Database;
 
 namespace BusinessProcesses.Version1_Aggregates;
 

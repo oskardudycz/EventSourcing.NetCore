@@ -1,4 +1,3 @@
-using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
 using FluentAssertions;

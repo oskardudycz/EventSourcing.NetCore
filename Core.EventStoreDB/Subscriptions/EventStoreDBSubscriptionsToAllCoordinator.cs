@@ -1,5 +1,4 @@
 using Core.EventStoreDB.Subscriptions.Checkpoints;
-using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 

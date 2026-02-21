@@ -2,7 +2,6 @@ using Bogus;
 using EntitiesDefinition.Core;
 using Xunit;
 using Xunit.Abstractions;
-using Database = EntitiesDefinition.Core.Database;
 
 namespace EntitiesDefinition;
 

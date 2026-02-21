@@ -1,4 +1,3 @@
-using JasperFx.Core;
 using Marten;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;

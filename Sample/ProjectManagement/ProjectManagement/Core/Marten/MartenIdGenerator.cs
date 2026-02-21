@@ -1,5 +1,3 @@
-using Marten.Schema.Identity;
-
 namespace ProjectManagement.Core.Marten;
 
 public static class MartenIdGenerator
