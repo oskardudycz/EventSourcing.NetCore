@@ -1,41 +1,29 @@
 # Exercise 17 - Multi-Stream Projections with Marten
 
-In exercises 15-16 you built multi-stream projections manually. Now you'll use Marten's `MultiStreamProjection` to handle the complexity for you.
+Same as Exercise 15 but using Marten's `MultiStreamProjection<T, TId>` API.
 
-## Scenario: Payment Verification with Marten
+## Goal
 
-The same payment verification domain from exercise 15, but using Marten's built-in multi-stream projection support.
+Learn how to use Marten's built-in multi-stream projection support to simplify correlation logic.
 
-## What to implement
+## Scenario
 
-Implement a `PaymentVerificationProjection` using Marten's `MultiStreamProjection<PaymentVerification, Guid>`:
+Events arrive from three different streams (payment, merchant, and fraud check), but they all reference the same `PaymentId`. Your projection must:
 
-1. Inherit from `MultiStreamProjection<PaymentVerification, Guid>`
-2. In the constructor, use `Identity<TEvent>` to specify how each event type maps to the `PaymentId`
-3. Define `Apply` methods for each event type to update the read model
-4. Register the projection with Marten's projection system in the test
+1. Collect data from all three event types
+2. Store them in a single `PaymentVerification` read model
+3. Derive the payment verification status when all data is present
 
-## Marten Multi-Stream Projection Pattern
+## Steps
 
-```csharp
-public class YourProjection: MultiStreamProjection<YourReadModel, Guid>
-{
-    public YourProjection()
-    {
-        // Tell Marten which property on each event contains the document ID
-        Identity<Event1>(e => e.DocumentId);
-        Identity<Event2>(e => e.DocumentId);
-    }
+1. Create a `PaymentVerificationProjection` class with `Handle` methods for each event type
+2. Register your handlers using `eventStore.Register`
+3. Implement decision logic in the `FraudScoreCalculated` handler (always last for completed payments):
+    - Reject if merchant failed
+    - Reject if fraud score > 0.75
+    - Reject if amount > 10000 AND fraud score > 0.5
+    - Otherwise approve
 
-    // Define how each event updates the read model
-    public void Apply(YourReadModel model, Event1 @event)
-    {
-        // Update model based on event
-    }
-}
-```
+## Reference
 
-##Reference
-
-Read more about Marten's multi-stream projections:
 - [Marten Multi-Stream Projections](https://martendb.io/events/projections/multi-stream-projections.html)
