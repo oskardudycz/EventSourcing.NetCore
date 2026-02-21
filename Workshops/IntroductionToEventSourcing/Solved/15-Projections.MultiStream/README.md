@@ -23,3 +23,11 @@ Events arrive from three different streams (payment, merchant, and fraud check),
    - Reject if fraud score > 0.75
    - Reject if amount > 10000 AND fraud score > 0.5
    - Otherwise approve
+
+## Key Concept
+
+Events arrive on **different stream IDs**, but all reference the same `PaymentId`. Use `PaymentId` (not the stream ID) as the read model key.
+
+## Reference
+
+- [Handling Events Coming in an Unknown Order](https://www.architecture-weekly.com/p/handling-events-coming-in-an-unknown)
