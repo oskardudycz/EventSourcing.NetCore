@@ -21,7 +21,6 @@ public static class Api
 
         shoppingCarts.MapPost("",
             async (
-                HttpContext context,
                 IDocumentSession session,
                 Guid clientId,
                 CancellationToken ct
@@ -38,7 +37,6 @@ public static class Api
 
         productItems.MapPost("",
             async (
-                HttpContext context,
                 IProductPriceCalculator pricingCalculator,
                 IDocumentSession session,
                 Guid shoppingCartId,
@@ -57,7 +55,6 @@ public static class Api
 
         productItems.MapDelete("{productId:guid}",
             async (
-                HttpContext context,
                 IDocumentSession session,
                 Guid shoppingCartId,
                 [FromRoute] Guid productId,
@@ -83,7 +80,6 @@ public static class Api
 
         shoppingCart.MapPost("confirm",
             async (
-                HttpContext context,
                 IDocumentSession session,
                 Guid shoppingCartId,
                 [FromIfMatchHeader] string eTag,
@@ -98,7 +94,6 @@ public static class Api
 
         shoppingCart.MapDelete("",
             async (
-                HttpContext context,
                 IDocumentSession session,
                 Guid shoppingCartId,
                 [FromIfMatchHeader] string eTag,
@@ -113,7 +108,6 @@ public static class Api
 
         shoppingCart.MapGet("",
             async Task<IResult> (
-                HttpContext context,
                 IQuerySession session,
                 Guid shoppingCartId,
                 [FromIfMatchHeader] string eTag,

@@ -14,10 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Update="appsettings.json">
         <CopyToPublishDirectory>Never</CopyToPublishDirectory>
       </Content>
