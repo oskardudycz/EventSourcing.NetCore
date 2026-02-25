@@ -17,7 +17,7 @@ Events arrive from three different streams (payment, merchant, and fraud check),
 ## Steps
 
 1. Create a `PaymentVerificationProjection` class with `Handle` methods for each event type
-2. Register your handlers using `eventStore.Register`
+2. Register your handlers using document store options `options.Projections.Add` as inline.
 3. Implement decision logic in the `FraudScoreCalculated` handler (always last for completed payments):
     - Reject if merchant failed
     - Reject if fraud score > 0.75

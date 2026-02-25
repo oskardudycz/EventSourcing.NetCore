@@ -27,12 +27,6 @@ public record FraudScoreCalculated(
 );
 
 // ENUMS
-public enum VerificationStatus
-{
-    Pending,
-    Passed,
-    Failed
-}
 
 public enum PaymentStatus
 {

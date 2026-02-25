@@ -10,7 +10,7 @@ Learn how to build resilient Marten projections that work even when events arriv
 
 Same out-of-order context as Exercise 16: events can arrive in any order (e.g., from different RabbitMQ queues or Kafka topics). The projection from Exercise 17 assumes ordered events — run the test to see it fail.
 
-**Emit event when payment verification is completed**.
+**Emit event when payment verification is completed**. Use [`RaiseSideEffects`method from Marten projections](https://martendb.io/events/projections/side-effects.html#side-effects)
 
 ## Reference
 
