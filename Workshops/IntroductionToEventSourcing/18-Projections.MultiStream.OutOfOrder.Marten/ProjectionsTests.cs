@@ -59,6 +59,10 @@ public class PaymentVerification
     public PaymentStatus Status { get; set; }
 }
 
+
+// TODO: This projection was built assuming ordered events. Run the test — it fails.
+// Events can arrive out of order (e.g. from different RabbitMQ queues or Kafka topics).
+// Fix it to handle out-of-order events and derive the verification decision.
 public class PaymentVerificationProjection: MultiStreamProjection<PaymentVerification, string>
 {
     public PaymentVerificationProjection()
@@ -138,10 +142,14 @@ public class ProjectionsTests
             // TODO: This projection was built assuming ordered events. Run the test — it fails.
             // Events can arrive out of order (e.g. from different RabbitMQ queues or Kafka topics).
             // Fix it to handle out-of-order events and derive the verification decision.
-
-            options.Projections.Add<PaymentVerificationProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<PaymentVerificationProjection>(ProjectionLifecycle.Async);
             options.Events.StreamIdentity = StreamIdentity.AsString;
         });
+
+        // Let's start Async Daemon to process async projections in the background
+        // Read more: https://martendb.io/events/projections/async-daemon.html#async-projections-daemon
+        using var daemon = await documentStore.BuildProjectionDaemonAsync();
+        await daemon.StartAllAsync();
 
         await using var session = documentStore.LightweightSession();
 
@@ -171,29 +179,61 @@ public class ProjectionsTests
 
         await session.SaveChangesAsync();
 
+        await daemon.WaitForNonStaleData(TimeSpan.FromSeconds(5));
+
         // Assert Payment 1: Approved
         var payment1 = await session.LoadAsync<PaymentVerification>(payment1Id);
         payment1.Should().NotBeNull();
+        payment1.Id.Should().Be(payment1Id);
+        payment1.OrderId.Should().Be(order1Id);
+        payment1.Amount.Should().Be(100m);
+        payment1.MerchantLimitStatus.Should().Be(VerificationStatus.Passed);
+        payment1.FraudStatus.Should().Be(VerificationStatus.Passed);
+        payment1.FraudScore.Should().Be(0.1m);
         payment1.Status.Should().Be(PaymentStatus.Approved);
 
         // Assert Payment 2: Rejected
         var payment2 = await session.LoadAsync<PaymentVerification>(payment2Id);
         payment2.Should().NotBeNull();
+        payment2.Id.Should().Be(payment2Id);
+        payment2.OrderId.Should().Be(order2Id);
+        payment2.Amount.Should().Be(5000m);
+        payment2.MerchantLimitStatus.Should().Be(VerificationStatus.Failed);
+        payment2.FraudStatus.Should().Be(VerificationStatus.Passed);
+        payment2.FraudScore.Should().Be(0.2m);
         payment2.Status.Should().Be(PaymentStatus.Rejected);
 
         // Assert Payment 3: Rejected
         var payment3 = await session.LoadAsync<PaymentVerification>(payment3Id);
         payment3.Should().NotBeNull();
+        payment3.Id.Should().Be(payment3Id);
+        payment3.OrderId.Should().Be(order3Id);
+        payment3.Amount.Should().Be(200m);
+        payment3.MerchantLimitStatus.Should().Be(VerificationStatus.Passed);
+        payment3.FraudStatus.Should().Be(VerificationStatus.Failed);
+        payment3.FraudScore.Should().Be(0.95m);
         payment3.Status.Should().Be(PaymentStatus.Rejected);
 
         // Assert Payment 4: Rejected
         var payment4 = await session.LoadAsync<PaymentVerification>(payment4Id);
         payment4.Should().NotBeNull();
+        payment4.Id.Should().Be(payment4Id);
+        payment4.OrderId.Should().Be(order4Id);
+        payment4.Amount.Should().Be(15000m);
+        payment4.MerchantLimitStatus.Should().Be(VerificationStatus.Passed);
+        payment4.FraudStatus.Should().Be(VerificationStatus.Passed);
+        payment4.FraudScore.Should().Be(0.6m);
         payment4.Status.Should().Be(PaymentStatus.Rejected);
 
         // Assert Payment 5: Pending
         var payment5 = await session.LoadAsync<PaymentVerification>(payment5Id);
         payment5.Should().NotBeNull();
+        payment5.Id.Should().Be(payment5Id);
+        payment5.OrderId.Should().Be(order5Id);
+        payment5.Amount.Should().Be(50m);
+        payment5.MerchantLimitStatus.Should().Be(VerificationStatus.Passed);
+        payment5.FraudStatus.Should().Be(VerificationStatus.Pending);
+        payment5.FraudScore.Should().Be(0m);
         payment5.Status.Should().Be(PaymentStatus.Pending);
 
         // Assert Payment 1: Verification is emitted

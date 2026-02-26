@@ -156,7 +156,6 @@ public class ProjectionsTests
         "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'";
 
     [Fact]
-    [Trait("Category", "SkipCI")]
     public async Task MultiStreamProjection_WithOutOfOrderEventsAndMarten_ShouldSucceed()
     {
         var payment1Id = $"payment:{Guid.CreateVersion7()}";
@@ -185,13 +184,14 @@ public class ProjectionsTests
             options.DatabaseSchemaName = options.Events.DatabaseSchemaName = "Exercise18MultiStreamOutOfOrderMarten";
             options.AutoCreateSchemaObjects = AutoCreate.All;
 
-            // TODO: This projection was built assuming ordered events. Run the test — it fails.
-            // Events can arrive out of order (e.g. from different RabbitMQ queues or Kafka topics).
-            // Fix it to handle out-of-order events and derive the verification decision.
-
-            options.Projections.Add<PaymentVerificationProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<PaymentVerificationProjection>(ProjectionLifecycle.Async);
             options.Events.StreamIdentity = StreamIdentity.AsString;
         });
+
+        // Let's start Async Daemon to process async projections in the background
+        // Read more: https://martendb.io/events/projections/async-daemon.html#async-projections-daemon
+        using var daemon = await documentStore.BuildProjectionDaemonAsync();
+        await daemon.StartAllAsync();
 
         await using var session = documentStore.LightweightSession();
 
@@ -220,6 +220,8 @@ public class ProjectionsTests
         session.Events.Append(payment5Id, new PaymentRecorded(payment5Id, order5Id, 50m));
 
         await session.SaveChangesAsync();
+
+        await daemon.WaitForNonStaleData(TimeSpan.FromSeconds(5));
 
         // Assert Payment 1: Approved
         var payment1 = await session.LoadAsync<PaymentVerification>(payment1Id);

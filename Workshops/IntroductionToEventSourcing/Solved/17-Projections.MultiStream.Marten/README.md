@@ -14,6 +14,13 @@ Learn how to use Marten's built-in multi-stream projection support to simplify c
 4. Put decision logic in the `FraudScoreCalculated` Apply method (same rules as Exercise 15)
 5. Register the projection using `options.Projections.Add<PaymentVerificationProjection>(ProjectionLifecycle.Inline)`
 
+Decision logic:
+- Reject if merchant failed
+- Reject if fraud score > 0.75
+- Reject if amount > 10000 AND fraud score > 0.5
+- Otherwise approve
+
+
 ## Key Differences from Exercise 15
 
 Instead of manually handling event routing and database operations, Marten:
@@ -24,3 +31,4 @@ Instead of manually handling event routing and database operations, Marten:
 ## Reference
 
 - [Marten Multi-Stream Projections](https://martendb.io/events/projections/multi-stream-projections.html)
+- [Marten Async Daemon - Backround worker processing async projections](https://martendb.io/events/projections/async-daemon.html#async-projections-daemon)

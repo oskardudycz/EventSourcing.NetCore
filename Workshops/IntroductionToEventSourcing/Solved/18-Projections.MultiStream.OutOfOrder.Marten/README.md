@@ -18,6 +18,13 @@ Same out-of-order context as Exercise 16: events can arrive in any order (e.g., 
 4. **Track data quality**: Add a `DataQuality` enum and field to track completeness
 5. **Use RaiseSideEffects**: Override `RaiseSideEffects` to publish `PaymentVerificationCompleted` using `slice.AppendEvent()` when a decision is made
 
+Decision logic:
+- Reject if merchant failed
+- Reject if fraud score > 0.75
+- Reject if amount > 10000 AND fraud score > 0.5
+- Otherwise approve
+
+
 ## RaiseSideEffects Pattern
 
 ```csharp
@@ -39,3 +46,5 @@ public override ValueTask RaiseSideEffects(
 
 - [Dealing with Race Conditions in Event-Driven Architecture](https://www.architecture-weekly.com/p/dealing-with-race-conditions-in-event)
 - [Marten Multi-Stream Projections](https://martendb.io/events/projections/multi-stream-projections.html)
+- [Marten Async Daemon - Backround worker processing async projections](https://martendb.io/events/projections/async-daemon.html#async-projections-daemon)
+

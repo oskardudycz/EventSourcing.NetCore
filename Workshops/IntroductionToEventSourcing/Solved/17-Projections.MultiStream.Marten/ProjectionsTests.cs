@@ -129,8 +129,13 @@ public class ProjectionsTests
             options.DatabaseSchemaName = options.Events.DatabaseSchemaName = "Exercise17MultiStreamMarten";
             options.AutoCreateSchemaObjects = AutoCreate.All;
 
-            options.Projections.Add<PaymentVerificationProjection>(ProjectionLifecycle.Inline);
+            options.Projections.Add<PaymentVerificationProjection>(ProjectionLifecycle.Async);
         });
+
+        // Let's start Async Daemon to process async projections in the background
+        // Read more: https://martendb.io/events/projections/async-daemon.html#async-projections-daemon
+        using var daemon = await documentStore.BuildProjectionDaemonAsync();
+        await daemon.StartAllAsync();
 
         await using var session = documentStore.LightweightSession();
 
@@ -159,6 +164,9 @@ public class ProjectionsTests
         session.Events.Append(merchant1Id, new MerchantLimitsChecked(payment5Id, merchant1Id, true));
 
         await session.SaveChangesAsync();
+
+        // Wait until Async Daemon processes all events
+        await daemon.WaitForNonStaleData(TimeSpan.FromSeconds(5));
 
         // Assert Payment 1: Approved
         var payment1 = await session.LoadAsync<PaymentVerification>(payment1Id);

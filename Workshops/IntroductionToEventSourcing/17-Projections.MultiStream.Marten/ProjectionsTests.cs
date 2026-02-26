@@ -82,6 +82,11 @@ public class ProjectionsTests
             // 2. Register the projection here using: options.Projections.Add<PaymentVerificationProjection>(ProjectionLifecycle.Inline);
         });
 
+        // Let's start Async Daemon to process async projections in the background
+        // Read more: https://martendb.io/events/projections/async-daemon.html#async-projections-daemon
+        using var daemon = await documentStore.BuildProjectionDaemonAsync();
+        await daemon.StartAllAsync();
+
         await using var session = documentStore.LightweightSession();
 
         // Payment 1: Approved — all checks pass
@@ -109,6 +114,9 @@ public class ProjectionsTests
         session.Events.Append(merchant1Id, new MerchantLimitsChecked(payment5Id, merchant1Id, true));
 
         await session.SaveChangesAsync();
+
+        // Wait until Async Daemon processes all events
+        await daemon.WaitForNonStaleData(TimeSpan.FromSeconds(5));
 
         // Assert Payment 1: Approved
         var payment1 = await session.LoadAsync<PaymentVerification>(payment1Id);

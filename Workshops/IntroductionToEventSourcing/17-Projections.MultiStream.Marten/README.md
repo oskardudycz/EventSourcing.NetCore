@@ -14,16 +14,19 @@ Events arrive from three different streams (payment, merchant, and fraud check),
 2. Store them in a single `PaymentVerification` read model
 3. Derive the payment verification status when all data is present
 
+Decision logic:
+- Reject if merchant failed
+- Reject if fraud score > 0.75
+- Reject if amount > 10000 AND fraud score > 0.5
+- Otherwise approve
+
 ## Steps
 
 1. Create a `PaymentVerificationProjection` class with `Handle` methods for each event type
 2. Register your handlers using document store options `options.Projections.Add` as inline.
-3. Implement decision logic in the `FraudScoreCalculated` handler (always last for completed payments):
-    - Reject if merchant failed
-    - Reject if fraud score > 0.75
-    - Reject if amount > 10000 AND fraud score > 0.5
-    - Otherwise approve
+3. Implement decision logic in the `FraudScoreCalculated` handler (always last for completed payments)
 
 ## Reference
 
 - [Marten Multi-Stream Projections](https://martendb.io/events/projections/multi-stream-projections.html)
+- [Marten Async Daemon - Backround worker processing async projections](https://martendb.io/events/projections/async-daemon.html#async-projections-daemon)
