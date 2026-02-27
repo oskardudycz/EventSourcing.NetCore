@@ -1,6 +1,4 @@
-﻿using Core.Configuration;
-using Core.EntityFramework.Projections;
-using Core.EventStoreDB.Subscriptions.Checkpoints;
+﻿using Core.EntityFramework.Projections;
 using ECommerce.Pricing;
 using ECommerce.ShoppingCarts;
 using ECommerce.Storage;

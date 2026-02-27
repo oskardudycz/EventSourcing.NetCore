@@ -5,7 +5,6 @@ using Core.Events;
 using Core.EventStoreDB;
 using Core.EventStoreDB.Commands;
 using Core.EventStoreDB.Events;
-using Core.EventStoreDB.Subscriptions;
 using Core.OpenTelemetry;
 using Core.Testing;
 using EventStore.Client;

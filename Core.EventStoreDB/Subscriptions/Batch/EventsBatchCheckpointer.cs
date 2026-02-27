@@ -1,4 +1,3 @@
-using Core.Events;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
 using EventStore.Client;
 

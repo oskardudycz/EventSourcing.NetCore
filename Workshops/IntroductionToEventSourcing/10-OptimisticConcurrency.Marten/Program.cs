@@ -2,7 +2,6 @@ using JasperFx;
 using JasperFx.CodeGeneration;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics;
-using Oakton;
 using OptimisticConcurrency.Core.Exceptions;
 using OptimisticConcurrency.Immutable.ShoppingCarts;
 using OptimisticConcurrency.Mixed.ShoppingCarts;

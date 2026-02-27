@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using Core.OpenTelemetry;
-using Microsoft.Extensions.Logging;
-
 namespace Core.Events;
 
 public class EventBusBatchHandler(

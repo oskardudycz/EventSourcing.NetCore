@@ -1,6 +1,5 @@
 using Core.Validation;
 using Marten;
-using Marten.Schema.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OptimisticConcurrency.Core.Http;
 using OptimisticConcurrency.Core.Marten;

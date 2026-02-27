@@ -106,7 +106,7 @@ public abstract class ElasticsearchProjection<TDocument>:
             var ids = events.Select(GetDocumentId).ToList();
 
             var searchResponse = await client.SearchAsync<TDocument>(s => s
-                .Index(IndexName)
+                .Indices(IndexName)
                 .Query(q => q.Ids(new IdsQuery { Values = new Ids(ids) })), ct);
 
             var existingDocuments = searchResponse.Documents.ToDictionary(ks => getDocumentId(ks), vs => vs);
@@ -137,7 +137,7 @@ public abstract class ElasticsearchProjection<TDocument>:
             .RefreshOnCompleted();
 
     protected override Task SetupMapping(ElasticsearchClient client) =>
-        client.Indices.CreateAsync<TDocument>(IndexName);
+        client.Indices.CreateAsync<TDocument>(i => i.Index(IndexName));
 
     private string GetDocumentId(object @event) =>
         projectors[@event.GetType()].GetId(@event);

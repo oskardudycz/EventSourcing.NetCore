@@ -1,5 +1,3 @@
-using Core.Events;
-using Core.EventStoreDB.Subscriptions;
 using Core.EventStoreDB.Subscriptions.Batch;
 using Core.EventStoreDB.Subscriptions.Checkpoints;
 using Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;

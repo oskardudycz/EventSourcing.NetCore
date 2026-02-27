@@ -1,6 +1,5 @@
 using System.Data;
 using Npgsql;
-using Polly;
 
 namespace Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
 

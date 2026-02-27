@@ -6,7 +6,6 @@ using JasperFx;
 using JasperFx.CodeGeneration;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics;
-using Oakton;
 
 var builder = WebApplication.CreateBuilder(args);
 

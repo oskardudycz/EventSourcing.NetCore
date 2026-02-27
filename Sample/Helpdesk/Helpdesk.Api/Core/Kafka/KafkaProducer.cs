@@ -4,8 +4,6 @@ using Marten;
 using JasperFx.Events;
 using JasperFx.Events.Daemon;
 using JasperFx.Events.Projections;
-using Marten.Events.Daemon;
-using Marten.Events.Daemon.Internals;
 using Marten.Subscriptions;
 
 namespace Helpdesk.Api.Core.Kafka;

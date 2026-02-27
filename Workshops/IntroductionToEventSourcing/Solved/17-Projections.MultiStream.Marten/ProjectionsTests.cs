@@ -3,7 +3,6 @@ using JasperFx;
 using JasperFx.Events.Projections;
 using Marten;
 using Marten.Events.Projections;
-using Weasel.Core;
 using Xunit;
 
 namespace IntroductionToEventSourcing.Projections.MultiStream.Marten;

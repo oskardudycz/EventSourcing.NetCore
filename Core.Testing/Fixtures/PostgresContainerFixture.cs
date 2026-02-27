@@ -6,7 +6,7 @@ namespace Core.Testing.Fixtures;
 
 public class PostgresContainerFixture: IAsyncLifetime
 {
-    private readonly PostgreSqlContainer container = new PostgreSqlBuilder()
+    private readonly PostgreSqlContainer container = new PostgreSqlBuilder("postgres:18")
         .WithReuse(true)
         .Build();
 

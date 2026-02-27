@@ -1,5 +1,3 @@
-using Core.EventStoreDB;
-using Core.EventStoreDB.Subscriptions;
 using Core.Exceptions;
 using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
@@ -8,7 +6,7 @@ using Core.WebApi.Swagger;
 using ECommerce;
 using EventStore.Client;
 using ECommerce.Core;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -3,7 +3,6 @@ using Core.Events.External;
 using Core.Requests;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Open.ChannelExtensions;

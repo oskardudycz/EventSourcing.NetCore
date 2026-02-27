@@ -3,13 +3,14 @@ using ECommerce.Repositories;
 using ECommerce.Services;
 using ECommerce.Storage;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddDbContext<ECommerceDbContext>()
-    .AddAutoMapper(typeof(ProductProfile).Assembly)
+    .AddAutoMapper(cfg => { }, typeof(ProductProfile).Assembly)
     .AddTransient(sp => sp.GetRequiredService<ECommerceDbContext>().Set<Product>())
     .AddTransient(sp => sp.GetRequiredService<ECommerceDbContext>().Set<Product>().AsNoTracking())
     .AddScoped<ProductReadOnlyRepository>()

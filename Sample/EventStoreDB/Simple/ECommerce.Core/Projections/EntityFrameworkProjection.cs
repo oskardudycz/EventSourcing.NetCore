@@ -1,10 +1,6 @@
-﻿using System.Linq.Expressions;
-using Core.EntityFramework;
-using Core.Events;
+﻿using Core.Events;
 using Core.Projections;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
