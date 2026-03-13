@@ -1070,6 +1070,7 @@ See more in:
 -   🛠️ [Eventuous - Event Sourcing for .NET](https://eventuous.dev/)
 -   🛠️ [SQLStreamStore - Stream Store library targeting RDBMS based implementations for .NET ](https://github.com/SQLStreamStore/SQLStreamStore)
 -   🛠️ [Equinox - .NET Event Sourcing library with CosmosDB, EventStoreDB, SqlStreamStore and integration test backends](https://github.com/jet/equinox)
+-   🛠️ [Sekiban - Event Sourcing and CQRS Framework using C#. It can store data into Azure Cosmos DB or AWS Dynamo DB](https://github.com/J-Tech-Japan/Sekiban)
 
 ### 12.15 Event processing
 -   📝 [Kamil Grzybek - The Outbox Pattern](http://www.kamilgrzybek.com/design/the-outbox-pattern/)
