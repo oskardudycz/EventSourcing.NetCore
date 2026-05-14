@@ -21,7 +21,7 @@
     <PackageVersion Include="FluentAssertions" Version="7.2.0" />
     <PackageVersion Include="GitHubActionsTestLogger" Version="2.4.1" />
     <PackageVersion Include="JsonNet.PrivateSettersContractResolvers" Version="1.0.0" />
-    <PackageVersion Include="Marten" Version="8.22.0" />
+    <PackageVersion Include="Marten" Version="8.37.0" />
     <PackageVersion Include="Marten.AspNetCore" Version="8.22.0" />
     <PackageVersion Include="MediatR" Version="12.4.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.13" />
