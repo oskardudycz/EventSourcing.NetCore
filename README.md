@@ -1070,6 +1070,7 @@ See more in:
 -   🛠️ [Eventuous - Event Sourcing for .NET](https://eventuous.dev/)
 -   🛠️ [SQLStreamStore - Stream Store library targeting RDBMS based implementations for .NET ](https://github.com/SQLStreamStore/SQLStreamStore)
 -   🛠️ [Equinox - .NET Event Sourcing library with CosmosDB, EventStoreDB, SqlStreamStore and integration test backends](https://github.com/jet/equinox)
+-   🛠️ [Cratis Chronicle - Event sourcing database and runtime for .NET with projections, reactors, reducers and pluggable MongoDB, PostgreSQL, SQL Server and SQLite storage](https://github.com/Cratis/Chronicle)
 
 ### 12.15 Event processing
 -   📝 [Kamil Grzybek - The Outbox Pattern](http://www.kamilgrzybek.com/design/the-outbox-pattern/)
