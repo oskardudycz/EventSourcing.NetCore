@@ -9,13 +9,12 @@
         <PackageReference Include="Npgsql.OpenTelemetry" />
         <PackageReference Include="Swashbuckle.AspNetCore" />
         <PackageReference Include="Aspire.Confluent.Kafka" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore" />
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
     </ItemGroup>
 
     <ItemGroup>

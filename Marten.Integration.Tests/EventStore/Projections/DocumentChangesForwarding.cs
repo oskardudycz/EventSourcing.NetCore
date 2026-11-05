@@ -33,7 +33,7 @@ public record ProjectInfo(
     string? ManagerId = null
 );
 
-public class ProjectInfoProjection: SingleStreamProjection<ProjectInfo, string>
+public partial class ProjectInfoProjection: SingleStreamProjection<ProjectInfo, string>
 {
     public static ProjectInfo Create(ProjectCreated created) =>
         new(created.ProjectId, created.Name);

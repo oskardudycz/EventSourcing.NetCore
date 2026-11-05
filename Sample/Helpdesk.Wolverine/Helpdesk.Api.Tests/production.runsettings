@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <ASPNETCORE_ENVIRONMENT>Production</ASPNETCORE_ENVIRONMENT>
+      <ConnectionStrings__WolverineIncidents>Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=Password12!;Include Error Detail=true</ConnectionStrings__WolverineIncidents>
+    </EnvironmentVariables>
+  </RunConfiguration>
+</RunSettings>

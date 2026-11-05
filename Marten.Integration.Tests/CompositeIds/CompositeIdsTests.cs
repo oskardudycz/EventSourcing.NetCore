@@ -1,9 +1,11 @@
+using Weasel.Core;
+using JasperFx.Events.Projections;
 using FluentAssertions;
 using JasperFx;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Marten.Schema;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Xunit;
 
 namespace Marten.Integration.Tests.CompositeIds;
@@ -86,6 +88,7 @@ public abstract class Aggregate<TKey, T>
         set { }
     }
 
+    [JsonInclude]
     public int Version { get; protected set; }
 
     [JsonIgnore] private readonly Queue<object> uncommittedEvents = new();
@@ -114,12 +117,16 @@ public enum ReservationStatus
 
 public class Reservation: Aggregate<ReservationId, Guid>
 {
+    [JsonInclude]
     public CustomerId CustomerId { get; private set; } = null!;
 
+    [JsonInclude]
     public SeatId SeatId { get; private set; } = null!;
 
+    [JsonInclude]
     public ReservationNumber Number { get; private set; } = null!;
 
+    [JsonInclude]
     public ReservationStatus Status { get; private set; }
 
 
@@ -133,6 +140,7 @@ public class Reservation: Aggregate<ReservationId, Guid>
             new ReservationNumber(Guid.CreateVersion7().ToString())
         );
 
+    [JsonConstructor]
     private Reservation() { }
 
     private Reservation(
@@ -228,7 +236,7 @@ public class CompositeIdsTests(MartenFixture fixture): MartenTest(fixture.Postgr
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.DatabaseSchemaName = SchemaName;
             options.Events.DatabaseSchemaName = SchemaName;
-            options.UseNewtonsoftForSerialization(nonPublicMembersStorage: NonPublicMembersStorage.All);
+            options.UseSystemTextJsonForSerialization();
 
             options.Projections.Snapshot<Reservation>(SnapshotLifecycle.Inline);
         });
@@ -260,9 +268,9 @@ public class CompositeIdsTests(MartenFixture fixture): MartenTest(fixture.Postgr
         var reservationId = reservation.Id;
 
         var issuesListFromInlineAggregationFromLinq =
-            Session.Query<Reservation>().SingleOrDefault(r => r.Id.Value == reservationId.Value);
-        var issuesListFromInlineAggregationFromLinqWithAggregateId = Session.Query<Reservation>()
-            .SingleOrDefault(r => r.AggregateId == reservationId.Value);
+            await Session.Query<Reservation>().SingleOrDefaultAsync(r => r.Id.Value == reservationId.Value);
+        var issuesListFromInlineAggregationFromLinqWithAggregateId = await Session.Query<Reservation>()
+            .SingleOrDefaultAsync(r => r.AggregateId == reservationId.Value);
 
         issuesListFromLiveAggregation.Should().NotBeNull();
         issuesListFromInlineAggregation.Should().NotBeNull();

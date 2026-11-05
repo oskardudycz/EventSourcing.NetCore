@@ -13,7 +13,7 @@ public record ReservationHistory(
     string Description
 );
 
-public class ReservationHistoryTransformation: EventProjection
+public partial class ReservationHistoryTransformation: EventProjection
 {
     public ReservationHistory Transform(IEvent<TentativeReservationCreated> input) =>
         new(

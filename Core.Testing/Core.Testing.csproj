@@ -10,7 +10,6 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
-        <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="Open.ChannelExtensions" />
         <PackageReference Include="GitHubActionsTestLogger">
             <PrivateAssets>all</PrivateAssets>

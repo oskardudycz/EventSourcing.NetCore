@@ -114,7 +114,7 @@ public enum ShoppingCartStatus
     Canceled = 4
 }
 
-public class GettingStateFromEventsTests: MartenTest
+public class GettingStateFromEventsTests(): MartenTest("solved_getting_state_immutable_default_convention")
 {
     /// <summary>
     /// Solution - Immutable entity

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Core.Aggregates;
 using Payments.Payments.CompletingPayment;
 using Payments.Payments.DiscardingPayment;
@@ -8,10 +9,13 @@ namespace Payments.Payments;
 
 public class Payment: Aggregate
 {
+    [JsonInclude]
     public Guid OrderId { get; private set; }
 
+    [JsonInclude]
     public decimal Amount { get; private set; }
 
+    [JsonInclude]
     public PaymentStatus Status { get; private set; }
 
     public static Payment Initialize(Guid paymentId, Guid orderId, decimal amount) =>

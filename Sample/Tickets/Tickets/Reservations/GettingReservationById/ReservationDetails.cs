@@ -42,16 +42,6 @@ public class ReservationDetails
     }
 }
 
-public class ReservationDetailsProjection: SingleStreamProjection<ReservationDetails, Guid>
+public partial class ReservationDetailsProjection: SingleStreamProjection<ReservationDetails, Guid>
 {
-    public ReservationDetailsProjection()
-    {
-        ProjectEvent<TentativeReservationCreated>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ReservationSeatChanged>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ReservationConfirmed>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ReservationCancelled>((item, @event) => item.Apply(@event));
-    }
 }

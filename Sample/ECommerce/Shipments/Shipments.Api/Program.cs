@@ -4,7 +4,7 @@ using Core.Kafka;
 using Core.OpenTelemetry;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.Swagger;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Npgsql;
 using OpenTelemetry.Trace;
 using Shipments;
@@ -30,7 +30,7 @@ builder.Services
     .AddShipmentsModule(builder.Configuration)
     .AddOpenTelemetry("Shipments", OpenTelemetryOptions.Build(options =>
         options.WithTracing(t =>
-            t.AddJaegerExporter()
+            t.AddOtlpExporter()
                 .AddNpgsql()
         ).DisableConsoleExporter(true)
     ))

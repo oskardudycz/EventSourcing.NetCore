@@ -1,5 +1,4 @@
 using JasperFx;
-using JasperFx.CodeGeneration;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics;
 using OptimisticConcurrency.Core.Exceptions;
@@ -34,7 +33,6 @@ builder.Services
 // Configure production vs development settings
 builder.Services.CritterStackDefaults(x =>
 {
-    x.Production.GeneratedCodeMode = TypeLoadMode.Static;
     x.Production.ResourceAutoCreate = AutoCreate.None;
 });
 

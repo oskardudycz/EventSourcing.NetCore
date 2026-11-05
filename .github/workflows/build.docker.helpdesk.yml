@@ -6,10 +6,12 @@ on:
     branches: [main]
     paths:
       - "Sample/Helpdesk/**"
+      - "Directory.Packages.props"
   # run it during pull request
   pull_request:
     paths:
       - "Sample/Helpdesk/**"
+      - "Directory.Packages.props"
 
 jobs:
     build:

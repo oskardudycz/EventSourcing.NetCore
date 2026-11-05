@@ -7,7 +7,7 @@ namespace EventStoreBasics.Tests;
 
 public class Exercise05StreamAggregation: IAsyncLifetime
 {
-    class User
+    internal class User
     {
         public Guid Id { get; private set; }
         public string Name { get; private set; } = null!;
@@ -34,14 +34,14 @@ public class Exercise05StreamAggregation: IAsyncLifetime
         }
     }
 
-    class UserCreated(Guid userId, string userName)
+    internal class UserCreated(Guid userId, string userName)
     {
         public Guid UserId { get; } = userId;
         public string UserName { get; } = userName;
     }
 
 
-    class UserNameUpdated(Guid userId, string userName)
+    internal class UserNameUpdated(Guid userId, string userName)
     {
         public Guid UserId { get; } = userId;
         public string UserName { get; } = userName;

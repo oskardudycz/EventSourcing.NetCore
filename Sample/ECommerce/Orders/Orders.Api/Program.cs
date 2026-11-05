@@ -10,7 +10,7 @@ using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using JasperFx;
 using Marten.Exceptions;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Orders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,8 +50,8 @@ builder
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Orders", OpenTelemetryOptions.Build(options =>
         options
-            .WithTracing(t => t.AddSource("Marten"))
-            .WithMetrics(m => m.AddMeter("Marten"))
+            .WithTracing(t => t.AddSource("Marten", "Quartz"))
+            .WithMetrics(m => m.AddMeter("Marten", "Quartz"))
             .DisableConsoleExporter(true)
     ))
     .AddQuartzDefaults()

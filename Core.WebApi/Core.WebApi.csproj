@@ -5,7 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
         <PackageReference Include="Swashbuckle.AspNetCore" />
     </ItemGroup>
 

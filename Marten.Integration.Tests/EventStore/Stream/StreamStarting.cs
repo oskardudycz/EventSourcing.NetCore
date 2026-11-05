@@ -59,7 +59,7 @@ public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSq
 
         await Session.SaveChangesAsync();
 
-        await Assert.ThrowsAsync<ExistingStreamIdCollisionException>(async () =>
+        await Assert.ThrowsAsync<Marten.Exceptions.ExistingStreamIdCollisionException>(async () =>
         {
             EventStore.StartStream(@event.IssueId, @event);
             await Session.SaveChangesAsync();

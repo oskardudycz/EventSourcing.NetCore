@@ -2,6 +2,26 @@
 
 # Pragmatic Event Sourcing With Marten and Wolverine
 
+Wolverine code generation uses different configurations for development and production:
+
+- Debug references `WolverineFx.RuntimeCompilation` for development and normal integration tests.
+- Release excludes the compiler and uses pre-generated handlers and endpoints in Production. Missing generated types fail startup.
+
+From the repository root, run normal integration tests with:
+
+```sh
+dotnet test Sample/Helpdesk.Wolverine/Helpdesk.Api.Tests/Helpdesk.Api.Tests.csproj --configuration Debug
+```
+
+To verify production loading, generate the code first, then run the same suite in Release:
+
+```sh
+dotnet run --project Sample/Helpdesk.Wolverine/Helpdesk.Api/Helpdesk.Api.csproj --configuration Debug -- codegen write
+dotnet test Sample/Helpdesk.Wolverine/Helpdesk.Api.Tests/Helpdesk.Api.Tests.csproj --configuration Release
+```
+
+The Release test settings select Production and use the local PostgreSQL test database. CI generates the code before its Release restore/build. The Docker build generates and validates code in Debug, publishes Release, and checks that no runtime compiler or Roslyn assemblies are shipped. Generated files do not need to be committed. See [Wolverine's code generation guide](https://wolverinefx.io/guide/codegen#dropping-roslyn-from-the-production-image-entirely).
+
 It's the extended version of the [Helpdesk sample](../Helpdesk) adding Wolverine into the game.
 
 It has:

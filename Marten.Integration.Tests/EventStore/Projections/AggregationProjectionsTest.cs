@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections;
 
-public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
+public partial class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
         string IssueId,
@@ -63,7 +63,7 @@ public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixtu
         }
     }
 
-    public class IssueDescriptionsProjection: SingleStreamProjection<IssueDescriptions, string>
+    public partial class IssueDescriptionsProjection: SingleStreamProjection<IssueDescriptions, string>
     {
         public void Apply(IssueCreated @event, IssueDescriptions item)
         {
@@ -119,7 +119,7 @@ public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixtu
         //3. Get inline aggregation
         var issuesListFromInlineAggregation = await Session.LoadAsync<IssuesList>(streamId);
 
-        var projection = Session.Query<IssueDescriptions>().FirstOrDefault();
+        var projection = await Session.Query<IssueDescriptions>().FirstOrDefaultAsync();
 
         issuesListFromLiveAggregation.Should().NotBeNull();
         issuesListFromInlineAggregation.Should().NotBeNull();

@@ -1,7 +1,8 @@
 using System.Text.Json.Serialization;
 using Marten;
 using Marten.Events.Aggregation;
-using Marten.Schema.Identity;
+using JasperFx;
+using JasperFx.Events.Projections;
 using Weasel.Core;
 using static Microsoft.AspNetCore.Http.Results;
 
@@ -22,7 +23,7 @@ builder.Services
         options.AutoCreateSchemaObjects = AutoCreate.All;
         options.Connection(builder.Configuration.GetConnectionString("Incidents") ??
                            throw new InvalidOperationException());
-        options.UseDefaultSerialization(EnumStorage.AsString, nonPublicMembersStorage: NonPublicMembersStorage.All);
+        options.UseSystemTextJsonForSerialization(EnumStorage.AsString);
 
         options.CreateDatabasesForTenants(c =>
         {
@@ -42,10 +43,9 @@ builder.Services
             x.Metadata.CorrelationId.Enabled = true;
         });
 
-        options.Projections.Add<HotelChainProjection>();
+        options.Projections.Add<HotelChainProjection>(ProjectionLifecycle.Inline);
     })
-    .UseLightweightSessions()
-    .OptimizeArtifactWorkflow();
+    .UseLightweightSessions();
 
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(o =>
     o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -105,7 +105,7 @@ public record HotelChain(
     string Name
 );
 
-public class HotelChainProjection: SingleStreamAggregation<HotelChain>
+public partial class HotelChainProjection: SingleStreamProjection<HotelChain, Guid>
 {
     public static HotelChain Create(HotelChainSetUp @event) =>
         new(@event.ChainId, @event.Name);

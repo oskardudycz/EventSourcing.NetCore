@@ -50,7 +50,7 @@ module Args =
         member val StatsInterval =          TimeSpan.FromMinutes 1.
         member val StateInterval =          p.GetResult(StateIntervalM, 10.) |> TimeSpan.FromMinutes
         member val PurgeInterval =          TimeSpan.FromHours 1.
-        member val IdleDelay =              p.GetResult(IdleDelayMs, 1000) |> TimeSpan.FromMilliseconds
+        member val IdleDelay =              p.GetResult(IdleDelayMs, 1000) |> float |> TimeSpan.FromMilliseconds
         member val WakeForResults =         p.Contains WakeForResults
         member val Store : Choice<SourceArgs.Cosmos.Arguments, SourceArgs.Dynamo.Arguments, SourceArgs.Esdb.Arguments> =
                                             match p.GetSubCommand() with

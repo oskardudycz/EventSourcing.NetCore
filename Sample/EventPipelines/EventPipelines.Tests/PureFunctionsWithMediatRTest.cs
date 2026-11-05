@@ -60,7 +60,8 @@ public class PureFunctionsWithMediatRTest
         serviceCollection
             .AddEventBus()
             .RouteEventsFromMediatR()
-            .AddScoped<IMediator, Mediator>()
+            .AddLogging()
+            .AddMediatR(config => config.RegisterServicesFromAssemblyContaining<PureFunctionsWithMediatRTest>())
             .Filter<UserAdded>(AdminPipeline.IsAdmin)
             .Transform<UserAdded, AdminAdded>(AdminPipeline.ToAdminAdded)
             .Handle<AdminAdded>(AdminPipeline.Handle)

@@ -1,3 +1,4 @@
+using JasperFx.Events.Projections;
 using FluentAssertions;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;

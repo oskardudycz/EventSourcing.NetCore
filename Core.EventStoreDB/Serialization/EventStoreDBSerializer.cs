@@ -1,24 +1,18 @@
-﻿using System.Text;
+﻿using System.Text.Json;
 using Core.Events;
 using Core.EventStoreDB.Events;
-using Core.Serialization.Newtonsoft;
 using EventStore.Client;
-using Newtonsoft.Json;
 using OpenTelemetry.Context.Propagation;
 
 namespace Core.EventStoreDB.Serialization;
 
 public static class EventStoreDBSerializer
 {
-    private static readonly JsonSerializerSettings SerializerSettings;
-
-    static EventStoreDBSerializer()
+    private static readonly JsonSerializerOptions SerializerOptions = new()
     {
-        SerializerSettings =
-            new JsonSerializerSettings().WithNonDefaultConstructorContractResolver();
-
-        SerializerSettings.Converters.Add(new EventStoreDBEventMetadataJsonConverter());
-    }
+        PropertyNameCaseInsensitive = true,
+        Converters = { new EventStoreDBEventMetadataJsonConverter() }
+    };
 
     public static T? Deserialize<T>(this ResolvedEvent resolvedEvent) where T : class =>
         Deserialize(resolvedEvent) as T;
@@ -32,10 +26,10 @@ public static class EventStoreDBSerializer
             return null;
 
         // deserialize event
-        return JsonConvert.DeserializeObject(
-            Encoding.UTF8.GetString(resolvedEvent.Event.Data.Span),
+        return JsonSerializer.Deserialize(
+            resolvedEvent.Event.Data.Span,
             eventType,
-            SerializerSettings
+            SerializerOptions
         )!;
     }
 
@@ -48,9 +42,9 @@ public static class EventStoreDBSerializer
             return null;
 
         // deserialize event
-        return JsonConvert.DeserializeObject<PropagationContext>(
-            Encoding.UTF8.GetString(resolvedEvent.Event.Metadata.Span),
-            SerializerSettings
+        return JsonSerializer.Deserialize<PropagationContext>(
+            resolvedEvent.Event.Metadata.Span,
+            SerializerOptions
         );
     }
 
@@ -58,7 +52,7 @@ public static class EventStoreDBSerializer
         new(
             Uuid.NewUuid(),
             EventTypeMapper.Instance.ToName(@event.GetType()),
-            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@event, SerializerSettings)),
-            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(metadata ?? new { }, SerializerSettings))
+            JsonSerializer.SerializeToUtf8Bytes(@event, @event.GetType(), SerializerOptions),
+            JsonSerializer.SerializeToUtf8Bytes(metadata ?? new { }, SerializerOptions)
         );
 }

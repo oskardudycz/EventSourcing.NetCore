@@ -1,5 +1,5 @@
 using Core.Aggregates;
-using Marten.Metadata;
+using JasperFx.Metadata;
 
 namespace HotelManagement.ProcessManagers.GuestStayAccounts;
 

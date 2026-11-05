@@ -38,7 +38,7 @@ public record ProjectInfo(
     string? ManagerId = null
 );
 
-public class ProjectInfoProjection: EventProjection
+public partial class ProjectInfoProjection: EventProjection
 {
     public static ProjectInfo Create(IDocumentOperations documentOperations, ProjectCreated created)
     {

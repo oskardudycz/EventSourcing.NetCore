@@ -16,7 +16,6 @@ services:
             context: .
             args:
                 project_name: Helpdesk.Api
-                run_codegen: true
         deploy:
             replicas: 1
         depends_on:

@@ -9,14 +9,13 @@ using Helpdesk.Api.Incidents.GetIncidentDetails;
 using Helpdesk.Api.Incidents.GetIncidentHistory;
 using Helpdesk.Api.Incidents.GetIncidentShortInfo;
 using JasperFx;
-using JasperFx.CodeGeneration;
 using Marten;
 using Marten.AspNetCore;
 using JasperFx.Events;
 using JasperFx.Events.Daemon;
 using JasperFx.Events.Projections;
 using Marten.Pagination;
-using Marten.Storage;
+using JasperFx.MultiTenancy;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -76,7 +75,6 @@ builder.Services
 // Configure production vs development settings
 builder.Services.CritterStackDefaults(x =>
 {
-    x.Production.GeneratedCodeMode = TypeLoadMode.Static;
     x.Production.ResourceAutoCreate = AutoCreate.None;
     x.ApplicationAssembly = typeof(CustomerIncidentsSummaryProjection).Assembly;
 });

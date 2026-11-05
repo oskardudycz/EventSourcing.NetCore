@@ -8,7 +8,7 @@ using Core.WebApi.Swagger;
 using ECommerce;
 using EventStore.Client;
 using ECommerce.Core;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +31,7 @@ builder.Services
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
         options.WithTracing(t =>
-            t.AddJaegerExporter()
+            t.AddOtlpExporter()
         ).DisableConsoleExporter(true)
     ))
     .AddControllers();

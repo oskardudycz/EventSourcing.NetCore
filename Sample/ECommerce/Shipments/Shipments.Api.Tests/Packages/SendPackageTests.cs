@@ -43,7 +43,7 @@ public class SendPackageTests(TestWebApplicationFactory<Program> fixture)
     ];
 
     private readonly ApiSpecification<Program> API = ApiSpecification<Program>.Setup(
-        new TestWebApplicationFactory<Program>()
+        fixture
     );
 
     public void Dispose() => API.Dispose();

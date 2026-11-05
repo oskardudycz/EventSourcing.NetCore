@@ -21,6 +21,16 @@ After that you can use PG Admin (IDE for Postgres) to see how tables and data lo
 - Login: `admin@pgadmin.org`, Password: `admin`
 - To connect to server click right mouse on Servers, then Register Server and use host: `postgres`, user: `postgres`, password: `Password12!`
 
+Each variant uses its own schema so the tests can run in parallel. After running a test, expand **Databases → postgres → Schemas** in PG Admin to inspect its events:
+
+| Variant | Schema |
+| --- | --- |
+| Mutable | `solved_getting_state_mutable` |
+| Immutable, default convention | `solved_getting_state_immutable_default_convention` |
+| Immutable, single Apply method | `solved_getting_state_immutable_single_apply` |
+
+The schema names stay the same between runs, and the data remains available for inspection.
+
 ## Solution
 
 Read also my articles:

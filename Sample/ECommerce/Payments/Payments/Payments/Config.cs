@@ -1,3 +1,4 @@
+using JasperFx.Events.Projections;
 using Core.Commands;
 using Core.Events;
 using Core.Marten.Repository;

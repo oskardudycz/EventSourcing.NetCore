@@ -7,10 +7,9 @@
     <ItemGroup>
         <PackageReference Include="Marten.AspNetCore" />
         <PackageReference Include="Npgsql.DependencyInjection" />
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
         <PackageReference Include="Aspire.Confluent.Kafka" />
         <PackageReference Include="Swashbuckle.AspNetCore" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Data;
 using Dapper;
 using EventStoreBasics.Tools;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Npgsql;
 
 namespace EventStoreBasics;
@@ -59,7 +59,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IAsyncDisposable, 
             new
             {
                 Id = Guid.CreateVersion7(),
-                Data = JsonConvert.SerializeObject(@event),
+                Data = JsonSerializer.Serialize(@event),
                 Type = @event.GetType().AssemblyQualifiedName,
                 StreamId = streamId,
                 StreamType = typeof(TStream).AssemblyQualifiedName,
@@ -125,7 +125,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IAsyncDisposable, 
 
         return result
             .Select(@event =>
-                JsonConvert.DeserializeObject(
+                JsonSerializer.Deserialize(
                     @event.data,
                     Type.GetType(@event.type, true)!
                 ))

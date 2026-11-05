@@ -10,7 +10,7 @@ public record IncidentHistory(
     string Description
 );
 
-public class IncidentHistoryTransformation: EventProjection
+public partial class IncidentHistoryTransformation: EventProjection
 {
     public IncidentHistory Transform(IEvent<IncidentLogged> input)
     {

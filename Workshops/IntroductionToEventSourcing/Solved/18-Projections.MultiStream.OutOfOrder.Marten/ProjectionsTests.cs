@@ -94,7 +94,7 @@ public class PaymentVerification
     }
 }
 
-public class PaymentVerificationProjection: MultiStreamProjection<PaymentVerification, string>
+public partial class PaymentVerificationProjection: MultiStreamProjection<PaymentVerification, string>
 {
     public PaymentVerificationProjection()
     {

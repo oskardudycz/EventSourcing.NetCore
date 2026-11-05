@@ -1,13 +1,13 @@
 using Core;
 using Core.Exceptions;
 using Core.OpenTelemetry;
-using Core.Serialization.Newtonsoft;
+using Core.Serialization.SystemTextJson;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using JasperFx;
 using Marten.Exceptions;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Npgsql;
 using OpenTelemetry.Trace;
 using Tickets;
@@ -32,12 +32,12 @@ builder.Services
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Tickets", OpenTelemetryOptions.Build(options =>
         options.WithTracing(t =>
-            t.AddJaegerExporter()
+            t.AddOtlpExporter()
                 .AddNpgsql()
         ).DisableConsoleExporter(true)
     ))
     .AddControllers()
-    .AddNewtonsoftJson(opt => opt.SerializerSettings.WithDefaults());
+    .AddJsonOptions(opt => opt.JsonSerializerOptions.WithDefaults());
 
 var app = builder.Build();
 

@@ -7,12 +7,12 @@ using static TimeHasPassed;
 
 public class PassageOfTimeJob(IEventBus eventBus, TimeProvider timeProvider): IJob
 {
-    public Task Execute(IJobExecutionContext context)
+    public ValueTask Execute(IJobExecutionContext context, CancellationToken cancellationToken = default)
     {
         var timeUnit = context.MergedJobDataMap.GetString("timeUnit")!.ToTimeUnit();
         var @event = timeUnit.ToEvent(timeProvider.GetUtcNow(), context.PreviousFireTimeUtc);
 
-        return eventBus.Publish(EventEnvelope.From(@event), CancellationToken.None);
+        return new ValueTask(eventBus.Publish(EventEnvelope.From(@event), cancellationToken));
     }
 }
 

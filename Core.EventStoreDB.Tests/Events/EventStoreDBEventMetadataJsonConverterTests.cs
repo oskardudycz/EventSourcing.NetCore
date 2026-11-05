@@ -2,7 +2,7 @@
 using Core.EventStoreDB.Events;
 using Core.OpenTelemetry;
 using FluentAssertions;
-using Newtonsoft.Json;
+using System.Text.Json;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 using Xunit;
@@ -11,7 +11,10 @@ namespace Core.EventStoreDB.Tests.Events;
 
 public class EventStoreDBEventMetadataJsonConverterTests
 {
-    private readonly EventStoreDBEventMetadataJsonConverter jsonConverter = new();
+    private readonly JsonSerializerOptions serializerOptions = new()
+    {
+        Converters = { new EventStoreDBEventMetadataJsonConverter() }
+    };
     private readonly ActivityScope activityScope = new();
 
     public EventStoreDBEventMetadataJsonConverterTests()
@@ -30,7 +33,7 @@ public class EventStoreDBEventMetadataJsonConverterTests
         var propagationContext = new PropagationContext(activity.Context, Baggage.Current);
 
         // When
-        var json = JsonConvert.SerializeObject(propagationContext, jsonConverter);
+        var json = JsonSerializer.Serialize(propagationContext, serializerOptions);
 
         json.Should()
             .Be(
@@ -56,7 +59,7 @@ public class EventStoreDBEventMetadataJsonConverterTests
             $"{{\"$correlationId\":\"{traceId}\",\"$causationId\":\"{spanId}\",\"traceparent\":\"00-{traceId}-{spanId}-01\"}}";
 
         // When
-        var propagationContext = JsonConvert.DeserializeObject<PropagationContext>(json, jsonConverter);
+        var propagationContext = JsonSerializer.Deserialize<PropagationContext>(json, serializerOptions);
 
         propagationContext.Should().Be(expectedPropagationContext);
     }

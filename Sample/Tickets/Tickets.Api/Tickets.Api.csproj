@@ -6,9 +6,8 @@
 
     <ItemGroup>
         <PackageReference Include="Npgsql.OpenTelemetry" />
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
         <PackageReference Include="Swashbuckle.AspNetCore" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
     </ItemGroup>
 
     <ItemGroup>

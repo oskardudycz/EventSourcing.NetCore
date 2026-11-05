@@ -9,7 +9,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
     </ItemGroup>
 
     <ItemGroup>

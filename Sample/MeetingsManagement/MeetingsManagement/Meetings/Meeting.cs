@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Core.Aggregates;
 using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.SchedulingMeeting;
@@ -7,10 +8,13 @@ namespace MeetingsManagement.Meetings;
 
 public class Meeting: Aggregate
 {
+    [JsonInclude]
     public string Name { get; private set; } = null!;
 
+    [JsonInclude]
     public DateTime Created { get; private set; }
 
+    [JsonInclude]
     public DateRange? Occurs { get; private set; }
 
     public Meeting()

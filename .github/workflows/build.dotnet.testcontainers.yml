@@ -23,7 +23,7 @@ jobs:
               run: dotnet workload install aspire
 
             - name: Restore NuGet packages
-              run: dotnet restore
+              run: dotnet restore --property:Configuration=Release
 
             - name: Build
               run: dotnet build --configuration Release --no-restore

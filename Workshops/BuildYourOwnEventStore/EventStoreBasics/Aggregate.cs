@@ -1,11 +1,13 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace EventStoreBasics;
 
 public class Aggregate: IAggregate
 {
+    [JsonInclude]
     public Guid Id { get; protected set; }
 
+    [JsonInclude]
     public int Version { get; protected set; }
 
     [JsonIgnore]

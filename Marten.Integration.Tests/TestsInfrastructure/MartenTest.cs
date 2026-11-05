@@ -10,7 +10,7 @@ namespace Marten.Integration.Tests.TestsInfrastructure;
 
 public class MartenFixture : IAsyncLifetime
 {
-    public readonly PostgreSqlContainer PostgreSqlContainer = new PostgreSqlBuilder()
+    public readonly PostgreSqlContainer PostgreSqlContainer = new PostgreSqlBuilder("postgres:15.1-alpine")
         .Build();
 
     public Task InitializeAsync() => PostgreSqlContainer.StartAsync();

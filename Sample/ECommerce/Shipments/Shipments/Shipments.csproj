@@ -13,8 +13,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="JsonNet.PrivateSettersContractResolvers" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

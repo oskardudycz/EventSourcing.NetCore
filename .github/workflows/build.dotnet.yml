@@ -25,8 +25,11 @@ jobs:
             - name: Install .NET Aspire workload
               run: dotnet workload install aspire
 
+            - name: Generate Wolverine code
+              run: dotnet run --project Sample/Helpdesk.Wolverine/Helpdesk.Api/Helpdesk.Api.csproj --configuration Debug -- codegen write
+
             - name: Restore NuGet packages
-              run: dotnet restore
+              run: dotnet restore --property:Configuration=Release
 
             - name: Build
               run: dotnet build --configuration Release --no-restore

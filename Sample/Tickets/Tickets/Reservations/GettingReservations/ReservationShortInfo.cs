@@ -26,13 +26,12 @@ public class ReservationShortInfo
     }
 }
 
-public class ReservationShortInfoProjection : SingleStreamProjection<ReservationShortInfo, Guid>
+public partial class ReservationShortInfoProjection : SingleStreamProjection<ReservationShortInfo, Guid>
 {
     public ReservationShortInfoProjection()
     {
-        ProjectEvent<TentativeReservationCreated>((item, @event) => item.Apply(@event));
 
-        ProjectEvent<ReservationConfirmed>((item, @event) => item.Apply(@event));
+
 
         DeleteEvent<ReservationCancelled>();
     }

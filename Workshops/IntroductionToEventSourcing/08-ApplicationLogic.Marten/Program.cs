@@ -3,10 +3,8 @@ using ApplicationLogic.Marten.Immutable.ShoppingCarts;
 using ApplicationLogic.Marten.Mixed.ShoppingCarts;
 using ApplicationLogic.Marten.Mutable.ShoppingCarts;
 using JasperFx;
-using JasperFx.CodeGeneration;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics;
-using Oakton;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +32,6 @@ builder.Services
 // Configure production vs development settings
 builder.Services.CritterStackDefaults(x =>
 {
-    x.Production.GeneratedCodeMode = TypeLoadMode.Static;
     x.Production.ResourceAutoCreate = AutoCreate.None;
 });
 

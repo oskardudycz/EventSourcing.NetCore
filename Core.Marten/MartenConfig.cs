@@ -4,6 +4,7 @@ using Core.Marten.Commands;
 using Core.Marten.Ids;
 using Core.Marten.Subscriptions;
 using JasperFx;
+using JasperFx.OpenTelemetry;
 using JasperFx.Events;
 using JasperFx.Events.Daemon;
 using Marten;

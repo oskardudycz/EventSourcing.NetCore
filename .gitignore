@@ -255,4 +255,4 @@ paket-files/
 
 # MACOS
 .DS_STORE
-**/Internal/Generated/**
+Sample/Helpdesk.Wolverine/Helpdesk.Api/Internal/Generated/

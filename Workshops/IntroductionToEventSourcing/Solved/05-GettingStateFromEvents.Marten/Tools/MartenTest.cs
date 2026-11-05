@@ -7,13 +7,13 @@ public abstract class MartenTest: IDisposable
     private readonly DocumentStore documentStore;
     protected readonly IDocumentSession DocumentSession;
 
-    protected MartenTest()
+    protected MartenTest(string schemaName)
     {
         var options = new StoreOptions();
         options.Connection(
             "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'");
         options.UseSystemTextJsonForSerialization();
-        options.DatabaseSchemaName = options.Events.DatabaseSchemaName = "IntroductionToEventSourcing";
+        options.DatabaseSchemaName = options.Events.DatabaseSchemaName = schemaName;
 
         documentStore = new DocumentStore(options);
         DocumentSession = documentStore.LightweightSession();

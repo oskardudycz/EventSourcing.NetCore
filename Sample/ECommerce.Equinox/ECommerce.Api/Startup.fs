@@ -9,9 +9,9 @@ open Serilog
 type Startup() =
 
     member _.ConfigureServices(services : IServiceCollection) : unit =
-        services.AddMvc() |> ignore
-        services.AddControllers()
-            .AddNewtonsoftJson() |> ignore
+        services.AddControllers().AddJsonOptions(fun options ->
+            FsCodec.SystemTextJson.Options.Create(autoTypeSafeEnumToJsonString = true).Converters
+            |> Seq.iter options.JsonSerializerOptions.Converters.Add) |> ignore
             // TODO AddSwaggerGen
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

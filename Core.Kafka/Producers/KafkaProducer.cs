@@ -4,7 +4,7 @@ using Core.Events;
 using Core.Events.External;
 using Core.OpenTelemetry;
 using Core.OpenTelemetry.Serialization;
-using Core.Serialization.Newtonsoft;
+using Core.Serialization.SystemTextJson;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static Core.Extensions.DictionaryExtensions;

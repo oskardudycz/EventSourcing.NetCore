@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using Helpdesk.Api.Core.Http.Middlewares.ExceptionHandling;
 using JasperFx;
-using JasperFx.CodeGeneration;
 using Marten;
 using Marten.AspNetCore;
 using JasperFx.Events;
@@ -32,7 +31,7 @@ builder.Services
     {
         ConcurrencyException =>
             exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
-        ExistingStreamIdCollisionException =>
+        Marten.Exceptions.ExistingStreamIdCollisionException =>
             exception.MapToProblemDetails(StatusCodes.Status412PreconditionFailed),
         _ => null,
     })
@@ -48,6 +47,8 @@ builder.Services
 
         // THIS IS IMPORTANT!
         options.Events.StreamIdentity = StreamIdentity.AsString;
+        // The inline shift tracker reads event sequences before the append completes.
+        options.Events.AppendMode = EventAppendMode.Rich;
 
         options.Projections.LiveStreamAggregation<CashierShift>();
         options.Projections.LiveStreamAggregation<CashRegister>();
@@ -65,7 +66,6 @@ builder.Services
 // Configure production vs development settings
 builder.Services.CritterStackDefaults(x =>
 {
-    x.Production.GeneratedCodeMode = TypeLoadMode.Static;
     x.Production.ResourceAutoCreate = AutoCreate.None;
 });
 
