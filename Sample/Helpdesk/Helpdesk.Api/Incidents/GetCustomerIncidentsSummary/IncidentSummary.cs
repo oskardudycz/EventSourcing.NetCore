@@ -15,7 +15,7 @@ public class CustomerIncidentsSummary
     public int Closed { get; set; }
 }
 
-public class CustomerIncidentsSummaryProjection: MultiStreamProjection<CustomerIncidentsSummary, Guid>
+public partial class CustomerIncidentsSummaryProjection: MultiStreamProjection<CustomerIncidentsSummary, Guid>
 {
     public CustomerIncidentsSummaryProjection()
     {
@@ -56,7 +56,7 @@ public class CustomerIncidentsSummaryGrouper: IAggregateGrouper<Guid>
         typeof(IncidentClosed)
     ];
 
-    public async Task Group(IQuerySession session, IEnumerable<IEvent> events, IEventGrouping<Guid> grouping)
+    public async Task Group(IQuerySession session, IReadOnlyList<IEvent> events, IEventGrouping<Guid> grouping)
     {
         var filteredEvents = events
             .Where(ev => eventTypes.Contains(ev.EventType))

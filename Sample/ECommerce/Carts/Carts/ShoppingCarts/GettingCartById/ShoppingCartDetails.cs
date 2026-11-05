@@ -80,18 +80,6 @@ public class ShoppingCartDetails
             .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));
 }
 
-public class CartDetailsProjection : SingleStreamProjection<ShoppingCartDetails, Guid>
+public partial class CartDetailsProjection : SingleStreamProjection<ShoppingCartDetails, Guid>
 {
-    public CartDetailsProjection()
-    {
-        ProjectEvent<ShoppingCartOpened>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ProductAdded>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ProductRemoved>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ShoppingCartConfirmed>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ShoppingCartCanceled>((item, @event) => item.Apply(@event));
-    }
 }

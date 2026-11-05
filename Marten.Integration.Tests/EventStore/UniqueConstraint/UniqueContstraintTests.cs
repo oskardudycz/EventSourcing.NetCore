@@ -1,3 +1,4 @@
+using Weasel.Core;
 using JasperFx;
 using JasperFx.Events;
 using JasperFx.Events.Projections;
@@ -8,7 +9,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.UniqueConstraint;
 
-public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
+public partial class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record UserCreated(
         string UserId,
@@ -29,7 +30,7 @@ public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.P
         string Email
     );
 
-    public class UserNameGuardProjection: SingleStreamProjection<UserNameGuard, string>
+    public partial class UserNameGuardProjection: SingleStreamProjection<UserNameGuard, string>
     {
         public UserNameGuardProjection() =>
             DeleteEvent<UserDeleted>();
@@ -46,7 +47,7 @@ public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.P
         var store = DocumentStore.For(options =>
         {
             options.Connection(ConnectionString);
-            options.UseNewtonsoftForSerialization(nonPublicMembersStorage: NonPublicMembersStorage.All);
+            options.UseSystemTextJsonForSerialization();
             options.AutoCreateSchemaObjects = AutoCreate.All;
             options.DatabaseSchemaName = SchemaName;
             options.Events.DatabaseSchemaName = SchemaName;

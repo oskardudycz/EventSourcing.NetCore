@@ -1,3 +1,4 @@
+using JasperFx.Events.Projections;
 using FluentAssertions;
 using JasperFx;
 using JasperFx.Events;

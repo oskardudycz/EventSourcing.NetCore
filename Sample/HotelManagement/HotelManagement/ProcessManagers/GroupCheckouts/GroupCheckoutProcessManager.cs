@@ -1,6 +1,6 @@
 using Core.ProcessManagers;
 using HotelManagement.ProcessManagers.GuestStayAccounts;
-using Marten.Metadata;
+using JasperFx.Metadata;
 
 namespace HotelManagement.ProcessManagers.GroupCheckouts;
 

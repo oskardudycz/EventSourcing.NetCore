@@ -18,7 +18,6 @@
 
     <ItemGroup>
         <PackageReference Include="Serilog.AspNetCore" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
     </ItemGroup>
 
     <ItemGroup>

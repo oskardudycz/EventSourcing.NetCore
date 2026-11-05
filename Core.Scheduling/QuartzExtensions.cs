@@ -20,8 +20,8 @@ public static class QuartzExtensions
             )
             .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
-    public static IServiceCollectionQuartzConfigurator AddPassageOfTime(
-        this IServiceCollectionQuartzConfigurator q,
+    public static IQuartzBuilder AddPassageOfTime(
+        this IQuartzBuilder q,
         TimeUnit timeUnit
     )
     {

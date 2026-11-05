@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Testcontainers.PostgreSql" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" />

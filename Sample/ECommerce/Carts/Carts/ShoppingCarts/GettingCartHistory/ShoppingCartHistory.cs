@@ -14,7 +14,7 @@ public record ShoppingCartHistory (
     string Description
 );
 
-public class CartHistoryTransformation : EventProjection
+public partial class CartHistoryTransformation : EventProjection
 {
     public ShoppingCartHistory Transform(IEvent<ShoppingCartOpened> input) =>
         new (

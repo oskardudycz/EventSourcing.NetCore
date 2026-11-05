@@ -9,7 +9,7 @@ using Core.WebApi.Swagger;
 using JasperFx;
 using Marten.Events.Daemon;
 using Marten.Exceptions;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Payments;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -7,7 +7,7 @@ module private Counter =
 
     let private make (config : Prometheus.CounterConfiguration) name desc =
         let ctr = Prometheus.Metrics.CreateCounter(name, desc, config)
-        fun tagValues (c : float) -> ctr.WithLabels(tagValues).Inc(c)
+        fun (tagValues : string[]) (c : float) -> ctr.WithLabels(tagValues).Inc(c)
 
     let create (tagNames, tagValues) stat desc =
         let config = Prometheus.CounterConfiguration(LabelNames = tagNames)

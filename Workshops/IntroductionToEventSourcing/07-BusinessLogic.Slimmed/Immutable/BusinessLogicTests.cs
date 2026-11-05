@@ -256,7 +256,7 @@ public class BusinessLogicTests
             .When(state =>
                 Handle(new CancelShoppingCart(shoppingCartId, now), state)
             )
-            .ThenThrows<InvalidOperationException>();
+            .Then(new ShoppingCartCanceled(shoppingCartId, now));
 
     [Fact]
     public void CancelsNonEmptyShoppingCart() =>

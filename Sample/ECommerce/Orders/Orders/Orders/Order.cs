@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Core.Aggregates;
 using Orders.Orders.CancellingOrder;
 using Orders.Products;
@@ -10,12 +11,16 @@ public class Order: Aggregate<OrderEvent>
 {
     public readonly TimeSpan DefaultTimeOut = TimeSpan.FromMinutes(5);
 
+    [JsonInclude]
     public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = null!;
 
+    [JsonInclude]
     public decimal TotalPrice { get; private set; }
 
+    [JsonInclude]
     public OrderStatus Status { get; private set; }
 
+    [JsonInclude]
     public Guid? PaymentId { get; private set; }
 
     public static Order Initialize(

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Core.Aggregates;
 using Tickets.Reservations.CancellingReservation;
 using Tickets.Reservations.ChangingReservationSeat;
@@ -9,10 +10,13 @@ namespace Tickets.Reservations;
 
 public class Reservation : Aggregate
 {
+    [JsonInclude]
     public Guid SeatId { get; private set; }
 
+    [JsonInclude]
     public string Number { get; private set; } = null!;
 
+    [JsonInclude]
     public ReservationStatus Status { get; private set; }
 
     // For serialization

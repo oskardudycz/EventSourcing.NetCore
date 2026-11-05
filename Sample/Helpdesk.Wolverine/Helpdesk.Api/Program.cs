@@ -71,6 +71,7 @@ builder.Services.AddResourceSetupOnStartup()
     .CritterStackDefaults(x =>
     {
         x.Production.GeneratedCodeMode = TypeLoadMode.Static;
+        x.Production.AssertAllPreGeneratedTypesExist = true;
         x.Production.ResourceAutoCreate = AutoCreate.None;
     });
 

@@ -52,7 +52,7 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
 
     public bool IsClosed => ShoppingCartStatus.Closed.HasFlag(Status);
 
-    protected override void Apply(ShoppingCartEvent @event)
+    public override void Apply(ShoppingCartEvent @event)
     {
         switch (@event)
         {
@@ -96,7 +96,7 @@ public class MutableShoppingCart: Aggregate<ShoppingCartEvent>
     }
 
     //just for default creation of empty object
-    private MutableShoppingCart() { }
+    public MutableShoppingCart() { }
 
     private void Apply(ShoppingCartOpened opened)
     {

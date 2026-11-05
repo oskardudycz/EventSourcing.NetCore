@@ -10,7 +10,6 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
-        <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="Open.ChannelExtensions" />
         <PackageReference Include="Polly" />
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" />

@@ -15,5 +15,6 @@
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
         <PackageReference Include="WolverineFx.Marten" />
         <PackageReference Include="WolverineFx.Http" />
+        <PackageReference Include="WolverineFx.RuntimeCompilation" Condition="'$(Configuration)' == 'Debug'" />
     </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using EventStore.Client;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,7 +33,7 @@ builder.Services
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("Carts", OpenTelemetryOptions.Build(options =>
         options.WithTracing(t =>
-            t.AddJaegerExporter()
+            t.AddOtlpExporter()
         ).DisableConsoleExporter(true)
     ))
     .AddControllers();

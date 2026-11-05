@@ -53,8 +53,9 @@ public partial class GuestStayAccountTests
     }
 
     [Fact]
-    public void GivenCheckedInWithSettledChargesGuestStayAccount_WhenRecordCharge_ThenFails()
+    public void GivenCheckedInWithSettledChargesGuestStayAccount_WhenRecordCharge_ThenSucceeds()
     {
+        var newChargeAmount = faker.Random.Decimal(0.1M);
         var settledAmount = faker.Random.Decimal(0.1M);
         var checkedInDate = faker.Date.RecentOffset();
 
@@ -63,13 +64,14 @@ public partial class GuestStayAccountTests
                 new ChargeRecorded(guestStayAccountId, settledAmount, faker.Date.RecentOffset(refDate: checkedInDate)),
                 new PaymentRecorded(guestStayAccountId, settledAmount, faker.Date.RecentOffset(refDate: checkedInDate))
             )
-            .When(state => state.RecordCharge(faker.Random.Decimal(0.1M), now))
-            .ThenThrows<InvalidOperationException>();
+            .When(state => state.RecordCharge(newChargeAmount, now))
+            .Then(new ChargeRecorded(guestStayAccountId, newChargeAmount, now));
     }
 
     [Fact]
-    public void GivenCheckedInWithNotSettledChargesGuestStayAccount_WhenRecordCharge_ThenFails()
+    public void GivenCheckedInWithNotSettledChargesGuestStayAccount_WhenRecordCharge_ThenSucceeds()
     {
+        var newChargeAmount = faker.Random.Decimal(0.1M);
         var chargeAmount = faker.Random.Decimal(0.1M);
         var checkedInDate = faker.Date.RecentOffset();
 
@@ -78,8 +80,8 @@ public partial class GuestStayAccountTests
                 new ChargeRecorded(guestStayAccountId, chargeAmount, faker.Date.RecentOffset(refDate: checkedInDate)),
                 new PaymentRecorded(guestStayAccountId, faker.Random.Decimal(chargeAmount), faker.Date.RecentOffset(refDate: checkedInDate))
             )
-            .When(state => state.RecordCharge(faker.Random.Decimal(0.1M), now))
-            .ThenThrows<InvalidOperationException>();
+            .When(state => state.RecordCharge(newChargeAmount, now))
+            .Then(new ChargeRecorded(guestStayAccountId, newChargeAmount, now));
     }
 
     [Fact]

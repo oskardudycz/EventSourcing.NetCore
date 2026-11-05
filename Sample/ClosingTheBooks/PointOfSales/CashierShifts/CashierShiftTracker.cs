@@ -9,7 +9,7 @@ public record CashierShiftTracker(
     long? LastShiftClosedSequence
 );
 
-public class CashierShiftTrackerProjection: MultiStreamProjection<CashierShiftTracker, string>
+public partial class CashierShiftTrackerProjection: MultiStreamProjection<CashierShiftTracker, string>
 {
     public CashierShiftTrackerProjection()
     {

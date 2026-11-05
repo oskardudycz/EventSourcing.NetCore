@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Core.Aggregates;
 using SmartHome.Temperature.MotionSensors.InstallingMotionSensor;
 
@@ -5,6 +6,7 @@ namespace SmartHome.Temperature.MotionSensors;
 
 public class MotionSensor: Aggregate
 {
+    [JsonInclude]
     public DateTime InstalledAt { get; private set; }
 
     // For serialization

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Data;
 using Dapper;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Npgsql;
 using Tools.Tools;
 
@@ -26,7 +26,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
             new
             {
                 Id = Guid.CreateVersion7(),
-                Data = JsonConvert.SerializeObject(@event),
+                Data = JsonSerializer.Serialize(@event),
                 Type = @event.GetType().AssemblyQualifiedName,
                 StreamId = streamId,
                 StreamType = typeof(TStream).AssemblyQualifiedName,
@@ -81,7 +81,7 @@ public class EventStore(NpgsqlConnection databaseConnection): IDisposable, IEven
         return databaseConnection
             .Query<dynamic>(getStreamSql, new { streamId, atStreamVersion, atTimestamp })
             .Select(@event =>
-                JsonConvert.DeserializeObject(
+                JsonSerializer.Deserialize(
                     @event.data,
                     Type.GetType(@event.type, true)!
                 ));

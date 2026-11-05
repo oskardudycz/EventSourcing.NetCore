@@ -86,10 +86,10 @@ public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSql
         );
         await Session.SaveChangesAsync();
 
-        var lastEvent = Session.Events.QueryAllRawEvents()
+        var lastEvent = await Session.Events.QueryAllRawEvents()
             .Where(e => e.StreamKey == streamId)
             .OrderByDescending(e => e.Version)
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
         lastEvent.Should().NotBeNull();
         lastEvent!.Data.Should().BeOfType<IssueUpdated>();

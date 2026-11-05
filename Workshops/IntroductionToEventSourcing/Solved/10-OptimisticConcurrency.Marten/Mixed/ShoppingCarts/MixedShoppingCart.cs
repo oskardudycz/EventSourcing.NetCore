@@ -97,7 +97,7 @@ public class MixedShoppingCart
         Apply(@event);
 
     //just for default creation of empty object
-    private MixedShoppingCart() { }
+    public MixedShoppingCart() { }
 
     private void Apply(ShoppingCartOpened opened)
     {

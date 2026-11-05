@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Core.WebApi.Swagger;
@@ -12,7 +12,7 @@ public class MetadataOperationFilter: IOperationFilter
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        operation.Parameters ??= new List<OpenApiParameter>();
+        operation.Parameters ??= new List<IOpenApiParameter>();
 
         if (context.ApiDescription.HttpMethod != null && StateChangeMethods.Contains(context.ApiDescription.HttpMethod))
         {

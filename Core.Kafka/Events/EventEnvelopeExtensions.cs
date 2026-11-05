@@ -2,7 +2,7 @@
 using Core.Events;
 using Core.OpenTelemetry.Serialization;
 using Core.Reflection;
-using Core.Serialization.Newtonsoft;
+using Core.Serialization.SystemTextJson;
 
 namespace Core.Kafka.Events;
 

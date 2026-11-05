@@ -8,7 +8,6 @@
       <PackageReference Include="Dapper" />
       <PackageReference Include="Dapper.Contrib" />
       <PackageReference Include="Marten" />
-      <PackageReference Include="Newtonsoft.Json" />
       <PackageReference Include="Simple.Migrations" />
     </ItemGroup>
 

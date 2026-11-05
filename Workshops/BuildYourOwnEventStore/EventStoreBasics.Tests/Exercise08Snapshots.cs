@@ -12,7 +12,7 @@ namespace EventStoreBasics.Tests;
 
 public class Exercise08Snapshots: IAsyncLifetime
 {
-    class User : Aggregate
+    internal class User : Aggregate
     {
         public string Name { get; private set; } = null!;
 
@@ -47,14 +47,14 @@ public class Exercise08Snapshots: IAsyncLifetime
         }
     }
 
-    class UserCreated(Guid userId, string userName)
+    internal class UserCreated(Guid userId, string userName)
     {
         public Guid UserId { get; } = userId;
         public string UserName { get; } = userName;
     }
 
 
-    class UserNameUpdated(Guid userId, string userName)
+    internal class UserNameUpdated(Guid userId, string userName)
     {
         public Guid UserId { get; } = userId;
         public string UserName { get; } = userName;

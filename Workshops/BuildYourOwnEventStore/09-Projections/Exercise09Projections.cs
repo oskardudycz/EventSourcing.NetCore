@@ -1,6 +1,6 @@
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Npgsql;
 using SimpleMigrations;
 using SimpleMigrations.DatabaseProvider;

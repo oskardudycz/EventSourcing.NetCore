@@ -1,11 +1,14 @@
+using System.Text.Json.Serialization;
 namespace Core.ProcessManagers;
 
 public abstract class ProcessManager: ProcessManager<Guid>, IProcessManager;
 
 public abstract class ProcessManager<T>: IProcessManager<T> where T : notnull
 {
+    [JsonInclude]
     public T Id { get; protected set; } = default!;
 
+    [JsonInclude]
     public int Version { get; protected set; }
 
     [NonSerialized] private readonly Queue<EventOrCommand> scheduledCommands = new();

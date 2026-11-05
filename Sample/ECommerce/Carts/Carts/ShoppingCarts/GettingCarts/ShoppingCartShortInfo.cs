@@ -43,18 +43,6 @@ public class ShoppingCartShortInfo
     }
 }
 
-public class CartShortInfoProjection : SingleStreamProjection<ShoppingCartShortInfo, Guid>
+public partial class CartShortInfoProjection : SingleStreamProjection<ShoppingCartShortInfo, Guid>
 {
-    public CartShortInfoProjection()
-    {
-        ProjectEvent<ShoppingCartOpened>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ProductAdded>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ProductRemoved>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ShoppingCartConfirmed>((item, @event) => item.Apply(@event));
-
-        ProjectEvent<ShoppingCartCanceled>((item, @event) => item.Apply(@event));
-    }
 }

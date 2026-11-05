@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using JasperFx;
 using JasperFx.Events.Projections;
@@ -11,6 +12,7 @@ namespace EventStoreBasics.Tests;
 
 public class User: Aggregate
 {
+    [JsonInclude]
     public string Name { get; private set; } = null!;
 
     // added only for dapper deserialization needs
@@ -58,8 +60,10 @@ public class UserNameUpdated(Guid userId, string userName)
 
 public class Order: Aggregate
 {
+    [JsonInclude]
     public string Number { get; private set; } = null!;
 
+    [JsonInclude]
     public decimal Amount { get; private set; }
 
     // added only for Marten deserialization needs
@@ -97,7 +101,7 @@ public class UserDashboard
     public decimal TotalAmount { get; set; }
 }
 
-public class UserDashboardProjection: MultiStreamProjection<UserDashboard, Guid>
+public partial class UserDashboardProjection: MultiStreamProjection<UserDashboard, Guid>
 {
     public UserDashboardProjection()
     {

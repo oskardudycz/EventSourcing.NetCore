@@ -1,5 +1,5 @@
 using Marten.Pagination;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Tickets.Api.Responses;
 
@@ -12,7 +12,7 @@ public class PagedListResponse<T>
     public bool HasNextPage { get; }
 
     [JsonConstructor]
-    internal PagedListResponse(IEnumerable<T> items, long totalItemCount, bool hasNextPage)
+    internal PagedListResponse(IReadOnlyList<T> items, long totalItemCount, bool hasNextPage)
     {
         Items = items.ToList();
         TotalItemCount = totalItemCount;
@@ -23,5 +23,5 @@ public class PagedListResponse<T>
 public static class PagedListResponse
 {
     public static PagedListResponse<T> From<T>(IPagedList<T> pagedList) =>
-        new(pagedList, pagedList.TotalItemCount, pagedList.HasNextPage);
+        new(pagedList.ToArray(), pagedList.TotalItemCount, pagedList.HasNextPage);
 }

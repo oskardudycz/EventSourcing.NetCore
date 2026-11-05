@@ -2,36 +2,28 @@ namespace OptimisticConcurrency.Core.Entities;
 
 public interface IAggregate
 {
-    public void Apply(object @event);
-
     object[] DequeueUncommittedEvents();
 }
 
-public abstract class Aggregate<TEvent>: IAggregate
+public abstract class Aggregate<TEvent>: Aggregate<TEvent, Guid>;
+
+public abstract class Aggregate<TEvent, TId>: IAggregate where TId: notnull
 {
-    public Guid Id { get; protected set; } = Guid.Empty!;
+    public TId Id { get; protected set; } = default!;
 
-    private readonly Queue<object> uncommittedEvents = new();
-
-    protected virtual void Apply(TEvent @event) { }
+    private readonly Queue<TEvent> uncommittedEvents = new();
 
     public object[] DequeueUncommittedEvents()
     {
-        var dequeuedEvents = uncommittedEvents.ToArray();
+        var dequeuedEvents = uncommittedEvents.Cast<object>().ToArray();
 
         uncommittedEvents.Clear();
 
         return dequeuedEvents;
     }
 
-    protected void Enqueue(object @event) =>
+    public abstract void Apply(TEvent @event);
+
+    protected void Enqueue(TEvent @event) =>
         uncommittedEvents.Enqueue(@event);
-
-    public void Apply(object @event)
-    {
-        if(@event is not TEvent typed)
-            return;
-
-        Apply(typed);
-    }
 }

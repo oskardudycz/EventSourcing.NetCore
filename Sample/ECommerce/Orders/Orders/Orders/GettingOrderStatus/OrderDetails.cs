@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using JasperFx.Events;
 using Marten.Events.Aggregation;
 using Orders.Products;
@@ -8,21 +9,30 @@ using static OrderEvent;
 
 public class OrderDetails
 {
+    [JsonInclude]
     public Guid Id { get; private set; }
+    [JsonInclude]
     public Guid ClientId { get; private set; }
 
+    [JsonInclude]
     public IReadOnlyList<PricedProductItem> ProductItems { get; private set; } = null!;
 
+    [JsonInclude]
     public decimal TotalPrice { get; private set; } = 0;
 
+    [JsonInclude]
     public OrderStatus Status { get; private set; }
 
+    [JsonInclude]
     public Guid? PaymentId { get; private set; }
 
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public List<EventsWrapper> Events { get; } = [];
 
+    [JsonInclude]
     public DateTimeOffset InitiatedAt { get; private set; }
 
+    [JsonInclude]
     public DateTimeOffset TimeoutAfter { get; private set; }
 
     public void Apply(IEvent<OrderInitiated> envelope)
@@ -68,7 +78,7 @@ public record EventsWrapper(int Version, string Type, object Event, DateTimeOffs
         new((int)@event.Version, @event.EventTypeName, @event.Data, @event.Timestamp);
 }
 
-public class OrderDetailsProjection: SingleStreamProjection<OrderDetails, Guid>
+public partial class OrderDetailsProjection: SingleStreamProjection<OrderDetails, Guid>
 {
     public void Apply(IEvent<OrderInitiated> envelope, OrderDetails details) =>
         details.Apply(envelope);

@@ -58,9 +58,9 @@ let run (args : Args.Arguments) =
     let carts = Domain.ShoppingCart.Config.create store
     let registerServices (services: IServiceCollection) =
         services.AddSingleton(carts) |> ignore
+        services.AddSerilog() |> ignore
     WebHostBuilder()
         .UseKestrel()
-        .UseSerilog()
         .ConfigureServices(registerServices)
         .UseStartup<Startup>()
         .Build()

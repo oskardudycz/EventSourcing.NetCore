@@ -6,7 +6,7 @@ namespace Core.Testing.Fixtures;
 
 public class PostgresContainerFixture: IAsyncLifetime
 {
-    private readonly PostgreSqlContainer container = new PostgreSqlBuilder()
+    private readonly PostgreSqlContainer container = new PostgreSqlBuilder("postgres:15.1-alpine")
         .WithReuse(true)
         .Build();
 
@@ -21,6 +21,6 @@ public class PostgresContainerFixture: IAsyncLifetime
     public async Task DisposeAsync()
     {
         await DataSource.DisposeAsync().ConfigureAwait(false);
-        await container.StopAsync().ConfigureAwait(false);
+        // Other fixtures and test processes can still be using this reusable container.
     }
 }

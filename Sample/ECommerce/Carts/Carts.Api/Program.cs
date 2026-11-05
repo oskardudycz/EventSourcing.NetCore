@@ -4,13 +4,13 @@ using Core.Configuration;
 using Core.Exceptions;
 using Core.Kafka;
 using Core.OpenTelemetry;
-using Core.Serialization.Newtonsoft;
+using Core.Serialization.SystemTextJson;
 using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using JasperFx;
 using Marten.Exceptions;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +50,7 @@ builder
     .AddCartsModule(builder.Configuration)
     .AddOptimisticConcurrencyMiddleware()
     .AddControllers()
-    .AddNewtonsoftJson(opt => opt.SerializerSettings.WithDefaults());
+    .AddJsonOptions(opt => opt.JsonSerializerOptions.WithDefaults());
 
 var app = builder.Build();
 

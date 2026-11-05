@@ -82,7 +82,7 @@ public partial class GuestStayAccountTests
     }
 
     [Fact]
-    public void GivenCheckedOutGuestStayAccount_WhenCheckOut_ThenSucceeds()
+    public void GivenCheckedOutGuestStayAccount_WhenCheckOut_ThenFails()
     {
         var checkedInDate = faker.Date.RecentOffset();
 
@@ -91,7 +91,7 @@ public partial class GuestStayAccountTests
                 new GuestCheckedOut(guestStayAccountId, faker.Date.RecentOffset(refDate: checkedInDate))
             )
             .When(state => state.CheckOut(now, groupCheckoutId).FlatMap())
-            .ThenThrows<InvalidOperationException>();
+            .Then(new GuestCheckoutFailed(guestStayAccountId, FailureReason.NotOpened, now, groupCheckoutId));
     }
 
     [Fact]

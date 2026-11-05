@@ -11,7 +11,6 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Hosting" />
-        <PackageReference Include="Newtonsoft.Json" />
         <!-- This dependency is only needed for the PostgreSQL subscriptions checkpoints -->
         <PackageReference Include="Npgsql" />
         <PackageReference Include="Open.ChannelExtensions" />

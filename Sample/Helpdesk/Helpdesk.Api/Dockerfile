@@ -7,7 +7,6 @@ ARG dotnet_version=10.0
 FROM mcr.microsoft.com/dotnet/sdk:${dotnet_version}-alpine AS builder
 # Project file name, mandatory parameter, e.g. Helpdesk.Api
 ARG project_name
-ARG run_codegen=true
 
 # Setup working directory for project
 WORKDIR /app
@@ -20,9 +19,6 @@ RUN dotnet restore ./${project_name}.csproj
 
 # Copy project files
 COPY ./ ./
-
-# Run code generation depending on the build argument
-RUN dotnet run -- codegen write & dotnet run -- codegen test
 
 # Build project with Release configuration
 # and no restore, as we did it already

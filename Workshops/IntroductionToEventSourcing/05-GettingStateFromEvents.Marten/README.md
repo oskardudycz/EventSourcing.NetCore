@@ -20,3 +20,12 @@ docker compose up
 After that you can use PG Admin (IDE for Postgres) to see how tables and data look like. It's available at: http://localhost:5050.
 - Login: `admin@pgadmin.org`, Password: `admin`
 - To connect to server click right mouse on Servers, then Register Server and use host: `postgres`, user: `postgres`, password: `Password12!`
+
+Each variant uses its own schema so the tests can run in parallel. After running a test, expand **Databases → postgres → Schemas** in PG Admin to inspect its events:
+
+| Variant | Schema |
+| --- | --- |
+| Mutable | `getting_state_mutable` |
+| Immutable | `getting_state_immutable` |
+
+The schema names stay the same between runs, and the data remains available for inspection.

@@ -2,7 +2,7 @@
 using Core.ElasticSearch;
 using Core.EventStoreDB;
 using Core.WebApi.Middlewares.ExceptionHandling;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace MarketBasketAnalytics.Api
 {

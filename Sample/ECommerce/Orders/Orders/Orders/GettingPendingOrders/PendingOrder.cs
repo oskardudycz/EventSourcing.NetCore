@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Marten.Events.Aggregation;
 
 namespace Orders.Orders.GettingPending;
@@ -5,8 +6,10 @@ using static OrderEvent;
 
 public class PendingOrder
 {
+    [JsonInclude]
     public Guid Id { get; private set; }
 
+    [JsonInclude]
     public DateTimeOffset TimeoutAfter { get; private set; }
 
     public void Apply(OrderInitiated @event) =>
@@ -14,7 +17,7 @@ public class PendingOrder
 }
 
 
-public class PendingOrdersProjection: SingleStreamProjection<PendingOrder, Guid>
+public partial class PendingOrdersProjection: SingleStreamProjection<PendingOrder, Guid>
 {
     public PendingOrdersProjection()
     {

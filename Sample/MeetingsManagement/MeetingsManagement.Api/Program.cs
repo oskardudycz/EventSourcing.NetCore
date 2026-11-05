@@ -8,7 +8,7 @@ using Core.WebApi.Swagger;
 using JasperFx;
 using Marten.Exceptions;
 using MeetingsManagement;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,7 +32,7 @@ builder.Services
     .AddOptimisticConcurrencyMiddleware()
     .AddOpenTelemetry("MeetingsManagement", OpenTelemetryOptions.Build(options =>
         options.WithTracing(t =>
-            t.AddJaegerExporter()
+            t.AddOtlpExporter()
         ).DisableConsoleExporter(true)
     ))
     .AddControllers();

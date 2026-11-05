@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using JasperFx;
 using JasperFx.Events.Projections;
@@ -9,10 +10,11 @@ using Xunit;
 
 namespace EventStoreBasics.Tests;
 
-public class Exercise10ProjectionsWithMarten
+public partial class Exercise10ProjectionsWithMarten
 {
     public class User: Aggregate
     {
+        [JsonInclude]
         public string Name { get; private set; } = null!;
 
         // added only for dapper deserialization needs
@@ -58,8 +60,10 @@ public class Exercise10ProjectionsWithMarten
 
     public class Order: Aggregate
     {
+        [JsonInclude]
         public string Number { get; private set; } = null!;
 
+        [JsonInclude]
         public decimal Amount { get; private set; }
 
         // added only for Marten deserialization needs
@@ -97,18 +101,18 @@ public class Exercise10ProjectionsWithMarten
         public decimal TotalAmount { get; set; }
     }
 
-    public class UserDashboardProjection: MultiStreamProjection<UserDashboard, Guid>
+    public partial class UserDashboardProjection: MultiStreamProjection<UserDashboard, Guid>
     {
         public UserDashboardProjection()
         {
             Identity<UserCreated>(e => e.UserId);
-            ProjectEvent<UserCreated>(Apply);
+
 
             Identity<UserNameUpdated>(e => e.UserId);
-            ProjectEvent<UserNameUpdated>(Apply);
+
 
             Identity<OrderCreated>(e => e.UserId);
-            ProjectEvent<OrderCreated>(Apply);
+
         }
 
         public void Apply(UserDashboard item, UserCreated @event)

@@ -7,7 +7,6 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" />
-        <PackageReference Include="Marten" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="GitHubActionsTestLogger">
             <PrivateAssets>all</PrivateAssets>

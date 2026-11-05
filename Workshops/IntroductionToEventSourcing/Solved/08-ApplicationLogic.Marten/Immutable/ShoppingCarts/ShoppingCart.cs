@@ -67,12 +67,16 @@ public record ShoppingCart(
     public ShoppingCart Apply(ShoppingCartEvent @event) =>
         @event switch
         {
-            ShoppingCartOpened(var shoppingCartId, var clientId, _) =>
+            ShoppingCartOpened(var shoppingCartId, var clientId, var openedAt) =>
                 this with
                 {
                     Id = shoppingCartId,
                     ClientId = clientId,
-                    Status = ShoppingCartStatus.Pending
+                    Status = ShoppingCartStatus.Pending,
+                    ProductItems = [],
+                    OpenedAt = openedAt,
+                    ConfirmedAt = null,
+                    CanceledAt = null
                 },
             ProductItemAddedToShoppingCart(_, var pricedProductItem, _) =>
                 this with

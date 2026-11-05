@@ -29,7 +29,11 @@ services:
     jaeger:
         profiles: [ otel, otel-all, all ]
         image: jaegertracing/all-in-one:latest
+        environment:
+            COLLECTOR_OTLP_ENABLED: "true"
         ports:
+            - "4317:4317"
+            - "4318:4318"
             - "5775:5775/udp"
             - "6831:6831/udp"
             - "6832:6832/udp"
@@ -72,7 +76,7 @@ services:
     #  Elastic Search
     #######################################################
     elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+        image: docker.elastic.co/elasticsearch/elasticsearch:9.5.6
         profiles: [ elastic, elastic-all, all, all-no-ui, ci ]
         environment:
             - discovery.type=single-node
@@ -100,7 +104,7 @@ services:
             - es_network
 
     kibana:
-        image: docker.elastic.co/kibana/kibana:8.13.2
+        image: docker.elastic.co/kibana/kibana:9.5.6
         profiles: [ elastic-ui, elastic-all, all ]
         environment:
             - ELASTICSEARCH_HOSTS=http://elastic_search:9200

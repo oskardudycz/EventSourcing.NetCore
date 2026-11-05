@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 namespace Core.Aggregates;
 
 public abstract class Aggregate: Aggregate<object, Guid>;
@@ -8,8 +9,10 @@ public abstract class Aggregate<TEvent, TId>: IAggregate<TEvent>
     where TEvent : class
     where TId : notnull
 {
+    [JsonInclude]
     public TId Id { get; protected set; } = default!;
 
+    [JsonInclude]
     public int Version { get; protected set; }
 
     [NonSerialized] private readonly Queue<TEvent> uncommittedEvents = new();

@@ -4,7 +4,7 @@ using Core.WebApi.Middlewares.ExceptionHandling;
 using Core.WebApi.OptimisticConcurrency;
 using Core.WebApi.Swagger;
 using JasperFx;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using SmartHome.Temperature;
 
 var builder = WebApplication.CreateBuilder(args);

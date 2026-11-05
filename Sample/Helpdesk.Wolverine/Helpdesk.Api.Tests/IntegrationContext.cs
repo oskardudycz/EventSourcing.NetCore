@@ -3,8 +3,9 @@ using Alba.Security;
 using FluentAssertions;
 using JasperFx.CommandLine;
 using Marten;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Oakton;
+using Microsoft.Extensions.Hosting;
 using Wolverine;
 using Wolverine.Tracking;
 using Xunit;
@@ -29,6 +30,8 @@ public class AppFixture : IAsyncLifetime
         // This is using a library named "Alba". See https://jasperfx.github.io/alba for more information
         Host = await AlbaHost.For<Program>(x =>
         {
+            x.UseEnvironment(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? Environments.Development);
+
             x.ConfigureServices(services =>
             {
                 services.DisableAllExternalWolverineTransports();
