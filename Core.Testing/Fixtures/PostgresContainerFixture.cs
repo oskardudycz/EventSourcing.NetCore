@@ -14,7 +14,7 @@ public class PostgresContainerFixture: IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await container.StartAsync().ConfigureAwait(false);
+        await ReusableContainer.StartAsync(container, nameof(PostgresContainerFixture)).ConfigureAwait(false);
         DataSource = new NpgsqlDataSourceBuilder(container.GetConnectionString()).Build();
     }
 

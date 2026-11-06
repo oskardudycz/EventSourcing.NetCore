@@ -12,10 +12,9 @@ public class PostgresContainerFixtureTests
         var first = new PostgresContainerFixture();
         var second = new PostgresContainerFixture();
 
-        await first.InitializeAsync();
+        await Task.WhenAll(first.InitializeAsync(), second.InitializeAsync());
         try
         {
-            await second.InitializeAsync();
             try
             {
                 Assert.Equal(first.DataSource.ConnectionString, second.DataSource.ConnectionString);
