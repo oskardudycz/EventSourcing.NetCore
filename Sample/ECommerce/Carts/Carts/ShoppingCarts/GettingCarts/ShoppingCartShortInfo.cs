@@ -43,6 +43,6 @@ public class ShoppingCartShortInfo
     }
 }
 
-public partial class CartShortInfoProjection : SingleStreamProjection<ShoppingCartShortInfo, Guid>
+public class CartShortInfoProjection: SingleStreamProjection<ShoppingCartShortInfo, Guid>
 {
 }

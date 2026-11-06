@@ -10,7 +10,7 @@ using Xunit;
 
 namespace EventStoreBasics.Tests;
 
-public partial class Exercise10ProjectionsWithMarten
+public class Exercise10ProjectionsWithMarten
 {
     public class User: Aggregate
     {
@@ -101,7 +101,7 @@ public partial class Exercise10ProjectionsWithMarten
         public decimal TotalAmount { get; set; }
     }
 
-    public partial class UserDashboardProjection: MultiStreamProjection<UserDashboard, Guid>
+    public class UserDashboardProjection: MultiStreamProjection<UserDashboard, Guid>
     {
         public UserDashboardProjection()
         {

@@ -42,6 +42,6 @@ public class ReservationDetails
     }
 }
 
-public partial class ReservationDetailsProjection: SingleStreamProjection<ReservationDetails, Guid>
+public class ReservationDetailsProjection: SingleStreamProjection<ReservationDetails, Guid>
 {
 }

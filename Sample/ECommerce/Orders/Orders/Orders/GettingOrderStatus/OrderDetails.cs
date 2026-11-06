@@ -78,7 +78,7 @@ public record EventsWrapper(int Version, string Type, object Event, DateTimeOffs
         new((int)@event.Version, @event.EventTypeName, @event.Data, @event.Timestamp);
 }
 
-public partial class OrderDetailsProjection: SingleStreamProjection<OrderDetails, Guid>
+public class OrderDetailsProjection: SingleStreamProjection<OrderDetails, Guid>
 {
     public void Apply(IEvent<OrderInitiated> envelope, OrderDetails details) =>
         details.Apply(envelope);

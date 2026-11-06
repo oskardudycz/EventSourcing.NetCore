@@ -63,7 +63,7 @@ public class PaymentVerification
 // TODO: This projection was built assuming ordered events. Run the test — it fails.
 // Events can arrive out of order (e.g. from different RabbitMQ queues or Kafka topics).
 // Fix it to handle out-of-order events and derive the verification decision.
-public partial class PaymentVerificationProjection: MultiStreamProjection<PaymentVerification, string>
+public class PaymentVerificationProjection: MultiStreamProjection<PaymentVerification, string>
 {
     public PaymentVerificationProjection()
     {

@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.UniqueConstraint;
 
-public partial class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
+public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record UserCreated(
         string UserId,
@@ -30,7 +30,7 @@ public partial class UniqueContstraintTests(MartenFixture fixture): MartenTest(f
         string Email
     );
 
-    public partial class UserNameGuardProjection: SingleStreamProjection<UserNameGuard, string>
+    public class UserNameGuardProjection: SingleStreamProjection<UserNameGuard, string>
     {
         public UserNameGuardProjection() =>
             DeleteEvent<UserDeleted>();

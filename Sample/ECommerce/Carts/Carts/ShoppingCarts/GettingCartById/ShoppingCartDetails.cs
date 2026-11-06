@@ -80,6 +80,6 @@ public class ShoppingCartDetails
             .SingleOrDefault(pi => pi.MatchesProductAndPrice(productItem));
 }
 
-public partial class CartDetailsProjection : SingleStreamProjection<ShoppingCartDetails, Guid>
+public class CartDetailsProjection: SingleStreamProjection<ShoppingCartDetails, Guid>
 {
 }

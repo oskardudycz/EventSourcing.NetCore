@@ -15,7 +15,7 @@ public class CustomerIncidentsSummary
     public int Closed { get; set; }
 }
 
-public partial class CustomerIncidentsSummaryProjection: MultiStreamProjection<CustomerIncidentsSummary, Guid>
+public class CustomerIncidentsSummaryProjection: MultiStreamProjection<CustomerIncidentsSummary, Guid>
 {
     public CustomerIncidentsSummaryProjection()
     {

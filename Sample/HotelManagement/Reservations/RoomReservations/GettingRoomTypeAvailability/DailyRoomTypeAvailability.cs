@@ -21,7 +21,7 @@ public record DailyRoomTypeAvailability
     public int OverbookedOverTheLimit => ReservedRooms - CapacityWithOverbooking;
 }
 
-public partial class DailyRoomTypeAvailabilityProjection: MultiStreamProjection<DailyRoomTypeAvailability, string>
+public class DailyRoomTypeAvailabilityProjection: MultiStreamProjection<DailyRoomTypeAvailability, string>
 {
     public DailyRoomTypeAvailabilityProjection() =>
         Identities<RoomReserved>(e =>

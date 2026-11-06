@@ -101,7 +101,7 @@ public class UserDashboard
     public decimal TotalAmount { get; set; }
 }
 
-public partial class UserDashboardProjection: MultiStreamProjection<UserDashboard, Guid>
+public class UserDashboardProjection: MultiStreamProjection<UserDashboard, Guid>
 {
     public UserDashboardProjection()
     {

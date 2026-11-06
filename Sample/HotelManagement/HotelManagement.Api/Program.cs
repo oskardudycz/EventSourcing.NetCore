@@ -105,7 +105,7 @@ public record HotelChain(
     string Name
 );
 
-public partial class HotelChainProjection: SingleStreamProjection<HotelChain, Guid>
+public class HotelChainProjection: SingleStreamProjection<HotelChain, Guid>
 {
     public static HotelChain Create(HotelChainSetUp @event) =>
         new(@event.ChainId, @event.Name);

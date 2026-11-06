@@ -54,7 +54,7 @@ public class PaymentVerification
     public PaymentStatus Status { get; set; }
 }
 
-public partial class PaymentVerificationProjection: MultiStreamProjection<PaymentVerification, Guid>
+public class PaymentVerificationProjection: MultiStreamProjection<PaymentVerification, Guid>
 {
     public PaymentVerificationProjection()
     {

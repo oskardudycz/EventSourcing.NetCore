@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Projections;
 
-public partial class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
+public class AggregationProjectionsTest(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
 {
     public record IssueCreated(
         string IssueId,
@@ -63,7 +63,7 @@ public partial class AggregationProjectionsTest(MartenFixture fixture): MartenTe
         }
     }
 
-    public partial class IssueDescriptionsProjection: SingleStreamProjection<IssueDescriptions, string>
+    public class IssueDescriptionsProjection: SingleStreamProjection<IssueDescriptions, string>
     {
         public void Apply(IssueCreated @event, IssueDescriptions item)
         {
