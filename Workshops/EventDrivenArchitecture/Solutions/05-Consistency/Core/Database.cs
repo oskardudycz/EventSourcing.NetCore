@@ -4,42 +4,33 @@ namespace Consistency.Core;
 
 public class Database
 {
-    private Dictionary<string, object> storage = new();
+    private Dictionary<string, object> storage;
+    private readonly TransientFailures? failures;
+
+    public Database(): this(new Dictionary<string, object>(), new TransientFailures("Database not available!")) { }
+
+    private Database(Dictionary<string, object> storage, TransientFailures? failures)
+    {
+        this.storage = storage;
+        this.failures = failures;
+    }
 
     public ValueTask Store<T>(Guid id, T obj, CancellationToken _) where T : class
     {
-        Monitor.Enter(storage);
-        try
-        {
-            if (DateTimeOffset.Now.Ticks % 5 == 0)
-                throw new TimeoutException("Database not available!");
+        failures?.FailIfUnavailable();
 
-            storage[GetId<T>(id)] = obj;
+        storage[GetId<T>(id)] = obj;
 
-            return ValueTask.CompletedTask;
-        }
-        finally
-        {
-            Monitor.Exit(storage);
-        }
+        return ValueTask.CompletedTask;
     }
 
     public ValueTask Delete<T>(Guid id, CancellationToken _)
     {
-        Monitor.Enter(storage);
-        try
-        {
-            if (DateTimeOffset.Now.Ticks % 5 == 0)
-                throw new TimeoutException("Database not available!");
+        failures?.FailIfUnavailable();
 
-            storage.Remove(GetId<T>(id));
+        storage.Remove(GetId<T>(id));
 
-            return ValueTask.CompletedTask;
-        }
-        finally
-        {
-            Monitor.Exit(storage);
-        }
+        return ValueTask.CompletedTask;
     }
 
     public ValueTask<T?> Get<T>(Guid id, CancellationToken _) where T : class =>
@@ -61,19 +52,16 @@ public class Database
                 ).ToArray()
         );
 
+    // Changes made in the action are committed together, or not at all if the action or the commit fails
     public async ValueTask Transaction(Func<Database, ValueTask> action)
     {
-        Monitor.Enter(storage);
-        try
-        {
-            var serialisedDatabase = new Database();
+        var transaction = new Database(new Dictionary<string, object>(storage), null);
 
-            await action(serialisedDatabase);
-        }
-        finally
-        {
-            Monitor.Exit(storage);
-        }
+        await action(transaction);
+
+        failures?.FailIfUnavailable();
+
+        storage = transaction.storage;
     }
 
     private static string GetId<T>(Guid id) => $"{typeof(T).Name}-{id}";
