@@ -6,8 +6,7 @@ public class EventBus
 {
     public async ValueTask Publish(object[] events, CancellationToken ct)
     {
-        if (DateTimeOffset.Now.Ticks % 5 == 0)
-            throw new TimeoutException("Database not available!");
+        failures.FailIfUnavailable();
 
         foreach (var @event in events)
         {
@@ -44,4 +43,5 @@ public class EventBus
 
     private readonly ConcurrentDictionary<Type, List<Func<object, CancellationToken, ValueTask>>> eventHandlers = new();
     private readonly List<Action<object>> middlewares = [];
+    private readonly TransientFailures failures = new("Event bus not available!");
 }
