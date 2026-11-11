@@ -21,7 +21,7 @@ public class EntityDefinitionTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStayIds, now);
 
         // When
-        await groupCheckoutToDoList.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -125,7 +125,7 @@ public class EntityDefinitionTests
     private async Task<Guid> InitiateGroupCheckout(params Guid[] guestStayIds)
     {
         var groupCheckoutId = Guid.NewGuid();
-        await groupCheckoutToDoList.InitiateGroupCheckout(
+        await groupCheckoutFacade.InitiateGroupCheckout(
             new InitiateGroupCheckout(groupCheckoutId, Guid.NewGuid(), guestStayIds, now.AddDays(-1))
         );
         publishedMessages.Reset();
@@ -136,15 +136,18 @@ public class EntityDefinitionTests
     private readonly Database database = new();
     private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
-    private readonly GroupCheckOutToDoList groupCheckoutToDoList;
+    private readonly GroupCheckOutFacade groupCheckoutFacade;
     private readonly DateTimeOffset now = DateTimeOffset.Now;
 
     public EntityDefinitionTests()
     {
-        groupCheckoutToDoList = new GroupCheckOutToDoList(database, messageBus);
+        groupCheckoutFacade = new GroupCheckOutFacade(messageBus);
 
         messageBus.Use(publishedMessages.Catch);
 
-        ConfigureGroupCheckouts(messageBus, groupCheckoutToDoList);
+        ConfigureGroupCheckouts(
+            messageBus,
+            new GroupCheckOutToDoList(new GroupCheckoutProjection(database), messageBus)
+        );
     }
 }

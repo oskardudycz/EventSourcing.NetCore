@@ -2,6 +2,7 @@ using Bogus;
 using BusinessProcesses.ToDoList.GroupCheckouts;
 using BusinessProcesses.ToDoList.GuestStayAccounts;
 using BusinessProcesses.Core;
+using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 using Database = BusinessProcesses.Core.Database;
@@ -32,7 +33,7 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await groupCheckoutToDoList.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -75,7 +76,7 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await groupCheckoutToDoList.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -119,7 +120,7 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await groupCheckoutToDoList.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -170,7 +171,7 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await groupCheckoutToDoList.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -195,11 +196,21 @@ public class BusinessProcessTests
         );
     }
 
+    [Fact]
+    public async Task GuestCheckoutForGroupCheckoutNotOnTheToDoList_Fails()
+    {
+        var guestCheckedOut = new GuestCheckedOut(Guid.NewGuid(), now, Guid.NewGuid());
+
+        var publishing = async () => await messageBus.Publish([guestCheckedOut], default);
+
+        await publishing.Should().ThrowAsync<InvalidOperationException>().WithMessage("Entity not found");
+    }
+
     private readonly Database database = new();
     private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
-    private readonly GroupCheckOutToDoList groupCheckoutToDoList;
+    private readonly GroupCheckOutFacade groupCheckoutFacade;
     private readonly Faker generate = new();
     private readonly DateTimeOffset now = DateTimeOffset.Now;
     private readonly ITestOutputHelper testOutputHelper;
@@ -208,11 +219,14 @@ public class BusinessProcessTests
     {
         this.testOutputHelper = testOutputHelper;
         guestStayFacade = new GuestStayFacade(database, messageBus);
-        groupCheckoutToDoList = new GroupCheckOutToDoList(database, messageBus);
+        groupCheckoutFacade = new GroupCheckOutFacade(messageBus);
 
         messageBus.Use(publishedMessages.Catch);
 
-        ConfigureGroupCheckouts(messageBus, groupCheckoutToDoList);
+        ConfigureGroupCheckouts(
+            messageBus,
+            new GroupCheckOutToDoList(new GroupCheckoutProjection(database), messageBus)
+        );
         ConfigureGuestStayAccounts(messageBus, guestStayFacade);
     }
 }
