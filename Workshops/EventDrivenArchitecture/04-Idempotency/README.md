@@ -19,13 +19,19 @@ We still need to support regular checkouts, payments, charges etc. as we do righ
 
 ## Goal
 
-**Make the group checkout handle the same command more than once.**
+**Make the guest stay accounts and the group checkout handle the same message more than once.**
 
 Message brokers usually guarantee at-least-once delivery, and clients retry requests when they don't get a response. Your handlers will see the same message twice, so handling it again must not change the outcome.
 
 - Start from the saga solution of the previous exercise. Choose one path: [Aggregates](./Version1-Aggregates) or [Immutable Entities](./Version2-ImmutableEntities),
+- Make the guest stay account ignore:
+  - checking in the same guest stay twice,
+  - recording the same charge twice (the same charge id),
+  - recording the same payment twice (the same payment id),
+  - checking out the guest twice for the same group checkout,
 - Make the group checkout ignore:
   - initiating a group checkout that already exists,
   - recording the same guest checkout completion twice,
   - recording the same guest checkout failure twice,
+- The whole process should give the same result when [the event bus](./Core/EventBus.cs) and [the command bus](./Core/CommandBus.cs) deliver every message twice,
 - Use `IdempotencyTests` to guide you and verify if you implemented it correctly. `BusinessProcessTests` and `EntityDefinitionTests` should stay green.

@@ -20,7 +20,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        var @event = account.RecordCharge(command.Amount, command.Now);
+        var @event = account.RecordCharge(command.ChargeId, command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account.Evolve(@event), ct);
         await eventBus.Publish([@event], ct);
@@ -31,7 +31,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        var @event = account.RecordPayment(command.Amount, command.Now);
+        var @event = account.RecordPayment(command.PaymentId, command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account.Evolve(@event), ct);
         await eventBus.Publish([@event], ct);
@@ -68,12 +68,14 @@ public abstract record GuestStayAccountCommand
 
     public record RecordCharge(
         Guid GuestStayId,
+        Guid ChargeId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
         Guid GuestStayId,
+        Guid PaymentId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;

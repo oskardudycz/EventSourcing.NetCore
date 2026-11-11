@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace Idempotency.Core;
 
-public class CommandBus
+public class CommandBus(bool deliverTwice = false)
 {
     public async ValueTask Send(object[] commands, CancellationToken ct)
     {
@@ -15,6 +15,9 @@ public class CommandBus
                 middleware(command);
 
             await handler(command, ct);
+
+            if (deliverTwice)
+                await handler(command, ct);
         }
     }
 

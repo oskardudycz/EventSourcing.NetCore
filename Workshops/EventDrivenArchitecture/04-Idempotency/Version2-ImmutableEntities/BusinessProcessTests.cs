@@ -63,17 +63,17 @@ public class BusinessProcessTests
         decimal[] amounts = [generate.Finance.Amount(), generate.Finance.Amount(), generate.Finance.Amount()];
 
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[0], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[0], now.AddHours(-1)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], Guid.NewGuid(), amounts[0], now.AddHours(-2)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], Guid.NewGuid(), amounts[0], now.AddHours(-1)));
 
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], amounts[1], now.AddHours(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[1], amounts[1], now.AddHours(-2)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], Guid.NewGuid(), amounts[1], now.AddHours(-1)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[1], Guid.NewGuid(), amounts[1], now.AddHours(-2)));
 
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[2], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[2] / 2, now.AddHours(-1)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[2] / 2, now.AddHours(-1)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], Guid.NewGuid(), amounts[2], now.AddHours(-2)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], Guid.NewGuid(), amounts[2] / 2, now.AddHours(-1)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], Guid.NewGuid(), amounts[2] / 2, now.AddHours(-1)));
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
@@ -113,17 +113,17 @@ public class BusinessProcessTests
 
         // 🟢 settled
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[0], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[0], now.AddHours(-1)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], Guid.NewGuid(), amounts[0], now.AddHours(-2)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], Guid.NewGuid(), amounts[0], now.AddHours(-1)));
 
         // 🛑 payment without charge
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], amounts[1], now.AddHours(-1)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], Guid.NewGuid(), amounts[1], now.AddHours(-1)));
 
         // 🛑 payment without charge
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[2], amounts[2], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[2], Guid.NewGuid(), amounts[2], now.AddHours(-2)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], Guid.NewGuid(), amounts[2] / 2, now.AddHours(-1)));
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
@@ -171,16 +171,16 @@ public class BusinessProcessTests
 
         // 🛑 charge without payment
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[0], now.AddHours(-2)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], Guid.NewGuid(), amounts[0], now.AddHours(-2)));
 
         // 🛑 payment without charge
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], amounts[1], now.AddHours(-1)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], Guid.NewGuid(), amounts[1], now.AddHours(-1)));
 
         // 🛑 payment without charge
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[2], amounts[2], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[2], Guid.NewGuid(), amounts[2], now.AddHours(-2)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], Guid.NewGuid(), amounts[2] / 2, now.AddHours(-1)));
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();

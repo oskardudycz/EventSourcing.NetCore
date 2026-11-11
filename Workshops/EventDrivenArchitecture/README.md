@@ -10,7 +10,8 @@ The workshop builds that knowledge step by step on a single domain, a hotel's gu
 2. Commands and events: intent versus facts.
 3. Business processes: choreography, todo list, process managers and sagas, with their trade-offs.
 4. Idempotency: handling the same message more than once without changing the outcome.
-5. Consistency: not losing state changes or events when the database or the message bus fails, using the transactional outbox.
+5. Optimistic concurrency: not losing changes when handlers update the same entity in parallel.
+6. Consistency: not losing state changes or events when the database or the message bus fails, using the transactional outbox.
 
 You can do the workshop as a self-paced kit. If you'd like to get full coverage with all nuances of the private workshop, feel free to contact me via [email](mailto:oskar.dudycz@gmail.com).
 
@@ -20,7 +21,8 @@ You can do the workshop as a self-paced kit. If you'd like to get full coverage 
 2. [Entities definition](./02-EntitiesDefinition).
 3. [Business processes](./03-BusinessProcesses).
 4. [Idempotency](./04-Idempotency).
-5. [Consistency](./05-Consistency).
+5. [Optimistic concurrency](./05-OptimisticConcurrency).
+6. [Consistency](./06-Consistency).
 
 Each exercise has a full implementation in the [Solutions](./Solutions/) folder. Some go further than the exercise:
 

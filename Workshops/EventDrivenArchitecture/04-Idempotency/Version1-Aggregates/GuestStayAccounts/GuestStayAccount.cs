@@ -14,12 +14,14 @@ public abstract record GuestStayAccountEvent
 
     public record ChargeRecorded(
         Guid GuestStayId,
+        Guid ChargeId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
 
     public record PaymentRecorded(
         Guid GuestStayId,
+        Guid PaymentId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
@@ -74,24 +76,24 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         return guestStay;
     }
 
-    public void RecordCharge(decimal amount, DateTimeOffset now)
+    public void RecordCharge(Guid chargeId, decimal amount, DateTimeOffset now)
     {
         if (status != GuestStayAccountStatus.Opened)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
         balance -= amount;
 
-        Enqueue(new ChargeRecorded(Id, amount, now));
+        Enqueue(new ChargeRecorded(Id, chargeId, amount, now));
     }
 
-    public void RecordPayment(decimal amount, DateTimeOffset now)
+    public void RecordPayment(Guid paymentId, decimal amount, DateTimeOffset now)
     {
         if (status != GuestStayAccountStatus.Opened)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
         balance += amount;
 
-        Enqueue(new PaymentRecorded(Id, amount, now));
+        Enqueue(new PaymentRecorded(Id, paymentId, amount, now));
     }
 
     public void CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)

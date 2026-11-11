@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace Idempotency.Core;
 
-public class EventBus
+public class EventBus(bool deliverTwice = false)
 {
     public async ValueTask Publish(object[] events, CancellationToken ct)
     {
@@ -15,7 +15,12 @@ public class EventBus
                 continue;
 
             foreach (var handler in handlers)
+            {
                 await handler(@event, ct);
+
+                if (deliverTwice)
+                    await handler(@event, ct);
+            }
         }
     }
 

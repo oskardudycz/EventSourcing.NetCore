@@ -11,12 +11,14 @@ public abstract record GuestStayAccountEvent
 
     public record ChargeRecorded(
         Guid GuestStayId,
+        Guid ChargeId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
 
     public record PaymentRecorded(
         Guid GuestStayId,
+        Guid PaymentId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
@@ -54,20 +56,20 @@ public record GuestStayAccount(
 
     public static GuestCheckedIn CheckIn(Guid guestStayId, DateTimeOffset now) => new(guestStayId, now);
 
-    public ChargeRecorded RecordCharge(decimal amount, DateTimeOffset now)
+    public ChargeRecorded RecordCharge(Guid chargeId, decimal amount, DateTimeOffset now)
     {
         if (Status != GuestStayAccountStatus.Opened)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
-        return new ChargeRecorded(Id, amount, now);
+        return new ChargeRecorded(Id, chargeId, amount, now);
     }
 
-    public PaymentRecorded RecordPayment(decimal amount, DateTimeOffset now)
+    public PaymentRecorded RecordPayment(Guid paymentId, decimal amount, DateTimeOffset now)
     {
         if (Status != GuestStayAccountStatus.Opened)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
-        return new PaymentRecorded(Id, amount, now);
+        return new PaymentRecorded(Id, paymentId, amount, now);
     }
 
     public GuestStayAccountEvent CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)
