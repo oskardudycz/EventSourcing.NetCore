@@ -9,14 +9,14 @@ using static GuestStayAccountCommand;
 using static GroupCheckoutEvent;
 using static GroupCheckoutCommand;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
         var @event = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
         await database.Store(command.GuestStayId, GuestStayAccount.Initial.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
@@ -27,7 +27,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var @event = account.RecordCharge(command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
@@ -38,7 +38,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var @event = account.RecordPayment(command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
@@ -51,19 +51,19 @@ public class GuestStayFacade(Database database, EventBus eventBus)
             case GuestCheckedOut checkedOut:
             {
                 await database.Store(command.GuestStayId, account.Evolve(checkedOut), ct);
-                await eventBus.Publish([checkedOut], ct);
+                await messageBus.Publish([checkedOut], ct);
                 return;
             }
             case GuestStayAccountEvent.GuestCheckOutFailed checkOutFailed:
             {
-                await eventBus.Publish([checkOutFailed], ct);
+                await messageBus.Publish([checkOutFailed], ct);
                 return;
             }
         }
     }
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
-        eventBus.Publish([
+        messageBus.Publish([
             new GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,

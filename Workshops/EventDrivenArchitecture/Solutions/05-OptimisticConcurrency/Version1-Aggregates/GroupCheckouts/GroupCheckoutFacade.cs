@@ -5,7 +5,7 @@ namespace OptimisticConcurrency.Version1_Aggregates.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade(Database database, EventBus eventBus)
+public class GroupCheckOutFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -27,7 +27,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
             return groupCheckout.DequeueUncommittedEvents();
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 
     public async ValueTask RecordGuestCheckoutCompletion(
@@ -47,7 +47,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
             return groupCheckout.DequeueUncommittedEvents();
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 
     public async ValueTask RecordGuestCheckoutFailure(
@@ -67,7 +67,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
             return groupCheckout.DequeueUncommittedEvents();
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 }
 

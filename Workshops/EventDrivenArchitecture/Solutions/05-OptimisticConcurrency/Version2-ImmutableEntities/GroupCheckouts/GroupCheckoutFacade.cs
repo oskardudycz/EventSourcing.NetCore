@@ -5,7 +5,7 @@ namespace OptimisticConcurrency.Version2_ImmutableEntities.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade(Database database, EventBus eventBus)
+public class GroupCheckOutFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -26,7 +26,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
             return [@event];
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 
     public ValueTask RecordGuestCheckoutCompletion(
@@ -74,7 +74,7 @@ public class GroupCheckOutFacade(Database database, EventBus eventBus)
         if (events.Length == 0)
             return;
 
-        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
+        await messageBus.Publish(events.Cast<object>().ToArray(), ct);
     }
 }
 

@@ -29,7 +29,7 @@ public static class Outbox
 
     public static async ValueTask PublishFromOutbox(
         Database database,
-        EventBus eventBus,
+        MessageBus messageBus,
         Guid outboxId,
         CancellationToken ct
     )
@@ -41,7 +41,7 @@ public static class Outbox
 
         foreach (var (_, message, _, position) in messages)
         {
-            await eventBus.Publish([message.ToMessage()], ct);
+            await messageBus.Publish([message.ToMessage()], ct);
 
             await Retry.UntilSucceeds(token => database.Store(outboxId, new OutboxCheckpoint(position), token), ct);
         }

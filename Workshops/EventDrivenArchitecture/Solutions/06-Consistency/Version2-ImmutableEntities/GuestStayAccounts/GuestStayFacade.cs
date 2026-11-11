@@ -10,14 +10,14 @@ public class GuestStayFacade
     private static readonly Guid OutboxId = new("0592188c-b86e-411c-ab2d-1a804c0c8eb2");
 
     private readonly Database database;
-    private readonly EventBus eventBus;
+    private readonly MessageBus messageBus;
 
-    public GuestStayFacade(Database database, EventBus eventBus, BackgroundJobs backgroundJobs)
+    public GuestStayFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
-        this.eventBus = eventBus;
+        this.messageBus = messageBus;
 
-        backgroundJobs.Register(ct => Outbox.PublishFromOutbox(database, eventBus, OutboxId, ct));
+        backgroundJobs.Register(ct => Outbox.PublishFromOutbox(database, messageBus, OutboxId, ct));
     }
 
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
@@ -25,7 +25,7 @@ public class GuestStayFacade
         var @event = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
         await Retry.UntilSucceeds(_ => database.Store(command.GuestStayId, GuestStayAccount.Initial.Evolve(@event), 0, ct), ct);
-        await Outbox.PublishOrStoreInOutbox(database, eventBus, OutboxId, [@event], ct);
+        await Outbox.PublishOrStoreInOutbox(database, messageBus, OutboxId, [@event], ct);
     }
 
     public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
@@ -49,7 +49,7 @@ public class GuestStayFacade
             return result;
         }, ct);
 
-        await Outbox.PublishOrStoreInOutbox(database, eventBus, OutboxId, [@event], ct);
+        await Outbox.PublishOrStoreInOutbox(database, messageBus, OutboxId, [@event], ct);
     }
 
     private async ValueTask Handle(
@@ -70,7 +70,7 @@ public class GuestStayFacade
             return @event;
         }, ct);
 
-        await Outbox.PublishOrStoreInOutbox(database, eventBus, OutboxId, [@event], ct);
+        await Outbox.PublishOrStoreInOutbox(database, messageBus, OutboxId, [@event], ct);
     }
 }
 

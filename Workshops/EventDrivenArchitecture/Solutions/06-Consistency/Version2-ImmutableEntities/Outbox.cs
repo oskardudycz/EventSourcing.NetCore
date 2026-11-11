@@ -16,7 +16,7 @@ public static class Outbox
 {
     public static async ValueTask PublishOrStoreInOutbox(
         Database database,
-        EventBus eventBus,
+        MessageBus messageBus,
         Guid outboxId,
         object[] messages,
         CancellationToken ct
@@ -26,7 +26,7 @@ public static class Outbox
         {
             try
             {
-                await eventBus.Publish([messages[index]], ct);
+                await messageBus.Publish([messages[index]], ct);
             }
             catch (Core.TimeoutException)
             {
@@ -44,7 +44,7 @@ public static class Outbox
 
     public static async ValueTask PublishFromOutbox(
         Database database,
-        EventBus eventBus,
+        MessageBus messageBus,
         Guid outboxId,
         CancellationToken ct
     )
@@ -54,7 +54,7 @@ public static class Outbox
 
         foreach (var (id, message, _, _) in messages)
         {
-            await eventBus.Publish([message.ToMessage()], ct);
+            await messageBus.Publish([message.ToMessage()], ct);
 
             await Retry.UntilSucceeds(token => database.Delete<OutboxMessage>(id, token), ct);
         }

@@ -33,5 +33,5 @@ Message brokers usually guarantee at-least-once delivery, and clients retry requ
   - initiating a group checkout that already exists,
   - recording the same guest checkout completion twice,
   - recording the same guest checkout failure twice,
-- The whole process should give the same result when [the event bus](./Core/EventBus.cs) and [the command bus](./Core/CommandBus.cs) deliver every message twice,
+- The whole process should give the same result when [the message bus](./Core/MessageBus.cs) delivers every message twice,
 - Use `IdempotencyTests` to guide you and verify if you implemented it correctly. `BusinessProcessTests` and `EntityDefinitionTests` should stay green.

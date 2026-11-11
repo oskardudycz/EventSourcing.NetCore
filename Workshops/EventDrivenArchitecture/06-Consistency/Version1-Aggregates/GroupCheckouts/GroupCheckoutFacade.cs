@@ -8,12 +8,12 @@ using static GroupCheckoutCommand;
 public class GroupCheckOutFacade
 {
     private readonly Database database;
-    private readonly EventBus eventBus;
+    private readonly MessageBus messageBus;
 
-    public GroupCheckOutFacade(Database database, EventBus eventBus, BackgroundJobs backgroundJobs)
+    public GroupCheckOutFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
-        this.eventBus = eventBus;
+        this.messageBus = messageBus;
     }
 
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
@@ -36,7 +36,7 @@ public class GroupCheckOutFacade
             return groupCheckout.DequeueUncommittedEvents();
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 
     public async ValueTask RecordGuestCheckoutCompletion(
@@ -56,7 +56,7 @@ public class GroupCheckOutFacade
             return groupCheckout.DequeueUncommittedEvents();
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 
     public async ValueTask RecordGuestCheckoutFailure(
@@ -76,7 +76,7 @@ public class GroupCheckOutFacade
             return groupCheckout.DequeueUncommittedEvents();
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 }
 

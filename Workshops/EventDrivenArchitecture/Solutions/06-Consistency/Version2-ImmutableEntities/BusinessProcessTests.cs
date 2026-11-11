@@ -37,7 +37,7 @@ public class BusinessProcessTests
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages);
-        publishedMessages.ShouldReceiveMessages(
+        publishedMessages.ShouldReceiveMessagesInAnyOrder(
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
@@ -88,7 +88,7 @@ public class BusinessProcessTests
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages);
-        publishedMessages.ShouldReceiveMessages(
+        publishedMessages.ShouldReceiveMessagesInAnyOrder(
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
@@ -140,7 +140,7 @@ public class BusinessProcessTests
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages);
-        publishedMessages.ShouldReceiveMessages(
+        publishedMessages.ShouldReceiveMessagesInAnyOrder(
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
@@ -148,14 +148,14 @@ public class BusinessProcessTests
                 new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now),
                 new GroupCheckoutEvent.GuestCheckoutCompleted(groupCheckoutId, guestStays[0], now),
                 new CheckOutGuest(guestStays[1], now, groupCheckoutId),
-                new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[1], now),
                 new GuestCheckOutFailed(guestStays[1], GuestCheckOutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
+                new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[1], now),
                 new GroupCheckoutEvent.GuestCheckOutFailed(groupCheckoutId, guestStays[1], now),
                 new CheckOutGuest(guestStays[2], now, groupCheckoutId),
-                new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[2], now),
                 new GuestCheckOutFailed(guestStays[2], GuestCheckOutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
+                new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[2], now),
                 new GroupCheckoutEvent.GuestCheckOutFailed(groupCheckoutId, guestStays[2], now),
                 new GroupCheckoutEvent.GroupCheckoutFailed(
                     groupCheckoutId,
@@ -199,7 +199,7 @@ public class BusinessProcessTests
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages);
-        publishedMessages.ShouldReceiveMessages(
+        publishedMessages.ShouldReceiveMessagesInAnyOrder(
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
@@ -228,9 +228,8 @@ public class BusinessProcessTests
     }
 
     private readonly Database database = new();
-    private readonly EventBus eventBus = new();
+    private readonly MessageBus messageBus = new();
     private readonly BackgroundJobs backgroundJobs = new();
-    private readonly CommandBus commandBus = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
     private readonly GroupCheckOutFacade groupCheckoutFacade;
@@ -241,13 +240,12 @@ public class BusinessProcessTests
     public BusinessProcessTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus, backgroundJobs);
-        groupCheckoutFacade = new GroupCheckOutFacade(database, eventBus, backgroundJobs);
+        guestStayFacade = new GuestStayFacade(database, messageBus, backgroundJobs);
+        groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus, backgroundJobs);
 
-        eventBus.Use(publishedMessages.Catch);
-        commandBus.Use(publishedMessages.Catch);
+        messageBus.Use(publishedMessages.Catch);
 
-        ConfigureGroupCheckouts(eventBus, commandBus, groupCheckoutFacade);
-        ConfigureGuestStayAccounts(commandBus, guestStayFacade);
+        ConfigureGroupCheckouts(messageBus, groupCheckoutFacade);
+        ConfigureGuestStayAccounts(messageBus, guestStayFacade);
     }
 }

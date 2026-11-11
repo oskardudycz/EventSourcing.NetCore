@@ -9,12 +9,12 @@ using static GroupCheckoutCommand;
 public class GuestStayFacade
 {
     private readonly Database database;
-    private readonly EventBus eventBus;
+    private readonly MessageBus messageBus;
 
-    public GuestStayFacade(Database database, EventBus eventBus, BackgroundJobs backgroundJobs)
+    public GuestStayFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
-        this.eventBus = eventBus;
+        this.messageBus = messageBus;
     }
 
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
@@ -22,7 +22,7 @@ public class GuestStayFacade
         var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
         await database.Store(command.GuestStayId, account, 0, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
@@ -35,7 +35,7 @@ public class GuestStayFacade
         Handle(command.GuestStayId, account => account.CheckOut(command.Now, command.GroupCheckOutId), ct);
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
-        eventBus.Publish([
+        messageBus.Publish([
             new GroupCheckoutEvent.GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,
@@ -58,7 +58,7 @@ public class GuestStayFacade
             return account.DequeueUncommittedEvents();
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 }
 

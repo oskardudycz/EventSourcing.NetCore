@@ -29,9 +29,7 @@ public class OptimisticConcurrencyTests
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages);
-        publishedMessages.ShouldReceiveMessages([
-            new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now)
-        ]);
+        publishedMessages.ShouldReceiveSingleMessage(new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
     }
 
     [Fact]
@@ -50,7 +48,7 @@ public class OptimisticConcurrencyTests
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages);
-        publishedMessages.ShouldReceiveMessages([
+        publishedMessages.ShouldReceiveMessagesInAnyOrder([
             ..guestStays.Select(guestStayId => new GuestCheckoutCompleted(groupCheckoutId, guestStayId, now)),
             new GroupCheckoutCompleted(groupCheckoutId, guestStays, now)
         ]);
@@ -79,7 +77,7 @@ public class OptimisticConcurrencyTests
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages);
-        publishedMessages.ShouldReceiveMessages([
+        publishedMessages.ShouldReceiveMessagesInAnyOrder([
             new GroupCheckoutEvent.GuestCheckOutFailed(groupCheckoutId, failedGuestStay, now),
             ..completedGuestStays.Select(guestStayId => new GuestCheckoutCompleted(groupCheckoutId, guestStayId, now)),
             new GroupCheckoutFailed(groupCheckoutId, completedGuestStays, [failedGuestStay], now)
@@ -167,7 +165,7 @@ public class OptimisticConcurrencyTests
         }).ToArray());
 
     private readonly Database database = new();
-    private readonly EventBus eventBus = new();
+    private readonly MessageBus messageBus = new();
     private readonly BackgroundJobs backgroundJobs = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
@@ -176,9 +174,9 @@ public class OptimisticConcurrencyTests
 
     public OptimisticConcurrencyTests()
     {
-        guestStayFacade = new GuestStayFacade(database, eventBus, backgroundJobs);
-        groupCheckoutFacade = new GroupCheckOutFacade(database, eventBus, backgroundJobs);
+        guestStayFacade = new GuestStayFacade(database, messageBus, backgroundJobs);
+        groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus, backgroundJobs);
 
-        eventBus.Use(publishedMessages.Catch);
+        messageBus.Use(publishedMessages.Catch);
     }
 }

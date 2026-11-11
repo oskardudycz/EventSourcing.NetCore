@@ -9,7 +9,7 @@ using static GroupCheckoutCommand;
 using static GroupCheckoutEvent;
 using static GuestStayAccountCommand;
 
-public class GroupCheckOutToDoList(Database database, EventBus eventBus, CommandBus commandBus)
+public class GroupCheckOutToDoList(Database database, MessageBus messageBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
@@ -24,12 +24,12 @@ public class GroupCheckOutToDoList(Database database, EventBus eventBus, Command
         var @event = new GroupCheckoutInitiated(command.GroupCheckoutId, command.ClerkId,
             command.GuestStayIds, command.Now);
 
-        await eventBus.Publish([@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 
     public ValueTask GroupCheckoutInitiated(GroupCheckoutInitiated @event,
         CancellationToken ct = default) =>
-        commandBus.Send(
+        messageBus.Publish(
             [
                 ..@event.GuestStayIds
                     .Select(guestStayId => new CheckOutGuest(guestStayId, @event.InitiatedAt, @event.GroupCheckoutId))
@@ -53,7 +53,7 @@ public class GroupCheckOutToDoList(Database database, EventBus eventBus, Command
         var completed = TryComplete(groupCheckout, guestCheckedOut.CheckedOutAt);
 
         if (completed != null)
-            await eventBus.Publish([completed], ct);
+            await messageBus.Publish([completed], ct);
     }
 
     public async ValueTask GuestCheckOutFailed(GuestStayAccountEvent.GuestCheckOutFailed checkOutFailed,
@@ -72,7 +72,7 @@ public class GroupCheckOutToDoList(Database database, EventBus eventBus, Command
         var completed = TryComplete(groupCheckout, checkOutFailed.FailedAt);
 
         if (completed != null)
-            await eventBus.Publish([completed], ct);
+            await messageBus.Publish([completed], ct);
     }
 
     // This could be also checked by Cron

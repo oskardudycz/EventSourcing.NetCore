@@ -10,27 +10,26 @@ using static SagaResult;
 public static class GroupCheckoutsConfig
 {
     public static void ConfigureGroupCheckouts(
-        EventBus eventBus,
-        CommandBus commandBus,
+        MessageBus messageBus,
         GroupCheckOutFacade groupCheckoutFacade
     )
     {
-        eventBus
+        messageBus
             .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>((@event, ct) =>
-                commandBus.Send(GroupCheckoutSaga.Handle(@event).Select(c => c.Message).ToArray(), ct)
+                messageBus.Publish(GroupCheckoutSaga.Handle(@event).Select(c => c.Message).ToArray(), ct)
             )
             .Subscribe<GuestCheckedOut>((@event, ct) =>
                 GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutCompletion>(var command)
-                    ? commandBus.Send([command], ct)
+                    ? messageBus.Publish([command], ct)
                     : ValueTask.CompletedTask
             )
             .Subscribe<GuestCheckOutFailed>((@event, ct) =>
                 GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutFailure>(var command)
-                    ? commandBus.Send([command], ct)
+                    ? messageBus.Publish([command], ct)
                     : ValueTask.CompletedTask
             );
 
-        commandBus.Handle<RecordGuestCheckoutCompletion>(groupCheckoutFacade.RecordGuestCheckoutCompletion);
-        commandBus.Handle<RecordGuestCheckoutFailure>(groupCheckoutFacade.RecordGuestCheckoutFailure);
+        messageBus.Subscribe<RecordGuestCheckoutCompletion>(groupCheckoutFacade.RecordGuestCheckoutCompletion);
+        messageBus.Subscribe<RecordGuestCheckoutFailure>(groupCheckoutFacade.RecordGuestCheckoutFailure);
     }
 }

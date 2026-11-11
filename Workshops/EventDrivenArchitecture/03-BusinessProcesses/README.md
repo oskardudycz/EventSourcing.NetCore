@@ -24,15 +24,17 @@ We still need to support regular checkouts, payments, charges etc. as we do righ
 **Based on the business logic solution from the previous exercise, model the process and business logic of the Group Checkout.**
 
 - Choose one path: [Aggregates](./Version1-Aggregates) or [Immutable Entities](./Version2-ImmutableEntities),
-- Guest Stay Account logic is already there, together with [GuestStayFacade](./Version1-Aggregates/GuestStayFacade.cs). Its `InitiateGroupCheckout` publishes the event that starts the process,
-- Define the Group Checkout entity and its application logic, using the [in-memory database](./Core/Database.cs) to store changes and the [in-memory event bus](./Core/EventBus.cs) to publish events as the outcome of business logic,
-- Coordinate the process by subscribing to events on the event bus and handling commands on the [command bus](./Core/CommandBus.cs). Wire them in the `BusinessProcessTests` constructor (think about it as setup called once upon application startup),
+- Guest Stay Account logic is already there, together with [GuestStayFacade](./Version1-Aggregates/GuestStayAccounts/GuestStayFacade.cs),
+- Define the Group Checkout entity in `GroupCheckouts/GroupCheckout.cs` and fill application logic in [GroupCheckoutFacade](./Version1-Aggregates/GroupCheckouts/GroupCheckoutFacade.cs), using the [in-memory database](./Core/Database.cs) and [in-memory message bus](./Core/MessageBus.cs) to store changes and publish events as the outcome of business logic,
+- Configure message handling in `GroupCheckoutsConfig` and `GuestStayAccountsConfig` by subscribing to commands and events on the message bus (think about them as setup called once upon application startup),
 - You can use any preferred style of implementing process coordination,
 - Use `BusinessProcessTests` to guide you and verify if you implemented it correctly.
 
-### Commands and events
+### Commands and events on one message bus
 
-Commands and events travel through separate buses here, which makes the difference in intent visible:
+Commands and events travel through the same [MessageBus](./Core/MessageBus.cs). The difference is intent, not transport:
 
-- a command asks for something to be done, e.g. `CheckOutGuest`. It has one intended recipient, which may accept or reject it, so the [command bus](./Core/CommandBus.cs) routes it to a single handler,
-- an event records something that already happened, e.g. `GuestCheckedOut`. Any number of subscribers may react to it, or none, so the [event bus](./Core/EventBus.cs) delivers it to every subscriber.
+- a command asks for something to be done, e.g. `RecordGuestCheckoutCompletion`. It has one intended recipient, which may accept or reject it,
+- an event records something that already happened, e.g. `GuestCheckedOut`. Any number of subscribers may react to it, or none.
+
+The bus delivers each message to every subscriber of its type. It doesn't check that a command has exactly one handler; that's up to how you wire your subscriptions.

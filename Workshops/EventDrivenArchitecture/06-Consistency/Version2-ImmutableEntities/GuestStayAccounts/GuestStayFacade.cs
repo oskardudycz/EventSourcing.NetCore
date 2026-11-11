@@ -8,12 +8,12 @@ using static GuestStayAccountEvent;
 public class GuestStayFacade
 {
     private readonly Database database;
-    private readonly EventBus eventBus;
+    private readonly MessageBus messageBus;
 
-    public GuestStayFacade(Database database, EventBus eventBus, BackgroundJobs backgroundJobs)
+    public GuestStayFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
-        this.eventBus = eventBus;
+        this.messageBus = messageBus;
     }
 
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
@@ -21,7 +21,7 @@ public class GuestStayFacade
         var @event = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
         await database.Store(command.GuestStayId, GuestStayAccount.Initial.Evolve(@event), 0, ct);
-        await eventBus.Publish([@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 
     public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
@@ -45,7 +45,7 @@ public class GuestStayFacade
             return result;
         }, ct);
 
-        await eventBus.Publish([@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 
     private async ValueTask Handle(
@@ -66,7 +66,7 @@ public class GuestStayFacade
             return @event;
         }, ct);
 
-        await eventBus.Publish([@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 }
 

@@ -107,7 +107,7 @@ public class EntityDefinitionTests
     }
 
     [Fact]
-    public async Task CheckingOutGuestWithSettledBalance_FailsWithGuestCheckoutFailed()
+    public async Task CheckingOutGuestWithUnsettledBalance_FailsWithGuestCheckoutFailed()
     {
         // Given
         var guestStayId = Guid.NewGuid();
@@ -135,7 +135,7 @@ public class EntityDefinitionTests
     }
 
     private readonly Database database = new();
-    private readonly EventBus eventBus = new();
+    private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
     private readonly Faker generate = new();
@@ -145,7 +145,7 @@ public class EntityDefinitionTests
     public EntityDefinitionTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
-        eventBus.Use(publishedMessages.Catch);
+        guestStayFacade = new GuestStayFacade(database, messageBus);
+        messageBus.Use(publishedMessages.Catch);
     }
 }

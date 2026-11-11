@@ -7,10 +7,10 @@ using static GuestStayAccountCommand;
 public static class GuestStayAccountsConfig
 {
     public static void ConfigureGuestStayAccounts(
-        CommandBus commandBus,
+        MessageBus messageBus,
         GuestStayFacade guestStayFacade
     )
     {
-        commandBus.Handle<CheckOutGuest>(guestStayFacade.CheckOutGuest);
+        messageBus.Subscribe<CheckOutGuest>(guestStayFacade.CheckOutGuest);
     }
 }

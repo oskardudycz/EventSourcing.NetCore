@@ -196,8 +196,7 @@ public class BusinessProcessTests
     }
 
     private readonly Database database = new();
-    private readonly EventBus eventBus = new();
-    private readonly CommandBus commandBus = new();
+    private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
     private readonly GroupCheckOutToDoList groupCheckoutToDoList;
@@ -208,13 +207,12 @@ public class BusinessProcessTests
     public BusinessProcessTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
-        groupCheckoutToDoList = new GroupCheckOutToDoList(database, eventBus, commandBus);
+        guestStayFacade = new GuestStayFacade(database, messageBus);
+        groupCheckoutToDoList = new GroupCheckOutToDoList(database, messageBus);
 
-        eventBus.Use(publishedMessages.Catch);
-        commandBus.Use(publishedMessages.Catch);
+        messageBus.Use(publishedMessages.Catch);
 
-        ConfigureGroupCheckouts(eventBus, groupCheckoutToDoList);
-        ConfigureGuestStayAccounts(commandBus, guestStayFacade);
+        ConfigureGroupCheckouts(messageBus, groupCheckoutToDoList);
+        ConfigureGuestStayAccounts(messageBus, guestStayFacade);
     }
 }

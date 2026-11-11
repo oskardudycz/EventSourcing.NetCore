@@ -19,13 +19,13 @@ public class EntityDefinitionTests
         // Given
         var guestStayId = Guid.NewGuid();
         var command = new CheckInGuest(guestStayId, now);
-        publishedEvents.Reset();
+        publishedMessages.Reset();
 
         // When
         await guestStayFacade.CheckInGuest(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new GuestCheckedIn(guestStayId, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedIn(guestStayId, now));
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class EntityDefinitionTests
         // Given
         var guestStayId = Guid.NewGuid();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
-        publishedEvents.Reset();
+        publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
         var command = new RecordCharge(guestStayId, amount, now);
@@ -44,7 +44,7 @@ public class EntityDefinitionTests
         await guestStayFacade.RecordCharge(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new ChargeRecorded(guestStayId, amount, now));
+        publishedMessages.ShouldReceiveSingleMessage(new ChargeRecorded(guestStayId, amount, now));
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class EntityDefinitionTests
         // Given
         var guestStayId = Guid.NewGuid();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
-        publishedEvents.Reset();
+        publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
         var command = new RecordPayment(guestStayId, amount, now);
@@ -63,7 +63,7 @@ public class EntityDefinitionTests
         await guestStayFacade.RecordPayment(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new PaymentRecorded(guestStayId, amount, now));
+        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, amount, now));
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class EntityDefinitionTests
         var guestStayId = Guid.NewGuid();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
         await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, generate.Finance.Amount(), now.AddHours(-1)));
-        publishedEvents.Reset();
+        publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
         var command = new RecordPayment(guestStayId, amount, now);
@@ -83,7 +83,7 @@ public class EntityDefinitionTests
         await guestStayFacade.RecordPayment(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new PaymentRecorded(guestStayId, amount, now));
+        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, amount, now));
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class EntityDefinitionTests
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
         await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, amount, now.AddHours(-2)));
         await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, amount, now.AddHours(-1)));
-        publishedEvents.Reset();
+        publishedMessages.Reset();
         // And
         var command = new CheckOutGuest(guestStayId, now);
 
@@ -105,12 +105,12 @@ public class EntityDefinitionTests
         await guestStayFacade.CheckOutGuest(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new GuestCheckedOut(guestStayId, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayId, now));
     }
 
     [Fact]
     [Trait("Category", "SkipCI")]
-    public async Task CheckingOutGuestWithSettledBalance_FailsWithGuestCheckoutFailed()
+    public async Task CheckingOutGuestWithUnsettledBalance_FailsWithGuestCheckoutFailed()
     {
         // Given
         var guestStayId = Guid.NewGuid();
@@ -119,7 +119,7 @@ public class EntityDefinitionTests
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
         await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, amount + 10, now.AddHours(-2)));
         await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, amount, now.AddHours(-1)));
-        publishedEvents.Reset();
+        publishedMessages.Reset();
         // And
         var command = new CheckOutGuest(guestStayId, now);
 
@@ -134,7 +134,7 @@ public class EntityDefinitionTests
         }
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class EntityDefinitionTests
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
-        publishedEvents.Reset();
+        publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
         var clerkId = Guid.NewGuid();
@@ -157,12 +157,12 @@ public class EntityDefinitionTests
         await guestStayFacade.InitiateGroupCheckout(command);
 
         // Then
-        publishedEvents.ShouldReceiveSingleEvent(new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
     }
 
     private readonly Database database = new();
-    private readonly EventBus eventBus = new();
-    private readonly EventCatcher publishedEvents = new();
+    private readonly MessageBus messageBus = new();
+    private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
     private readonly Faker generate = new();
     private readonly DateTimeOffset now = DateTimeOffset.Now;
@@ -171,7 +171,7 @@ public class EntityDefinitionTests
     public EntityDefinitionTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
-        eventBus.Use(publishedEvents.Catch);
+        guestStayFacade = new GuestStayFacade(database, messageBus);
+        messageBus.Use(publishedMessages.Catch);
     }
 }
