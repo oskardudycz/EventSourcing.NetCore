@@ -11,6 +11,8 @@ namespace BusinessProcesses.Version2_ImmutableEntities;
 using static GuestStayAccountCommand;
 using static GuestStayAccountEvent;
 using static GroupCheckoutCommand;
+using static GroupCheckoutsConfig;
+using static GuestStayAccountsConfig;
 
 public class BusinessProcessTests
 {
@@ -30,7 +32,7 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await guestStayFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -76,7 +78,7 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await guestStayFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -123,7 +125,7 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await guestStayFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -177,7 +179,7 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await guestStayFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -206,10 +208,10 @@ public class BusinessProcessTests
     }
 
     private readonly Database database = new();
-    private readonly EventBus eventBus = new();
-    private readonly CommandBus commandBus = new();
+    private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
+    private readonly GroupCheckoutFacade groupCheckoutFacade;
     private readonly Faker generate = new();
     private readonly DateTimeOffset now = DateTimeOffset.Now;
     private readonly ITestOutputHelper testOutputHelper;
@@ -217,8 +219,12 @@ public class BusinessProcessTests
     public BusinessProcessTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
+        guestStayFacade = new GuestStayFacade(database, messageBus);
+        groupCheckoutFacade = new GroupCheckoutFacade(database, messageBus);
 
-        eventBus.Use(publishedMessages.Catch);
+        messageBus.Use(publishedMessages.Catch);
+
+        ConfigureGroupCheckouts(messageBus, groupCheckoutFacade);
+        ConfigureGuestStayAccounts(messageBus, guestStayFacade);
     }
 }

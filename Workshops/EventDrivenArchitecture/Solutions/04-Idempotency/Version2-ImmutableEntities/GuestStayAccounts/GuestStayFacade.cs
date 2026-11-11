@@ -4,7 +4,7 @@ namespace Idempotency.Version2_ImmutableEntities.GuestStayAccounts;
 
 using static GuestStayAccountCommand;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
@@ -14,7 +14,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var @event = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
         await database.Store(command.GuestStayId, GuestStayAccount.Initial.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 
     public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
@@ -41,7 +41,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
             return;
 
         await database.Store(guestStayId, events.Aggregate(account, (state, @event) => state.Evolve(@event)), ct);
-        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
+        await messageBus.Publish(events.Cast<object>().ToArray(), ct);
     }
 }
 

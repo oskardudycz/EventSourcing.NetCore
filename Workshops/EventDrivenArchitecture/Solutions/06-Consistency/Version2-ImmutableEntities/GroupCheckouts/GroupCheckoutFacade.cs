@@ -10,14 +10,14 @@ public class GroupCheckOutFacade
     private static readonly Guid OutboxId = new("ac49ffe5-ab2f-4827-9fd0-511412441e48");
 
     private readonly Database database;
-    private readonly EventBus eventBus;
+    private readonly MessageBus messageBus;
 
-    public GroupCheckOutFacade(Database database, EventBus eventBus, BackgroundJobs backgroundJobs)
+    public GroupCheckOutFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
-        this.eventBus = eventBus;
+        this.messageBus = messageBus;
 
-        backgroundJobs.Register(ct => Outbox.PublishFromOutbox(database, eventBus, OutboxId, ct));
+        backgroundJobs.Register(ct => Outbox.PublishFromOutbox(database, messageBus, OutboxId, ct));
     }
 
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
@@ -39,7 +39,7 @@ public class GroupCheckOutFacade
             return [@event];
         }, ct);
 
-        await Outbox.PublishOrStoreInOutbox(database, eventBus, OutboxId, events, ct);
+        await Outbox.PublishOrStoreInOutbox(database, messageBus, OutboxId, events, ct);
     }
 
     public ValueTask RecordGuestCheckoutCompletion(
@@ -87,7 +87,7 @@ public class GroupCheckOutFacade
         if (events.Length == 0)
             return;
 
-        await Outbox.PublishOrStoreInOutbox(database, eventBus, OutboxId, events.Cast<object>().ToArray(), ct);
+        await Outbox.PublishOrStoreInOutbox(database, messageBus, OutboxId, events.Cast<object>().ToArray(), ct);
     }
 }
 

@@ -182,24 +182,23 @@ public class IdempotencyTests
     }
 
     [Fact]
-    public async Task GroupCheckoutCompletesOnceWhenBusesDeliverEveryMessageTwice()
+    public async Task GroupCheckoutCompletesOnceWhenTheBusDeliversEveryMessageTwice()
     {
         // Given
         var database = new Database();
-        var eventBus = new EventBus(deliverTwice: true);
-        var commandBus = new CommandBus(deliverTwice: true);
-        var publishedEvents = new MessageCatcher();
-        eventBus.Use(publishedEvents.Catch);
+        var messageBus = new MessageBus(deliverTwice: true);
+        var publishedMessages = new MessageCatcher();
+        messageBus.Use(publishedMessages.Catch);
 
-        var guestStayFacade = new GuestStayFacade(database, eventBus);
-        var groupCheckoutFacade = new GroupCheckOutFacade(database, eventBus);
-        ConfigureGuestStayAccounts(commandBus, guestStayFacade);
-        ConfigureGroupCheckouts(eventBus, commandBus, groupCheckoutFacade);
+        var guestStayFacade = new GuestStayFacade(database, messageBus);
+        var groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus);
+        ConfigureGuestStayAccounts(messageBus, guestStayFacade);
+        ConfigureGroupCheckouts(messageBus, groupCheckoutFacade);
 
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid()];
         foreach (var guestStayId in guestStays)
             await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now));
-        publishedEvents.Reset();
+        publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
         var clerkId = Guid.NewGuid();
@@ -209,14 +208,22 @@ public class IdempotencyTests
             new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now));
 
         // Then
-        publishedEvents.ShouldReceiveMessages(
+        publishedMessages.ShouldReceiveMessages(
             [
                 new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
+                new CheckOutGuest(guestStays[0], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[0], now, groupCheckoutId),
+                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now),
                 new GuestCheckoutCompleted(groupCheckoutId, guestStays[0], now),
+                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now),
+                new CheckOutGuest(guestStays[1], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[1], now, groupCheckoutId),
+                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[1], now),
                 new GuestCheckoutCompleted(groupCheckoutId, guestStays[1], now),
-                new GroupCheckoutCompleted(groupCheckoutId, guestStays, now)
+                new GroupCheckoutCompleted(groupCheckoutId, guestStays, now),
+                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[1], now),
+                new CheckOutGuest(guestStays[0], now, groupCheckoutId),
+                new CheckOutGuest(guestStays[1], now, groupCheckoutId)
             ]
         );
     }
@@ -230,8 +237,7 @@ public class IdempotencyTests
     }
 
     private readonly Database database = new();
-    private readonly EventBus eventBus = new();
-    private readonly CommandBus commandBus = new();
+    private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
     private readonly GuestStayFacade guestStayFacade;
     private readonly GroupCheckOutFacade groupCheckoutFacade;
@@ -242,10 +248,9 @@ public class IdempotencyTests
     public IdempotencyTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, eventBus);
-        groupCheckoutFacade = new GroupCheckOutFacade(database, eventBus);
+        guestStayFacade = new GuestStayFacade(database, messageBus);
+        groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus);
 
-        eventBus.Use(publishedMessages.Catch);
-        commandBus.Use(publishedMessages.Catch);
+        messageBus.Use(publishedMessages.Catch);
     }
 }

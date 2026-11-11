@@ -11,11 +11,11 @@ public class GroupCheckOutFacade
 
     private readonly Database database;
 
-    public GroupCheckOutFacade(Database database, EventBus eventBus, BackgroundJobs backgroundJobs)
+    public GroupCheckOutFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
 
-        backgroundJobs.Register(ct => Outbox.PublishFromOutbox(database, eventBus, OutboxId, ct));
+        backgroundJobs.Register(ct => Outbox.PublishFromOutbox(database, messageBus, OutboxId, ct));
     }
 
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>

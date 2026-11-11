@@ -1,0 +1,3 @@
+namespace BusinessProcesses.Version2_ImmutableEntities.GroupCheckouts;
+
+public record GroupCheckout;

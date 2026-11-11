@@ -24,6 +24,6 @@ We still need to support regular checkouts, payments, charges etc. as we do righ
 **Model the entity and business logic of the Guest Stay Account.**
 
 - Define the entity in a new file, based on [Guest Stay Account events](./GuestStayAccountEvents.cs),
-- Fill application logic in [GuestStayFacade](./GuestStayFacade.cs), using the [in-memory database](./Core/Database.cs) and [in-memory event bus](./Core/EventBus.cs) to store changes and publish events as the outcome of business logic,
+- Fill application logic in [GuestStayFacade](./GuestStayFacade.cs), using the [in-memory database](./Core/Database.cs) and [in-memory message bus](./Core/MessageBus.cs) to store changes and publish events as the outcome of business logic,
 - You can use any preferred style of implementing business logic,
 - Use [EntityDefinitionTests](./EntityDefinitionTests.cs) to guide you and verify if you implemented it correctly.

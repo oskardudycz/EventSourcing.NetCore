@@ -6,7 +6,7 @@ namespace OptimisticConcurrency.Version1_Aggregates.GuestStayAccounts;
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
@@ -22,7 +22,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
             return account.DequeueUncommittedEvents();
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 
     public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
@@ -35,7 +35,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         Handle(command.GuestStayId, account => account.CheckOut(command.Now, command.GroupCheckOutId), ct);
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
-        eventBus.Publish([
+        messageBus.Publish([
             new GroupCheckoutEvent.GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,
@@ -58,7 +58,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
             return account.DequeueUncommittedEvents();
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 }
 

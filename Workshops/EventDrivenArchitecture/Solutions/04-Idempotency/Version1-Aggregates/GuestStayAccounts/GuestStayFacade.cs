@@ -6,7 +6,7 @@ namespace Idempotency.Version1_Aggregates.GuestStayAccounts;
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
@@ -16,7 +16,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
         await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
@@ -27,7 +27,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         account.RecordCharge(command.ChargeId, command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
@@ -38,7 +38,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         account.RecordPayment(command.PaymentId, command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
@@ -49,11 +49,11 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         account.CheckOut(command.Now, command.GroupCheckOutId);
 
         await database.Store(command.GuestStayId, account, ct);
-        await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
+        await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
-        eventBus.Publish([
+        messageBus.Publish([
             new GroupCheckoutEvent.GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,

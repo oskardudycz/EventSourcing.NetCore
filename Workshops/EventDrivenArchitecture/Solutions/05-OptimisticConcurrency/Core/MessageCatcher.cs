@@ -29,5 +29,8 @@ public class MessageCatcher
     }
 
     public void ShouldReceiveMessages(object[] messages) =>
+        Published.Should().BeEquivalentTo(messages, options => options.WithStrictOrdering());
+
+    public void ShouldReceiveMessagesInAnyOrder(object[] messages) =>
         Published.Should().BeEquivalentTo(messages);
 }

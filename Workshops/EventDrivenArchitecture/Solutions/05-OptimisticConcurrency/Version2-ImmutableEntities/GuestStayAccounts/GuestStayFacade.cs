@@ -4,7 +4,7 @@ namespace OptimisticConcurrency.Version2_ImmutableEntities.GuestStayAccounts;
 
 using static GuestStayAccountCommand;
 
-public class GuestStayFacade(Database database, EventBus eventBus)
+public class GuestStayFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
@@ -20,7 +20,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
             return [@event];
         }, ct);
 
-        await eventBus.Publish(events, ct);
+        await messageBus.Publish(events, ct);
     }
 
     public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
@@ -57,7 +57,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         if (events.Length == 0)
             return;
 
-        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
+        await messageBus.Publish(events.Cast<object>().ToArray(), ct);
     }
 }
 
