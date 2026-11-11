@@ -3,59 +3,45 @@ using Idempotency.Core;
 namespace Idempotency.Version2_ImmutableEntities.GuestStayAccounts;
 
 using static GuestStayAccountCommand;
-using static GuestStayAccountEvent;
 
 public class GuestStayFacade(Database database, EventBus eventBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
+        if (await database.Get<GuestStayAccount>(command.GuestStayId, ct) != null)
+            return;
+
         var @event = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
         await database.Store(command.GuestStayId, GuestStayAccount.Initial.Evolve(@event), ct);
         await eventBus.Publish([@event], ct);
     }
 
-    public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
+    public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
+        Handle(command.GuestStayId, account => account.RecordCharge(command.ChargeId, command.Amount, command.Now), ct);
+
+    public ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default) =>
+        Handle(command.GuestStayId, account => account.RecordPayment(command.PaymentId, command.Amount, command.Now), ct);
+
+    public ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default) =>
+        Handle(command.GuestStayId, account => account.CheckOut(command.Now, command.GroupCheckOutId), ct);
+
+    private async ValueTask Handle(
+        Guid guestStayId,
+        Func<GuestStayAccount, GuestStayAccountEvent[]> decide,
+        CancellationToken ct
+    )
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
+        var account = await database.Get<GuestStayAccount>(guestStayId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        var @event = account.RecordCharge(command.Amount, command.Now);
+        var events = decide(account);
 
-        await database.Store(command.GuestStayId, account.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
-    }
+        if (events.Length == 0)
+            return;
 
-    public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
-    {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
-
-        var @event = account.RecordPayment(command.Amount, command.Now);
-
-        await database.Store(command.GuestStayId, account.Evolve(@event), ct);
-        await eventBus.Publish([@event], ct);
-    }
-
-    public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
-    {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
-
-        switch (account.CheckOut(command.Now, command.GroupCheckOutId))
-        {
-            case GuestCheckedOut checkedOut:
-            {
-                await database.Store(command.GuestStayId, account.Evolve(checkedOut), ct);
-                await eventBus.Publish([checkedOut], ct);
-                return;
-            }
-            case GuestCheckOutFailed checkOutFailed:
-            {
-                await eventBus.Publish([checkOutFailed], ct);
-                return;
-            }
-        }
+        await database.Store(guestStayId, events.Aggregate(account, (state, @event) => state.Evolve(@event)), ct);
+        await eventBus.Publish(events.Cast<object>().ToArray(), ct);
     }
 }
 
@@ -68,12 +54,14 @@ public abstract record GuestStayAccountCommand
 
     public record RecordCharge(
         Guid GuestStayId,
+        Guid ChargeId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
         Guid GuestStayId,
+        Guid PaymentId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;

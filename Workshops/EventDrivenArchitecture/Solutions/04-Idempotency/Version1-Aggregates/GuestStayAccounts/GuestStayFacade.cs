@@ -10,6 +10,9 @@ public class GuestStayFacade(Database database, EventBus eventBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
+        if (await database.Get<GuestStayAccount>(command.GuestStayId, ct) != null)
+            return;
+
         var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
 
         await database.Store(command.GuestStayId, account, ct);
@@ -21,7 +24,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        account.RecordCharge(command.Amount, command.Now);
+        account.RecordCharge(command.ChargeId, command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account, ct);
         await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
@@ -32,7 +35,7 @@ public class GuestStayFacade(Database database, EventBus eventBus)
         var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        account.RecordPayment(command.Amount, command.Now);
+        account.RecordPayment(command.PaymentId, command.Amount, command.Now);
 
         await database.Store(command.GuestStayId, account, ct);
         await eventBus.Publish(account.DequeueUncommittedEvents(), ct);
@@ -69,12 +72,14 @@ public abstract record GuestStayAccountCommand
 
     public record RecordCharge(
         Guid GuestStayId,
+        Guid ChargeId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
         Guid GuestStayId,
+        Guid PaymentId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;

@@ -38,13 +38,14 @@ public class EntityDefinitionTests
         publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
-        var command = new RecordCharge(guestStayId, amount, now);
+        var chargeId = Guid.NewGuid();
+        var command = new RecordCharge(guestStayId, chargeId, amount, now);
 
         // When
         await guestStayFacade.RecordCharge(command);
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new ChargeRecorded(guestStayId, amount, now));
+        publishedMessages.ShouldReceiveSingleMessage(new ChargeRecorded(guestStayId, chargeId, amount, now));
     }
 
     [Fact]
@@ -56,13 +57,14 @@ public class EntityDefinitionTests
         publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
-        var command = new RecordPayment(guestStayId, amount, now);
+        var paymentId = Guid.NewGuid();
+        var command = new RecordPayment(guestStayId, paymentId, amount, now);
 
         // When
         await guestStayFacade.RecordPayment(command);
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, amount, now));
+        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, paymentId, amount, now));
     }
 
     [Fact]
@@ -71,17 +73,18 @@ public class EntityDefinitionTests
         // Given
         var guestStayId = Guid.NewGuid();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, generate.Finance.Amount(), now.AddHours(-1)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), generate.Finance.Amount(), now.AddHours(-1)));
         publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
-        var command = new RecordPayment(guestStayId, amount, now);
+        var paymentId = Guid.NewGuid();
+        var command = new RecordPayment(guestStayId, paymentId, amount, now);
 
         // When
         await guestStayFacade.RecordPayment(command);
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, amount, now));
+        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, paymentId, amount, now));
     }
 
     [Fact]
@@ -92,8 +95,8 @@ public class EntityDefinitionTests
 
         var amount = generate.Finance.Amount();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, amount, now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, amount, now.AddHours(-1)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), amount, now.AddHours(-2)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, Guid.NewGuid(), amount, now.AddHours(-1)));
         publishedMessages.Reset();
         // And
         var command = new CheckOutGuest(guestStayId, now);
@@ -113,8 +116,8 @@ public class EntityDefinitionTests
 
         var amount = generate.Finance.Amount();
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, amount + 10, now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, amount, now.AddHours(-1)));
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), amount + 10, now.AddHours(-2)));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, Guid.NewGuid(), amount, now.AddHours(-1)));
         publishedMessages.Reset();
         // And
         var command = new CheckOutGuest(guestStayId, now);
