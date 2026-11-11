@@ -25,11 +25,33 @@ public abstract record GroupCheckoutEvent
     private GroupCheckoutEvent() { }
 }
 
-public class GroupCheckOut
+public record GroupCheckOut(
+    Guid Id,
+    Dictionary<Guid, CheckoutStatus> GuestStayCheckouts,
+    DateTimeOffset UpdatedAt
+)
 {
-    public required Guid Id { get; init; }
-    public required Dictionary<Guid, CheckoutStatus> GuestStayCheckouts { get; init;  }
-    public CheckoutStatus Status { get; set; } = CheckoutStatus.Initiated;
+    public static GroupCheckOut Initiated(Guid id, Guid[] guestStayIds, DateTimeOffset initiatedAt) =>
+        new(id, guestStayIds.Distinct().ToDictionary(guestStayId => guestStayId, _ => CheckoutStatus.Initiated), initiatedAt);
+
+    public GroupCheckOut WithCheckout(Guid guestStayId, CheckoutStatus status, DateTimeOffset at) =>
+        this with
+        {
+            GuestStayCheckouts = new Dictionary<Guid, CheckoutStatus>(GuestStayCheckouts) { [guestStayId] = status },
+            UpdatedAt = at
+        };
+
+    public bool AreAnyOngoingCheckouts() =>
+        GuestStayCheckouts.Values.Any(status => status is CheckoutStatus.Initiated);
+
+    public bool AreAnyFailedCheckouts() =>
+        GuestStayCheckouts.Values.Any(status => status is CheckoutStatus.Failed);
+
+    public Guid[] CheckoutsWith(CheckoutStatus status) =>
+        GuestStayCheckouts
+            .Where(pair => pair.Value == status)
+            .Select(pair => pair.Key)
+            .ToArray();
 }
 
 public enum CheckoutStatus

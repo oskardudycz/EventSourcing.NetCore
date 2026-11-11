@@ -1,9 +1,6 @@
-﻿using BusinessProcesses.ToDoList.GuestStayAccounts;
 using BusinessProcesses.Core;
 
 namespace BusinessProcesses.ToDoList.GroupCheckouts;
-
-using static GuestStayAccountEvent;
 
 public static class GroupCheckoutsConfig
 {
@@ -12,9 +9,7 @@ public static class GroupCheckoutsConfig
         GroupCheckOutToDoList groupCheckoutToDoList
     )
     {
-        messageBus
-            .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>(groupCheckoutToDoList.GroupCheckoutInitiated)
-            .Subscribe<GuestCheckedOut>(groupCheckoutToDoList.GuestCheckedOut)
-            .Subscribe<GuestCheckOutFailed>(groupCheckoutToDoList.GuestCheckOutFailed);
+        foreach (var eventType in groupCheckoutToDoList.CanHandle())
+            messageBus.Subscribe(eventType, groupCheckoutToDoList.Handle);
     }
 }

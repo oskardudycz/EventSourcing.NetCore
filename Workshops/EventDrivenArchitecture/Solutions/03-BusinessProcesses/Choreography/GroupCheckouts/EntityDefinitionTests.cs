@@ -6,6 +6,8 @@ using Database = BusinessProcesses.Core.Database;
 namespace BusinessProcesses.Choreography.GroupCheckouts;
 
 using static GroupCheckoutCommand;
+using static GuestStayAccountCommand;
+using static GroupCheckoutsConfig;
 
 public class EntityDefinitionTests
 {
@@ -25,6 +27,9 @@ public class EntityDefinitionTests
         publishedMessages.ShouldReceiveMessages(
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStayIds, now),
+                new CheckOutGuest(guestStayIds[0], now, groupCheckoutId),
+                new CheckOutGuest(guestStayIds[1], now, groupCheckoutId),
+                new CheckOutGuest(guestStayIds[2], now, groupCheckoutId),
             ]
         );
     }
@@ -139,5 +144,7 @@ public class EntityDefinitionTests
         groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus);
 
         messageBus.Use(publishedMessages.Catch);
+
+        ConfigureGroupCheckouts(messageBus, groupCheckoutFacade);
     }
 }

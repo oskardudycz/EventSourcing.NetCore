@@ -18,9 +18,9 @@ public class EventsDefinitionTests
         };
 
         // Then
-        const int minimumExpectedEventTypesCount = 5;
-        events.Should().HaveCountGreaterThanOrEqualTo(minimumExpectedEventTypesCount);
-        events.GroupBy(e => e.GetType()).Should().HaveCountGreaterThanOrEqualTo(minimumExpectedEventTypesCount);
+        const int expectedEventTypesCount = 5;
+        events.Should().HaveCount(expectedEventTypesCount);
+        events.GroupBy(e => e.GetType()).Should().HaveCount(expectedEventTypesCount);
     }
 
     [Fact]
@@ -36,8 +36,8 @@ public class EventsDefinitionTests
         };
 
         // Then
-        const int minimumExpectedEventTypesCount = 5;
-        events.Should().HaveCountGreaterThanOrEqualTo(minimumExpectedEventTypesCount);
-        events.GroupBy(e => e.GetType()).Should().HaveCountGreaterThanOrEqualTo(minimumExpectedEventTypesCount);
+        const int expectedEventTypesCount = 5;
+        events.Should().HaveCount(expectedEventTypesCount);
+        events.GroupBy(e => e.GetType()).Should().HaveCount(expectedEventTypesCount);
     }
 }
