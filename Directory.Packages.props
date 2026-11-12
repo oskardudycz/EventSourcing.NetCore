@@ -5,10 +5,10 @@
 
   <ItemGroup>
     <PackageVersion Include="Alba" Version="8.5.3" />
-    <PackageVersion Include="Aspire.Confluent.Kafka" Version="13.6.4" />
-    <PackageVersion Include="Aspire.Hosting.Kafka" Version="13.6.4" />
-    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.6.4" />
-    <PackageVersion Include="Aspire.Npgsql" Version="13.6.4" />
+    <PackageVersion Include="Aspire.Confluent.Kafka" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Hosting.Kafka" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Npgsql" Version="13.6.5" />
     <PackageVersion Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0" />
     <PackageVersion Include="AutoMapper" Version="16.2.0" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
