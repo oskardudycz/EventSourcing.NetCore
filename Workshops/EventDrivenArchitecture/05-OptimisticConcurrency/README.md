@@ -29,4 +29,4 @@ The [in-memory database](./Core/Database.cs) now versions documents and responds
 - Start from the idempotent saga of the previous exercise. Choose one path: [Aggregates](./Version1-Aggregates) or [Immutable Entities](./Version2-ImmutableEntities),
 - Store with the version you loaded, so a conflicting change fails instead of overwriting,
 - Handle the conflict by loading the current state and deciding again, for a few attempts. Publish only the events of the attempt that succeeded,
-- Use `OptimisticConcurrencyTests` to guide you and verify if you implemented it correctly. `BusinessProcessTests`, `EntityDefinitionTests` and `IdempotencyTests` should stay green.
+- Use `OptimisticConcurrencyTests` ([Aggregates](./Version1-Aggregates/OptimisticConcurrencyTests.cs), [Immutable Entities](./Version2-ImmutableEntities/OptimisticConcurrencyTests.cs)) to guide you and verify if you implemented it correctly. `BusinessProcessTests`, `EntityDefinitionTests` and `IdempotencyTests` should stay green.

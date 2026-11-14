@@ -1,7 +1,7 @@
 namespace Core.Commands;
 
 /// <summary>
-/// Note: This is an example of the outbox pattern for Command Bus using EventStoreDB
+/// Note: This is an example of the outbox pattern for Command Bus using KurrentDB
 /// For production use mature tooling like Wolverine, MassTransit or NServiceBus
 /// </summary>
 public class CommandForwarder<T>(ICommandBus commandBus): IEventHandler<T>

@@ -1,4 +1,4 @@
-# Exercise 02 - Entities Definition
+# Exercise 02 - Entity Definition
 
 Having the group checkout modelled in the previous exercise, and defined as:
 

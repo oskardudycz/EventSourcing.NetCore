@@ -1,9 +1,9 @@
 using Core.Events;
-using Core.EventStoreDB.Subscriptions;
-using Core.EventStoreDB.Subscriptions.Batch;
-using Core.EventStoreDB.Subscriptions.Checkpoints;
-using Core.EventStoreDB.Subscriptions.Checkpoints.Postgres;
-using EventStore.Client;
+using Core.KurrentDB.Subscriptions;
+using Core.KurrentDB.Subscriptions.Batch;
+using Core.KurrentDB.Subscriptions.Checkpoints;
+using Core.KurrentDB.Subscriptions.Checkpoints.Postgres;
+using KurrentDB.Client;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 

@@ -22,18 +22,26 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - Kafka as a messaging platform to integrate microservices,
 - example of the case when some services are event-sourced ([Carts](./ECommerce/Carts), [Orders](./ECommerce/Orders), [Payments](./ECommerce/Payments)) and some are not ([Shipments](./ECommerce/Shipments) using EntityFramework as ORM)
 
-## [Simple EventSourcing with EventStoreDB](./EventStoreDB/Simple)
+## [Simple EventSourcing with KurrentDB](./KurrentDB/Simple)
 - typical Event Sourcing and CQRS flow,
 - functional composition, no aggregates, just data and functions,
-- stores events to  EventStoreDB,
-- Builds read models using [Subscription to `$all`](https://developers.eventstore.com/clients/grpc/subscribing-to-streams/#subscribing-to-all),
+- stores events to  KurrentDB,
+- Builds read models using [Subscription to `$all`](https://docs.kurrent.io/clients/dotnet/v1.4/subscriptions#basic-subscriptions),
 - Read models are stored as Postgres tables using EntityFramework.
 
-## [ECommerce with EventStoreDB](./EventStoreDB/ECommerce) 
+## [Implementing Distributed Processes](./HotelManagement)
+- orchestrate and coordinate business workflow spanning across multiple aggregates using [Saga pattern](https://event-driven.io/en/saga_process_manager_distributed_transactions/),
+- handle distributed processing both for asynchronous commands scheduling and events publishing,
+- getting at-least-once delivery guarantee,
+- implementing command store and outbox pattern on top of Marten and KurrentDB,
+- unit testing aggregates and Saga with a little help from [Ogooreck](https://github.com/oskardudycz/Ogooreck),
+- testing asynchronous code.
+
+## [ECommerce with KurrentDB](./KurrentDB/ECommerce) 
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
-- stores events to  EventStoreDB,
-- Builds read models using [Subscription to `$all`](https://developers.eventstore.com/clients/grpc/subscribing-to-streams/#subscribing-to-all).
+- stores events to  KurrentDB,
+- Builds read models using [Subscription to `$all`](https://docs.kurrent.io/clients/dotnet/v1.4/subscriptions#basic-subscriptions).
 - Read models are stored as Marten documents.
 
 ## [Warehouse](./Warehouse)
@@ -60,6 +68,9 @@ Shows how to handle basic event schema versioning scenarios using event and stre
 - [Downcasters](./EventsVersioning/#downcasters)
 - [Events Transformations](./EventsVersioning/#events-transformations)
 - [Stream Transformation](./EventsVersioning/#stream-transformation)
+- [Explicit serialisation](./EventsVersioning/#explicit-serialisation)
+- [Contract testing](./EventsVersioning/#contract-testing)
+- [Migrations](./EventsVersioning/#migrations)
 - [Summary](./EventsVersioning/#summary)
 
 ## [Event Pipelines](./EventPipelines)
@@ -91,3 +102,14 @@ Shows how to compose event handlers in the processing pipelines to:
 - DDD using Aggregates,
 - stores events to Marten,
 - asynchronous projections rebuild using AsynDaemon feature.
+
+## [Pragmatic Event Sourcing With Marten and Wolverine](./Helpdesk.Wolverine)
+- extended version of the [Helpdesk sample](./Helpdesk) adding Wolverine,
+- simplest CQRS and Event Sourcing flow using Wolverine Endpoints,
+- Wolverine code generation setup for development and production.
+
+## [Implementing Closing the Books With Marten](./ClosingTheBooks)
+- how to model processes to keep streams short,
+- Closing the Books pattern implemented with Marten,
+- both closing and opening as the same and as separate operations.
+- 📝 Read more [Implementing Closing the Books With Marten](https://event-driven.io/en/closing_the_books_in_practice/?utm_source=event_sourcing_net)

@@ -31,9 +31,9 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
   - [6. Samples](#6-samples)
     - [6.1 Pragmatic Event Sourcing With Marten](#61-pragmatic-event-sourcing-with-marten)
     - [6.2 ECommerce with Marten](#62-ecommerce-with-marten)
-    - [6.3 Simple EventSourcing with EventStoreDB](#63-simple-eventsourcing-with-eventstoredb)
+    - [6.3 Simple EventSourcing with KurrentDB](#63-simple-eventsourcing-with-kurrentdb)
     - [6.4 Implementing Distributed Processes](#64-implementing-distributed-processes)
-    - [6.5 ECommerce with EventStoreDB](#65-ecommerce-with-eventstoredb)
+    - [6.5 ECommerce with KurrentDB](#65-ecommerce-with-kurrentdb)
     - [6.6 Warehouse](#66-warehouse)
     - [6.7 Warehouse Minimal API](#67-warehouse-minimal-api)
     - [6.8 Event Versioning](#68-event-versioning)
@@ -41,9 +41,12 @@ Tutorial, practical samples and other resources about Event Sourcing in .NET. Se
     - [6.10 Meetings Management with Marten](#610-meetings-management-with-marten)
     - [6.11 Cinema Tickets Reservations with Marten](#611-cinema-tickets-reservations-with-marten)
     - [6.12 SmartHome IoT with Marten](#612-smarthome-iot-with-marten)
+    - [6.13 Pragmatic Event Sourcing With Marten and Wolverine](#613-pragmatic-event-sourcing-with-marten-and-wolverine)
+    - [6.14 Implementing Closing the Books With Marten](#614-implementing-closing-the-books-with-marten)
   - [7. Self-paced training Kits](#7-self-paced-training-kits)
     - [7.1 Introduction to Event Sourcing](#71-introduction-to-event-sourcing)
     - [7.2 Build your own Event Store](#72-build-your-own-event-store)
+    - [7.3 Event-Driven Architecture](#73-event-driven-architecture)
   - [8. Articles](#8-articles)
   - [9. Event Store - Marten](#9-event-store---marten)
   - [10. CQRS (Command Query Responsibility Separation)](#10-cqrs-command-query-responsibility-separation)
@@ -382,7 +385,7 @@ In Marten `Evolve` method is not needed. Marten uses naming convention and call 
 See samples:
 - [Generic stream aggregation](/Core.Tests/AggregateWithWhenTests.cs)
 - [Marten](/Marten.Integration.Tests/EventStore/Aggregate/EventsAggregation.cs)
-- [EventStoreDB](/Core.EventStoreDB/Events/AggregateStreamExtensions.cs)
+- [KurrentDB](/Core.KurrentDB/Events/AggregateStreamExtensions.cs)
 
 
 Read more in my article:
@@ -625,7 +628,7 @@ Feel free to [create an issue](https://github.com/oskardudycz/EventSourcing.NetC
 
 For running the Event Store examples you need to have:
 
-1. .NET 6 installed - https://dotnet.microsoft.com/download/dotnet/6.0
+1. .NET 10 installed - https://dotnet.microsoft.com/download/dotnet/10.0
 2. [Docker](https://store.docker.com/search?type=edition&offering=community) installed. Then going to the `docker` folder and running:
 
 ```
@@ -637,7 +640,7 @@ docker compose --profile all up
 ## 5. Tools used
 
 1. [Marten](https://martendb.io/) - Event Store and Read Models
-2. [EventStoreDB](https://eventstore.com) - Event Store
+2. [KurrentDB](https://www.kurrent.io/kurrentdb) - Event Store
 3. [Kafka](https://kafka.apache.org/) - External Durable Message Bus to integrate services
 4. [ElasticSearch](https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/nest-getting-started.html) - Read Models
 
@@ -664,26 +667,26 @@ Samples are using CQRS architecture. They're sliced based on the business module
 - Kafka as a messaging platform to integrate microservices,
 - example of the case when some services are event-sourced ([Carts](./Sample/ECommerce/Carts), [Orders](./Sample/ECommerce/Orders), [Payments](./Sample/ECommerce/Payments)) and some are not ([Shipments](./Sample/ECommerce/Shipments) using EntityFramework as ORM)
 
-### 6.3 [Simple EventSourcing with EventStoreDB](./Sample/EventStoreDB/Simple)
+### 6.3 [Simple EventSourcing with KurrentDB](./Sample/KurrentDB/Simple)
 - typical Event Sourcing and CQRS flow,
 - functional composition, no aggregates, just data and functions,
-- stores events to  EventStoreDB,
-- Builds read models using [Subscription to `$all`](https://developers.eventstore.com/clients/grpc/subscribing-to-streams/#subscribing-to-all),
+- stores events to  KurrentDB,
+- Builds read models using [Subscription to `$all`](https://docs.kurrent.io/clients/dotnet/v1.4/subscriptions#basic-subscriptions),
 - Read models are stored as Postgres tables using EntityFramework.
 
 ### 6.4 [Implementing Distributed Processes](./Sample/HotelManagement)
 - orchestrate and coordinate business workflow spanning across multiple aggregates using [Saga pattern](https://event-driven.io/en/saga_process_manager_distributed_transactions/),
 - handle distributed processing both for asynchronous commands scheduling and events publishing,
 - getting at-least-once delivery guarantee,
-- implementing command store and outbox pattern on top of Marten and EventStoreDB,
+- implementing command store and outbox pattern on top of Marten and KurrentDB,
 - unit testing aggregates and Saga with a little help from [Ogooreck](https://github.com/oskardudycz/Ogooreck),
 - testing asynchronous code.
 
-### 6.5 [ECommerce with EventStoreDB](./Sample/EventStoreDB/ECommerce)
+### 6.5 [ECommerce with KurrentDB](./Sample/KurrentDB/ECommerce)
 - typical Event Sourcing and CQRS flow,
 - DDD using Aggregates,
-- stores events to  EventStoreDB,
-- Builds read models using [Subscription to `$all`](https://developers.eventstore.com/clients/grpc/subscribing-to-streams/#subscribing-to-all).
+- stores events to  KurrentDB,
+- Builds read models using [Subscription to `$all`](https://docs.kurrent.io/clients/dotnet/v1.4/subscriptions#basic-subscriptions).
 - Read models are stored as Marten documents.
 
 ### 6.6 [Warehouse](./Sample/Warehouse)
@@ -710,6 +713,9 @@ Shows how to handle basic event schema versioning scenarios using event and stre
 - [Downcasters](./Sample/EventsVersioning/#downcasters)
 - [Events Transformations](./Sample/EventsVersioning/#events-transformations)
 - [Stream Transformation](./Sample/EventsVersioning/#stream-transformation)
+- [Explicit serialisation](./Sample/EventsVersioning/#explicit-serialisation)
+- [Contract testing](./Sample/EventsVersioning/#contract-testing)
+- [Migrations](./Sample/EventsVersioning/#migrations)
 - [Summary](./Sample/EventsVersioning/#summary)
 - 📝 [Simple patterns for events schema versioning](https://event-driven.io/en/simple_events_versioning_patterns/?utm_source=event_sourcing_net)
 
@@ -744,6 +750,17 @@ Shows how to compose event handlers in the processing pipelines to:
 - stores events to Marten,
 - asynchronous projections rebuild using AsyncDaemon feature.
 
+### 6.13 [Pragmatic Event Sourcing With Marten and Wolverine](./Sample/Helpdesk.Wolverine)
+- extended version of the [Helpdesk sample](./Sample/Helpdesk) adding Wolverine,
+- simplest CQRS and Event Sourcing flow using Wolverine Endpoints,
+- Wolverine code generation setup for development and production.
+
+### 6.14 [Implementing Closing the Books With Marten](./Sample/ClosingTheBooks)
+- how to model processes to keep streams short,
+- Closing the Books pattern implemented with Marten,
+- both closing and opening as the same and as separate operations.
+- 📝 Read more [Implementing Closing the Books With Marten](https://event-driven.io/en/closing_the_books_in_practice/?utm_source=event_sourcing_net)
+
 ## 7. Self-paced training Kits
 
 I prepared the self-paced training Kits for the Event Sourcing. See more in the [Workshop description](./Workshops/BuildYourOwnEventStore/Readme.md).
@@ -754,29 +771,42 @@ Event Sourcing is perceived as a complex pattern. Some believe that it's like Ne
 
 The workshop aims to build the knowledge of the general concept and its related patterns for the participants. The acquired knowledge will allow for the conscious design of architectural solutions and the analysis of associated risks.
 
-The emphasis will be on a pragmatic understanding of architectures and applying it in practice using Marten and EventStoreDB.
+The emphasis will be on a pragmatic understanding of architectures and applying it in practice using Marten and KurrentDB.
 
-You can do the workshop as a self-paced kit. That should give you a good foundation for starting your journey with Event Sourcing and learning tools like Marten and EventStoreDB. If you'd like to get full coverage with all nuances of the private workshop, feel free to contact me via [email](mailto:oskar.dudycz@gmail.com).
+You can do the workshop as a self-paced kit. That should give you a good foundation for starting your journey with Event Sourcing and learning tools like Marten and KurrentDB. If you'd like to get full coverage with all nuances of the private workshop, feel free to contact me via [email](mailto:oskar.dudycz@gmail.com).
 
 1. [Events definition](./Workshops/IntroductionToEventSourcing/01-EventsDefinition).
 2. [Getting State from events](./Workshops/IntroductionToEventSourcing/02-GettingStateFromEvents).
 3. Appending Events:
    * [Marten](./Workshops/IntroductionToEventSourcing/03-AppendingEvents.Marten)
-   * [EventStoreDB](./Workshops/IntroductionToEventSourcing/04-AppendingEvents.EventStoreDB)
+   * [KurrentDB](./Workshops/IntroductionToEventSourcing/04-AppendingEvents.KurrentDB)
 4. Getting State from events
    * [Marten](./Workshops/IntroductionToEventSourcing/05-GettingStateFromEvents.Marten)
-   * [EventStoreDB](./Workshops/IntroductionToEventSourcing/06-GettingStateFromEvents.EventStoreDB)
+   * [KurrentDB](./Workshops/IntroductionToEventSourcing/06-GettingStateFromEvents.KurrentDB)
 5. Business logic:
    * [General](./Workshops/IntroductionToEventSourcing/07-BusinessLogic)
-   * [Marten](./Workshops/IntroductionToEventSourcing/08-BusinessLogic.Marten)
-   * [EventStoreDB](./Workshops/IntroductionToEventSourcing/09-BusinessLogic.EventStoreDB)
-6. Optimistic Concurrency:
+   * [Slimmed](./Workshops/IntroductionToEventSourcing/07-BusinessLogic.Slimmed)
+6. Application Logic:
+   * [Marten](./Workshops/IntroductionToEventSourcing/08-ApplicationLogic.Marten)
+   * [KurrentDB](./Workshops/IntroductionToEventSourcing/09-ApplicationLogic.KurrentDB)
+7. Optimistic Concurrency:
    * [Marten](./Workshops/IntroductionToEventSourcing/10-OptimisticConcurrency.Marten)
-   * [EventStoreDB](./Workshops/IntroductionToEventSourcing/11-OptimisticConcurrency.EventStoreDB)
-7. Projections:
-   * [General](./Workshops/IntroductionToEventSourcing/12-Projections)
-   * [Idempotency](./Workshops/IntroductionToEventSourcing/13-Projections.Idempotency)
-   * [Eventual Consistency](./Workshops/IntroductionToEventSourcing/14-Projections.EventualConsistency)
+   * [KurrentDB](./Workshops/IntroductionToEventSourcing/11-OptimisticConcurrency.KurrentDB)
+8. Projections:
+   * [General](./Workshops/IntroductionToEventSourcing/12-Projections.SingleStream)
+   * [Idempotency](./Workshops/IntroductionToEventSourcing/13-Projections.SingleStream.Idempotency)
+   * [Eventual Consistency](./Workshops/IntroductionToEventSourcing/14-Projections.SingleStream.EventualConsistency)
+9. Multi-Stream Projections:
+   * [General](./Workshops/IntroductionToEventSourcing/15-Projections.MultiStream)
+   * [Out-of-Order Events](./Workshops/IntroductionToEventSourcing/16-Projections.MultiStream.OutOfOrder)
+   * [Marten](./Workshops/IntroductionToEventSourcing/17-Projections.MultiStream.Marten)
+   * [Out-of-Order Events with Marten](./Workshops/IntroductionToEventSourcing/18-Projections.MultiStream.OutOfOrder.Marten)
+10. Business Processes:
+   * [Events definition](./Workshops/IntroductionToEventSourcing/19-EventsDefinition)
+   * [Entities definition](./Workshops/IntroductionToEventSourcing/20-EntitiesDefinition)
+   * [Business processes](./Workshops/IntroductionToEventSourcing/21-BusinessProcesses)
+   * [Idempotency](./Workshops/IntroductionToEventSourcing/22-Idempotency)
+   * [Consistency](./Workshops/IntroductionToEventSourcing/23-Consistency)
 
 ### 7.2 [Build your own Event Store](./Workshops/BuildYourOwnEventStore)
 
@@ -793,6 +823,17 @@ It teaches the event store basics by showing how to build your Event Store on to
 9. [Snapshots](./Workshops/BuildYourOwnEventStore/08-Snapshots)
 10. [Projections](./Workshops/BuildYourOwnEventStore/09-Projections)
 11. [Projections With Marten](./Workshops/BuildYourOwnEventStore/10-ProjectionsWithMarten)
+
+### 7.3 [Event-Driven Architecture](./Workshops/EventDrivenArchitecture)
+
+The workshop builds Event-Driven Architecture knowledge step by step on a single domain, a hotel's guest stays and group checkouts. You start with modelling events and entities, then coordinate a business process across modules and make it survive duplicates and failures.
+
+1. [Events definition](./Workshops/EventDrivenArchitecture/01-EventsDefinition).
+2. [Entities definition](./Workshops/EventDrivenArchitecture/02-EntitiesDefinition).
+3. [Business processes](./Workshops/EventDrivenArchitecture/03-BusinessProcesses).
+4. [Idempotency](./Workshops/EventDrivenArchitecture/04-Idempotency).
+5. [Optimistic concurrency](./Workshops/EventDrivenArchitecture/05-OptimisticConcurrency).
+6. [Consistency](./Workshops/EventDrivenArchitecture/06-Consistency).
 
 ## 8. Articles
 Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https://event-driven.io/?utm_source=event_sourcing_net) posts:
@@ -908,19 +949,18 @@ Read also more on the **Event Sourcing** and **CQRS** topics in my [blog](https:
             ```csharp
             var onlineAggregation = documentSession.Events.AggregateStream<TEntity>(streamId);
             documentSession.Store<TEntity>(onlineAggregation);
-            documentawait Session.SaveChangesAsync();
+            await documentSession.SaveChangesAsync();
             ```
 -   **Event transformations**
     -   **[One event to one object transformations](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Transformations/OneToOneEventTransformations.cs)**
-    -   **[Inline Transformation storage](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Transformations/InlineTransformationsStorage.cs)**
 -   **Events projection**
     -   **[Projection of single stream](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/EventStore/Projections/AggregationProjectionsTest.cs)**
 -   **[Multitenancy per schema](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/Marten.Integration.Tests/Tenancy/TenancyPerSchema.cs)**
 
 ## 10. CQRS (Command Query Responsibility Separation)
 
--   **[Command handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/CQRS.Tests/Commands/Commands.cs)**
--   **[Query handling](https://github.com/oskardudycz/EventSourcing.NetCore/blob/main/CQRS.Tests/Queries/Queries.cs)**
+-   **[Command handling](./Core/Commands/)**
+-   **[Query handling](./Core/Queries/)**
 
 ## 11. NuGet packages to help you get started.
 
@@ -938,7 +978,7 @@ See more in:
 ## 12. Other resources
 
 ### 12.1 Introduction
--   📝 [Event Store - A Beginner's Guide to Event Sourcing](https://www.eventstore.com/event-sourcing)
+-   📝 [Event Store - A Beginner's Guide to Event Sourcing](https://www.kurrent.io/event-sourcing)
 -   🎞 [Greg Young - CQRS & Event Sourcing](https://youtube.com/watch?v=JHGkaShoyNs)
 -   📰 [Lorenzo Nicora - A visual introduction to event sourcing and cqrs](https://www.slideshare.net/LorenzoNicora/a-visual-introduction-to-event-sourcing-and-cqrs)
 -   🎞 [Mathew McLoughlin - An Introduction to CQRS and Event Sourcing Patterns](https://www.youtube.com/watch?v=9a1PqwFrMP0)
@@ -984,7 +1024,7 @@ See more in:
 -   📝 [Pedro Costa - Migrating to Microservices and Event-Sourcing: the Dos and Dont's](https://hackernoon.com/migrating-to-microservices-and-event-sourcing-the-dos-and-donts-195153c7487d)
 -   🎞 [Dennis Doomen - An Event Sourcing Retrospective - The Good, The Bad and the Ugly](https://www.youtube.com/watch?v=goknSHnTD4M)
 -   🎞 [David Schmitz - Event Sourcing You are doing it wrong](https://www.youtube.com/watch?v=GzrZworHpIk)
--   📝 [Dennis Doomen - A recipe for gradually migrating from CRUD to Event Sourcing](https://www.eventstore.com/blog/a-recipe-for-gradually-migrating-from-crud-to-event-sourcing)
+-   📝 [Dennis Doomen - A recipe for gradually migrating from CRUD to Event Sourcing](https://www.kurrent.io/blog/a-recipe-for-gradually-migrating-from-crud-to-event-sourcing)
 -   🎞 [Nat Pryce - Mistakes made adopting event sourcing (and how we recovered)](https://www.youtube.com/watch?v=osk0ZBdBbx4)
 
 ### 12.3 Projections
@@ -1006,7 +1046,7 @@ See more in:
 -   📝 [Greg Young - Versioning in an Event Sourced System](https://leanpub.com/esversioning/read)
 -   📝 [Kacper Gunia - Event Sourcing: Snapshotting](https://domaincentric.net/blog/event-sourcing-snapshotting)
 -   📝 [M. Overeem, M. Spoor - The dark side of event sourcing: Managing data conversion](https://www.researchgate.net/publication/315637858_The_dark_side_of_event_sourcing_Managing_data_conversion)
--   📝 [Savvas Kleanthous - Event immutability and dealing with change](https://www.eventstore.com/blog/event-immutability-and-dealing-with-change)
+-   📝 [Savvas Kleanthous - Event immutability and dealing with change](https://www.kurrent.io/blog/event-immutability-and-dealing-with-change)
 -   📝 [Versioning in an Event Sourced System](http://blog.approache.com/2019/02/versioning-in-event-sourced-system-tldr_10.html?m=1)
 
 ### 12.6 Storage
@@ -1065,7 +1105,7 @@ See more in:
 
 ### 12.14 Tools
 -   🛠️ [Marten - .NET Transactional Document DB and Event Store on PostgreSQL](https://eventuous.dev/)
--   🛠️ [EventStoreDB - The stream database built for Event Sourcing ](https://developers.eventstore.com/)
+-   🛠️ [KurrentDB - The stream database built for Event Sourcing ](https://docs.kurrent.io/)
 -   🛠️ [GoldenEye - The CQRS flavoured framework that will speed up your WebAPI and Microservices development ](https://github.com/oskardudycz/GoldenEye)
 -   🛠️ [Eventuous - Event Sourcing for .NET](https://eventuous.dev/)
 -   🛠️ [SQLStreamStore - Stream Store library targeting RDBMS based implementations for .NET ](https://github.com/SQLStreamStore/SQLStreamStore)

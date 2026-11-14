@@ -97,7 +97,7 @@ var builder = EventHandlersBuilder
     .Transform<UserAdded, List<AdminGrantedInTenant>>(AdminPipeline.SendToTenants)
     .Handle<AdminGrantedInTenant>(AdminPipeline.Handle);
 
-var eventBus = new EventBus(builder);
+var eventBus = new EventBus(builder.Build());
 ```
 
 ## Samples
@@ -105,7 +105,7 @@ var eventBus = new EventBus(builder);
 Check different ways of defining and integrating Event Handlers:
 - [Pure functions with Builder](./EventPipelines.Tests/PureFunctionsWithBuilderTest.cs)
 - [Pure functions with Dependency Injection](./EventPipelines.Tests/PureFunctionsWithIoCTest.cs)
-- [Classes with Builder](./EventPipelines.Tests/PureFunctionsWithBuilderTest.cs)
+- [Classes with Builder](./EventPipelines.Tests/ClassesWithBuilderTest.cs)
 - [Classes with Dependency Injection](./EventPipelines.Tests/ClassesWithIoCTest.cs)
 
 And how to integrate with MediatR:

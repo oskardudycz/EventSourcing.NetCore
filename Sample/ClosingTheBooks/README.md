@@ -12,4 +12,4 @@ Check also my talk:
 
 <a href="https://www.youtube.com/watch?v=gG6DGmYKk4I&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=2" target="_blank"><img src="https://img.youtube.com/vi/gG6DGmYKk4I/0.jpg" alt="Keep your streams short! Or how to model event-sourced systems efficiently" width="640" height="480" border="10" /></a>
 
-And full guide in [Keep your streams short! Temporal modeling for fast reads and optimal data retention](https://www.eventstore.com/blog/keep-your-streams-short-temporal-modelling-for-fast-reads-and-optimal-data-retention)
+And full guide in [Keep your streams short! Temporal modeling for fast reads and optimal data retention](https://www.kurrent.io/blog/keep-your-streams-short-temporal-modelling-for-fast-reads-and-optimal-data-retention)

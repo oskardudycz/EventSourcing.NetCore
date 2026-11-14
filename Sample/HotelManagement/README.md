@@ -12,10 +12,10 @@ It shows how to:
 - orchestrate and coordinate a business workflow spanning across multiple aggregates using the [Saga pattern](./HotelManagement/Sagas), [Choreography](./HotelManagement/Choreography) and [Process Managers](./HotelManagement/ProcessManagers),
 - handle distributed processing both for asynchronous command scheduling and event publishing,
 - getting at-least-once delivery guarantee,
-- implementing command store and outbox pattern on top of Marten and EventStoreDB,
+- implementing command store and outbox pattern on top of Marten and KurrentDB,
 - unit testing aggregates and Sagas with a little help from [Ogooreck](https://github.com/oskardudycz/Ogooreck),
 - testing asynchronous code.
 
 Read more in:
-- [Saga and Process Manager - distributed processes in practice](https://event-driven.io/en/saga_process_manager_distributed_transactions/)
-- [Event-driven distributed processes by example](https://event-driven.io/en/saga_process_manager_distributed_transactions)
+- [Saga and Process Manager - distributed processes in practice](https://event-driven.io/en/saga_process_manager_distributed_transactions/?utm_source=event_sourcing_net)
+- [Event-driven distributed processes by example](https://event-driven.io/en/event_driven_distributed_processes_by_example/?utm_source=event_sourcing_net)
