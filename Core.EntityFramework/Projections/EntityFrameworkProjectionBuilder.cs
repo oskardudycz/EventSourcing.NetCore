@@ -2,9 +2,9 @@ using System.Linq.Expressions;
 using Core.EntityFramework.Queries;
 using Core.EntityFramework.Subscriptions.Checkpoints;
 using Core.Events;
-using Core.EventStoreDB;
-using Core.EventStoreDB.Subscriptions;
-using Core.EventStoreDB.Subscriptions.Batch;
+using Core.KurrentDB;
+using Core.KurrentDB.Subscriptions;
+using Core.KurrentDB.Subscriptions.Batch;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -30,8 +30,8 @@ public static class EntityFrameworkProjection
         var builder = new EntityFrameworkProjectionBuilder<TView, TId, TDbContext>(services);
         setup(builder);
 
-        services.AddEventStoreDBSubscriptionToAll(
-            new EventStoreDBSubscriptionToAllOptions { SubscriptionId = typeof(TView).FullName!, BatchSize = batchSize },
+        services.AddKurrentDBSubscriptionToAll(
+            new KurrentDBSubscriptionToAllOptions { SubscriptionId = typeof(TView).FullName!, BatchSize = batchSize },
             sp =>
             {
                 var dbContext = sp.GetRequiredService<TDbContext>();

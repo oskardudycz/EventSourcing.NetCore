@@ -8,8 +8,8 @@
     <Project Path="Core.ElasticSearch/Core.ElasticSearch.csproj" />
     <Project Path="Core.EntityFramework.Tests/Core.EntityFramework.Tests.csproj" />
     <Project Path="Core.EntityFramework/Core.EntityFramework.csproj" />
-    <Project Path="Core.EventStoreDB.Tests/Core.EventStoreDB.Tests.csproj" />
-    <Project Path="Core.EventStoreDB/Core.EventStoreDB.csproj" />
+    <Project Path="Core.KurrentDB.Tests/Core.KurrentDB.Tests.csproj" />
+    <Project Path="Core.KurrentDB/Core.KurrentDB.csproj" />
     <Project Path="Core.Kafka.Tests/Core.Kafka.Tests.csproj" />
     <Project Path="Core.Kafka/Core.Kafka.csproj" />
     <Project Path="Core.Marten/Core.Marten.csproj" />
@@ -114,26 +114,26 @@
     <Project Path="Sample/EventPipelines/EventPipelines.Tests/EventPipelines.Tests.csproj" />
     <Project Path="Sample/EventPipelines/EventPipelines/EventPipelines.csproj" />
   </Folder>
-  <Folder Name="/Sample/EventStoreDB/" />
-  <Folder Name="/Sample/EventStoreDB/DataAnalytics/">
-    <Project Path="Sample/EventStoreDB/DataAnalytics/MarketBasketAnalytics.Api/MarketBasketAnalytics.Api.csproj" />
-    <Project Path="Sample/EventStoreDB/DataAnalytics/MarketBasketAnalytics/MarketBasketAnalytics.csproj" />
+  <Folder Name="/Sample/KurrentDB/" />
+  <Folder Name="/Sample/KurrentDB/DataAnalytics/">
+    <Project Path="Sample/KurrentDB/DataAnalytics/MarketBasketAnalytics.Api/MarketBasketAnalytics.Api.csproj" />
+    <Project Path="Sample/KurrentDB/DataAnalytics/MarketBasketAnalytics/MarketBasketAnalytics.csproj" />
   </Folder>
-  <Folder Name="/Sample/EventStoreDB/ECommerce/">
-    <File Path="Sample/EventStoreDB/ECommerce/README.md" />
+  <Folder Name="/Sample/KurrentDB/ECommerce/">
+    <File Path="Sample/KurrentDB/ECommerce/README.md" />
   </Folder>
-  <Folder Name="/Sample/EventStoreDB/ECommerce/Carts/">
-    <Project Path="Sample/EventStoreDB/ECommerce/Carts/Carts.Api.Tests/Carts.Api.Tests.csproj" />
-    <Project Path="Sample/EventStoreDB/ECommerce/Carts/Carts.Api/Carts.Api.csproj" />
-    <Project Path="Sample/EventStoreDB/ECommerce/Carts/Carts.Tests/Carts.Tests.csproj" />
-    <Project Path="Sample/EventStoreDB/ECommerce/Carts/Carts/Carts.csproj" />
+  <Folder Name="/Sample/KurrentDB/ECommerce/Carts/">
+    <Project Path="Sample/KurrentDB/ECommerce/Carts/Carts.Api.Tests/Carts.Api.Tests.csproj" />
+    <Project Path="Sample/KurrentDB/ECommerce/Carts/Carts.Api/Carts.Api.csproj" />
+    <Project Path="Sample/KurrentDB/ECommerce/Carts/Carts.Tests/Carts.Tests.csproj" />
+    <Project Path="Sample/KurrentDB/ECommerce/Carts/Carts/Carts.csproj" />
   </Folder>
-  <Folder Name="/Sample/EventStoreDB/Simple/">
-    <File Path="Sample/EventStoreDB/Simple/README.md" />
-    <Project Path="Sample/EventStoreDB/Simple/ECommerce.Api.Tests/ECommerce.Api.Tests.csproj" />
-    <Project Path="Sample/EventStoreDB/Simple/ECommerce.Api/ECommerce.Api.csproj" />
-    <Project Path="Sample/EventStoreDB/Simple/ECommerce.Core/ECommerce.Core.csproj" />
-    <Project Path="Sample/EventStoreDB/Simple/ECommerce/ECommerce.csproj" />
+  <Folder Name="/Sample/KurrentDB/Simple/">
+    <File Path="Sample/KurrentDB/Simple/README.md" />
+    <Project Path="Sample/KurrentDB/Simple/ECommerce.Api.Tests/ECommerce.Api.Tests.csproj" />
+    <Project Path="Sample/KurrentDB/Simple/ECommerce.Api/ECommerce.Api.csproj" />
+    <Project Path="Sample/KurrentDB/Simple/ECommerce.Core/ECommerce.Core.csproj" />
+    <Project Path="Sample/KurrentDB/Simple/ECommerce/ECommerce.csproj" />
   </Folder>
   <Folder Name="/Sample/EventsVersioning/">
     <File Path="Sample/EventsVersioning/README.md" />
@@ -162,7 +162,7 @@
     <Project Path="Sample/MartenMeetsElastic/MartenMeetsElastic/MartenMeetsElastic.csproj" />
   </Folder>
   <Folder Name="/Sample/MeetingsManagement/">
-    <File Path="Sample/MeetingsManagement/Readme.md" />
+    <File Path="Sample/MeetingsManagement/README.md" />
     <Project Path="Sample/MeetingsManagement/MeetingsManagement.Api/MeetingsManagement.Api.csproj" />
     <Project Path="Sample/MeetingsManagement/MeetingsManagement.IntegrationTests/MeetingsManagement.IntegrationTests.csproj" />
     <Project Path="Sample/MeetingsManagement/MeetingsManagement/MeetingsManagement.csproj" />
@@ -235,19 +235,19 @@
     <Project Path="Workshops/IntroductionToEventSourcing/01-EventsDefinition/01-EventsDefinition.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/02-GettingStateFromEvents/02-GettingStateFromEvents.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/03-AppendingEvents.Marten/03-AppendingEvents.Marten.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/04-AppendingEvents.EventStoreDB/04-AppendingEvents.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/04-AppendingEvents.KurrentDB/04-AppendingEvents.KurrentDB.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/05-GettingStateFromEvents.Marten/05-GettingStateFromEvents.Marten.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/06-GettingStateFromEvents.EventStoreDB/06-GettingStateFromEvents.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/06-GettingStateFromEvents.KurrentDB/06-GettingStateFromEvents.KurrentDB.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/07-BusinessLogic.Slimmed/07-BusinessLogic.Slimmed.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/07-BusinessLogic/07-BusinessLogic.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/08-ApplicationLogic.Marten.Tests/08-ApplicationLogic.Marten.Tests.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/08-ApplicationLogic.Marten/08-ApplicationLogic.Marten.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/09-ApplicationLogic.EventStoreDB.Tests/09-ApplicationLogic.EventStoreDB.Tests.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/09-ApplicationLogic.EventStoreDB/09-ApplicationLogic.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/09-ApplicationLogic.KurrentDB.Tests/09-ApplicationLogic.KurrentDB.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/09-ApplicationLogic.KurrentDB/09-ApplicationLogic.KurrentDB.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/10-OptimisticConcurrency.Marten.Tests/10-OptimisticConcurrency.Marten.Tests.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/10-OptimisticConcurrency.Marten/10-OptimisticConcurrency.Marten.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/11-OptimisticConcurrency.EventStoreDB.Tests/11-OptimisticConcurrency.EventStoreDB.Tests.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/11-OptimisticConcurrency.EventStoreDB/11-OptimisticConcurrency.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/11-OptimisticConcurrency.KurrentDB.Tests/11-OptimisticConcurrency.KurrentDB.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/11-OptimisticConcurrency.KurrentDB/11-OptimisticConcurrency.KurrentDB.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/12-Projections.SingleStream/12-Projections.SingleStream.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/13-Projections.SingleStream.Idempotency/13-Projections.SingleStream.Idempotency.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/14-Projections.SingleStream.EventualConsistency/14-Projections.SingleStream.EventualConsistency.csproj" />
@@ -268,19 +268,19 @@
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/01-EventsDefinition/01-EventsDefinition.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/02-GettingStateFromEvents/02-GettingStateFromEvents.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/03-AppendingEvents.Marten/03-AppendingEvents.Marten.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/Solved/04-AppendingEvents.EventStoreDB/04-AppendingEvents.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/04-AppendingEvents.KurrentDB/04-AppendingEvents.KurrentDB.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/05-GettingStateFromEvents.Marten/05-GettingStateFromEvents.Marten.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/Solved/06-GettingStateFromEvents.EventStoreDB/06-GettingStateFromEvents.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/06-GettingStateFromEvents.KurrentDB/06-GettingStateFromEvents.KurrentDB.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/07-BusinessLogic.Slimmed/07-BusinessLogic.Slimmed.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/07-BusinessLogic/07-BusinessLogic.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/08-ApplicationLogic.Marten.Tests/08-ApplicationLogic.Marten.Tests.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/08-ApplicationLogic.Marten/08-ApplicationLogic.Marten.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/Solved/09-ApplicationLogic.EventStoreDB.Tests/09-ApplicationLogic.EventStoreDB.Tests.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/Solved/09-ApplicationLogic.EventStoreDB/09-ApplicationLogic.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/09-ApplicationLogic.KurrentDB.Tests/09-ApplicationLogic.KurrentDB.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/09-ApplicationLogic.KurrentDB/09-ApplicationLogic.KurrentDB.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/10-OptimisticConcurrency.Marten.Tests/10-OptimisticConcurrency.Marten.Tests.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/10-OptimisticConcurrency.Marten/10-OptimisticConcurrency.Marten.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/Solved/11-OptimisticConcurrency.EventStoreDB.Tests/11-OptimisticConcurrency.EventStoreDB.Tests.csproj" />
-    <Project Path="Workshops/IntroductionToEventSourcing/Solved/11-OptimisticConcurrency.EventStoreDB/11-OptimisticConcurrency.EventStoreDB.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/11-OptimisticConcurrency.KurrentDB.Tests/11-OptimisticConcurrency.KurrentDB.Tests.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Solved/11-OptimisticConcurrency.KurrentDB/11-OptimisticConcurrency.KurrentDB.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/12-Projections.SingleStream/12-Projections.SingleStream.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/13-Projections.SingleStream.Idempotency/13-Projections.SingleStream.Idempotency.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/Solved/14-Projections.SingleStream.EventualConsistency/14-Projections.SingleStream.EventualConsistency.csproj" />

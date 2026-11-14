@@ -2,16 +2,16 @@
 
 # Practical Event Sourcing Workshop
 
-## Prerequisities
+## Prerequisites
 
 1. Install git - https://git-scm.com/downloads.
 2. Install .NET 10 - https://dotnet.microsoft.com/en-us/download/dotnet/10.0.
-3. Install Visual Studio 2019, Rider or VSCode.
-4. Install docker - https://docs.docker.com/docker-for-windows/install/.
+3. Install Visual Studio 2022, Rider or VSCode.
+4. Install docker - https://docs.docker.com/engine/install/.
 5. Make sure that you have ~10GB disk space.
 6. Create Github Account
 7. Clone Project https://github.com/oskardudycz/EventSourcing.NetCore, make sure that's compiling
-8. Check https://github.com/StackExchange/Dapper/, http://jasperfx.github.io/marten/documentation/
+8. Check [Marten documentation](https://martendb.io/).
 9. Open `PracticalEventSourcing.slnx` solution.
 10. Docker useful commands
 
@@ -22,7 +22,7 @@
     - `docker ps -a` - to show all dockers (also stopped)
 
 11. Go to [docker](./docker) and run: `docker compose up`.
-12. Wait until all dockers got are downloaded and running.
+12. Wait until all containers are downloaded and running.
 13. You should automatically get:
     - Postgres DB running
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
@@ -30,3 +30,5 @@
         - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
     - Kafka
     - Kafka ide for browsing topics. Available at: http://localhost:8080/ui/clusters/local/topics
+
+Alternatively, run the [ECommerce.AppHost](./ECommerce.AppHost/) project. It uses [.NET Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/) to start PostgreSQL with PgAdmin, Kafka, and the Carts, Payments and Orders APIs.

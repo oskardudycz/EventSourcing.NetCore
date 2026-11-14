@@ -13,6 +13,5 @@ You can watch the webinar on YouTube where I'm explaining the details of the imp
 <a href="https://www.youtube.com/watch?v=jnDchr5eabI&list=PLw-VZz_H4iiqUeEBDfGNendS0B3qIk-ps&index=1" target="_blank"><img src="https://img.youtube.com/vi/jnDchr5eabI/0.jpg" alt="Pragmatic Event Sourcing with Marten" width="640" height="480" border="10" /></a>
 
 or read the articles explaining this design:
-- [Event-driven projections in Marten explained](https://event-driven.io/en/projections_in_marten_explained/)
 - [Slim your aggregates with Event Sourcing!](https://event-driven.io/en/slim_your_entities_with_event_sourcing/?utm_source=event_sourcing_net)
-- [Event-driven projections in Marten explained](https://event-driven.io/pl/projections_in_marten_explained/?utm_source=event_sourcing_net)
+- [Event-driven projections in Marten explained](https://event-driven.io/en/projections_in_marten_explained/?utm_source=event_sourcing_net)

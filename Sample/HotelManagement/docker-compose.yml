@@ -25,42 +25,39 @@ services:
             - postgres
 
     #######################################################
-    #  EventStoreDB
+    #  KurrentDB
     #######################################################
-    eventstore.db:
-        image: eventstore/eventstore:22.10.1-buster-slim
+    kurrentdb:
+        image: kurrentplatform/kurrentdb:26.2.3
         # use this image if you're running ARM-based proc like Apple M1
-        # image: eventstore/eventstore:22.10.0-alpha-arm64v8
+        # image: kurrentplatform/kurrentdb:26.2.3-experimental-arm64-10.0-noble
         environment:
-            - EVENTSTORE_CLUSTER_SIZE=1
-            - EVENTSTORE_RUN_PROJECTIONS=All
-            - EVENTSTORE_START_STANDARD_PROJECTIONS=true
-            - EVENTSTORE_EXT_TCP_PORT=1113
-            - EVENTSTORE_HTTP_PORT=2113
-            - EVENTSTORE_INSECURE=true
-            - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
-            - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+            - KURRENTDB_CLUSTER_SIZE=1
+            - KURRENTDB_RUN_PROJECTIONS=All
+            - KURRENTDB_START_STANDARD_PROJECTIONS=true
+            - KURRENTDB_NODE_PORT=2113
+            - KURRENTDB_INSECURE=true
+            - KURRENTDB_ENABLE_ATOM_PUB_OVER_HTTP=true
         ports:
-            - '1113:1113'
             - '2113:2113'
         volumes:
             - type: volume
-              source: eventstore-volume-data
-              target: /var/lib/eventstore
+              source: kurrentdb-volume-data
+              target: /var/lib/kurrentdb
             - type: volume
-              source: eventstore-volume-logs
-              target: /var/log/eventstore
+              source: kurrentdb-volume-logs
+              target: /var/log/kurrentdb
         networks:
-            - eventstore.db
+            - kurrentdb
 
 networks:
     postgres:
         driver: bridge
-    eventstore.db:
+    kurrentdb:
         driver: bridge
 
 volumes:
     postgres:
     pgadmin:
-    eventstore-volume-data:
-    eventstore-volume-logs:
+    kurrentdb-volume-data:
+    kurrentdb-volume-logs:

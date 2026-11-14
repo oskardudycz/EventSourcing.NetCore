@@ -1,6 +1,7 @@
 <Solution>
-  <Project Path="ECommerce.ApiService/ECommerce.ApiService.csproj" />
+  <Project Path="Carts/Carts.Api/Carts.Api.csproj" />
   <Project Path="ECommerce.AppHost/ECommerce.AppHost.csproj" />
   <Project Path="ECommerce.ServiceDefaults/ECommerce.ServiceDefaults.csproj" />
-  <Project Path="ECommerce.Web/ECommerce.Web.csproj" />
+  <Project Path="Orders/Orders.Api/Orders.Api.csproj" />
+  <Project Path="Payments/Payments.Api/Payments.Api.csproj" />
 </Solution>

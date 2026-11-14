@@ -13,6 +13,8 @@
   - [Downcasters](#downcasters)
   - [Events Transformations](#events-transformations)
   - [Stream Transformation](#stream-transformation)
+  - [Explicit serialisation](#explicit-serialisation)
+  - [Contract testing](#contract-testing)
   - [Migrations](#migrations)
   - [Summary](#summary)
 
@@ -140,7 +142,7 @@ public class ShoppingCartOpened
 
 We'll either use the new property name or, if it's not available, then an old one. The downside is that we had to pollute our code with additional fields and nullable markers. As always, pick your poison.
 
-See full sample: [NewRequiredProperty.cs](./EventsVersioning.Tests/SimpleMappings/NewRequiredProperty.cs).
+See full sample: [RenamedProperty.cs](./EventsVersioning.Tests/SimpleMappings/RenamedProperty.cs).
 
 ## Upcasting
 
@@ -289,7 +291,7 @@ public static V1.ShoppingCartOpened Downcast(
 }
 ```
 
-See full sample: [ChangedStructure.cs](./EventsVersioning.Tests/Upcasters/ChangedStructure.cs).
+See full sample: [ChangedStructure.cs](./EventsVersioning.Tests/Downcasters/ChangedStructure.cs).
 
 ## Events Transformations
 
@@ -386,9 +388,9 @@ var mapping = new EventTypeMapping()
     );
 ```
 
-See details in [EventTypeMapping](./EventsVersioning.Tests/Transformations/MultipleTransformationsWithDifferentEventTypes.cs).
+See details of `EventTypeMapping` in [MultipleTransformationsWithDifferentEventTypes.cs](./EventsVersioning.Tests/Transformations/MultipleTransformationsWithDifferentEventTypes.cs).
 
-It's the most straightforward wrapper that requires manual mapping for all the event types, but it benefits from being explicit and less error-prone. For the convention-based mapper, there is a risk that refactoring accidentally changes the event type name stored in the event store. Still, a viable option is a mixed solution. See more in [EventTypeMapper in the Core project](../../Events/EventTypeMapper.cs)
+It's the most straightforward wrapper that requires manual mapping for all the event types, but it benefits from being explicit and less error-prone. For the convention-based mapper, there is a risk that refactoring accidentally changes the event type name stored in the event store. Still, a viable option is a mixed solution. See more in [EventTypeMapper in the Core project](../../Core/Events/EventTypeMapper.cs)
 
 Having those classes, we can define the final deserialisation logic.
 
@@ -588,13 +590,24 @@ private EventData ToShoppingCartInitializedWithProducts(
 
 See a full sample in [StreamTransformations.cs](./EventsVersioning.Tests/Transformations/StreamTransformations.cs).
 
+## Explicit serialisation
+
+Instead of relying on the serialiser conventions, you can map events to JSON and back by hand. Then renaming a class or a property doesn't change the stored payload, and each change of the stored shape is visible in the mapping code. [ShoppingCartEventsSerde](./EventsVersioning.Tests/ExplicitSerialization/ShoppingCart.cs) serialises events with strongly typed values (e.g. `ShoppingCartId`, `Quantity`, `Money`) to `JsonObject` and deserialises them based on the event type name.
+
+See a full sample in [ExplicitSerializationTests.cs](./EventsVersioning.Tests/ExplicitSerialization/ExplicitSerializationTests.cs).
+
+## Contract testing
+
+Versioning patterns help only if you notice that the event schema changed. Snapshot tests store the serialised event and fail when it changes, so the change can't be made by accident.
+
+- [EventsSnapshotTests.cs](./EventsVersioning.Tests/SnapshotTesting/EventsSnapshotTests.cs) uses [Verify](https://github.com/VerifyTests/Verify) to compare the serialised event with the stored snapshot, both with complete and with only required data.
+- [PackageSnapshotTests.cs](./EventsVersioning.Tests/SnapshotTesting/PackageSnapshotTests.cs) uses [PublicApiGenerator](https://github.com/PublicApiGenerator/PublicApiGenerator) to store the public API of the [ECommerce.V1](./ECommerce.V1/) events assembly, so changing the events' shape fails the test.
+
 ## Migrations
 
 You can say that, well, those patterns are not migrations. Events will stay as they were, and you'll have to keep the old structure forever. That's quite true. Still, this is fine, as typically, you should not change the past. Having precise information, even including bugs, is a valid scenario. It allows you to get insights and see the precise history. However, pragmatically you may sometimes want to have a "clean" event log with only a new schema.
 
-It appears that composing the patterns described above can support such a case. For example, if you're running EventStoreDB or Marten, you can read/subscribe to the event stream, store events in the new stream, or even a new EventStoreDB cluster or Postgres schema. Having that, you could even rewrite the whole log and switch databases once the new one caught up.
-
-I hope that those samples will show you that you can support many versioning scenarios with basic composition techniques.
+It appears that composing the patterns described above can support such a case. For example, if you're running KurrentDB or Marten, you can read/subscribe to the event stream, store events in the new stream, or even a new KurrentDB cluster or Postgres schema. Having that, you could even rewrite the whole log and switch databases once the new one caught up.
 
 ![migrations](./assets/migration.png)
 

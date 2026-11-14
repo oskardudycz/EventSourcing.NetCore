@@ -28,7 +28,7 @@ We still need to support regular checkouts, payments, charges etc. as we do righ
 - Define the Group Checkout entity in `GroupCheckouts/GroupCheckout.cs` and fill application logic in [GroupCheckoutFacade](./Version1-Aggregates/GroupCheckouts/GroupCheckoutFacade.cs), using the [in-memory database](./Core/Database.cs) and [in-memory message bus](./Core/MessageBus.cs) to store changes and publish events as the outcome of business logic,
 - Configure message handling in `GroupCheckoutsConfig` and `GuestStayAccountsConfig` by subscribing to commands and events on the message bus (think about them as setup called once upon application startup),
 - You can use any preferred style of implementing process coordination,
-- Use `BusinessProcessTests` to guide you and verify if you implemented it correctly.
+- Use `BusinessProcessTests` ([Aggregates](./Version1-Aggregates/BusinessProcessTests.cs), [Immutable Entities](./Version2-ImmutableEntities/BusinessProcessTests.cs)) and the group checkout `EntityDefinitionTests` ([Aggregates](./Version1-Aggregates/GroupCheckouts/EntityDefinitionTests.cs), [Immutable Entities](./Version2-ImmutableEntities/GroupCheckouts/EntityDefinitionTests.cs)) to guide you and verify if you implemented it correctly.
 
 ### Commands and events on one message bus
 
