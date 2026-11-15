@@ -1,5 +1,5 @@
 using System.Text.Json;
-using FluentAssertions;
+using Shouldly;
 using Tickets.Reservations;
 using Tickets.Tests.Stubs.Reservations;
 using Xunit;
@@ -17,10 +17,10 @@ public class ReservationSerializationTests
 
         var restored = JsonSerializer.Deserialize<Reservation>(JsonSerializer.Serialize(reservation))!;
 
-        restored.Id.Should().Be(reservation.Id);
-        restored.SeatId.Should().Be(reservation.SeatId);
-        restored.Number.Should().Be(reservation.Number);
-        restored.Status.Should().Be(ReservationStatus.Confirmed);
-        restored.DequeueUncommittedEvents().Should().BeEmpty();
+        restored.Id.ShouldBe(reservation.Id);
+        restored.SeatId.ShouldBe(reservation.SeatId);
+        restored.Number.ShouldBe(reservation.Number);
+        restored.Status.ShouldBe(ReservationStatus.Confirmed);
+        restored.DequeueUncommittedEvents().ShouldBeEmpty();
     }
 }

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace EventsDefinition;
@@ -19,8 +19,8 @@ public class EventsDefinitionTests
 
         // Then
         const int expectedEventTypesCount = 5;
-        events.Should().HaveCount(expectedEventTypesCount);
-        events.GroupBy(e => e.GetType()).Should().HaveCount(expectedEventTypesCount);
+        events.Count().ShouldBe(expectedEventTypesCount);
+        events.GroupBy(e => e.GetType()).Count().ShouldBe(expectedEventTypesCount);
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class EventsDefinitionTests
 
         // Then
         const int expectedEventTypesCount = 5;
-        events.Should().HaveCount(expectedEventTypesCount);
-        events.GroupBy(e => e.GetType()).Should().HaveCount(expectedEventTypesCount);
+        events.Count().ShouldBe(expectedEventTypesCount);
+        events.GroupBy(e => e.GetType()).Count().ShouldBe(expectedEventTypesCount);
     }
 }

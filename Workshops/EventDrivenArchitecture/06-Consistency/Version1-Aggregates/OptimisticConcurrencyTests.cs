@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Consistency.Core;
 using Consistency.Version1_Aggregates.GroupCheckouts;
 using Consistency.Version1_Aggregates.GuestStayAccounts;
@@ -28,7 +28,7 @@ public class OptimisticConcurrencyTests
         await InParallel(Enumerable.Range(0, 5).Select(_ => (Func<ValueTask>)(() => groupCheckoutFacade.InitiateGroupCheckout(command))));
 
         // Then
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveSingleMessage(new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
     }
 
@@ -47,7 +47,7 @@ public class OptimisticConcurrencyTests
         ));
 
         // Then
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveMessagesInAnyOrder([
             ..guestStays.Select(guestStayId => new GuestCheckoutCompleted(groupCheckoutId, guestStayId, now)),
             new GroupCheckoutCompleted(groupCheckoutId, guestStays, now)
@@ -76,7 +76,7 @@ public class OptimisticConcurrencyTests
         ]);
 
         // Then
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveMessagesInAnyOrder([
             new GroupCheckoutEvent.GuestCheckOutFailed(groupCheckoutId, failedGuestStay, now),
             ..completedGuestStays.Select(guestStayId => new GuestCheckoutCompleted(groupCheckoutId, guestStayId, now)),
@@ -94,15 +94,15 @@ public class OptimisticConcurrencyTests
         await InParallel(amounts.Select(amount => (Func<ValueTask>)(() =>
             guestStayFacade.RecordCharge(new RecordCharge(guestStayId, amount, now))
         )));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, amounts.Sum(), now));
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, amounts.Sum(), now), TestContext.Current.CancellationToken);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.Reset();
 
         // When
-        await guestStayFacade.CheckOutGuest(new CheckOutGuest(guestStayId, now));
+        await guestStayFacade.CheckOutGuest(new CheckOutGuest(guestStayId, now), TestContext.Current.CancellationToken);
 
         // Then
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayId, now));
     }
 
@@ -119,15 +119,15 @@ public class OptimisticConcurrencyTests
         ], ignoring: typeof(InvalidOperationException));
 
         // Then
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         var publishedTypes = publishedMessages.Published.Select(message => message.GetType()).ToArray();
         Type[] checkedOutBeforeCharge = [typeof(GuestCheckedOut)];
         Type[] chargedBeforeCheckout = [typeof(ChargeRecorded), typeof(GuestStayAccountEvent.GuestCheckOutFailed)];
 
-        publishedTypes.Should().Match<Type[]>(types =>
-            types.ToHashSet().SetEquals(checkedOutBeforeCharge) && types.Length == checkedOutBeforeCharge.Length ||
-            types.ToHashSet().SetEquals(chargedBeforeCheckout) && types.Length == chargedBeforeCheckout.Length
-        );
+        (
+            publishedTypes.ToHashSet().SetEquals(checkedOutBeforeCharge) && publishedTypes.Length == checkedOutBeforeCharge.Length ||
+            publishedTypes.ToHashSet().SetEquals(chargedBeforeCheckout) && publishedTypes.Length == chargedBeforeCheckout.Length
+        ).ShouldBeTrue();
     }
 
     private async Task<Guid> InitiateGroupCheckout(Guid[] guestStays)

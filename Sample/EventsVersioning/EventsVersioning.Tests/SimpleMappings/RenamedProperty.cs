@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using FluentAssertions;
+using Shouldly;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using V1 = ECommerce.V1;
 
@@ -27,9 +27,9 @@ public class RenamedProperty
         // When
         var @event = JsonSerializer.Deserialize<ShoppingCartOpened>(json);
 
-        @event.Should().NotBeNull();
-        @event!.CartId.Should().Be(oldEvent.ShoppingCartId);
-        @event.ClientId.Should().Be(oldEvent.ClientId);
+        @event.ShouldNotBeNull();
+        @event!.CartId.ShouldBe(oldEvent.ShoppingCartId);
+        @event.ClientId.ShouldBe(oldEvent.ClientId);
     }
 
     [Fact]
@@ -42,8 +42,8 @@ public class RenamedProperty
         // When
         var oldEvent = JsonSerializer.Deserialize<V1.ShoppingCartOpened>(json);
 
-        oldEvent.Should().NotBeNull();
-        oldEvent!.ShoppingCartId.Should().Be(@event.CartId);
-        oldEvent.ClientId.Should().Be(@event.ClientId);
+        oldEvent.ShouldNotBeNull();
+        oldEvent!.ShoppingCartId.ShouldBe(@event.CartId);
+        oldEvent.ClientId.ShouldBe(@event.ClientId);
     }
 }

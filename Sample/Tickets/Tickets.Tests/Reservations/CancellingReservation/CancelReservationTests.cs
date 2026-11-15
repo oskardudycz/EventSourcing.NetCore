@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Tickets.Reservations;
 using Tickets.Reservations.CancellingReservation;
 using Tickets.Tests.Builders;
@@ -22,13 +22,13 @@ public class CancelReservationTests
         reservation.Cancel();
 
         // Then
-        reservation.Status.Should().Be(ReservationStatus.Cancelled);
+        reservation.Status.ShouldBe(ReservationStatus.Cancelled);
 
         var @event = reservation.PublishedEvent<ReservationCancelled>();
 
-        @event.Should().NotBeNull();
-        @event.Should().BeOfType<ReservationCancelled>();
-        @event!.ReservationId.Should().Be(reservation.Id);
+        @event.ShouldNotBeNull();
+        @event.ShouldBeOfType<ReservationCancelled>();
+        @event!.ReservationId.ShouldBe(reservation.Id);
     }
 
     [Fact]

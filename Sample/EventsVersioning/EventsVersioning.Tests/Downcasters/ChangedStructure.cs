@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using FluentAssertions;
+using Shouldly;
 using V1 = ECommerce.V1;
 
 namespace EventsVersioning.Tests.Downcasters;
@@ -50,9 +50,9 @@ public static V1.ShoppingCartOpened Downcast(
         // When
         var @event = Downcast(newEvent);
 
-        @event.Should().NotBeNull();
-        @event.ShoppingCartId.Should().Be(newEvent.ShoppingCartId);
-        @event.ClientId.Should().Be(newEvent.Client.Id);
+        @event.ShouldNotBeNull();
+        @event.ShoppingCartId.ShouldBe(newEvent.ShoppingCartId);
+        @event.ClientId.ShouldBe(newEvent.Client.Id);
     }
 
     [Fact]
@@ -68,8 +68,8 @@ public static V1.ShoppingCartOpened Downcast(
             JsonSerializer.Serialize(newEvent)
         );
 
-        @event.Should().NotBeNull();
-        @event.ShoppingCartId.Should().Be(newEvent.ShoppingCartId);
-        @event.ClientId.Should().Be(newEvent.Client.Id);
+        @event.ShouldNotBeNull();
+        @event.ShoppingCartId.ShouldBe(newEvent.ShoppingCartId);
+        @event.ClientId.ShouldBe(newEvent.Client.Id);
     }
 }

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Tickets.Reservations;
 using Tickets.Tests.Extensions.Reservations;
 using Tickets.Tests.Stubs.Reservations;
@@ -24,7 +24,7 @@ public class CreateTentativeReservationTests
         );
 
         // Then
-        numberGenerator.LastGeneratedNumber.Should().NotBeNull();
+        numberGenerator.LastGeneratedNumber.ShouldNotBeNull();
 
         reservation
             .IsTentativeReservationWith(

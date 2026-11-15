@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using FluentAssertions;
+using Shouldly;
 using V1 = ECommerce.V1;
 
 namespace EventsVersioning.Tests.Upcasters;
@@ -51,10 +51,10 @@ public class NewRequiredPropertyFromMetadata
         // When
         var @event = Upcast(oldEvent, eventMetadata);
 
-        @event.Should().NotBeNull();
-        @event.ShoppingCartId.Should().Be(oldEvent.ShoppingCartId);
-        @event.ClientId.Should().Be(oldEvent.ClientId);
-        @event.InitializedBy.Should().Be(eventMetadata.UserId);
+        @event.ShouldNotBeNull();
+        @event.ShoppingCartId.ShouldBe(oldEvent.ShoppingCartId);
+        @event.ClientId.ShouldBe(oldEvent.ClientId);
+        @event.InitializedBy.ShouldBe(eventMetadata.UserId);
     }
 
     [Fact]
@@ -70,9 +70,9 @@ public class NewRequiredPropertyFromMetadata
             JsonSerializer.Serialize(eventMetadata)
         );
 
-        @event.Should().NotBeNull();
-        @event.ShoppingCartId.Should().Be(oldEvent.ShoppingCartId);
-        @event.ClientId.Should().Be(oldEvent.ClientId);
-        @event.InitializedBy.Should().Be(eventMetadata.UserId);
+        @event.ShouldNotBeNull();
+        @event.ShoppingCartId.ShouldBe(oldEvent.ShoppingCartId);
+        @event.ClientId.ShouldBe(oldEvent.ClientId);
+        @event.InitializedBy.ShouldBe(eventMetadata.UserId);
     }
 }

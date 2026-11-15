@@ -5,5 +5,8 @@
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
       <ImplicitUsings>enable</ImplicitUsings>
       <LangVersion>latest</LangVersion>
+      <Verify_SponsorshipExemption>OpenSource</Verify_SponsorshipExemption>
+      <Verify_SponsorshipExemptionUntil>2027-11</Verify_SponsorshipExemptionUntil>
+      <TestingPlatformCommandLineArguments>$(TestingPlatformCommandLineArguments) --ignore-exit-code 8</TestingPlatformCommandLineArguments>
   </PropertyGroup>
 </Project>

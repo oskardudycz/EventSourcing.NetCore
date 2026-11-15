@@ -1,23 +1,41 @@
-version: "3"
+name: eventsourcing
+
 services:
+    #######################################################
+    #  PostgreSQL
+    #######################################################
     postgres:
-        image: clkao/postgres-plv8
-        container_name: postgres
+        profiles: [ postgres, postgres-all, all, all-no-ui, ci, sample ]
+        image: postgres:18.7-alpine
         environment:
-            POSTGRES_PASSWORD: Password12!
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
         ports:
-            - "5432:5432"
+            - '${POSTGRES_PORT:-5432}:5432'
+        volumes:
+            - postgres-data:/var/lib/postgresql
+        healthcheck:
+            test: pg_isready -U postgres -d postgres
+            interval: 5s
+            timeout: 10s
+            retries: 100
         networks:
             - postgres
 
     pgadmin:
-        image: dpage/pgadmin4
-        container_name: pgadmin_container
+        profiles: [ postgres-ui, postgres-all, all ]
+        image: dpage/pgadmin4:9.19
         environment:
-            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.org}
             PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+            PGADMIN_CONFIG_SERVER_MODE: 'False'
         ports:
-            - "${PGADMIN_PORT:-5050}:80"
+            - '${PGADMIN_PORT:-5050}:80'
+        volumes:
+            - pgadmin-data:/var/lib/pgadmin
+        depends_on:
+            - postgres
         networks:
             - postgres
 
@@ -25,9 +43,9 @@ services:
     #  KurrentDB
     #######################################################
     kurrentdb:
-        image: kurrentplatform/kurrentdb:26.2.3
-        # use this image if you're running ARM-based proc like Apple M1
-        # image: kurrentplatform/kurrentdb:26.2.3-experimental-arm64-10.0-noble
+        profiles: [ kurrentdb, kurrentdb-all, all, all-no-ui, ci, sample ]
+        image: ${KURRENTDB_IMAGE:-kurrentplatform/kurrentdb:26.2.3}
+        # on ARM (e.g. Apple Silicon) run: KURRENTDB_IMAGE=kurrentplatform/kurrentdb:26.2.3-experimental-arm64-10.0-noble docker compose --profile all up
         environment:
             - KURRENTDB_CLUSTER_SIZE=1
             - KURRENTDB_RUN_PROJECTIONS=All
@@ -36,14 +54,12 @@ services:
             - KURRENTDB_INSECURE=true
             - KURRENTDB_ENABLE_ATOM_PUB_OVER_HTTP=true
         ports:
-            - '2113:2113'
+            - '${KURRENTDB_PORT:-2113}:2113'
         volumes:
-            - type: volume
-              source: kurrentdb-volume-data
-              target: /var/lib/kurrentdb
-            - type: volume
-              source: kurrentdb-volume-logs
-              target: /var/log/kurrentdb
+            - kurrentdb-data:/var/lib/kurrentdb
+            - kurrentdb-logs:/var/log/kurrentdb
+        networks:
+            - kurrentdb
 
 networks:
     postgres:
@@ -52,7 +68,7 @@ networks:
         driver: bridge
 
 volumes:
-    postgres:
-    pgadmin:
-    kurrentdb-volume-data:
-    kurrentdb-volume-logs:
+    postgres-data:
+    pgadmin-data:
+    kurrentdb-data:
+    kurrentdb-logs:

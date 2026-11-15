@@ -1,6 +1,7 @@
+using Core.Testing.Fixtures;
 using Weasel.Core;
 using JasperFx.Events.Projections;
-using FluentAssertions;
+using Shouldly;
 using JasperFx;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
@@ -223,7 +224,7 @@ public class Reservation: Aggregate<ReservationId, Guid>
     }
 }
 
-public class CompositeIdsTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
+public class CompositeIdsTests(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString)
 {
     private const string FirstTenant = "Tenant1";
     private const string SecondTenant = "Tenant2";
@@ -256,30 +257,30 @@ public class CompositeIdsTests(MartenFixture fixture): MartenTest(fixture.Postgr
         //1. Create events
         EventStore.Append(reservation.AggregateId, @event);
 
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         //2. Get live aggregation
-        var issuesListFromLiveAggregation = await EventStore.AggregateStreamAsync<Reservation>(reservation.AggregateId);
+        var issuesListFromLiveAggregation = await EventStore.AggregateStreamAsync<Reservation>(reservation.AggregateId, token: TestContext.Current.CancellationToken);
 
         //3. Get inline aggregation
-        var issuesListFromInlineAggregation = await Session.LoadAsync<Reservation>(reservation.AggregateId);
+        var issuesListFromInlineAggregation = await Session.LoadAsync<Reservation>(reservation.AggregateId, TestContext.Current.CancellationToken);
 
         //4. Get inline aggregation through linq
         var reservationId = reservation.Id;
 
         var issuesListFromInlineAggregationFromLinq =
-            await Session.Query<Reservation>().SingleOrDefaultAsync(r => r.Id.Value == reservationId.Value);
+            await Session.Query<Reservation>().SingleOrDefaultAsync(r => r.Id.Value == reservationId.Value, token: TestContext.Current.CancellationToken);
         var issuesListFromInlineAggregationFromLinqWithAggregateId = await Session.Query<Reservation>()
-            .SingleOrDefaultAsync(r => r.AggregateId == reservationId.Value);
+            .SingleOrDefaultAsync(r => r.AggregateId == reservationId.Value, token: TestContext.Current.CancellationToken);
 
-        issuesListFromLiveAggregation.Should().NotBeNull();
-        issuesListFromInlineAggregation.Should().NotBeNull();
-        issuesListFromInlineAggregationFromLinq.Should().NotBeNull();
-        issuesListFromInlineAggregationFromLinqWithAggregateId.Should().NotBeNull();
+        issuesListFromLiveAggregation.ShouldNotBeNull();
+        issuesListFromInlineAggregation.ShouldNotBeNull();
+        issuesListFromInlineAggregationFromLinq.ShouldNotBeNull();
+        issuesListFromInlineAggregationFromLinqWithAggregateId.ShouldNotBeNull();
 
-        issuesListFromLiveAggregation!.AggregateId.Should().Be(reservationId.Value);
-        issuesListFromLiveAggregation.AggregateId.Should().Be(reservationId.Value);
-        issuesListFromInlineAggregationFromLinq!.AggregateId.Should().Be(reservationId.Value);
-        issuesListFromInlineAggregationFromLinqWithAggregateId!.AggregateId.Should().Be(reservationId.Value);
+        issuesListFromLiveAggregation!.AggregateId.ShouldBe(reservationId.Value);
+        issuesListFromLiveAggregation.AggregateId.ShouldBe(reservationId.Value);
+        issuesListFromInlineAggregationFromLinq!.AggregateId.ShouldBe(reservationId.Value);
+        issuesListFromInlineAggregationFromLinqWithAggregateId!.AggregateId.ShouldBe(reservationId.Value);
     }
 }

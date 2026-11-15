@@ -1,6 +1,6 @@
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
-using FluentAssertions;
+using Shouldly;
 using Ogooreck.API;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
@@ -31,10 +31,10 @@ public class CancelShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>((details, ctx) =>
                 {
-                    details.Id.Should().Be(ctx.OpenedShoppingCartId());
-                    details.Status.Should().Be(ShoppingCartStatus.Canceled);
-                    details.ProductItems.Should().BeEmpty();
-                    details.ClientId.Should().Be(ClientId);
-                    details.Version.Should().Be(1);
+                    details.Id.ShouldBe(ctx.OpenedShoppingCartId());
+                    details.Status.ShouldBe(ShoppingCartStatus.Canceled);
+                    details.ProductItems.ShouldBeEmpty();
+                    details.ClientId.ShouldBe(ClientId);
+                    details.Version.ShouldBe(1);
                 }));
 }

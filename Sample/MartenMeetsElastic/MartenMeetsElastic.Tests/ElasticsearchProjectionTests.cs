@@ -1,7 +1,8 @@
 using Core.ElasticSearch.Indices;
+using Core.Testing.Fixtures;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
-using FluentAssertions;
+using Shouldly;
 using JasperFx.Core;
 using Marten;
 using JasperFx.Events;
@@ -92,7 +93,8 @@ public class OrderProjection: ElasticsearchProjection<Order>
         };
 }
 
-public class MeetsElasticTest: MartenMeetsElasticTest
+public class MeetsElasticTest(PostgresContainerFixture postgres, ElasticsearchContainerFixture elasticsearch)
+    : MartenMeetsElasticTest(postgres, elasticsearch)
 {
     protected override void Options(StoreOptions options)
     {
@@ -122,8 +124,8 @@ public class MeetsElasticTest: MartenMeetsElasticTest
                     .Query(q => q.Ids(new IdsQuery { Values = new Ids("order1") }))
                 );
 
-                searchResponse.IsValidResponse.Should().BeTrue();
-                searchResponse.Documents.Should().HaveCount(1);
+                searchResponse.IsValidResponse.ShouldBeTrue();
+                searchResponse.Documents.Count().ShouldBe(1);
             });
     }
 }

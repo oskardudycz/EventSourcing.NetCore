@@ -1,7 +1,7 @@
 using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
-using FluentAssertions;
+using Shouldly;
 using Ogooreck.API;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
@@ -26,11 +26,11 @@ public class OpenShoppingCartTests(ApiFixture fixture): ApiTest(fixture)
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>((details, ctx) =>
                 {
-                    details.Id.Should().Be(ctx.GetCreatedId<Guid>());
-                    details.Status.Should().Be(ShoppingCartStatus.Pending);
-                    details.ProductItems.Should().BeEmpty();
-                    details.ClientId.Should().Be(ClientId);
-                    details.Version.Should().Be(1);
+                    details.Id.ShouldBe(ctx.GetCreatedId<Guid>());
+                    details.Status.ShouldBe(ShoppingCartStatus.Pending);
+                    details.ProductItems.ShouldBeEmpty();
+                    details.ClientId.ShouldBe(ClientId);
+                    details.Version.ShouldBe(1);
                 }));
 
     public readonly Guid ClientId = Guid.CreateVersion7();

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace IntroductionToEventSourcing.EventsDefinition.Solution2;
@@ -113,7 +113,7 @@ public class EventsDefinitionTests
         };
 
         const int expectedEventTypesCount = 5;
-        events.Should().HaveCount(expectedEventTypesCount);
-        events.GroupBy(e => e.GetType()).Should().HaveCount(expectedEventTypesCount);
+        events.Count().ShouldBe(expectedEventTypesCount);
+        events.GroupBy(e => e.GetType()).Count().ShouldBe(expectedEventTypesCount);
     }
 }

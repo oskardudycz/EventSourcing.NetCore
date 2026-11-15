@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Tickets.Reservations.ChangingReservationSeat;
 using Tickets.Tests.Builders;
 using Tickets.Tests.Extensions;
@@ -23,13 +23,13 @@ public class ChangeSeatTests
         reservation.ChangeSeat(newSeatId);
 
         // Then
-        reservation.SeatId.Should().Be(newSeatId);
+        reservation.SeatId.ShouldBe(newSeatId);
 
         var @event = reservation.PublishedEvent<ReservationSeatChanged>();
 
-        @event.Should().NotBeNull();
-        @event.Should().BeOfType<ReservationSeatChanged>();
-        @event!.ReservationId.Should().Be(reservation.Id);
-        @event.SeatId.Should().Be(newSeatId);
+        @event.ShouldNotBeNull();
+        @event.ShouldBeOfType<ReservationSeatChanged>();
+        @event!.ReservationId.ShouldBe(reservation.Id);
+        @event.SeatId.ShouldBe(newSeatId);
     }
 }

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -43,8 +43,8 @@ public class Exercise02CreateEventsTable: IDisposable
     {
         var streamsTable = schemaProvider.GetTable(EventsTableName);
 
-        streamsTable.Should().NotBeNull();
-        streamsTable!.Name.Should().Be(EventsTableName);
+        streamsTable.ShouldNotBeNull();
+        streamsTable!.Name.ShouldBe(EventsTableName);
     }
 
     /// <summary>
@@ -58,9 +58,9 @@ public class Exercise02CreateEventsTable: IDisposable
             .GetTable(EventsTableName)?
             .GetColumn(IdColumnName);
 
-        idColumn.Should().NotBeNull();
-        idColumn!.Name.Should().Be(IdColumnName);
-        idColumn.Type.Should().Be(Column.GuidType);
+        idColumn.ShouldNotBeNull();
+        idColumn!.Name.ShouldBe(IdColumnName);
+        idColumn.Type.ShouldBe(Column.GuidType);
     }
 
     /// <summary>
@@ -74,9 +74,9 @@ public class Exercise02CreateEventsTable: IDisposable
             .GetTable(EventsTableName)?
             .GetColumn(DataColumnName);
 
-        dataColumn.Should().NotBeNull();
-        dataColumn!.Name.Should().Be(DataColumnName);
-        dataColumn.Type.Should().Be(Column.JsonType);
+        dataColumn.ShouldNotBeNull();
+        dataColumn!.Name.ShouldBe(DataColumnName);
+        dataColumn.Type.ShouldBe(Column.JsonType);
     }
 
     /// <summary>
@@ -90,9 +90,9 @@ public class Exercise02CreateEventsTable: IDisposable
             .GetTable(EventsTableName)?
             .GetColumn(StreamIdColumnName);
 
-        dataColumn.Should().NotBeNull();
-        dataColumn!.Name.Should().Be(StreamIdColumnName);
-        dataColumn.Type.Should().Be(Column.GuidType);
+        dataColumn.ShouldNotBeNull();
+        dataColumn!.Name.ShouldBe(StreamIdColumnName);
+        dataColumn.Type.ShouldBe(Column.GuidType);
     }
 
     /// <summary>
@@ -106,9 +106,9 @@ public class Exercise02CreateEventsTable: IDisposable
             .GetTable(EventsTableName)?
             .GetColumn(TypeColumnName);
 
-        typeColumn.Should().NotBeNull();
-        typeColumn!.Name.Should().Be(TypeColumnName);
-        typeColumn.Type.Should().Be(Column.StringType);
+        typeColumn.ShouldNotBeNull();
+        typeColumn!.Name.ShouldBe(TypeColumnName);
+        typeColumn.Type.ShouldBe(Column.StringType);
     }
 
     /// <summary>
@@ -122,9 +122,9 @@ public class Exercise02CreateEventsTable: IDisposable
             .GetTable(EventsTableName)?
             .GetColumn(VersionColumnName);
 
-        versionColumn.Should().NotBeNull();
-        versionColumn!.Name.Should().Be(VersionColumnName);
-        versionColumn.Type.Should().Be(Column.LongType);
+        versionColumn.ShouldNotBeNull();
+        versionColumn!.Name.ShouldBe(VersionColumnName);
+        versionColumn.Type.ShouldBe(Column.LongType);
     }
 
     /// <summary>
@@ -138,9 +138,9 @@ public class Exercise02CreateEventsTable: IDisposable
             .GetTable(EventsTableName)?
             .GetColumn(CreatedColumnName);
 
-        createdColumn.Should().NotBeNull();
-        createdColumn!.Name.Should().Be(CreatedColumnName);
-        createdColumn.Type.Should().Be(Column.DateTimeType);
+        createdColumn.ShouldNotBeNull();
+        createdColumn!.Name.ShouldBe(CreatedColumnName);
+        createdColumn.Type.ShouldBe(Column.DateTimeType);
     }
 
     /// <summary>

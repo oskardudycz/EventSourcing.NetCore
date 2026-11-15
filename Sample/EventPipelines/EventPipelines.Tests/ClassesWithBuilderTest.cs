@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using Xunit;
 
 namespace EventPipelines.Tests;
@@ -95,10 +95,10 @@ public class ClassesWithBuilderTest
 
         await eventBus.Publish(new UserAdded("Big", "Bird", true), CancellationToken.None);
 
-        adminStorage.AdminsInTenants.Should().HaveCount(3);
-        adminStorage.GlobalAdmins.Should().HaveCount(1);
+        adminStorage.AdminsInTenants.Count().ShouldBe(3);
+        adminStorage.GlobalAdmins.Count().ShouldBe(1);
 
-        adminStorage.GlobalAdmins.Single().FirstName.Should().Be("Big");
-        adminStorage.GlobalAdmins.Single().LastName.Should().Be("Bird");
+        adminStorage.GlobalAdmins.Single().FirstName.ShouldBe("Big");
+        adminStorage.GlobalAdmins.Single().LastName.ShouldBe("Bird");
     }
 }

@@ -8,8 +8,9 @@ using Core.KurrentDB.Events;
 using Core.KurrentDB.Subscriptions;
 using Core.OpenTelemetry;
 using Core.Testing;
+using Core.Testing.Fixtures;
 using KurrentDB.Client;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
@@ -28,7 +29,7 @@ public class KurrentDBAsyncCommandBusTests
     private readonly KurrentDBClient kurrentDBClient;
     private readonly IHostedService subscriptionToAll;
 
-    public KurrentDBAsyncCommandBusTests()
+    public KurrentDBAsyncCommandBusTests(KurrentDBContainerFixture kurrentDB)
     {
         var services = new ServiceCollection();
 
@@ -44,7 +45,7 @@ public class KurrentDBAsyncCommandBusTests
                 )
             )
             .AddCoreServices()
-            .AddKurrentDB(new KurrentDBConfig { ConnectionString = "kurrentdb://localhost:2113?tls=false" })
+            .AddKurrentDB(new KurrentDBConfig { ConnectionString = kurrentDB.ConnectionString })
             .AddKurrentDBSubscriptionToAll<EventBusBatchHandler>("AsyncCommandBusTest")
             .AddCommandHandler<AddUser, AddUserCommandHandler>(
                 _ => new AddUserCommandHandler(userIds)
@@ -82,12 +83,12 @@ public class KurrentDBAsyncCommandBusTests
         await eventListener.WaitForProcessing(command, ct);
 
         var commands = await kurrentDBClient.ReadStream(KurrentDBAsyncCommandBus.CommandsStreamId, ct);
-        commands.Should().HaveCountGreaterThanOrEqualTo(1);
+        commands.Count().ShouldBeGreaterThanOrEqualTo(1);
         commands.OfType<AddUser>()
             .Count(e => e.UserId == userId)
-            .Should().Be(1);
+            .ShouldBe(1);
 
-        userIds.Should().Contain(userId);
+        userIds.ShouldContain(userId);
     }
 }
 

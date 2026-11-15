@@ -1,6 +1,6 @@
 ﻿using V1 = ECommerce.V1;
 using System.Text.Json;
-using FluentAssertions;
+using Shouldly;
 
 namespace EventsVersioning.Tests.Transformations;
 
@@ -261,22 +261,22 @@ public class MergeEvents
         var deserializedEvents = serializer.Deserialize(serialisedEvents);
 
         // Then
-        deserializedEvents.Should().HaveCount(3);
-        deserializedEvents[0].As<ShoppingCartInitializedWithProducts>()
-            .ClientId.Should().Be(clientId);
-        deserializedEvents[0].As<ShoppingCartInitializedWithProducts>()
-            .ShoppingCartId.Should().Be(shoppingCardId);
-        deserializedEvents[0].As<ShoppingCartInitializedWithProducts>()
-            .ProductItems.Should().HaveCount(2);
-        deserializedEvents[0].As<ShoppingCartInitializedWithProducts>()
-            .ProductItems.Should().OnlyContain(pr => pr.Equals(productItem));
+        deserializedEvents.Count().ShouldBe(3);
+        deserializedEvents[0].ShouldBeOfType<ShoppingCartInitializedWithProducts>()
+            .ClientId.ShouldBe(clientId);
+        deserializedEvents[0].ShouldBeOfType<ShoppingCartInitializedWithProducts>()
+            .ShoppingCartId.ShouldBe(shoppingCardId);
+        deserializedEvents[0].ShouldBeOfType<ShoppingCartInitializedWithProducts>()
+            .ProductItems.Count().ShouldBe(2);
+        deserializedEvents[0].ShouldBeOfType<ShoppingCartInitializedWithProducts>()
+            .ProductItems.ShouldAllBe(pr => pr.Equals(productItem));
 
-        deserializedEvents[1].As<V1.ProductItemAddedToShoppingCart>()
-            .ShoppingCartId.Should().Be(shoppingCardId);
-        deserializedEvents[1].As<V1.ProductItemAddedToShoppingCart>()
-            .ProductItem.Should().Be(productItem);
+        deserializedEvents[1].ShouldBeOfType<V1.ProductItemAddedToShoppingCart>()
+            .ShoppingCartId.ShouldBe(shoppingCardId);
+        deserializedEvents[1].ShouldBeOfType<V1.ProductItemAddedToShoppingCart>()
+            .ProductItem.ShouldBe(productItem);
 
-        deserializedEvents[2].As<V1.ShoppingCartConfirmed>()
-            .ShoppingCartId.Should().Be(shoppingCardId);
+        deserializedEvents[2].ShouldBeOfType<V1.ShoppingCartConfirmed>()
+            .ShoppingCartId.ShouldBe(shoppingCardId);
     }
 }

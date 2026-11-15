@@ -95,6 +95,7 @@ builder.Host.ApplyJasperFxExtensions();
 // Configure Wolverine
 builder.Host.UseWolverine(opts =>
 {
+    opts.ApplicationAssembly = typeof(Program).Assembly;
     opts.ConfigureIncidents();
     opts.Policies.AutoApplyTransactions();
 });

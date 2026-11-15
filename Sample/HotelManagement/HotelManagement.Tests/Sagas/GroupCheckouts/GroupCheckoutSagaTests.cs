@@ -1,5 +1,5 @@
 using Core.Commands;
-using FluentAssertions;
+using Shouldly;
 using HotelManagement.Sagas.GroupCheckouts;
 using HotelManagement.Sagas.GuestStayAccounts;
 using Xunit;
@@ -118,11 +118,11 @@ internal class AsyncCommandBusStub: IAsyncCommandBus
 
     public void ShouldNotHaveScheduledCommands(params object[] expected)
     {
-        commands.Should().NotContain(expected);
+        commands.ShouldNotContain(command => expected.Contains(command));
     }
 
     public void ShouldHaveScheduled(params object[] expected)
     {
-        commands.Should().Contain(expected);
+        expected.ShouldBeSubsetOf(commands);
     }
 }

@@ -1,5 +1,5 @@
 using System.Text.Json;
-using FluentAssertions;
+using Shouldly;
 
 namespace EventsVersioning.Tests.ExplicitSerialization;
 
@@ -53,7 +53,7 @@ public class ExplicitSerializationTests
 
         for (var i = 0; i < deserializedEvents.Length; i++)
         {
-            deserializedEvents[i].Equals(events[i]).Should().BeTrue();
+            deserializedEvents[i].Equals(events[i]).ShouldBeTrue();
         }
     }
 
@@ -96,12 +96,12 @@ public class ExplicitSerializationTests
 
         var shoppingCart = events.Aggregate(ShoppingCart.Default, ShoppingCart.Evolve);
 
-        shoppingCart.Id.Should().Be(shoppingCartId);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
-        shoppingCart.ProductItems.Should().HaveCount(2);
-        shoppingCart.ProductItems.Keys.Should().Contain([tShirt, shoes]);
-        shoppingCart.ProductItems[tShirt].Should().Be(Quantity.Parse(2));
-        shoppingCart.ProductItems[shoes].Should().Be(Quantity.Parse(1));
+        shoppingCart.Id.ShouldBe(shoppingCartId);
+        shoppingCart.ClientId.ShouldBe(clientId);
+        shoppingCart.Status.ShouldBe(ShoppingCartStatus.Confirmed);
+        shoppingCart.ProductItems.Count().ShouldBe(2);
+        shoppingCart.ProductItems.Keys.ShouldBe([tShirt, shoes], ignoreOrder: true);
+        shoppingCart.ProductItems[tShirt].ShouldBe(Quantity.Parse(2));
+        shoppingCart.ProductItems[shoes].ShouldBe(Quantity.Parse(1));
     }
 }

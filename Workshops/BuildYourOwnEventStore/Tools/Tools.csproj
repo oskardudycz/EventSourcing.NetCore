@@ -10,10 +10,12 @@
         <PackageReference Include="Dapper.Contrib" />
         <PackageReference Include="Marten" />
         <PackageReference Include="Simple.Migrations" />
+        <PackageReference Include="Testcontainers.PostgreSql" />
         <PackageReference Include="GitHubActionsTestLogger">
             <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <IncludeAssets>runtime; build; compile; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.v3.extensibility.core" />
+        <PackageReference Include="xunit.v3.assert" />
     </ItemGroup>
 </Project>

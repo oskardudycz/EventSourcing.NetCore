@@ -2,7 +2,7 @@ using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.ConfirmingCart;
 using Carts.Tests.Builders;
 using Core.Testing;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Carts.Tests.Carts.ConfirmingCart;
@@ -23,13 +23,13 @@ public class ConfirmCartTests
         cart.Confirm();
 
         // Then
-        cart.Status.Should().Be(ShoppingCartStatus.Confirmed);
+        cart.Status.ShouldBe(ShoppingCartStatus.Confirmed);
 
         var @event = cart.PublishedEvent<ShoppingCartConfirmed>();
 
-        @event.Should().NotBeNull();
-        @event.Should().BeOfType<ShoppingCartConfirmed>();
-        @event!.CartId.Should().Be(cart.Id);
+        @event.ShouldNotBeNull();
+        @event.ShouldBeOfType<ShoppingCartConfirmed>();
+        @event!.CartId.ShouldBe(cart.Id);
     }
 
     [Fact]
@@ -45,6 +45,6 @@ public class ConfirmCartTests
         Action confirmAction = () => emptyCart.Confirm();
 
         // Then
-        confirmAction.Should().Throw<InvalidOperationException>();
+        confirmAction.ShouldThrow<InvalidOperationException>();
     }
 }

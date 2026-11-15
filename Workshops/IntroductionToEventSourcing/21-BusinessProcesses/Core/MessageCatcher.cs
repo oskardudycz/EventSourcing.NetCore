@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Text.Json;
+using Shouldly;
 
 namespace BusinessProcesses.Core;
 
@@ -12,21 +13,24 @@ public class MessageCatcher
     public void Reset() => Published.Clear();
 
     public void ShouldNotReceiveAnyMessage() =>
-        Published.Should().BeEmpty();
+        Published.ShouldBeEmpty();
 
 
     public void ShouldReceiveMessage<T>(T message) where T: notnull
     {
-        Published.Should().Contain(message);
+        Published.ShouldContain(message);
     }
 
     public void ShouldReceiveSingleMessage<T>(T message)
     {
-        Published.Should().HaveCount(1);
-        Published.OfType<T>().Should().HaveCount(1);
-        Published.Single().Should().Be(message);
+        Published.Count().ShouldBe(1);
+        Published.OfType<T>().Count().ShouldBe(1);
+        Published.Single().ShouldBe(message);
     }
 
     public void ShouldReceiveMessages(object[] messages) =>
-        Published.Should().BeEquivalentTo(messages);
+        Published.Select(Describe).ShouldBe(messages.Select(Describe), ignoreOrder: true);
+
+    private static string Describe(object message) =>
+        $"{message.GetType().Name} {JsonSerializer.Serialize(message)}";
 }

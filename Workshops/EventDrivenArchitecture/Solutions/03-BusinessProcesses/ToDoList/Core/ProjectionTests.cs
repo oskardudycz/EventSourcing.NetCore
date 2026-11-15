@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 using Database = BusinessProcesses.Core.Database;
 
@@ -42,47 +42,47 @@ public class ProjectionTests
     {
         var id = Guid.NewGuid();
 
-        var result = await projection.Handle(new Started(id));
+        var result = await projection.Handle(new Started(id), TestContext.Current.CancellationToken);
 
-        result.Should().Be(new Counter(id, 0));
-        (await database.Get<Counter>(id, default)).Should().Be(new Counter(id, 0));
+        result.ShouldBe(new Counter(id, 0));
+        (await database.Get<Counter>(id, TestContext.Current.CancellationToken)).ShouldBe(new Counter(id, 0));
     }
 
     [Fact]
     public async Task NextEvent_EvolvesTheStoredDocument()
     {
         var id = Guid.NewGuid();
-        await projection.Handle(new Started(id));
+        await projection.Handle(new Started(id), TestContext.Current.CancellationToken);
 
-        var result = await projection.Handle(new Incremented(id));
+        var result = await projection.Handle(new Incremented(id), TestContext.Current.CancellationToken);
 
-        result.Should().Be(new Counter(id, 1));
-        (await database.Get<Counter>(id, default)).Should().Be(new Counter(id, 1));
+        result.ShouldBe(new Counter(id, 1));
+        (await database.Get<Counter>(id, TestContext.Current.CancellationToken)).ShouldBe(new Counter(id, 1));
     }
 
     [Fact]
     public async Task EventWithoutDocumentId_IsSkipped()
     {
-        var result = await projection.Handle(new Incremented(null));
+        var result = await projection.Handle(new Incremented(null), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
     public async Task NoDocumentFromEvolve_DeletesTheDocument()
     {
         var id = Guid.NewGuid();
-        await projection.Handle(new Started(id));
+        await projection.Handle(new Started(id), TestContext.Current.CancellationToken);
 
-        var result = await projection.Handle(new Finished(id));
+        var result = await projection.Handle(new Finished(id), TestContext.Current.CancellationToken);
 
-        result.Should().BeNull();
-        (await database.Get<Counter>(id, default)).Should().BeNull();
+        result.ShouldBeNull();
+        (await database.Get<Counter>(id, TestContext.Current.CancellationToken)).ShouldBeNull();
     }
 
     [Fact]
     public void CanHandle_ListsTheProjectedEvents() =>
-        projection.CanHandle().Should().Equal(typeof(Started), typeof(Incremented), typeof(Finished));
+        projection.CanHandle().ShouldBe([typeof(Started), typeof(Incremented), typeof(Finished)]);
 
     private readonly Database database = new();
     private readonly CounterProjection projection;

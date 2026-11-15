@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 using Marten;
 using Xunit;
@@ -170,16 +170,16 @@ public class GettingStateFromEventsTests(): MartenTest("solved_getting_state_mut
 
         var shoppingCart = await GetShoppingCart(DocumentSession, shoppingCartId, CancellationToken.None);
 
-        shoppingCart.Id.Should().Be(shoppingCartId);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(2);
+        shoppingCart.Id.ShouldBe(shoppingCartId);
+        shoppingCart.ClientId.ShouldBe(clientId);
+        shoppingCart.ProductItems.Count().ShouldBe(2);
 
-        shoppingCart.ProductItems[0].ProductId.Should().Be(shoesId);
-        shoppingCart.ProductItems[0].Quantity.Should().Be(pairOfShoes.Quantity);
-        shoppingCart.ProductItems[0].UnitPrice.Should().Be(pairOfShoes.UnitPrice);
+        shoppingCart.ProductItems[0].ProductId.ShouldBe(shoesId);
+        shoppingCart.ProductItems[0].Quantity.ShouldBe(pairOfShoes.Quantity);
+        shoppingCart.ProductItems[0].UnitPrice.ShouldBe(pairOfShoes.UnitPrice);
 
-        shoppingCart.ProductItems[1].ProductId.Should().Be(tShirtId);
-        shoppingCart.ProductItems[1].Quantity.Should().Be(tShirt.Quantity);
-        shoppingCart.ProductItems[1].UnitPrice.Should().Be(tShirt.UnitPrice);
+        shoppingCart.ProductItems[1].ProductId.ShouldBe(tShirtId);
+        shoppingCart.ProductItems[1].Quantity.ShouldBe(tShirt.Quantity);
+        shoppingCart.ProductItems[1].UnitPrice.ShouldBe(tShirt.UnitPrice);
     }
 }

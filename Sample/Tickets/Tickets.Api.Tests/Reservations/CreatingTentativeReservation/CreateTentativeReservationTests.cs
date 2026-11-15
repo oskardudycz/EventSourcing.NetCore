@@ -1,5 +1,5 @@
 using Core.Testing;
-using FluentAssertions;
+using Shouldly;
 using Tickets.Api.Requests;
 using Tickets.Api.Responses;
 using Tickets.Reservations;
@@ -29,11 +29,11 @@ public class CreateTentativeReservationTests
                 OK,
                 RESPONSE_BODY<ReservationDetails>((reservation, ctx) =>
                 {
-                    reservation.Id.Should().Be(ctx.GetCreatedId<Guid>());
-                    reservation.Status.Should().Be(ReservationStatus.Tentative);
-                    reservation.SeatId.Should().Be(SeatId);
-                    reservation.Number.Should().NotBeEmpty();
-                    reservation.Version.Should().Be(1);
+                    reservation.Id.ShouldBe(ctx.GetCreatedId<Guid>());
+                    reservation.Status.ShouldBe(ReservationStatus.Tentative);
+                    reservation.SeatId.ShouldBe(SeatId);
+                    reservation.Number.ShouldNotBeEmpty();
+                    reservation.Version.ShouldBe(1);
                 })
             )
             .And()
@@ -42,18 +42,18 @@ public class CreateTentativeReservationTests
                 OK,
                 RESPONSE_BODY<PagedListResponse<ReservationShortInfo>>((reservations, ctx) =>
                 {
-                    reservations.Should().NotBeNull();
-                    reservations.Items.Should().NotBeNull();
+                    reservations.ShouldNotBeNull();
+                    reservations.Items.ShouldNotBeNull();
 
-                    reservations.Items.Should().HaveCount(1);
-                    reservations.TotalItemCount.Should().Be(1);
-                    reservations.HasNextPage.Should().Be(false);
+                    reservations.Items.Count().ShouldBe(1);
+                    reservations.TotalItemCount.ShouldBe(1);
+                    reservations.HasNextPage.ShouldBe(false);
 
                     var reservationInfo = reservations.Items.Single();
 
-                    reservationInfo.Id.Should().Be(ctx.GetCreatedId());
-                    reservationInfo.Number.Should().NotBeNull().And.NotBeEmpty();
-                    reservationInfo.Status.Should().Be(ReservationStatus.Tentative);
+                    reservationInfo.Id.ShouldBe(ctx.GetCreatedId<Guid>());
+                    reservationInfo.Number.ShouldNotBeNullOrEmpty();
+                    reservationInfo.Status.ShouldBe(ReservationStatus.Tentative);
                 }))
             .And()
             .When(GET, URI(ctx => $"/api/Reservations/{ctx.GetCreatedId()}/history"))
@@ -61,17 +61,17 @@ public class CreateTentativeReservationTests
                 OK,
                 RESPONSE_BODY<PagedListResponse<ReservationHistory>>((reservations, ctx) =>
                 {
-                    reservations.Should().NotBeNull();
-                    reservations.Items.Should().NotBeNull();
+                    reservations.ShouldNotBeNull();
+                    reservations.Items.ShouldNotBeNull();
 
-                    reservations.Items.Should().HaveCount(1);
-                    reservations.TotalItemCount.Should().Be(1);
-                    reservations.HasNextPage.Should().Be(false);
+                    reservations.Items.Count().ShouldBe(1);
+                    reservations.TotalItemCount.ShouldBe(1);
+                    reservations.HasNextPage.ShouldBe(false);
 
                     var reservationInfo = reservations.Items.Single();
 
-                    reservationInfo.ReservationId.Should().Be(ctx.GetCreatedId<Guid>());
-                    reservationInfo.Description.Should().StartWith("Created tentative reservation with number");
+                    reservationInfo.ReservationId.ShouldBe(ctx.GetCreatedId<Guid>());
+                    reservationInfo.Description.ShouldStartWith("Created tentative reservation with number");
                 })
             );
 

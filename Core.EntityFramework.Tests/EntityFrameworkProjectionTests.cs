@@ -1,7 +1,7 @@
 using Core.EntityFramework.Projections;
 using Core.EntityFramework.Tests.Fixtures;
 using Core.Events;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -49,25 +49,25 @@ public class EntityFrameworkProjectionTests(EfCorePostgresContainerFixture<TestD
         var clientId = Guid.CreateVersion7();
 
         await projection.Handle([EventEnvelope.From(new Opened(cartId, clientId))], CancellationToken.None);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync();
-        savedEntity.Should().NotBeNull();
-        savedEntity.Should().BeEquivalentTo(new ShoppingCart { Id = cartId, ClientId = clientId, ProductCount = 0 });
+        var savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync(cancellationToken: TestContext.Current.CancellationToken);
+        savedEntity.ShouldNotBeNull();
+        savedEntity.ShouldBeEquivalentTo(new ShoppingCart { Id = cartId, ClientId = clientId, ProductCount = 0 });
 
         await projection.Handle([EventEnvelope.From(new ProductItemAdded(cartId, 2))], CancellationToken.None);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync();
-        savedEntity.Should().NotBeNull();
-        savedEntity.Should().BeEquivalentTo(new ShoppingCart { Id = cartId, ClientId = clientId, ProductCount = 2 });
+        savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync(cancellationToken: TestContext.Current.CancellationToken);
+        savedEntity.ShouldNotBeNull();
+        savedEntity.ShouldBeEquivalentTo(new ShoppingCart { Id = cartId, ClientId = clientId, ProductCount = 2 });
 
 
         await projection.Handle([EventEnvelope.From(new Cancelled(cartId))], CancellationToken.None);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync();
-        savedEntity.Should().BeNull();
+        savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync(cancellationToken: TestContext.Current.CancellationToken);
+        savedEntity.ShouldBeNull();
     }
 
     [Fact]
@@ -84,11 +84,11 @@ public class EntityFrameworkProjectionTests(EfCorePostgresContainerFixture<TestD
             EventEnvelope.From(new ProductItemAdded(cartId, 3)),
             EventEnvelope.From(new ProductItemAdded(cartId, 5))
         ], CancellationToken.None);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync();
-        savedEntity.Should().NotBeNull();
-        savedEntity.Should().BeEquivalentTo(new ShoppingCart { Id = cartId, ClientId = clientId, ProductCount = 10 });
+        var savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync(cancellationToken: TestContext.Current.CancellationToken);
+        savedEntity.ShouldNotBeNull();
+        savedEntity.ShouldBeEquivalentTo(new ShoppingCart { Id = cartId, ClientId = clientId, ProductCount = 10 });
     }
 
     [Fact]
@@ -103,10 +103,10 @@ public class EntityFrameworkProjectionTests(EfCorePostgresContainerFixture<TestD
             EventEnvelope.From(new Opened(cartId, clientId)),
             EventEnvelope.From(new Cancelled(cartId))
         ], CancellationToken.None);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync();
-        savedEntity.Should().BeNull();
+        var savedEntity = await context.ShoppingCarts.Where(e => e.Id == cartId).FirstOrDefaultAsync(cancellationToken: TestContext.Current.CancellationToken);
+        savedEntity.ShouldBeNull();
     }
 
     [Fact]
@@ -114,11 +114,11 @@ public class EntityFrameworkProjectionTests(EfCorePostgresContainerFixture<TestD
     {
         var entity = new ShoppingCart { Id = Guid.CreateVersion7(), ProductCount = 2, ClientId = Guid.CreateVersion7() };
         context.ShoppingCarts.Add(entity);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var savedEntity = await context.ShoppingCarts.FindAsync(entity.Id);
+        var savedEntity = await context.ShoppingCarts.FindAsync(new object?[] { entity.Id }, TestContext.Current.CancellationToken);
         Assert.NotNull(savedEntity);
-        savedEntity.Should().NotBeNull();
-        savedEntity.Should().BeEquivalentTo(entity);
+        savedEntity.ShouldNotBeNull();
+        savedEntity.ShouldBeEquivalentTo(entity);
     }
 }

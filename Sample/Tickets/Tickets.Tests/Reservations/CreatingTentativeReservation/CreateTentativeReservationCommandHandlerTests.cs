@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Tickets.Reservations;
 using Tickets.Reservations.CreatingTentativeReservation;
 using Tickets.Tests.Extensions.Reservations;
@@ -28,7 +28,7 @@ public class CreateTentativeReservationCommandHandlerTests
         await commandHandler.Handle(command, CancellationToken.None);
 
         //Then
-        repository.Aggregates.Should().HaveCount(1);
+        repository.Aggregates.Count().ShouldBe(1);
 
         var reservation = repository.Aggregates.Values.Single();
 

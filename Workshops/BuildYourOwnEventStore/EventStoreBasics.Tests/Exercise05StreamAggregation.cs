@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -68,19 +68,19 @@ public class Exercise05StreamAggregation: IAsyncLifetime
         var userCreated = new UserCreated(streamId, "John Doe");
         var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
 
-        await eventStore.AppendEvent<User>(streamId, userCreated);
-        await eventStore.AppendEvent<User>(streamId, userNameUpdated);
+        await eventStore.AppendEvent<User>(streamId, userCreated, ct: TestContext.Current.CancellationToken);
+        await eventStore.AppendEvent<User>(streamId, userNameUpdated, ct: TestContext.Current.CancellationToken);
 
-        var aggregate = await eventStore.AggregateStream<User>(streamId);
+        var aggregate = await eventStore.AggregateStream<User>(streamId, ct: TestContext.Current.CancellationToken);
 
-        aggregate!.Id.Should().Be(streamId);
-        aggregate.Name.Should().Be(userNameUpdated.UserName);
-        aggregate.Version.Should().Be(2);
+        aggregate!.Id.ShouldBe(streamId);
+        aggregate.Name.ShouldBe(userNameUpdated.UserName);
+        aggregate.Version.ShouldBe(2);
     }
 
-    public Task InitializeAsync() =>
-        eventStore.Init();
+    public ValueTask InitializeAsync() =>
+        new(eventStore.Init());
 
-    public async Task DisposeAsync() =>
+    public async ValueTask DisposeAsync() =>
         await eventStore.DisposeAsync();
 }

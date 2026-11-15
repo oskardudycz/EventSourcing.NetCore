@@ -61,7 +61,7 @@ public class GetProductsFixture(): ApiSpecification<Program>(new WarehouseTestWe
 {
     public List<ProductListItem> RegisteredProducts { get; } = [];
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         var productsToRegister = new[]
         {
@@ -82,5 +82,5 @@ public class GetProductsFixture(): ApiSpecification<Program>(new WarehouseTestWe
         }
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

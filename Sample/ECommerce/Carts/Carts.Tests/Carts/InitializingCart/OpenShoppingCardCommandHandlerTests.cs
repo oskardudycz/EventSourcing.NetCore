@@ -2,7 +2,7 @@ using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.OpeningCart;
 using Carts.Tests.Extensions.Reservations;
 using Carts.Tests.Stubs.Repositories;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Carts.Tests.Carts.InitializingCart;
@@ -23,7 +23,7 @@ public class OpenShoppingCardCommandHandlerTests
         await commandHandler.Handle(command, CancellationToken.None);
 
         //Then
-        repository.Aggregates.Should().HaveCount(1);
+        repository.Aggregates.Count().ShouldBe(1);
 
         var cart = repository.Aggregates.Values.Single();
 

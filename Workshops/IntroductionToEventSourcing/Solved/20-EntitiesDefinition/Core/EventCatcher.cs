@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 
 namespace EntitiesDefinition.Core;
 
@@ -12,18 +12,18 @@ public class EventCatcher
     public void Reset() => Published.Clear();
 
     public void ShouldNotReceiveAnyEvent() =>
-        Published.Should().BeEmpty();
+        Published.ShouldBeEmpty();
 
 
     public void ShouldReceiveEvent<T>(T message) where T: notnull
     {
-        Published.Should().Contain(message);
+        Published.ShouldContain(message);
     }
 
     public void ShouldReceiveSingleEvent<T>(T message)
     {
-        Published.Should().HaveCount(1);
-        Published.OfType<T>().Should().HaveCount(1);
-        Published.Single().Should().Be(message);
+        Published.Count().ShouldBe(1);
+        Published.OfType<T>().Count().ShouldBe(1);
+        Published.Single().ShouldBe(message);
     }
 }

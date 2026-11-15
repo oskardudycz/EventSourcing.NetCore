@@ -62,13 +62,13 @@ API integration tests for:
 
 ## Running
 
-1. Go to [docker](./docker) and run: `docker compose up`.
+1. Go to [docker](./docker) and run: `docker compose --profile all up`.
 2. Wait until all containers are downloaded and running.
 3. You should automatically get:
     - KurrentDB UI (for event store): http://localhost:2113/
     - Postgres DB running (for read models)
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `pgadmin4@pgadmin.org`, Password: `admin`
-        - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
+        - To connect to server Use host: `postgres`, user: `postgres`, password: `postgres`
 4. Open, build and run `ECommerce.slnx` solution.
     - Swagger should be available at: http://localhost:5000/index.html

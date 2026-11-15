@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 using Alba;
-using FluentAssertions;
+using Shouldly;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.ResolutionBatch;
 using Helpdesk.Api.Tests.Incidents.Fixtures;
@@ -35,8 +35,8 @@ public class BatchResolutionTests(AppFixture fixture): IntegrationContext(fixtur
         // Then
         // Check the HTTP Response
         var response = await result.ReadAsJsonAsync<CreationResponse>();
-        response.Should().NotBeNull();
-        response!.Url.Should().StartWith("/api/incidents/resolution/");
+        response.ShouldNotBeNull();
+        response!.Url.ShouldStartWith("/api/incidents/resolution/");
 
         // Check if details are available
         result = await Host.Scenario(x =>
@@ -47,7 +47,7 @@ public class BatchResolutionTests(AppFixture fixture): IntegrationContext(fixtur
         });
 
         var updated = await result.ReadAsJsonAsync<IncidentsBatchResolution>();
-        updated.Should().BeEquivalentTo(
+        updated.ShouldBeEquivalentTo(
             new IncidentsBatchResolution(
                 response.GetCreatedId("/api/incidents/resolution/"),
                 incidents.ToImmutableDictionary(ks => ks, _ => ResolutionStatus.Pending),
@@ -79,7 +79,7 @@ public class BatchResolutionTests(AppFixture fixture): IntegrationContext(fixtur
         var batchId = creationResponse!.GetCreatedId("/api/incidents/resolution/");
 
         // Then
-        session.Status.Should().Be(TrackingStatus.Completed);
+        session.Status.ShouldBe(TrackingStatus.Completed);
 
         // Check if details are available
         result = await Host.Scenario(x =>
@@ -90,8 +90,8 @@ public class BatchResolutionTests(AppFixture fixture): IntegrationContext(fixtur
         });
 
         var updated = await result.ReadAsJsonAsync<IncidentsBatchResolution>();
-        updated.Should().NotBeNull();
-        updated.Should().BeEquivalentTo(
+        updated.ShouldNotBeNull();
+        updated.ShouldBeEquivalentTo(
             new IncidentsBatchResolution(
                 batchId,
                 incidents.ToImmutableDictionary(ks => ks, _ => ResolutionStatus.Resolved),

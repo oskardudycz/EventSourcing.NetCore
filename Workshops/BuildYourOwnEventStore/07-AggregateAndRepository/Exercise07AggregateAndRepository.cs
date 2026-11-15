@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -83,9 +83,9 @@ public class Exercise07AggregateAndRepository
 
         var userFromRepository = repository.Find(streamId);
 
-        userFromRepository.Id.Should().Be(streamId);
-        userFromRepository.Name.Should().Be("John Doe");
-        userFromRepository.Version.Should().Be(1);
+        userFromRepository.Id.ShouldBe(streamId);
+        userFromRepository.Name.ShouldBe("John Doe");
+        userFromRepository.Version.ShouldBe(1);
 
         userFromRepository.ChangeName("Adam Smith");
 
@@ -93,8 +93,8 @@ public class Exercise07AggregateAndRepository
 
         var userAfterUpdate = repository.Find(streamId);
 
-        userAfterUpdate.Id.Should().Be(streamId);
-        userAfterUpdate.Name.Should().Be("Adam Smith");
-        userFromRepository.Version.Should().Be(2);
+        userAfterUpdate.Id.ShouldBe(streamId);
+        userAfterUpdate.Name.ShouldBe("Adam Smith");
+        userFromRepository.Version.ShouldBe(2);
     }
 }

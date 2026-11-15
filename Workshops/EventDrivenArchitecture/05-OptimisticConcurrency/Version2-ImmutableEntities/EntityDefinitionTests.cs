@@ -2,7 +2,6 @@ using Bogus;
 using OptimisticConcurrency.Core;
 using OptimisticConcurrency.Version2_ImmutableEntities.GuestStayAccounts;
 using Xunit;
-using Xunit.Abstractions;
 using Database = OptimisticConcurrency.Core.Database;
 
 namespace OptimisticConcurrency.Version2_ImmutableEntities;
@@ -21,7 +20,7 @@ public class EntityDefinitionTests
         publishedMessages.Reset();
 
         // When
-        await guestStayFacade.CheckInGuest(command);
+        await guestStayFacade.CheckInGuest(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedIn(guestStayId, now));
@@ -32,7 +31,7 @@ public class EntityDefinitionTests
     {
         // Given
         var guestStayId = Guid.NewGuid();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
@@ -40,7 +39,7 @@ public class EntityDefinitionTests
         var command = new RecordCharge(guestStayId, chargeId, amount, now);
 
         // When
-        await guestStayFacade.RecordCharge(command);
+        await guestStayFacade.RecordCharge(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new ChargeRecorded(guestStayId, chargeId, amount, now));
@@ -51,7 +50,7 @@ public class EntityDefinitionTests
     {
         // Given
         var guestStayId = Guid.NewGuid();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
@@ -59,7 +58,7 @@ public class EntityDefinitionTests
         var command = new RecordPayment(guestStayId, paymentId, amount, now);
 
         // When
-        await guestStayFacade.RecordPayment(command);
+        await guestStayFacade.RecordPayment(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, paymentId, amount, now));
@@ -70,8 +69,8 @@ public class EntityDefinitionTests
     {
         // Given
         var guestStayId = Guid.NewGuid();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), generate.Finance.Amount(), now.AddHours(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), generate.Finance.Amount(), now.AddHours(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
@@ -79,7 +78,7 @@ public class EntityDefinitionTests
         var command = new RecordPayment(guestStayId, paymentId, amount, now);
 
         // When
-        await guestStayFacade.RecordPayment(command);
+        await guestStayFacade.RecordPayment(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, paymentId, amount, now));
@@ -92,15 +91,15 @@ public class EntityDefinitionTests
         var guestStayId = Guid.NewGuid();
 
         var amount = generate.Finance.Amount();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), amount, now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, Guid.NewGuid(), amount, now.AddHours(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), amount, now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, Guid.NewGuid(), amount, now.AddHours(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var command = new CheckOutGuest(guestStayId, now);
 
         // When
-        await guestStayFacade.CheckOutGuest(command);
+        await guestStayFacade.CheckOutGuest(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayId, now));
@@ -113,9 +112,9 @@ public class EntityDefinitionTests
         var guestStayId = Guid.NewGuid();
 
         var amount = generate.Finance.Amount();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), amount + 10, now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, Guid.NewGuid(), amount, now.AddHours(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), amount + 10, now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, Guid.NewGuid(), amount, now.AddHours(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var command = new CheckOutGuest(guestStayId, now);
@@ -123,7 +122,7 @@ public class EntityDefinitionTests
         // When
         try
         {
-            await guestStayFacade.CheckOutGuest(command);
+            await guestStayFacade.CheckOutGuest(command, TestContext.Current.CancellationToken);
         }
         catch (Exception exc)
         {

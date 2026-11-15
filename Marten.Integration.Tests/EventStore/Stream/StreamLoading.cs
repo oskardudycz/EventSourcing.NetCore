@@ -1,10 +1,11 @@
-using FluentAssertions;
+using Core.Testing.Fixtures;
+using Shouldly;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Stream;
 
-public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
+public class StreamLoading(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString)
 {
     public record IssueCreated(
         string IssueId,
@@ -35,11 +36,11 @@ public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSql
         var streamId = await GetExistingStreamId();
 
         //When
-        var events = await EventStore.FetchStreamAsync(streamId);
+        var events = await EventStore.FetchStreamAsync(streamId, token: TestContext.Current.CancellationToken);
 
         //Then
-        events.Count.Should().Be(1);
-        events.First().Version.Should().Be(1);
+        events.Count.ShouldBe(1);
+        events.First().Version.ShouldBe(1);
     }
 
     [Fact]
@@ -50,13 +51,13 @@ public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSql
 
         //When
         EventStore.Append(streamId, new IssueUpdated(issueId, "New Description"));
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         //Then
-        var events = await EventStore.FetchStreamAsync(streamId);
+        var events = await EventStore.FetchStreamAsync(streamId, token: TestContext.Current.CancellationToken);
 
-        events.Count.Should().Be(2);
-        events.Last().Version.Should().Be(2);
+        events.Count.ShouldBe(2);
+        events.Last().Version.ShouldBe(2);
     }
 
     [Fact]
@@ -64,14 +65,14 @@ public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSql
     {
         //Given
         var streamId = await GetExistingStreamId();
-        var eventId = (await EventStore.FetchStreamAsync(streamId)).Single().Id;
+        var eventId = (await EventStore.FetchStreamAsync(streamId, token: TestContext.Current.CancellationToken)).Single().Id;
 
         //When
-        var @event = await EventStore.LoadAsync<IssueCreated>(eventId);
+        var @event = await EventStore.LoadAsync<IssueCreated>(eventId, TestContext.Current.CancellationToken);
 
         //Then
-        @event.Should().NotBeNull();
-        @event!.Id.Should().Be(eventId);
+        @event.ShouldNotBeNull();
+        @event!.Id.ShouldBe(eventId);
     }
 
     [Fact]
@@ -84,18 +85,18 @@ public class StreamLoading(MartenFixture fixture): MartenTest(fixture.PostgreSql
             new IssueUpdated(streamId, "Description"),
             new IssueUpdated(streamId, "The Last One")
         );
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var lastEvent = await Session.Events.QueryAllRawEvents()
             .Where(e => e.StreamKey == streamId)
             .OrderByDescending(e => e.Version)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(token: TestContext.Current.CancellationToken);
 
-        lastEvent.Should().NotBeNull();
-        lastEvent!.Data.Should().BeOfType<IssueUpdated>();
+        lastEvent.ShouldNotBeNull();
+        lastEvent!.Data.ShouldBeOfType<IssueUpdated>();
 
         var lastUpdatedEvent = (IssueUpdated)lastEvent.Data;
-        lastUpdatedEvent.IssueId.Should().Be(streamId);
-        lastUpdatedEvent.Description.Should().Be("The Last One");
+        lastUpdatedEvent.IssueId.ShouldBe(streamId);
+        lastUpdatedEvent.Description.ShouldBe("The Last One");
     }
 }

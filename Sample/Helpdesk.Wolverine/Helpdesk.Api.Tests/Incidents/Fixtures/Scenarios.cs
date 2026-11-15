@@ -1,7 +1,7 @@
 using Alba;
 using Bogus;
 using Bogus.DataSets;
-using FluentAssertions;
+using Shouldly;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.AcknowledgingResolution;
 using Helpdesk.Api.Incidents.GettingDetails;
@@ -36,7 +36,7 @@ public static class Scenarios
 
         result = await api.GetIncidentDetails(await result.GetCreatedId());
         var incident = await result.ReadAsJsonAsync<IncidentDetails>();
-        incident.Should().NotBeNull();
+        incident.ShouldNotBeNull();
         return incident!;
     }
 
@@ -52,7 +52,7 @@ public static class Scenarios
 
         var result = await api.GetIncidentDetails(incident.Id);
         incident = await result.ReadAsJsonAsync<IncidentDetails>();
-        incident.Should().NotBeNull();
+        incident.ShouldNotBeNull();
         return incident!;
     }
 
@@ -66,7 +66,7 @@ public static class Scenarios
 
         var result = await api.GetIncidentDetails(incident.Id);
         incident = await result.ReadAsJsonAsync<IncidentDetails>();
-        incident.Should().NotBeNull();
+        incident.ShouldNotBeNull();
         return incident!;
     }
 
@@ -132,7 +132,7 @@ public static class Scenarios
         var result = await api.GetIncidentDetails(incident.Id);
 
         var updated = await result.ReadAsJsonAsync<IncidentDetails>();
-        updated.Should().BeEquivalentTo(incident);
+        updated.ShouldBeEquivalentTo(incident);
 
         return result;
     }
@@ -140,15 +140,15 @@ public static class Scenarios
     public static async Task<Guid> GetCreatedId(this IScenarioResult result)
     {
         var response = await result.ReadAsJsonAsync<CreationResponse>();
-        response.Should().NotBeNull();
-        response!.Url.Should().StartWith("/api/incidents/");
+        response.ShouldNotBeNull();
+        response!.Url.ShouldStartWith("/api/incidents/");
 
         return response.GetCreatedId("/api/incidents/");
     }
 
     public static Guid GetCreatedId(this CreationResponse response, string urlPrefix)
     {
-        response.Url.Should().StartWith(urlPrefix);
+        response.Url.ShouldStartWith(urlPrefix);
 
         var uri = new Uri(response.Url.Split('?')[0]);
         var createdId = uri.Segments.Last();

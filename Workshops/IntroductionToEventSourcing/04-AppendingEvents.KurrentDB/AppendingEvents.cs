@@ -1,6 +1,7 @@
 using KurrentDB.Client;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
+using IntroductionToEventSourcing.Tools;
 
 namespace IntroductionToEventSourcing.AppendingEvents;
 using static ShoppingCartEvent;
@@ -84,7 +85,7 @@ public class GettingStateFromEventsTests
         };
 
         await using var eventStore =
-            new KurrentDBClient(KurrentDBClientSettings.Create("kurrentdb://localhost:2113?tls=false"));
+            new KurrentDBClient(KurrentDBClientSettings.Create(TestDatabases.KurrentDBConnectionString));
 
         var streamName = $"shopping_cart-{shoppingCartId}";
 
@@ -95,7 +96,7 @@ public class GettingStateFromEventsTests
             appendedEvents = (ulong)result.NextExpectedStreamState.ToInt64();
         });
 
-        exception.Should().BeNull();
-        appendedEvents.Should().Be((ulong)events.Length - 1);
+        exception.ShouldBeNull();
+        appendedEvents.ShouldBe((ulong)events.Length - 1);
     }
 }

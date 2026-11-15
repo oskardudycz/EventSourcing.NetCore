@@ -1,16 +1,19 @@
-version: "3.8"
+name: eventsourcing
+
 services:
     nginx:
+        profiles: [ sample ]
         restart: always
-        image: nginx:alpine
+        image: nginx:1.31.8-alpine
         ports:
-            - 8089:80
+            - "${NGINX_PORT:-8089}:80"
         volumes:
             - ./nginx.conf:/etc/nginx/nginx.conf
         depends_on:
-            - backend
+            - helpdesk-api
 
-    backend:
+    helpdesk-api:
+        profiles: [ sample ]
         build:
             dockerfile: Dockerfile
             context: .
@@ -23,16 +26,31 @@ services:
                 condition: service_healthy
         restart: always
 
+    #######################################################
+    #  PostgreSQL
+    #######################################################
     postgres:
-        image: postgres:15.1-alpine
-        container_name: postgres
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U postgres"]
-            interval: 5s
-            timeout: 5s
-            retries: 5
+        profiles: [ postgres, postgres-all, all, all-no-ui, ci, sample ]
+        image: postgres:18.7-alpine
         environment:
             - POSTGRES_DB=postgres
-            - POSTGRES_PASSWORD=Password12!
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
         ports:
-            - "5432:5432"
+            - '${POSTGRES_PORT:-5432}:5432'
+        volumes:
+            - postgres-data:/var/lib/postgresql
+        healthcheck:
+            test: pg_isready -U postgres -d postgres
+            interval: 5s
+            timeout: 10s
+            retries: 100
+        networks:
+            - postgres
+
+networks:
+    postgres:
+        driver: bridge
+
+volumes:
+    postgres-data:

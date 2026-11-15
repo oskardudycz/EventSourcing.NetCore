@@ -1,7 +1,7 @@
 using Core.Events;
 using Core.Events.External;
 using Core.Requests;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,7 +46,7 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
     }
 
     public void PublishedExternalEventsOfType<TEvent>() where TEvent : IExternalEvent =>
-        externalEventProducer.PublishedEvents.OfType<TEvent>().Should().NotBeEmpty();
+        externalEventProducer.PublishedEvents.OfType<TEvent>().ShouldNotBeEmpty();
 
     public Task PublishInternalEvent<TEvent>(TEvent @event, CancellationToken ct = default) where TEvent : notnull =>
         PublishInternalEvent(
@@ -95,7 +95,7 @@ public class TestWebApplicationFactory<TProject>: WebApplicationFactory<TProject
         }
         catch (OperationCanceledException)
         {
-            0.Should().Be(1, "No events matching criteria were published");
+            0.ShouldBe(1, "No events matching criteria were published");
         }
     }
 }

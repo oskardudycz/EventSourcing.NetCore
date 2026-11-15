@@ -2,7 +2,7 @@ using System.Text.Json;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.Products;
 using Carts.Tests.Stubs.Products;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Carts.Tests.Carts;
@@ -18,11 +18,11 @@ public class CartSerializationTests
 
         var restored = JsonSerializer.Deserialize<ShoppingCart>(JsonSerializer.Serialize(cart))!;
 
-        restored.Id.Should().Be(cart.Id);
-        restored.ClientId.Should().Be(cart.ClientId);
-        restored.Status.Should().Be(cart.Status);
-        restored.ProductItems.Should().BeEquivalentTo(cart.ProductItems);
-        restored.TotalPrice.Should().Be(cart.TotalPrice);
-        restored.DequeueUncommittedEvents().Should().BeEmpty();
+        restored.Id.ShouldBe(cart.Id);
+        restored.ClientId.ShouldBe(cart.ClientId);
+        restored.Status.ShouldBe(cart.Status);
+        restored.ProductItems.ShouldBeEquivalentTo(cart.ProductItems);
+        restored.TotalPrice.ShouldBe(cart.TotalPrice);
+        restored.DequeueUncommittedEvents().ShouldBeEmpty();
     }
 }

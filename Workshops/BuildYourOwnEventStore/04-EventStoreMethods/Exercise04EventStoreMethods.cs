@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -50,9 +50,9 @@ public class Exercise04EventStoreMethods
 
         var streamState = eventStore.GetStreamState(streamId);
 
-        streamState.Id.Should().Be(streamId);
-        streamState.Type.Should().Be(typeof(User));
-        streamState.Version.Should().Be(1);
+        streamState.Id.ShouldBe(streamId);
+        streamState.Type.ShouldBe(typeof(User));
+        streamState.Version.ShouldBe(1);
     }
 
     [Fact]
@@ -68,12 +68,12 @@ public class Exercise04EventStoreMethods
 
         var events = eventStore.GetEvents(streamId);
 
-        events.Cast<object>().Should().HaveCount(2);
+        events.Cast<object>().Count().ShouldBe(2);
 
-        events.OfType<UserCreated>().Should().Contain(
+        events.OfType<UserCreated>().ShouldContain(
             e => e.UserId == userCreated.UserId && e.UserName == userCreated.UserName);
 
-        events.OfType<UserNameUpdated>().Should().Contain(
+        events.OfType<UserNameUpdated>().ShouldContain(
             e => e.UserId == userNameUpdated.UserId && e.UserName == userNameUpdated.UserName);
     }
 }

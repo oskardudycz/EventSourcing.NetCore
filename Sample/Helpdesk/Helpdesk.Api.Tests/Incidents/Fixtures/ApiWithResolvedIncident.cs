@@ -6,13 +6,13 @@ namespace Helpdesk.Api.Tests.Incidents.Fixtures;
 
 public class ApiWithResolvedIncident: ApiSpecification<Program>, IAsyncLifetime
 {
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         Incident = await this.ResolvedIncident();
     }
 
     public IncidentDetails Incident { get; set; } = null!;
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 

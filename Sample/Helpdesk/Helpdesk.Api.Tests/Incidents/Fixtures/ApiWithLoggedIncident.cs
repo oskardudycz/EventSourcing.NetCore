@@ -6,10 +6,10 @@ namespace Helpdesk.Api.Tests.Incidents.Fixtures;
 
 public class ApiWithLoggedIncident: ApiSpecification<Program>, IAsyncLifetime
 {
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         Incident = await this.LoggedIncident();
     }
     public IncidentDetails Incident { get; protected set; } = null!;
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

@@ -1,5 +1,5 @@
 using Dapper.Contrib.Extensions;
-using FluentAssertions;
+using Shouldly;
 using System.Text.Json.Serialization;
 using Npgsql;
 using SimpleMigrations;
@@ -166,10 +166,10 @@ public class Exercise09Projections
 
         var userDashboard = databaseConnection.Get<UserDashboard>(user.Id);
 
-        userDashboard.Should().NotBeNull();
-        userDashboard.Id.Should().Be(user.Id);
-        userDashboard.UserName.Should().Be(user.Name);
-        userDashboard.OrdersCount.Should().Be(2);
-        userDashboard.TotalAmount.Should().Be(firstOrder.Amount + secondOrder.Amount);
+        userDashboard.ShouldNotBeNull();
+        userDashboard.Id.ShouldBe(user.Id);
+        userDashboard.UserName.ShouldBe(user.Name);
+        userDashboard.OrdersCount.ShouldBe(2);
+        userDashboard.TotalAmount.ShouldBe(firstOrder.Amount + secondOrder.Amount);
     }
 }

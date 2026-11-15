@@ -39,5 +39,5 @@ Each exercise has a full implementation in the [Solutions](./Solutions/) folder.
 ## Running
 
 1. Build the solution. Everything runs in memory, so you don't need Docker.
-2. Run the tests of the exercise you're working on, e.g. `dotnet test 01-EventsDefinition`.
+2. Run the tests of the exercise you're working on, e.g. `dotnet test --project 01-EventsDefinition`.
 3. To see the solved exercises, look into the [Solutions](./Solutions/) folder of the same solution.

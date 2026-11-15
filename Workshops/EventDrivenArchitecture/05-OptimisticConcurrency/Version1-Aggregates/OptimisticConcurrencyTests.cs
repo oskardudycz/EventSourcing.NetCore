@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using OptimisticConcurrency.Core;
 using OptimisticConcurrency.Version1_Aggregates.GroupCheckouts;
 using OptimisticConcurrency.Version1_Aggregates.GuestStayAccounts;
@@ -91,11 +91,11 @@ public class OptimisticConcurrencyTests
         await InParallel(amounts.Select(amount => (Func<ValueTask>)(() =>
             guestStayFacade.RecordCharge(new RecordCharge(guestStayId, Guid.NewGuid(), amount, now))
         )));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, Guid.NewGuid(), amounts.Sum(), now));
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, Guid.NewGuid(), amounts.Sum(), now), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
 
         // When
-        await guestStayFacade.CheckOutGuest(new CheckOutGuest(guestStayId, now));
+        await guestStayFacade.CheckOutGuest(new CheckOutGuest(guestStayId, now), TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayId, now));
@@ -118,10 +118,10 @@ public class OptimisticConcurrencyTests
         Type[] checkedOutBeforeCharge = [typeof(GuestCheckedOut)];
         Type[] chargedBeforeCheckout = [typeof(ChargeRecorded), typeof(GuestStayAccountEvent.GuestCheckOutFailed)];
 
-        publishedTypes.Should().Match<Type[]>(types =>
-            types.ToHashSet().SetEquals(checkedOutBeforeCharge) && types.Length == checkedOutBeforeCharge.Length ||
-            types.ToHashSet().SetEquals(chargedBeforeCheckout) && types.Length == chargedBeforeCheckout.Length
-        );
+        (
+            publishedTypes.ToHashSet().SetEquals(checkedOutBeforeCharge) && publishedTypes.Length == checkedOutBeforeCharge.Length ||
+            publishedTypes.ToHashSet().SetEquals(chargedBeforeCheckout) && publishedTypes.Length == chargedBeforeCheckout.Length
+        ).ShouldBeTrue();
     }
 
     private async Task<Guid> InitiateGroupCheckout(Guid[] guestStays)

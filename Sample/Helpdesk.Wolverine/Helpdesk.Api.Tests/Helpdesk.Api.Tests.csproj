@@ -2,12 +2,12 @@
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
-        <RunSettingsFilePath Condition="'$(Configuration)' == 'Release'">$(MSBuildProjectDirectory)/production.runsettings</RunSettingsFilePath>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Alba" />
-        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Shouldly" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
@@ -15,9 +15,9 @@
         <PackageReference Include="NSubstitute" />
         <PackageReference Include="GitHubActionsTestLogger">
             <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <IncludeAssets>runtime; build; compile; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.v3" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" />
         <PackageReference Include="Bogus" />
         <PackageReference Include="xunit.runner.visualstudio">
@@ -27,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj" />
       <ProjectReference Include="..\Helpdesk.Api\Helpdesk.Api.csproj" />
     </ItemGroup>
 

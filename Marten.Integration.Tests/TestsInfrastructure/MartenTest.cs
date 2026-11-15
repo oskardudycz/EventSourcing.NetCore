@@ -1,29 +1,17 @@
 using System.Data;
-using DotNet.Testcontainers.Containers;
-using FluentAssertions;
+using Shouldly;
 using Marten.Events;
 using Npgsql;
-using Testcontainers.PostgreSql;
 using Xunit;
 
 namespace Marten.Integration.Tests.TestsInfrastructure;
 
-public class MartenFixture : IAsyncLifetime
-{
-    public readonly PostgreSqlContainer PostgreSqlContainer = new PostgreSqlBuilder("postgres:15.1-alpine")
-        .Build();
-
-    public Task InitializeAsync() => PostgreSqlContainer.StartAsync();
-
-    public Task DisposeAsync() => PostgreSqlContainer.DisposeAsync().AsTask();
-}
-
 [CollectionDefinition("MartenIntegrationTests", DisableParallelization = false)]
-public class MartenCollection : ICollectionFixture<MartenFixture>;
+public class MartenCollection;
 
 [Collection("MartenIntegrationTests")]
 public abstract class MartenTest(
-    PostgreSqlContainer postgreSqlContainer,
+    string connectionString,
     bool shouldCreateSession = true,
     bool useRandomSchema = true)
     : IAsyncLifetime
@@ -32,7 +20,7 @@ public abstract class MartenTest(
 
     private IDocumentSession? session;
 
-    protected string ConnectionString => postgreSqlContainer.GetConnectionString();
+    protected string ConnectionString => connectionString;
 
     protected IEventStoreOperations EventStore => Session.Events;
     protected static string GenerateRandomId() => Guid.CreateVersion7().ToString();
@@ -41,11 +29,8 @@ public abstract class MartenTest(
 
     protected virtual IDocumentSession CreateSession(Action<StoreOptions>? storeOptions = null)
     {
-        if (postgreSqlContainer.State != TestcontainersStates.Running)
-            throw new InvalidOperationException($"Container is not started! ({postgreSqlContainer.State})");
-
         return DocumentSessionProvider.Get(
-            postgreSqlContainer.GetConnectionString(),
+            connectionString,
             SchemaName,
             storeOptions
         );
@@ -57,20 +42,20 @@ public abstract class MartenTest(
     protected async Task SaveChangesAsyncShouldFailWith<TException>() where TException : Exception
     {
         var saveChanges = SaveChangesAsync;
-        await saveChanges.Should().ThrowAsync<TException>();
+        await saveChanges.ShouldThrowAsync<TException>();
 
         session = CreateSession();
     }
 
-    public virtual Task InitializeAsync()
+    public virtual ValueTask InitializeAsync()
     {
         if (shouldCreateSession)
             session = CreateSession();
 
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
-    public virtual async Task DisposeAsync()
+    public virtual async ValueTask DisposeAsync()
     {
         if (session != null)
             await session.DisposeAsync();

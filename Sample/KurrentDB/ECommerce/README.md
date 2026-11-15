@@ -14,14 +14,14 @@ Sample is showing the typical flow of the Event Sourcing app with [KurrentDB](ht
 
 ## Running
 
-1. Go to [docker](./docker) and run: `docker compose up`.
+1. Go to [docker](./docker) and run: `docker compose --profile all up`.
 2. Wait until all containers are downloaded and running.
 3. You should automatically get:
     - KurrentDB UI (for event store): http://localhost:2113/
     - Postgres DB running (for read models)
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `pgadmin4@pgadmin.org`, Password: `admin`
-        - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
+        - To connect to server Use host: `postgres`, user: `postgres`, password: `postgres`
 4. Build and run the `Carts.Api` project.
     - Swagger should be available at: http://localhost:5000/index.html
 
@@ -66,9 +66,9 @@ It uses:
 ## Trivia
 
 1. Docker useful commands
-    - `docker compose up` - start dockers
-    - `docker compose kill` - to stop running dockers.
-    - `docker compose down -v` - to clean stopped dockers.
+    - `docker compose --profile all up` - start dockers
+    - `docker compose --profile all kill` - to stop running dockers.
+    - `docker compose --profile all down -v` - to clean stopped dockers.
     - `docker ps` - for showing running dockers
     - `docker ps -a` - to show all dockers (also stopped)
 

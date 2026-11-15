@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using MeetingsManagement.Meetings.CreatingMeeting;
 using MeetingsManagement.Meetings.GettingMeeting;
 using MeetingsManagement.Meetings.ValueObjects;
@@ -32,10 +32,10 @@ public class ScheduleMeetingTests(ApiSpecification<Program> api): IClassFixture<
                 OK,
                 RESPONSE_BODY<MeetingView>(meeting =>
                 {
-                    meeting.Id.Should().Be(MeetingId);
-                    meeting.Name.Should().Be(MeetingName);
-                    meeting.Start.Should().Be(Start);
-                    meeting.End.Should().Be(End);
+                    meeting.Id.ShouldBe(MeetingId);
+                    meeting.Name.ShouldBe(MeetingName);
+                    meeting.Start.ShouldBe(Start);
+                    meeting.End.ShouldBe(End);
                 }));
     }
 

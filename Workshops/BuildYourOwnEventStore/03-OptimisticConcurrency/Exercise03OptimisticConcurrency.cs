@@ -1,5 +1,5 @@
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -44,7 +44,7 @@ public class Exercise03OptimisticConcurrency
         var appendFunctionExists = schemaProvider
             .FunctionExists(AppendEventFunctionName);
 
-        appendFunctionExists.Should().BeTrue();
+        appendFunctionExists.ShouldBeTrue();
     }
 
     [Fact]
@@ -56,16 +56,16 @@ public class Exercise03OptimisticConcurrency
 
         var result = eventStore.AppendEvent<User>(streamId, @event);
 
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
 
         var wasStreamCreated = databaseConnection.QuerySingle<bool>(
             "select exists (select 1 from streams where id = @streamId)", new { streamId }
         );
-        wasStreamCreated.Should().BeTrue();
+        wasStreamCreated.ShouldBeTrue();
 
         var wasEventAppended = databaseConnection.QuerySingle<bool>(
             "select exists (select 1 from events where stream_id = @streamId)", new { streamId }
         );
-        wasEventAppended.Should().BeTrue();
+        wasEventAppended.ShouldBeTrue();
     }
 }

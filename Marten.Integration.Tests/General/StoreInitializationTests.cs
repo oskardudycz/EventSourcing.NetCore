@@ -1,11 +1,12 @@
-using FluentAssertions;
+using Core.Testing.Fixtures;
+using Shouldly;
 using JasperFx;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Xunit;
 
 namespace Marten.Integration.Tests.General;
 
-public class StoreInitializationTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, false, false)
+public class StoreInitializationTests(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString, false, false)
 {
     [Fact]
     public async Task GivenWrongConnectionString_WhenDocumentSessionIsInitialized_ThenConnectionIsCreated()
@@ -17,7 +18,7 @@ public class StoreInitializationTests(MartenFixture fixture): MartenTest(fixture
             return ConnectionShouldBeEstablished(store);
         });
 
-        ex.Should().NotBeNull();
+        ex.ShouldNotBeNull();
     }
 
     [Fact]
@@ -30,7 +31,7 @@ public class StoreInitializationTests(MartenFixture fixture): MartenTest(fixture
             return ConnectionShouldBeEstablished(store);
         });
 
-        ex.Should().BeNull();
+        ex.ShouldBeNull();
     }
 
     [Fact]
@@ -48,7 +49,7 @@ public class StoreInitializationTests(MartenFixture fixture): MartenTest(fixture
             return ConnectionShouldBeEstablished(store);
         });
 
-        ex.Should().BeNull();
+        ex.ShouldBeNull();
     }
 
     [Fact(Skip = "To investigate in Npgsql")]
@@ -64,13 +65,13 @@ public class StoreInitializationTests(MartenFixture fixture): MartenTest(fixture
             });
 
             await using var session = store.LightweightSession();
-            await using var transaction = await session.Connection.BeginTransactionAsync();
+            await using var transaction = await session.Connection.BeginTransactionAsync(TestContext.Current.CancellationToken);
             await ConnectionShouldBeEstablished(store);
 
-            await transaction.RollbackAsync();
+            await transaction.RollbackAsync(TestContext.Current.CancellationToken);
         });
 
-        ex.Should().BeNull();
+        ex.ShouldBeNull();
     }
 
     private static async Task ConnectionShouldBeEstablished(IDocumentStore store)
@@ -78,6 +79,6 @@ public class StoreInitializationTests(MartenFixture fixture): MartenTest(fixture
         await using var session = store.LightweightSession();
         var result = await session.QueryAsync<int>("SELECT 1");
 
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 }

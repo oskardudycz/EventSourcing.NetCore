@@ -2,7 +2,7 @@ using System.Globalization;
 using ECommerce.Api.Requests;
 using ECommerce.ShoppingCarts;
 using ECommerce.ShoppingCarts.GettingCartById;
-using FluentAssertions;
+using Shouldly;
 using Ogooreck.API;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
@@ -30,19 +30,19 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>
                 {
-                    details.Id.Should().Be(ShoppingCartId);
-                    details.Status.Should().Be(ShoppingCartStatus.Pending);
-                    details.ProductItems.Should().HaveCount(1);
+                    details.Id.ShouldBe(ShoppingCartId);
+                    details.Status.ShouldBe(ShoppingCartStatus.Pending);
+                    details.ProductItems.Count().ShouldBe(1);
                     var productItem = details.ProductItems.Single();
-                    productItem.Should().BeEquivalentTo(
+                    productItem.ShouldBeEquivalentTo(
                         new ShoppingCartDetailsProductItem
                         {
                             ProductId = ProductItem.ProductId!.Value,
                             Quantity = ProductItem.Quantity!.Value - RemovedCount,
                             UnitPrice = UnitPrice
                         });
-                    details.ClientId.Should().Be(ClientId);
-                    details.Version.Should().Be(2);
+                    details.ClientId.ShouldBe(ClientId);
+                    details.Version.ShouldBe(2);
                 }));
 
     public Guid ShoppingCartId { get; private set; }
@@ -55,7 +55,7 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
 
     private readonly int RemovedCount = 5;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         var cartDetails = await API.Given()
             .When(POST, URI("/api/ShoppingCarts"), BODY(new OpenShoppingCartRequest(ClientId)))
@@ -78,5 +78,5 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
         UnitPrice = cartDetails.ProductItems.Single().UnitPrice;
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

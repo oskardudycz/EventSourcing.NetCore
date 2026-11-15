@@ -62,20 +62,20 @@ Read also more in my article [Introduction to Event Sourcing - Self Paced Kit](h
 
 1. Install git - https://git-scm.com/downloads.
 2. Clone this repository.
-3. Install .NET 8.0 - https://dotnet.microsoft.com/download/dotnet/8.0.
+3. Install .NET 10.0 - https://dotnet.microsoft.com/download/dotnet/10.0.
 4. Install Visual Studio, Rider or VSCode.
 5. Install docker - https://docs.docker.com/engine/install/.
 6. Open [Exercises.slnx](./Exercises.slnx) solution.
 
 ## Running
 
-1. Run: `docker compose up` (or for Mac `docker compose -f docker-compose.arm.yml up`).
+1. Run: `docker compose --profile all up` (or for Mac `docker compose -f docker-compose.arm.yml --profile all up`). Tests use these containers. If they aren't running, tests start their own through [Testcontainers](https://dotnet.testcontainers.org/), so Docker running is enough.
 2. Wait until all dockers got are downloaded and running.
 3. You should automatically get:
     - Postgres DB running for [Marten storage](https://martendb.io)
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `admin@pgadmin.org`, Password: `admin`
-        - To connect to server click right mouse on Servers, then Register Server and use host: `postgres`, user: `postgres`, password: `Password12!`
+        - To connect to server click right mouse on Servers, then Register Server and use host: `postgres`, user: `postgres`, password: `postgres`
    - KurrentDB UI: http://localhost:2113/
 4. Open, build and run [Exercises.slnx](./Exercises.slnx) solution.
 4. To see solved exercises, open [Solved.slnx](./Solved.slnx) solution.

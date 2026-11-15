@@ -34,4 +34,5 @@
   <Project Path="21-BusinessProcesses/21-BusinessProcesses.csproj" />
   <Project Path="22-Idempotency/22-Idempotency.csproj" />
   <Project Path="23-Consistency/23-Consistency.csproj" />
+  <Project Path="Tools/IntroductionToEventSourcing.Tools.csproj" />
 </Solution>

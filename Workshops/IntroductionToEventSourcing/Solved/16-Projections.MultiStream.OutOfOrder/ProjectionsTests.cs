@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using IntroductionToEventSourcing.Projections.MultiStream.OutOfOrder.Tools;
 using Xunit;
 
@@ -195,27 +195,27 @@ public class ProjectionsTests
 
         // Assert Payment 1: Approved
         var payment1 = database.Get<PaymentVerification>(payment1Id)!;
-        payment1.Should().NotBeNull();
-        payment1.Status.Should().Be(PaymentStatus.Approved);
+        payment1.ShouldNotBeNull();
+        payment1.Status.ShouldBe(PaymentStatus.Approved);
 
         // Assert Payment 2: Rejected
         var payment2 = database.Get<PaymentVerification>(payment2Id)!;
-        payment2.Should().NotBeNull();
-        payment2.Status.Should().Be(PaymentStatus.Rejected);
+        payment2.ShouldNotBeNull();
+        payment2.Status.ShouldBe(PaymentStatus.Rejected);
 
         // Assert Payment 3: Rejected
         var payment3 = database.Get<PaymentVerification>(payment3Id)!;
-        payment3.Should().NotBeNull();
-        payment3.Status.Should().Be(PaymentStatus.Rejected);
+        payment3.ShouldNotBeNull();
+        payment3.Status.ShouldBe(PaymentStatus.Rejected);
 
         // Assert Payment 4: Rejected
         var payment4 = database.Get<PaymentVerification>(payment4Id)!;
-        payment4.Should().NotBeNull();
-        payment4.Status.Should().Be(PaymentStatus.Rejected);
+        payment4.ShouldNotBeNull();
+        payment4.Status.ShouldBe(PaymentStatus.Rejected);
 
         // Assert Payment 5: Pending
         var payment5 = database.Get<PaymentVerification>(payment5Id)!;
-        payment5.Should().NotBeNull();
-        payment5.Status.Should().Be(PaymentStatus.Pending);
+        payment5.ShouldNotBeNull();
+        payment5.Status.ShouldBe(PaymentStatus.Pending);
     }
 }
