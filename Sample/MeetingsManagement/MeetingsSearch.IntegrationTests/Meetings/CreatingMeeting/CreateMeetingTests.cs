@@ -1,6 +1,6 @@
 using Core.Events;
 using Core.Testing;
-using FluentAssertions;
+using Shouldly;
 using MeetingsSearch.Meetings;
 using MeetingsSearch.Meetings.CreatingMeeting;
 using Xunit;
@@ -24,7 +24,7 @@ public class CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
                 MeetingName
             ),
             new EventMetadata("event-id", 1, 2, null)
-        ));
+        ), Xunit.TestContext.Current.CancellationToken);
 
         await API.Given()
             .When(
@@ -37,7 +37,7 @@ public class CreateMeetingTests(TestWebApplicationFactory<Program> fixture)
             )
             .Then(
                 RESPONSE_BODY<IReadOnlyCollection<Meeting>>(meetings =>
-                    meetings.Should().Contain(meeting =>
+                    meetings.ShouldContain(meeting =>
                         meeting.Id == MeetingId
                         && meeting.Name == MeetingName
                     )

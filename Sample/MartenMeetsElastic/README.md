@@ -21,5 +21,5 @@ The sample has:
 
 ## Running
 
-1. Start Postgres and Elasticsearch from the repository root: `docker compose --profile ci up`.
-2. Run the tests: `dotnet test Sample/MartenMeetsElastic/MartenMeetsElastic.Tests`.
+1. Start Docker. The tests start Postgres and Elasticsearch containers with [Testcontainers](https://dotnet.testcontainers.org/). If the containers from `docker compose --profile ci up` in the repository root are running, the tests use them instead.
+2. Run the tests: `dotnet test --project Sample/MartenMeetsElastic/MartenMeetsElastic.Tests`.

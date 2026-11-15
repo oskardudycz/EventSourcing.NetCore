@@ -1,3 +1,4 @@
+using Core.Testing.Fixtures;
 using System.Diagnostics.Metrics;
 using Core;
 using Core.Commands;
@@ -6,7 +7,7 @@ using Core.Marten;
 using Core.Marten.Commands;
 using Core.OpenTelemetry;
 using Core.Testing;
-using FluentAssertions;
+using Shouldly;
 using Marten.Events.Daemon.Coordination;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +19,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.Commands;
 
-public class MartenAsyncCommandBusTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, true)
+public class MartenAsyncCommandBusTests(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString, true)
 {
     [Fact]
     public async Task CommandIsStoredInMartenAndForwardedToCommandHandler()
@@ -36,15 +37,15 @@ public class MartenAsyncCommandBusTests(MartenFixture fixture): MartenTest(fixtu
         await eventListener.WaitForProcessing(command, ct);
 
         var commands = await Session.Events.FetchStreamAsync(MartenAsyncCommandBus.CommandsStreamId, token: ct);
-        commands.Should().HaveCountGreaterThanOrEqualTo(1);
+        commands.Count().ShouldBeGreaterThanOrEqualTo(1);
         commands.Select(e => e.Data).OfType<AddUser>()
             .Count(e => e.UserId == userId)
-            .Should().Be(1);
+            .ShouldBe(1);
 
-        userIds.Should().Contain(userId);
+        userIds.ShouldContain(userId);
     }
 
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
         var services = new ServiceCollection();

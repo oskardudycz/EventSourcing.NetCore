@@ -1,3 +1,4 @@
+using Core.Testing.Fixtures;
 using Core.Testing;
 using JasperFx.Events;
 using JasperFx.Events.Daemon;
@@ -105,7 +106,7 @@ public class AsyncDocumentChangesForwarder(IMessagingSystem messagingSystem): IC
         Task.CompletedTask;
 }
 
-public class DocumentChangesForwarding(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, false, false)
+public class DocumentChangesForwarding(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString, false, false)
 {
     [Fact(Skip = "Some weird is happening in System channels")]
     public async Task GivenEvents_WhenInlineTransformationIsApplied_ThenReturnsSameNumberOfTransformedItems()
@@ -127,7 +128,7 @@ public class DocumentChangesForwarding(MartenFixture fixture): MartenTest(fixtur
             cts.Token);
     }
 
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
 
@@ -162,7 +163,7 @@ public class DocumentChangesForwarding(MartenFixture fixture): MartenTest(fixtur
     private EventListener eventListener = new();
     private MessagingSystemStub messagingSystemStub = new();
 
-    public override async Task DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         await daemon.StopAsync(CancellationToken.None);
         serviceScope.Dispose();

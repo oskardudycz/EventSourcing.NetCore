@@ -1,4 +1,5 @@
-using FluentAssertions;
+using Core.Testing.Fixtures;
+using Shouldly;
 using JasperFx.Events;
 using Marten.Exceptions;
 using Marten.Integration.Tests.TestsInfrastructure;
@@ -21,7 +22,7 @@ public record Issue(
     string Description
 );
 
-public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
+public class StreamStarting(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString)
 {
     [Fact]
     public async Task GivenNoEvents_WhenStreamIsStarting_ThenEventsAreNotSavedWithError()
@@ -35,7 +36,7 @@ public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSq
             await Session.SaveChangesAsync();
         });
 
-        await starting.Should().ThrowAsync<EmptyEventStreamException>();
+        await starting.ShouldThrowAsync<EmptyEventStreamException>();
     }
 
     [Fact]
@@ -45,9 +46,9 @@ public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSq
 
         var streamId = EventStore.StartStream(@event.IssueId, @event);
 
-        streamId.Should().NotBeNull();
+        streamId.ShouldNotBeNull();
 
-        return Session.SaveChangesAsync();
+        return Session.SaveChangesAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -57,12 +58,12 @@ public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSq
 
         EventStore.StartStream(@event.IssueId, @event);
 
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await Assert.ThrowsAsync<Marten.Exceptions.ExistingStreamIdCollisionException>(async () =>
         {
             EventStore.StartStream(@event.IssueId, @event);
-            await Session.SaveChangesAsync();
+            await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
         });
     }
 
@@ -74,12 +75,12 @@ public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSq
 
         EventStore.Append(streamId, @event);
 
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var streamState = await EventStore.FetchStreamStateAsync(streamId);
+        var streamState = await EventStore.FetchStreamStateAsync(streamId, TestContext.Current.CancellationToken);
 
-        streamState.Should().NotBeNull();
-        streamState!.Version.Should().Be(1);
+        streamState.ShouldNotBeNull();
+        streamState!.Version.ShouldBe(1);
     }
 
     [Fact]
@@ -94,8 +95,8 @@ public class StreamStarting(MartenFixture fixture): MartenTest(fixture.PostgreSq
 
         EventStore.StartStream(streamId, events);
 
-        streamId.Should().NotBeNull();
+        streamId.ShouldNotBeNull();
 
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
     }
 }

@@ -2,10 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Shouldly" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
@@ -13,9 +14,9 @@
         <PackageReference Include="NSubstitute" />
         <PackageReference Include="GitHubActionsTestLogger">
             <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <IncludeAssets>runtime; build; compile; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.v3" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" />
         <PackageReference Include="Ogooreck" />
         <PackageReference Include="Bogus" />
@@ -26,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Core.Testing\Core.Testing.csproj" />
         <ProjectReference Include="..\PointOfSales.Api\PointOfSales.Api.csproj" />
     </ItemGroup>
 

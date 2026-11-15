@@ -1,9 +1,10 @@
-using FluentAssertions;
+using Shouldly;
 using JasperFx;
 using Marten;
 using Marten.Events.Projections;
 using Weasel.Core;
 using Xunit;
+using IntroductionToEventSourcing.Tools;
 
 namespace IntroductionToEventSourcing.Projections.MultiStream.Marten;
 
@@ -44,8 +45,7 @@ public class PaymentVerification
 
 public class ProjectionsTests
 {
-    private const string ConnectionString =
-        "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'";
+    private static string ConnectionString => TestDatabases.PostgresConnectionString;
 
     [Fact]
     [Trait("Category", "SkipCI")]
@@ -113,34 +113,34 @@ public class ProjectionsTests
         session.Events.Append(payment5Id, new PaymentRecorded(payment5Id, order5Id, 50m));
         session.Events.Append(merchant1Id, new MerchantLimitsChecked(payment5Id, merchant1Id, true));
 
-        await session.SaveChangesAsync();
+        await session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Wait until Async Daemon processes all events
         await daemon.WaitForNonStaleData(TimeSpan.FromSeconds(5));
 
         // Assert Payment 1: Approved
-        var payment1 = await session.LoadAsync<PaymentVerification>(payment1Id);
-        payment1.Should().NotBeNull();
-        payment1!.Status.Should().Be(PaymentStatus.Approved);
+        var payment1 = await session.LoadAsync<PaymentVerification>(payment1Id, TestContext.Current.CancellationToken);
+        payment1.ShouldNotBeNull();
+        payment1!.Status.ShouldBe(PaymentStatus.Approved);
 
         // Assert Payment 2: Rejected
-        var payment2 = await session.LoadAsync<PaymentVerification>(payment2Id);
-        payment2.Should().NotBeNull();
-        payment2!.Status.Should().Be(PaymentStatus.Rejected);
+        var payment2 = await session.LoadAsync<PaymentVerification>(payment2Id, TestContext.Current.CancellationToken);
+        payment2.ShouldNotBeNull();
+        payment2!.Status.ShouldBe(PaymentStatus.Rejected);
 
         // Assert Payment 3: Rejected
-        var payment3 = await session.LoadAsync<PaymentVerification>(payment3Id);
-        payment3.Should().NotBeNull();
-        payment3!.Status.Should().Be(PaymentStatus.Rejected);
+        var payment3 = await session.LoadAsync<PaymentVerification>(payment3Id, TestContext.Current.CancellationToken);
+        payment3.ShouldNotBeNull();
+        payment3!.Status.ShouldBe(PaymentStatus.Rejected);
 
         // Assert Payment 4: Rejected
-        var payment4 = await session.LoadAsync<PaymentVerification>(payment4Id);
-        payment4.Should().NotBeNull();
-        payment4!.Status.Should().Be(PaymentStatus.Rejected);
+        var payment4 = await session.LoadAsync<PaymentVerification>(payment4Id, TestContext.Current.CancellationToken);
+        payment4.ShouldNotBeNull();
+        payment4!.Status.ShouldBe(PaymentStatus.Rejected);
 
         // Assert Payment 5: Pending
-        var payment5 = await session.LoadAsync<PaymentVerification>(payment5Id);
-        payment5.Should().NotBeNull();
-        payment5!.Status.Should().Be(PaymentStatus.Pending);
+        var payment5 = await session.LoadAsync<PaymentVerification>(payment5Id, TestContext.Current.CancellationToken);
+        payment5.ShouldNotBeNull();
+        payment5!.Status.ShouldBe(PaymentStatus.Pending);
     }
 }

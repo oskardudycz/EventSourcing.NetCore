@@ -1,3 +1,4 @@
+using Core.Testing.Fixtures;
 using Weasel.Core;
 using Elastic.Clients.Elasticsearch;
 using Marten;
@@ -15,13 +16,12 @@ public abstract class MartenMeetsElasticTest: IDisposable
 
     protected IProjectionDaemon daemon = null!;
 
-    protected MartenMeetsElasticTest()
+    protected MartenMeetsElasticTest(PostgresContainerFixture postgres, ElasticsearchContainerFixture elasticsearch)
     {
-        elasticClient = new ElasticsearchClient(new ElasticsearchClientSettings(new Uri("http://localhost:9200/")));
+        elasticClient = new ElasticsearchClient(new ElasticsearchClientSettings(new Uri(elasticsearch.Url)));
 
         var options = new StoreOptions();
-        options.Connection(
-            "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'");
+        options.Connection(postgres.ConnectionString);
         options.UseSystemTextJsonForSerialization();
         options.DatabaseSchemaName = options.Events.DatabaseSchemaName = "MartenMeetsElastic";
         options.Events.StreamIdentity = StreamIdentity.AsString;

@@ -1,3 +1,4 @@
+using Core.Testing.Fixtures;
 using Core.Testing;
 using JasperFx.Events;
 using JasperFx.Events.Daemon;
@@ -141,7 +142,7 @@ public class EventTransformationsWithForwarding: MartenTest
             cts.Token);
     }
 
-    public EventTransformationsWithForwarding(MartenFixture fixture) : base(fixture.PostgreSqlContainer)
+    public EventTransformationsWithForwarding(PostgresContainerFixture postgres) : base(postgres.ConnectionString)
     {
         var services = new ServiceCollection();
 
@@ -175,7 +176,7 @@ public class EventTransformationsWithForwarding: MartenTest
     private readonly EventListener eventListener = new();
     private readonly MessagingSystemStub messagingSystemStub = new();
 
-    public override async Task DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         await daemon.StopAsync(CancellationToken.None);
         serviceScope.Dispose();

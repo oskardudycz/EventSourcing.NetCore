@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Core.KurrentDB.Events;
 using Core.OpenTelemetry;
-using FluentAssertions;
+using Shouldly;
 using System.Text.Json;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
@@ -35,8 +35,7 @@ public class KurrentDBEventMetadataJsonConverterTests
         // When
         var json = JsonSerializer.Serialize(propagationContext, serializerOptions);
 
-        json.Should()
-            .Be(
+        json.ShouldBe(
                 $"{{\"$correlationId\":\"{activity.Context.TraceId}\",\"$causationId\":\"{activity.Context.SpanId}\",\"traceparent\":\"00-{propagationContext.ActivityContext.TraceId}-{propagationContext.ActivityContext.SpanId}-01\"}}");
     }
 
@@ -61,6 +60,6 @@ public class KurrentDBEventMetadataJsonConverterTests
         // When
         var propagationContext = JsonSerializer.Deserialize<PropagationContext>(json, serializerOptions);
 
-        propagationContext.Should().Be(expectedPropagationContext);
+        propagationContext.ShouldBe(expectedPropagationContext);
     }
 }

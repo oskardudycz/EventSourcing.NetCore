@@ -1,16 +1,19 @@
+using Core.Testing.Fixtures;
 using JasperFx.CommandLine;
 using Xunit;
-using Xunit.Abstractions;
 using Xunit.Sdk;
+using Xunit.v3;
 
-[assembly: TestFramework("ApplicationLogic.Marten.Tests.AssemblyFixture", "ApplicationLogic.Marten.Tests")]
-[assembly: CollectionBehavior(DisableTestParallelization = true)]
+[assembly: TestFramework(typeof(ApplicationLogic.Marten.Tests.AssemblyFixture))]
+[assembly: Parallelization(Mode = ParallelMode.None)]
+[assembly: AssemblyFixture(typeof(ApplicationLogic.Marten.Tests.TestPostgres))]
 
 namespace ApplicationLogic.Marten.Tests;
 
 public sealed class AssemblyFixture : XunitTestFramework
 {
-    public AssemblyFixture(IMessageSink messageSink)
-        :base(messageSink) =>
+    public AssemblyFixture() =>
         JasperFxEnvironment.AutoStartHost = true;
 }
+
+public class TestPostgres(): PostgresContainerFixture("ConnectionStrings__ShoppingCarts");

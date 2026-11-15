@@ -13,13 +13,17 @@
         <PackageReference Include="Open.ChannelExtensions" />
         <PackageReference Include="GitHubActionsTestLogger">
             <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <IncludeAssets>runtime; build; compile; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="xunit" />
-        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="xunit.v3.extensibility.core" />
+        <PackageReference Include="xunit.v3.assert" />
+        <PackageReference Include="Shouldly" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
         <PackageReference Include="Ogooreck" />
+        <PackageReference Include="Testcontainers.Elasticsearch" />
+        <PackageReference Include="Testcontainers.Kafka" />
+        <PackageReference Include="Testcontainers.KurrentDb" />
         <!-- For PostgreSQL checkpointing tests -->
         <PackageReference Include="Testcontainers.PostgreSql" />
         <PackageReference Include="Npgsql"/>

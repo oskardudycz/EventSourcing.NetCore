@@ -3,7 +3,6 @@ using Consistency.Core;
 using Consistency.Version1_Aggregates.GroupCheckouts;
 using Consistency.Version1_Aggregates.GuestStayAccounts;
 using Xunit;
-using Xunit.Abstractions;
 using Database = Consistency.Core.Database;
 using GroupCheckoutCommand = Consistency.Version1_Aggregates.GroupCheckouts.GroupCheckoutCommand;
 
@@ -23,10 +22,10 @@ public class BusinessProcessTests
         // Given;
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
 
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
@@ -34,10 +33,10 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await groupCheckoutFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
 
         // Then
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveMessagesInAnyOrder(
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
@@ -65,19 +64,19 @@ public class BusinessProcessTests
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
         decimal[] amounts = [generate.Finance.Amount(), generate.Finance.Amount(), generate.Finance.Amount()];
 
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[0], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[0], now.AddHours(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[0], now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[0], now.AddHours(-1)), TestContext.Current.CancellationToken);
 
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], amounts[1], now.AddHours(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[1], amounts[1], now.AddHours(-2)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], amounts[1], now.AddHours(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[1], amounts[1], now.AddHours(-2)), TestContext.Current.CancellationToken);
 
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[2], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[2] / 2, now.AddHours(-1)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[2] / 2, now.AddHours(-1)));
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[2], now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[2] / 2, now.AddHours(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[2] / 2, now.AddHours(-1)), TestContext.Current.CancellationToken);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
@@ -85,10 +84,10 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await groupCheckoutFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
 
         // Then
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveMessagesInAnyOrder(
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
@@ -117,19 +116,19 @@ public class BusinessProcessTests
         decimal[] amounts = [generate.Finance.Amount(), generate.Finance.Amount(), generate.Finance.Amount()];
 
         // 🟢 settled
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[0], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[0], now.AddHours(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[0], now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[0], now.AddHours(-1)), TestContext.Current.CancellationToken);
 
         // 🛑 payment without charge
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], amounts[1], now.AddHours(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], amounts[1], now.AddHours(-1)), TestContext.Current.CancellationToken);
 
         // 🛑 payment without charge
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[2], amounts[2], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)));
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[2], amounts[2], now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)), TestContext.Current.CancellationToken);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
@@ -137,10 +136,10 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await groupCheckoutFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
 
         // Then
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveMessagesInAnyOrder(
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
@@ -177,18 +176,18 @@ public class BusinessProcessTests
         decimal[] amounts = [generate.Finance.Amount(), generate.Finance.Amount(), generate.Finance.Amount()];
 
         // 🛑 charge without payment
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[0], now.AddHours(-2)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[0], now.AddHours(-2)), TestContext.Current.CancellationToken);
 
         // 🛑 payment without charge
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], amounts[1], now.AddHours(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[1], amounts[1], now.AddHours(-1)), TestContext.Current.CancellationToken);
 
         // 🛑 payment without charge
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)));
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[2], amounts[2], now.AddHours(-2)));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)));
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[2], amounts[2], now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)), TestContext.Current.CancellationToken);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
@@ -196,10 +195,10 @@ public class BusinessProcessTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
 
         // When
-        await groupCheckoutFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
 
         // Then
-        await backgroundJobs.RunUntilIdle(publishedMessages);
+        await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveMessagesInAnyOrder(
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),

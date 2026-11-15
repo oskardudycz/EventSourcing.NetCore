@@ -629,11 +629,15 @@ Feel free to [create an issue](https://github.com/oskardudycz/EventSourcing.NetC
 For running the Event Store examples you need to have:
 
 1. .NET 10 installed - https://dotnet.microsoft.com/download/dotnet/10.0
-2. [Docker](https://store.docker.com/search?type=edition&offering=community) installed. Then going to the `docker` folder and running:
+2. [Docker](https://store.docker.com/search?type=edition&offering=community) installed. Tests start the databases they need with [Testcontainers](https://dotnet.testcontainers.org/), so `dotnet test` only needs Docker running. To run the samples locally, start the containers from the repository root:
 
 ```
 docker compose --profile all up
 ```
+
+Host ports default to the standard ones (e.g. `5432` for PostgreSQL, `2113` for KurrentDB). If a port is taken, set its variable, e.g. `POSTGRES_PORT=5433 docker compose --profile all up`. On ARM (e.g. Apple Silicon) also set `KURRENTDB_IMAGE=kurrentplatform/kurrentdb:26.2.3-experimental-arm64-10.0-noble`.
+
+While these containers are running, tests use them instead of starting their own. To start only the databases that tests need, as CI does, run `docker compose --profile ci up -d --wait`.
 
 **More information about using .NET, WebApi and Docker you can find in my other tutorials:** [WebApi with .NET](https://github.com/oskardudycz/WebApiWith.NETCore)
 

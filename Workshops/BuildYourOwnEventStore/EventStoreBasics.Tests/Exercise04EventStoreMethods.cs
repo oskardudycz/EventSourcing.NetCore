@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -41,14 +41,14 @@ public class Exercise04EventStoreMethods: IAsyncLifetime
         var streamId = Guid.CreateVersion7();
         var @event = new UserCreated(streamId,"John Doe");
 
-        await eventStore.AppendEvent<User>(streamId, @event);
+        await eventStore.AppendEvent<User>(streamId, @event, ct: TestContext.Current.CancellationToken);
 
-        var streamState = await eventStore.GetStreamState(streamId);
+        var streamState = await eventStore.GetStreamState(streamId, TestContext.Current.CancellationToken);
 
-        streamState.Should().NotBeNull();
-        streamState!.Id.Should().Be(streamId);
-        streamState.Type.Should().Be(typeof(User));
-        streamState.Version.Should().Be(1);
+        streamState.ShouldNotBeNull();
+        streamState!.Id.ShouldBe(streamId);
+        streamState.Type.ShouldBe(typeof(User));
+        streamState.Version.ShouldBe(1);
     }
 
     [Fact]
@@ -58,23 +58,23 @@ public class Exercise04EventStoreMethods: IAsyncLifetime
         var userCreated = new UserCreated(streamId, "John Doe");
         var userNameUpdated = new UserNameUpdated(streamId, "Adam Smith");
 
-        await eventStore.AppendEvent<User>(streamId, userCreated);
-        await eventStore.AppendEvent<User>(streamId, userNameUpdated);
+        await eventStore.AppendEvent<User>(streamId, userCreated, ct: TestContext.Current.CancellationToken);
+        await eventStore.AppendEvent<User>(streamId, userNameUpdated, ct: TestContext.Current.CancellationToken);
 
-        var events = await eventStore.GetEvents(streamId);
+        var events = await eventStore.GetEvents(streamId, ct: TestContext.Current.CancellationToken);
 
-        events.Cast<object>().Should().HaveCount(2);
+        events.Cast<object>().Count().ShouldBe(2);
 
-        events.OfType<UserCreated>().Should().Contain(
+        events.OfType<UserCreated>().ShouldContain(
             e => e.UserId == userCreated.UserId && e.UserName == userCreated.UserName);
 
-        events.OfType<UserNameUpdated>().Should().Contain(
+        events.OfType<UserNameUpdated>().ShouldContain(
             e => e.UserId == userNameUpdated.UserId && e.UserName == userNameUpdated.UserName);
     }
 
-    public Task InitializeAsync() =>
-        eventStore.Init();
+    public ValueTask InitializeAsync() =>
+        new(eventStore.Init());
 
-    public async Task DisposeAsync() =>
+    public async ValueTask DisposeAsync() =>
         await eventStore.DisposeAsync();
 }

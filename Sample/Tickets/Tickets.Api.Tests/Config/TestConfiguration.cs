@@ -7,7 +7,7 @@ public static class TestConfiguration
         {
             {
                 "EventStore:ConnectionString",
-                "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; MINPOOLSIZE = 1; MAXPOOLSIZE = 100; COMMANDTIMEOUT = 20; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'"
+                "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; MINPOOLSIZE = 1; MAXPOOLSIZE = 100; COMMANDTIMEOUT = 20; DATABASE = 'postgres'; PASSWORD = 'postgres'; USER ID = 'postgres'"
             },
             {"EventStore:WriteModelSchema", $"{fixtureName}Write"},
             {"EventStore:ReadModelSchema", $"{fixtureName}Read"},

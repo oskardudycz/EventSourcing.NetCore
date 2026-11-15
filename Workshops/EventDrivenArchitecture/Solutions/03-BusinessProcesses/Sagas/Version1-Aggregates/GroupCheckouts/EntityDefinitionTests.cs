@@ -18,7 +18,7 @@ public class EntityDefinitionTests
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStayIds, now);
 
         // When
-        await groupCheckoutFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -38,7 +38,7 @@ public class EntityDefinitionTests
         var command = new RecordGuestCheckoutCompletion(groupCheckoutId, guestStayId, now);
 
         // When
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -58,7 +58,7 @@ public class EntityDefinitionTests
         var command = new RecordGuestCheckoutFailure(groupCheckoutId, guestStayId, now);
 
         // When
-        await groupCheckoutFacade.RecordGuestCheckoutFailure(command);
+        await groupCheckoutFacade.RecordGuestCheckoutFailure(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -75,13 +75,13 @@ public class EntityDefinitionTests
         var completedGuestStayId = Guid.NewGuid();
         var lastGuestStayId = Guid.NewGuid();
         var groupCheckoutId = await InitiateGroupCheckout(completedGuestStayId, lastGuestStayId);
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(new RecordGuestCheckoutCompletion(groupCheckoutId, completedGuestStayId, now));
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(new RecordGuestCheckoutCompletion(groupCheckoutId, completedGuestStayId, now), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var command = new RecordGuestCheckoutCompletion(groupCheckoutId, lastGuestStayId, now);
 
         // When
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -99,13 +99,13 @@ public class EntityDefinitionTests
         var failedGuestStayId = Guid.NewGuid();
         var lastGuestStayId = Guid.NewGuid();
         var groupCheckoutId = await InitiateGroupCheckout(failedGuestStayId, lastGuestStayId);
-        await groupCheckoutFacade.RecordGuestCheckoutFailure(new RecordGuestCheckoutFailure(groupCheckoutId, failedGuestStayId, now));
+        await groupCheckoutFacade.RecordGuestCheckoutFailure(new RecordGuestCheckoutFailure(groupCheckoutId, failedGuestStayId, now), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var command = new RecordGuestCheckoutCompletion(groupCheckoutId, lastGuestStayId, now);
 
         // When
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveMessages(

@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using SimpleMigrations;
 using SimpleMigrations.DatabaseProvider;
@@ -118,10 +118,10 @@ public class Exercise08Snapshots
 
         var userFromDb = databaseConnection.Get<User>(streamId);
 
-        userFromDb.Should().NotBeNull();
-        userFromDb.Id.Should().Be(streamId);
-        userFromDb.Name.Should().Be("John Doe");
-        userFromDb.Version.Should().Be(1);
+        userFromDb.ShouldNotBeNull();
+        userFromDb.Id.ShouldBe(streamId);
+        userFromDb.Name.ShouldBe("John Doe");
+        userFromDb.Version.ShouldBe(1);
 
         userFromDb.ChangeName("Adam Smith");
 
@@ -129,9 +129,9 @@ public class Exercise08Snapshots
 
         var userAfterUpdate = databaseConnection.Get<User>(streamId);
 
-        userAfterUpdate.Id.Should().Be(streamId);
-        userAfterUpdate.Name.Should().Be("Adam Smith");
-        userFromDb.Version.Should().Be(2);
+        userAfterUpdate.Id.ShouldBe(streamId);
+        userAfterUpdate.Name.ShouldBe("Adam Smith");
+        userFromDb.Version.ShouldBe(2);
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public class Exercise08Snapshots
                     FROM USERS
                     WHERE name LIKE '%" + john + "%'");
 
-        users.Count().Should().Be(2);
+        users.Count().ShouldBe(2);
 
         Expression<Func<User, bool>> UserEqualTo(User userToCompare)
         {
@@ -162,8 +162,8 @@ public class Exercise08Snapshots
                         && x.Version == userToCompare.Version;
         }
 
-        users.Should().Contain(UserEqualTo(firstMatchingUser));
-        users.Should().Contain(UserEqualTo(secondMatchingUser));
-        users.Should().NotContain(UserEqualTo(notMatchingUser));
+        users.ShouldContain(UserEqualTo(firstMatchingUser));
+        users.ShouldContain(UserEqualTo(secondMatchingUser));
+        users.ShouldNotContain(UserEqualTo(notMatchingUser));
     }
 }

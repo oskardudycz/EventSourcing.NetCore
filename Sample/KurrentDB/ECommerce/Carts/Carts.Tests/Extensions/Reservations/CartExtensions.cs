@@ -1,7 +1,7 @@
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.OpeningCart;
 using Core.Testing;
-using FluentAssertions;
+using Shouldly;
 
 namespace Carts.Tests.Extensions.Reservations;
 
@@ -13,12 +13,12 @@ internal static class CartExtensions
         Guid clientId)
     {
 
-        shoppingCart.Id.Should().Be(id);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.Status.Should().Be(ShoppingCartStatus.Pending);
-        shoppingCart.ProductItems.Should().BeEmpty();
-        shoppingCart.TotalPrice.Should().Be(0);
-        shoppingCart.Version.Should().Be(0);
+        shoppingCart.Id.ShouldBe(id);
+        shoppingCart.ClientId.ShouldBe(clientId);
+        shoppingCart.Status.ShouldBe(ShoppingCartStatus.Pending);
+        shoppingCart.ProductItems.ShouldBeEmpty();
+        shoppingCart.TotalPrice.ShouldBe(0);
+        shoppingCart.Version.ShouldBe(0);
 
         return shoppingCart;
     }
@@ -30,11 +30,11 @@ internal static class CartExtensions
     {
         var @event = shoppingCart.PublishedEvent<ShoppingCartOpened>();
 
-        @event.Should().NotBeNull();
-        @event.Should().BeOfType<ShoppingCartOpened>();
-        @event!.CartId.Should().Be(id);
-        @event.ClientId.Should().Be(clientId);
-        @event.ShoppingCartStatus.Should().Be(ShoppingCartStatus.Pending);
+        @event.ShouldNotBeNull();
+        @event.ShouldBeOfType<ShoppingCartOpened>();
+        @event!.CartId.ShouldBe(id);
+        @event.ClientId.ShouldBe(clientId);
+        @event.ShoppingCartStatus.ShouldBe(ShoppingCartStatus.Pending);
 
         return shoppingCart;
     }

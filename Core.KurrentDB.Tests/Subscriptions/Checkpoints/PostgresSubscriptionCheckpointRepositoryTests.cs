@@ -9,7 +9,6 @@ namespace Core.KurrentDB.Tests.Subscriptions.Checkpoints;
 using static ISubscriptionCheckpointRepository;
 
 public class PostgresSubscriptionCheckpointRepositoryTests(PostgresContainerFixture fixture)
-    : IClassFixture<PostgresContainerFixture>
 {
     private readonly string subscriptionId = Guid.CreateVersion7().ToString("N");
 

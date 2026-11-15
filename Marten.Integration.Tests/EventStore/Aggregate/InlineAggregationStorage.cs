@@ -1,12 +1,13 @@
+using Core.Testing.Fixtures;
 using JasperFx.Events.Projections;
-using FluentAssertions;
+using Shouldly;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.Aggregate;
 
-public class InlineAggregationStorage(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
+public class InlineAggregationStorage(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString)
 {
     public record IssueCreated(
         string IssueId,
@@ -68,18 +69,18 @@ public class InlineAggregationStorage(MartenFixture fixture): MartenTest(fixture
         //1. Create events
         EventStore.StartStream<IssuesList>(streamId, events);
 
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         //2. Get live aggregation
-        var issuesListFromLiveAggregation = await EventStore.AggregateStreamAsync<IssuesList>(streamId)!;
+        var issuesListFromLiveAggregation = await EventStore.AggregateStreamAsync<IssuesList>(streamId, token: TestContext.Current.CancellationToken)!;
 
         //3. Get inline aggregation
-        var issuesListFromInlineAggregation = await Session.LoadAsync<IssuesList>(streamId);
+        var issuesListFromInlineAggregation = await Session.LoadAsync<IssuesList>(streamId, TestContext.Current.CancellationToken);
 
-        issuesListFromLiveAggregation.Should().NotBeNull();
-        issuesListFromInlineAggregation.Should().NotBeNull();
+        issuesListFromLiveAggregation.ShouldNotBeNull();
+        issuesListFromInlineAggregation.ShouldNotBeNull();
 
-        issuesListFromLiveAggregation!.Issues.Count.Should().Be(2);
-        issuesListFromLiveAggregation.Issues.Count.Should().Be(issuesListFromInlineAggregation!.Issues.Count);
+        issuesListFromLiveAggregation!.Issues.Count.ShouldBe(2);
+        issuesListFromLiveAggregation.Issues.Count.ShouldBe(issuesListFromInlineAggregation!.Issues.Count);
     }
 }

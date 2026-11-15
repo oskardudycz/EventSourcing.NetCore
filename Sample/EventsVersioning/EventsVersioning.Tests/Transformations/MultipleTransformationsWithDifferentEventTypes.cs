@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using FluentAssertions;
+using Shouldly;
 using V1 = ECommerce.V1;
 
 namespace EventsVersioning.Tests.Transformations;
@@ -168,21 +168,21 @@ public class MultipleTransformationsWithDifferentEventTypes
             .OfType<ShoppingCartInitializedWithStatus>()
             .ToList();
 
-        deserializedEvents.Should().HaveCount(3);
+        deserializedEvents.Count().ShouldBe(3);
 
         // Then
-        deserializedEvents[0].ShoppingCartId.Should().Be(eventV1.ShoppingCartId);
-        deserializedEvents[0].Client.Should().NotBeNull();
-        deserializedEvents[0].Client.Id.Should().Be(eventV1.ClientId);
-        deserializedEvents[0].Client.Name.Should().Be("Unknown");
-        deserializedEvents[0].Status.Should().Be(ShoppingCartStatus.Opened);
+        deserializedEvents[0].ShoppingCartId.ShouldBe(eventV1.ShoppingCartId);
+        deserializedEvents[0].Client.ShouldNotBeNull();
+        deserializedEvents[0].Client.Id.ShouldBe(eventV1.ClientId);
+        deserializedEvents[0].Client.Name.ShouldBe("Unknown");
+        deserializedEvents[0].Status.ShouldBe(ShoppingCartStatus.Opened);
 
-        deserializedEvents[1].ShoppingCartId.Should().Be(eventV2.ShoppingCartId);
-        deserializedEvents[1].Client.Should().Be(eventV2.Client);
-        deserializedEvents[1].Status.Should().Be(ShoppingCartStatus.Opened);
+        deserializedEvents[1].ShoppingCartId.ShouldBe(eventV2.ShoppingCartId);
+        deserializedEvents[1].Client.ShouldBe(eventV2.Client);
+        deserializedEvents[1].Status.ShouldBe(ShoppingCartStatus.Opened);
 
-        deserializedEvents[2].ShoppingCartId.Should().Be(eventV3.ShoppingCartId);
-        deserializedEvents[2].Client.Should().Be(eventV3.Client);
-        deserializedEvents[2].Status.Should().Be(eventV3.Status);
+        deserializedEvents[2].ShoppingCartId.ShouldBe(eventV3.ShoppingCartId);
+        deserializedEvents[2].Client.ShouldBe(eventV3.Client);
+        deserializedEvents[2].Status.ShouldBe(eventV3.Status);
     }
 }

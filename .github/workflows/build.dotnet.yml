@@ -15,7 +15,7 @@ jobs:
               uses: actions/checkout@v6
 
             - name: Start containers
-              run: docker compose --profile ci up -d
+              run: docker compose --profile ci up -d --wait
 
             - name: Setup .NET
               uses: actions/setup-dotnet@v5
@@ -35,8 +35,11 @@ jobs:
               run: dotnet build --configuration Release --no-restore
 
             - name: Run tests
-              run: dotnet test --configuration Release --no-build --filter "Category!=SkipCI&FullyQualifiedName!~Marten.Integration.Tests" --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal"
+              run: dotnet test --solution EventSourcing.NetCore.slnx --configuration Release --no-build --filter "Category!=SkipCI&FullyQualifiedName!~Marten.Integration.Tests"
+
+            - name: Run Marten integration tests
+              run: dotnet test --project Marten.Integration.Tests/Marten.Integration.Tests.csproj --configuration Release --no-build --filter "Category!=SkipCI"
 
             - name: Stop containers
               if: always()
-              run: docker compose --profile ci down
+              run: docker compose --profile ci down -v

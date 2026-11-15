@@ -39,17 +39,17 @@ and read:
 10. Open `BuildYourOwnEventStore.slnx` solution.
 11. Docker useful commands
 
-    - `docker compose up` - start dockers
-    - `docker compose kill` - to stop running dockers.
-    - `docker compose down -v` - to clean stopped dockers.
+    - `docker compose --profile all up` - start dockers
+    - `docker compose --profile all kill` - to stop running dockers.
+    - `docker compose --profile all down -v` - to clean stopped dockers.
     - `docker ps` - for showing running dockers
     - `docker ps -a` - to show all dockers (also stopped)
 
-12. For the first part of workshop please go to [./docker](./docker) and run: `docker compose up`.
+12. For the first part of workshop please go to [./docker](./docker) and run: `docker compose --profile all up`. Tests use this PostgreSQL. If it isn't running, tests start their own through [Testcontainers](https://dotnet.testcontainers.org/), so Docker running is enough.
 13. Wait until all dockers got are downloaded and running.
 14. You should automatically get:
 
     - Postgres DB running
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `admin@pgadmin.org`, Password: `admin`
-        - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
+        - To connect to server Use host: `postgres`, user: `postgres`, password: `postgres`

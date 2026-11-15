@@ -1,5 +1,6 @@
+using Core.Testing.Fixtures;
 using JasperFx.Events.Projections;
-using FluentAssertions;
+using Shouldly;
 using Marten.Events.Projections;
 using Marten.Integration.Tests.TestsInfrastructure;
 using Xunit;
@@ -58,7 +59,7 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
         }
     }
 
-    public class Reaggregation(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, false)
+    public class Reaggregation(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString, false)
     {
         public IDocumentSession CreateSessionWithInlineAggregationFor<TIssue>() where TIssue : class, new()
         {
@@ -88,15 +89,15 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
                 //1. Publish events
                 session.Events.StartStream<OldVersion.Issue>(taskId, events);
 
-                await session.SaveChangesAsync();
+                await session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-                issueFromV1InlineAggregation = (await session.LoadAsync<OldVersion.Issue>(taskId))!;
-                issueFromV1OnlineAggregation = (await session.Events.AggregateStreamAsync<OldVersion.Issue>(taskId))!;
+                issueFromV1InlineAggregation = (await session.LoadAsync<OldVersion.Issue>(taskId, TestContext.Current.CancellationToken))!;
+                issueFromV1OnlineAggregation = (await session.Events.AggregateStreamAsync<OldVersion.Issue>(taskId, token: TestContext.Current.CancellationToken))!;
             }
 
             //2. Both inline and online aggregation for the same type should be the same
-            issueFromV1InlineAggregation.Description.Should().Be("Issue 1 Updated");
-            issueFromV1InlineAggregation.Description.Should().Be(issueFromV1OnlineAggregation.Description);
+            issueFromV1InlineAggregation.Description.ShouldBe("Issue 1 Updated");
+            issueFromV1InlineAggregation.Description.ShouldBe(issueFromV1OnlineAggregation.Description);
 
             //3. Simulate change to aggregation logic
             NewVersion.Issue issueFromV2InlineAggregation;
@@ -104,17 +105,17 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
 
             await using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
             {
-                issueFromV2InlineAggregation = (await session.LoadAsync<NewVersion.Issue>(taskId))!;
-                issueFromV2OnlineAggregation = (await session.Events.AggregateStreamAsync<NewVersion.Issue>(taskId))!;
+                issueFromV2InlineAggregation = (await session.LoadAsync<NewVersion.Issue>(taskId, TestContext.Current.CancellationToken))!;
+                issueFromV2OnlineAggregation = (await session.Events.AggregateStreamAsync<NewVersion.Issue>(taskId, token: TestContext.Current.CancellationToken))!;
             }
 
             //4. Inline aggregated snapshot won't change automatically
-            issueFromV2InlineAggregation.Description.Should().Be(issueFromV1InlineAggregation.Description);
-            issueFromV2InlineAggregation.Description.Should().NotBe("New Logic: Issue 1 Updated");
+            issueFromV2InlineAggregation.Description.ShouldBe(issueFromV1InlineAggregation.Description);
+            issueFromV2InlineAggregation.Description.ShouldNotBe("New Logic: Issue 1 Updated");
 
             //5. But online aggregation is being applied automatically
-            issueFromV2OnlineAggregation.Description.Should().NotBe(issueFromV1OnlineAggregation.Description);
-            issueFromV2OnlineAggregation.Description.Should().Be("New Logic: Issue 1 Updated");
+            issueFromV2OnlineAggregation.Description.ShouldNotBe(issueFromV1OnlineAggregation.Description);
+            issueFromV2OnlineAggregation.Description.ShouldBe("New Logic: Issue 1 Updated");
 
             //6. Reagregation
             await using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
@@ -122,27 +123,27 @@ namespace Marten.Integration.Tests.EventStore.Aggregate
                 //7. Get online aggregation
                 //8. Store manually online aggregation as inline aggregation
                 session.Store(issueFromV2OnlineAggregation);
-                await session.SaveChangesAsync();
+                await session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-                var taskFromV2AfterReaggregation = (await session.LoadAsync<NewVersion.Issue>(taskId))!;
+                var taskFromV2AfterReaggregation = (await session.LoadAsync<NewVersion.Issue>(taskId, TestContext.Current.CancellationToken))!;
 
-                taskFromV2AfterReaggregation.Description.Should().NotBe(issueFromV1OnlineAggregation.Description);
-                taskFromV2AfterReaggregation.Description.Should().Be(issueFromV2OnlineAggregation.Description);
-                taskFromV2AfterReaggregation.Description.Should().Be("New Logic: Issue 1 Updated");
+                taskFromV2AfterReaggregation.Description.ShouldNotBe(issueFromV1OnlineAggregation.Description);
+                taskFromV2AfterReaggregation.Description.ShouldBe(issueFromV2OnlineAggregation.Description);
+                taskFromV2AfterReaggregation.Description.ShouldBe("New Logic: Issue 1 Updated");
             }
 
             await using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
             {
                 //9. Check if next event would be properly applied to inline aggregation
                 session.Events.Append(taskId, new IssueUpdated(taskId, "Completely New text"));
-                await session.SaveChangesAsync();
+                await session.SaveChangesAsync(TestContext.Current.CancellationToken);
             }
 
             // TODO: Something has changed here in Marten v7
             // using (var session = CreateSessionWithInlineAggregationFor<NewVersion.Issue>())
             // {
             //     var taskFromV2NewInlineAggregation = await session.LoadAsync<NewVersion.Issue>(taskId)!;
-            //     taskFromV2NewInlineAggregation.Description.Should().Be("New Logic: Completely New text");
+            //     taskFromV2NewInlineAggregation.Description.ShouldBe("New Logic: Completely New text");
             // }
         }
     }

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Immutable.Solution1;
@@ -155,11 +155,11 @@ public class GettingStateFromEventsTests
 
         var shoppingCart = GetShoppingCart(events);
 
-        shoppingCart.Id.Should().Be(shoppingCartId);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(2);
+        shoppingCart.Id.ShouldBe(shoppingCartId);
+        shoppingCart.ClientId.ShouldBe(clientId);
+        shoppingCart.ProductItems.Count().ShouldBe(2);
 
-        shoppingCart.ProductItems[0].Should().Be(pairOfShoes);
-        shoppingCart.ProductItems[1].Should().Be(tShirt);
+        shoppingCart.ProductItems[0].ShouldBe(pairOfShoes);
+        shoppingCart.ProductItems[1].ShouldBe(tShirt);
     }
 }

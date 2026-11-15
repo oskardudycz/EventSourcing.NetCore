@@ -1,3 +1,4 @@
+using Core.Testing.Fixtures;
 using Weasel.Core;
 using JasperFx;
 using JasperFx.Events;
@@ -9,7 +10,7 @@ using Xunit;
 
 namespace Marten.Integration.Tests.EventStore.UniqueConstraint;
 
-public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer)
+public class UniqueContstraintTests(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString)
 {
     public record UserCreated(
         string UserId,
@@ -70,12 +71,12 @@ public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.P
         var user1Id = GenerateRandomId();
         var user1Created = new UserCreated(user1Id, email);
         EventStore.StartStream(user1Id, user1Created);
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // should succeed for user with other name
         var user2Id = GenerateRandomId();
         EventStore.StartStream(user2Id, new UserCreated(user2Id, "some.other@email.com"));
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // should fail if added again
         var user3Id = GenerateRandomId();
@@ -88,7 +89,7 @@ public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.P
 
         // should succeed if updated to yet another non-existing email
         EventStore.Append(user1Id, new UserEmailUpdated(GenerateRandomId(), "yet.another@email.com"));
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // should fail for user with updated email
         var user4Id = GenerateRandomId();
@@ -96,11 +97,11 @@ public class UniqueContstraintTests(MartenFixture fixture): MartenTest(fixture.P
         await SaveChangesAsyncShouldFailWith<DocumentAlreadyExistsException>();
 
         EventStore.Append(user1Id, new UserDeleted(user1Id));
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // should succeed as we deleted
         var user5Id = GenerateRandomId();
         EventStore.StartStream(user3Id, new UserCreated(user5Id, "yet.another@email.com"));
-        await Session.SaveChangesAsync();
+        await Session.SaveChangesAsync(TestContext.Current.CancellationToken);
     }
 }

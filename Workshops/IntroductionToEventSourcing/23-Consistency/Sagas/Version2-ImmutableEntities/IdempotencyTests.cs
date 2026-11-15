@@ -4,7 +4,6 @@ using Consistency.Core;
 using Consistency.Sagas.Version2_ImmutableEntities.GroupCheckouts;
 using Consistency.Sagas.Version2_ImmutableEntities.GuestStayAccounts;
 using Xunit;
-using Xunit.Abstractions;
 using Database = Consistency.Core.Database;
 using GroupCheckoutCommand = Consistency.Sagas.Version2_ImmutableEntities.GroupCheckouts.GroupCheckoutCommand;
 
@@ -25,10 +24,10 @@ public class IdempotencyTests
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
         // And
-        await groupCheckoutFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
 
         // When
-        await groupCheckoutFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
 
         // Then
 
@@ -46,15 +45,15 @@ public class IdempotencyTests
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
         // And
         await groupCheckoutFacade.InitiateGroupCheckout(new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays,
-            now.AddDays(-1)));
+            now.AddDays(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
 
 
         var command = new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now);
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command, TestContext.Current.CancellationToken);
 
         // When
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command, TestContext.Current.CancellationToken);
 
         // Then
 
@@ -71,15 +70,15 @@ public class IdempotencyTests
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
         // And
         await groupCheckoutFacade.InitiateGroupCheckout(new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays,
-            now.AddDays(-1)));
+            now.AddDays(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
 
 
         var command = new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[0], now);
-        await groupCheckoutFacade.RecordGuestCheckoutFailure(command);
+        await groupCheckoutFacade.RecordGuestCheckoutFailure(command, TestContext.Current.CancellationToken);
 
         // When
-        await groupCheckoutFacade.RecordGuestCheckoutFailure(command);
+        await groupCheckoutFacade.RecordGuestCheckoutFailure(command, TestContext.Current.CancellationToken);
 
         // Then
 

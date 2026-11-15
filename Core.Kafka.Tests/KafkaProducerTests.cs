@@ -1,7 +1,8 @@
 using Core.Events;
 using Core.Kafka.Producers;
 using Core.OpenTelemetry;
-using FluentAssertions;
+using Core.Testing.Fixtures;
+using Shouldly;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -10,13 +11,13 @@ namespace Core.Kafka.Tests;
 
 public record TestEvent(string SomeValue, int AndAnother);
 
-public class KafkaProducerTests
+public class KafkaProducerTests(KafkaContainerFixture kafka)
 {
     private readonly IConfiguration kafkaConfig = new ConfigurationBuilder()
         .AddInMemoryCollection(
             new Dictionary<string, string?>
             {
-                { "KafkaProducer:ProducerConfig:BootstrapServers", "localhost:9092" },
+                { "KafkaProducer:ProducerConfig:BootstrapServers", kafka.BootstrapServers },
                 { "KafkaProducer:Topic", "MeetingsManagement" },
             }
         )
@@ -34,6 +35,6 @@ public class KafkaProducerTests
         var exception = await Record.ExceptionAsync(async () =>
             await kafkaProducer.Publish(eventEnvelope, CancellationToken.None)
         );
-        exception.Should().BeNull();
+        exception.ShouldBeNull();
     }
 }

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -74,8 +74,8 @@ public class Exercise05StreamAggregation
 
         var aggregate = eventStore.AggregateStream<User>(streamId);
 
-        aggregate.Id.Should().Be(streamId);
-        aggregate.Name.Should().Be(userNameUpdated.UserName);
-        aggregate.Version.Should().Be(2);
+        aggregate.Id.ShouldBe(streamId);
+        aggregate.Name.ShouldBe(userNameUpdated.UserName);
+        aggregate.Version.ShouldBe(2);
     }
 }

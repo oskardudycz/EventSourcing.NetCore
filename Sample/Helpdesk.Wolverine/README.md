@@ -34,14 +34,14 @@ Wolverine code generation uses different configurations for development and prod
 From the repository root, run normal integration tests with:
 
 ```sh
-dotnet test Sample/Helpdesk.Wolverine/Helpdesk.Api.Tests/Helpdesk.Api.Tests.csproj --configuration Debug
+dotnet test --project Sample/Helpdesk.Wolverine/Helpdesk.Api.Tests/Helpdesk.Api.Tests.csproj --configuration Debug
 ```
 
 To verify production loading, generate the code first, then run the same suite in Release:
 
 ```sh
 dotnet run --project Sample/Helpdesk.Wolverine/Helpdesk.Api/Helpdesk.Api.csproj --configuration Debug -- codegen write
-dotnet test Sample/Helpdesk.Wolverine/Helpdesk.Api.Tests/Helpdesk.Api.Tests.csproj --configuration Release
+dotnet test --project Sample/Helpdesk.Wolverine/Helpdesk.Api.Tests/Helpdesk.Api.Tests.csproj --configuration Release
 ```
 
-The Release test settings select Production and use the local PostgreSQL test database. CI generates the code before its Release restore/build. The Docker build generates and validates code in Debug, publishes Release, and checks that no runtime compiler or Roslyn assemblies are shipped. Generated files do not need to be committed. See [Wolverine's code generation guide](https://wolverinefx.io/guide/codegen#dropping-roslyn-from-the-production-image-entirely).
+Release test builds select Production, and the tests start PostgreSQL with Testcontainers, so only Docker needs to be running. If the containers from `docker compose --profile ci up` in the repository root are running, the tests use them instead. CI generates the code before its Release restore/build. The Docker build generates and validates code in Debug, publishes Release, and checks that no runtime compiler or Roslyn assemblies are shipped. Generated files do not need to be committed. See [Wolverine's code generation guide](https://wolverinefx.io/guide/codegen#dropping-roslyn-from-the-production-image-entirely).

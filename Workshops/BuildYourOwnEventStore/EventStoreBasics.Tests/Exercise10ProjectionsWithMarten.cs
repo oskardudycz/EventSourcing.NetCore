@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using FluentAssertions;
+using Shouldly;
 using JasperFx;
 using JasperFx.Events.Projections;
 using Marten;
@@ -178,24 +178,24 @@ public class Exercise10ProjectionsWithMarten
     {
         var user = new User(Guid.CreateVersion7(), "John Doe");
 
-        await userRepository.Add(user);
+        await userRepository.Add(user, TestContext.Current.CancellationToken);
 
         var firstOrder = new Order(Guid.CreateVersion7(), user.Id, "ORD/2019/08/01", 100.13M);
         var secondOrder = new Order(Guid.CreateVersion7(), user.Id, "ORD/2019/08/01", 2.110M);
 
-        await orderRepository.Add(firstOrder);
-        await orderRepository.Add(secondOrder);
+        await orderRepository.Add(firstOrder, TestContext.Current.CancellationToken);
+        await orderRepository.Add(secondOrder, TestContext.Current.CancellationToken);
 
         user.ChangeName("Alan Smith");
 
-        await userRepository.Update(user);
+        await userRepository.Update(user, TestContext.Current.CancellationToken);
 
-        var userDashboard = await documentSession.LoadAsync<UserDashboard>(user.Id);
+        var userDashboard = await documentSession.LoadAsync<UserDashboard>(user.Id, TestContext.Current.CancellationToken);
 
-        userDashboard.Should().NotBeNull();
-        userDashboard!.Id.Should().Be(user.Id);
-        userDashboard.UserName.Should().Be(user.Name);
-        userDashboard.OrdersCount.Should().Be(2);
-        userDashboard.TotalAmount.Should().Be(firstOrder.Amount + secondOrder.Amount);
+        userDashboard.ShouldNotBeNull();
+        userDashboard!.Id.ShouldBe(user.Id);
+        userDashboard.UserName.ShouldBe(user.Name);
+        userDashboard.OrdersCount.ShouldBe(2);
+        userDashboard.TotalAmount.ShouldBe(firstOrder.Amount + secondOrder.Amount);
     }
 }

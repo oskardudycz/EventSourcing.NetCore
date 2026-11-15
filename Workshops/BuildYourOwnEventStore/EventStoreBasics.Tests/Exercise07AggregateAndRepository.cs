@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -79,30 +79,30 @@ public class Exercise07AggregateAndRepository: IAsyncLifetime
         var streamId = Guid.CreateVersion7();
         var user = new User(streamId, "John Doe");
 
-        await repository.Add(user);
+        await repository.Add(user, TestContext.Current.CancellationToken);
 
-        var userFromRepository = await repository.Find(streamId);
+        var userFromRepository = await repository.Find(streamId, TestContext.Current.CancellationToken);
 
-        userFromRepository.Should().NotBeNull();
-        userFromRepository!.Id.Should().Be(streamId);
-        userFromRepository.Name.Should().Be("John Doe");
-        userFromRepository.Version.Should().Be(1);
+        userFromRepository.ShouldNotBeNull();
+        userFromRepository!.Id.ShouldBe(streamId);
+        userFromRepository.Name.ShouldBe("John Doe");
+        userFromRepository.Version.ShouldBe(1);
 
         userFromRepository.ChangeName("Adam Smith");
 
-        await repository.Update(userFromRepository);
+        await repository.Update(userFromRepository, TestContext.Current.CancellationToken);
 
-        var userAfterUpdate = await repository.Find(streamId);
+        var userAfterUpdate = await repository.Find(streamId, TestContext.Current.CancellationToken);
 
-        userAfterUpdate.Should().NotBeNull();
-        userAfterUpdate!.Id.Should().Be(streamId);
-        userAfterUpdate.Name.Should().Be("Adam Smith");
-        userFromRepository.Version.Should().Be(2);
+        userAfterUpdate.ShouldNotBeNull();
+        userAfterUpdate!.Id.ShouldBe(streamId);
+        userAfterUpdate.Name.ShouldBe("Adam Smith");
+        userFromRepository.Version.ShouldBe(2);
     }
 
-    public Task InitializeAsync() =>
-        eventStore.Init();
+    public ValueTask InitializeAsync() =>
+        new(eventStore.Init());
 
-    public async Task DisposeAsync() =>
+    public async ValueTask DisposeAsync() =>
         await eventStore.DisposeAsync();
 }

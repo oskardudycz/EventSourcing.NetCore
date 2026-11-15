@@ -4,16 +4,13 @@ using Xunit;
 
 namespace Core.EntityFramework.Tests.Fixtures;
 
-public class EfCorePostgresContainerFixture<TContext>: IAsyncLifetime where TContext : DbContext
+public class EfCorePostgresContainerFixture<TContext>(PostgresContainerFixture postgresContainerFixture): IAsyncLifetime
+    where TContext : DbContext
 {
-    private readonly PostgresContainerFixture postgresContainerFixture = new();
-
     public TContext DbContext { get; private set; } = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await postgresContainerFixture.InitializeAsync().ConfigureAwait(false);
-
         var optionsBuilder = new DbContextOptionsBuilder<TContext>()
             .UseNpgsql(postgresContainerFixture.DataSource);
 
@@ -22,10 +19,6 @@ public class EfCorePostgresContainerFixture<TContext>: IAsyncLifetime where TCon
         await DbContext.Database.MigrateAsync().ConfigureAwait(false);
     }
 
-    public async Task DisposeAsync()
-    {
-        await DbContext.DisposeAsync().ConfigureAwait(false);
-        await postgresContainerFixture.DisposeAsync().ConfigureAwait(false);
-    }
+    public ValueTask DisposeAsync() => DbContext.DisposeAsync();
 }
 

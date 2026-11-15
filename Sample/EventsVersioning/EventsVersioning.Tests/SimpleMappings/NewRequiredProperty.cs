@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using FluentAssertions;
+using Shouldly;
 using V1 = ECommerce.V1;
 
 namespace EventsVersioning.Tests.SimpleMappings;
@@ -31,10 +31,10 @@ public class NewRequiredProperty
         // When
         var @event = JsonSerializer.Deserialize<ShoppingCartOpened>(json);
 
-        @event.Should().NotBeNull();
-        @event!.ShoppingCartId.Should().Be(oldEvent.ShoppingCartId);
-        @event.ClientId.Should().Be(oldEvent.ClientId);
-        @event.Status.Should().Be(ShoppingCartStatus.Opened);
+        @event.ShouldNotBeNull();
+        @event!.ShoppingCartId.ShouldBe(oldEvent.ShoppingCartId);
+        @event.ClientId.ShouldBe(oldEvent.ClientId);
+        @event.Status.ShouldBe(ShoppingCartStatus.Opened);
     }
 
     [Fact]
@@ -47,8 +47,8 @@ public class NewRequiredProperty
         // When
         var oldEvent = JsonSerializer.Deserialize<V1.ShoppingCartOpened>(json);
 
-        oldEvent.Should().NotBeNull();
-        oldEvent!.ShoppingCartId.Should().Be(@event.ShoppingCartId);
-        oldEvent.ClientId.Should().Be(@event.ClientId);
+        oldEvent.ShouldNotBeNull();
+        oldEvent!.ShoppingCartId.ShouldBe(@event.ShoppingCartId);
+        oldEvent.ClientId.ShouldBe(@event.ClientId);
     }
 }

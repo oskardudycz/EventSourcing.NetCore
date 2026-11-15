@@ -35,7 +35,7 @@ public class GetProductDetailsFixture()
 {
     public ProductDetails ExistingProduct = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         var registerProduct = new RegisterProductRequest("IN11111", "ValidName", "ValidDescription");
         var productId = await Given()
@@ -47,5 +47,5 @@ public class GetProductDetailsFixture()
         ExistingProduct = new ProductDetails(productId, sku!, name!, description);
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

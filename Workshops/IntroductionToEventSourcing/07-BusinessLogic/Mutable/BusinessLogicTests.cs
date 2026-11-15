@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using IntroductionToEventSourcing.BusinessLogic.Tools;
 using Xunit;
 
@@ -76,24 +76,24 @@ public class BusinessLogicTests
             shoppingCart.Cancel();
             eventStore.AppendToStream(shoppingCartId, shoppingCart.UncommittedEvents);
         });
-        exception.Should().BeOfType<InvalidOperationException>();
+        exception.ShouldBeOfType<InvalidOperationException>();
 
         shoppingCart = eventStore.GetShoppingCart(shoppingCartId);
 
-        shoppingCart.Id.Should().Be(shoppingCartId);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.ProductItems.Should().HaveCount(2);
-        shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
+        shoppingCart.Id.ShouldBe(shoppingCartId);
+        shoppingCart.ClientId.ShouldBe(clientId);
+        shoppingCart.ProductItems.Count().ShouldBe(2);
+        shoppingCart.Status.ShouldBe(ShoppingCartStatus.Confirmed);
 
-        shoppingCart.ProductItems[0].Should().BeEquivalentTo(pricedPairOfShoes);
-        shoppingCart.ProductItems[1].Should().BeEquivalentTo(pricedTShirt);
+        shoppingCart.ProductItems[0].ShouldBeEquivalentTo(pricedPairOfShoes);
+        shoppingCart.ProductItems[1].ShouldBeEquivalentTo(pricedTShirt);
 
         var events = eventStore.ReadStream<ShoppingCartEvent>(shoppingCartId);
-        events.Should().HaveCount(5);
-        events[0].Should().BeOfType<ShoppingCartOpened>();
-        events[1].Should().BeOfType<ProductItemAddedToShoppingCart>();
-        events[2].Should().BeOfType<ProductItemAddedToShoppingCart>();
-        events[3].Should().BeOfType<ProductItemRemovedFromShoppingCart>();
-        events[4].Should().BeOfType<ShoppingCartConfirmed>();
+        events.Count().ShouldBe(5);
+        events[0].ShouldBeOfType<ShoppingCartOpened>();
+        events[1].ShouldBeOfType<ProductItemAddedToShoppingCart>();
+        events[2].ShouldBeOfType<ProductItemAddedToShoppingCart>();
+        events[3].ShouldBeOfType<ProductItemRemovedFromShoppingCart>();
+        events[4].ShouldBeOfType<ShoppingCartConfirmed>();
     }
 }

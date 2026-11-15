@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Tickets.Reservations;
 using Tickets.Reservations.CreatingTentativeReservation;
 
@@ -12,11 +12,11 @@ internal static class ReservationExtensions
         string number,
         Guid seatId)
     {
-        reservation.Status.Should().Be(ReservationStatus.Tentative);
+        reservation.Status.ShouldBe(ReservationStatus.Tentative);
 
-        reservation.Id.Should().Be(id);
-        reservation.Number.Should().Be(number);
-        reservation.SeatId.Should().Be(seatId);
+        reservation.Id.ShouldBe(id);
+        reservation.Number.ShouldBe(number);
+        reservation.SeatId.ShouldBe(seatId);
 
         return reservation;
     }
@@ -29,11 +29,11 @@ internal static class ReservationExtensions
     {
         var @event = reservation.PublishedEvent<TentativeReservationCreated>();
 
-        @event.Should().NotBeNull();
-        @event.Should().BeOfType<TentativeReservationCreated>();
-        @event!.ReservationId.Should().Be(id);
-        @event.Number.Should().Be(number);
-        @event.SeatId.Should().Be(seatId);
+        @event.ShouldNotBeNull();
+        @event.ShouldBeOfType<TentativeReservationCreated>();
+        @event!.ReservationId.ShouldBe(id);
+        @event.Number.ShouldBe(number);
+        @event.SeatId.ShouldBe(seatId);
 
         return reservation;
     }

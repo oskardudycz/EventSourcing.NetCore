@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -76,20 +76,20 @@ public class Exercise06TimeTravelling
 
         var aggregateAtVersion1 = eventStore.AggregateStream<User>(streamId, 1);
 
-        aggregateAtVersion1.Id.Should().Be(streamId);
-        aggregateAtVersion1.Name.Should().Be(userCreated.UserName);
-        aggregateAtVersion1.Version.Should().Be(1);
+        aggregateAtVersion1.Id.ShouldBe(streamId);
+        aggregateAtVersion1.Name.ShouldBe(userCreated.UserName);
+        aggregateAtVersion1.Version.ShouldBe(1);
 
         var aggregateAtVersion2 = eventStore.AggregateStream<User>(streamId, 2);
 
-        aggregateAtVersion2.Id.Should().Be(streamId);
-        aggregateAtVersion2.Name.Should().Be(userNameUpdated.UserName);
-        aggregateAtVersion2.Version.Should().Be(2);
+        aggregateAtVersion2.Id.ShouldBe(streamId);
+        aggregateAtVersion2.Name.ShouldBe(userNameUpdated.UserName);
+        aggregateAtVersion2.Version.ShouldBe(2);
 
         var aggregateAtVersion3 = eventStore.AggregateStream<User>(streamId, 3);
 
-        aggregateAtVersion3.Id.Should().Be(streamId);
-        aggregateAtVersion3.Name.Should().Be(userNameUpdatedAgain.UserName);
-        aggregateAtVersion3.Version.Should().Be(3);
+        aggregateAtVersion3.Id.ShouldBe(streamId);
+        aggregateAtVersion3.Name.ShouldBe(userNameUpdatedAgain.UserName);
+        aggregateAtVersion3.Version.ShouldBe(3);
     }
 }

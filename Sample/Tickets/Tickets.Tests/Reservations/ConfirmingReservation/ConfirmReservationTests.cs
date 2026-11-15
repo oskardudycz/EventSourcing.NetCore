@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Tickets.Reservations;
 using Tickets.Reservations.ConfirmingReservation;
 using Tickets.Tests.Builders;
@@ -22,12 +22,12 @@ public class ConfirmReservationTests
         reservation.Confirm();
 
         // Then
-        reservation.Status.Should().Be(ReservationStatus.Confirmed);
+        reservation.Status.ShouldBe(ReservationStatus.Confirmed);
 
         var @event = reservation.PublishedEvent<ReservationConfirmed>();
 
-        @event.Should().NotBeNull();
-        @event.Should().BeOfType<ReservationConfirmed>();
-        @event!.ReservationId.Should().Be(reservation.Id);
+        @event.ShouldNotBeNull();
+        @event.ShouldBeOfType<ReservationConfirmed>();
+        @event!.ReservationId.ShouldBe(reservation.Id);
     }
 }

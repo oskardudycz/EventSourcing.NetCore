@@ -3,7 +3,6 @@ using Idempotency.Core;
 using Idempotency.Version1_Aggregates.GroupCheckouts;
 using Idempotency.Version1_Aggregates.GuestStayAccounts;
 using Xunit;
-using Xunit.Abstractions;
 using Database = Idempotency.Core.Database;
 using GroupCheckoutCommand = Idempotency.Version1_Aggregates.GroupCheckouts.GroupCheckoutCommand;
 
@@ -27,10 +26,10 @@ public class IdempotencyTests
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
         var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
         // And
-        await groupCheckoutFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
 
         // When
-        await groupCheckoutFacade.InitiateGroupCheckout(command);
+        await groupCheckoutFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
 
         // Then
 
@@ -47,15 +46,15 @@ public class IdempotencyTests
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
         // And
         await groupCheckoutFacade.InitiateGroupCheckout(new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays,
-            now.AddDays(-1)));
+            now.AddDays(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
 
 
         var command = new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now);
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command, TestContext.Current.CancellationToken);
 
         // When
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command, TestContext.Current.CancellationToken);
 
         // Then
 
@@ -71,15 +70,15 @@ public class IdempotencyTests
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
         // And
         await groupCheckoutFacade.InitiateGroupCheckout(new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays,
-            now.AddDays(-1)));
+            now.AddDays(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
 
 
         var command = new RecordGuestCheckoutFailure(groupCheckoutId, guestStays[0], now);
-        await groupCheckoutFacade.RecordGuestCheckoutFailure(command);
+        await groupCheckoutFacade.RecordGuestCheckoutFailure(command, TestContext.Current.CancellationToken);
 
         // When
-        await groupCheckoutFacade.RecordGuestCheckoutFailure(command);
+        await groupCheckoutFacade.RecordGuestCheckoutFailure(command, TestContext.Current.CancellationToken);
 
         // Then
 
@@ -94,10 +93,10 @@ public class IdempotencyTests
         var guestStayId = Guid.NewGuid();
         var command = new CheckInGuest(guestStayId, now);
         // And
-        await guestStayFacade.CheckInGuest(command);
+        await guestStayFacade.CheckInGuest(command, TestContext.Current.CancellationToken);
 
         // When
-        await guestStayFacade.CheckInGuest(command);
+        await guestStayFacade.CheckInGuest(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedIn(guestStayId, now));
@@ -111,10 +110,10 @@ public class IdempotencyTests
         var chargeId = Guid.NewGuid();
         var command = new RecordCharge(guestStayId, chargeId, 100, now);
         // And
-        await guestStayFacade.RecordCharge(command);
+        await guestStayFacade.RecordCharge(command, TestContext.Current.CancellationToken);
 
         // When
-        await guestStayFacade.RecordCharge(command);
+        await guestStayFacade.RecordCharge(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new ChargeRecorded(guestStayId, chargeId, 100, now));
@@ -128,10 +127,10 @@ public class IdempotencyTests
         var paymentId = Guid.NewGuid();
         var command = new RecordPayment(guestStayId, paymentId, 100, now);
         // And
-        await guestStayFacade.RecordPayment(command);
+        await guestStayFacade.RecordPayment(command, TestContext.Current.CancellationToken);
 
         // When
-        await guestStayFacade.RecordPayment(command);
+        await guestStayFacade.RecordPayment(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, paymentId, 100, now));
@@ -145,10 +144,10 @@ public class IdempotencyTests
         var groupCheckoutId = Guid.NewGuid();
         var command = new CheckOutGuest(guestStayId, now, groupCheckoutId);
         // And
-        await guestStayFacade.CheckOutGuest(command);
+        await guestStayFacade.CheckOutGuest(command, TestContext.Current.CancellationToken);
 
         // When
-        await guestStayFacade.CheckOutGuest(command);
+        await guestStayFacade.CheckOutGuest(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayId, now, groupCheckoutId));
@@ -160,17 +159,15 @@ public class IdempotencyTests
         // Given
         var groupCheckoutId = Guid.NewGuid();
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid()];
-        await groupCheckoutFacade.InitiateGroupCheckout(
-            new InitiateGroupCheckout(groupCheckoutId, Guid.NewGuid(), guestStays, now));
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(
-            new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now));
+        await groupCheckoutFacade.InitiateGroupCheckout(new InitiateGroupCheckout(groupCheckoutId, Guid.NewGuid(), guestStays, now), TestContext.Current.CancellationToken);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var command = new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[1], now);
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command, TestContext.Current.CancellationToken);
 
         // When
-        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command);
+        await groupCheckoutFacade.RecordGuestCheckoutCompletion(command, TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -197,15 +194,14 @@ public class IdempotencyTests
 
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid()];
         foreach (var guestStayId in guestStays)
-            await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now));
+            await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
         var clerkId = Guid.NewGuid();
 
         // When
-        await groupCheckoutFacade.InitiateGroupCheckout(
-            new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now));
+        await groupCheckoutFacade.InitiateGroupCheckout(new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now), TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveMessages(

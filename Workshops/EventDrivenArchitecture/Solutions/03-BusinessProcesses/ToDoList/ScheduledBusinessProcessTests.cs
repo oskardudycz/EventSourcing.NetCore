@@ -1,7 +1,7 @@
 using BusinessProcesses.Core;
 using BusinessProcesses.ToDoList.GroupCheckouts;
 using BusinessProcesses.ToDoList.GuestStayAccounts;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 using Database = BusinessProcesses.Core.Database;
 
@@ -20,15 +20,15 @@ public class ScheduledBusinessProcessTests
         // Given
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid()];
 
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)));
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)));
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
         var clerkId = Guid.NewGuid();
 
         // When
-        await groupCheckoutFacade.InitiateGroupCheckout(new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now));
+        await groupCheckoutFacade.InitiateGroupCheckout(new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now), TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -42,8 +42,8 @@ public class ScheduledBusinessProcessTests
         );
 
         // When
-        await scheduledToDoList.HandleAll();
-        await scheduledToDoList.HandleAll();
+        await scheduledToDoList.HandleAll(TestContext.Current.CancellationToken);
+        await scheduledToDoList.HandleAll(TestContext.Current.CancellationToken);
 
         // Then
         publishedMessages.ShouldReceiveMessages(
@@ -56,8 +56,8 @@ public class ScheduledBusinessProcessTests
                 new GroupCheckoutEvent.GroupCheckoutCompleted(groupCheckoutId, guestStays, now),
             ]
         );
-        (await database.Get<GroupCheckOut>(groupCheckoutId, default))
-            .Should().BeNull("done group checkout is removed from the to-do list");
+        (await database.Get<GroupCheckOut>(groupCheckoutId, TestContext.Current.CancellationToken))
+            .ShouldBeNull("done group checkout is removed from the to-do list");
     }
 
     private readonly Database database = new();

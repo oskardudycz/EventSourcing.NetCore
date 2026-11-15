@@ -1,5 +1,6 @@
 using Weasel.Core;
 using Marten;
+using IntroductionToEventSourcing.Tools;
 
 namespace IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 
@@ -11,8 +12,7 @@ public abstract class MartenTest: IDisposable
     protected MartenTest(string schemaName)
     {
         var options = new StoreOptions();
-        options.Connection(
-            "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'");
+        options.Connection(TestDatabases.PostgresConnectionString);
         options.UseSystemTextJsonForSerialization();
         options.DatabaseSchemaName = options.Events.DatabaseSchemaName = schemaName;
 

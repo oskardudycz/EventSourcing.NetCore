@@ -1,44 +1,60 @@
+name: eventsourcing
+
 services:
     #######################################################
-    #  Postgres
+    #  PostgreSQL
     #######################################################
     postgres:
-        profiles: [ postgres, postgres-all, all, all-no-ui, ci ]
-        image: postgres:15.1-alpine
-        container_name: postgres
+        profiles: [ postgres, postgres-all, all, all-no-ui, ci, sample ]
+        image: postgres:18.7-alpine
         environment:
             - POSTGRES_DB=postgres
-            - POSTGRES_PASSWORD=Password12!
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
         ports:
-            - "5432:5432"
+            - '${POSTGRES_PORT:-5432}:5432'
+        volumes:
+            - postgres-data:/var/lib/postgresql
+        healthcheck:
+            test: pg_isready -U postgres -d postgres
+            interval: 5s
+            timeout: 10s
+            retries: 100
         networks:
             - postgres
 
     pgadmin:
         profiles: [ postgres-ui, postgres-all, all ]
-        image: dpage/pgadmin4
-        container_name: pgadmin
+        image: dpage/pgadmin4:9.19
         environment:
             PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.org}
             PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+            PGADMIN_CONFIG_SERVER_MODE: 'False'
         ports:
-            - "${PGADMIN_PORT:-5050}:80"
+            - '${PGADMIN_PORT:-5050}:80'
+        volumes:
+            - pgadmin-data:/var/lib/pgadmin
+        depends_on:
+            - postgres
         networks:
             - postgres
 
+    #######################################################
+    #  Jaeger
+    #######################################################
     jaeger:
         profiles: [ otel, otel-all, all ]
-        image: jaegertracing/all-in-one:latest
+        image: jaegertracing/all-in-one:1.76.0
         environment:
             COLLECTOR_OTLP_ENABLED: "true"
         ports:
-            - "4317:4317"
-            - "4318:4318"
+            - "${OTEL_GRPC_PORT:-4317}:4317"
+            - "${OTEL_HTTP_PORT:-4318}:4318"
             - "5775:5775/udp"
             - "6831:6831/udp"
             - "6832:6832/udp"
             - "5778:5778"
-            - "16686:16686"
+            - "${JAEGER_UI_PORT:-16686}:16686"
             - "14268:14268"
             - "9411:9411"
 
@@ -46,10 +62,9 @@ services:
     #  KurrentDB
     #######################################################
     kurrentdb:
-        profiles: [ kurrentdb, kurrentdb-all, all, all-no-ui, ci ]
-        image: kurrentplatform/kurrentdb:26.2.3
-        # use this image if you're running ARM-based proc like Apple M1
-        # image: kurrentplatform/kurrentdb:26.2.3-experimental-arm64-10.0-noble
+        profiles: [ kurrentdb, kurrentdb-all, all, all-no-ui, ci, sample ]
+        image: ${KURRENTDB_IMAGE:-kurrentplatform/kurrentdb:26.2.3}
+        # on ARM (e.g. Apple Silicon) run: KURRENTDB_IMAGE=kurrentplatform/kurrentdb:26.2.3-experimental-arm64-10.0-noble docker compose --profile all up
         environment:
             - KURRENTDB_CLUSTER_SIZE=1
             - KURRENTDB_RUN_PROJECTIONS=All
@@ -58,23 +73,19 @@ services:
             - KURRENTDB_INSECURE=true
             - KURRENTDB_ENABLE_ATOM_PUB_OVER_HTTP=true
         ports:
-            - '2113:2113'
+            - '${KURRENTDB_PORT:-2113}:2113'
         volumes:
-            -   type: volume
-                source: kurrentdb-volume-data
-                target: /var/lib/kurrentdb
-            -   type: volume
-                source: kurrentdb-volume-logs
-                target: /var/log/kurrentdb
+            - kurrentdb-data:/var/lib/kurrentdb
+            - kurrentdb-logs:/var/log/kurrentdb
         networks:
-            - kurrentdb_network
+            - kurrentdb
 
     #######################################################
-    #  Elastic Search
+    #  Elasticsearch
     #######################################################
     elasticsearch:
+        profiles: [ elasticsearch, elasticsearch-all, all, all-no-ui, ci ]
         image: docker.elastic.co/elasticsearch/elasticsearch:9.5.6
-        profiles: [ elastic, elastic-all, all, all-no-ui, ci ]
         environment:
             - discovery.type=single-node
             - cluster.name=docker-cluster
@@ -93,22 +104,27 @@ services:
                 soft: -1
                 hard: -1
         volumes:
-            - elastic-data:/usr/share/elasticsearch/data
+            - elasticsearch-data:/usr/share/elasticsearch/data
         ports:
-            - "9200:9200"
-            - "9300:9300"
+            - "${ELASTICSEARCH_PORT:-9200}:9200"
+            - "${ELASTICSEARCH_TRANSPORT_PORT:-9300}:9300"
+        healthcheck:
+            test: curl -fs "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s" > /dev/null || exit 1
+            interval: 5s
+            timeout: 10s
+            retries: 100
         networks:
-            - es_network
+            - elasticsearch
 
     kibana:
+        profiles: [ elasticsearch-ui, elasticsearch-all, all ]
         image: docker.elastic.co/kibana/kibana:9.5.6
-        profiles: [ elastic-ui, elastic-all, all ]
         environment:
-            - ELASTICSEARCH_HOSTS=http://elastic_search:9200
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
         ports:
-            - "5601:5601"
+            - "${KIBANA_PORT:-5601}:5601"
         networks:
-            - es_network
+            - elasticsearch
         depends_on:
             - elasticsearch
 
@@ -116,17 +132,16 @@ services:
     #  Kafka
     #######################################################
     kafka:
-        image: confluentinc/confluent-local:7.6.1
-        profiles: [kafka, kafka-all, all, all-no-ui]
+        profiles: [ kafka, kafka-all, all, all-no-ui, ci ]
+        image: confluentinc/confluent-local:8.4.1
         hostname: kafka
-        container_name: kafka
         networks:
-            - kafka_network
+            - kafka
         ports:
-            - "9092:9092"
+            - "${KAFKA_PORT:-9092}:9092"
             - "9091:9091"
         healthcheck:
-            test: nc -z localhost 9092 || exit -1
+            test: kafka-broker-api-versions --bootstrap-server localhost:9092 > /dev/null 2>&1 || exit 1
             interval: 5s
             timeout: 10s
             retries: 100
@@ -150,15 +165,14 @@ services:
             KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
 
     init-kafka:
-        image: confluentinc/confluent-local:7.6.1
         profiles: [ kafka, kafka-all, all, all-no-ui ]
+        image: confluentinc/confluent-local:8.4.1
         hostname: init-kafka
-        container_name: init-kafka
         depends_on:
             - kafka
         entrypoint: [ '/bin/sh', '-c' ]
         networks:
-            - kafka_network
+            - kafka
         command: |
             "
             # blocks until kafka is reachable
@@ -174,21 +188,17 @@ services:
             kafka-topics --bootstrap-server kafka:29092 --list
             "
 
-    #######################################################
-    #  Schema Registry
-    #######################################################
     schema_registry:
-        image: confluentinc/cp-schema-registry:7.6.1
-        container_name: schema_registry
-        hostname: schema_registry
         profiles: [ kafka-ui, kafka-all, all ]
+        image: confluentinc/cp-schema-registry:8.4.1
+        hostname: schema_registry
         ports:
             - 8181:8181
-            - 8081:8081
+            - "${SCHEMA_REGISTRY_PORT:-8081}:8081"
         depends_on:
             - kafka
         networks:
-            - kafka_network
+            - kafka
         environment:
             SCHEMA_REGISTRY_HOST_NAME: schema_registry
             SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
@@ -198,30 +208,26 @@ services:
             SCHEMA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
 
     kafka_topics_ui:
-        image: provectuslabs/kafka-ui:latest
-        hostname: kafka-ui
         profiles: [ kafka-ui, kafka-all, all ]
+        image: provectuslabs/kafka-ui:v0.7.2
+        hostname: kafka-ui
         ports:
-            - "8080:8080"
+            - "${KAFKA_UI_PORT:-8080}:8080"
         environment:
             KAFKA_CLUSTERS_0_NAME: local
             KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
         networks:
-            - kafka_network
+            - kafka
         depends_on:
             - kafka
 
-    #######################################################
-    #  Test Backend Service
-    #######################################################
-    backend:
+    tickets-api:
+        profiles: [ sample ]
         build:
             dockerfile: Dockerfile
             context: .
-        container_name: event_sourcing_sample
-        profiles: [sample]
         ports:
-            - "5555:5000"
+            - "${BACKEND_PORT:-5555}:5000"
         depends_on:
             postgres:
                 condition: service_healthy
@@ -229,18 +235,18 @@ services:
             - postgres
 
 networks:
-    es_network:
-        driver: bridge
     postgres:
         driver: bridge
-    kurrentdb_network:
+    kurrentdb:
         driver: bridge
-    kafka_network:
+    elasticsearch:
+        driver: bridge
+    kafka:
         driver: bridge
 
 volumes:
-    postgres:
-    pgadmin:
-    kurrentdb-volume-data:
-    kurrentdb-volume-logs:
-    elastic-data:
+    postgres-data:
+    pgadmin-data:
+    kurrentdb-data:
+    kurrentdb-logs:
+    elasticsearch-data:

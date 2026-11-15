@@ -1,5 +1,5 @@
 ﻿using EventPipelines.MediatR;
-using FluentAssertions;
+using Shouldly;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -104,10 +104,10 @@ public class ClassesWithMediatRTest
 
         var adminStorage = sp.GetRequiredService<AdminStorage>();
 
-        adminStorage.AdminsInTenants.Should().HaveCount(3);
-        adminStorage.GlobalAdmins.Should().HaveCount(1);
+        adminStorage.AdminsInTenants.Count().ShouldBe(3);
+        adminStorage.GlobalAdmins.Count().ShouldBe(1);
 
-        adminStorage.GlobalAdmins.Single().FirstName.Should().Be("Big");
-        adminStorage.GlobalAdmins.Single().LastName.Should().Be("Bird");
+        adminStorage.GlobalAdmins.Single().FirstName.ShouldBe("Big");
+        adminStorage.GlobalAdmins.Single().LastName.ShouldBe("Bird");
     }
 }

@@ -15,19 +15,19 @@
 9. Open `MeetingsManagement.slnx` solution.
 10. Docker useful commands
 
-    - `docker compose up` - start dockers
-    - `docker compose kill` - to stop running dockers.
-    - `docker compose down -v` - to clean stopped dockers.
+    - `docker compose --profile all up` - start dockers
+    - `docker compose --profile all kill` - to stop running dockers.
+    - `docker compose --profile all down -v` - to clean stopped dockers.
     - `docker ps` - for showing running dockers
     - `docker ps -a` - to show all dockers (also stopped)
 
-11. Go to [docker](./docker) and run: `docker compose up`. Wait until all containers are downloaded and running.
+11. Go to [docker](./docker) and run: `docker compose --profile all up`. Wait until all containers are downloaded and running.
 12. You should automatically get:
 
     - Postgres DB running
     - PG Admin - IDE for postgres. Available at: http://localhost:5050.
         - Login: `admin@pgadmin.org`, Password: `admin`
-        - To connect to server Use host: `postgres`, user: `postgres`, password: `Password12!`
+        - To connect to server Use host: `postgres`, user: `postgres`, password: `postgres`
     - Kafka
     - Kafka ide for browsing topics. Available at: http://localhost:8080/ui/clusters/local/topics
     - ElasticSearch

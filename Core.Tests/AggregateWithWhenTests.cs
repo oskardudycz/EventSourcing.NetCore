@@ -1,5 +1,5 @@
 ﻿using Core.Aggregates;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Core.Tests;
@@ -128,18 +128,18 @@ public class AggregateWithWhenTests
             invoice.Apply(@event);
         }
 
-        invoice.Id.Should().Be(invoiceInitiated.Number);
-        invoice.Amount.Should().Be(invoiceInitiated.Amount);
-        invoice.Number.Should().Be(invoiceInitiated.Number);
-        invoice.Status.Should().Be(InvoiceStatus.Sent);
+        invoice.Id.ShouldBe(invoiceInitiated.Number);
+        invoice.Amount.ShouldBe(invoiceInitiated.Amount);
+        invoice.Number.ShouldBe(invoiceInitiated.Number);
+        invoice.Status.ShouldBe(InvoiceStatus.Sent);
 
-        invoice.IssuedTo.Should().Be(invoiceInitiated.IssuedTo);
-        invoice.InitiatedAt.Should().Be(invoiceInitiated.InitiatedAt);
+        invoice.IssuedTo.ShouldBe(invoiceInitiated.IssuedTo);
+        invoice.InitiatedAt.ShouldBe(invoiceInitiated.InitiatedAt);
 
-        invoice.IssuedBy.Should().Be(invoiceIssued.IssuedBy);
-        invoice.IssuedAt.Should().Be(invoiceIssued.IssuedAt);
+        invoice.IssuedBy.ShouldBe(invoiceIssued.IssuedBy);
+        invoice.IssuedAt.ShouldBe(invoiceIssued.IssuedAt);
 
-        invoice.SentVia.Should().Be(invoiceSent.SentVia);
-        invoice.SentAt.Should().Be(invoiceSent.SentAt);
+        invoice.SentVia.ShouldBe(invoiceSent.SentVia);
+        invoice.SentAt.ShouldBe(invoiceSent.SentAt);
     }
 }

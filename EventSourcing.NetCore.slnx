@@ -1,6 +1,5 @@
 <Solution>
   <Folder Name="/CI/">
-    <File Path=".github/workflows/build.dotnet.testcontainers.yml" />
     <File Path=".github/workflows/build.dotnet.yml" />
     <File Path=".github/workflows/publish.docker.yml" />
   </Folder>
@@ -260,6 +259,7 @@
     <Project Path="Workshops/IntroductionToEventSourcing/21-BusinessProcesses/21-BusinessProcesses.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/22-Idempotency/22-Idempotency.csproj" />
     <Project Path="Workshops/IntroductionToEventSourcing/23-Consistency/23-Consistency.csproj" />
+    <Project Path="Workshops/IntroductionToEventSourcing/Tools/IntroductionToEventSourcing.Tools.csproj" />
   </Folder>
   <Folder Name="/Workshops/IntroductionToEventSourcing/docker/">
     <File Path="Workshops/IntroductionToEventSourcing/docker-compose.yml" />

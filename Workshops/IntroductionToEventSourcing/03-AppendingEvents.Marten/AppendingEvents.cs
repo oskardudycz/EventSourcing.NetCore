@@ -1,7 +1,8 @@
-using FluentAssertions;
+using Shouldly;
 using IntroductionToEventSourcing.AppendingEvents.Tools;
 using Marten;
 using Xunit;
+using IntroductionToEventSourcing.Tools;
 
 namespace IntroductionToEventSourcing.AppendingEvents;
 
@@ -77,8 +78,7 @@ public class GettingStateFromEventsTests
             new ShoppingCartCanceled(shoppingCartId, DateTime.UtcNow)
         };
 
-        const string connectionString =
-            "PORT = 5432; HOST = localhost; TIMEOUT = 15; POOLING = True; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'";
+        var connectionString = TestDatabases.PostgresConnectionString;
 
         await using var documentStore = DocumentStore.For(options =>
         {
@@ -92,7 +92,7 @@ public class GettingStateFromEventsTests
         var exception = await Record.ExceptionAsync(async () =>
             await AppendEvents(documentSession, shoppingCartId, events, CancellationToken.None)
         );
-        exception.Should().BeNull();
-        MartenEventsChangesListener.Instance.AppendedEventsCount.Should().Be(events.Length);
+        exception.ShouldBeNull();
+        MartenEventsChangesListener.Instance.AppendedEventsCount.ShouldBe(events.Length);
     }
 }

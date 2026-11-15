@@ -1,3 +1,4 @@
+using Core.Testing.Fixtures;
 using System.Collections.Concurrent;
 using System.Data;
 using Marten.Integration.Tests.TestsInfrastructure;
@@ -56,7 +57,7 @@ public record TestDocumentForTenancy(
     string Name
 );
 
-public class TenancyPerSchema(MartenFixture fixture): MartenTest(fixture.PostgreSqlContainer, false)
+public class TenancyPerSchema(PostgresContainerFixture postgres): MartenTest(postgres.ConnectionString, false)
 {
     private const string FirstTenant = "Tenant1";
     private const string SecondTenant = "Tenant2";
@@ -77,7 +78,7 @@ public class TenancyPerSchema(MartenFixture fixture): MartenTest(fixture.Postgre
             await using (var session = firstScope.ServiceProvider.GetRequiredService<IDocumentSession>())
             {
                 session.Insert(new TestDocumentForTenancy(Guid.CreateVersion7(), FirstTenant));
-                await session.SaveChangesAsync();
+                await session.SaveChangesAsync(TestContext.Current.CancellationToken);
             }
         }
 
@@ -89,7 +90,7 @@ public class TenancyPerSchema(MartenFixture fixture): MartenTest(fixture.Postgre
             await using (var session = secondScope.ServiceProvider.GetRequiredService<IDocumentSession>())
             {
                 session.Insert(new TestDocumentForTenancy(Guid.CreateVersion7(), SecondTenant));
-                await session.SaveChangesAsync();
+                await session.SaveChangesAsync(TestContext.Current.CancellationToken);
             }
         }
     }

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
+        <OutputType>Exe</OutputType>
         <WarningLevel>5</WarningLevel>
     </PropertyGroup>
 
@@ -12,9 +13,9 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
 
-        <PackageReference Include="FsCheck.Xunit" />
+        <PackageReference Include="FsCheck.Xunit.v3" />
         <PackageReference Include="unquote" />
-        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.v3" />
         <PackageReference Include="xunit.runner.visualstudio">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>

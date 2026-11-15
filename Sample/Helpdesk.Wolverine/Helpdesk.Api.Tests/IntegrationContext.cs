@@ -1,6 +1,6 @@
 using Alba;
 using Alba.Security;
-using FluentAssertions;
+using Shouldly;
 using JasperFx.CommandLine;
 using Marten;
 using Microsoft.AspNetCore.Hosting;
@@ -14,11 +14,17 @@ namespace Helpdesk.Api.Tests;
 
 public class AppFixture : IAsyncLifetime
 {
+#if DEBUG
+    private static readonly string DefaultEnvironment = Environments.Development;
+#else
+    private static readonly string DefaultEnvironment = Environments.Production;
+#endif
+
     public IAlbaHost Host { get; private set; } = null!;
 
     // This is a one time initialization of the
     // system under test before the first usage
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         // Sorry folks, but this is absolutely necessary if you
         // use Oakton for command line processing and want to
@@ -30,7 +36,7 @@ public class AppFixture : IAsyncLifetime
         // This is using a library named "Alba". See https://jasperfx.github.io/alba for more information
         Host = await AlbaHost.For<Program>(x =>
         {
-            x.UseEnvironment(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? Environments.Development);
+            x.UseEnvironment(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? DefaultEnvironment);
 
             x.ConfigureServices(services =>
             {
@@ -43,14 +49,14 @@ public class AppFixture : IAsyncLifetime
         }, new AuthenticationStub());
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         if (Host != null)
         {
-            return Host.DisposeAsync().AsTask();
+            return Host.DisposeAsync();
         }
 
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 }
 
@@ -83,7 +89,7 @@ public abstract class IntegrationContext(AppFixture fixture): IAsyncLifetime
 
     public IDocumentStore Store => fixture.Host.Services.GetRequiredService<IDocumentStore>();
 
-    public virtual async Task InitializeAsync()
+    public virtual async ValueTask InitializeAsync()
     {
         // Using Marten, wipe out all data and reset the state
         // back to exactly what we described in InitialAccountData
@@ -93,7 +99,7 @@ public abstract class IntegrationContext(AppFixture fixture): IAsyncLifetime
     // This is required because of the IAsyncLifetime
     // interface. Note that I do *not* tear down database
     // state after the test. That's purposeful
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     public async Task<IScenarioResult> Scenario(Action<Scenario> configure) =>
         await Host.Scenario(configure);
@@ -116,7 +122,7 @@ public abstract class IntegrationContext(AppFixture fixture): IAsyncLifetime
             result = await Host.Scenario(configuration);
         }, timeout);
 
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
 
         return (tracked, result!);
     }

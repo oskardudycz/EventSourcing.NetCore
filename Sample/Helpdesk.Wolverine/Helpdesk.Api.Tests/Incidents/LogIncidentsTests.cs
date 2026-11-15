@@ -1,6 +1,6 @@
 using Bogus;
 using Bogus.DataSets;
-using FluentAssertions;
+using Shouldly;
 using Helpdesk.Api.Incidents;
 using Helpdesk.Api.Incidents.GettingDetails;
 using Helpdesk.Api.Incidents.Logging;
@@ -24,8 +24,8 @@ public class LogIncidentsTests(AppFixture fixture): IntegrationContext(fixture)
         });
 
         var response = await result.ReadAsJsonAsync<CreationResponse>();
-        response.Should().NotBeNull();
-        response!.Url.Should().StartWith("/api/incidents/");
+        response.ShouldNotBeNull();
+        response!.Url.ShouldStartWith("/api/incidents/");
 
 
         await Host.IncidentDetailsShouldBe(

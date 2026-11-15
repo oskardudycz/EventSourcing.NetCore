@@ -7,6 +7,8 @@ using static GroupCheckoutCommand;
 
 public class GuestStayFacade(EventStore eventStore)
 {
+    private readonly EventStore eventStore = eventStore;
+
     public ValueTask CheckInGuest(CheckInGuest command)
     {
         // TODO: Fill the implementation calling your entity/aggregate

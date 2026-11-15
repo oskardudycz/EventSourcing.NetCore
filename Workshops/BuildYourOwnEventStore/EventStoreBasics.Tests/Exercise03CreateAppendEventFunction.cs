@@ -1,5 +1,5 @@
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -41,7 +41,7 @@ public class Exercise03CreateAppendEventFunction: IAsyncLifetime
         var appendFunctionExists = schemaProvider
             .FunctionExists(AppendEventFunctionName);
 
-        appendFunctionExists.Should().BeTrue();
+        appendFunctionExists.ShouldBeTrue();
     }
 
     [Fact]
@@ -50,24 +50,24 @@ public class Exercise03CreateAppendEventFunction: IAsyncLifetime
         var streamId = Guid.CreateVersion7();
         var @event = new UserCreated("John Doe");
 
-        var result = await eventStore.AppendEvent<User>(streamId, @event);
+        var result = await eventStore.AppendEvent<User>(streamId, @event, ct: TestContext.Current.CancellationToken);
 
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
 
         var wasStreamCreated = await databaseConnection.QuerySingleAsync<bool>(
             "select exists (select 1 from streams where id = @streamId)", new {streamId}
         );
-        wasStreamCreated.Should().BeTrue();
+        wasStreamCreated.ShouldBeTrue();
 
         var wasEventAppended = await databaseConnection.QuerySingleAsync<bool>(
             "select exists (select 1 from events where stream_id = @streamId)", new {streamId}
         );
-        wasEventAppended.Should().BeTrue();
+        wasEventAppended.ShouldBeTrue();
     }
 
-    public Task InitializeAsync() =>
-        eventStore.Init();
+    public ValueTask InitializeAsync() =>
+        new(eventStore.Init());
 
-    public async Task DisposeAsync() =>
+    public async ValueTask DisposeAsync() =>
         await eventStore.DisposeAsync();
 }

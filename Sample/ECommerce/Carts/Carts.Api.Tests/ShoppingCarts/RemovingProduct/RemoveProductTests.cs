@@ -3,7 +3,7 @@ using Carts.Api.Requests;
 using Carts.ShoppingCarts;
 using Carts.ShoppingCarts.GettingCartById;
 using Carts.ShoppingCarts.Products;
-using FluentAssertions;
+using Shouldly;
 using Ogooreck.API;
 using Xunit;
 using static Ogooreck.API.ApiSpecification;
@@ -31,11 +31,11 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
                 OK,
                 RESPONSE_BODY<ShoppingCartDetails>(details =>
                 {
-                    details.Id.Should().Be(ShoppingCartId);
-                    details.Status.Should().Be(ShoppingCartStatus.Pending);
-                    details.ProductItems.Should().HaveCount(1);
+                    details.Id.ShouldBe(ShoppingCartId);
+                    details.Status.ShouldBe(ShoppingCartStatus.Pending);
+                    details.ProductItems.Count().ShouldBe(1);
                     var productItem = details.ProductItems.Single();
-                    productItem.Should().BeEquivalentTo(
+                    productItem.ShouldBeEquivalentTo(
                         PricedProductItem.Create(
                             ProductItem.From
                             (
@@ -44,8 +44,8 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
                             ),
                             unitPrice
                         ));
-                    details.ClientId.Should().Be(clientId);
-                    details.Version.Should().Be(3);
+                    details.ClientId.ShouldBe(clientId);
+                    details.Version.ShouldBe(3);
                 }));
 
 
@@ -55,7 +55,7 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
     private decimal unitPrice;
     private const int RemovedCount = 5;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         var cartDetails = await API
             .Given()
@@ -79,5 +79,5 @@ public class RemoveProductTests(ApiFixture fixture): ApiTest(fixture), IAsyncLif
         unitPrice = cartDetails.ProductItems.Single().UnitPrice;
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

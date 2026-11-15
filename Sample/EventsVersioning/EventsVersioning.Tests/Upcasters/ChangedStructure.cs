@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using FluentAssertions;
+using Shouldly;
 using V1 = ECommerce.V1;
 
 namespace EventsVersioning.Tests.Upcasters;
@@ -47,10 +47,10 @@ public class ChangedStructure
         // When
         var @event = Upcast(oldEvent);
 
-        @event.Should().NotBeNull();
-        @event.ShoppingCartId.Should().Be(oldEvent.ShoppingCartId);
-        @event.Client.Id.Should().Be(oldEvent.ClientId);
-        @event.Client.Name.Should().Be("Unknown");
+        @event.ShouldNotBeNull();
+        @event.ShoppingCartId.ShouldBe(oldEvent.ShoppingCartId);
+        @event.Client.Id.ShouldBe(oldEvent.ClientId);
+        @event.Client.Name.ShouldBe("Unknown");
     }
 
     [Fact]
@@ -64,9 +64,9 @@ public class ChangedStructure
             JsonSerializer.Serialize(oldEvent)
         );
 
-        @event.Should().NotBeNull();
-        @event.ShoppingCartId.Should().Be(oldEvent.ShoppingCartId);
-        @event.Client.Id.Should().Be(oldEvent.ClientId);
-        @event.Client.Name.Should().Be("Unknown");
+        @event.ShouldNotBeNull();
+        @event.ShoppingCartId.ShouldBe(oldEvent.ShoppingCartId);
+        @event.Client.Id.ShouldBe(oldEvent.ClientId);
+        @event.Client.Name.ShouldBe("Unknown");
     }
 }

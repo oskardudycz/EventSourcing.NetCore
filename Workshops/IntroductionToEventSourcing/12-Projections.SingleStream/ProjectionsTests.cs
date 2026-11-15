@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using IntroductionToEventSourcing.GettingStateFromEvents.Tools;
 using Xunit;
 
@@ -127,64 +127,64 @@ public class ProjectionsTests
 
         // first confirmed
         var shoppingCart = database.Get<ShoppingCartDetails>(shoppingCartId)!;
-        shoppingCart.Should().NotBeNull();
-        shoppingCart.Id.Should().Be(shoppingCartId);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
-        shoppingCart.ProductItems.Should().HaveCount(2);
-        shoppingCart.ProductItems.Should().Contain(pairOfShoes);
-        shoppingCart.ProductItems.Should().Contain(tShirt);
+        shoppingCart.ShouldNotBeNull();
+        shoppingCart.Id.ShouldBe(shoppingCartId);
+        shoppingCart.ClientId.ShouldBe(clientId);
+        shoppingCart.Status.ShouldBe(ShoppingCartStatus.Confirmed);
+        shoppingCart.ProductItems.Count().ShouldBe(2);
+        shoppingCart.ProductItems.ShouldContain(pairOfShoes);
+        shoppingCart.ProductItems.ShouldContain(tShirt);
 
         var shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(shoppingCartId);
-        shoppingCartShortInfo.Should().BeNull();
+        shoppingCartShortInfo.ShouldBeNull();
 
         // cancelled
         shoppingCart = database.Get<ShoppingCartDetails>(cancelledShoppingCartId)!;
-        shoppingCart.Should().NotBeNull();
-        shoppingCart.Id.Should().Be(cancelledShoppingCartId);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.Status.Should().Be(ShoppingCartStatus.Canceled);
-        shoppingCart.ProductItems.Should().HaveCount(1);
-        shoppingCart.ProductItems.Should().Contain(dress);
+        shoppingCart.ShouldNotBeNull();
+        shoppingCart.Id.ShouldBe(cancelledShoppingCartId);
+        shoppingCart.ClientId.ShouldBe(clientId);
+        shoppingCart.Status.ShouldBe(ShoppingCartStatus.Canceled);
+        shoppingCart.ProductItems.Count().ShouldBe(1);
+        shoppingCart.ProductItems.ShouldContain(dress);
 
         shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(cancelledShoppingCartId)!;
-        shoppingCartShortInfo.Should().BeNull();
+        shoppingCartShortInfo.ShouldBeNull();
 
         // confirmed but other client
         shoppingCart = database.Get<ShoppingCartDetails>(otherClientShoppingCartId)!;
-        shoppingCart.Should().NotBeNull();
-        shoppingCart.Id.Should().Be(otherClientShoppingCartId);
-        shoppingCart.ClientId.Should().Be(otherClientId);
-        shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
-        shoppingCart.ProductItems.Should().HaveCount(1);
-        shoppingCart.ProductItems.Should().Contain(dress);
+        shoppingCart.ShouldNotBeNull();
+        shoppingCart.Id.ShouldBe(otherClientShoppingCartId);
+        shoppingCart.ClientId.ShouldBe(otherClientId);
+        shoppingCart.Status.ShouldBe(ShoppingCartStatus.Confirmed);
+        shoppingCart.ProductItems.Count().ShouldBe(1);
+        shoppingCart.ProductItems.ShouldContain(dress);
 
         shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(otherClientShoppingCartId);
-        shoppingCartShortInfo.Should().BeNull();
+        shoppingCartShortInfo.ShouldBeNull();
 
         // second confirmed
         shoppingCart = database.Get<ShoppingCartDetails>(otherConfirmedShoppingCartId)!;
-        shoppingCart.Should().NotBeNull();
-        shoppingCart.Id.Should().Be(otherConfirmedShoppingCartId);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.Status.Should().Be(ShoppingCartStatus.Confirmed);
-        shoppingCart.ProductItems.Should().HaveCount(1);
-        shoppingCart.ProductItems.Should().Contain(trousers);
+        shoppingCart.ShouldNotBeNull();
+        shoppingCart.Id.ShouldBe(otherConfirmedShoppingCartId);
+        shoppingCart.ClientId.ShouldBe(clientId);
+        shoppingCart.Status.ShouldBe(ShoppingCartStatus.Confirmed);
+        shoppingCart.ProductItems.Count().ShouldBe(1);
+        shoppingCart.ProductItems.ShouldContain(trousers);
 
         shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(otherConfirmedShoppingCartId);
-        shoppingCartShortInfo.Should().BeNull();
+        shoppingCartShortInfo.ShouldBeNull();
 
         // first pending
         shoppingCart = database.Get<ShoppingCartDetails>(otherPendingShoppingCartId)!;
-        shoppingCart.Should().NotBeNull();
-        shoppingCart.Id.Should().Be(otherPendingShoppingCartId);
-        shoppingCart.ClientId.Should().Be(clientId);
-        shoppingCart.Status.Should().Be(ShoppingCartStatus.Pending);
-        shoppingCart.ProductItems.Should().BeEmpty();
+        shoppingCart.ShouldNotBeNull();
+        shoppingCart.Id.ShouldBe(otherPendingShoppingCartId);
+        shoppingCart.ClientId.ShouldBe(clientId);
+        shoppingCart.Status.ShouldBe(ShoppingCartStatus.Pending);
+        shoppingCart.ProductItems.ShouldBeEmpty();
 
         shoppingCartShortInfo = database.Get<ShoppingCartShortInfo>(otherPendingShoppingCartId)!;
-        shoppingCartShortInfo.Should().NotBeNull();
-        shoppingCartShortInfo.Id.Should().Be(otherPendingShoppingCartId);
-        shoppingCartShortInfo.ClientId.Should().Be(clientId);
+        shoppingCartShortInfo.ShouldNotBeNull();
+        shoppingCartShortInfo.Id.ShouldBe(otherPendingShoppingCartId);
+        shoppingCartShortInfo.ClientId.ShouldBe(clientId);
     }
 }

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -75,10 +75,10 @@ public class PureFunctionsWithIoCTest
 
         await eventBus.Publish(new UserAdded("Big", "Bird", true), CancellationToken.None);
 
-        AdminPipeline.AdminsInTenants.Should().HaveCount(3);
-        AdminPipeline.GlobalAdmins.Should().HaveCount(1);
+        AdminPipeline.AdminsInTenants.Count().ShouldBe(3);
+        AdminPipeline.GlobalAdmins.Count().ShouldBe(1);
 
-        AdminPipeline.GlobalAdmins.Single().FirstName.Should().Be("Big");
-        AdminPipeline.GlobalAdmins.Single().LastName.Should().Be("Bird");
+        AdminPipeline.GlobalAdmins.Single().FirstName.ShouldBe("Big");
+        AdminPipeline.GlobalAdmins.Single().LastName.ShouldBe("Bird");
     }
 }

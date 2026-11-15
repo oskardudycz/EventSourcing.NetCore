@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Npgsql;
 using Tools.Tools;
 using Xunit;
@@ -40,8 +40,8 @@ public class Exercise01CreateStreamsTable: IDisposable
     {
         var streamsTable = schemaProvider.GetTable(StreamsTableName);
 
-        streamsTable.Should().NotBeNull();
-        streamsTable!.Name.Should().Be(StreamsTableName);
+        streamsTable.ShouldNotBeNull();
+        streamsTable!.Name.ShouldBe(StreamsTableName);
     }
 
     /// <summary>
@@ -55,9 +55,9 @@ public class Exercise01CreateStreamsTable: IDisposable
             .GetTable(StreamsTableName)?
             .GetColumn(IdColumnName);
 
-        idColumn.Should().NotBeNull();
-        idColumn!.Name.Should().Be(IdColumnName);
-        idColumn.Type.Should().Be(Column.GuidType);
+        idColumn.ShouldNotBeNull();
+        idColumn!.Name.ShouldBe(IdColumnName);
+        idColumn.Type.ShouldBe(Column.GuidType);
     }
 
     /// <summary>
@@ -71,9 +71,9 @@ public class Exercise01CreateStreamsTable: IDisposable
             .GetTable(StreamsTableName)?
             .GetColumn(TypeColumnName);
 
-        typeColumn.Should().NotBeNull();
-        typeColumn!.Name.Should().Be(TypeColumnName);
-        typeColumn.Type.Should().Be(Column.StringType);
+        typeColumn.ShouldNotBeNull();
+        typeColumn!.Name.ShouldBe(TypeColumnName);
+        typeColumn.Type.ShouldBe(Column.StringType);
     }
 
     /// <summary>
@@ -87,9 +87,9 @@ public class Exercise01CreateStreamsTable: IDisposable
             .GetTable(StreamsTableName)?
             .GetColumn(VersionColumnName);
 
-        versionColumn.Should().NotBeNull();
-        versionColumn!.Name.Should().Be(VersionColumnName);
-        versionColumn.Type.Should().Be(Column.LongType);
+        versionColumn.ShouldNotBeNull();
+        versionColumn!.Name.ShouldBe(VersionColumnName);
+        versionColumn.Type.ShouldBe(Column.LongType);
     }
 
     /// <summary>

@@ -17,7 +17,9 @@ public static class ETagExtensions
         if (value is null)
             throw new ArgumentNullException(nameof(eTag));
 
-        return StreamState.StreamRevision(ulong.Parse(value.Substring(1, value.Length - 2)));
+        var version = long.Parse(value.Substring(1, value.Length - 2));
+
+        return version >= 0 ? StreamState.StreamRevision((ulong)version) : StreamState.NoStream;
     }
 
     public static void SetResponseEtag(this HttpContext httpContext, StreamState? revision)

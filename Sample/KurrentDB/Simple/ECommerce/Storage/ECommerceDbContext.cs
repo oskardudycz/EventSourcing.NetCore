@@ -22,7 +22,7 @@ public class ECommerceDBContextFactory: IDesignTimeDbContextFactory<ECommerceDbC
             return new ECommerceDbContext(optionsBuilder.Options);
 
         optionsBuilder.UseNpgsql(
-            "PORT = 5432; HOST = 127.0.0.1; DATABASE = 'postgres'; PASSWORD = 'Password12!'; USER ID = 'postgres'");
+            "PORT = 5432; HOST = 127.0.0.1; DATABASE = 'postgres'; PASSWORD = 'postgres'; USER ID = 'postgres'");
 
         return new ECommerceDbContext(optionsBuilder.Options);
     }
