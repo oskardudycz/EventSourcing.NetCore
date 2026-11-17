@@ -73,7 +73,7 @@ public record GuestStayAccount(
     public PaymentRecorded[] RecordPayment(Guid paymentId, decimal amount, DateTimeOffset now)
     {
         if (Status != GuestStayAccountStatus.Opened)
-            throw new InvalidOperationException("Cannot record charge for not opened account");
+            throw new InvalidOperationException("Cannot record payment for not opened account");
 
         if (RecordedPaymentIds.Contains(paymentId))
             return [];

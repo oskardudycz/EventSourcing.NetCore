@@ -102,7 +102,7 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
     public void RecordPayment(Guid paymentId, decimal amount, DateTimeOffset now)
     {
         if (status != GuestStayAccountStatus.Opened)
-            throw new InvalidOperationException("Cannot record charge for not opened account");
+            throw new InvalidOperationException("Cannot record payment for not opened account");
 
         if (recordedPaymentIds.Contains(paymentId))
             return;
