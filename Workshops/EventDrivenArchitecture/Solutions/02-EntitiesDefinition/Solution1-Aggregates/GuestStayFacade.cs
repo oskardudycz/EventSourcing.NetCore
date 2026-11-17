@@ -85,7 +85,7 @@ public abstract record GuestStayAccountCommand
         Guid GuestStayId,
         DateTimeOffset Now,
         Guid? GroupCheckOutId = null
-    );
+    ): GuestStayAccountCommand;
 }
 
 public abstract record GroupCheckoutCommand

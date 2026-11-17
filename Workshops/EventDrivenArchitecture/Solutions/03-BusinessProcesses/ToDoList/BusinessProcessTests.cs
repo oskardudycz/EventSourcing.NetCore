@@ -65,9 +65,9 @@ public class BusinessProcessTests
         await guestStayFacade.RecordCharge(new RecordCharge(guestStays[1], amounts[1], now.AddHours(-2)), TestContext.Current.CancellationToken);
 
         await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)), TestContext.Current.CancellationToken);
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[0], amounts[2], now.AddHours(-2)), TestContext.Current.CancellationToken);
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[2] / 2, now.AddHours(-1)), TestContext.Current.CancellationToken);
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[0], amounts[2] / 2, now.AddHours(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStays[2], amounts[2], now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStays[2], amounts[2] / 2, now.AddHours(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
