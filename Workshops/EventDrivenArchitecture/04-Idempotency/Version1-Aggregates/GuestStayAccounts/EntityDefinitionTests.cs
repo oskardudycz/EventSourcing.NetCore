@@ -1,15 +1,12 @@
 using Bogus;
 using Idempotency.Core;
-using Idempotency.Version1_Aggregates.GroupCheckouts;
-using Idempotency.Version1_Aggregates.GuestStayAccounts;
 using Xunit;
 using Database = Idempotency.Core.Database;
 
-namespace Idempotency.Version1_Aggregates;
+namespace Idempotency.Version1_Aggregates.GuestStayAccounts;
 
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
-using static GroupCheckoutCommand;
 
 public class EntityDefinitionTests
 {
@@ -133,28 +130,6 @@ public class EntityDefinitionTests
 
         // Then
         publishedMessages.ShouldReceiveSingleMessage(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
-    }
-
-    [Fact]
-    public async Task GroupCheckoutForMultipleGuestStay_ShouldBeInitiated()
-    {
-        // Given;
-        Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
-
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[0], now.AddDays(-1)), TestContext.Current.CancellationToken);
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[1], now.AddDays(-1)), TestContext.Current.CancellationToken);
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStays[2], now.AddDays(-1)), TestContext.Current.CancellationToken);
-        publishedMessages.Reset();
-        // And
-        var groupCheckoutId = Guid.NewGuid();
-        var clerkId = Guid.NewGuid();
-        var command = new InitiateGroupCheckout(groupCheckoutId, clerkId, guestStays, now);
-
-        // When
-        await guestStayFacade.InitiateGroupCheckout(command, TestContext.Current.CancellationToken);
-
-        // Then
-        publishedMessages.ShouldReceiveSingleMessage(new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now));
     }
 
     private readonly Database database = new();

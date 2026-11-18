@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Idempotency.Core;
+namespace Idempotency.Version1_Aggregates.Core;
 
 public abstract class Aggregate<TEvent, TId>
     where TEvent : class

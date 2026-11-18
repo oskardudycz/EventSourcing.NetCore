@@ -1,10 +1,8 @@
 using Idempotency.Core;
-using Idempotency.Version1_Aggregates.GroupCheckouts;
 
 namespace Idempotency.Version1_Aggregates.GuestStayAccounts;
 
 using static GuestStayAccountCommand;
-using static GroupCheckoutCommand;
 
 public class GuestStayFacade(Database database, MessageBus messageBus)
 {
@@ -43,24 +41,15 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
+        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct);
+        if (account == null)
+            return;
 
         account.CheckOut(command.Now, command.GroupCheckOutId);
 
         await database.Store(command.GuestStayId, account, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
-
-    public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
-        messageBus.Publish([
-            new GroupCheckoutEvent.GroupCheckoutInitiated(
-                command.GroupCheckoutId,
-                command.ClerkId,
-                command.GuestStayIds,
-                command.Now
-            )
-        ], ct);
 }
 
 public abstract record GuestStayAccountCommand
@@ -90,4 +79,3 @@ public abstract record GuestStayAccountCommand
         Guid? GroupCheckOutId = null
     ): GuestStayAccountCommand;
 }
-

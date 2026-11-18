@@ -1,4 +1,4 @@
-using Idempotency.Core;
+using Idempotency.Version2_ImmutableEntities.Core;
 
 namespace Idempotency.Version2_ImmutableEntities.GroupCheckouts;
 

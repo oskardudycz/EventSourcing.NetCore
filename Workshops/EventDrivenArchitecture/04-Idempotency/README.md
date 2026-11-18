@@ -34,4 +34,17 @@ Message brokers usually guarantee at-least-once delivery, and clients retry requ
   - recording the same guest checkout completion twice,
   - recording the same guest checkout failure twice,
 - The whole process should give the same result when [the message bus](./Core/MessageBus.cs) delivers every message twice,
-- Use `IdempotencyTests` ([Aggregates](./Version1-Aggregates/IdempotencyTests.cs), [Immutable Entities](./Version2-ImmutableEntities/IdempotencyTests.cs)) to guide you and verify if you implemented it correctly. `BusinessProcessTests` and `EntityDefinitionTests` should stay green.
+- Use the idempotency tests to guide you and verify if you implemented it correctly. Business process and entity definition tests should stay green.
+
+## Tests
+
+The business process tests and the test where the message bus delivers every message twice are in the variant folder. The entity definition and idempotency tests of each module sit next to the module's code.
+
+- Aggregates:
+  - [Business process](./Version1-Aggregates/BusinessProcessTests.cs) and [message bus delivers every message twice](./Version1-Aggregates/IdempotencyTests.cs),
+  - group checkouts: [entity definition](./Version1-Aggregates/GroupCheckouts/EntityDefinitionTests.cs) and [idempotency](./Version1-Aggregates/GroupCheckouts/IdempotencyTests.cs),
+  - guest stay accounts: [entity definition](./Version1-Aggregates/GuestStayAccounts/EntityDefinitionTests.cs) and [idempotency](./Version1-Aggregates/GuestStayAccounts/IdempotencyTests.cs).
+- Immutable Entities:
+  - [Business process](./Version2-ImmutableEntities/BusinessProcessTests.cs) and [message bus delivers every message twice](./Version2-ImmutableEntities/IdempotencyTests.cs),
+  - group checkouts: [entity definition](./Version2-ImmutableEntities/GroupCheckouts/EntityDefinitionTests.cs) and [idempotency](./Version2-ImmutableEntities/GroupCheckouts/IdempotencyTests.cs),
+  - guest stay accounts: [entity definition](./Version2-ImmutableEntities/GuestStayAccounts/EntityDefinitionTests.cs) and [idempotency](./Version2-ImmutableEntities/GuestStayAccounts/IdempotencyTests.cs).

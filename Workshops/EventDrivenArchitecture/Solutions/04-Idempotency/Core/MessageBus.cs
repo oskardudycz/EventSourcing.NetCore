@@ -36,12 +36,13 @@ public class MessageBus(bool deliverTwice = false)
         }
     }
 
-    public MessageBus Subscribe<T>(Func<T, CancellationToken, ValueTask> messageHandler)
-    {
-        Func<object, CancellationToken, ValueTask> handler = (message, ct) => messageHandler((T)message, ct);
+    public MessageBus Subscribe<T>(Func<T, CancellationToken, ValueTask> messageHandler) =>
+        Subscribe(typeof(T), (message, ct) => messageHandler((T)message, ct));
 
+    public MessageBus Subscribe(Type messageType, Func<object, CancellationToken, ValueTask> handler)
+    {
         messageHandlers.AddOrUpdate(
-            typeof(T),
+            messageType,
             _ => [handler],
             (_, handlers) =>
             {

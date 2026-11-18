@@ -56,6 +56,9 @@ public record GroupCheckOut(
         DateTimeOffset now
     )
     {
+        if (Status != CheckoutStatus.Initiated)
+            return [];
+
         var guestCheckoutCompleted = new GuestCheckoutCompleted(Id, guestStayId, now);
 
         var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Completed);
@@ -70,6 +73,9 @@ public record GroupCheckOut(
         DateTimeOffset now
     )
     {
+        if (Status != CheckoutStatus.Initiated)
+            return [];
+
         var guestCheckoutFailed = new GuestCheckOutFailed(Id, guestStayId, now);
 
         var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Failed);

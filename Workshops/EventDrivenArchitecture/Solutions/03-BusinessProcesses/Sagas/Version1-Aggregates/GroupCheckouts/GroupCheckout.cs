@@ -82,7 +82,7 @@ public class GroupCheckOut: Aggregate<GroupCheckoutEvent, Guid>
         DateTimeOffset now
     )
     {
-        if (status != CheckoutStatus.Initiated || this.guestStayCheckouts[guestStayId] == CheckoutStatus.Completed)
+        if (status != CheckoutStatus.Initiated)
             return;
 
         var guestCheckoutCompleted = new GuestCheckoutCompleted(Id, guestStayId, now);
@@ -100,7 +100,7 @@ public class GroupCheckOut: Aggregate<GroupCheckoutEvent, Guid>
         DateTimeOffset now
     )
     {
-        if (status != CheckoutStatus.Initiated || this.guestStayCheckouts[guestStayId] == CheckoutStatus.Failed)
+        if (status != CheckoutStatus.Initiated)
             return;
 
         var guestCheckoutFailed = new GuestCheckOutFailed(Id, guestStayId, now);
@@ -113,20 +113,29 @@ public class GroupCheckOut: Aggregate<GroupCheckoutEvent, Guid>
             Enqueue(Finalize(now));
     }
 
-    private GroupCheckoutEvent Finalize(DateTimeOffset now) =>
-        !AreAnyFailedCheckouts()
-            ? new GroupCheckoutCompleted(
-                Id,
-                CheckoutsWith(CheckoutStatus.Completed),
-                now
-            )
-            : new GroupCheckoutFailed
+    private GroupCheckoutEvent Finalize(DateTimeOffset now)
+    {
+        if (AreAnyFailedCheckouts())
+        {
+            status = CheckoutStatus.Failed;
+
+            return new GroupCheckoutFailed
             (
                 Id,
                 CheckoutsWith(CheckoutStatus.Completed),
                 CheckoutsWith(CheckoutStatus.Failed),
                 now
             );
+        }
+
+        status = CheckoutStatus.Completed;
+
+        return new GroupCheckoutCompleted(
+            Id,
+            CheckoutsWith(CheckoutStatus.Completed),
+            now
+        );
+    }
 
     private bool AreAnyOngoingCheckouts() =>
         guestStayCheckouts.Values.Any(guestStayStatus => guestStayStatus is CheckoutStatus.Initiated);

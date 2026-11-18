@@ -22,8 +22,9 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         if (!@event.GroupCheckOutId.HasValue)
             return;
 
-        var groupCheckout = await database.Get<GroupCheckOut>(@event.GroupCheckOutId.Value, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await database.Get<GroupCheckOut>(@event.GroupCheckOutId.Value, ct);
+        if (groupCheckout == null)
+            return;
 
         var messages = groupCheckout.On(@event);
 
@@ -35,8 +36,9 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         if (!@event.GroupCheckOutId.HasValue)
             return;
 
-        var groupCheckout = await database.Get<GroupCheckOut>(@event.GroupCheckOutId.Value, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await database.Get<GroupCheckOut>(@event.GroupCheckOutId.Value, ct);
+        if (groupCheckout == null)
+            return;
 
         var messages = groupCheckout.On(@event);
 

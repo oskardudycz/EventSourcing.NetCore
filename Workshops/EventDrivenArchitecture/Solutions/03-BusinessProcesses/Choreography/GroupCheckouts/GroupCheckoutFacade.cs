@@ -34,8 +34,9 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         if (!guestCheckedOut.GroupCheckOutId.HasValue)
             return;
 
-        var groupCheckout = await database.Get<GroupCheckOut>(guestCheckedOut.GroupCheckOutId.Value, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await database.Get<GroupCheckOut>(guestCheckedOut.GroupCheckOutId.Value, ct);
+        if (groupCheckout == null)
+            return;
 
         var events =
             groupCheckout.RecordGuestCheckoutCompletion(guestCheckedOut.GuestStayId, guestCheckedOut.CheckedOutAt);
@@ -51,8 +52,9 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         if (!checkOutFailed.GroupCheckOutId.HasValue)
             return;
 
-        var groupCheckout = await database.Get<GroupCheckOut>(checkOutFailed.GroupCheckOutId.Value, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await database.Get<GroupCheckOut>(checkOutFailed.GroupCheckOutId.Value, ct);
+        if (groupCheckout == null)
+            return;
 
         var events = groupCheckout.RecordGuestCheckoutFailure(checkOutFailed.GuestStayId, checkOutFailed.FailedAt);
 

@@ -196,13 +196,13 @@ public class BusinessProcessTests
     }
 
     [Fact]
-    public async Task GuestCheckoutForGroupCheckoutNotOnTheToDoList_Fails()
+    public async Task GuestCheckoutForGroupCheckoutNotOnTheToDoList_IsIgnored()
     {
         var guestCheckedOut = new GuestCheckedOut(Guid.NewGuid(), now, Guid.NewGuid());
 
-        var publishing = async () => await messageBus.Publish([guestCheckedOut], default);
+        await messageBus.Publish([guestCheckedOut], TestContext.Current.CancellationToken);
 
-        (await publishing.ShouldThrowAsync<InvalidOperationException>()).Message.ShouldBe("Entity not found");
+        publishedMessages.ShouldReceiveMessages([guestCheckedOut]);
     }
 
     private readonly Database database = new();
