@@ -66,6 +66,9 @@ public record GroupCheckOut(
 
     public ProcessManagerResult[] On(GuestStayAccountEvent.GuestCheckedOut @event)
     {
+        if (Status != CheckoutStatus.Initiated)
+            return [Ignore];
+
         var (guestStayId, checkedOutAt, _) = @event;
 
         // We could consider even not publishing this event, but storing the one from guest stay account
@@ -80,6 +83,9 @@ public record GroupCheckOut(
 
     public ProcessManagerResult[] On(GuestStayAccountEvent.GuestCheckOutFailed @event)
     {
+        if (Status != CheckoutStatus.Initiated)
+            return [Ignore];
+
         var (guestStayId, _, failedAt, _) = @event;
 
         var guestCheckoutFailed = new GuestCheckOutFailed(Id, guestStayId, failedAt);

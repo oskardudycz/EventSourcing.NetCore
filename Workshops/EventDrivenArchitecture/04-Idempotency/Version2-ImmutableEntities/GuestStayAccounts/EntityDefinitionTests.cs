@@ -1,10 +1,9 @@
 using Bogus;
 using Idempotency.Core;
-using Idempotency.Version2_ImmutableEntities.GuestStayAccounts;
 using Xunit;
 using Database = Idempotency.Core.Database;
 
-namespace Idempotency.Version2_ImmutableEntities;
+namespace Idempotency.Version2_ImmutableEntities.GuestStayAccounts;
 
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;

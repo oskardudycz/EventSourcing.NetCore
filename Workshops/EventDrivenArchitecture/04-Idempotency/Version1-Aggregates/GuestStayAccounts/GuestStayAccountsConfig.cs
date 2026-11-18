@@ -1,6 +1,6 @@
 ﻿    using Idempotency.Core;
 
-    namespace Idempotency.Version1_Aggregates.GuestStayAccounts;
+namespace Idempotency.Version1_Aggregates.GuestStayAccounts;
 
 using static GuestStayAccountCommand;
 

@@ -28,5 +28,13 @@ public class Database
                 : null
         );
 
+    public ValueTask<T[]> GetAll<T>(CancellationToken _) where T : class =>
+        ValueTask.FromResult(
+            storage
+                .Where(entry => entry.Key.StartsWith($"{typeof(T).Name}-"))
+                .Select(entry => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize((T)entry.Value))!)
+                .ToArray()
+        );
+
     private static string GetId<T>(Guid id) => $"{typeof(T).Name}-{id}";
 }

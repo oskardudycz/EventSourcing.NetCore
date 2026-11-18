@@ -35,13 +35,10 @@ public class GroupCheckoutProjection(Database database): Projection<GroupCheckOu
             GroupCheckoutInitiated initiated =>
                 GroupCheckOut.Initiated(initiated.GroupCheckoutId, initiated.GuestStayIds, initiated.InitiatedAt),
             GuestCheckedOut checkedOut =>
-                Existing(current).WithCheckout(checkedOut.GuestStayId, CheckoutStatus.Completed, checkedOut.CheckedOutAt),
+                current?.WithCheckout(checkedOut.GuestStayId, CheckoutStatus.Completed, checkedOut.CheckedOutAt),
             GuestCheckOutFailed checkOutFailed =>
-                Existing(current).WithCheckout(checkOutFailed.GuestStayId, CheckoutStatus.Failed, checkOutFailed.FailedAt),
+                current?.WithCheckout(checkOutFailed.GuestStayId, CheckoutStatus.Failed, checkOutFailed.FailedAt),
             GroupCheckoutCompleted or GroupCheckoutFailed => null,
             _ => current
         };
-
-    private static GroupCheckOut Existing(GroupCheckOut? current) =>
-        current ?? throw new InvalidOperationException("Entity not found");
 }

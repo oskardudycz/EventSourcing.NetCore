@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Idempotency.Core;
+using Idempotency.Version1_Aggregates.Core;
 
 namespace Idempotency.Version1_Aggregates.GuestStayAccounts;
 

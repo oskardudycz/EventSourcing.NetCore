@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Idempotency.Core;
+using Idempotency.Version1_Aggregates.Core;
 
 namespace Idempotency.Version1_Aggregates.GroupCheckouts;
 
@@ -113,20 +113,29 @@ public class GroupCheckOut: Aggregate<GroupCheckoutEvent, Guid>
             Enqueue(Finalize(now));
     }
 
-    private GroupCheckoutEvent Finalize(DateTimeOffset now) =>
-        !AreAnyFailedCheckouts()
-            ? new GroupCheckoutCompleted(
-                Id,
-                CheckoutsWith(CheckoutStatus.Completed),
-                now
-            )
-            : new GroupCheckoutFailed
+    private GroupCheckoutEvent Finalize(DateTimeOffset now)
+    {
+        if (AreAnyFailedCheckouts())
+        {
+            status = CheckoutStatus.Failed;
+
+            return new GroupCheckoutFailed
             (
                 Id,
                 CheckoutsWith(CheckoutStatus.Completed),
                 CheckoutsWith(CheckoutStatus.Failed),
                 now
             );
+        }
+
+        status = CheckoutStatus.Completed;
+
+        return new GroupCheckoutCompleted(
+            Id,
+            CheckoutsWith(CheckoutStatus.Completed),
+            now
+        );
+    }
 
     private bool AreAnyOngoingCheckouts() =>
         guestStayCheckouts.Values.Any(guestStayStatus => guestStayStatus is CheckoutStatus.Initiated);

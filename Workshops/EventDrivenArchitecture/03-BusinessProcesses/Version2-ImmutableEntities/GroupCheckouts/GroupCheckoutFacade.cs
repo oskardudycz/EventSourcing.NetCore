@@ -18,8 +18,9 @@ public class GroupCheckoutFacade(Database database, MessageBus messageBus)
     )
     {
         // TODO: Fill the implementation calling your entity/aggregate, for instance:
-        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct);
+        if (groupCheckout == null)
+            return;
 
         // groupCheckout.DoSomething();
 
@@ -37,8 +38,9 @@ public class GroupCheckoutFacade(Database database, MessageBus messageBus)
     )
     {
         // TODO: Fill the implementation calling your entity/aggregate, for instance:
-        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct);
+        if (groupCheckout == null)
+            return;
 
         // groupCheckout.DoSomething();
 

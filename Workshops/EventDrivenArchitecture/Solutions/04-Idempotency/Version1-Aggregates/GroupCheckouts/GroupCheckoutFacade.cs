@@ -20,6 +20,7 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
                 command.Now
             );
 
+
         await database.Store(command.GroupCheckoutId, groupCheckout, ct);
         await messageBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
     }
@@ -29,8 +30,9 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct);
+        if (groupCheckout == null)
+            return;
 
         groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt);
 
@@ -43,8 +45,9 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct)
-                            ?? throw new InvalidOperationException("Entity not found");
+        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct);
+        if (groupCheckout == null)
+            return;
 
         groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt);
 

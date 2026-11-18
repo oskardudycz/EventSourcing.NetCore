@@ -1,4 +1,4 @@
-namespace Idempotency.Core;
+namespace Idempotency.Version2_ImmutableEntities.Core;
 
 public static class DictionaryExtensions
 {

@@ -39,8 +39,9 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
-                      ?? throw new InvalidOperationException("Entity not found");
+        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct);
+        if (account == null)
+            return;
 
         switch (GuestStayAccountDecider.CheckOut(command, account))
         {
