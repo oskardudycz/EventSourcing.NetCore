@@ -5,19 +5,19 @@ public abstract record GroupCheckoutEvent
     public record GroupCheckoutInitiated(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset InitiatedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckoutCompleted(
+    public record GuestCheckoutCompletionRecorded(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset CompletedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckOutFailed(
+    public record GuestCheckoutFailureRecorded(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset FailedAt
     ): GroupCheckoutEvent;
 

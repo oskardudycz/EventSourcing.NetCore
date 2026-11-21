@@ -5,97 +5,93 @@ namespace Consistency.Version2_ImmutableEntities.GuestStayAccounts;
 using static GuestStayAccountCommand;
 using static GuestStayAccountEvent;
 
-public class GuestStayFacade
+public class GuestStayAccountFacade
 {
-    private static readonly Guid OutboxId = new("0592188c-b86e-411c-ab2d-1a804c0c8eb2");
-
     private readonly Database database;
     private readonly MessageBus messageBus;
 
-    public GuestStayFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
+    public GuestStayAccountFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
         this.messageBus = messageBus;
-
-        backgroundJobs.Register(ct => Outbox.PublishFromOutbox(database, messageBus, OutboxId, ct));
     }
 
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
-        var @event = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
+        var @event = GuestStayAccount.CheckIn(command.GuestStayAccountId, command.Now);
 
-        await Retry.UntilSucceeds(_ => database.Store(command.GuestStayId, GuestStayAccount.Initial.Evolve(@event), 0, ct), ct);
-        await Outbox.PublishOrStoreInOutbox(database, messageBus, OutboxId, [@event], ct);
+        await database.Store(command.GuestStayAccountId, GuestStayAccount.Initial.Evolve(@event), 0, ct);
+        await messageBus.Publish([@event], ct);
     }
 
     public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
-        Handle(command.GuestStayId, account => account.RecordCharge(command.Amount, command.Now), ct);
+        Handle(command.GuestStayAccountId, account => account.RecordCharge(command.Amount, command.Now), ct);
 
     public ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default) =>
-        Handle(command.GuestStayId, account => account.RecordPayment(command.Amount, command.Now), ct);
+        Handle(command.GuestStayAccountId, account => account.RecordPayment(command.Amount, command.Now), ct);
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
         var @event = await Retry.OnConflict<GuestStayAccountEvent>(async token =>
         {
-            var (account, version) = await database.Get<GuestStayAccount>(command.GuestStayId, token)
+            var (account, version) = await database.Get<GuestStayAccount>(command.GuestStayAccountId, token)
                                      ?? throw new InvalidOperationException("Entity not found");
 
-            var result = account.CheckOut(command.Now, command.GroupCheckOutId);
+            var result = account.Checkout(command.Now, command.GroupCheckoutId);
 
             if (result is GuestCheckedOut checkedOut)
-                await Retry.UntilSucceeds(_ => database.Store(command.GuestStayId, account.Evolve(checkedOut), version, token), token);
+                await database.Store(command.GuestStayAccountId, account.Evolve(checkedOut), version, token);
 
             return result;
         }, ct);
 
-        await Outbox.PublishOrStoreInOutbox(database, messageBus, OutboxId, [@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 
     private async ValueTask Handle(
-        Guid guestStayId,
+        Guid guestStayAccountId,
         Func<GuestStayAccount, GuestStayAccountEvent> decide,
         CancellationToken ct
     )
     {
         var @event = await Retry.OnConflict(async token =>
         {
-            var (account, version) = await database.Get<GuestStayAccount>(guestStayId, token)
+            var (account, version) = await database.Get<GuestStayAccount>(guestStayAccountId, token)
                                      ?? throw new InvalidOperationException("Entity not found");
 
             var @event = decide(account);
 
-            await Retry.UntilSucceeds(_ => database.Store(guestStayId, account.Evolve(@event), version, token), token);
+            await database.Store(guestStayAccountId, account.Evolve(@event), version, token);
 
             return @event;
         }, ct);
 
-        await Outbox.PublishOrStoreInOutbox(database, messageBus, OutboxId, [@event], ct);
+        await messageBus.Publish([@event], ct);
     }
 }
 
 public abstract record GuestStayAccountCommand
 {
     public record CheckInGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordCharge(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record CheckOutGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountCommand;
 }

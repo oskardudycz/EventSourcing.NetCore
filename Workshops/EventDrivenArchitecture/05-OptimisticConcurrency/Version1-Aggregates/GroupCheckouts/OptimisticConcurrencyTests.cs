@@ -34,15 +34,15 @@ public class OptimisticConcurrencyTests
         var groupCheckoutId = await InitiateGroupCheckout(guestStays);
 
         // When
-        await InParallel(guestStays.Select(guestStayId => (Func<ValueTask>)(() =>
+        await InParallel(guestStays.Select(guestStayAccountId => (Func<ValueTask>)(() =>
             groupCheckoutFacade.RecordGuestCheckoutCompletion(
-                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStayId, now)
+                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStayAccountId, now)
             ))
         ));
 
         // Then
         publishedMessages.ShouldReceiveMessagesInAnyOrder([
-            ..guestStays.Select(guestStayId => new GuestCheckoutCompleted(groupCheckoutId, guestStayId, now)),
+            ..guestStays.Select(guestStayAccountId => new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStayAccountId, now)),
             new GroupCheckoutCompleted(groupCheckoutId, guestStays, now)
         ]);
     }
@@ -61,17 +61,17 @@ public class OptimisticConcurrencyTests
             () => groupCheckoutFacade.RecordGuestCheckoutFailure(
                 new RecordGuestCheckoutFailure(groupCheckoutId, failedGuestStay, now)
             ),
-            ..completedGuestStays.Select(guestStayId => (Func<ValueTask>)(() =>
+            ..completedGuestStays.Select(guestStayAccountId => (Func<ValueTask>)(() =>
                 groupCheckoutFacade.RecordGuestCheckoutCompletion(
-                    new RecordGuestCheckoutCompletion(groupCheckoutId, guestStayId, now)
+                    new RecordGuestCheckoutCompletion(groupCheckoutId, guestStayAccountId, now)
                 )
             ))
         ]);
 
         // Then
         publishedMessages.ShouldReceiveMessagesInAnyOrder([
-            new GuestCheckOutFailed(groupCheckoutId, failedGuestStay, now),
-            ..completedGuestStays.Select(guestStayId => new GuestCheckoutCompleted(groupCheckoutId, guestStayId, now)),
+            new GuestCheckoutFailureRecorded(groupCheckoutId, failedGuestStay, now),
+            ..completedGuestStays.Select(guestStayAccountId => new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStayAccountId, now)),
             new GroupCheckoutFailed(groupCheckoutId, completedGuestStays, [failedGuestStay], now)
         ]);
     }
@@ -106,12 +106,12 @@ public class OptimisticConcurrencyTests
     private readonly Database database = new();
     private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
-    private readonly GroupCheckOutFacade groupCheckoutFacade;
+    private readonly GroupCheckoutFacade groupCheckoutFacade;
     private readonly DateTimeOffset now = DateTimeOffset.Now;
 
     public OptimisticConcurrencyTests()
     {
-        groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus);
+        groupCheckoutFacade = new GroupCheckoutFacade(database, messageBus);
 
         messageBus.Use(publishedMessages.Catch);
     }

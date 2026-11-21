@@ -56,31 +56,31 @@ public class ScheduledBusinessProcessTests
                 new GroupCheckoutEvent.GroupCheckoutCompleted(groupCheckoutId, guestStays, now),
             ]
         );
-        (await database.Get<GroupCheckOut>(groupCheckoutId, TestContext.Current.CancellationToken))
+        (await database.Get<GroupCheckout>(groupCheckoutId, TestContext.Current.CancellationToken))
             .ShouldBeNull("done group checkout is removed from the to-do list");
     }
 
     private readonly Database database = new();
     private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
-    private readonly GuestStayFacade guestStayFacade;
-    private readonly GroupCheckOutFacade groupCheckoutFacade;
-    private readonly ScheduledGroupCheckOutToDoList scheduledToDoList;
+    private readonly GuestStayAccountFacade guestStayFacade;
+    private readonly GroupCheckoutFacade groupCheckoutFacade;
+    private readonly ScheduledGroupCheckoutToDoList scheduledToDoList;
     private readonly DateTimeOffset now = DateTimeOffset.Now;
 
     public ScheduledBusinessProcessTests()
     {
-        guestStayFacade = new GuestStayFacade(database, messageBus);
-        groupCheckoutFacade = new GroupCheckOutFacade(messageBus);
+        guestStayFacade = new GuestStayAccountFacade(database, messageBus);
+        groupCheckoutFacade = new GroupCheckoutFacade(messageBus);
 
         messageBus.Use(publishedMessages.Catch);
 
         var groupCheckoutProjection = new GroupCheckoutProjection(database);
         foreach (var eventType in groupCheckoutProjection.CanHandle())
             messageBus.Subscribe(eventType, async (@event, ct) => await groupCheckoutProjection.Handle(@event, ct));
-        scheduledToDoList = new ScheduledGroupCheckOutToDoList(
+        scheduledToDoList = new ScheduledGroupCheckoutToDoList(
             database,
-            new GroupCheckOutToDoList(groupCheckoutProjection, messageBus)
+            new GroupCheckoutToDoList(groupCheckoutProjection, messageBus)
         );
         ConfigureGuestStayAccounts(messageBus, guestStayFacade);
     }

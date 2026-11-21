@@ -10,7 +10,7 @@ public static class GroupCheckoutsConfig
 {
     public static void ConfigureGroupCheckouts(
         MessageBus messageBus,
-        GroupCheckOutFacade groupCheckoutFacade
+        GroupCheckoutFacade groupCheckoutFacade
     )
     {
         var saga = new GroupCheckoutSaga(messageBus);
@@ -18,7 +18,7 @@ public static class GroupCheckoutsConfig
         messageBus
             .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>(saga.Handle)
             .Subscribe<GuestCheckedOut>(saga.Handle)
-            .Subscribe<GuestCheckOutFailed>(saga.Handle);
+            .Subscribe<GuestCheckoutFailed>(saga.Handle);
 
         messageBus.Subscribe<RecordGuestCheckoutCompletion>(groupCheckoutFacade.RecordGuestCheckoutCompletion);
         messageBus.Subscribe<RecordGuestCheckoutFailure>(groupCheckoutFacade.RecordGuestCheckoutFailure);

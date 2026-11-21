@@ -1,53 +1,50 @@
-using Idempotency.Core;
+using BusinessProcesses.Core;
 
-namespace Idempotency.Version1_Aggregates.GuestStayAccounts;
+namespace BusinessProcesses.Version1_Aggregates.GuestStayAccounts;
 
 using static GuestStayAccountCommand;
 
-public class GuestStayFacade(Database database, MessageBus messageBus)
+public class GuestStayAccountFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
-        if (await database.Get<GuestStayAccount>(command.GuestStayId, ct) != null)
-            return;
+        var account = GuestStayAccount.CheckIn(command.GuestStayAccountId, command.Now);
 
-        var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
-
-        await database.Store(command.GuestStayId, account, ct);
+        await database.Store(command.GuestStayAccountId, account, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
+        var account = await database.Get<GuestStayAccount>(command.GuestStayAccountId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        account.RecordCharge(command.ChargeId, command.Amount, command.Now);
+        account.RecordCharge(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account, ct);
+        await database.Store(command.GuestStayAccountId, account, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
+        var account = await database.Get<GuestStayAccount>(command.GuestStayAccountId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        account.RecordPayment(command.PaymentId, command.Amount, command.Now);
+        account.RecordPayment(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account, ct);
+        await database.Store(command.GuestStayAccountId, account, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct);
+        var account = await database.Get<GuestStayAccount>(command.GuestStayAccountId, ct);
         if (account == null)
             return;
 
-        account.CheckOut(command.Now, command.GroupCheckOutId);
+        account.Checkout(command.Now, command.GroupCheckoutId);
 
-        await database.Store(command.GuestStayId, account, ct);
+        await database.Store(command.GuestStayAccountId, account, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 }
@@ -55,27 +52,25 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
 public abstract record GuestStayAccountCommand
 {
     public record CheckInGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordCharge(
-        Guid GuestStayId,
-        Guid ChargeId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
-        Guid GuestStayId,
-        Guid PaymentId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record CheckOutGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountCommand;
 }

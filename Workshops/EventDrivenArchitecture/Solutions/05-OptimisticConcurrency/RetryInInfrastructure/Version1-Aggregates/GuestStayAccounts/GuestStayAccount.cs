@@ -8,40 +8,40 @@ using static GuestStayAccountEvent;
 public abstract record GuestStayAccountEvent
 {
     public record GuestCheckedIn(
-        Guid GuestStayId,
-        DateTimeOffset CheckedInAt
+        Guid GuestStayAccountId,
+        DateTimeOffset OpenedAt
     ): GuestStayAccountEvent;
 
     public record ChargeRecorded(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         Guid ChargeId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
 
     public record PaymentRecorded(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         Guid PaymentId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
 
     public record GuestCheckedOut(
-        Guid GuestStayId,
-        DateTimeOffset CheckedOutAt,
-        Guid? GroupCheckOutId = null
+        Guid GuestStayAccountId,
+        DateTimeOffset CompletedAt,
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountEvent;
 
-    public record GuestCheckOutFailed(
-        Guid GuestStayId,
-        GuestCheckOutFailed.FailureReason Reason,
+    public record GuestCheckoutFailed(
+        Guid GuestStayAccountId,
+        GuestCheckoutFailed.FailureReason Reason,
         DateTimeOffset FailedAt,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountEvent
     {
         public enum FailureReason
         {
-            NotOpened,
+            InvalidState,
             BalanceNotSettled
         }
     }
@@ -55,7 +55,7 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
     [JsonInclude] private GuestStayAccountStatus status;
     [JsonInclude] private List<Guid> recordedChargeIds;
     [JsonInclude] private List<Guid> recordedPaymentIds;
-    [JsonInclude] private Guid? groupCheckOutId;
+    [JsonInclude] private Guid? groupCheckoutId;
     private bool IsSettled => balance == 0;
 
     [JsonConstructor]
@@ -65,7 +65,7 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         GuestStayAccountStatus status,
         List<Guid> recordedChargeIds,
         List<Guid> recordedPaymentIds,
-        Guid? groupCheckOutId
+        Guid? groupCheckoutId
     )
     {
         Id = id;
@@ -73,21 +73,21 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         this.status = status;
         this.recordedChargeIds = recordedChargeIds;
         this.recordedPaymentIds = recordedPaymentIds;
-        this.groupCheckOutId = groupCheckOutId;
+        this.groupCheckoutId = groupCheckoutId;
     }
 
-    public static GuestStayAccount CheckIn(Guid guestStayId, DateTimeOffset now)
+    public static GuestStayAccount CheckIn(Guid guestStayAccountId, DateTimeOffset now)
     {
-        var guestStay = new GuestStayAccount(guestStayId, 0, GuestStayAccountStatus.Opened, [], [], null);
+        var guestStay = new GuestStayAccount(guestStayAccountId, 0, GuestStayAccountStatus.Open, [], [], null);
 
-        guestStay.Enqueue(new GuestCheckedIn(guestStayId, now));
+        guestStay.Enqueue(new GuestCheckedIn(guestStayAccountId, now));
 
         return guestStay;
     }
 
     public void RecordCharge(Guid chargeId, decimal amount, DateTimeOffset now)
     {
-        if (status != GuestStayAccountStatus.Opened)
+        if (status != GuestStayAccountStatus.Open)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
         if (recordedChargeIds.Contains(chargeId))
@@ -101,7 +101,7 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
 
     public void RecordPayment(Guid paymentId, decimal amount, DateTimeOffset now)
     {
-        if (status != GuestStayAccountStatus.Opened)
+        if (status != GuestStayAccountStatus.Open)
             throw new InvalidOperationException("Cannot record payment for not opened account");
 
         if (recordedPaymentIds.Contains(paymentId))
@@ -113,18 +113,18 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         Enqueue(new PaymentRecorded(Id, paymentId, amount, now));
     }
 
-    public void CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)
+    public void Checkout(DateTimeOffset now, Guid? groupCheckoutId = null)
     {
-        if (status == GuestStayAccountStatus.CheckedOut && groupCheckOutId == groupCheckoutId)
+        if (status == GuestStayAccountStatus.CheckedOut && this.groupCheckoutId == groupCheckoutId)
             return;
 
-        if (status != GuestStayAccountStatus.Opened || !IsSettled)
+        if (status != GuestStayAccountStatus.Open || !IsSettled)
         {
-            Enqueue(new GuestCheckOutFailed(
+            Enqueue(new GuestCheckoutFailed(
                 Id,
-                status != GuestStayAccountStatus.Opened
-                    ? GuestCheckOutFailed.FailureReason.NotOpened
-                    : GuestCheckOutFailed.FailureReason.BalanceNotSettled,
+                status != GuestStayAccountStatus.Open
+                    ? GuestCheckoutFailed.FailureReason.InvalidState
+                    : GuestCheckoutFailed.FailureReason.BalanceNotSettled,
                 now,
                 groupCheckoutId
             ));
@@ -132,7 +132,7 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         }
 
         status = GuestStayAccountStatus.CheckedOut;
-        groupCheckOutId = groupCheckoutId;
+        this.groupCheckoutId = groupCheckoutId;
 
         Enqueue(
             new GuestCheckedOut(
@@ -146,6 +146,6 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
 
 public enum GuestStayAccountStatus
 {
-    Opened = 1,
+    Open = 1,
     CheckedOut = 2
 }

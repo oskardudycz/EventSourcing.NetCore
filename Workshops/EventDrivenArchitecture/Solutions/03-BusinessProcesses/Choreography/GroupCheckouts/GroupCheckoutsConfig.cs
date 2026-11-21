@@ -9,12 +9,12 @@ public static class GroupCheckoutsConfig
 {
     public static void ConfigureGroupCheckouts(
         MessageBus messageBus,
-        GroupCheckOutFacade groupCheckoutFacade
+        GroupCheckoutFacade groupCheckoutFacade
     )
     {
         messageBus
             .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>(groupCheckoutFacade.GroupCheckoutInitiated)
-            .Subscribe<GuestCheckedOut>(groupCheckoutFacade.GuestCheckedOut)
-            .Subscribe<GuestCheckOutFailed>(groupCheckoutFacade.GuestCheckOutFailed);
+            .Subscribe<GuestCheckedOut>(groupCheckoutFacade.RecordGuestCheckoutCompletion)
+            .Subscribe<GuestCheckoutFailed>(groupCheckoutFacade.RecordGuestCheckoutFailure);
     }
 }

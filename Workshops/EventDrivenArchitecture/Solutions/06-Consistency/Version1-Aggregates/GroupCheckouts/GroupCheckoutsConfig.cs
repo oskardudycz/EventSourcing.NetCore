@@ -11,7 +11,7 @@ public static class GroupCheckoutsConfig
 {
     public static void ConfigureGroupCheckouts(
         MessageBus messageBus,
-        GroupCheckOutFacade groupCheckoutFacade
+        GroupCheckoutFacade groupCheckoutFacade
     )
     {
         messageBus
@@ -24,7 +24,7 @@ public static class GroupCheckoutsConfig
                     ? new ValueTask(Retry.UntilSucceeds(token => messageBus.Publish([command], token), ct))
                     : ValueTask.CompletedTask
             )
-            .Subscribe<GuestCheckOutFailed>((@event, ct) =>
+            .Subscribe<GuestCheckoutFailed>((@event, ct) =>
                 GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutFailure>(var command)
                     ? new ValueTask(Retry.UntilSucceeds(token => messageBus.Publish([command], token), ct))
                     : ValueTask.CompletedTask

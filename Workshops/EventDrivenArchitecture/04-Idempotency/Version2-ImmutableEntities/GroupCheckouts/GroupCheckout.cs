@@ -9,19 +9,19 @@ public abstract record GroupCheckoutEvent
     public record GroupCheckoutInitiated(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset InitiatedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckoutCompleted(
+    public record GuestCheckoutCompletionRecorded(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset CompletedAt
     ): GroupCheckoutEvent;
 
-    public record GuestCheckOutFailed(
+    public record GuestCheckoutFailureRecorded(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset FailedAt
     ): GroupCheckoutEvent;
 
@@ -41,45 +41,45 @@ public abstract record GroupCheckoutEvent
     private GroupCheckoutEvent() { }
 }
 
-public record GroupCheckOut(
+public record GroupCheckout(
     Guid Id,
     Dictionary<Guid, CheckoutStatus> GuestStayCheckouts,
     CheckoutStatus Status = CheckoutStatus.NotExisting
 )
 {
-    public static GroupCheckoutInitiated Initiate(Guid groupCheckoutId, Guid clerkId, Guid[] guestStayIds,
+    public static GroupCheckoutInitiated Initiate(Guid groupCheckoutId, Guid clerkId, Guid[] guestStayAccountIds,
         DateTimeOffset initiatedAt) =>
-        new(groupCheckoutId, clerkId, guestStayIds, initiatedAt);
+        new(groupCheckoutId, clerkId, guestStayAccountIds, initiatedAt);
 
     public GroupCheckoutEvent[] RecordGuestCheckoutCompletion(
-        Guid guestStayId,
+        Guid guestStayAccountId,
         DateTimeOffset now
     )
     {
-        var guestCheckoutCompleted = new GuestCheckoutCompleted(Id, guestStayId, now);
+        var guestCheckoutCompleted = new GuestCheckoutCompletionRecorded(Id, guestStayAccountId, now);
 
-        var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Completed);
+        var guestStayCheckouts = GuestStayCheckouts.With(guestStayAccountId, CheckoutStatus.Completed);
 
         return AreAnyOngoingCheckouts(guestStayCheckouts)
             ? [guestCheckoutCompleted]
-            : [guestCheckoutCompleted, Finalize(guestStayCheckouts, now)];
+            : [guestCheckoutCompleted, Finish(guestStayCheckouts, now)];
     }
 
     public GroupCheckoutEvent[] RecordGuestCheckoutFailure(
-        Guid guestStayId,
+        Guid guestStayAccountId,
         DateTimeOffset now
     )
     {
-        var guestCheckoutFailed = new GuestCheckOutFailed(Id, guestStayId, now);
+        var guestCheckoutFailed = new GuestCheckoutFailureRecorded(Id, guestStayAccountId, now);
 
-        var guestStayCheckouts = GuestStayCheckouts.With(guestStayId, CheckoutStatus.Failed);
+        var guestStayCheckouts = GuestStayCheckouts.With(guestStayAccountId, CheckoutStatus.Failed);
 
         return AreAnyOngoingCheckouts(guestStayCheckouts)
             ? [guestCheckoutFailed]
-            : [guestCheckoutFailed, Finalize(guestStayCheckouts, now)];
+            : [guestCheckoutFailed, Finish(guestStayCheckouts, now)];
     }
 
-    private GroupCheckoutEvent Finalize(
+    private GroupCheckoutEvent Finish(
         Dictionary<Guid, CheckoutStatus> guestStayCheckouts,
         DateTimeOffset now
     ) =>
@@ -111,27 +111,27 @@ public record GroupCheckOut(
             .ToArray();
 
 
-    public GroupCheckOut Evolve(GroupCheckoutEvent @event) =>
+    public GroupCheckout Evolve(GroupCheckoutEvent @event) =>
         @event switch
         {
             GroupCheckoutInitiated initiated => this with
             {
                 Id = initiated.GroupCheckoutId,
-                GuestStayCheckouts = initiated.GuestStayIds.ToDictionary(id => id, _ => CheckoutStatus.Initiated),
+                GuestStayCheckouts = initiated.GuestStayAccountIds.ToDictionary(id => id, _ => CheckoutStatus.Initiated),
                 Status = CheckoutStatus.Initiated
             },
-            GuestCheckoutCompleted guestCheckedOut => this with
+            GuestCheckoutCompletionRecorded guestCheckedOut => this with
             {
                 GuestStayCheckouts = GuestStayCheckouts.ToDictionary(
                     ks => ks.Key,
-                    vs => vs.Key == guestCheckedOut.GuestStayId ? CheckoutStatus.Completed : vs.Value
+                    vs => vs.Key == guestCheckedOut.GuestStayAccountId ? CheckoutStatus.Completed : vs.Value
                 )
             },
-            GuestCheckOutFailed guestCheckedOutFailed => this with
+            GuestCheckoutFailureRecorded guestCheckedOutFailed => this with
             {
                 GuestStayCheckouts = GuestStayCheckouts.ToDictionary(
                     ks => ks.Key,
-                    vs => vs.Key == guestCheckedOutFailed.GuestStayId ? CheckoutStatus.Failed : vs.Value
+                    vs => vs.Key == guestCheckedOutFailed.GuestStayAccountId ? CheckoutStatus.Failed : vs.Value
                 )
             },
             GroupCheckoutCompleted => this with { Status = CheckoutStatus.Completed },
@@ -139,7 +139,7 @@ public record GroupCheckOut(
             _ => this
         };
 
-    public static GroupCheckOut Initial = new(default, [], CheckoutStatus.NotExisting);
+    public static GroupCheckout Initial = new(default, [], CheckoutStatus.NotExisting);
 }
 
 public enum CheckoutStatus

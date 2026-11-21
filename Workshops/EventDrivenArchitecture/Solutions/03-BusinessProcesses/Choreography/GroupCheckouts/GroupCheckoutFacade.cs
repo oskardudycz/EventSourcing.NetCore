@@ -8,14 +8,14 @@ using static GroupCheckoutCommand;
 using static GuestStayAccountEvent;
 using static GuestStayAccountCommand;
 
-public class GroupCheckOutFacade(Database database, MessageBus messageBus)
+public class GroupCheckoutFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
-        var @event = GroupCheckOut.Initiate(command.GroupCheckoutId, command.ClerkId,
-            command.GuestStayIds, command.Now);
+        var @event = GroupCheckout.Initiate(command.GroupCheckoutId, command.ClerkId,
+            command.GuestStayAccountIds, command.Now);
 
-        await database.Store(command.GroupCheckoutId, GroupCheckOut.Initial.Evolve(@event), ct);
+        await database.Store(command.GroupCheckoutId, GroupCheckout.Initial.Evolve(@event), ct);
         await messageBus.Publish([@event], ct);
     }
 
@@ -23,23 +23,23 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         CancellationToken ct = default) =>
         messageBus.Publish(
             [
-                ..@event.GuestStayIds
-                    .Select(guestStayId => new CheckOutGuest(guestStayId, @event.InitiatedAt, @event.GroupCheckoutId))
+                ..@event.GuestStayAccountIds
+                    .Select(guestStayAccountId => new CheckOutGuest(guestStayAccountId, @event.InitiatedAt, @event.GroupCheckoutId))
             ],
             ct
         );
 
-    public async ValueTask GuestCheckedOut(GuestCheckedOut guestCheckedOut, CancellationToken ct = default)
+    public async ValueTask RecordGuestCheckoutCompletion(GuestCheckedOut guestCheckedOut, CancellationToken ct = default)
     {
-        if (!guestCheckedOut.GroupCheckOutId.HasValue)
+        if (!guestCheckedOut.GroupCheckoutId.HasValue)
             return;
 
-        var groupCheckout = await database.Get<GroupCheckOut>(guestCheckedOut.GroupCheckOutId.Value, ct);
+        var groupCheckout = await database.Get<GroupCheckout>(guestCheckedOut.GroupCheckoutId.Value, ct);
         if (groupCheckout == null)
             return;
 
         var events =
-            groupCheckout.RecordGuestCheckoutCompletion(guestCheckedOut.GuestStayId, guestCheckedOut.CheckedOutAt);
+            groupCheckout.RecordGuestCheckoutCompletion(guestCheckedOut.GuestStayAccountId, guestCheckedOut.CompletedAt);
 
         await database.Store(groupCheckout.Id,
             events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event)), ct
@@ -47,16 +47,16 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         await messageBus.Publish([..events], ct);
     }
 
-    public async ValueTask GuestCheckOutFailed(GuestCheckOutFailed checkOutFailed, CancellationToken ct = default)
+    public async ValueTask RecordGuestCheckoutFailure(GuestCheckoutFailed checkOutFailed, CancellationToken ct = default)
     {
-        if (!checkOutFailed.GroupCheckOutId.HasValue)
+        if (!checkOutFailed.GroupCheckoutId.HasValue)
             return;
 
-        var groupCheckout = await database.Get<GroupCheckOut>(checkOutFailed.GroupCheckOutId.Value, ct);
+        var groupCheckout = await database.Get<GroupCheckout>(checkOutFailed.GroupCheckoutId.Value, ct);
         if (groupCheckout == null)
             return;
 
-        var events = groupCheckout.RecordGuestCheckoutFailure(checkOutFailed.GuestStayId, checkOutFailed.FailedAt);
+        var events = groupCheckout.RecordGuestCheckoutFailure(checkOutFailed.GuestStayAccountId, checkOutFailed.FailedAt);
 
         await database.Store(groupCheckout.Id,
             events.Aggregate(groupCheckout, (state, @event) => state.Evolve(@event)), ct
@@ -70,7 +70,7 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 

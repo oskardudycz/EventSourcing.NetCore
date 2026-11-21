@@ -6,19 +6,19 @@ namespace OptimisticConcurrency.RetryInInfrastructure.Version2_ImmutableEntities
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade(Database database, MessageBus messageBus)
+public class GroupCheckoutFacade(Database database, MessageBus messageBus)
 {
-    private readonly CommandHandler<GroupCheckOut, GroupCheckoutEvent> commandHandler =
-        new(database, GroupCheckOut.Initial, (state, @event) => state.Evolve(@event));
+    private readonly CommandHandler<GroupCheckout, GroupCheckoutEvent> commandHandler =
+        new(database, GroupCheckout.Initial, (state, @event) => state.Evolve(@event));
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
         Handle(
             command.GroupCheckoutId,
             groupCheckout => groupCheckout.Status == CheckoutStatus.NotExisting
-                ? [GroupCheckOut.Initiate(
+                ? [GroupCheckout.Initiate(
                     command.GroupCheckoutId,
                     command.ClerkId,
-                    command.GuestStayIds,
+                    command.GuestStayAccountIds,
                     command.Now
                 )]
                 : [],
@@ -33,7 +33,7 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
             command.GroupCheckoutId,
             groupCheckout => groupCheckout.Status == CheckoutStatus.NotExisting
                 ? []
-                : groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt),
+                : groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayAccountId, command.Now),
             ct
         );
 
@@ -45,13 +45,13 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
             command.GroupCheckoutId,
             groupCheckout => groupCheckout.Status == CheckoutStatus.NotExisting
                 ? []
-                : groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt),
+                : groupCheckout.RecordGuestCheckoutFailure(command.GuestStayAccountId, command.Now),
             ct
         );
 
     private async ValueTask Handle(
         Guid groupCheckoutId,
-        Func<GroupCheckOut, GroupCheckoutEvent[]> handle,
+        Func<GroupCheckout, GroupCheckoutEvent[]> handle,
         CancellationToken ct
     )
     {
@@ -69,20 +69,20 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutCompletion(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset CompletedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutFailure(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset FailedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     private GroupCheckoutCommand() { }

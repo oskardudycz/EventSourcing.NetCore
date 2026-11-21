@@ -5,16 +5,16 @@ namespace OptimisticConcurrency.RetryInFacade.Version2_ImmutableEntities.GroupCh
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade(Database database, MessageBus messageBus)
+public class GroupCheckoutFacade(Database database, MessageBus messageBus)
 {
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
         Handle(
             command.GroupCheckoutId,
             groupCheckout => groupCheckout.Status == CheckoutStatus.NotExisting
-                ? [GroupCheckOut.Initiate(
+                ? [GroupCheckout.Initiate(
                     command.GroupCheckoutId,
                     command.ClerkId,
-                    command.GuestStayIds,
+                    command.GuestStayAccountIds,
                     command.Now
                 )]
                 : [],
@@ -29,7 +29,7 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
             command.GroupCheckoutId,
             groupCheckout => groupCheckout.Status == CheckoutStatus.NotExisting
                 ? []
-                : groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt),
+                : groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayAccountId, command.Now),
             ct
         );
 
@@ -41,20 +41,20 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
             command.GroupCheckoutId,
             groupCheckout => groupCheckout.Status == CheckoutStatus.NotExisting
                 ? []
-                : groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt),
+                : groupCheckout.RecordGuestCheckoutFailure(command.GuestStayAccountId, command.Now),
             ct
         );
 
     private async ValueTask Handle(
         Guid groupCheckoutId,
-        Func<GroupCheckOut, GroupCheckoutEvent[]> handle,
+        Func<GroupCheckout, GroupCheckoutEvent[]> handle,
         CancellationToken ct
     )
     {
         var events = await Retry.OnConflict(async token =>
         {
-            var loaded = await database.Get<GroupCheckOut>(groupCheckoutId, token);
-            var groupCheckout = loaded?.Document ?? GroupCheckOut.Initial;
+            var loaded = await database.Get<GroupCheckout>(groupCheckoutId, token);
+            var groupCheckout = loaded?.Document ?? GroupCheckout.Initial;
 
             var events = handle(groupCheckout);
             if (events.Length == 0)
@@ -78,20 +78,20 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutCompletion(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset CompletedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutFailure(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset FailedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     private GroupCheckoutCommand() { }

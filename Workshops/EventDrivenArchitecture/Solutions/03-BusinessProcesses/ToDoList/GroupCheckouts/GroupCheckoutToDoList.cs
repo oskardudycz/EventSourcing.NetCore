@@ -4,7 +4,7 @@ namespace BusinessProcesses.ToDoList.GroupCheckouts;
 
 using static GroupCheckoutEvent;
 
-public class GroupCheckOutToDoList(GroupCheckoutProjection projection, MessageBus messageBus)
+public class GroupCheckoutToDoList(GroupCheckoutProjection projection, MessageBus messageBus)
 {
     public Type[] CanHandle() => projection.CanHandle();
 
@@ -17,7 +17,7 @@ public class GroupCheckOutToDoList(GroupCheckoutProjection projection, MessageBu
     }
 
     // This could be also checked by Cron
-    public ValueTask TryComplete(GroupCheckOut groupCheckout, CancellationToken ct = default)
+    public ValueTask TryComplete(GroupCheckout groupCheckout, CancellationToken ct = default)
     {
         if (groupCheckout.AreAnyOngoingCheckouts())
             return ValueTask.CompletedTask;

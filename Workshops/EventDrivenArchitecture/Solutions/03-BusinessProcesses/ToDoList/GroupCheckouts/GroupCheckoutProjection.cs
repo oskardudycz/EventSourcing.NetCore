@@ -7,13 +7,13 @@ namespace BusinessProcesses.ToDoList.GroupCheckouts;
 using static GroupCheckoutEvent;
 using static GuestStayAccountEvent;
 
-public class GroupCheckoutProjection(Database database): Projection<GroupCheckOut>(database)
+public class GroupCheckoutProjection(Database database): Projection<GroupCheckout>(database)
 {
     public override Type[] CanHandle() =>
     [
         typeof(GroupCheckoutInitiated),
         typeof(GuestCheckedOut),
-        typeof(GuestCheckOutFailed),
+        typeof(GuestCheckoutFailed),
         typeof(GroupCheckoutCompleted),
         typeof(GroupCheckoutFailed)
     ];
@@ -22,22 +22,22 @@ public class GroupCheckoutProjection(Database database): Projection<GroupCheckOu
         @event switch
         {
             GroupCheckoutInitiated initiated => initiated.GroupCheckoutId,
-            GuestCheckedOut checkedOut => checkedOut.GroupCheckOutId,
-            GuestCheckOutFailed checkOutFailed => checkOutFailed.GroupCheckOutId,
+            GuestCheckedOut checkedOut => checkedOut.GroupCheckoutId,
+            GuestCheckoutFailed checkOutFailed => checkOutFailed.GroupCheckoutId,
             GroupCheckoutCompleted completed => completed.GroupCheckoutId,
             GroupCheckoutFailed failed => failed.GroupCheckoutId,
             _ => null
         };
 
-    protected override GroupCheckOut? Evolve(GroupCheckOut? current, object @event) =>
+    protected override GroupCheckout? Evolve(GroupCheckout? current, object @event) =>
         @event switch
         {
             GroupCheckoutInitiated initiated =>
-                GroupCheckOut.Initiated(initiated.GroupCheckoutId, initiated.GuestStayIds, initiated.InitiatedAt),
+                GroupCheckout.Initiated(initiated.GroupCheckoutId, initiated.GuestStayAccountIds, initiated.InitiatedAt),
             GuestCheckedOut checkedOut =>
-                current?.WithCheckout(checkedOut.GuestStayId, CheckoutStatus.Completed, checkedOut.CheckedOutAt),
-            GuestCheckOutFailed checkOutFailed =>
-                current?.WithCheckout(checkOutFailed.GuestStayId, CheckoutStatus.Failed, checkOutFailed.FailedAt),
+                current?.WithCheckout(checkedOut.GuestStayAccountId, CheckoutStatus.Completed, checkedOut.CompletedAt),
+            GuestCheckoutFailed checkOutFailed =>
+                current?.WithCheckout(checkOutFailed.GuestStayAccountId, CheckoutStatus.Failed, checkOutFailed.FailedAt),
             GroupCheckoutCompleted or GroupCheckoutFailed => null,
             _ => current
         };

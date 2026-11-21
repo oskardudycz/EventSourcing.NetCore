@@ -16,14 +16,14 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
     {
         // TODO: Fill the implementation calling your entity/aggregate, for instance:
-        var entity = await database.Get<object>(command.GuestStayId, ct) // use here your real type
+        var entity = await database.Get<object>(command.GuestStayAccountId, ct) // use here your real type
                      ?? throw new InvalidOperationException("Entity not found");
 
         // entity.DoSomething();
 
         object[] events = [new object()]; // get the new event(s) as an outcome of the business logic
 
-        await database.Store(command.GuestStayId, entity, ct);
+        await database.Store(command.GuestStayAccountId, entity, ct);
         await messageBus.Publish(events, ct);
 
         throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
@@ -32,14 +32,14 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
     {
         // TODO: Fill the implementation calling your entity/aggregate, for instance:
-        var entity = await database.Get<object>(command.GuestStayId, ct) // use here your real type
+        var entity = await database.Get<object>(command.GuestStayAccountId, ct) // use here your real type
                      ?? throw new InvalidOperationException("Entity not found");
 
         // entity.DoSomething();
 
         object[] events = [new object()]; // get the new event(s) as an outcome of the business logic
 
-        await database.Store(command.GuestStayId, entity, ct);
+        await database.Store(command.GuestStayAccountId, entity, ct);
         await messageBus.Publish(events, ct);
 
         throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
@@ -48,14 +48,14 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
         // TODO: Fill the implementation calling your entity/aggregate, for instance:
-        var entity = await database.Get<object>(command.GuestStayId, ct) // use here your real type
+        var entity = await database.Get<object>(command.GuestStayAccountId, ct) // use here your real type
                      ?? throw new InvalidOperationException("Entity not found");
 
         // entity.DoSomething();
 
         object[] events = [new object()]; // get the new event(s) as an outcome of the business logic
 
-        await database.Store(command.GuestStayId, entity, ct);
+        await database.Store(command.GuestStayAccountId, entity, ct);
         await messageBus.Publish(events, ct);
 
         throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
@@ -71,26 +71,26 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
 public abstract record GuestStayAccountCommand
 {
     public record CheckInGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordCharge(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record CheckOutGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountCommand;
 }
 
@@ -99,7 +99,7 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 

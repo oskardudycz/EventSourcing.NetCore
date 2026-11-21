@@ -6,12 +6,12 @@ namespace Consistency.Version1_Aggregates.GuestStayAccounts;
 using static GuestStayAccountCommand;
 using static GroupCheckoutCommand;
 
-public class GuestStayFacade
+public class GuestStayAccountFacade
 {
     private readonly Database database;
     private readonly MessageBus messageBus;
 
-    public GuestStayFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
+    public GuestStayAccountFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
         this.messageBus = messageBus;
@@ -19,41 +19,41 @@ public class GuestStayFacade
 
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
-        var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
+        var account = GuestStayAccount.CheckIn(command.GuestStayAccountId, command.Now);
 
-        await database.Store(command.GuestStayId, account, 0, ct);
+        await database.Store(command.GuestStayAccountId, account, 0, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
-        Handle(command.GuestStayId, account => account.RecordCharge(command.Amount, command.Now), ct);
+        Handle(command.GuestStayAccountId, account => account.RecordCharge(command.Amount, command.Now), ct);
 
     public ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default) =>
-        Handle(command.GuestStayId, account => account.RecordPayment(command.Amount, command.Now), ct);
+        Handle(command.GuestStayAccountId, account => account.RecordPayment(command.Amount, command.Now), ct);
 
     public ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default) =>
-        Handle(command.GuestStayId, account => account.CheckOut(command.Now, command.GroupCheckOutId), ct);
+        Handle(command.GuestStayAccountId, account => account.Checkout(command.Now, command.GroupCheckoutId), ct);
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
         messageBus.Publish([
             new GroupCheckoutEvent.GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,
-                command.GuestStayIds,
+                command.GuestStayAccountIds,
                 command.Now
             )
         ], ct);
 
-    private async ValueTask Handle(Guid guestStayId, Action<GuestStayAccount> handle, CancellationToken ct)
+    private async ValueTask Handle(Guid guestStayAccountId, Action<GuestStayAccount> handle, CancellationToken ct)
     {
         var events = await Retry.OnConflict(async token =>
         {
-            var (account, version) = await database.Get<GuestStayAccount>(guestStayId, token)
+            var (account, version) = await database.Get<GuestStayAccount>(guestStayAccountId, token)
                                      ?? throw new InvalidOperationException("Entity not found");
 
             handle(account);
 
-            await database.Store(guestStayId, account, version, token);
+            await database.Store(guestStayAccountId, account, version, token);
 
             return account.DequeueUncommittedEvents();
         }, ct);
@@ -65,26 +65,26 @@ public class GuestStayFacade
 public abstract record GuestStayAccountCommand
 {
     public record CheckInGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordCharge(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record CheckOutGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountCommand;
 }
 

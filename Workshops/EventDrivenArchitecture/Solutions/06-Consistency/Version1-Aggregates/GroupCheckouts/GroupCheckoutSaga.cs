@@ -11,33 +11,33 @@ using static SagaResult;
 public static class GroupCheckoutSaga
 {
     public static Command<CheckOutGuest>[] Handle(GroupCheckoutInitiated @event) =>
-        @event.GuestStayIds.Select(guestAccountId =>
+        @event.GuestStayAccountIds.Select(guestAccountId =>
             Send(new CheckOutGuest(guestAccountId, @event.InitiatedAt, @event.GroupCheckoutId))
         ).ToArray();
 
     public static SagaResult Handle(GuestCheckedOut @event)
     {
-        if (!@event.GroupCheckOutId.HasValue)
+        if (!@event.GroupCheckoutId.HasValue)
             return Ignore;
 
         return Send(
             new RecordGuestCheckoutCompletion(
-                @event.GroupCheckOutId.Value,
-                @event.GuestStayId,
-                @event.CheckedOutAt
+                @event.GroupCheckoutId.Value,
+                @event.GuestStayAccountId,
+                @event.CompletedAt
             )
         );
     }
 
-    public static SagaResult Handle(GuestStayAccountEvent.GuestCheckOutFailed @event)
+    public static SagaResult Handle(GuestStayAccountEvent.GuestCheckoutFailed @event)
     {
-        if (!@event.GroupCheckOutId.HasValue)
+        if (!@event.GroupCheckoutId.HasValue)
             return Ignore;
 
         return Send(
             new RecordGuestCheckoutFailure(
-                @event.GroupCheckOutId.Value,
-                @event.GuestStayId,
+                @event.GroupCheckoutId.Value,
+                @event.GuestStayAccountId,
                 @event.FailedAt
             )
         );

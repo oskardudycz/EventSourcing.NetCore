@@ -24,7 +24,7 @@ We still need to support regular checkouts, payments, charges etc. as we do righ
 **Based on the business logic solution from the previous exercise, model the process and business logic of the Group Checkout.**
 
 - Choose one path: [Aggregates](./Version1-Aggregates) or [Immutable Entities](./Version2-ImmutableEntities),
-- Guest Stay Account logic is already there, together with [GuestStayFacade](./Version1-Aggregates/GuestStayAccounts/GuestStayFacade.cs),
+- Guest Stay Account logic is already there, together with [GuestStayAccountFacade](./Version1-Aggregates/GuestStayAccounts/GuestStayAccountFacade.cs),
 - Define the Group Checkout entity in `GroupCheckouts/GroupCheckout.cs` and fill application logic in [GroupCheckoutFacade](./Version1-Aggregates/GroupCheckouts/GroupCheckoutFacade.cs), using the [in-memory database](./Core/Database.cs) and [in-memory message bus](./Core/MessageBus.cs) to store changes and publish events as the outcome of business logic,
 - Configure message handling in `GroupCheckoutsConfig` and `GuestStayAccountsConfig` by subscribing to commands and events on the message bus (think about them as setup called once upon application startup),
 - You can use any preferred style of implementing process coordination,

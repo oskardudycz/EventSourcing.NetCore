@@ -12,42 +12,42 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default)
     {
-        var account = GuestStayAccount.CheckIn(command.GuestStayId, command.Now);
+        var account = GuestStayAccount.CheckIn(command.GuestStayAccountId, command.Now);
 
-        await database.Store(command.GuestStayId, account, ct);
+        await database.Store(command.GuestStayAccountId, account, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
+        var account = await database.Get<GuestStayAccount>(command.GuestStayAccountId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
         account.RecordCharge(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account, ct);
+        await database.Store(command.GuestStayAccountId, account, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
+        var account = await database.Get<GuestStayAccount>(command.GuestStayAccountId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
         account.RecordPayment(command.Amount, command.Now);
 
-        await database.Store(command.GuestStayId, account, ct);
+        await database.Store(command.GuestStayAccountId, account, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
     public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
-        var account = await database.Get<GuestStayAccount>(command.GuestStayId, ct)
+        var account = await database.Get<GuestStayAccount>(command.GuestStayAccountId, ct)
                       ?? throw new InvalidOperationException("Entity not found");
 
-        account.CheckOut(command.Now, command.GroupCheckOutId);
+        account.Checkout(command.Now, command.GroupCheckoutId);
 
-        await database.Store(command.GuestStayId, account, ct);
+        await database.Store(command.GuestStayAccountId, account, ct);
         await messageBus.Publish(account.DequeueUncommittedEvents(), ct);
     }
 
@@ -56,7 +56,7 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
             new GroupCheckoutInitiated(
                 command.GroupCheckoutId,
                 command.ClerkId,
-                command.GuestStayIds,
+                command.GuestStayAccountIds,
                 command.Now
             )
         ], ct);
@@ -65,26 +65,26 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
 public abstract record GuestStayAccountCommand
 {
     public record CheckInGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordCharge(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record CheckOutGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountCommand;
 }
 
@@ -93,7 +93,7 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 

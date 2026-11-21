@@ -8,11 +8,11 @@ using static GuestStayAccountEvent;
 public static class GroupCheckoutsConfig
 {
     public static void ConfigureGroupCheckouts(MessageBus messageBus,
-        GroupCheckOutFacade groupCheckoutFacade
+        GroupCheckoutFacade groupCheckoutFacade
     )
     {
         messageBus
-            .Subscribe<GuestCheckedOut>(groupCheckoutFacade.GuestCheckedOut)
-            .Subscribe<GuestCheckOutFailed>(groupCheckoutFacade.GuestCheckOutFailed);
+            .Subscribe<GuestCheckedOut>(groupCheckoutFacade.RecordGuestCheckoutCompletion)
+            .Subscribe<GuestCheckoutFailed>(groupCheckoutFacade.RecordGuestCheckoutFailure);
     }
 }

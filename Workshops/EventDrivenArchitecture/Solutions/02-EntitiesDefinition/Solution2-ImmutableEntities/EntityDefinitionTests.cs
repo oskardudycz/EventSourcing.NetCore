@@ -17,106 +17,106 @@ public class EntityDefinitionTests
     public async Task CheckingInGuest_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
-        var command = new CheckInGuest(guestStayId, now);
+        var guestStayAccountId = Guid.NewGuid();
+        var command = new CheckInGuest(guestStayAccountId, now);
         publishedMessages.Reset();
 
         // When
         await guestStayFacade.CheckInGuest(command, TestContext.Current.CancellationToken);
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedIn(guestStayId, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedIn(guestStayAccountId, now));
     }
 
     [Fact]
     public async Task RecordingChargeForCheckedInGuest_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
+        var guestStayAccountId = Guid.NewGuid();
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayAccountId, now.AddDays(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
-        var command = new RecordCharge(guestStayId, amount, now);
+        var command = new RecordCharge(guestStayAccountId, amount, now);
 
         // When
         await guestStayFacade.RecordCharge(command, TestContext.Current.CancellationToken);
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new ChargeRecorded(guestStayId, amount, now));
+        publishedMessages.ShouldReceiveSingleMessage(new ChargeRecorded(guestStayAccountId, amount, now));
     }
 
     [Fact]
     public async Task RecordingPaymentForCheckedInGuest_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
+        var guestStayAccountId = Guid.NewGuid();
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayAccountId, now.AddDays(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
-        var command = new RecordPayment(guestStayId, amount, now);
+        var command = new RecordPayment(guestStayAccountId, amount, now);
 
         // When
         await guestStayFacade.RecordPayment(command, TestContext.Current.CancellationToken);
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, amount, now));
+        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayAccountId, amount, now));
     }
 
     [Fact]
     public async Task RecordingPaymentForCheckedInGuestWithCharge_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, generate.Finance.Amount(), now.AddHours(-1)), TestContext.Current.CancellationToken);
+        var guestStayAccountId = Guid.NewGuid();
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayAccountId, now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStayAccountId, generate.Finance.Amount(), now.AddHours(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var amount = generate.Finance.Amount();
-        var command = new RecordPayment(guestStayId, amount, now);
+        var command = new RecordPayment(guestStayAccountId, amount, now);
 
         // When
         await guestStayFacade.RecordPayment(command, TestContext.Current.CancellationToken);
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayId, amount, now));
+        publishedMessages.ShouldReceiveSingleMessage(new PaymentRecorded(guestStayAccountId, amount, now));
     }
 
     [Fact]
     public async Task CheckingOutGuestWithSettledBalance_Succeeds()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
+        var guestStayAccountId = Guid.NewGuid();
 
         var amount = generate.Finance.Amount();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, amount, now.AddHours(-2)), TestContext.Current.CancellationToken);
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, amount, now.AddHours(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayAccountId, now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStayAccountId, amount, now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStayAccountId, amount, now.AddHours(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
-        var command = new CheckOutGuest(guestStayId, now);
+        var command = new CheckOutGuest(guestStayAccountId, now);
 
         // When
         await guestStayFacade.CheckOutGuest(command, TestContext.Current.CancellationToken);
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayId, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayAccountId, now));
     }
 
     [Fact]
     public async Task CheckingOutGuestWithUnsettledBalance_FailsWithGuestCheckoutFailed()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
+        var guestStayAccountId = Guid.NewGuid();
 
         var amount = generate.Finance.Amount();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)), TestContext.Current.CancellationToken);
-        await guestStayFacade.RecordCharge(new RecordCharge(guestStayId, amount + 10, now.AddHours(-2)), TestContext.Current.CancellationToken);
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, amount, now.AddHours(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayAccountId, now.AddDays(-1)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordCharge(new RecordCharge(guestStayAccountId, amount + 10, now.AddHours(-2)), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStayAccountId, amount, now.AddHours(-1)), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
-        var command = new CheckOutGuest(guestStayId, now);
+        var command = new CheckOutGuest(guestStayAccountId, now);
 
         // When
         try
@@ -129,7 +129,7 @@ public class EntityDefinitionTests
         }
 
         // Then
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckoutFailed(guestStayAccountId, GuestCheckoutFailed.FailureReason.BalanceNotSettled, now));
     }
 
     [Fact]

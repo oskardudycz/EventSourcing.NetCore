@@ -58,20 +58,20 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutCompletion(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset CompletedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutFailure(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset FailedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     private GroupCheckoutCommand() { }

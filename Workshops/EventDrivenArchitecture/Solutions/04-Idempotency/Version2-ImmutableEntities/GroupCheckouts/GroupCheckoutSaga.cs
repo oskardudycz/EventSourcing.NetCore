@@ -12,7 +12,7 @@ public class GroupCheckoutSaga(MessageBus messageBus)
 {
     public ValueTask Handle(GroupCheckoutInitiated @event, CancellationToken ct) =>
         messageBus.Publish(
-            @event.GuestStayIds
+            @event.GuestStayAccountIds
                 .Select(guestAccountId => new CheckOutGuest(guestAccountId, @event.InitiatedAt, @event.GroupCheckoutId))
                 .Cast<object>()
                 .ToArray(),
@@ -21,31 +21,31 @@ public class GroupCheckoutSaga(MessageBus messageBus)
 
     public ValueTask Handle(GuestCheckedOut @event, CancellationToken ct)
     {
-        if (!@event.GroupCheckOutId.HasValue)
+        if (!@event.GroupCheckoutId.HasValue)
             return ValueTask.CompletedTask;
 
         return messageBus.Publish(
             [
                 new RecordGuestCheckoutCompletion(
-                    @event.GroupCheckOutId.Value,
-                    @event.GuestStayId,
-                    @event.CheckedOutAt
+                    @event.GroupCheckoutId.Value,
+                    @event.GuestStayAccountId,
+                    @event.CompletedAt
                 )
             ],
             ct
         );
     }
 
-    public ValueTask Handle(GuestStayAccountEvent.GuestCheckOutFailed @event, CancellationToken ct)
+    public ValueTask Handle(GuestStayAccountEvent.GuestCheckoutFailed @event, CancellationToken ct)
     {
-        if (!@event.GroupCheckOutId.HasValue)
+        if (!@event.GroupCheckoutId.HasValue)
             return ValueTask.CompletedTask;
 
         return messageBus.Publish(
             [
                 new RecordGuestCheckoutFailure(
-                    @event.GroupCheckOutId.Value,
-                    @event.GuestStayId,
+                    @event.GroupCheckoutId.Value,
+                    @event.GuestStayAccountId,
                     @event.FailedAt
                 )
             ],

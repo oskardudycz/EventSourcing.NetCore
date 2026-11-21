@@ -128,10 +128,10 @@ public class BusinessProcessTests
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[0], now, groupCheckoutId),
                 new CheckOutGuest(guestStays[1], now, groupCheckoutId),
-                new GuestCheckOutFailed(guestStays[1], GuestCheckOutFailed.FailureReason.BalanceNotSettled, now,
+                new GuestCheckoutFailed(guestStays[1], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
                 new CheckOutGuest(guestStays[2], now, groupCheckoutId),
-                new GuestCheckOutFailed(guestStays[2], GuestCheckOutFailed.FailureReason.BalanceNotSettled, now,
+                new GuestCheckoutFailed(guestStays[2], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
                 new GroupCheckoutEvent.GroupCheckoutFailed(
                     groupCheckoutId,
@@ -177,13 +177,13 @@ public class BusinessProcessTests
             [
                 new GroupCheckoutEvent.GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStays, now),
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
-                new GuestCheckOutFailed(guestStays[0], GuestCheckOutFailed.FailureReason.BalanceNotSettled, now,
+                new GuestCheckoutFailed(guestStays[0], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
                 new CheckOutGuest(guestStays[1], now, groupCheckoutId),
-                new GuestCheckOutFailed(guestStays[1], GuestCheckOutFailed.FailureReason.BalanceNotSettled, now,
+                new GuestCheckoutFailed(guestStays[1], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
                 new CheckOutGuest(guestStays[2], now, groupCheckoutId),
-                new GuestCheckOutFailed(guestStays[2], GuestCheckOutFailed.FailureReason.BalanceNotSettled, now,
+                new GuestCheckoutFailed(guestStays[2], GuestCheckoutFailed.FailureReason.BalanceNotSettled, now,
                     groupCheckoutId),
                 new GroupCheckoutEvent.GroupCheckoutFailed(
                     groupCheckoutId,
@@ -208,8 +208,8 @@ public class BusinessProcessTests
     private readonly Database database = new();
     private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
-    private readonly GuestStayFacade guestStayFacade;
-    private readonly GroupCheckOutFacade groupCheckoutFacade;
+    private readonly GuestStayAccountFacade guestStayFacade;
+    private readonly GroupCheckoutFacade groupCheckoutFacade;
     private readonly Faker generate = new();
     private readonly DateTimeOffset now = DateTimeOffset.Now;
     private readonly ITestOutputHelper testOutputHelper;
@@ -217,14 +217,14 @@ public class BusinessProcessTests
     public BusinessProcessTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, messageBus);
-        groupCheckoutFacade = new GroupCheckOutFacade(messageBus);
+        guestStayFacade = new GuestStayAccountFacade(database, messageBus);
+        groupCheckoutFacade = new GroupCheckoutFacade(messageBus);
 
         messageBus.Use(publishedMessages.Catch);
 
         ConfigureGroupCheckouts(
             messageBus,
-            new GroupCheckOutToDoList(new GroupCheckoutProjection(database), messageBus)
+            new GroupCheckoutToDoList(new GroupCheckoutProjection(database), messageBus)
         );
         ConfigureGuestStayAccounts(messageBus, guestStayFacade);
     }

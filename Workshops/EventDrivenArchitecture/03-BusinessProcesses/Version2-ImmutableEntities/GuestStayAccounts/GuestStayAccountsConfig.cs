@@ -8,7 +8,7 @@ public static class GuestStayAccountsConfig
 {
     public static void ConfigureGuestStayAccounts(
         MessageBus messageBus,
-        GuestStayFacade guestStayFacade
+        GuestStayAccountFacade guestStayFacade
     )
     {
         messageBus.Subscribe<CheckOutGuest>(guestStayFacade.CheckOutGuest);

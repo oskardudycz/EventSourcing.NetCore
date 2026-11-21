@@ -40,16 +40,16 @@ public class OptimisticConcurrencyTests
         var groupCheckoutId = await InitiateGroupCheckout(guestStays);
 
         // When
-        await InParallel(guestStays.Select(guestStayId => (Func<ValueTask>)(() =>
+        await InParallel(guestStays.Select(guestStayAccountId => (Func<ValueTask>)(() =>
             groupCheckoutFacade.RecordGuestCheckoutCompletion(
-                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStayId, now)
+                new RecordGuestCheckoutCompletion(groupCheckoutId, guestStayAccountId, now)
             ))
         ));
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveMessagesInAnyOrder([
-            ..guestStays.Select(guestStayId => new GuestCheckoutCompleted(groupCheckoutId, guestStayId, now)),
+            ..guestStays.Select(guestStayAccountId => new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStayAccountId, now)),
             new GroupCheckoutCompleted(groupCheckoutId, guestStays, now)
         ]);
     }
@@ -68,9 +68,9 @@ public class OptimisticConcurrencyTests
             () => groupCheckoutFacade.RecordGuestCheckoutFailure(
                 new RecordGuestCheckoutFailure(groupCheckoutId, failedGuestStay, now)
             ),
-            ..completedGuestStays.Select(guestStayId => (Func<ValueTask>)(() =>
+            ..completedGuestStays.Select(guestStayAccountId => (Func<ValueTask>)(() =>
                 groupCheckoutFacade.RecordGuestCheckoutCompletion(
-                    new RecordGuestCheckoutCompletion(groupCheckoutId, guestStayId, now)
+                    new RecordGuestCheckoutCompletion(groupCheckoutId, guestStayAccountId, now)
                 )
             ))
         ]);
@@ -78,8 +78,8 @@ public class OptimisticConcurrencyTests
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.ShouldReceiveMessagesInAnyOrder([
-            new GroupCheckoutEvent.GuestCheckOutFailed(groupCheckoutId, failedGuestStay, now),
-            ..completedGuestStays.Select(guestStayId => new GuestCheckoutCompleted(groupCheckoutId, guestStayId, now)),
+            new GroupCheckoutEvent.GuestCheckoutFailureRecorded(groupCheckoutId, failedGuestStay, now),
+            ..completedGuestStays.Select(guestStayAccountId => new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStayAccountId, now)),
             new GroupCheckoutFailed(groupCheckoutId, completedGuestStays, [failedGuestStay], now)
         ]);
     }
@@ -88,41 +88,41 @@ public class OptimisticConcurrencyTests
     public async Task ChargesRecordedConcurrently_AllCountTowardsBalance()
     {
         // Given
-        var guestStayId = await CheckInGuest();
+        var guestStayAccountId = await CheckInGuest();
         decimal[] amounts = [10, 20, 30, 40, 50];
 
         await InParallel(amounts.Select(amount => (Func<ValueTask>)(() =>
-            guestStayFacade.RecordCharge(new RecordCharge(guestStayId, amount, now))
+            guestStayFacade.RecordCharge(new RecordCharge(guestStayAccountId, amount, now))
         )));
-        await guestStayFacade.RecordPayment(new RecordPayment(guestStayId, amounts.Sum(), now), TestContext.Current.CancellationToken);
+        await guestStayFacade.RecordPayment(new RecordPayment(guestStayAccountId, amounts.Sum(), now), TestContext.Current.CancellationToken);
         await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         publishedMessages.Reset();
 
         // When
-        await guestStayFacade.CheckOutGuest(new CheckOutGuest(guestStayId, now), TestContext.Current.CancellationToken);
+        await guestStayFacade.CheckOutGuest(new CheckOutGuest(guestStayAccountId, now), TestContext.Current.CancellationToken);
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayId, now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckedOut(guestStayAccountId, now));
     }
 
     [Fact]
     public async Task ChargeRecordedConcurrentlyWithCheckout_DoesNotLetGuestCheckOutWithUnsettledBalance()
     {
         // Given
-        var guestStayId = await CheckInGuest();
+        var guestStayAccountId = await CheckInGuest();
 
         // When
         await InParallel([
-            () => guestStayFacade.CheckOutGuest(new CheckOutGuest(guestStayId, now)),
-            () => guestStayFacade.RecordCharge(new RecordCharge(guestStayId, 100, now))
+            () => guestStayFacade.CheckOutGuest(new CheckOutGuest(guestStayAccountId, now)),
+            () => guestStayFacade.RecordCharge(new RecordCharge(guestStayAccountId, 100, now))
         ], ignoring: typeof(InvalidOperationException));
 
         // Then
         await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
         var publishedTypes = publishedMessages.Published.Select(message => message.GetType()).ToArray();
         Type[] checkedOutBeforeCharge = [typeof(GuestCheckedOut)];
-        Type[] chargedBeforeCheckout = [typeof(ChargeRecorded), typeof(GuestStayAccountEvent.GuestCheckOutFailed)];
+        Type[] chargedBeforeCheckout = [typeof(ChargeRecorded), typeof(GuestStayAccountEvent.GuestCheckoutFailed)];
 
         (
             publishedTypes.ToHashSet().SetEquals(checkedOutBeforeCharge) && publishedTypes.Length == checkedOutBeforeCharge.Length ||
@@ -144,12 +144,12 @@ public class OptimisticConcurrencyTests
 
     private async Task<Guid> CheckInGuest()
     {
-        var guestStayId = Guid.NewGuid();
-        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now.AddDays(-1)));
+        var guestStayAccountId = Guid.NewGuid();
+        await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayAccountId, now.AddDays(-1)));
         await backgroundJobs.RunUntilIdle(publishedMessages);
         publishedMessages.Reset();
 
-        return guestStayId;
+        return guestStayAccountId;
     }
 
     private static Task InParallel(IEnumerable<Func<ValueTask>> handlers, Type? ignoring = null) =>
@@ -168,14 +168,14 @@ public class OptimisticConcurrencyTests
     private readonly MessageBus messageBus = new();
     private readonly BackgroundJobs backgroundJobs = new();
     private readonly MessageCatcher publishedMessages = new();
-    private readonly GuestStayFacade guestStayFacade;
-    private readonly GroupCheckOutFacade groupCheckoutFacade;
+    private readonly GuestStayAccountFacade guestStayFacade;
+    private readonly GroupCheckoutFacade groupCheckoutFacade;
     private readonly DateTimeOffset now = DateTimeOffset.Now;
 
     public OptimisticConcurrencyTests()
     {
-        guestStayFacade = new GuestStayFacade(database, messageBus, backgroundJobs);
-        groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus, backgroundJobs);
+        guestStayFacade = new GuestStayAccountFacade(database, messageBus, backgroundJobs);
+        groupCheckoutFacade = new GroupCheckoutFacade(database, messageBus, backgroundJobs);
 
         messageBus.Use(publishedMessages.Catch);
     }

@@ -5,21 +5,21 @@ namespace OptimisticConcurrency.Version2_ImmutableEntities.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade(Database database, MessageBus messageBus)
+public class GroupCheckoutFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
-        if (await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct) != null)
+        if (await database.Get<GroupCheckout>(command.GroupCheckoutId, ct) != null)
             return;
         
-        var @event = GroupCheckOut.Initiate(
+        var @event = GroupCheckout.Initiate(
             command.GroupCheckoutId,
             command.ClerkId,
-            command.GuestStayIds,
+            command.GuestStayAccountIds,
             command.Now
         );
 
-        await database.Store(command.GroupCheckoutId, GroupCheckOut.Initial.Evolve(@event), ct);
+        await database.Store(command.GroupCheckoutId, GroupCheckout.Initial.Evolve(@event), ct);
         await messageBus.Publish([@event], ct);
     }
 
@@ -28,11 +28,11 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = (await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct))?.Document;
+        var groupCheckout = (await database.Get<GroupCheckout>(command.GroupCheckoutId, ct))?.Document;
         if (groupCheckout == null)
             return;
 
-        var events = groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt);
+        var events = groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayAccountId, command.Now);
 
         if (events.Length == 0)
             return;
@@ -48,11 +48,11 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = (await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct))?.Document;
+        var groupCheckout = (await database.Get<GroupCheckout>(command.GroupCheckoutId, ct))?.Document;
         if (groupCheckout == null)
             return;
 
-        var events = groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt);
+        var events = groupCheckout.RecordGuestCheckoutFailure(command.GuestStayAccountId, command.Now);
 
         if (events.Length == 0)
             return;
@@ -70,20 +70,20 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutCompletion(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset CompletedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutFailure(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset FailedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     private GroupCheckoutCommand() { }

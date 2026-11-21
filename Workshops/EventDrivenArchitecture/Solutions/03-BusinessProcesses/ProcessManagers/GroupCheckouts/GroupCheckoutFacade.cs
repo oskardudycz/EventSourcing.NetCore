@@ -8,21 +8,21 @@ using static GroupCheckoutCommand;
 using static GuestStayAccountEvent;
 using static ProcessManagerResult;
 
-public class GroupCheckOutFacade(Database database, MessageBus messageBus)
+public class GroupCheckoutFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
-        var messages = GroupCheckOut.Handle(command);
+        var messages = GroupCheckout.Handle(command);
 
-        await ProcessMessages(command.GroupCheckOutId, GroupCheckOut.Initial, messages, ct);
+        await ProcessMessages(command.GroupCheckoutId, GroupCheckout.Initial, messages, ct);
     }
 
-    public async ValueTask GuestCheckedOut(GuestCheckedOut @event, CancellationToken ct = default)
+    public async ValueTask RecordGuestCheckoutCompletion(GuestCheckedOut @event, CancellationToken ct = default)
     {
-        if (!@event.GroupCheckOutId.HasValue)
+        if (!@event.GroupCheckoutId.HasValue)
             return;
 
-        var groupCheckout = await database.Get<GroupCheckOut>(@event.GroupCheckOutId.Value, ct);
+        var groupCheckout = await database.Get<GroupCheckout>(@event.GroupCheckoutId.Value, ct);
         if (groupCheckout == null)
             return;
 
@@ -31,12 +31,12 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         await ProcessMessages(groupCheckout.Id, groupCheckout, messages, ct);
     }
 
-    public async ValueTask GuestCheckOutFailed(GuestCheckOutFailed @event, CancellationToken ct = default)
+    public async ValueTask RecordGuestCheckoutFailure(GuestCheckoutFailed @event, CancellationToken ct = default)
     {
-        if (!@event.GroupCheckOutId.HasValue)
+        if (!@event.GroupCheckoutId.HasValue)
             return;
 
-        var groupCheckout = await database.Get<GroupCheckOut>(@event.GroupCheckOutId.Value, ct);
+        var groupCheckout = await database.Get<GroupCheckout>(@event.GroupCheckoutId.Value, ct);
         if (groupCheckout == null)
             return;
 
@@ -46,8 +46,8 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
     }
 
     private async Task ProcessMessages(
-        Guid groupCheckOutId,
-        GroupCheckOut groupCheckOut,
+        Guid groupCheckoutId,
+        GroupCheckout groupCheckout,
         ProcessManagerResult[] messages,
         CancellationToken ct
     )
@@ -57,7 +57,7 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
             switch (message)
             {
                 case Event (GroupCheckoutEvent @event):
-                    await database.Store(groupCheckOutId, groupCheckOut.Evolve(@event), ct);
+                    await database.Store(groupCheckoutId, groupCheckout.Evolve(@event), ct);
                     await messageBus.Publish([@event], ct);
                     break;
                 case Command(GuestStayAccountCommand command):
@@ -71,9 +71,9 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
 public abstract record GroupCheckoutCommand
 {
     public record InitiateGroupCheckout(
-        Guid GroupCheckOutId,
+        Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 

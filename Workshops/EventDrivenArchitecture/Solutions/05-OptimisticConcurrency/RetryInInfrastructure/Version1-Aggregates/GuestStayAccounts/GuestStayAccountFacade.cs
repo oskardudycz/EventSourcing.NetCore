@@ -1,21 +1,24 @@
+using OptimisticConcurrency.RetryInInfrastructure.Core;
 using OptimisticConcurrency.Core;
 
-namespace OptimisticConcurrency.RetryInFacade.Version1_Aggregates.GuestStayAccounts;
+namespace OptimisticConcurrency.RetryInInfrastructure.Version1_Aggregates.GuestStayAccounts;
 
 using static GuestStayAccountCommand;
 
-public class GuestStayFacade(Database database, MessageBus messageBus)
+public class GuestStayAccountFacade(Database database, MessageBus messageBus)
 {
+    private readonly AggregateStore<GuestStayAccount, GuestStayAccountEvent> store = new(database);
+
     public ValueTask CheckInGuest(CheckInGuest command, CancellationToken ct = default) =>
         Handle(
-            command.GuestStayId,
-            account => account == null ? GuestStayAccount.CheckIn(command.GuestStayId, command.Now) : null,
+            command.GuestStayAccountId,
+            account => account == null ? GuestStayAccount.CheckIn(command.GuestStayAccountId, command.Now) : null,
             ct
         );
 
     public ValueTask RecordCharge(RecordCharge command, CancellationToken ct = default) =>
         Handle(
-            command.GuestStayId,
+            command.GuestStayAccountId,
             account =>
             {
                 if (account == null)
@@ -30,7 +33,7 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
 
     public ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default) =>
         Handle(
-            command.GuestStayId,
+            command.GuestStayAccountId,
             account =>
             {
                 if (account == null)
@@ -45,10 +48,10 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
 
     public ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default) =>
         Handle(
-            command.GuestStayId,
+            command.GuestStayAccountId,
             account =>
             {
-                account?.CheckOut(command.Now, command.GroupCheckOutId);
+                account?.Checkout(command.Now, command.GroupCheckoutId);
 
                 return account;
             },
@@ -56,27 +59,12 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
         );
 
     private async ValueTask Handle(
-        Guid guestStayId,
+        Guid guestStayAccountId,
         Func<GuestStayAccount?, GuestStayAccount?> handle,
         CancellationToken ct
     )
     {
-        var events = await Retry.OnConflict<object[]>(async token =>
-        {
-            var loaded = await database.Get<GuestStayAccount>(guestStayId, token);
-
-            var account = handle(loaded?.Document);
-            if (account == null)
-                return [];
-
-            var events = account.DequeueUncommittedEvents();
-            if (events.Length == 0)
-                return events;
-
-            await database.Store(guestStayId, account, loaded?.Version ?? 0, token);
-
-            return events;
-        }, ct);
+        var events = await store.Handle(guestStayAccountId, handle, ct);
 
         if (events.Length == 0)
             return;
@@ -88,27 +76,27 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
 public abstract record GuestStayAccountCommand
 {
     public record CheckInGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordCharge(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         Guid ChargeId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         Guid PaymentId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record CheckOutGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountCommand;
 }

@@ -8,38 +8,38 @@ using static GuestStayAccountEvent;
 public abstract record GuestStayAccountEvent
 {
     public record GuestCheckedIn(
-        Guid GuestStayId,
-        DateTimeOffset CheckedInAt
+        Guid GuestStayAccountId,
+        DateTimeOffset OpenedAt
     ): GuestStayAccountEvent;
 
     public record ChargeRecorded(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
 
     public record PaymentRecorded(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
 
     public record GuestCheckedOut(
-        Guid GuestStayId,
-        DateTimeOffset CheckedOutAt,
-        Guid? GroupCheckOutId = null
+        Guid GuestStayAccountId,
+        DateTimeOffset CompletedAt,
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountEvent;
 
-    public record GuestCheckOutFailed(
-        Guid GuestStayId,
-        GuestCheckOutFailed.FailureReason Reason,
+    public record GuestCheckoutFailed(
+        Guid GuestStayAccountId,
+        GuestCheckoutFailed.FailureReason Reason,
         DateTimeOffset FailedAt,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountEvent
     {
         public enum FailureReason
         {
-            NotOpened,
+            InvalidState,
             BalanceNotSettled
         }
     }
@@ -65,18 +65,18 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         this.status = status;
     }
 
-    public static GuestStayAccount CheckIn(Guid guestStayId, DateTimeOffset now)
+    public static GuestStayAccount CheckIn(Guid guestStayAccountId, DateTimeOffset now)
     {
-        var guestStay = new GuestStayAccount(guestStayId, 0, GuestStayAccountStatus.Opened);
+        var guestStay = new GuestStayAccount(guestStayAccountId, 0, GuestStayAccountStatus.Open);
 
-        guestStay.Enqueue(new GuestCheckedIn(guestStayId, now));
+        guestStay.Enqueue(new GuestCheckedIn(guestStayAccountId, now));
 
         return guestStay;
     }
 
     public void RecordCharge(decimal amount, DateTimeOffset now)
     {
-        if (status != GuestStayAccountStatus.Opened)
+        if (status != GuestStayAccountStatus.Open)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
         balance -= amount;
@@ -86,7 +86,7 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
 
     public void RecordPayment(decimal amount, DateTimeOffset now)
     {
-        if (status != GuestStayAccountStatus.Opened)
+        if (status != GuestStayAccountStatus.Open)
             throw new InvalidOperationException("Cannot record payment for not opened account");
 
         balance += amount;
@@ -94,15 +94,15 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
         Enqueue(new PaymentRecorded(Id, amount, now));
     }
 
-    public void CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)
+    public void Checkout(DateTimeOffset now, Guid? groupCheckoutId = null)
     {
-        if (status != GuestStayAccountStatus.Opened || !IsSettled)
+        if (status != GuestStayAccountStatus.Open || !IsSettled)
         {
-            Enqueue(new GuestCheckOutFailed(
+            Enqueue(new GuestCheckoutFailed(
                 Id,
-                status != GuestStayAccountStatus.Opened
-                    ? GuestCheckOutFailed.FailureReason.NotOpened
-                    : GuestCheckOutFailed.FailureReason.BalanceNotSettled,
+                status != GuestStayAccountStatus.Open
+                    ? GuestCheckoutFailed.FailureReason.InvalidState
+                    : GuestCheckoutFailed.FailureReason.BalanceNotSettled,
                 now,
                 groupCheckoutId
             ));
@@ -123,6 +123,6 @@ public class GuestStayAccount: Aggregate<GuestStayAccountEvent, Guid>
 
 public enum GuestStayAccountStatus
 {
-    Opened = 1,
+    Open = 1,
     CheckedOut = 2
 }

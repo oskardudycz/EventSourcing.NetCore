@@ -25,14 +25,14 @@ public class IdempotencyTests
         var publishedMessages = new MessageCatcher();
         messageBus.Use(publishedMessages.Catch);
 
-        var guestStayFacade = new GuestStayFacade(database, messageBus);
-        var groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus);
+        var guestStayFacade = new GuestStayAccountFacade(database, messageBus);
+        var groupCheckoutFacade = new GroupCheckoutFacade(database, messageBus);
         ConfigureGuestStayAccounts(messageBus, guestStayFacade);
         ConfigureGroupCheckouts(messageBus, groupCheckoutFacade);
 
         Guid[] guestStays = [Guid.NewGuid(), Guid.NewGuid()];
-        foreach (var guestStayId in guestStays)
-            await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayId, now), TestContext.Current.CancellationToken);
+        foreach (var guestStayAccountId in guestStays)
+            await guestStayFacade.CheckInGuest(new CheckInGuest(guestStayAccountId, now), TestContext.Current.CancellationToken);
         publishedMessages.Reset();
         // And
         var groupCheckoutId = Guid.NewGuid();
@@ -48,12 +48,12 @@ public class IdempotencyTests
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[0], now, groupCheckoutId),
                 new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now),
-                new GuestCheckoutCompleted(groupCheckoutId, guestStays[0], now),
+                new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStays[0], now),
                 new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[0], now),
                 new CheckOutGuest(guestStays[1], now, groupCheckoutId),
                 new GuestCheckedOut(guestStays[1], now, groupCheckoutId),
                 new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[1], now),
-                new GuestCheckoutCompleted(groupCheckoutId, guestStays[1], now),
+                new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStays[1], now),
                 new GroupCheckoutCompleted(groupCheckoutId, guestStays, now),
                 new RecordGuestCheckoutCompletion(groupCheckoutId, guestStays[1], now),
                 new CheckOutGuest(guestStays[0], now, groupCheckoutId),

@@ -5,12 +5,12 @@ namespace Consistency.Version2_ImmutableEntities.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade
+public class GroupCheckoutFacade
 {
     private readonly Database database;
     private readonly MessageBus messageBus;
 
-    public GroupCheckOutFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
+    public GroupCheckoutFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
         this.messageBus = messageBus;
@@ -20,17 +20,17 @@ public class GroupCheckOutFacade
     {
         var events = await Retry.OnConflict<object[]>(async token =>
         {
-            if (await database.Get<GroupCheckOut>(command.GroupCheckoutId, token) != null)
+            if (await database.Get<GroupCheckout>(command.GroupCheckoutId, token) != null)
                 return [];
 
-            var @event = GroupCheckOut.Initiate(
+            var @event = GroupCheckout.Initiate(
                 command.GroupCheckoutId,
                 command.ClerkId,
-                command.GuestStayIds,
+                command.GuestStayAccountIds,
                 command.Now
             );
 
-            await database.Store(command.GroupCheckoutId, GroupCheckOut.Initial.Evolve(@event), 0, token);
+            await database.Store(command.GroupCheckoutId, GroupCheckout.Initial.Evolve(@event), 0, token);
 
             return [@event];
         }, ct);
@@ -44,7 +44,7 @@ public class GroupCheckOutFacade
     ) =>
         Handle(
             command.GroupCheckoutId,
-            groupCheckout => groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt),
+            groupCheckout => groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayAccountId, command.Now),
             ct
         );
 
@@ -54,19 +54,19 @@ public class GroupCheckOutFacade
     ) =>
         Handle(
             command.GroupCheckoutId,
-            groupCheckout => groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt),
+            groupCheckout => groupCheckout.RecordGuestCheckoutFailure(command.GuestStayAccountId, command.Now),
             ct
         );
 
     private async ValueTask Handle(
         Guid groupCheckoutId,
-        Func<GroupCheckOut, GroupCheckoutEvent[]> decide,
+        Func<GroupCheckout, GroupCheckoutEvent[]> decide,
         CancellationToken ct
     )
     {
         var events = await Retry.OnConflict(async token =>
         {
-            var (groupCheckout, version) = await database.Get<GroupCheckOut>(groupCheckoutId, token)
+            var (groupCheckout, version) = await database.Get<GroupCheckout>(groupCheckoutId, token)
                                            ?? throw new InvalidOperationException("Entity not found");
 
             var events = decide(groupCheckout);
@@ -92,20 +92,20 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutCompletion(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset CompletedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutFailure(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset FailedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     private GroupCheckoutCommand() { }

@@ -6,7 +6,7 @@ public static class GroupCheckoutsConfig
 {
     public static void ConfigureGroupCheckouts(
         MessageBus messageBus,
-        GroupCheckOutToDoList groupCheckoutToDoList
+        GroupCheckoutToDoList groupCheckoutToDoList
     )
     {
         foreach (var eventType in groupCheckoutToDoList.CanHandle())

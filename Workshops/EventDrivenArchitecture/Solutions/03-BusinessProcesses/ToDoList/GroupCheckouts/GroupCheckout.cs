@@ -5,7 +5,7 @@ public abstract record GroupCheckoutEvent
     public record GroupCheckoutInitiated(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset InitiatedAt
     ): GroupCheckoutEvent;
 
@@ -25,19 +25,19 @@ public abstract record GroupCheckoutEvent
     private GroupCheckoutEvent() { }
 }
 
-public record GroupCheckOut(
+public record GroupCheckout(
     Guid Id,
     Dictionary<Guid, CheckoutStatus> GuestStayCheckouts,
     DateTimeOffset UpdatedAt
 )
 {
-    public static GroupCheckOut Initiated(Guid id, Guid[] guestStayIds, DateTimeOffset initiatedAt) =>
-        new(id, guestStayIds.Distinct().ToDictionary(guestStayId => guestStayId, _ => CheckoutStatus.Initiated), initiatedAt);
+    public static GroupCheckout Initiated(Guid id, Guid[] guestStayAccountIds, DateTimeOffset initiatedAt) =>
+        new(id, guestStayAccountIds.Distinct().ToDictionary(guestStayAccountId => guestStayAccountId, _ => CheckoutStatus.Initiated), initiatedAt);
 
-    public GroupCheckOut WithCheckout(Guid guestStayId, CheckoutStatus status, DateTimeOffset at) =>
+    public GroupCheckout WithCheckout(Guid guestStayAccountId, CheckoutStatus status, DateTimeOffset at) =>
         this with
         {
-            GuestStayCheckouts = new Dictionary<Guid, CheckoutStatus>(GuestStayCheckouts) { [guestStayId] = status },
+            GuestStayCheckouts = new Dictionary<Guid, CheckoutStatus>(GuestStayCheckouts) { [guestStayAccountId] = status },
             UpdatedAt = at
         };
 

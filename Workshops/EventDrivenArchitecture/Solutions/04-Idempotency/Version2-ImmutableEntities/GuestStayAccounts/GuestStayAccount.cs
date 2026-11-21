@@ -5,40 +5,40 @@ using static GuestStayAccountEvent;
 public abstract record GuestStayAccountEvent
 {
     public record GuestCheckedIn(
-        Guid GuestStayId,
-        DateTimeOffset CheckedInAt
+        Guid GuestStayAccountId,
+        DateTimeOffset OpenedAt
     ): GuestStayAccountEvent;
 
     public record ChargeRecorded(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         Guid ChargeId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
 
     public record PaymentRecorded(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         Guid PaymentId,
         decimal Amount,
         DateTimeOffset RecordedAt
     ): GuestStayAccountEvent;
 
     public record GuestCheckedOut(
-        Guid GuestStayId,
-        DateTimeOffset CheckedOutAt,
-        Guid? GroupCheckOutId = null
+        Guid GuestStayAccountId,
+        DateTimeOffset CompletedAt,
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountEvent;
 
-    public record GuestCheckOutFailed(
-        Guid GuestStayId,
-        GuestCheckOutFailed.FailureReason Reason,
+    public record GuestCheckoutFailed(
+        Guid GuestStayAccountId,
+        GuestCheckoutFailed.FailureReason Reason,
         DateTimeOffset FailedAt,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountEvent
     {
         public enum FailureReason
         {
-            NotOpened,
+            InvalidState,
             BalanceNotSettled
         }
     }
@@ -51,17 +51,17 @@ public record GuestStayAccount(
     Guid[] RecordedChargeIds,
     Guid[] RecordedPaymentIds,
     decimal Balance = 0,
-    GuestStayAccountStatus Status = GuestStayAccountStatus.Opened,
-    Guid? GroupCheckOutId = null
+    GuestStayAccountStatus Status = GuestStayAccountStatus.Open,
+    Guid? GroupCheckoutId = null
 )
 {
     public bool IsSettled => Balance == 0;
 
-    public static GuestCheckedIn CheckIn(Guid guestStayId, DateTimeOffset now) => new(guestStayId, now);
+    public static GuestCheckedIn CheckIn(Guid guestStayAccountId, DateTimeOffset now) => new(guestStayAccountId, now);
 
     public ChargeRecorded[] RecordCharge(Guid chargeId, decimal amount, DateTimeOffset now)
     {
-        if (Status != GuestStayAccountStatus.Opened)
+        if (Status != GuestStayAccountStatus.Open)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
         if (RecordedChargeIds.Contains(chargeId))
@@ -72,7 +72,7 @@ public record GuestStayAccount(
 
     public PaymentRecorded[] RecordPayment(Guid paymentId, decimal amount, DateTimeOffset now)
     {
-        if (Status != GuestStayAccountStatus.Opened)
+        if (Status != GuestStayAccountStatus.Open)
             throw new InvalidOperationException("Cannot record payment for not opened account");
 
         if (RecordedPaymentIds.Contains(paymentId))
@@ -81,17 +81,17 @@ public record GuestStayAccount(
         return [new PaymentRecorded(Id, paymentId, amount, now)];
     }
 
-    public GuestStayAccountEvent[] CheckOut(DateTimeOffset now, Guid? groupCheckoutId = null)
+    public GuestStayAccountEvent[] Checkout(DateTimeOffset now, Guid? groupCheckoutId = null)
     {
-        if (Status == GuestStayAccountStatus.CheckedOut && GroupCheckOutId == groupCheckoutId)
+        if (Status == GuestStayAccountStatus.CheckedOut && GroupCheckoutId == groupCheckoutId)
             return [];
 
-        if (Status != GuestStayAccountStatus.Opened)
+        if (Status != GuestStayAccountStatus.Open)
             return
             [
-                new GuestCheckOutFailed(
+                new GuestCheckoutFailed(
                     Id,
-                    GuestCheckOutFailed.FailureReason.NotOpened,
+                    GuestCheckoutFailed.FailureReason.InvalidState,
                     now,
                     groupCheckoutId
                 )
@@ -108,9 +108,9 @@ public record GuestStayAccount(
             ]
             :
             [
-                new GuestCheckOutFailed(
+                new GuestCheckoutFailed(
                     Id,
-                    GuestCheckOutFailed.FailureReason.BalanceNotSettled,
+                    GuestCheckoutFailed.FailureReason.BalanceNotSettled,
                     now,
                     groupCheckoutId
                 )
@@ -124,7 +124,7 @@ public record GuestStayAccount(
         {
             GuestCheckedIn checkedIn => this with
             {
-                Id = checkedIn.GuestStayId, Status = GuestStayAccountStatus.Opened
+                Id = checkedIn.GuestStayAccountId, Status = GuestStayAccountStatus.Open
             },
             ChargeRecorded charge => this with
             {
@@ -136,9 +136,9 @@ public record GuestStayAccount(
             },
             GuestCheckedOut checkedOut => this with
             {
-                Status = GuestStayAccountStatus.CheckedOut, GroupCheckOutId = checkedOut.GroupCheckOutId
+                Status = GuestStayAccountStatus.CheckedOut, GroupCheckoutId = checkedOut.GroupCheckoutId
             },
-            GuestCheckOutFailed => this,
+            GuestCheckoutFailed => this,
             _ => this
         };
 
@@ -148,6 +148,6 @@ public record GuestStayAccount(
 public enum GuestStayAccountStatus
 {
     NotExisting = 0,
-    Opened = 1,
+    Open = 1,
     CheckedOut = 2
 }

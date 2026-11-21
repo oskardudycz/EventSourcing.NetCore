@@ -5,15 +5,15 @@ namespace BusinessProcesses.Sagas.Version1_Aggregates.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade(Database database, MessageBus messageBus)
+public class GroupCheckoutFacade(Database database, MessageBus messageBus)
 {
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)
     {
         var groupCheckout =
-            GroupCheckOut.Initiate(
+            GroupCheckout.Initiate(
                 command.GroupCheckoutId,
                 command.ClerkId,
-                command.GuestStayIds,
+                command.GuestStayAccountIds,
                 command.Now
             );
 
@@ -27,11 +27,11 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct);
+        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct);
         if (groupCheckout == null)
             return;
 
-        groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt);
+        groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayAccountId, command.Now);
 
         await database.Store(command.GroupCheckoutId, groupCheckout, ct);
         await messageBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
@@ -42,11 +42,11 @@ public class GroupCheckOutFacade(Database database, MessageBus messageBus)
         CancellationToken ct = default
     )
     {
-        var groupCheckout = await database.Get<GroupCheckOut>(command.GroupCheckoutId, ct);
+        var groupCheckout = await database.Get<GroupCheckout>(command.GroupCheckoutId, ct);
         if (groupCheckout == null)
             return;
 
-        groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt);
+        groupCheckout.RecordGuestCheckoutFailure(command.GuestStayAccountId, command.Now);
 
         await database.Store(command.GroupCheckoutId, groupCheckout, ct);
         await messageBus.Publish(groupCheckout.DequeueUncommittedEvents(), ct);
@@ -58,20 +58,20 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutCompletion(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset CompletedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutFailure(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset FailedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     private GroupCheckoutCommand() { }

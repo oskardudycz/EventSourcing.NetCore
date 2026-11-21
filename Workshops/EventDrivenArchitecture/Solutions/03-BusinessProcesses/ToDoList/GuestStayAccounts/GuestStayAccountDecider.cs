@@ -6,26 +6,26 @@ using static GuestStayAccountCommand;
 public abstract record GuestStayAccountCommand
 {
     public record CheckInGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordCharge(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record RecordPayment(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         decimal Amount,
         DateTimeOffset Now
     ): GuestStayAccountCommand;
 
     public record CheckOutGuest(
-        Guid GuestStayId,
+        Guid GuestStayAccountId,
         DateTimeOffset Now,
-        Guid? GroupCheckOutId = null
+        Guid? GroupCheckoutId = null
     ): GuestStayAccountCommand;
 }
 
@@ -37,16 +37,16 @@ public static class GuestStayAccountDecider
             (CheckInGuest checkInGuest, null) => CheckIn(checkInGuest),
             (RecordCharge recordCharge, { } state) => RecordCharge(recordCharge, state),
             (RecordPayment recordPayment, { } state) => RecordPayment(recordPayment, state),
-            (CheckOutGuest checkOutGuest, { } state) => CheckOut(checkOutGuest, state),
+            (CheckOutGuest checkOutGuest, { } state) => Checkout(checkOutGuest, state),
             _ => throw new ArgumentOutOfRangeException(nameof(command))
         };
 
     public static GuestCheckedIn CheckIn(CheckInGuest command) =>
-        new(command.GuestStayId, command.Now);
+        new(command.GuestStayAccountId, command.Now);
 
     public static ChargeRecorded RecordCharge(RecordCharge command, GuestStayAccount state)
     {
-        if (state.Status != GuestStayAccountStatus.Opened)
+        if (state.Status != GuestStayAccountStatus.Open)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
         return new ChargeRecorded(state.Id, command.Amount, command.Now);
@@ -54,33 +54,33 @@ public static class GuestStayAccountDecider
 
     public static PaymentRecorded RecordPayment(RecordPayment command, GuestStayAccount state)
     {
-        if (state.Status != GuestStayAccountStatus.Opened)
+        if (state.Status != GuestStayAccountStatus.Open)
             throw new InvalidOperationException("Cannot record charge for not opened account");
 
         return new PaymentRecorded(state.Id, command.Amount, command.Now);
     }
 
-    public static GuestStayAccountEvent CheckOut(CheckOutGuest command, GuestStayAccount state)
+    public static GuestStayAccountEvent Checkout(CheckOutGuest command, GuestStayAccount state)
     {
-        if (state.Status != GuestStayAccountStatus.Opened)
-            return new GuestCheckOutFailed(
+        if (state.Status != GuestStayAccountStatus.Open)
+            return new GuestCheckoutFailed(
                 state.Id,
-                GuestCheckOutFailed.FailureReason.NotOpened,
+                GuestCheckoutFailed.FailureReason.InvalidState,
                 command.Now,
-                command.GroupCheckOutId
+                command.GroupCheckoutId
             );
 
         return state.IsSettled
             ? new GuestCheckedOut(
                 state.Id,
                 command.Now,
-                command.GroupCheckOutId
+                command.GroupCheckoutId
             )
-            : new GuestCheckOutFailed(
+            : new GuestCheckoutFailed(
                 state.Id,
-                GuestCheckOutFailed.FailureReason.BalanceNotSettled,
+                GuestCheckoutFailed.FailureReason.BalanceNotSettled,
                 command.Now,
-                command.GroupCheckOutId
+                command.GroupCheckoutId
             );
     }
 }

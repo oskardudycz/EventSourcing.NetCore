@@ -57,7 +57,7 @@ public class IdempotencyTests
         // Then
 
         await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckoutCompleted(groupCheckoutId, guestStays[0], now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStays[0], now));
     }
 
     [Fact]
@@ -83,15 +83,15 @@ public class IdempotencyTests
         // Then
 
         await backgroundJobs.RunUntilIdle(publishedMessages, TestContext.Current.CancellationToken);
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckOutFailed(groupCheckoutId, guestStays[0], now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckoutFailureRecorded(groupCheckoutId, guestStays[0], now));
     }
 
     private readonly Database database = new();
     private readonly MessageBus messageBus = new();
     private readonly BackgroundJobs backgroundJobs = new();
     private readonly MessageCatcher publishedMessages = new();
-    private readonly GuestStayFacade guestStayFacade;
-    private readonly GroupCheckOutFacade groupCheckoutFacade;
+    private readonly GuestStayAccountFacade guestStayFacade;
+    private readonly GroupCheckoutFacade groupCheckoutFacade;
     private readonly Faker generate = new();
     private readonly DateTimeOffset now = DateTimeOffset.Now;
     private readonly ITestOutputHelper testOutputHelper;
@@ -99,8 +99,8 @@ public class IdempotencyTests
     public IdempotencyTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        guestStayFacade = new GuestStayFacade(database, messageBus, backgroundJobs);
-        groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus, backgroundJobs);
+        guestStayFacade = new GuestStayAccountFacade(database, messageBus, backgroundJobs);
+        groupCheckoutFacade = new GroupCheckoutFacade(database, messageBus, backgroundJobs);
 
         messageBus.Use(publishedMessages.Catch);
     }

@@ -5,13 +5,13 @@ namespace Consistency.Version1_Aggregates.GroupCheckouts;
 
 using static GroupCheckoutCommand;
 
-public class GroupCheckOutFacade
+public class GroupCheckoutFacade
 {
     private static readonly Guid OutboxId = new("83dcd2c1-28e9-4de1-abce-56466496a0dc");
 
     private readonly Database database;
 
-    public GroupCheckOutFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
+    public GroupCheckoutFacade(Database database, MessageBus messageBus, BackgroundJobs backgroundJobs)
     {
         this.database = database;
 
@@ -21,14 +21,14 @@ public class GroupCheckOutFacade
     public async ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default) =>
         await Retry.OnConflict(async token => await Retry.UntilSucceeds(_ => database.Transaction(async transaction =>
         {
-            if (await transaction.Get<GroupCheckOut>(command.GroupCheckoutId, token) != null)
+            if (await transaction.Get<GroupCheckout>(command.GroupCheckoutId, token) != null)
                 return;
 
             var groupCheckout =
-                GroupCheckOut.Initiate(
+                GroupCheckout.Initiate(
                     command.GroupCheckoutId,
                     command.ClerkId,
-                    command.GuestStayIds,
+                    command.GuestStayAccountIds,
                     command.Now
                 );
 
@@ -43,10 +43,10 @@ public class GroupCheckOutFacade
     ) =>
         await Retry.OnConflict(async token => await Retry.UntilSucceeds(_ => database.Transaction(async transaction =>
         {
-            var (groupCheckout, version) = await transaction.Get<GroupCheckOut>(command.GroupCheckoutId, token)
+            var (groupCheckout, version) = await transaction.Get<GroupCheckout>(command.GroupCheckoutId, token)
                                            ?? throw new InvalidOperationException("Entity not found");
 
-            groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayId, command.CompletedAt);
+            groupCheckout.RecordGuestCheckoutCompletion(command.GuestStayAccountId, command.Now);
 
             await transaction.Store(command.GroupCheckoutId, groupCheckout, version, token);
 
@@ -59,10 +59,10 @@ public class GroupCheckOutFacade
     ) =>
         await Retry.OnConflict(async token => await Retry.UntilSucceeds(_ => database.Transaction(async transaction =>
         {
-            var (groupCheckout, version) = await transaction.Get<GroupCheckOut>(command.GroupCheckoutId, token)
+            var (groupCheckout, version) = await transaction.Get<GroupCheckout>(command.GroupCheckoutId, token)
                                            ?? throw new InvalidOperationException("Entity not found");
 
-            groupCheckout.RecordGuestCheckoutFailure(command.GuestStayId, command.FailedAt);
+            groupCheckout.RecordGuestCheckoutFailure(command.GuestStayAccountId, command.Now);
 
             await transaction.Store(command.GroupCheckoutId, groupCheckout, version, token);
 
@@ -75,20 +75,20 @@ public abstract record GroupCheckoutCommand
     public record InitiateGroupCheckout(
         Guid GroupCheckoutId,
         Guid ClerkId,
-        Guid[] GuestStayIds,
+        Guid[] GuestStayAccountIds,
         DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutCompletion(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset CompletedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     public record RecordGuestCheckoutFailure(
         Guid GroupCheckoutId,
-        Guid GuestStayId,
-        DateTimeOffset FailedAt
+        Guid GuestStayAccountId,
+        DateTimeOffset Now
     ): GroupCheckoutCommand;
 
     private GroupCheckoutCommand() { }

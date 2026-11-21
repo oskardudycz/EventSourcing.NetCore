@@ -12,18 +12,18 @@ public class EventsDefinitionTests
     public void GuestStayAccountEventTypes_AreDefined()
     {
         // Given
-        var guestStayId = Guid.NewGuid();
+        var guestStayAccountId = Guid.NewGuid();
         var groupCheckoutId = Guid.NewGuid();
 
         // When
         var events = new GuestStayAccountEvent[]
         {
-            new GuestCheckedIn(guestStayId, DateTimeOffset.Now),
-            new ChargeRecorded(guestStayId, 100, DateTimeOffset.Now),
-            new PaymentRecorded(guestStayId, 100, DateTimeOffset.Now),
-            new GuestCheckedOut(guestStayId, DateTimeOffset.Now, groupCheckoutId),
-            new GuestStayAccountEvent.GuestCheckOutFailed(guestStayId,
-                GuestStayAccountEvent.GuestCheckOutFailed.FailureReason.NotOpened, DateTimeOffset.Now,
+            new GuestCheckedIn(guestStayAccountId, DateTimeOffset.Now),
+            new ChargeRecorded(guestStayAccountId, 100, DateTimeOffset.Now),
+            new PaymentRecorded(guestStayAccountId, 100, DateTimeOffset.Now),
+            new GuestCheckedOut(guestStayAccountId, DateTimeOffset.Now, groupCheckoutId),
+            new GuestStayAccountEvent.GuestCheckoutFailed(guestStayAccountId,
+                GuestStayAccountEvent.GuestCheckoutFailed.FailureReason.InvalidState, DateTimeOffset.Now,
                 groupCheckoutId)
         };
 
@@ -38,17 +38,17 @@ public class EventsDefinitionTests
     {
         // Given
         var groupCheckoutId = Guid.NewGuid();
-        Guid[] guestStayIds = [Guid.NewGuid(), Guid.NewGuid()];
+        Guid[] guestStayAccountIds = [Guid.NewGuid(), Guid.NewGuid()];
         var clerkId = Guid.NewGuid();
 
         // When
         var events = new GroupCheckoutEvent[]
         {
-            new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStayIds, DateTimeOffset.Now),
-            new GuestCheckoutCompleted(groupCheckoutId, guestStayIds[0], DateTimeOffset.Now),
-            new GroupCheckoutEvent.GuestCheckOutFailed(groupCheckoutId, guestStayIds[1], DateTimeOffset.Now),
-            new GroupCheckoutFailed(groupCheckoutId, [guestStayIds[0]], [guestStayIds[1]], DateTimeOffset.Now),
-            new GroupCheckoutCompleted(groupCheckoutId, guestStayIds, DateTimeOffset.Now)
+            new GroupCheckoutInitiated(groupCheckoutId, clerkId, guestStayAccountIds, DateTimeOffset.Now),
+            new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStayAccountIds[0], DateTimeOffset.Now),
+            new GroupCheckoutEvent.GuestCheckoutFailureRecorded(groupCheckoutId, guestStayAccountIds[1], DateTimeOffset.Now),
+            new GroupCheckoutFailed(groupCheckoutId, [guestStayAccountIds[0]], [guestStayAccountIds[1]], DateTimeOffset.Now),
+            new GroupCheckoutCompleted(groupCheckoutId, guestStayAccountIds, DateTimeOffset.Now)
         };
 
         // Then

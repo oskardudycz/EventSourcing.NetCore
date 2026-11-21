@@ -50,7 +50,7 @@ public class IdempotencyTests
 
         // Then
 
-        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckoutCompleted(groupCheckoutId, guestStays[0], now));
+        publishedMessages.ShouldReceiveSingleMessage(new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStays[0], now));
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class IdempotencyTests
         // Then
 
         publishedMessages.ShouldReceiveSingleMessage(
-            new GroupCheckoutEvent.GuestCheckOutFailed(groupCheckoutId, guestStays[0], now));
+            new GroupCheckoutEvent.GuestCheckoutFailureRecorded(groupCheckoutId, guestStays[0], now));
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class IdempotencyTests
         // Then
         publishedMessages.ShouldReceiveMessages(
             [
-                new GuestCheckoutCompleted(groupCheckoutId, guestStays[1], now),
+                new GuestCheckoutCompletionRecorded(groupCheckoutId, guestStays[1], now),
                 new GroupCheckoutCompleted(groupCheckoutId, guestStays, now)
             ]
         );
@@ -106,12 +106,12 @@ public class IdempotencyTests
     private readonly Database database = new();
     private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();
-    private readonly GroupCheckOutFacade groupCheckoutFacade;
+    private readonly GroupCheckoutFacade groupCheckoutFacade;
     private readonly DateTimeOffset now = DateTimeOffset.Now;
 
     public IdempotencyTests()
     {
-        groupCheckoutFacade = new GroupCheckOutFacade(database, messageBus);
+        groupCheckoutFacade = new GroupCheckoutFacade(database, messageBus);
 
         messageBus.Use(publishedMessages.Catch);
     }
