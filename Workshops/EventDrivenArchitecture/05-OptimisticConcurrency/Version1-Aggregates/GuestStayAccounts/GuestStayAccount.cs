@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using OptimisticConcurrency.Core;
+using OptimisticConcurrency.Version1_Aggregates.Core;
 
 namespace OptimisticConcurrency.Version1_Aggregates.GuestStayAccounts;
 

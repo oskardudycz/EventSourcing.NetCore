@@ -29,16 +29,36 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
         throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
     }
 
-    public ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
+    public async ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default)
     {
-        // TODO: Fill the implementation calling your entity/aggregate
+        // TODO: Fill the implementation calling your entity/aggregate, for instance:
+        var entity = await database.Get<object>(command.GuestStayId, ct) // use here your real type
+                     ?? throw new InvalidOperationException("Entity not found");
+
+        // entity.DoSomething();
+
+        object[] events = [new object()]; // get the new event(s) as an outcome of the business logic
+
+        await database.Store(command.GuestStayId, entity, ct);
+        await messageBus.Publish(events, ct);
+
         throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
     }
 
-    public ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
+    public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
     {
-        // TODO: Fill the implementation calling your entity/aggregate
-        throw new NotImplementedException();
+        // TODO: Fill the implementation calling your entity/aggregate, for instance:
+        var entity = await database.Get<object>(command.GuestStayId, ct) // use here your real type
+                     ?? throw new InvalidOperationException("Entity not found");
+
+        // entity.DoSomething();
+
+        object[] events = [new object()]; // get the new event(s) as an outcome of the business logic
+
+        await database.Store(command.GuestStayId, entity, ct);
+        await messageBus.Publish(events, ct);
+
+        throw new NotImplementedException("TODO: Fill the implementation calling your entity/aggregate");
     }
 
     public ValueTask InitiateGroupCheckout(InitiateGroupCheckout command, CancellationToken ct = default)

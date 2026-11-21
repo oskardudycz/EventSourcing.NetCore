@@ -59,5 +59,18 @@ public class Database
         return result;
     }
 
+    public ValueTask<T[]> FindAll<T>(CancellationToken _) where T : class
+    {
+        lock (storageLock)
+        {
+            return ValueTask.FromResult(
+                storage
+                    .Where(entry => entry.Key.StartsWith($"{typeof(T).Name}-"))
+                    .Select(entry => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize((T)entry.Value.Document))!)
+                    .ToArray()
+            );
+        }
+    }
+
     private static string GetId<T>(Guid id) => $"{typeof(T).Name}-{id}";
 }

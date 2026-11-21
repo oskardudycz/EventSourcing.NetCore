@@ -112,11 +112,12 @@ public record GuestStayAccount(
             _ => this
         };
 
-    public static readonly GuestStayAccount Initial = new(default, default, default);
+    public static readonly GuestStayAccount Initial = new(default, default, GuestStayAccountStatus.NotExisting);
 }
 
 public enum GuestStayAccountStatus
 {
+    NotExisting = 0,
     Opened = 1,
     CheckedOut = 2
 }

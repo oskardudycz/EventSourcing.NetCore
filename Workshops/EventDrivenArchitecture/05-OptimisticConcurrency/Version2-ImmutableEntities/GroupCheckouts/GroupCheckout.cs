@@ -1,4 +1,4 @@
-using OptimisticConcurrency.Core;
+using OptimisticConcurrency.Version2_ImmutableEntities.Core;
 
 namespace OptimisticConcurrency.Version2_ImmutableEntities.GroupCheckouts;
 
@@ -44,7 +44,7 @@ public abstract record GroupCheckoutEvent
 public record GroupCheckOut(
     Guid Id,
     Dictionary<Guid, CheckoutStatus> GuestStayCheckouts,
-    CheckoutStatus Status = CheckoutStatus.Initiated
+    CheckoutStatus Status = CheckoutStatus.NotExisting
 )
 {
     public static GroupCheckoutInitiated Initiate(Guid groupCheckoutId, Guid clerkId, Guid[] guestStayIds,
@@ -145,11 +145,12 @@ public record GroupCheckOut(
             _ => this
         };
 
-    public static GroupCheckOut Initial = new(default, [], default);
+    public static GroupCheckOut Initial = new(default, [], CheckoutStatus.NotExisting);
 }
 
 public enum CheckoutStatus
 {
+    NotExisting,
     Initiated,
     Completed,
     Failed

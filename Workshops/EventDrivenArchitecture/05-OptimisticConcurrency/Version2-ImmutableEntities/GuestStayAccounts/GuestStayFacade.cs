@@ -23,8 +23,20 @@ public class GuestStayFacade(Database database, MessageBus messageBus)
     public ValueTask RecordPayment(RecordPayment command, CancellationToken ct = default) =>
         Handle(command.GuestStayId, account => account.RecordPayment(command.PaymentId, command.Amount, command.Now), ct);
 
-    public ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default) =>
-        Handle(command.GuestStayId, account => account.CheckOut(command.Now, command.GroupCheckOutId), ct);
+    public async ValueTask CheckOutGuest(CheckOutGuest command, CancellationToken ct = default)
+    {
+        var account = (await database.Get<GuestStayAccount>(command.GuestStayId, ct))?.Document;
+        if (account == null)
+            return;
+
+        var events = account.CheckOut(command.Now, command.GroupCheckOutId);
+
+        if (events.Length == 0)
+            return;
+
+        await database.Store(command.GuestStayId, events.Aggregate(account, (state, @event) => state.Evolve(@event)), ct);
+        await messageBus.Publish(events.Cast<object>().ToArray(), ct);
+    }
 
     private async ValueTask Handle(
         Guid guestStayId,

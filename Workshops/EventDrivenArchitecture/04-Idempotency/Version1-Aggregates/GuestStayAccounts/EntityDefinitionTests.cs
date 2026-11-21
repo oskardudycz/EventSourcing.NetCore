@@ -132,6 +132,38 @@ public class EntityDefinitionTests
         publishedMessages.ShouldReceiveSingleMessage(new GuestCheckOutFailed(guestStayId, GuestCheckOutFailed.FailureReason.BalanceNotSettled, now));
     }
 
+    [Fact]
+    public async Task RecordingChargeForMissingGuestStayAccount_FailsWithEntityNotFound()
+    {
+        // Given
+        var command = new RecordCharge(Guid.NewGuid(), Guid.NewGuid(), generate.Finance.Amount(), now);
+        publishedMessages.Reset();
+
+        // When
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await guestStayFacade.RecordCharge(command, TestContext.Current.CancellationToken));
+
+        // Then
+        Assert.Equal("Entity not found", exception.Message);
+        publishedMessages.ShouldNotReceiveAnyMessage();
+    }
+
+    [Fact]
+    public async Task RecordingPaymentForMissingGuestStayAccount_FailsWithEntityNotFound()
+    {
+        // Given
+        var command = new RecordPayment(Guid.NewGuid(), Guid.NewGuid(), generate.Finance.Amount(), now);
+        publishedMessages.Reset();
+
+        // When
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await guestStayFacade.RecordPayment(command, TestContext.Current.CancellationToken));
+
+        // Then
+        Assert.Equal("Entity not found", exception.Message);
+        publishedMessages.ShouldNotReceiveAnyMessage();
+    }
+
     private readonly Database database = new();
     private readonly MessageBus messageBus = new();
     private readonly MessageCatcher publishedMessages = new();

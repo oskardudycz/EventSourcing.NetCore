@@ -5,7 +5,6 @@ namespace OptimisticConcurrency.Version1_Aggregates.GroupCheckouts;
 
 using static GuestStayAccountEvent;
 using static GroupCheckoutCommand;
-using static SagaResult;
 
 public static class GroupCheckoutsConfig
 {
@@ -14,20 +13,12 @@ public static class GroupCheckoutsConfig
         GroupCheckOutFacade groupCheckoutFacade
     )
     {
+        var saga = new GroupCheckoutSaga(messageBus);
+
         messageBus
-            .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>((@event, ct) =>
-                messageBus.Publish(GroupCheckoutSaga.Handle(@event).Select(c => c.Message).ToArray(), ct)
-            )
-            .Subscribe<GuestCheckedOut>((@event, ct) =>
-                GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutCompletion>(var command)
-                    ? messageBus.Publish([command], ct)
-                    : ValueTask.CompletedTask
-            )
-            .Subscribe<GuestCheckOutFailed>((@event, ct) =>
-                GroupCheckoutSaga.Handle(@event) is Command<RecordGuestCheckoutFailure>(var command)
-                    ? messageBus.Publish([command], ct)
-                    : ValueTask.CompletedTask
-            );
+            .Subscribe<GroupCheckoutEvent.GroupCheckoutInitiated>(saga.Handle)
+            .Subscribe<GuestCheckedOut>(saga.Handle)
+            .Subscribe<GuestCheckOutFailed>(saga.Handle);
 
         messageBus.Subscribe<RecordGuestCheckoutCompletion>(groupCheckoutFacade.RecordGuestCheckoutCompletion);
         messageBus.Subscribe<RecordGuestCheckoutFailure>(groupCheckoutFacade.RecordGuestCheckoutFailure);

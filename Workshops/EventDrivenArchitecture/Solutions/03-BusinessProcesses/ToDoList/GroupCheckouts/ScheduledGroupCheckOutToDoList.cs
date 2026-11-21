@@ -6,7 +6,7 @@ public class ScheduledGroupCheckOutToDoList(Database database, GroupCheckOutToDo
 {
     public async ValueTask HandleAll(CancellationToken ct = default)
     {
-        foreach (var groupCheckout in await database.GetAll<GroupCheckOut>(ct))
+        foreach (var groupCheckout in await database.FindAll<GroupCheckOut>(ct))
             await groupCheckoutToDoList.TryComplete(groupCheckout, ct);
     }
 }

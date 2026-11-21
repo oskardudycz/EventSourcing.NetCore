@@ -1,6 +1,6 @@
 ﻿    using OptimisticConcurrency.Core;
 
-    namespace OptimisticConcurrency.Version1_Aggregates.GuestStayAccounts;
+namespace OptimisticConcurrency.Version1_Aggregates.GuestStayAccounts;
 
 using static GuestStayAccountCommand;
 

@@ -1,4 +1,5 @@
-﻿using OptimisticConcurrency.Version2_ImmutableEntities.GuestStayAccounts;
+﻿using OptimisticConcurrency.Core;
+using OptimisticConcurrency.Version2_ImmutableEntities.GuestStayAccounts;
 
 namespace OptimisticConcurrency.Version2_ImmutableEntities.GroupCheckouts;
 
@@ -6,55 +7,49 @@ using static GroupCheckoutCommand;
 using static GroupCheckoutEvent;
 using static GuestStayAccountCommand;
 using static GuestStayAccountEvent;
-using static SagaResult;
 
-public static class GroupCheckoutSaga
+public class GroupCheckoutSaga(MessageBus messageBus)
 {
-    public static Command<CheckOutGuest>[] Handle(GroupCheckoutInitiated @event) =>
-        @event.GuestStayIds.Select(guestAccountId =>
-            Send(new CheckOutGuest(guestAccountId, @event.InitiatedAt, @event.GroupCheckoutId))
-        ).ToArray();
+    public ValueTask Handle(GroupCheckoutInitiated @event, CancellationToken ct) =>
+        messageBus.Publish(
+            @event.GuestStayIds
+                .Select(guestAccountId => new CheckOutGuest(guestAccountId, @event.InitiatedAt, @event.GroupCheckoutId))
+                .Cast<object>()
+                .ToArray(),
+            ct
+        );
 
-    public static SagaResult Handle(GuestCheckedOut @event)
+    public ValueTask Handle(GuestCheckedOut @event, CancellationToken ct)
     {
         if (!@event.GroupCheckOutId.HasValue)
-            return Ignore;
+            return ValueTask.CompletedTask;
 
-        return Send(
-            new RecordGuestCheckoutCompletion(
-                @event.GroupCheckOutId.Value,
-                @event.GuestStayId,
-                @event.CheckedOutAt
-            )
+        return messageBus.Publish(
+            [
+                new RecordGuestCheckoutCompletion(
+                    @event.GroupCheckOutId.Value,
+                    @event.GuestStayId,
+                    @event.CheckedOutAt
+                )
+            ],
+            ct
         );
     }
 
-    public static SagaResult Handle(GuestStayAccountEvent.GuestCheckOutFailed @event)
+    public ValueTask Handle(GuestStayAccountEvent.GuestCheckOutFailed @event, CancellationToken ct)
     {
         if (!@event.GroupCheckOutId.HasValue)
-            return Ignore;
+            return ValueTask.CompletedTask;
 
-        return Send(
-            new RecordGuestCheckoutFailure(
-                @event.GroupCheckOutId.Value,
-                @event.GuestStayId,
-                @event.FailedAt
-            )
+        return messageBus.Publish(
+            [
+                new RecordGuestCheckoutFailure(
+                    @event.GroupCheckOutId.Value,
+                    @event.GuestStayId,
+                    @event.FailedAt
+                )
+            ],
+            ct
         );
     }
-};
-
-public abstract record SagaResult
-{
-    public record Command<T>(T Message): SagaResult;
-
-    public record Event<T>(T Message): SagaResult;
-
-    public record None: SagaResult;
-
-    public static Command<T> Send<T>(T command) => new(command);
-
-    public static Event<T> Publish<T>(T @event) => new(@event);
-
-    public static readonly None Ignore = new();
 }

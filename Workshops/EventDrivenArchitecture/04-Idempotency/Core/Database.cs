@@ -28,7 +28,7 @@ public class Database
                 : null
         );
 
-    public ValueTask<T[]> GetAll<T>(CancellationToken _) where T : class =>
+    public ValueTask<T[]> FindAll<T>(CancellationToken _) where T : class =>
         ValueTask.FromResult(
             storage
                 .Where(entry => entry.Key.StartsWith($"{typeof(T).Name}-"))
